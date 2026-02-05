@@ -1,0 +1,227 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap');
+@import './styles/theme.css';
+@import './styles/ui.css';
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  color: var(--text);
+  background: var(--bg);
+  font-family: var(--font-body);
+  line-height: 1.55;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Atmospheric background: subtle mesh + grid */
+body::before {
+  content: '';
+  position: fixed;
+  inset: -40vmax;
+  background:
+    radial-gradient(closest-side at 20% 25%, rgba(124, 255, 203, 0.08), transparent 60%),
+    radial-gradient(closest-side at 75% 20%, rgba(110, 115, 255, 0.08), transparent 55%),
+    radial-gradient(closest-side at 70% 75%, rgba(255, 184, 107, 0.05), transparent 55%),
+    radial-gradient(closest-side at 20% 75%, rgba(255, 255, 255, 0.04), transparent 60%);
+  filter: blur(18px);
+  opacity: 0.95;
+  pointer-events: none;
+  z-index: -2;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.035) 1px, transparent 1px, transparent 42px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.03) 1px, transparent 1px, transparent 42px);
+  opacity: 0.16;
+  pointer-events: none;
+  z-index: -1;
+  mix-blend-mode: screen;
+}
+
+a {
+  color: rgba(124, 255, 203, 0.92);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  letter-spacing: 0.18px;
+  margin: 0;
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.95em;
+  color: rgba(255, 255, 255, 0.86);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+pre {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.45;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  overflow: auto;
+}
+
+/* Safe defaults so legacy pages still look decent */
+button {
+  appearance: none;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 10px 12px;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.2px;
+  color: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease;
+}
+
+button:hover {
+  border-color: rgba(124, 255, 203, 0.22);
+  background: rgba(124, 255, 203, 0.06);
+  box-shadow: 0 0 0 3px rgba(124, 255, 203, 0.08);
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+input[type='checkbox'],
+input[type='radio'] {
+  accent-color: var(--accent);
+}
+
+input:not([type='checkbox']):not([type='radio']):not([type='file']),
+textarea,
+select {
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.92);
+  padding: 10px 12px;
+  font-family: var(--font-body);
+  outline: none;
+  /* Hint native controls to use dark UI (helps Windows <select> popups). */
+  color-scheme: dark;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
+}
+
+/* Native <select> dropdown menus on Windows may keep a light popup background
+   even in dark pages. Ensure options remain readable. */
+select option,
+select optgroup {
+  color: rgba(255, 255, 255, 0.92);
+  background: #0b0f14;
+}
+
+textarea {
+  resize: vertical;
+}
+
+input:not([type='checkbox']):not([type='radio']):not([type='file']):focus,
+textarea:focus,
+select:focus {
+  border-color: rgba(124, 255, 203, 0.32);
+  box-shadow: 0 0 0 4px var(--ring);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Markdown rendering (Ask answers, evidence snippets, etc.) */
+.markdown {
+  overflow-wrap: anywhere;
+}
+
+.markdown p {
+  margin: 0 0 10px;
+}
+
+.markdown p:last-child {
+  margin-bottom: 0;
+}
+
+.markdown h1,
+.markdown h2,
+.markdown h3 {
+  margin: 14px 0 10px;
+  line-height: 1.25;
+}
+
+.markdown ul,
+.markdown ol {
+  margin: 8px 0 10px 20px;
+}
+
+.markdown blockquote {
+  margin: 10px 0;
+  padding: 8px 10px;
+  border-left: 3px solid rgba(124, 255, 203, 0.42);
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 10px;
+}
+
+.markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+}
+
+.markdown th,
+.markdown td {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 6px 8px;
+}
+
+.markdown img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.02);
+}

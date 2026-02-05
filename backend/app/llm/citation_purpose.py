@@ -1,0 +1,195 @@
+from __future__ import annotations
+
+import json
+import re
+from typing import Any
+
+from app.llm.client import call_json
+
+
+PURPOSE_LABELS = [
+    "Survey",
+    "Background",
+    "ProblemSetup",
+    "Theory",
+    "MethodUse",
+    "DataTool",
+    "BaselineCompare",
+    "SupportEvidence",
+    "CritiqueLimit",
+    "ExtendImprove",
+    "FutureDirection",
+]
+
+_TPL_RE = re.compile(r"\{\{\s*([A-Za-z][A-Za-z0-9_]*)\s*\}\}")
+
+
+def _render_template(template: str, vars: dict[str, Any]) -> str:
+    def _sub(m: re.Match[str]) -> str:
+        key = m.group(1)
+        v = vars.get(key)
+        if v is None:
+            return ""
+        if isinstance(v, (dict, list)):
+            return json.dumps(v, ensure_ascii=False)
+        return str(v)
+
+    return _TPL_RE.sub(_sub, template or "")
+
+
+def classify_citation_purpose(
+    citing_title: str,
+    cited_title: str | None,
+    cited_doi: str | None,
+    contexts: list[str],
+) -> dict:
+    contexts = [c.strip() for c in contexts if c and c.strip()]
+    contexts = contexts[:6]
+
+    system = (
+        "You classify the PURPOSE of a citation in a mechanics research paper.\n"
+        "Return STRICT JSON only.\n"
+        "Choose 1-3 labels from the allowed list and assign scores in [0,1] (higher=more likely).\n"
+        "If evidence is insufficient, return label Background with low confidence.\n"
+        f"Allowed labels: {', '.join(PURPOSE_LABELS)}"
+    )
+    user = (
+        f"Citing paper title: {citing_title}\n"
+        f"Cited paper title: {cited_title or ''}\n"
+        f"Cited paper DOI: {cited_doi or ''}\n\n"
+        "Evidence contexts (snippets around in-text citations):\n"
+        + "\n---\n".join(contexts)
+        + "\n\n"
+        "Output JSON schema:\n"
+        '{ "labels": ["MethodUse"], "scores": [0.72], "rationale": "short phrase" }\n'
+    )
+    out = call_json(system, user)
+    labels = out.get("labels") or []
+    scores = out.get("scores") or []
+    if not isinstance(labels, list) or not labels:
+        labels = ["Background"]
+    if not isinstance(scores, list) or len(scores) != len(labels):
+        scores = [0.4] * len(labels)
+    # sanitize
+    clean_labels = []
+    clean_scores = []
+    for l, s in zip(labels, scores):
+        if l not in PURPOSE_LABELS:
+            continue
+        try:
+            ss = float(s)
+        except Exception:
+            ss = 0.4
+        ss = max(0.0, min(1.0, ss))
+        clean_labels.append(l)
+        clean_scores.append(ss)
+    if not clean_labels:
+        clean_labels = ["Background"]
+        clean_scores = [0.4]
+    # keep top 3
+    pairs = sorted(zip(clean_labels, clean_scores), key=lambda x: x[1], reverse=True)[:3]
+    return {"labels": [p[0] for p in pairs], "scores": [p[1] for p in pairs], "raw": out}
+
+
+def classify_citation_purposes_batch(
+    citing_title: str,
+    cites: list[dict],
+    max_contexts_per_cite: int = 3,
+    max_context_chars: int = 900,
+    prompt_overrides: dict[str, Any] | None = None,
+) -> dict:
+    """
+    Classify purposes for many (A->B) citations in ONE LLM call.
+
+    `cites` items:
+      - cited_paper_id
+      - cited_title (optional)
+      - cited_doi (optional)
+      - contexts: list[str]
+    """
+    items = []
+    for c in cites[:60]:
+        ctxs = [x.strip() for x in (c.get("contexts") or []) if x and x.strip()]
+        ctxs = [x[:max_context_chars] for x in ctxs][:max_contexts_per_cite]
+        items.append(
+            {
+                "cited_paper_id": c.get("cited_paper_id"),
+                "cited_title": c.get("cited_title") or "",
+                "cited_doi": c.get("cited_doi") or "",
+                "contexts": ctxs,
+            }
+        )
+
+    default_system = (
+        "You classify the PURPOSE of citations in a mechanics paper.\n"
+        "Return STRICT JSON only.\n"
+        "For each cited_paper_id, output 1-3 labels from the allowed list and scores in [0,1].\n"
+        "Be conservative: if evidence is weak, use Background/Summary with low confidence.\n"
+        f"Allowed labels: {', '.join(PURPOSE_LABELS)}"
+    )
+    default_user = (
+        f"Citing paper title: {citing_title}\n\n"
+        "For each citation, you are given the cited paper metadata (may be empty) and context snippets.\n"
+        "Input JSON:\n"
+        + json.dumps({"cites": items}, ensure_ascii=False)
+        + "\n\n"
+        "Output JSON schema:\n"
+        "{\n"
+        '  "cites": [\n'
+        '    {"cited_paper_id": "doi:10....", "labels": ["MethodUse"], "scores":[0.72]}\n'
+        "  ]\n"
+        "}\n"
+    )
+
+    ov = prompt_overrides if isinstance(prompt_overrides, dict) else {}
+    system = str(ov.get("citation_purpose_batch_system") or "").strip() or default_system
+    user_t = str(ov.get("citation_purpose_batch_user_template") or "").strip()
+    if user_t:
+        user = _render_template(
+            user_t,
+            {
+                "citing_title": citing_title,
+                "cites_json": json.dumps({"cites": items}, ensure_ascii=False),
+                "allowed_labels": ", ".join(PURPOSE_LABELS),
+            },
+        )
+    else:
+        user = default_user
+
+    out = call_json(system, user)
+    rows = out.get("cites") or []
+    by_id: dict[str, dict] = {}
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        cited_paper_id = row.get("cited_paper_id")
+        if not cited_paper_id:
+            continue
+        labels = row.get("labels") or []
+        scores = row.get("scores") or []
+        if not isinstance(labels, list) or not labels:
+            labels = ["Background"]
+        if not isinstance(scores, list) or len(scores) != len(labels):
+            scores = [0.4] * len(labels)
+        clean_labels = []
+        clean_scores = []
+        for l, s in zip(labels, scores):
+            if l not in PURPOSE_LABELS:
+                continue
+            try:
+                ss = float(s)
+            except Exception:
+                ss = 0.4
+            ss = max(0.0, min(1.0, ss))
+            clean_labels.append(l)
+            clean_scores.append(ss)
+        if not clean_labels:
+            clean_labels = ["Background"]
+            clean_scores = [0.4]
+        pairs = sorted(zip(clean_labels, clean_scores), key=lambda x: x[1], reverse=True)[:3]
+        by_id[str(cited_paper_id)] = {
+            "labels": [p[0] for p in pairs],
+            "scores": [p[1] for p in pairs],
+        }
+
+    return {"by_id": by_id, "raw": out}
