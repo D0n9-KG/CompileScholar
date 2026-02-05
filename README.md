@@ -1,199 +1,349 @@
 ﻿# LogicKG
 
-力学领域科技论文知识图谱系统：
-- **单篇论文逻辑链条**（IMRaD 主线 + Claims）抽取并入库
-- **跨论文引用网络**：不仅存“引用了谁”，还存“引用目的”（多标签 + 置信度）
-- **证据可追溯**：回答与边属性都能回指到 MinerU `md` 的文本片段（chunk + 行号）
-- **GraphRAG**：向量召回（FAISS + `BAAI/bge-m3`）+ 图信息（Neo4j）+ DeepSeek 生成
+面向力学等科研论文的“结构化理解 + 可追溯证据”的知识图谱系统：将 MinerU 输出的论文 Markdown 解析为 **Paper / Chunk / ReferenceEntry / CITES** 等图结构，并结合向量检索（FAISS）与大模型生成，提供可交互的前端工作台（导入、浏览、图谱、问答、编辑与重建）。
+
+本仓库已做过一次清理：不包含运行产物（`backend/runs/`、`backend/storage/`）、依赖目录（`node_modules/`、`backend/.venv/`）与个人计划文档；适合直接上传到 GitHub 供他人部署。
 
 ---
 
-## 0. 目录结构（你需要关心的）
+## 1. 你将获得什么
 
-- `backend/`：FastAPI + 解析/抽取/写库/GraphRAG
-- `frontend/`：React 工作台（Ingest / Papers / Paper Detail / Unresolved / Ask）
-- `backend/runs/<run_id>/`：每次 ingest 的产物（解析 IR、Crossref、LLM 输出、FAISS 索引等）
-
----
-
-## 1. 前置条件（Windows / PowerShell）
-
-- Python 3.10+
-- Node 18+
-- Neo4j 5.x（推荐 Neo4j Desktop 本地启动）
-- API Key：
-  - DeepSeek：用于所有 LLM 生成/抽取
-  - SiliconFlow：用于 embedding（推荐 `BAAI/bge-m3`）
-
-说明：项目会读取 **项目根目录的 `.env`**（也支持 `backend/.env`）。
+- **图谱入库**：Paper、段落 Chunk、参考文献、引用关系（CITES）等写入 Neo4j
+- **引用网络**：不仅记录“引用了谁”，也支持“引用目的”（多标签 + 置信度）
+- **证据可追溯**：图谱边与回答可回指到 MinerU `md` 的文本片段（chunk + 行号/跨度）
+- **GraphRAG**：向量召回（FAISS）+ 图信息（Neo4j）+ LLM 生成
+- **前端工作台**：导入、论文列表、论文详情、未解析引用、图谱视图、问答、任务等
 
 ---
 
-## 2. 配置 `.env`（放在项目根目录）
+## 2. 系统架构（概览）
 
-根目录 `.env` 至少需要：
+```
+MinerU 输出(md+images)
+        |
+        v
+backend(FastAPI)  ----->  backend/storage/   (规范化存储：论文源文件、派生物等)
+   |  |  |               backend/runs/      (每次 ingest 的运行产物：IR、crossref、索引等)
+   |  |  +----->  FAISS 向量索引
+   |  +--------->  Neo4j (Paper/Chunk/CITES/...)
+   +------------>  LLM/Embeddings (DeepSeek/SiliconFlow/OpenAI/OpenRouter)
+
+frontend(React/Vite) <---- HTTP API ---- backend
+```
+
+---
+
+## 3. 目录结构（重要）
+
+> 下面带 “（生成/不提交）” 的目录会在运行时自动产生，默认在 `.gitignore` 中忽略。
+
+```
+.
+├─ backend/                 # FastAPI 后端
+│  ├─ app/                  # API、入库、RAG、任务等
+│  ├─ scripts/              # 辅助脚本（可选）
+│  ├─ runs/                 # （生成/不提交）每次 ingest 的产物
+│  ├─ storage/              # （生成/不提交）规范化存储与派生物
+│  └─ requirements.txt
+├─ frontend/                # React 前端工作台（Vite）
+├─ docs/
+│  └─ neo4j-setup.md         # Neo4j 本地启动说明
+├─ docker-compose.yml        # 仅用于启动 Neo4j（可选）
+├─ .env.example              # 根目录示例配置（复制为 .env）
+└─ run.ps1                   # Windows 一键启动（开发用）
+```
+
+---
+
+## 4. 上传 GitHub 前：敏感信息检查（已替你检查 + 你也可复查）
+
+结论（基于当前仓库内容）：
+- 未发现私钥块（`BEGIN ... PRIVATE KEY`）、常见 token 前缀（`ghp_`、`github_pat_`、`sk-` 等）
+- 仓库中出现的 `..._API_KEY` / `..._PASSWORD` 主要是 **示例占位符** 或配置字段名
+- **根目录 `.env` 已在 `.gitignore` 中忽略**，但请确保你本地 `.env` 没有被强制 add
+
+建议你推送前在仓库根目录执行：
+
+```bash
+git status -sb
+git ls-files | rg '\.env'          # 确认未提交 .env
+rg -n "ghp_|github_pat_|sk-|BEGIN .*PRIVATE KEY" -S .
+```
+
+如果你怀疑历史里曾经误提交过密钥：请立即在对应平台 **吊销并换新**（rotate），再考虑用 `git filter-repo` 清理历史。
+
+---
+
+## 5. 快速开始（本地开发）
+
+### 5.1 前置依赖
+
+- Python 3.10+（推荐 3.11）
+- Node.js 18+（推荐 20）
+- Neo4j 5.x（Neo4j Desktop 或 Docker 均可）
+- 需要的 API Key（至少一个 LLM）：
+  - DeepSeek：用于 LLM 生成/抽取（默认）
+  - SiliconFlow：用于 embedding（可选但推荐，默认模型 `BAAI/bge-m3`）
+
+### 5.2 配置 `.env`
+
+在项目根目录复制示例配置：
+
+```bash
+cp .env.example .env
+```
+
+然后编辑 `.env`（不要提交），至少保证 Neo4j 与 LLM 可用：
 
 ```env
-# Neo4j
 NEO4J_URI=bolt://localhost:7687
-NEO4J_USERNAME=neo4j
-NEO4J_PASSWORD=...
+NEO4J_USER=neo4j
+NEO4J_PASSWORD=请改成你自己的
 
-# LLM (DeepSeek, OpenAI-compatible)
-DEEPSEEK_API_KEY=...
 LLM_PROVIDER=deepseek
 LLM_MODEL=deepseek-chat
-
-# Embeddings (SiliconFlow, OpenAI-compatible)
-SILICONFLOW_API_KEY=...
-# 可选：显式指定（不写也能自动推断）
-EMBEDDING_PROVIDER=siliconflow
-EMBEDDING_MODEL=BAAI/bge-m3
+DEEPSEEK_API_KEY=你的_key
 ```
 
-默认 embedding base_url 为 `https://api.siliconflow.cn/v1`；如你账号只支持 `.com`，可在 `.env` 里加：
+#### 5.2.1 配置项说明（常用）
 
-```env
-EMBEDDING_BASE_URL=https://api.siliconflow.com/v1
+- `NEO4J_URI`：Neo4j Bolt 地址（默认 `bolt://localhost:7687`）
+- `NEO4J_USER` / `NEO4J_USERNAME`：Neo4j 用户名（后端同时兼容两个变量名）
+- `NEO4J_PASSWORD`：Neo4j 密码
+- `LLM_PROVIDER`：`deepseek | openrouter | openai`（默认 `deepseek`）
+- `LLM_MODEL`：LLM 模型名（例如 `deepseek-chat`）
+- `DEEPSEEK_API_KEY` / `OPENAI_API_KEY` / `OPENROUTER_API_KEY`：对应平台 key
+- `LLM_API_KEY`：可选；统一 key（优先级高于 provider-specific key）
+- `LLM_BASE_URL`：可选；自定义 OpenAI-compatible base url
+- `EMBEDDING_PROVIDER`：`siliconflow | openai | openrouter | deepseek | (空=禁用)`（可选）
+- `EMBEDDING_MODEL`：向量模型（例如 `BAAI/bge-m3`）
+- `SILICONFLOW_API_KEY`：SiliconFlow key（当 `EMBEDDING_PROVIDER=siliconflow`）
+- `EMBEDDING_API_KEY` / `EMBEDDING_BASE_URL`：可选；统一 embedding key / base url
+
+> 说明：后端会优先读取 `backend/.env`，其次读取根目录 `.env`；两者任选其一即可。
+
+### 5.3 启动 Neo4j（两种方式）
+
+方式 A：Neo4j Desktop（推荐新手）
+- 参考 `docs/neo4j-setup.md`
+
+方式 B：Docker Compose（可选）
+
+> 需要你已安装 Docker；本仓库的 `docker-compose.yml` 只负责启动 Neo4j。
+
+```bash
+docker compose up -d
 ```
 
----
+### 5.4 启动后端与前端
 
-## 3. 启动 Neo4j（无 Docker 推荐）
-
-如果你没有 Docker：参考 `docs/neo4j-setup.md`。
-
-启动后，你应该能连上：
-- Bolt：`bolt://localhost:7687`
-- Browser：`http://localhost:7474`
-
----
-
-## 4. 一键启动（推荐）
-
-在项目根目录一条命令启动前后端（Neo4j 仍需你先单独启动）：
+Windows（PowerShell，推荐一键）：
 
 ```powershell
 .\run.ps1
 ```
 
-等价命令（喜欢用 npm 的话）：
-
-```powershell
-npm run dev
-```
-
 启动后：
 - 前端：`http://127.0.0.1:5173/`
-- 后端：`http://127.0.0.1:8000/docs`
+- 后端 Swagger：`http://127.0.0.1:8000/docs`
+
+Linux / macOS（手动两终端）：
+
+终端 1（后端）：
+
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+终端 2（前端）：
+
+```bash
+cd frontend
+npm install
+cp .env.example .env.local
+npm run dev -- --host 127.0.0.1 --port 5173
+```
 
 ---
 
-## 5. 后端（FastAPI）启动与使用
+## 6. 使用方式
 
-### 5.1 安装依赖 & 启动
-
-```powershell
-cd backend
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-python -m uvicorn app.main:app --reload
-```
-
-Swagger 文档：`http://127.0.0.1:8000/docs`
-
-### 5.2 导入 MinerU Markdown（Ingest）
+### 6.1 导入 MinerU Markdown（Ingest）
 
 MinerU 通常是一篇论文一个文件夹，里面有：
 - `xxx.md`
-- `images/`
+- `images/`（或其他图片目录）
 
-你可以对**项目根目录**执行导入（会递归寻找 MinerU 输出的 `*.md`，并自动跳过 `backend/`、`frontend/`、`docs/`、`node_modules/`、`.venv/`、根目录 `README.md` 等）：
+后端提供 `POST /ingest/path`：递归查找指定路径下的 `*.md` 并导入（会跳过 `backend/`、`frontend/`、`docs/`、`node_modules/`、`.venv/` 等常见目录）。
 
-```powershell
-Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8000/ingest/path -ContentType application/json -Body (@{ path = "C:\\Users\\jd\\Desktop\\LogicKG" } | ConvertTo-Json)
-```
-
-如果你传入的是**单篇论文文件夹**（里面就是 `xxx.md` + `images/`），也可以直接导入该文件夹。
-
-> Windows PowerShell 有时会把中文路径编码成 `?` 导致后端找不到目录；建议用 UTF-8 bytes 方式提交 JSON：
->
-> ```powershell
-> $json = @{ path = "C:\\Users\\jd\\Desktop\\LogicKG" } | ConvertTo-Json -Compress
-> $bytes = [System.Text.Encoding]::UTF8.GetBytes($json)
-> Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8000/ingest/path -ContentType 'application/json; charset=utf-8' -Body $bytes
-> ```
-
-导入会做这些事（按顺序）：
-1) 解析 Markdown → `Chunk`（带行号范围）
-2) 抽取参考文献与 in-text citation → Crossref 解析 DOI → 写入 Neo4j
-3) DeepSeek 抽取：IMRaD + Claims；并为每条引用边生成“引用目的”多标签 → 写入 Neo4j
-4) SiliconFlow(bge-m3) 计算 chunk embedding → 建 FAISS → 用于 GraphRAG
-
-产物都在 `backend/runs/<run_id>/`：
-- `*.document_ir.json`（结构/引用事件）
-- `*.citations.json`（Crossref + cites）
-- `*.llm_imrad.json`（IMRaD + Claims）
-- `*.llm_citation_purposes.json`（引用目的）
-- `faiss/`（索引）
-
-### 5.3 GraphRAG 问答（Ask）
+PowerShell 示例：
 
 ```powershell
-Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8000/rag/ask -ContentType application/json -Body (@{ question = "What is the new dimensionless number introduced?"; k = 6 } | ConvertTo-Json)
+Invoke-RestMethod -Method Post `
+  -Uri http://127.0.0.1:8000/ingest/path `
+  -ContentType application/json `
+  -Body (@{ path = "D:\\papers\\mineru_output" } | ConvertTo-Json)
 ```
 
-返回包含：
-- `answer`（DeepSeek 生成）
-- `evidence[]`（FAISS 检索到的 chunk，含 md 路径与行号）
+curl 示例：
+
+```bash
+curl -X POST 'http://127.0.0.1:8000/ingest/path' \
+  -H 'Content-Type: application/json' \
+  -d '{"path":"/data/mineru_output"}'
+```
+
+导入后：
+- Neo4j 中会出现 Paper/Chunk/ReferenceEntry 等节点与关系
+- `backend/runs/` / `backend/storage/`（本地）会产生运行产物与规范化存储（均不提交）
+
+### 6.2 前端工作台
+
+打开前端首页后，你通常会按以下路径使用：
+1. Ingest：导入论文
+2. Papers / Paper Detail：浏览与定位证据
+3. Graph：查看引用网络/内容图
+4. Ask：基于 GraphRAG 的问答
+5. Unresolved：处理未能解析的引用
+
+### 6.3 后端 API 快速入口
+
+- Swagger（交互式文档）：`http://127.0.0.1:8000/docs`
+- 健康检查：`GET /health`
+- 导入：`POST /ingest/path`
+
+> 其余路由可直接在 Swagger 中查看（Graph、Papers、Tasks、Schema 等）。
 
 ---
 
-## 6. 前端（React 工作台）启动与使用
+## 7. 部署到服务器（推荐做法：Neo4j Docker + 后端 systemd + 前端 Nginx）
 
-```powershell
+> 下面以 Linux 服务器为例；目标是：外网只暴露 80/443（Nginx），Neo4j 端口不对公网开放。
+
+### 7.0 部署前准备（建议）
+
+- 目录规划：例如将仓库放到 `/opt/LogicKG`（或任意你习惯的位置）
+- 运行用户：建议创建专用用户（例如 `logickg`），避免用 root 直接跑后端
+- 数据持久化：
+  - `backend/storage/`：论文规范化存储与派生物（重要，建议定期备份）
+  - `backend/runs/`：每次 ingest 的运行产物（可按需清理，但用于复现与排查很有价值）
+- 安全建议：
+  - 不要把 Neo4j 的 `7474/7687` 直接暴露到公网
+  - `.env` 只放服务器本地，权限建议 `600`
+
+### 7.1 Neo4j（Docker）
+
+1) 在服务器上放置 `.env`（不要提交）：
+
+```env
+NEO4J_USER=neo4j
+NEO4J_PASSWORD=请改成强密码
+```
+
+2) 启动：
+
+```bash
+docker compose up -d
+```
+
+确保 Neo4j 只对内网或本机开放（可通过防火墙或反向代理策略控制）。
+
+### 7.2 后端（systemd）
+
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+建议以 `127.0.0.1:8000` 方式运行（由 Nginx 反代）：
+
+```bash
+uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 2 --proxy-headers
+```
+
+你可以创建一个 `systemd` 服务（示例，按需修改路径与用户）：
+
+```ini
+# /etc/systemd/system/logickg-backend.service
+[Unit]
+Description=LogicKG Backend
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/LogicKG/backend
+EnvironmentFile=/opt/LogicKG/.env
+ExecStart=/opt/LogicKG/backend/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 2
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+```
+
+启用并启动服务：
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now logickg-backend
+sudo systemctl status logickg-backend
+```
+
+### 7.3 前端（构建 + Nginx 静态托管）
+
+1) 构建：
+
+```bash
 cd frontend
-npm install
-Copy-Item .env.example .env.local
-npm run dev
+echo 'VITE_API_URL=/api' > .env.production
+npm ci
+npm run build
 ```
 
-打开：`http://127.0.0.1:5173/`
+2) 将 `frontend/dist/` 部署到 Nginx 的静态目录，例如 `/var/www/logickg/`。
 
-页面说明：
-- `Ingest`：点 Run 触发导入（用你填写的 path）
-- `Papers`：论文列表（点击进详情）
-- `Paper` 详情：
-  - Logic Chain (IMRaD)：DeepSeek 摘要链
-  - Claims：论文关键主张
-  - Outgoing Cites：引用边 + 引用目的标签（可点击标签进行手工修正）
-- `Unresolved`：未解析引用条目（Crossref candidates 展开 + 手填 DOI 修复）
-- `Ask`：GraphRAG 问答 + Evidence 卡片
+3) Nginx 示例配置（同时反代后端 `/api`）：
+
+```nginx
+server {
+  listen 80;
+  server_name your.domain.com;
+
+  root /var/www/logickg;
+  index index.html;
+
+  location / {
+    try_files $uri $uri/ /index.html;
+  }
+
+  location /api/ {
+    proxy_pass http://127.0.0.1:8000/;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  }
+}
+```
+
+启用 HTTPS：推荐使用 certbot / acme 自动签证书（略）。
 
 ---
 
-## 7. 常见问题（Troubleshooting）
+## 8. 常见问题（Troubleshooting）
 
-### 7.1 `faiss_built=false`
-
-- 检查 `.env` 是否配置：`SILICONFLOW_API_KEY`
-- 检查 `EMBEDDING_BASE_URL` 是否和账号匹配（`.cn` / `.com`）
-
-### 7.2 `neo4j_written=false`
-
-- 确认 Neo4j 已启动并且 `NEO4J_URI/NEO4J_USERNAME/NEO4J_PASSWORD` 正确
-
-### 7.3 Paper 详情页 404
-
-`paper_id` 采用 `doi:...`（包含 `/`），后端已支持该路径参数；如仍出现旧数据干扰，建议清库后重新 ingest。
+- Neo4j 连不上：确认 `NEO4J_URI`（bolt 7687）与账号密码；检查防火墙/端口占用
+- 端口冲突：Windows 开发建议直接用 `run.ps1`（会自动避开被系统保留/占用的端口）
+- Embedding 不可用：可先不配 `EMBEDDING_PROVIDER`（系统会退化到更弱的检索能力），或改用你可用的平台
+- 导入慢/失败：先在后端 Swagger（`/docs`）观察任务与报错；检查 MinerU 输出路径是否包含大量无关 md
 
 ---
 
-## 8. （可选）清空 Neo4j 重新开始
+## 9. License
 
-在 Neo4j Browser 里执行（慎用，会删光）：
-
-```cypher
-MATCH (n) DETACH DELETE n;
-```
+如需开源发布，请补充许可证（LICENSE）与贡献指南（CONTRIBUTING）。

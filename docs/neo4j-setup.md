@@ -20,3 +20,20 @@ NEO4J_PASSWORD=neo4j_password
 启动后端后：
 - 先调用 `POST /ingest/path` 导入 MinerU 输出的 `*.md`
 - 再打开 Neo4j Browser 验证图结构（`Paper` / `Chunk` / `ReferenceEntry` / `CITES` 等）
+
+---
+
+## 用 Docker Compose 启动（可选）
+
+如果你有 Docker，也可以使用仓库根目录的 `docker-compose.yml` 启动 Neo4j：
+
+1. 复制根目录 `.env.example` 为 `.env`，设置 `NEO4J_USER` / `NEO4J_PASSWORD`（或使用 `NEO4J_USERNAME`）
+2. 启动：
+
+```bash
+docker compose up -d
+```
+
+然后访问：
+- Neo4j Browser：`http://localhost:7474`
+- Bolt：`bolt://localhost:7687`
