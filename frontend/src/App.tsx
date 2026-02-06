@@ -7,6 +7,7 @@ import HomePage from './pages/HomePage'
 import IngestPage from './pages/IngestPage'
 import PaperDetailPage from './pages/PaperDetailPage'
 import PapersPage from './pages/PapersPage'
+import EvolutionPage from './pages/EvolutionPage'
 import SchemaPage from './pages/SchemaPage'
 import TasksPage from './pages/TasksPage'
 import UnresolvedPage from './pages/UnresolvedPage'
@@ -19,6 +20,7 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/ingest" element={<IngestPage />} />
           <Route path="/graph" element={<GraphPage />} />
+          <Route path="/evolution" element={<EvolutionPage />} />
           <Route path="/content" element={<ContentPage />} />
           <Route path="/papers" element={<PapersPage />} />
           <Route path="/paper/:paperId" element={<PaperDetailPage />} />

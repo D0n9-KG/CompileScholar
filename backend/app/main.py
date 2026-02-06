@@ -10,11 +10,13 @@ from app.api.routers.papers import router as papers_router
 from app.api.routers.paper_edits import router as paper_edits_router
 from app.api.routers.schema import router as schema_router
 from app.api.routers.collections import router as collections_router
+from app.api.routers.evolution import router as evolution_router
 
 from app.tasks.handlers import (
     handle_ingest_path,
     handle_ingest_upload_ready,
     handle_rebuild_all,
+    handle_rebuild_evolution,
     handle_rebuild_faiss,
     handle_rebuild_paper,
     handle_rebuild_similarity,
@@ -42,6 +44,7 @@ app.include_router(papers_router)
 app.include_router(paper_edits_router)
 app.include_router(schema_router)
 app.include_router(collections_router)
+app.include_router(evolution_router)
 
 
 @app.on_event("startup")
@@ -53,5 +56,6 @@ def _start_tasks() -> None:
     task_manager.register(TaskType.rebuild_faiss, handle_rebuild_faiss)
     task_manager.register(TaskType.rebuild_all, handle_rebuild_all)
     task_manager.register(TaskType.rebuild_similarity, handle_rebuild_similarity)
+    task_manager.register(TaskType.rebuild_evolution, handle_rebuild_evolution)
     task_manager.register(TaskType.update_similarity_paper, handle_update_similarity_paper)
     task_manager.start()

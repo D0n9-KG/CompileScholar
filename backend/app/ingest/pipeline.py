@@ -229,6 +229,14 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
                 with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
                     client.upsert_logic_steps_and_claims(paper_id=paper_id, logic=logic_claims["logic"], claims=logic_claims["claims"], step_order=step_order)
                     try:
+                        client.upsert_proposition_mentions_for_claims(
+                            paper_id=paper_id,
+                            claims=logic_claims["claims"],
+                            paper_year=doc.paper.year,
+                        )
+                    except Exception:
+                        pass
+                    try:
                         client.apply_human_claim_evidence_overrides(paper_id)
                     except Exception:
                         pass

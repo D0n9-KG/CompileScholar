@@ -39,6 +39,9 @@ function typeLabel(type: string) {
   if (type === 'rebuild_paper') return '重建论文'
   if (type === 'rebuild_faiss') return '重建全局 FAISS'
   if (type === 'rebuild_all') return '全链路重建（所有论文）'
+  if (type === 'rebuild_similarity') return '重建相似度关系'
+  if (type === 'rebuild_evolution') return '重算演化关系/状态'
+  if (type === 'update_similarity_paper') return '更新单论文相似度'
   return type
 }
 
@@ -50,6 +53,7 @@ function stageLabel(stage: string | null | undefined) {
   if (s.includes('neo4j_write')) return '写入 Neo4j'
   if (s.includes('llm')) return `${TERMS.llm} 抽取`
   if (s.includes('faiss')) return `${TERMS.faiss} 重建`
+  if (s.includes('evolution')) return '演化关系/状态重算'
   if (s === 'done') return '完成'
   if (s === 'canceled') return '已取消'
   if (s === 'failed') return '失败'
@@ -87,7 +91,7 @@ export default function TasksPage() {
         const r = await apiGet<{ tasks: TaskRow[] }>('/tasks?limit=120&keep_finished=10&prune_finished=true')
         if (!canceled) setTasks(r.tasks ?? [])
       } catch {
-        // silent during polling; user can still click "刷新"
+        // keep polling silent
       } finally {
         inFlight = false
       }
@@ -129,13 +133,28 @@ export default function TasksPage() {
   }
 
   async function submitRebuildAll() {
-    if (!window.confirm('确定要“全链路重建（所有论文）”吗？\n这会重新解析/抽取并写回 Neo4j，并在最后重建全局 FAISS。')) return
+    if (!window.confirm('确定要“全链路重建（所有论文）”吗？\n这会重新解析/抽取并写图谱，可能耗时较长。')) return
     setActionBusy('rebuild_all')
     setError('')
     setInfo('')
     try {
       const res = await apiPost<{ task_id: string }>('/tasks/rebuild/all', {})
       setInfo(`已提交任务：全链路重建（${res.task_id ?? ''}）`)
+      await refresh()
+    } catch (e: unknown) {
+      setError(String((e as { message?: unknown } | null)?.message ?? e))
+    } finally {
+      setActionBusy('')
+    }
+  }
+
+  async function submitRebuildEvolution() {
+    setActionBusy('rebuild_evolution')
+    setError('')
+    setInfo('')
+    try {
+      const res = await apiPost<{ task_id: string }>('/tasks/rebuild/evolution', {})
+      setInfo(`已提交任务：重算演化关系/状态（${res.task_id ?? ''}）`)
       await refresh()
     } catch (e: unknown) {
       setError(String((e as { message?: unknown } | null)?.message ?? e))
@@ -161,7 +180,7 @@ export default function TasksPage() {
       <div className="pageHeader">
         <div>
           <h2 className="pageTitle">任务</h2>
-          <div className="pageSubtitle">后台队列任务（上传 / 替换 / 重建 / FAISS）</div>
+          <div className="pageSubtitle">后台队列任务（导入 / 替换 / 重建 / 演化重算）</div>
         </div>
         <div className="pageActions">
           <span className="pill">
@@ -172,6 +191,9 @@ export default function TasksPage() {
           </button>
           <button className="btn btnDanger" disabled={!!actionBusy} onClick={submitRebuildAll}>
             {actionBusy === 'rebuild_all' ? '提交中…' : '全链路重建'}
+          </button>
+          <button className="btn" disabled={!!actionBusy} onClick={submitRebuildEvolution}>
+            {actionBusy === 'rebuild_evolution' ? '提交中…' : '重算演化关系/状态'}
           </button>
           <button className="btn" onClick={() => refresh().catch((e: unknown) => setError(String((e as { message?: unknown } | null)?.message ?? e)))}>
             刷新
@@ -204,7 +226,7 @@ export default function TasksPage() {
                 <option value="failed">失败</option>
                 <option value="canceled">已取消</option>
               </select>
-              <input className="input" style={{ width: 260, maxWidth: '70vw' }} value={query} onChange={(e) => setQuery(e.target.value)} placeholder="搜索…" />
+              <input className="input" style={{ width: 260, maxWidth: '70vw' }} value={query} onChange={(e) => setQuery(e.target.value)} placeholder="搜索任务…" />
             </div>
           </div>
         </div>

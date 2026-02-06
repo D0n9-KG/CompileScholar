@@ -10,7 +10,7 @@ export default function Layout() {
           <Link to="/" className="brand">
             LogicKG
           </Link>
-          <div className="tagline">逻辑链 · 引文网络 · 图谱问答（GraphRAG）</div>
+          <div className="tagline">逻辑链 · 引文网络 · 演化追踪 · GraphRAG</div>
         </div>
         <div className="topRight">
           <div className="apiPill">
@@ -26,11 +26,12 @@ export default function Layout() {
             <div className="navGroupTitle">数据</div>
             <NavLink to="/ingest">导入</NavLink>
             <NavLink to="/papers">论文</NavLink>
-            <NavLink to="/unresolved">待解析</NavLink>
+            <NavLink to="/unresolved">待解析引用</NavLink>
           </div>
           <div className="navGroup">
             <div className="navGroupTitle">探索</div>
             <NavLink to="/graph">图谱</NavLink>
+            <NavLink to="/evolution">演化</NavLink>
             <NavLink to="/ask">问答</NavLink>
           </div>
           <div className="navGroup">
