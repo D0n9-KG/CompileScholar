@@ -6,8 +6,32 @@ function Ensure-Command($name) {
   }
 }
 
-Ensure-Command python
 Ensure-Command node
+
+function Resolve-PythonExecutable() {
+  if ($env:LOGICKG_PYTHON) {
+    if (Test-Path $env:LOGICKG_PYTHON) { return $env:LOGICKG_PYTHON }
+    throw "LOGICKG_PYTHON points to a missing file: $($env:LOGICKG_PYTHON)"
+  }
+
+  $pyCmd = Get-Command py -ErrorAction SilentlyContinue
+  if ($pyCmd) {
+    try {
+      $resolved = & py -3.11 -c "import sys; print(sys.executable)" 2>$null
+      if ($LASTEXITCODE -eq 0 -and $resolved) {
+        return (($resolved | Select-Object -First 1).Trim())
+      }
+    } catch { }
+  }
+
+  $pythonCmd = Get-Command python -ErrorAction SilentlyContinue
+  if ($pythonCmd) {
+    return $pythonCmd.Source
+  }
+  throw "Missing required command: python (or py launcher)"
+}
+
+$pythonExe = Resolve-PythonExecutable
 
 # ---- Port selection helpers (avoid WinError 10013/10048) ----
 function Get-ExcludedTcpPortRanges() {
@@ -71,6 +95,7 @@ if (-not $npmCmd) { $npmCmd = (Get-Command npm -ErrorAction Stop).Source }
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 Write-Host "[LogicKG] Root: $root"
+Write-Host "[LogicKG] Python: $pythonExe"
 
 # 1) Backend venv + deps
 $backendDir = Join-Path $root "backend"
@@ -82,7 +107,8 @@ $marker = Join-Path $backendDir ".venv\\.logickg_requirements_hash"
 if (-not (Test-Path $venvPy)) {
   Write-Host "[LogicKG] Creating backend venv..."
   Push-Location $backendDir
-  python -m venv .venv | Out-Host
+  & $pythonExe -m venv .venv | Out-Host
+  if ($LASTEXITCODE -ne 0) { throw "Failed to create backend venv with $pythonExe (exit code $LASTEXITCODE)" }
   Pop-Location
 }
 
@@ -96,6 +122,7 @@ if ($needPipInstall) {
   Write-Host "[LogicKG] Installing backend requirements..."
   Push-Location $backendDir
   & $venvPip install -r requirements.txt | Out-Host
+  if ($LASTEXITCODE -ne 0) { throw "pip install failed with exit code $LASTEXITCODE" }
   $reqHash | Out-File -FilePath $marker -Encoding ascii -Force
   Pop-Location
 }
@@ -106,6 +133,7 @@ if (-not (Test-Path (Join-Path $frontendDir "node_modules"))) {
   Write-Host "[LogicKG] Installing frontend npm dependencies..."
   Push-Location $frontendDir
   & $npmCmd install | Out-Host
+  if ($LASTEXITCODE -ne 0) { throw "npm install failed with exit code $LASTEXITCODE" }
   Pop-Location
 }
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, Literal
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.schema_store import PaperType, activate_version, create_new_version, list_versions, load_active, load_version, validate_schema
 
@@ -12,13 +12,14 @@ router = APIRouter(prefix="/schema", tags=["schema"])
 
 
 class SchemaResponse(BaseModel):
-    schema: dict[str, Any]
+    model_config = ConfigDict(populate_by_name=True)
+    schema_: dict[str, Any] = Field(alias="schema")
 
 
 @router.get("/active", response_model=SchemaResponse)
 def get_active_schema(paper_type: PaperType = "research"):
     try:
-        return SchemaResponse(schema=load_active(paper_type))
+        return SchemaResponse(schema_=load_active(paper_type))
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
@@ -26,7 +27,7 @@ def get_active_schema(paper_type: PaperType = "research"):
 @router.get("/version/{version}", response_model=SchemaResponse)
 def get_schema_version(version: int, paper_type: PaperType = "research"):
     try:
-        return SchemaResponse(schema=load_version(paper_type, version))
+        return SchemaResponse(schema_=load_version(paper_type, version))
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except ValueError as exc:
@@ -45,13 +46,14 @@ def get_versions(paper_type: PaperType = "research"):
 
 
 class ValidateSchemaRequest(BaseModel):
-    schema: dict[str, Any]
+    model_config = ConfigDict(populate_by_name=True)
+    schema_: dict[str, Any] = Field(alias="schema")
 
 
 @router.post("/validate")
 def validate_schema_endpoint(req: ValidateSchemaRequest):
     try:
-        validate_schema(req.schema)
+        validate_schema(req.schema_)
         return {"ok": True}
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
@@ -60,16 +62,17 @@ def validate_schema_endpoint(req: ValidateSchemaRequest):
 
 
 class CreateSchemaRequest(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
     paper_type: PaperType = Field(default="research")
-    schema: dict[str, Any]
+    schema_: dict[str, Any] = Field(alias="schema")
     activate: bool = True
 
 
 @router.post("/new", response_model=SchemaResponse)
 def create_schema(req: CreateSchemaRequest):
     try:
-        s = create_new_version(req.paper_type, req.schema, activate=bool(req.activate))
-        return SchemaResponse(schema=s)
+        s = create_new_version(req.paper_type, req.schema_, activate=bool(req.activate))
+        return SchemaResponse(schema_=s)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:
@@ -84,7 +87,7 @@ class ActivateSchemaRequest(BaseModel):
 @router.post("/activate", response_model=SchemaResponse)
 def activate_schema(req: ActivateSchemaRequest):
     try:
-        return SchemaResponse(schema=activate_version(req.paper_type, req.version))
+        return SchemaResponse(schema_=activate_version(req.paper_type, req.version))
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except Exception as exc:
