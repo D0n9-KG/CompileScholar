@@ -21,7 +21,7 @@ export function loadScope(): Scope {
     const collectionId = typeof d.collectionId === 'string' ? d.collectionId : undefined
     const paperIds = Array.isArray(d.paperIds) ? d.paperIds.map(String).filter(Boolean) : undefined
     if (mode === 'collection') return { mode, collectionId: collectionId ?? '' }
-    if (mode === 'papers') return { mode, paperIds: (paperIds ?? []).slice(0, 50) }
+    if (mode === 'papers') return { mode, paperIds: paperIds ?? [] }
     return { mode: 'all' }
   } catch {
     return { mode: 'all' }
@@ -33,7 +33,7 @@ export function saveScope(scope: Scope) {
     scope.mode === 'collection'
       ? { mode: 'collection', collectionId: String(scope.collectionId ?? '') }
       : scope.mode === 'papers'
-        ? { mode: 'papers', paperIds: (scope.paperIds ?? []).map(String).filter(Boolean).slice(0, 50) }
+        ? { mode: 'papers', paperIds: (scope.paperIds ?? []).map(String).filter(Boolean) }
         : { mode: 'all' }
   localStorage.setItem(LS_KEY, JSON.stringify(s))
   emitScopeChanged()
@@ -78,4 +78,3 @@ export function scopeLabel(scope: Scope): string {
   if (scope.mode === 'collection') return `论文集: ${scope.collectionId ?? ''}`
   return `已选论文: ${(scope.paperIds ?? []).length}`
 }
-

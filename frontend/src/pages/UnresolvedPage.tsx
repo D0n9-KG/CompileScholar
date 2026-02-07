@@ -59,7 +59,7 @@ export default function UnresolvedPage() {
           <span className="pill">
             <span className="kicker">数量</span> {filtered.length}
           </span>
-          <input className="input" style={{ width: 340, maxWidth: '70vw' }} value={query} onChange={(e) => setQuery(e.target.value)} placeholder="搜索…" />
+          <input className="input" name="unresolved_search_query" style={{ width: 340, maxWidth: '70vw' }} value={query} onChange={(e) => setQuery(e.target.value)} placeholder="搜索…" />
           <button className="btn" onClick={() => refresh().catch((e: unknown) => setError(String((e as { message?: unknown } | null)?.message ?? e)))}>
             刷新
           </button>
@@ -87,6 +87,7 @@ export default function UnresolvedPage() {
                 <div className="row" style={{ marginTop: 10 }}>
                   <input
                     className="input"
+                    name={`unresolved_doi_${r.ref_id}`}
                     placeholder="DOI（例如 10.xxxx/...）"
                     value={doiByRef[r.ref_id] ?? ''}
                     onChange={(e) => setDoiByRef({ ...doiByRef, [r.ref_id]: e.target.value })}

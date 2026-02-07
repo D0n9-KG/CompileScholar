@@ -1,26 +1,50 @@
 :root {
-  --font-display: 'Fraunces', 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', 'STSong', ui-serif, Georgia, 'Times New Roman', serif;
-  --font-body: 'IBM Plex Sans', 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  --font-display:
+    'Fraunces',
+    'Noto Serif SC',
+    'Source Han Serif SC',
+    'Songti SC',
+    'STSong',
+    ui-serif,
+    Georgia,
+    'Times New Roman',
+    serif;
+  --font-body:
+    'IBM Plex Sans',
+    'Noto Sans SC',
+    'Source Han Sans SC',
+    'PingFang SC',
+    'Microsoft YaHei',
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
 
-  --bg: #070a10;
-  --panel: rgba(16, 20, 30, 0.72);
-  --panel-2: rgba(10, 12, 18, 0.78);
-  --border: rgba(255, 255, 255, 0.09);
-  --border-2: rgba(255, 255, 255, 0.14);
-  --text: rgba(255, 255, 255, 0.9);
-  --muted: rgba(255, 255, 255, 0.68);
-  --faint: rgba(255, 255, 255, 0.52);
-  --danger: #ff6b6b;
+  --bg: #060b17;
+  --bg-elevated: #0a1326;
+  --panel: rgba(17, 28, 47, 0.76);
+  --panel-2: rgba(12, 21, 37, 0.86);
+  --border: rgba(145, 167, 217, 0.22);
+  --border-2: rgba(145, 167, 217, 0.34);
+  --text: rgba(242, 248, 255, 0.94);
+  --muted: rgba(209, 223, 247, 0.72);
+  --faint: rgba(173, 191, 224, 0.56);
+  --danger: #ff7a7a;
+  --success: #7cffcb;
+  --warning: #ffca84;
 
   --accent: #7cffcb;
-  --accent-2: #6e73ff;
-  --accent-3: #ffb86b;
-  --ring: rgba(124, 255, 203, 0.32);
+  --accent-2: #7e8bff;
+  --accent-3: #ffca84;
+  --ring: rgba(124, 255, 203, 0.35);
 
-  --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
-  --shadow-soft: 0 12px 28px rgba(0, 0, 0, 0.32);
-  --radius: 16px;
+  --shadow: 0 22px 56px rgba(2, 8, 24, 0.52);
+  --shadow-soft: 0 14px 30px rgba(2, 8, 24, 0.38);
+  --radius: 18px;
   --radius-sm: 12px;
   --radius-pill: 999px;
 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { apiGet, apiPost, apiPostForm } from '../api'
 import { TERMS } from '../ui/terms'
@@ -115,6 +115,18 @@ function taskStageLabel(stage: string | null | undefined) {
   return s
 }
 
+function parseApiDetailMessage(msg: string): string {
+  const s = String(msg ?? '').trim()
+  if (!s) return ''
+  try {
+    const obj = JSON.parse(s) as { detail?: unknown } | null
+    if (obj && typeof obj.detail === 'string') return obj.detail
+  } catch {
+    // ignore
+  }
+  return s
+}
+
 export default function IngestPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [error, setError] = useState<string>('')
@@ -223,32 +235,43 @@ export default function IngestPage() {
     if (!loadUploadId.trim() || loadUploadId.trim() === uploadId) setLoadUploadId(uploadId)
   }, [loadUploadId, uploadId])
 
+  const refreshScan = useCallback(async (id: string) => {
+    const s = await apiGet<UploadScan>(`/ingest/upload/scan?upload_id=${encodeURIComponent(id)}`)
+    setScan(s)
+    return s
+  }, [])
+
   useEffect(() => {
     if (!uploadId) return
     // Best-effort: refresh scan after route-switch / reload
-    refreshScan(uploadId).catch(() => {})
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uploadId])
+    refreshScan(uploadId).catch((e: unknown) => {
+      const raw = String((e as { message?: unknown } | null)?.message ?? e)
+      const detail = parseApiDetailMessage(raw).toLowerCase()
+      const missingUpload =
+        (detail.includes('upload') && (detail.includes('not found') || detail.includes('missing') || detail.includes('404'))) ||
+        detail.includes('no such file or directory') ||
+        detail.includes('manifest.json')
+      if (missingUpload) {
+        setError('')
+        setScan(null)
+        setUploadId('')
+        setLoadUploadId('')
+        setInfo(`上次 upload_id 已失效并被清理：${uploadId}`)
+      }
+    })
+  }, [uploadId, refreshScan])
 
   const scanGroups = useMemo(() => groupScan(scan), [scan])
   const uploadPct = useMemo(() => {
     if (!uploadProgress.total) return 0
     return Math.round((uploadProgress.sent / uploadProgress.total) * 100)
   }, [uploadProgress.sent, uploadProgress.total])
+  const scanTotal = scan?.units.length ?? 0
+  const scanIssueCount = scanGroups.conflicts.length + scanGroups.needDoi.length + scanGroups.errors.length
+  const taskProgressPct = Math.round(Math.max(0, Math.min(1, Number(task?.progress ?? 0))) * 100)
+  const taskIsActive = ['queued', 'running'].includes(String(task?.status ?? ''))
 
-  function parseApiDetailMessage(msg: string): string {
-    const s = String(msg ?? '').trim()
-    if (!s) return ''
-    try {
-      const obj = JSON.parse(s) as { detail?: unknown } | null
-      if (obj && typeof obj.detail === 'string') return obj.detail
-    } catch {
-      // ignore
-    }
-    return s
-  }
-
-  async function pollTask(id: string): Promise<{ isFinal: boolean }> {
+  const pollTask = useCallback(async (id: string): Promise<{ isFinal: boolean }> => {
     let t: TaskInfo
     try {
       t = await apiGet<TaskInfo>(`/tasks/${encodeURIComponent(id)}`)
@@ -302,7 +325,7 @@ export default function IngestPage() {
       }
     }
     return { isFinal: Boolean(isFinal) }
-  }
+  }, [refreshScan, refreshedForTaskId, searchParams, setSearchParams, uploadId])
 
   useEffect(() => {
     if (!taskId) return
@@ -326,7 +349,7 @@ export default function IngestPage() {
     return () => {
       stop()
     }
-  }, [taskId, uploadId, refreshedForTaskId])
+  }, [taskId, pollTask])
 
   async function rebuildFaiss() {
     setError('')
@@ -353,12 +376,6 @@ export default function IngestPage() {
     } catch (e: unknown) {
       setError(String((e as { message?: unknown } | null)?.message ?? e))
     }
-  }
-
-  async function refreshScan(id: string) {
-    const s = await apiGet<UploadScan>(`/ingest/upload/scan?upload_id=${encodeURIComponent(id)}`)
-    setScan(s)
-    return s
   }
 
   async function uploadChunksZip(id: string, file: File) {
@@ -520,7 +537,7 @@ export default function IngestPage() {
   }
 
   return (
-    <div className="page">
+    <div className="page ingestPage">
       <div className="pageHeader">
         <div>
           <h2 className="pageTitle">导入</h2>
@@ -529,7 +546,7 @@ export default function IngestPage() {
         <div className="pageActions">
           <span className="pill">
             <span className="kicker">分片(MB)</span>
-            <input className="input" style={{ width: 92 }} type="number" min={1} max={64} value={chunkMB} onChange={(e) => setChunkMB(Number(e.target.value || 8))} />
+            <input className="input ingestChunkInput" name="ingest_chunk_mb" type="number" min={1} max={64} value={chunkMB} onChange={(e) => setChunkMB(Number(e.target.value || 8))} />
           </span>
           {uploadId && (
             <span className="pill">
@@ -541,7 +558,7 @@ export default function IngestPage() {
 
       {error && <div className="errorBox">{error}</div>}
       {info && (
-        <div className="infoBox" style={{ marginTop: 12 }}>
+        <div className="infoBox ingestInfoBox">
           <div className="split">
             <div style={{ whiteSpace: 'pre-wrap' }}>{info}</div>
             <button className="btn btnSmall" onClick={() => setInfo('')}>
@@ -551,8 +568,31 @@ export default function IngestPage() {
         </div>
       )}
 
-      <div className="grid2">
-        <div className="panel">
+      <div className="ingestSummaryRow">
+        <div className="ingestSummaryCard">
+          <div className="kicker">Session</div>
+          <div className="ingestSummaryValue">{uploadId ? <code>{uploadId}</code> : '--'}</div>
+          <div className="metaLine">Current upload context</div>
+        </div>
+        <div className="ingestSummaryCard">
+          <div className="kicker">Units</div>
+          <div className="ingestSummaryValue">{scanTotal}</div>
+          <div className="metaLine">Detected scan units</div>
+        </div>
+        <div className="ingestSummaryCard">
+          <div className="kicker">Pending</div>
+          <div className="ingestSummaryValue">{scanIssueCount}</div>
+          <div className="metaLine">Conflicts / DOI / Errors</div>
+        </div>
+        <div className="ingestSummaryCard">
+          <div className="kicker">Task</div>
+          <div className="ingestSummaryValue">{taskId ? `${taskProgressPct}%` : '--'}</div>
+          <div className="metaLine">{taskId ? (taskIsActive ? 'Running' : 'Completed') : 'No active task'}</div>
+        </div>
+      </div>
+
+      <div className="grid2 ingestTopGrid">
+        <div className="panel ingestUploadPanel">
           <div className="panelHeader">
             <div className="split">
               <div className="panelTitle">上传（文件夹 / ZIP）</div>
@@ -574,7 +614,7 @@ export default function IngestPage() {
               <div className="itemCard">
                 <div className="itemTitle">ZIP（压缩包）</div>
                 <div className="row" style={{ marginTop: 8 }}>
-                  <input type="file" accept=".zip" onChange={(e) => setZipFile(e.target.files?.[0] ?? null)} />
+                  <input type="file" name="ingest_zip_file" accept=".zip" onChange={(e) => setZipFile(e.target.files?.[0] ?? null)} />
                   <button className="btn btnPrimary" disabled={uploadBusy} onClick={() => startUpload('zip')}>
                     {uploadBusy ? '上传中…' : '上传 ZIP'}
                   </button>
@@ -587,6 +627,7 @@ export default function IngestPage() {
                 <div className="row" style={{ marginTop: 8 }}>
                   <input
                     type="file"
+                    name="ingest_folder_files"
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-ignore
                     webkitdirectory="true"
@@ -637,7 +678,7 @@ export default function IngestPage() {
           </div>
         </div>
 
-        <div className="panel">
+        <div className="panel ingestOpsPanel">
           <div className="panelHeader">
             <div className="panelTitle">任务状态 / 运维</div>
           </div>
@@ -660,7 +701,7 @@ export default function IngestPage() {
                   你可以粘贴 upload_id 载入扫描结果（也会同步到地址栏，便于分享/恢复）。注意：<code>127.0.0.1</code> 与 <code>localhost</code> 的浏览器存储不互通。
                 </div>
                 <div className="row" style={{ marginTop: 10 }}>
-                  <input className="input" style={{ flex: 1, minWidth: 220 }} value={loadUploadId} onChange={(e) => setLoadUploadId(e.target.value)} placeholder="upload_id（例如 upload-xxxx...）" />
+                  <input className="input ingestLoadInput" name="ingest_load_upload_id" value={loadUploadId} onChange={(e) => setLoadUploadId(e.target.value)} placeholder="upload_id（例如 upload-xxxx...）" />
                   <button
                     className="btn"
                     disabled={uploadBusy || !loadUploadId.trim()}
@@ -674,7 +715,7 @@ export default function IngestPage() {
                   </button>
                 </div>
               </div>
-              <div className="row">
+              <div className="row ingestOpsActions">
                 <Link className="btn" to="/tasks" style={{ display: 'inline-flex', alignItems: 'center' }}>
                   打开任务列表
                 </Link>
@@ -685,14 +726,14 @@ export default function IngestPage() {
                   全链路重建
                 </button>
               </div>
-              <div className="hint">提示：导入 / 替换后如需增强问答证据覆盖，可在此重建全局 FAISS。</div>
+              <div className="hint ingestOpsHint">提示：导入 / 替换后如需增强问答证据覆盖，可在此重建全局 FAISS。</div>
             </div>
           </div>
         </div>
       </div>
 
       {scan && (
-        <div className="panel" style={{ marginTop: 14 }}>
+        <div className="panel ingestScanPanel">
           <div className="panelHeader">
             <div className="split">
               <div className="panelTitle">扫描结果</div>
@@ -705,7 +746,7 @@ export default function IngestPage() {
             </div>
           </div>
           <div className="panelBody">
-            <div className="row">
+            <div className="row ingestScanActions">
               <button className="btn btnPrimary" disabled={uploadBusy} onClick={commitReady}>
                 导入可导入项（异步）
               </button>
@@ -722,9 +763,9 @@ export default function IngestPage() {
             </div>
 
             {scanGroups.conflicts.length > 0 && (
-              <div style={{ marginTop: 12 }}>
+              <div className="ingestBucket ingestBucketConflict">
                 <div className="metaLine">冲突（DOI 已存在）</div>
-                <div className="list" style={{ marginTop: 10 }}>
+                <div className="list ingestBucketList">
                   {scanGroups.conflicts.map((u) => (
                     <div key={u.unit_id} className="itemCard">
                       <div className="itemMeta">
@@ -734,8 +775,8 @@ export default function IngestPage() {
                       <div className="row" style={{ marginTop: 10 }}>
                         <span className="kicker">论文类型</span>
                         <select
-                          className="select"
-                          style={{ width: 220 }}
+                          className="select ingestTypeSelect"
+                          name={`ingest_conflict_type_${u.unit_id}`}
                           value={paperTypeByUnit[u.unit_id] ?? String(u.paper_type ?? 'research')}
                           onChange={(e) => {
                             const v = e.target.value
@@ -766,9 +807,9 @@ export default function IngestPage() {
             )}
 
             {scanGroups.needDoi.length > 0 && (
-              <div style={{ marginTop: 12 }}>
+              <div className="ingestBucket ingestBucketNeedDoi">
                 <div className="metaLine">需要 DOI</div>
-                <div className="list" style={{ marginTop: 10 }}>
+                <div className="list ingestBucketList">
                   {scanGroups.needDoi.map((u) => (
                     <div key={u.unit_id} className="itemCard">
                       <div className="itemMeta">
@@ -778,8 +819,8 @@ export default function IngestPage() {
                       <div className="row" style={{ marginTop: 10 }}>
                         <span className="kicker">论文类型</span>
                         <select
-                          className="select"
-                          style={{ width: 220 }}
+                          className="select ingestTypeSelect"
+                          name={`ingest_needdoi_type_${u.unit_id}`}
                           value={paperTypeByUnit[u.unit_id] ?? String(u.paper_type ?? 'research')}
                           onChange={(e) => {
                             const v = e.target.value
@@ -792,7 +833,7 @@ export default function IngestPage() {
                         </select>
                       </div>
                       <div className="row" style={{ marginTop: 10 }}>
-                        <input className="input" placeholder="DOI（10.xxxx/...）" value={doiByUnit[u.unit_id] ?? ''} onChange={(e) => setDoiByUnit({ ...doiByUnit, [u.unit_id]: e.target.value })} />
+                        <input className="input ingestDoiInput" name={`ingest_doi_${u.unit_id}`} placeholder="DOI（10.xxxx/...）" value={doiByUnit[u.unit_id] ?? ''} onChange={(e) => setDoiByUnit({ ...doiByUnit, [u.unit_id]: e.target.value })} />
                         <button className="btn btnPrimary" onClick={() => setDoi(u.unit_id)}>
                           设置 DOI
                         </button>
@@ -804,9 +845,9 @@ export default function IngestPage() {
             )}
 
             {scanGroups.errors.length > 0 && (
-              <div style={{ marginTop: 12 }}>
+              <div className="ingestBucket ingestBucketError">
                 <div className="metaLine">错误</div>
-                <div className="list" style={{ marginTop: 10 }}>
+                <div className="list ingestBucketList">
                   {scanGroups.errors.map((u) => (
                     <div key={u.unit_id} className="itemCard">
                       <div className="itemMeta">
@@ -823,7 +864,7 @@ export default function IngestPage() {
       )}
 
       {result && (
-        <div className="panel" style={{ marginTop: 14 }}>
+        <div className="panel ingestResultPanel">
           <div className="panelHeader">
             <div className="panelTitle">结果 JSON</div>
           </div>

@@ -78,7 +78,6 @@ export default function SchemaPage() {
 
   useEffect(() => {
     refresh(paperType).catch(() => {})
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paperType])
 
   const dirty = useMemo(() => {

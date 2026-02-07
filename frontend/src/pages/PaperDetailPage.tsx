@@ -314,7 +314,7 @@ export default function PaperDetailPage() {
     if (!p) return
     setMetaTitle(String(p.title ?? ''))
     setMetaYear(p.year === undefined || p.year === null ? '' : String(p.year))
-  }, [detail?.paper?.paper_id])
+  }, [detail?.paper])
 
   useEffect(() => {
     if (!rebuildTaskId) return
@@ -922,13 +922,13 @@ export default function PaperDetailPage() {
   if (!id) return <div className="page">Missing paper id</div>
 
   return (
-    <div className="page">
-      <div className="pageHeader">
+    <div className="page paperDetailPage">
+      <div className="pageHeader paperDetailHeader">
         <div>
           <h2 className="pageTitle">论文</h2>
           <div className="pageSubtitle">{title}</div>
         </div>
-        <div className="pageActions">
+        <div className="pageActions paperDetailActions">
           <span className="pill">
             <span className="kicker">年份</span> {stats.year}
           </span>
@@ -956,15 +956,51 @@ export default function PaperDetailPage() {
       </div>
 
       {error && <div className="errorBox">{error}</div>}
-      {info && <div className="infoBox">{info}</div>}
+      {info && <div className="infoBox paperDetailInfo">{info}</div>}
+
+      {detail && (
+        <div className="paperDetailSummary">
+          <div className="paperDetailSummaryCard">
+            <div className="kicker">Paper</div>
+            <div className="paperDetailSummaryValue">
+              <code>{stats.paperId}</code>
+            </div>
+            <div className="metaLine">Current node id</div>
+          </div>
+          <div className="paperDetailSummaryCard">
+            <div className="kicker">DOI</div>
+            <div className="paperDetailSummaryValue">{stats.doi ? '已关联' : '待补充'}</div>
+            <div className="metaLine">{stats.doi || 'No DOI yet'}</div>
+          </div>
+          <div className="paperDetailSummaryCard">
+            <div className="kicker">Coverage</div>
+            <div className="paperDetailSummaryValue">
+              {stats.chunks} / {stats.refs} / {stats.figures}
+            </div>
+            <div className="metaLine">Chunks / Cites / Figures</div>
+          </div>
+          <div className="paperDetailSummaryCard">
+            <div className="kicker">Review</div>
+            <div className="paperDetailSummaryValue">{reviewPendingCount}</div>
+            <div className="metaLine">{reviewNeedsReview ? 'Need human arbitration' : 'No pending review'}</div>
+          </div>
+          {rebuildTaskId && (
+            <div className="paperDetailSummaryCard">
+              <div className="kicker">Rebuild Task</div>
+              <div className="paperDetailSummaryValue">{Math.round(clamp01(Number(rebuildTask?.progress ?? 0)) * 100)}%</div>
+              <div className="metaLine">{taskStatusLabel(String(rebuildTask?.status ?? '')) || 'Queued'}</div>
+            </div>
+          )}
+        </div>
+      )}
 
       {!detail ? (
-        <div className="panel">
+        <div className="panel paperDetailLoading">
           <div className="panelBody">加载中…</div>
         </div>
       ) : (
         <>
-           <div className="row" style={{ marginBottom: 14 }}>
+           <div className="row paperDetailMetaRow">
              <span className="pill">
                <span className="kicker">论文ID</span> <code>{stats.paperId}</code>
              </span>
@@ -974,7 +1010,7 @@ export default function PaperDetailPage() {
               </span>
             )}
             <label className="pill" style={{ gap: 8 }}>
-              <input type="checkbox" checked={rebuildFaiss} onChange={(e) => setRebuildFaiss(e.target.checked)} />
+              <input type="checkbox" name="paper_rebuild_faiss" checked={rebuildFaiss} onChange={(e) => setRebuildFaiss(e.target.checked)} />
               <span className="kicker">重建 FAISS</span>
             </label>
            {rebuildTaskId && (
@@ -985,7 +1021,7 @@ export default function PaperDetailPage() {
            )}
          </div>
 
-         <div className="row" style={{ marginBottom: 14 }}>
+         <div className="row paperDetailTabRow">
            <span className="kicker">页面</span>
            <button className={`chip ${tab === 'logic' ? 'chipActive' : ''}`} onClick={() => selectTab('logic')}>
              逻辑链
@@ -1002,14 +1038,14 @@ export default function PaperDetailPage() {
          </div>
 
          {!detail.paper.ingested && stats.chunks === 0 && (
-           <div className="infoBox" style={{ marginBottom: 14 }}>
+           <div className="infoBox paperDetailCallout">
              <div style={{ fontWeight: 850, marginBottom: 6 }}>该论文目前仅包含元数据（{TERMS.stub}），尚未导入 MinerU Markdown。</div>
              <div className="metaLine">建议回到“图谱”页，在节点信息抽屉中上传该论文的 MinerU 输出进行补全导入。</div>
              </div>
            )}
 
            {reviewNeedsReview && (
-             <div className="infoBox" style={{ marginBottom: 14 }}>
+             <div className="infoBox paperDetailCallout">
                <div className="split">
                  <div>
                    <div style={{ fontWeight: 850, marginBottom: 6 }}>有 {reviewPendingCount} 项需要裁决（仅包含人工改过的内容）。</div>
@@ -1023,7 +1059,7 @@ export default function PaperDetailPage() {
            )}
 
            {metaEditOpen && (
-             <div className="panel" style={{ marginBottom: 14 }}>
+             <div className="panel paperDetailMetaPanel">
                <div className="panelHeader">
                  <div className="split">
                    <div className="panelTitle">元数据编辑</div>
@@ -1038,13 +1074,13 @@ export default function PaperDetailPage() {
                      <div className="metaLine" style={{ marginBottom: 6 }}>
                        标题
                      </div>
-                     <input className="input" value={metaTitle} onChange={(e) => setMetaTitle(e.target.value)} placeholder="标题" />
+                    <input className="input" name="paper_meta_title" value={metaTitle} onChange={(e) => setMetaTitle(e.target.value)} placeholder="标题" />
                    </div>
                    <div>
                      <div className="metaLine" style={{ marginBottom: 6 }}>
                        年份
                      </div>
-                     <input className="input" value={metaYear} onChange={(e) => setMetaYear(e.target.value)} placeholder="年份（可空）" />
+                    <input className="input" name="paper_meta_year" value={metaYear} onChange={(e) => setMetaYear(e.target.value)} placeholder="年份（可空）" />
                    </div>
                    <div className="row">
                      <button className="btn btnPrimary" onClick={saveMetadata}>
@@ -1066,7 +1102,7 @@ export default function PaperDetailPage() {
              </div>
            )}
 
-           <div className="stack">
+           <div className="stack paperDetailContentStack">
              {tab === 'logic' && (
               <div className="panel">
                 <div className="panelHeader">
@@ -1127,6 +1163,7 @@ export default function PaperDetailPage() {
                           <div style={{ marginTop: 10 }}>
                             <textarea
                               className="textarea"
+                              name={`logic_draft_${s.step_type}`}
                               value={logicDraft[s.step_type] ?? ''}
                               onChange={(e) => setLogicDraft((m) => ({ ...m, [s.step_type]: e.target.value }))}
                             />
@@ -1169,7 +1206,7 @@ export default function PaperDetailPage() {
                 <div className="panelBody">
                   <div className="itemCard" style={{ marginBottom: 12 }}>
                     <div className="itemTitle">新增要点（人工）</div>
-                    <textarea className="textarea" value={newClaimText} onChange={(e) => setNewClaimText(e.target.value)} placeholder="输入一条要点…" />
+                    <textarea className="textarea" name="claim_new_text" value={newClaimText} onChange={(e) => setNewClaimText(e.target.value)} placeholder="输入一条要点…" />
                     <div className="hint">保存后会生成稳定的 claim_key，用于后续重建对齐与裁决。</div>
                   </div>
                   <div className="list">
@@ -1254,7 +1291,7 @@ export default function PaperDetailPage() {
                             </div>
                           ) : (
                             <div style={{ marginTop: 10 }}>
-                              <textarea className="textarea" value={claimDraft[key] ?? ''} onChange={(e) => setClaimDraft((m) => ({ ...m, [key]: e.target.value }))} />
+                              <textarea className="textarea" name={`claim_draft_${key}`} value={claimDraft[key] ?? ''} onChange={(e) => setClaimDraft((m) => ({ ...m, [key]: e.target.value }))} />
                               <div className="row" style={{ marginTop: 10 }}>
                                 <button className="btn btnPrimary" onClick={() => saveClaim(key)}>
                                   保存
@@ -1474,7 +1511,7 @@ export default function PaperDetailPage() {
             </div>
             <div className="modalBody">
               <div className="row">
-                <input className="input" value={evidenceQuery} onChange={(e) => setEvidenceQuery(e.target.value)} placeholder="搜索证据 chunk（输入关键词；可直接用当前文本）" />
+                <input className="input" name="evidence_search_query" value={evidenceQuery} onChange={(e) => setEvidenceQuery(e.target.value)} placeholder="搜索证据 chunk（输入关键词；可直接用当前文本）" />
                 <button className="btn" disabled={evidenceBusy || !evidenceQuery.trim()} onClick={() => searchEvidence(evidenceQuery).catch(() => {})}>
                   {evidenceBusy ? '搜索中…' : '搜索'}
                 </button>
@@ -1504,6 +1541,7 @@ export default function PaperDetailPage() {
                           <label className="row" style={{ gap: 8 }}>
                             <input
                               type="checkbox"
+                              name={`evidence_select_${cid}`}
                               checked={selected}
                               onChange={(e) => setEvidenceSelected((m) => ({ ...m, [cid]: e.target.checked }))}
                             />

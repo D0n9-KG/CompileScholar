@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { apiDelete, apiGet, apiPatch, apiPost } from '../api'
 
@@ -26,29 +26,26 @@ export default function PapersPage() {
   const [paperDeleteOpen, setPaperDeleteOpen] = useState<boolean>(false)
   const [paperDeleteId, setPaperDeleteId] = useState<string>('')
 
-  useEffect(() => {
-    reloadCollections()
-      .then(() => reloadPapers())
-      .catch((e: unknown) => setError(String((e as { message?: unknown } | null)?.message ?? e)))
-  }, [])
-
-  useEffect(() => {
-    reloadPapers().catch((e: unknown) => setError(String((e as { message?: unknown } | null)?.message ?? e)))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [collectionFilter])
-
-  async function reloadCollections() {
+  const reloadCollections = useCallback(async () => {
     const r = await apiGet<{ collections: CollectionRow[] }>('/collections?limit=200')
     setCollections(r.collections ?? [])
-  }
+  }, [])
 
-  async function reloadPapers() {
+  const reloadPapers = useCallback(async () => {
     setError('')
     const cid = collectionFilter === 'all' ? '' : collectionFilter
     const qs = cid ? `&collection_id=${encodeURIComponent(cid)}` : ''
     const r = await apiGet<{ papers: PaperRow[] }>(`/graph/papers?limit=600${qs}`)
     setPapers(r.papers ?? [])
-  }
+  }, [collectionFilter])
+
+  useEffect(() => {
+    reloadCollections().catch((e: unknown) => setError(String((e as { message?: unknown } | null)?.message ?? e)))
+  }, [reloadCollections])
+
+  useEffect(() => {
+    reloadPapers().catch((e: unknown) => setError(String((e as { message?: unknown } | null)?.message ?? e)))
+  }, [reloadPapers])
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()

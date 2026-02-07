@@ -1,39 +1,67 @@
 .appShell {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
 .topBar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background: linear-gradient(180deg, rgba(10, 12, 18, 0.9), rgba(10, 12, 18, 0.55));
-  backdrop-filter: blur(10px);
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(145, 167, 217, 0.22);
+  background:
+    linear-gradient(180deg, rgba(8, 12, 24, 0.96), rgba(8, 12, 24, 0.84)),
+    radial-gradient(120% 120% at 15% 0%, rgba(124, 255, 203, 0.16), transparent 55%);
+  backdrop-filter: blur(16px);
+}
+
+.topBar::after {
+  content: '';
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(124, 255, 203, 0.04), rgba(124, 255, 203, 0.58), rgba(110, 115, 255, 0.56), rgba(124, 255, 203, 0.04));
+  pointer-events: none;
 }
 
 .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   font-family: var(--font-display);
-  font-weight: 750;
-  letter-spacing: 0.25px;
-  color: rgba(255, 255, 255, 0.92);
+  font-weight: 760;
+  letter-spacing: 0.32px;
+  color: rgba(244, 248, 255, 0.95);
   text-decoration: none;
-  font-size: 18px;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.brandGlyph {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  filter: drop-shadow(0 4px 14px rgba(124, 255, 203, 0.28));
 }
 
 .topLeft {
   display: flex;
-  align-items: baseline;
-  gap: 12px;
+  align-items: center;
+  gap: 14px;
   min-width: 0;
 }
 
 .tagline {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.6);
-  letter-spacing: 0.25px;
+  font-size: 12.5px;
+  color: rgba(229, 236, 253, 0.68);
+  letter-spacing: 0.28px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -42,126 +70,228 @@
 .topRight {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .apiPill {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
+  gap: 9px;
+  padding: 8px 12px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(145, 167, 217, 0.3);
+  background: rgba(25, 35, 58, 0.78);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  max-width: min(42vw, 520px);
 }
 
 .apiDot {
   width: 9px;
   height: 9px;
   border-radius: 999px;
-  background: radial-gradient(circle at 30% 30%, rgba(124, 255, 203, 1), rgba(110, 115, 255, 0.85));
-  box-shadow: 0 0 0 3px rgba(124, 255, 203, 0.12);
+  background: radial-gradient(circle at 30% 30%, rgba(124, 255, 203, 1), rgba(110, 115, 255, 0.9));
+  box-shadow:
+    0 0 0 3px rgba(124, 255, 203, 0.18),
+    0 0 16px rgba(124, 255, 203, 0.45);
+  flex: 0 0 auto;
 }
 
 .apiLabel {
   font-size: 11px;
-  letter-spacing: 0.35px;
+  letter-spacing: 0.45px;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(232, 240, 255, 0.74);
 }
 
 .apiValue {
   background: transparent;
   border: 0;
   padding: 0;
+  color: rgba(244, 248, 255, 0.88);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .body {
   flex: 1;
   display: grid;
-  grid-template-columns: 240px 1fr;
+  grid-template-columns: 264px minmax(0, 1fr);
   min-height: 0;
 }
 
 .sideNav {
-  padding: 14px 12px 14px 12px;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(10, 12, 18, 0.55);
-  backdrop-filter: blur(10px);
+  padding: 16px 12px 18px;
+  border-right: 1px solid rgba(145, 167, 217, 0.16);
+  background:
+    linear-gradient(180deg, rgba(10, 16, 30, 0.84), rgba(9, 14, 24, 0.72)),
+    radial-gradient(120% 100% at 0% 0%, rgba(124, 255, 203, 0.08), transparent 45%);
+  backdrop-filter: blur(14px);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
+  overflow-y: auto;
 }
 
 .navGroup {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  padding: 6px;
+  border-radius: 16px;
+  border: 1px solid rgba(145, 167, 217, 0.12);
+  background: rgba(12, 20, 35, 0.54);
 }
 
 .navGroupTitle {
   font-size: 11px;
-  letter-spacing: 0.38px;
+  letter-spacing: 0.48px;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
-  padding: 6px 10px;
+  color: rgba(214, 223, 244, 0.52);
+  padding: 7px 10px 4px;
 }
 
-.sideNav a {
-  padding: 10px 10px;
-  border-radius: 14px;
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 10px 11px;
+  border-radius: 13px;
   text-decoration: none;
-  color: rgba(255, 255, 255, 0.74);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.02);
+  color: rgba(223, 232, 250, 0.77);
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
   transition:
-    transform 140ms ease,
-    border-color 140ms ease,
-    background 140ms ease;
+    border-color 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
 }
 
-.sideNav a:hover {
+.navIcon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  color: rgba(212, 223, 248, 0.76);
+}
+
+.navLink:hover {
   transform: translateY(-1px);
-  border-color: rgba(124, 255, 203, 0.18);
-  background: rgba(124, 255, 203, 0.04);
-}
-
-.sideNav a.active {
-  color: rgba(255, 255, 255, 0.95);
-  background: linear-gradient(180deg, rgba(124, 255, 203, 0.12), rgba(110, 115, 255, 0.08));
-  border-color: rgba(124, 255, 203, 0.22);
+  border-color: rgba(124, 255, 203, 0.34);
+  background: rgba(124, 255, 203, 0.08);
+  color: rgba(245, 250, 255, 0.95);
 }
 
 .main {
-  padding: 18px 18px 24px 18px;
+  padding: 22px 24px 32px;
   min-height: 0;
   overflow: auto;
 }
 
+.navLink:focus-visible {
+  outline: none;
+  border-color: rgba(124, 255, 203, 0.75);
+  box-shadow: 0 0 0 3px rgba(124, 255, 203, 0.25);
+}
+
+.navLink.active {
+  color: rgba(251, 253, 255, 0.96);
+  border-color: rgba(124, 255, 203, 0.46);
+  background:
+    linear-gradient(135deg, rgba(124, 255, 203, 0.2), rgba(110, 115, 255, 0.22)),
+    rgba(17, 27, 46, 0.85);
+  box-shadow:
+    0 12px 24px rgba(2, 8, 24, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.navLink.active .navIcon {
+  color: rgba(248, 253, 255, 0.98);
+}
+
+@media (max-width: 1160px) {
+  .body {
+    grid-template-columns: 232px minmax(0, 1fr);
+  }
+
+  .main {
+    padding: 18px;
+  }
+}
+
 @media (max-width: 960px) {
+  .topBar {
+    padding: 14px 14px 12px;
+  }
+
   .tagline {
     display: none;
   }
+
   .body {
     grid-template-columns: 1fr;
   }
+
   .sideNav {
     flex-direction: row;
-    gap: 10px;
+    align-items: stretch;
+    gap: 8px;
     border-right: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(145, 167, 217, 0.16);
     overflow: auto;
-    padding: 10px 10px;
+    padding: 10px;
   }
+
   .navGroupTitle {
     display: none;
   }
+
   .navGroup {
     flex-direction: row;
-    gap: 8px;
+    gap: 6px;
     align-items: center;
+    padding: 4px;
+    border-radius: 14px;
   }
-  .sideNav a {
+
+  .navLink {
     white-space: nowrap;
+    min-height: 40px;
+    padding: 8px 9px;
+    gap: 8px;
+  }
+
+  .navIcon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .apiPill {
+    max-width: 52vw;
+  }
+}
+
+@media (max-width: 680px) {
+  .topLeft {
+    min-width: 0;
+  }
+
+  .brand {
+    font-size: 18px;
+  }
+
+  .brandGlyph {
+    width: 24px;
+    height: 24px;
+  }
+
+  .apiLabel {
+    display: none;
+  }
+
+  .main {
+    padding: 14px 12px 20px;
   }
 }

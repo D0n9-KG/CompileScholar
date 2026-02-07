@@ -18,24 +18,29 @@ body {
   color: var(--text);
   background: var(--bg);
   font-family: var(--font-body);
-  line-height: 1.55;
+  line-height: 1.6;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+::selection {
+  color: #031123;
+  background: rgba(124, 255, 203, 0.88);
+}
+
 /* Atmospheric background: subtle mesh + grid */
 body::before {
   content: '';
   position: fixed;
-  inset: -40vmax;
+  inset: -44vmax;
   background:
-    radial-gradient(closest-side at 20% 25%, rgba(124, 255, 203, 0.08), transparent 60%),
-    radial-gradient(closest-side at 75% 20%, rgba(110, 115, 255, 0.08), transparent 55%),
-    radial-gradient(closest-side at 70% 75%, rgba(255, 184, 107, 0.05), transparent 55%),
-    radial-gradient(closest-side at 20% 75%, rgba(255, 255, 255, 0.04), transparent 60%);
-  filter: blur(18px);
+    radial-gradient(closest-side at 18% 20%, rgba(124, 255, 203, 0.14), transparent 60%),
+    radial-gradient(closest-side at 80% 16%, rgba(126, 139, 255, 0.16), transparent 58%),
+    radial-gradient(closest-side at 72% 76%, rgba(255, 202, 132, 0.11), transparent 56%),
+    radial-gradient(closest-side at 15% 78%, rgba(133, 171, 255, 0.1), transparent 58%);
+  filter: blur(22px);
   opacity: 0.95;
   pointer-events: none;
   z-index: -2;
@@ -46,22 +51,24 @@ body::after {
   position: fixed;
   inset: 0;
   background-image:
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.035) 1px, transparent 1px, transparent 42px),
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.03) 1px, transparent 1px, transparent 42px);
-  opacity: 0.16;
+    repeating-linear-gradient(0deg, rgba(156, 180, 233, 0.065), rgba(156, 180, 233, 0.065) 1px, transparent 1px, transparent 56px),
+    repeating-linear-gradient(90deg, rgba(156, 180, 233, 0.06), rgba(156, 180, 233, 0.06) 1px, transparent 1px, transparent 56px);
+  opacity: 0.15;
   pointer-events: none;
   z-index: -1;
-  mix-blend-mode: screen;
+  mix-blend-mode: lighten;
 }
 
 a {
-  color: rgba(124, 255, 203, 0.92);
+  color: rgba(152, 255, 215, 0.96);
   text-decoration: none;
+  transition: color 160ms ease;
 }
 
 a:hover {
+  color: #b4ffe5;
   text-decoration: underline;
-  text-underline-offset: 3px;
+  text-underline-offset: 4px;
 }
 
 h1,
@@ -75,9 +82,9 @@ h3 {
 code {
   font-family: var(--font-mono);
   font-size: 0.95em;
-  color: rgba(255, 255, 255, 0.86);
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(238, 246, 255, 0.9);
+  background: rgba(146, 168, 217, 0.14);
+  border: 1px solid rgba(146, 168, 217, 0.28);
   padding: 2px 6px;
   border-radius: 10px;
 }
@@ -86,8 +93,8 @@ pre {
   font-family: var(--font-mono);
   font-size: 12px;
   line-height: 1.45;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(146, 168, 217, 0.1);
+  border: 1px solid rgba(146, 168, 217, 0.2);
   border-radius: var(--radius);
   padding: 12px 14px;
   overflow: auto;
@@ -97,13 +104,13 @@ pre {
 button {
   appearance: none;
   border-radius: var(--radius-sm);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(146, 168, 217, 0.24);
   padding: 10px 12px;
   font-weight: 600;
   font-size: 13px;
   letter-spacing: 0.2px;
-  color: rgba(255, 255, 255, 0.88);
-  background: rgba(255, 255, 255, 0.05);
+  color: rgba(240, 248, 255, 0.9);
+  background: rgba(146, 168, 217, 0.12);
   cursor: pointer;
   transition:
     transform 160ms ease,
@@ -113,9 +120,9 @@ button {
 }
 
 button:hover {
-  border-color: rgba(124, 255, 203, 0.22);
-  background: rgba(124, 255, 203, 0.06);
-  box-shadow: 0 0 0 3px rgba(124, 255, 203, 0.08);
+  border-color: rgba(124, 255, 203, 0.4);
+  background: rgba(124, 255, 203, 0.12);
+  box-shadow: 0 0 0 3px rgba(124, 255, 203, 0.16);
   transform: translateY(-1px);
 }
 
@@ -139,9 +146,9 @@ input:not([type='checkbox']):not([type='radio']):not([type='file']),
 textarea,
 select {
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(146, 168, 217, 0.26);
+  background: rgba(146, 168, 217, 0.1);
+  color: rgba(244, 248, 255, 0.94);
   padding: 10px 12px;
   font-family: var(--font-body);
   outline: none;
@@ -157,8 +164,8 @@ select {
    even in dark pages. Ensure options remain readable. */
 select option,
 select optgroup {
-  color: rgba(255, 255, 255, 0.92);
-  background: #0b0f14;
+  color: rgba(244, 248, 255, 0.94);
+  background: #0b1324;
 }
 
 textarea {
@@ -168,9 +175,22 @@ textarea {
 input:not([type='checkbox']):not([type='radio']):not([type='file']):focus,
 textarea:focus,
 select:focus {
-  border-color: rgba(124, 255, 203, 0.32);
+  border-color: rgba(124, 255, 203, 0.58);
   box-shadow: 0 0 0 4px var(--ring);
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(146, 168, 217, 0.16);
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+}
+
+button:focus-visible,
+a:focus-visible {
+  box-shadow: 0 0 0 3px rgba(124, 255, 203, 0.32);
 }
 
 /* Markdown rendering (Ask answers, evidence snippets, etc.) */
@@ -201,8 +221,8 @@ select:focus {
 .markdown blockquote {
   margin: 10px 0;
   padding: 8px 10px;
-  border-left: 3px solid rgba(124, 255, 203, 0.42);
-  background: rgba(255, 255, 255, 0.04);
+  border-left: 3px solid rgba(124, 255, 203, 0.6);
+  background: rgba(146, 168, 217, 0.1);
   border-radius: 10px;
 }
 
@@ -214,7 +234,7 @@ select:focus {
 
 .markdown th,
 .markdown td {
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(146, 168, 217, 0.25);
   padding: 6px 8px;
 }
 
@@ -222,6 +242,6 @@ select:focus {
   max-width: 100%;
   height: auto;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(146, 168, 217, 0.26);
+  background: rgba(146, 168, 217, 0.06);
 }
