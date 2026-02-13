@@ -28,12 +28,14 @@ type ScanUnit = {
 type UploadScan = {
   upload_id: string
   mode: string
+  doi_strategy?: string
   root: string
   units: ScanUnit[]
   errors?: unknown[]
 }
 
 type FolderFile = { path: string; file: File; size: number }
+type DoiStrategy = 'extract_only' | 'title_crossref'
 
 type WebkitFileEntry = {
   isFile: true
@@ -127,6 +129,10 @@ function parseApiDetailMessage(msg: string): string {
   return s
 }
 
+function normalizeDoiStrategy(v: unknown): DoiStrategy {
+  return String(v ?? '').trim().toLowerCase() === 'title_crossref' ? 'title_crossref' : 'extract_only'
+}
+
 export default function IngestPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [error, setError] = useState<string>('')
@@ -142,6 +148,7 @@ export default function IngestPage() {
   const [uploadId, setUploadId] = useState<string>('')
   const [uploadProgress, setUploadProgress] = useState<{ sent: number; total: number }>({ sent: 0, total: 0 })
   const [scan, setScan] = useState<UploadScan | null>(null)
+  const [doiStrategy, setDoiStrategy] = useState<DoiStrategy>('extract_only')
   const [doiByUnit, setDoiByUnit] = useState<Record<string, string>>({})
   const [paperTypeByUnit, setPaperTypeByUnit] = useState<Record<string, string>>({})
 
@@ -164,6 +171,7 @@ export default function IngestPage() {
         chunkMB: number
         uploadId: string
         scan: UploadScan | null
+        doiStrategy: DoiStrategy
         taskId: string
         doiByUnit: Record<string, string>
         paperTypeByUnit: Record<string, string>
@@ -171,12 +179,15 @@ export default function IngestPage() {
         chunkMB: number
         uploadId: string
         scan: UploadScan | null
+        doiStrategy: DoiStrategy
         taskId: string
         doiByUnit: Record<string, string>
         paperTypeByUnit: Record<string, string>
       }>
       if (typeof s.chunkMB === 'number' && Number.isFinite(s.chunkMB)) setChunkMB(s.chunkMB)
       if (s.scan) setScan(s.scan)
+      if (s.scan?.doi_strategy) setDoiStrategy(normalizeDoiStrategy(s.scan.doi_strategy))
+      if (s.doiStrategy) setDoiStrategy(normalizeDoiStrategy(s.doiStrategy))
       const storedUploadId =
         (typeof s.uploadId === 'string' && s.uploadId) || (s.scan?.upload_id ? String(s.scan.upload_id) : '')
       const id = urlUploadId || storedUploadId
@@ -201,12 +212,12 @@ export default function IngestPage() {
   useEffect(() => {
     if (!hydrated) return
     try {
-      const payload = { chunkMB, uploadId, scan, taskId, doiByUnit, paperTypeByUnit }
+      const payload = { chunkMB, uploadId, scan, doiStrategy, taskId, doiByUnit, paperTypeByUnit }
       localStorage.setItem(persistKey, JSON.stringify(payload))
     } catch {
       // ignore
     }
-  }, [chunkMB, doiByUnit, hydrated, paperTypeByUnit, scan, taskId, uploadId])
+  }, [chunkMB, doiByUnit, doiStrategy, hydrated, paperTypeByUnit, scan, taskId, uploadId])
 
   useEffect(() => {
     if (!hydrated) return
@@ -238,6 +249,7 @@ export default function IngestPage() {
   const refreshScan = useCallback(async (id: string) => {
     const s = await apiGet<UploadScan>(`/ingest/upload/scan?upload_id=${encodeURIComponent(id)}`)
     setScan(s)
+    if (s?.doi_strategy) setDoiStrategy(normalizeDoiStrategy(s.doi_strategy))
     return s
   }, [])
 
@@ -440,6 +452,7 @@ export default function IngestPage() {
           chunk_bytes: chunkBytes,
           total_bytes: zipFile.size,
           filename: zipFile.name,
+          doi_strategy: doiStrategy,
         })
         const id = String(start.upload_id ?? '')
         setUploadId(id)
@@ -454,6 +467,7 @@ export default function IngestPage() {
           mode: 'folder',
           chunk_bytes: chunkBytes,
           files: folderFiles.map((f) => ({ path: f.path, size: f.size })),
+          doi_strategy: doiStrategy,
         })
         const id = String(start.upload_id ?? '')
         setUploadId(id)
@@ -547,6 +561,13 @@ export default function IngestPage() {
           <span className="pill">
             <span className="kicker">分片(MB)</span>
             <input className="input ingestChunkInput" name="ingest_chunk_mb" type="number" min={1} max={64} value={chunkMB} onChange={(e) => setChunkMB(Number(e.target.value || 8))} />
+          </span>
+          <span className="pill">
+            <span className="kicker">{'DOI\u7b56\u7565'}</span>
+            <select className="input" name="ingest_doi_strategy" value={doiStrategy} onChange={(e) => setDoiStrategy(normalizeDoiStrategy(e.target.value))}>
+              <option value="extract_only">{'\u89c4\u5219\u62bd\u53d6'}</option>
+              <option value="title_crossref">{'\u6807\u9898 + Crossref'}</option>
+            </select>
           </span>
           {uploadId && (
             <span className="pill">

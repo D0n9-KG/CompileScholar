@@ -37,6 +37,22 @@ def _render_template(template: str, vars: dict[str, Any]) -> str:
     return _TPL_RE.sub(_sub, template or "")
 
 
+def _rule_int(rules: dict[str, Any], key: str, default: int, *, lo: int, hi: int) -> int:
+    try:
+        v = int(rules.get(key) if key in rules else default)
+    except Exception:
+        v = int(default)
+    return max(lo, min(hi, v))
+
+
+def _rule_float(rules: dict[str, Any], key: str, default: float, *, lo: float, hi: float) -> float:
+    try:
+        v = float(rules.get(key) if key in rules else default)
+    except Exception:
+        v = float(default)
+    return max(lo, min(hi, v))
+
+
 def classify_citation_purpose(
     citing_title: str,
     cited_title: str | None,
@@ -97,6 +113,7 @@ def classify_citation_purposes_batch(
     max_contexts_per_cite: int = 3,
     max_context_chars: int = 900,
     prompt_overrides: dict[str, Any] | None = None,
+    rules: dict[str, Any] | None = None,
 ) -> dict:
     """
     Classify purposes for many (A->B) citations in ONE LLM call.
@@ -107,10 +124,47 @@ def classify_citation_purposes_batch(
       - cited_doi (optional)
       - contexts: list[str]
     """
+    rule_map = rules if isinstance(rules, dict) else {}
+    max_contexts = _rule_int(
+        rule_map,
+        "citation_purpose_max_contexts_per_cite",
+        max_contexts_per_cite,
+        lo=1,
+        hi=12,
+    )
+    max_context_len = _rule_int(
+        rule_map,
+        "citation_purpose_max_context_chars",
+        max_context_chars,
+        lo=120,
+        hi=8000,
+    )
+    max_cites = _rule_int(
+        rule_map,
+        "citation_purpose_max_cites_per_batch",
+        60,
+        lo=1,
+        hi=200,
+    )
+    max_labels = _rule_int(
+        rule_map,
+        "citation_purpose_max_labels_per_cite",
+        3,
+        lo=1,
+        hi=8,
+    )
+    fallback_score = _rule_float(
+        rule_map,
+        "citation_purpose_fallback_score",
+        0.4,
+        lo=0.0,
+        hi=1.0,
+    )
+
     items = []
-    for c in cites[:60]:
+    for c in cites[:max_cites]:
         ctxs = [x.strip() for x in (c.get("contexts") or []) if x and x.strip()]
-        ctxs = [x[:max_context_chars] for x in ctxs][:max_contexts_per_cite]
+        ctxs = [x[:max_context_len] for x in ctxs][:max_contexts]
         items.append(
             {
                 "cited_paper_id": c.get("cited_paper_id"),
@@ -170,7 +224,7 @@ def classify_citation_purposes_batch(
         if not isinstance(labels, list) or not labels:
             labels = ["Background"]
         if not isinstance(scores, list) or len(scores) != len(labels):
-            scores = [0.4] * len(labels)
+            scores = [fallback_score] * len(labels)
         clean_labels = []
         clean_scores = []
         for l, s in zip(labels, scores):
@@ -179,14 +233,14 @@ def classify_citation_purposes_batch(
             try:
                 ss = float(s)
             except Exception:
-                ss = 0.4
+                ss = fallback_score
             ss = max(0.0, min(1.0, ss))
             clean_labels.append(l)
             clean_scores.append(ss)
         if not clean_labels:
             clean_labels = ["Background"]
-            clean_scores = [0.4]
-        pairs = sorted(zip(clean_labels, clean_scores), key=lambda x: x[1], reverse=True)[:3]
+            clean_scores = [fallback_score]
+        pairs = sorted(zip(clean_labels, clean_scores), key=lambda x: x[1], reverse=True)[:max_labels]
         by_id[str(cited_paper_id)] = {
             "labels": [p[0] for p in pairs],
             "scores": [p[1] for p in pairs],

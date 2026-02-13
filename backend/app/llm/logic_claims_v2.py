@@ -12,6 +12,17 @@ from app.llm.client import call_json
 _WS_RE = re.compile(r"\s+")
 _TOKEN_RE = re.compile(r"[A-Za-z]+|\d+|[\u4e00-\u9fff]+")
 _TPL_RE = re.compile(r"\{\{\s*([A-Za-z][A-Za-z0-9_]*)\s*\}\}")
+_DEFAULT_EXCLUDED_SECTION_TERMS = (
+    "reference",
+    "references",
+    "bibliography",
+    "further reading",
+    "acknowledg",
+    "funding",
+    "appendix references",
+    "参考文献",
+    "致谢",
+)
 
 
 def _render_template(template: str, vars: dict[str, Any]) -> str:
@@ -62,6 +73,89 @@ def _tokens(s: str) -> list[str]:
     return [t for t in out if t and t not in {"the", "and", "of", "to", "in", "a", "an"}]
 
 
+def _rule_int(rules: dict[str, Any], key: str, default: int, *, lo: int, hi: int) -> int:
+    try:
+        raw = rules.get(key, default)
+        v = int(raw)
+    except Exception:
+        v = int(default)
+    return max(lo, min(hi, v))
+
+
+def _rule_float(rules: dict[str, Any], key: str, default: float, *, lo: float, hi: float) -> float:
+    try:
+        raw = rules.get(key, default)
+        v = float(raw)
+    except Exception:
+        v = float(default)
+    return max(lo, min(hi, v))
+
+
+def _rule_bool(rules: dict[str, Any], key: str, default: bool) -> bool:
+    raw = rules.get(key, None)
+    if raw is None:
+        return bool(default)
+    if isinstance(raw, bool):
+        return raw
+    s = str(raw or "").strip().lower()
+    if not s:
+        return bool(default)
+    if s in {"1", "true", "yes", "on"}:
+        return True
+    if s in {"0", "false", "no", "off"}:
+        return False
+    return bool(default)
+
+
+def _rule_str_list(rules: dict[str, Any], key: str) -> list[str]:
+    raw = rules.get(key, None)
+    if raw is None:
+        return []
+    if not isinstance(raw, list):
+        return []
+    out: list[str] = []
+    for item in raw:
+        s = str(item or "").strip().lower()
+        if s and s not in out:
+            out.append(s)
+    return out
+
+
+def _normalize_section_text(section: Any) -> str:
+    s = str(section or "").strip().lower()
+    return _WS_RE.sub(" ", s)
+
+
+def _section_is_excluded(section: Any, rules: dict[str, Any]) -> bool:
+    if not _rule_bool(rules, "phase1_filter_reference_sections", True):
+        return False
+    section_n = _normalize_section_text(section)
+    if not section_n:
+        return False
+    section_compact = re.sub(r"[\s_\-:：]+", "", section_n)
+    markers = _rule_str_list(rules, "phase1_excluded_section_terms") or list(_DEFAULT_EXCLUDED_SECTION_TERMS)
+    for marker in markers:
+        m = _normalize_section_text(marker)
+        if not m:
+            continue
+        m_compact = re.sub(r"[\s_\-:：]+", "", m)
+        if m in section_n:
+            return True
+        if m_compact and m_compact in section_compact:
+            return True
+    return False
+
+
+def _include_chunk(chunk: Any, rules: dict[str, Any]) -> bool:
+    if str(getattr(chunk, "kind", "") or "") == "heading":
+        return False
+    if not str(getattr(chunk, "text", "") or "").strip():
+        return False
+    if _section_is_excluded(getattr(chunk, "section", ""), rules):
+        return False
+    return True
+
+
 def _lexical_top_chunks(query: str, chunks: list[dict[str, Any]], k: int = 8) -> list[dict[str, Any]]:
     q_tokens = _tokens(query)
     if not q_tokens:
@@ -102,8 +196,11 @@ def add_logic_step_evidence(doc: DocumentIR, schema: dict[str, Any], logic: dict
     emax = max(0, min(12, emax))
     if emax and emin and emax < emin:
         emax = emin
+    lexical_topk_min = _rule_int(rules, "phase1_logic_lexical_topk_min", 6, lo=1, hi=64)
+    lexical_topk_multiplier = _rule_int(rules, "phase1_logic_lexical_topk_multiplier", 3, lo=1, hi=12)
+    weak_score_threshold = _rule_float(rules, "phase1_logic_evidence_weak_score_threshold", 2.0, lo=0.0, hi=20.0)
 
-    chunks = [{"chunk_id": c.chunk_id, "text": c.text} for c in doc.chunks if c.kind != "heading" and (c.text or "").strip()]
+    chunks = [{"chunk_id": c.chunk_id, "text": c.text} for c in doc.chunks if _include_chunk(c, rules)]
 
     for step_type, v in (logic or {}).items():
         if not isinstance(v, dict):
@@ -113,7 +210,7 @@ def add_logic_step_evidence(doc: DocumentIR, schema: dict[str, Any], logic: dict
             v["evidence_chunk_ids"] = []
             v["evidence_weak"] = False
             continue
-        cand = _lexical_top_chunks(summary, chunks, k=max(6, emax * 3))
+        cand = _lexical_top_chunks(summary, chunks, k=max(lexical_topk_min, emax * lexical_topk_multiplier))
         picked: list[str] = []
         for c in cand:
             cid = str(c.get("chunk_id") or "").strip()
@@ -126,7 +223,7 @@ def add_logic_step_evidence(doc: DocumentIR, schema: dict[str, Any], logic: dict
         top_score = float(cand[0].get("score") or 0.0) if cand else 0.0
         if not picked:
             weak = True
-        elif top_score < 2.0:
+        elif top_score < weak_score_threshold:
             weak = True
 
         v["evidence_chunk_ids"] = picked[:emax]
@@ -155,9 +252,16 @@ def extract_logic_and_claims_v2(doc: DocumentIR, paper_id: str, schema: dict[str
     rules = schema.get("rules") or {}
     cmin = int(rules.get("claims_per_paper_min") or 24)
     cmax = int(rules.get("claims_per_paper_max") or max(cmin, 48))
+    doc_chars_max = int(rules.get("phase1_doc_chars_max") or max_chars)
+    doc_chars_max = max(2000, min(120000, doc_chars_max))
+    evidence_candidate_topk = _rule_int(rules, "phase1_evidence_lexical_topk", 10, lo=1, hi=64)
+    verify_candidates_max = _rule_int(rules, "phase1_evidence_verify_candidates_max", 6, lo=1, hi=16)
 
-    body = "\n\n".join(c.text for c in doc.chunks if c.kind != "heading")
-    body = _shorten(body, max_chars=max_chars)
+    source_chunks = [c for c in doc.chunks if _include_chunk(c, rules)]
+    if not source_chunks:
+        source_chunks = [c for c in doc.chunks if str(getattr(c, "kind", "") or "") != "heading" and str(c.text or "").strip()]
+    body = "\n\n".join(str(c.text or "") for c in source_chunks)
+    body = _shorten(body, max_chars=doc_chars_max)
 
     default_system = (
         "You extract a paper's reasoning structure for a research knowledge graph.\n"
@@ -290,6 +394,8 @@ def add_evidence_and_targets(
     evidence_verification = str(rules.get("evidence_verification") or "llm")
     targets_max = int(rules.get("targets_per_claim_max") or 3)
     require_target_kinds = set(rules.get("require_targets_for_kinds") or [])
+    evidence_candidate_topk = _rule_int(rules, "phase1_evidence_lexical_topk", 10, lo=1, hi=64)
+    verify_candidates_max = _rule_int(rules, "phase1_evidence_verify_candidates_max", 6, lo=1, hi=16)
 
     chunks = [
         {
@@ -301,7 +407,7 @@ def add_evidence_and_targets(
             "end_line": c.span.end_line,
         }
         for c in doc.chunks
-        if c.kind != "heading"
+        if _include_chunk(c, rules)
     ]
 
     cited_by_chunk: dict[str, list[dict[str, Any]]] = {}
@@ -320,11 +426,12 @@ def add_evidence_and_targets(
     for cl in claims:
         q = str(cl.get("text") or "")
         key = str(cl.get("claim_key") or "")
-        candidates_by_key[key] = _lexical_top_chunks(q, chunks, k=10)
+        candidates_by_key[key] = _lexical_top_chunks(q, chunks, k=evidence_candidate_topk)
 
     # 2) Optional LLM verification in small batches to reduce calls.
     if evidence_verification == "llm":
-        batch_size = 6
+        batch_size = int(rules.get("phase1_evidence_verify_batch_size") or 6)
+        batch_size = max(1, min(32, batch_size))
         keys = [str(c.get("claim_key") or "") for c in claims]
         verified: dict[str, dict[str, Any]] = {}
         for i in range(0, len(keys), batch_size):
@@ -336,7 +443,7 @@ def add_evidence_and_targets(
                 cl = next((x for x in claims if str(x.get("claim_key") or "") == k), None)
                 if not cl:
                     continue
-                cand = candidates_by_key.get(k, [])[:6]
+                cand = candidates_by_key.get(k, [])[:verify_candidates_max]
                 payload.append({"claim_key": k, "text": str(cl.get("text") or ""), "candidates": cand})
             if not payload:
                 continue
@@ -402,7 +509,11 @@ def add_evidence_and_targets(
     # 3) Fill remaining claims with lexical fallback.
     for cl in claims:
         q = str(cl.get("text") or "")
-        candidates = candidates_by_key.get(str(cl.get("claim_key") or ""), []) or _lexical_top_chunks(q, chunks, k=10)
+        candidates = candidates_by_key.get(str(cl.get("claim_key") or ""), []) or _lexical_top_chunks(
+            q,
+            chunks,
+            k=evidence_candidate_topk,
+        )
         picked = list(cl.get("evidence_chunk_ids") or [])
         weak = bool(cl.get("evidence_weak") or False)
         if not picked and candidates:

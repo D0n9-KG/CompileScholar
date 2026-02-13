@@ -53,6 +53,7 @@ class CrossrefClient:
                 if self._mailto:
                     params["mailto"] = self._mailto
                 r = self._session.get("https://api.crossref.org/works", params=params, timeout=timeout_s)
+                self._raise_if_rate_limited(r)
                 r.raise_for_status()
                 return {
                     "ok": True,
@@ -69,12 +70,27 @@ class CrossrefClient:
     def _cache_key(self, query: str) -> str:
         return hashlib.sha256(query.strip().encode("utf-8", errors="ignore")).hexdigest()
 
+    @staticmethod
+    def _retry_after_seconds(retry_after: str | None) -> float:
+        try:
+            raw = float(str(retry_after or "").strip())
+        except Exception:  # noqa: BLE001
+            raw = 2.0
+        return max(0.2, min(60.0, raw))
+
+    def _raise_if_rate_limited(self, response: requests.Response) -> None:
+        if int(response.status_code) != 429:
+            return
+        time.sleep(self._retry_after_seconds(response.headers.get("Retry-After")))
+        raise RuntimeError("Crossref rate limited (429)")
+
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=0.6, min=0.6, max=3.0))
     def _query(self, query: str, rows: int = 5) -> dict:
         params = {"query.bibliographic": query, "rows": rows}
         if self._mailto:
             params["mailto"] = self._mailto
         r = self._session.get("https://api.crossref.org/works", params=params, timeout=15)
+        self._raise_if_rate_limited(r)
         r.raise_for_status()
         return r.json()
 
@@ -82,6 +98,7 @@ class CrossrefClient:
     def _get_work(self, doi: str) -> dict:
         # DOI may contain slashes; requests will handle encoding.
         r = self._session.get(f"https://api.crossref.org/works/{doi}", timeout=15)
+        self._raise_if_rate_limited(r)
         r.raise_for_status()
         return r.json()
 

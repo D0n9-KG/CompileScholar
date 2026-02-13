@@ -51,6 +51,7 @@ class UploadStartRequest(BaseModel):
     total_bytes: int | None = Field(default=None, ge=1)
     filename: str | None = None
     files: list[dict] | None = None  # folder mode: [{path,size}]
+    doi_strategy: str = Field(default="extract_only", pattern="^(extract_only|title_crossref)$")
 
 
 @router.post("/upload/start")
@@ -76,9 +77,10 @@ def upload_start(req: UploadStartRequest):
             total_chunks=total_chunks,
             filename=req.filename,
             files=files,
+            doi_strategy=req.doi_strategy,
         )
         save_manifest(m)
-        return {"upload_id": upload_id, "chunk_bytes": req.chunk_bytes}
+        return {"upload_id": upload_id, "chunk_bytes": req.chunk_bytes, "doi_strategy": req.doi_strategy}
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:

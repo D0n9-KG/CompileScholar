@@ -142,6 +142,29 @@ if (-not (Test-Path $feEnvLocal) -and (Test-Path (Join-Path $frontendDir ".env.e
   Copy-Item (Join-Path $frontendDir ".env.example") $feEnvLocal -Force
 }
 
+function Set-FrontendApiUrl($envFile, $port) {
+  $targetLine = "VITE_API_URL=http://127.0.0.1:$port"
+  $lines = @()
+  if (Test-Path $envFile) {
+    $lines = @(Get-Content $envFile -ErrorAction SilentlyContinue)
+  }
+
+  $updated = $false
+  for ($i = 0; $i -lt $lines.Count; $i++) {
+    if ($lines[$i] -match '^\s*VITE_API_URL\s*=') {
+      $lines[$i] = $targetLine
+      $updated = $true
+      break
+    }
+  }
+
+  if (-not $updated) {
+    $lines += $targetLine
+  }
+
+  Set-Content -Path $envFile -Value $lines -Encoding UTF8
+}
+
 Write-Host "[LogicKG] Starting dev servers..."
 
 $excludedRanges = Get-ExcludedTcpPortRanges
@@ -164,8 +187,11 @@ if ($frontendPort -eq $backendPort) {
   $frontendPort = Find-FreePort @($frontendPort+1, $frontendPort+2, 5173,5174,5175,5180,15173) $excludedRanges
 }
 
+Set-FrontendApiUrl $feEnvLocal $backendPort
+
 Write-Host "[LogicKG] Backend:  http://127.0.0.1:$backendPort/docs"
 Write-Host "[LogicKG] Frontend: http://127.0.0.1:$frontendPort/"
+Write-Host "[LogicKG] Frontend API URL synced: http://127.0.0.1:$backendPort"
 Write-Host "[LogicKG] Press Ctrl+C to stop."
 
 $backendProc = $null

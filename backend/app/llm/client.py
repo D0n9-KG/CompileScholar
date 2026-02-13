@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import json
 import re
+from typing import Any
 
-from langchain_openai import ChatOpenAI
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from app.settings import settings
@@ -26,7 +26,9 @@ def _extract_json(text: str) -> dict:
     return json.loads(text)
 
 
-def llm() -> ChatOpenAI:
+def llm() -> Any:
+    from langchain_openai import ChatOpenAI
+
     api_key = settings.effective_llm_api_key()
     base_url = settings.effective_llm_base_url()
     if not api_key:

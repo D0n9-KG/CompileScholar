@@ -7,12 +7,14 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
+from app.crossref.client import CrossrefClient
 from app.graph.neo4j_client import Neo4jClient
 from app.ingest.parse_md import parse_mineru_markdown
 from app.ingest.upload_store import (
     assembled_root,
     extracted_root,
     load_manifest,
+    normalize_doi_strategy,
     overrides_get,
     paper_type_overrides_get,
     safe_relpath,
@@ -23,6 +25,7 @@ from app.settings import settings
 
 
 _DOI_RE = re.compile(r"^10\.\d{4,9}/\S+$")
+_CROSSREF_CONFIDENCE_THRESHOLD = 0.25
 
 
 @dataclass
@@ -46,8 +49,10 @@ def scan_upload(upload_id: str) -> dict[str, Any]:
     else:
         root = assembled_root(upload_id)
 
+    doi_strategy = normalize_doi_strategy(getattr(m, "doi_strategy", None))
     overrides = overrides_get(upload_id)
     paper_type_overrides = paper_type_overrides_get(upload_id)
+    crossref: CrossrefClient | None = CrossrefClient() if doi_strategy == "title_crossref" else None
 
     units: list[PaperUnit] = []
     errors: list[dict[str, Any]] = []
@@ -92,6 +97,16 @@ def scan_upload(upload_id: str) -> dict[str, Any]:
             continue
 
         doi = (doi_override or doc.paper.doi or "").strip().lower() or None
+        if not doi and crossref:
+            query = (doc.paper.title or doc.paper.title_alt or "").strip()
+            if query:
+                try:
+                    r = crossref.resolve_reference(query)
+                    selected = r.selected
+                    if selected and selected.doi and float(r.confidence) >= _CROSSREF_CONFIDENCE_THRESHOLD:
+                        doi = str(selected.doi).strip().lower()
+                except Exception as exc:  # noqa: BLE001
+                    errors.append({"unit_dir": rel_dir, "error": f"Crossref title DOI resolve failed: {exc}"})
         if doi and not _DOI_RE.match(doi):
             doi = None
 
@@ -133,6 +148,7 @@ def scan_upload(upload_id: str) -> dict[str, Any]:
     out = {
         "upload_id": upload_id,
         "mode": m.mode,
+        "doi_strategy": doi_strategy,
         "root": str(root),
         "units": [asdict(u) for u in units],
         "errors": errors,

@@ -49,6 +49,12 @@ class Settings(BaseSettings):
         validation_alias=AliasChoices("SILICONFLOW_API_KEY", "SILICON_FLOW_API_KEY", "SILICONCLOUD_API_KEY"),
     )
 
+    # Phase1 extraction gate controls (quality-first pipeline).
+    phase1_gate_allow_weak: bool = Field(
+        default=False,
+        validation_alias=AliasChoices("PHASE1_GATE_ALLOW_WEAK"),
+    )
+
     data_root: str = ".."
     storage_dir: str = "storage"
 

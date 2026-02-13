@@ -22,6 +22,12 @@ export default function PapersPage() {
   const [assignPaper, setAssignPaper] = useState<PaperRow | null>(null)
   const [assignSelected, setAssignSelected] = useState<Record<string, boolean>>({})
   const [assignBusy, setAssignBusy] = useState<boolean>(false)
+  const [selectedPaperIds, setSelectedPaperIds] = useState<Record<string, boolean>>({})
+  const [batchAssignOpen, setBatchAssignOpen] = useState<boolean>(false)
+  const [batchAssignSelected, setBatchAssignSelected] = useState<Record<string, boolean>>({})
+  const [batchAssignBusy, setBatchAssignBusy] = useState<boolean>(false)
+  const [batchDeleteOpen, setBatchDeleteOpen] = useState<boolean>(false)
+  const [batchDeleteBusy, setBatchDeleteBusy] = useState<boolean>(false)
   const [deleteBusy, setDeleteBusy] = useState<string>('')
   const [paperDeleteOpen, setPaperDeleteOpen] = useState<boolean>(false)
   const [paperDeleteId, setPaperDeleteId] = useState<string>('')
@@ -57,6 +63,41 @@ export default function PapersPage() {
       : papers
     return [...rows].sort((a, b) => (b.year ?? 0) - (a.year ?? 0))
   }, [papers, query])
+
+  const selectedPaperIdList = useMemo(() => {
+    const valid = new Set(papers.map((p) => String(p.paper_id)))
+    return Object.entries(selectedPaperIds)
+      .filter(([paperId, checked]) => !!checked && valid.has(String(paperId)))
+      .map(([paperId]) => String(paperId))
+  }, [papers, selectedPaperIds])
+
+  const selectedPaperCount = selectedPaperIdList.length
+  const selectedCollectionCount = useMemo(
+    () => Object.values(batchAssignSelected).filter((v) => !!v).length,
+    [batchAssignSelected],
+  )
+  const selectedInFilteredCount = useMemo(
+    () => filtered.filter((p) => !!selectedPaperIds[p.paper_id]).length,
+    [filtered, selectedPaperIds],
+  )
+  const allFilteredSelected = filtered.length > 0 && selectedInFilteredCount === filtered.length
+
+  useEffect(() => {
+    const valid = new Set(papers.map((p) => String(p.paper_id)))
+    setSelectedPaperIds((prev) => {
+      let changed = false
+      const next: Record<string, boolean> = {}
+      for (const [k, v] of Object.entries(prev)) {
+        if (!v || !valid.has(String(k))) {
+          if (v) changed = true
+          continue
+        }
+        next[k] = true
+      }
+      if (!changed && Object.keys(next).length === Object.keys(prev).length) return prev
+      return next
+    })
+  }, [papers])
 
   function openCreateCollection() {
     setCollectionEditMode('create')
@@ -160,6 +201,106 @@ export default function PapersPage() {
     }
   }
 
+  function togglePaperSelected(paperId: string, checked: boolean) {
+    setSelectedPaperIds((prev) => {
+      const next = { ...prev }
+      if (checked) next[paperId] = true
+      else delete next[paperId]
+      return next
+    })
+  }
+
+  function toggleFilteredSelected(checked: boolean) {
+    setSelectedPaperIds((prev) => {
+      const next = { ...prev }
+      for (const p of filtered) {
+        const paperId = String(p.paper_id)
+        if (checked) next[paperId] = true
+        else delete next[paperId]
+      }
+      return next
+    })
+  }
+
+  function openBatchAssign() {
+    if (!selectedPaperCount) return
+    setBatchAssignSelected({})
+    setBatchAssignOpen(true)
+  }
+
+  async function saveBatchAssign() {
+    if (!selectedPaperCount) return
+    const collectionIds = Object.entries(batchAssignSelected)
+      .filter(([, v]) => !!v)
+      .map(([k]) => String(k))
+    if (!collectionIds.length) {
+      setError('\u8bf7\u81f3\u5c11\u9009\u62e9\u4e00\u4e2a\u8bba\u6587\u96c6\u3002')
+      return
+    }
+    setBatchAssignBusy(true)
+    setError('')
+    setInfo('')
+    let ok = 0
+    const failed: string[] = []
+    try {
+      for (const paperId of selectedPaperIdList) {
+        try {
+          for (const cid of collectionIds) {
+            await apiPost<Record<string, unknown>>(`/collections/${encodeURIComponent(cid)}/papers/${encodeURIComponent(paperId)}`, {})
+          }
+          ok += 1
+        } catch {
+          failed.push(paperId)
+        }
+      }
+      await reloadPapers()
+      const msg = `\u6279\u91cf\u5206\u7c7b\u5b8c\u6210\uff1a${ok}/${selectedPaperIdList.length}\u3002`
+      if (failed.length > 0) {
+        setError(`${msg}\n\u5931\u8d25 ${failed.length} \u7bc7\uff1a${failed.slice(0, 5).join(', ')}${failed.length > 5 ? ' ...' : ''}`)
+      } else {
+        setInfo(msg)
+      }
+      if (failed.length === 0) setBatchAssignOpen(false)
+    } finally {
+      setBatchAssignBusy(false)
+    }
+  }
+
+  function openBatchDelete() {
+    if (!selectedPaperCount) return
+    setBatchDeleteOpen(true)
+  }
+
+  async function confirmBatchDelete() {
+    if (!selectedPaperCount) return
+    setBatchDeleteBusy(true)
+    setError('')
+    setInfo('')
+    let ok = 0
+    const failed: string[] = []
+    try {
+      for (const paperId of selectedPaperIdList) {
+        try {
+          await apiDelete<Record<string, unknown>>(`/papers/${encodeURIComponent(paperId)}`)
+          ok += 1
+        } catch {
+          failed.push(paperId)
+        }
+      }
+      await reloadPapers()
+      setSelectedPaperIds({})
+      const msg = `\u6279\u91cf\u5220\u9664\u5b8c\u6210\uff1a${ok}/${selectedPaperIdList.length}\u3002`
+      if (failed.length > 0) {
+        setError(`${msg}\n\u5931\u8d25 ${failed.length} \u7bc7\uff1a${failed.slice(0, 5).join(', ')}${failed.length > 5 ? ' ...' : ''}`)
+      } else {
+        setInfo(msg)
+      }
+      setBatchDeleteOpen(false)
+    } finally {
+      setBatchDeleteBusy(false)
+    }
+  }
+
   function openDeletePaper(paperId: string) {
     setPaperDeleteId(paperId)
     setPaperDeleteOpen(true)
@@ -173,7 +314,7 @@ export default function PapersPage() {
     setInfo('')
     try {
       await apiDelete<Record<string, unknown>>(`/papers/${encodeURIComponent(paperId)}`)
-      setInfo('已删除论文（回退为 stub）。建议随后重建全局 FAISS 以清理检索索引。')
+      setInfo('已删除论文（含 Neo4j 图数据）。建议随后重建全局 FAISS 以清理检索索引。')
       setPaperDeleteOpen(false)
       setPaperDeleteId('')
       await reloadPapers()
@@ -213,6 +354,12 @@ export default function PapersPage() {
           <button className="btn btnDanger" disabled={collectionFilter === 'all' || collectionFilter === '__uncategorized__'} onClick={() => openDeleteCollection()}>
             删除论文集
           </button>
+          <button className="btn" disabled={!selectedPaperCount} onClick={() => openBatchAssign()}>
+            {'\u6279\u91cf\u5206\u7c7b'}
+          </button>
+          <button className="btn btnDanger" disabled={!selectedPaperCount} onClick={() => openBatchDelete()}>
+            {'\u6279\u91cf\u5220\u9664'}
+          </button>
           <input className="input" style={{ width: 340, maxWidth: '70vw' }} value={query} onChange={(e) => setQuery(e.target.value)} placeholder="搜索标题 / DOI…" />
         </div>
       </div>
@@ -231,15 +378,29 @@ export default function PapersPage() {
 
       <div className="panel">
         <div className="panelHeader">
-          <div className="panelTitle">列表</div>
+          <div className="split">
+            <div className="panelTitle">列表</div>
+            <div className="row" style={{ gap: 10 }}>
+              <label className="row" style={{ gap: 8 }}>
+                <input type="checkbox" checked={allFilteredSelected} disabled={filtered.length === 0} onChange={(e) => toggleFilteredSelected(e.target.checked)} />
+                <span className="kicker">{'\u5168\u9009\u5f53\u524d\u7ed3\u679c'}</span>
+              </label>
+              <span className="pill">
+                <span className="kicker">{'\u5df2\u9009'}</span> {selectedPaperCount}
+              </span>
+            </div>
+          </div>
         </div>
         <div className="panelBody">
           <div className="list">
             {filtered.map((p) => (
               <div key={p.paper_id} className="itemCard">
                 <div className="split">
-                  <div className="itemTitle">
-                    <Link to={`/paper/${encodeURIComponent(p.paper_id)}`}>{p.title ?? p.paper_source}</Link>
+                  <div className="row" style={{ gap: 10, minWidth: 0 }}>
+                    <input type="checkbox" checked={!!selectedPaperIds[p.paper_id]} onChange={(e) => togglePaperSelected(String(p.paper_id), e.target.checked)} />
+                    <div className="itemTitle">
+                      <Link to={`/paper/${encodeURIComponent(p.paper_id)}`}>{p.title ?? p.paper_source}</Link>
+                    </div>
                   </div>
                   <div className="row" style={{ gap: 8 }}>
                     <span className="badge">{p.year ?? ''}</span>
@@ -325,6 +486,89 @@ export default function PapersPage() {
         </div>
       )}
 
+      {batchAssignOpen && (
+        <div className="modalOverlay" onClick={() => !batchAssignBusy && setBatchAssignOpen(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modalHeader">
+              <div className="modalTitle">{'\u6279\u91cf\u5206\u7c7b'}</div>
+              <button className="btn btnSmall" disabled={batchAssignBusy} onClick={() => setBatchAssignOpen(false)}>
+                关闭
+              </button>
+            </div>
+            <div className="modalBody">
+              <div className="hint" style={{ marginBottom: 12 }}>
+                {'\u5df2\u9009\u8bba\u6587\uff1a'}
+                <b>{selectedPaperCount}</b>
+                {'\u3002\u9009\u4e2d\u540e\u4f1a\u5c06\u8bba\u6587\u52a0\u5165\u5bf9\u5e94\u8bba\u6587\u96c6\u3002'}
+              </div>
+              <div className="row" style={{ marginBottom: 10 }}>
+                <button className="btn btnSmall" disabled={batchAssignBusy} onClick={() => openCreateCollection()}>
+                  新建论文集
+                </button>
+              </div>
+              <div className="list">
+                {collections.map((c) => {
+                  const checked = !!batchAssignSelected[c.collection_id]
+                  return (
+                    <div key={c.collection_id} className="itemCard">
+                      <div className="split">
+                        <div className="itemTitle">{c.name}</div>
+                        <label className="row" style={{ gap: 10 }}>
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={(e) => setBatchAssignSelected((m) => ({ ...m, [c.collection_id]: e.target.checked }))}
+                          />
+                          <span className="kicker">{checked ? '\u5df2\u9009\u4e2d' : '\u672a\u9009\u4e2d'}</span>
+                        </label>
+                      </div>
+                      <div className="itemMeta">
+                        <code>{c.collection_id}</code>
+                      </div>
+                    </div>
+                  )
+                })}
+                {collections.length === 0 && <div className="metaLine">暂无论文集。你可以先点击“新建论文集”。</div>}
+              </div>
+              <div className="row" style={{ marginTop: 12 }}>
+                <button className="btn btnPrimary" disabled={batchAssignBusy || selectedCollectionCount === 0} onClick={() => saveBatchAssign().catch(() => {})}>
+                  {batchAssignBusy ? '保存中…' : '保存'}
+                </button>
+                <button className="btn" disabled={batchAssignBusy} onClick={() => setBatchAssignOpen(false)}>
+                  取消
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {batchDeleteOpen && (
+        <div className="modalOverlay" onClick={() => !batchDeleteBusy && setBatchDeleteOpen(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modalHeader">
+              <div className="modalTitle">{'\u6279\u91cf\u5220\u9664\u8bba\u6587'}</div>
+              <button className="btn btnSmall" disabled={batchDeleteBusy} onClick={() => setBatchDeleteOpen(false)}>
+                关闭
+              </button>
+            </div>
+            <div className="modalBody">
+              <div className="hint" style={{ whiteSpace: 'pre-wrap' }}>
+                {`\u786e\u5b9a\u5220\u9664\u5df2\u9009\u4e2d\u7684 ${selectedPaperCount} \u7bc7\u8bba\u6587\u5417\uff1f\n\u8fd9\u4f1a\u76f4\u63a5\u5220\u9664\u8fd9\u4e9b\u8bba\u6587\u7684 Neo4j \u56fe\u6570\u636e\uff0c\u5e76\u6e05\u7406\u5bf9\u5e94\u6d3e\u751f\u6587\u4ef6\u3002`}
+              </div>
+              <div className="row" style={{ marginTop: 12 }}>
+                <button className="btn btnDanger" disabled={batchDeleteBusy} onClick={() => confirmBatchDelete().catch(() => {})}>
+                  {batchDeleteBusy ? '删除中…' : '确定删除'}
+                </button>
+                <button className="btn" disabled={batchDeleteBusy} onClick={() => setBatchDeleteOpen(false)}>
+                  取消
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {collectionEditOpen && (
         <div className="modalOverlay" onClick={() => !collectionEditBusy && setCollectionEditOpen(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -390,7 +634,7 @@ export default function PapersPage() {
             <div className="modalBody">
               <div className="hint" style={{ whiteSpace: 'pre-wrap' }}>
                 确定要删除这篇“已导入论文”吗？
-                {'\n'}该操作会删除该论文的抽取结果/派生文件，并把论文回退为 stub（用于保留其它论文对它的引用）。
+                {'\n'}该操作会直接删除该论文在 Neo4j 中的图数据（含关系）以及本地派生文件。
               </div>
               <div className="row" style={{ marginTop: 12 }}>
                 <button className="btn btnDanger" disabled={deleteBusy === paperDeleteId} onClick={() => confirmDeletePaper().catch(() => {})}>

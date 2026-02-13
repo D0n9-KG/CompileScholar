@@ -541,6 +541,13 @@ RETURN p
             claims_cleared = set(_safe_json(paper.get("human_claims_cleared_json"), []))
             human_cites = _safe_json(paper.get("human_cites_purpose_json"), {})
             cites_cleared = set(_safe_json(paper.get("human_cites_purpose_cleared_json"), []))
+            paper["phase1_quality"] = _safe_json(paper.get("phase1_quality_json"), {})
+            paper["phase1_gate_passed"] = bool(paper.get("phase1_gate_passed"))
+            paper["phase1_quality_tier"] = str(paper.get("phase1_quality_tier") or "")
+            try:
+                paper["phase1_quality_tier_score"] = float(paper.get("phase1_quality_tier_score") or 0.0)
+            except Exception:
+                paper["phase1_quality_tier_score"] = 0.0
 
             pending_task_id = paper.get("review_pending_task_id")
             resolved_task_id = paper.get("review_resolved_task_id")
@@ -1111,6 +1118,20 @@ DETACH DELETE f
         with self._driver.session() as session:
             for s in stmts:
                 session.run(s, paper_id=paper_id)
+
+    def delete_paper_node(self, paper_id: str) -> None:
+        """
+        Hard delete the Paper node itself (and any remaining incident relationships).
+        Intended for user-facing full deletion scenarios.
+        """
+        with self._driver.session() as session:
+            session.run(
+                """
+MATCH (p:Paper {paper_id:$paper_id})
+DETACH DELETE p
+""",
+                paper_id=paper_id,
+            )
 
     def list_chunks_for_faiss(self, limit: int = 200000) -> list[dict]:
         cypher = """

@@ -11,6 +11,8 @@ from typing import Any
 
 from app.settings import settings
 
+DOI_STRATEGIES = {"extract_only", "title_crossref"}
+
 
 def _backend_root() -> Path:
     return Path(__file__).resolve().parents[2]
@@ -39,6 +41,13 @@ def utc_now_iso() -> str:
     return datetime.now(tz=timezone.utc).isoformat()
 
 
+def normalize_doi_strategy(value: str | None) -> str:
+    s = str(value or "").strip().lower()
+    if s in DOI_STRATEGIES:
+        return s
+    return "extract_only"
+
+
 @dataclass
 class UploadFileEntry:
     path: str
@@ -54,6 +63,7 @@ class UploadManifest:
     total_chunks: int | None = None
     filename: str | None = None
     files: list[UploadFileEntry] = field(default_factory=list)
+    doi_strategy: str = "extract_only"  # extract_only | title_crossref
     created_at: str = field(default_factory=utc_now_iso)
 
     def to_dict(self) -> dict[str, Any]:
@@ -71,6 +81,7 @@ class UploadManifest:
             total_chunks=(int(d["total_chunks"]) if d.get("total_chunks") is not None else None),
             filename=d.get("filename"),
             files=[UploadFileEntry(path=str(x["path"]), size=int(x.get("size") or 0)) for x in (d.get("files") or [])],
+            doi_strategy=normalize_doi_strategy(d.get("doi_strategy")),
             created_at=str(d.get("created_at") or utc_now_iso()),
         )
 

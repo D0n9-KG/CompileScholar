@@ -6,7 +6,9 @@ from pathlib import Path
 from typing import Any, Callable
 
 from app.citations.aggregate import build_reference_and_cite_records
+from app.citations.citation_event_recovery import recover_citation_events_from_references
 from app.crossref.client import CrossrefClient
+from app.extraction.orchestrator import run_phase1_extraction
 from app.graph.neo4j_client import Neo4jClient
 from app.graph.neo4j_client import paper_id_for_md_path
 from app.ingest.figures import extract_figures_from_markdown
@@ -14,7 +16,7 @@ from app.ingest.paper_meta import load_canonical_meta
 from app.ingest.models import Chunk, MdSpan
 from app.ingest.parse_md import parse_mineru_markdown
 from app.llm.citation_purpose import classify_citation_purposes_batch
-from app.llm.logic_claims_v2 import add_evidence_and_targets, extract_logic_and_claims_v2
+from app.llm.reference_recovery import recover_references_with_agent
 from app.schema_store import load_active
 from app.settings import settings
 from app.vector.faiss_store import build_faiss_for_chunks
@@ -36,6 +38,25 @@ def _storage_dir() -> Path:
 
 def _safe_id(s: str) -> str:
     return re.sub(r"[^A-Za-z0-9_.-]+", "_", s)
+
+
+def _paper_type_for_md(md_path: str) -> str:
+    try:
+        meta = load_canonical_meta(md_path)
+        paper_type = str(meta.get("paper_type") or "research").strip().lower()
+        if paper_type not in {"research", "review"}:
+            return "research"
+        return paper_type
+    except Exception:
+        return "research"
+
+
+def _schema_for_md(md_path: str) -> dict[str, Any]:
+    paper_type = _paper_type_for_md(md_path)
+    try:
+        return load_active(paper_type)  # type: ignore[arg-type]
+    except Exception:
+        return load_active("research")  # type: ignore[arg-type]
 
 
 def rebuild_paper(
@@ -68,6 +89,22 @@ def rebuild_paper(
 
     notify("rebuild:parse", 0.15, "Parsing markdown")
     doc = parse_mineru_markdown(str(md_file))
+    schema_for_recovery = _schema_for_md(doc.paper.md_path)
+    notify("rebuild:reference_recovery", 0.20, "Recovering references via fallback agent")
+    doc, reference_recovery = recover_references_with_agent(
+        doc,
+        prompt_overrides=schema_for_recovery.get("prompts"),
+        rules=schema_for_recovery.get("rules"),
+    )
+    notify("rebuild:citation_event_recovery", 0.24, "Recovering citation events from references when needed")
+    doc, citation_event_recovery = recover_citation_events_from_references(
+        doc,
+        rules=schema_for_recovery.get("rules"),
+    )
+    citation_event_recovery["paper_source"] = doc.paper.paper_source
+    citation_event_recovery["paper_id"] = paper_id_for_md_path(doc.paper.md_path, doi=doc.paper.doi)
+    citation_event_recovery["schema_version"] = int(schema_for_recovery.get("version") or 1)
+    citation_event_recovery["schema_paper_type"] = str(schema_for_recovery.get("paper_type") or "research")
     expected_paper_id = paper_id_for_md_path(doc.paper.md_path, doi=doc.paper.doi)
     if expected_paper_id != paper_id:
         raise RuntimeError(
@@ -134,24 +171,25 @@ def rebuild_paper(
             )
 
     notify("rebuild:llm", 0.68, "Running LLM extraction (Logic/Claims/Citation Purposes)")
-    meta = load_canonical_meta(doc.paper.md_path)
-    paper_type = str(meta.get("paper_type") or "research").strip().lower()
-    if paper_type not in {"research", "review"}:
-        paper_type = "research"
-    schema = load_active(paper_type)  # type: ignore[arg-type]
-    steps_sorted = sorted(schema.get("steps") or [], key=lambda x: int((x or {}).get("order") or 0))
-    step_order = [str(s.get("id") or "") for s in steps_sorted if bool((s or {}).get("enabled", True)) and str((s or {}).get("id") or "").strip()]
-    if not step_order:
-        step_order = [str(s.get("id") or "") for s in steps_sorted if str((s or {}).get("id") or "").strip()]
-
-    logic_claims = extract_logic_and_claims_v2(doc, paper_id=paper_id, schema=schema)
-    try:
-        from app.llm.logic_claims_v2 import add_logic_step_evidence
-
-        add_logic_step_evidence(doc, schema=schema, logic=logic_claims["logic"])
-    except Exception:
-        pass
-    add_evidence_and_targets(doc, schema=schema, claims=logic_claims["claims"], cite_rec=cite_rec)
+    schema = _schema_for_md(doc.paper.md_path)
+    phase1_artifacts_dir = _storage_dir() / "derived" / "papers" / _safe_id(paper_id) / "raw_pool"
+    phase1 = run_phase1_extraction(
+        doc=doc,
+        paper_id=paper_id,
+        cite_rec=cite_rec,
+        schema=schema,
+        artifacts_dir=phase1_artifacts_dir,
+        allow_weak=bool(getattr(settings, "phase1_gate_allow_weak", False)),
+    )
+    step_order = list(phase1.get("step_order") or [])
+    logic_claims = {
+        "logic": phase1.get("logic") or {},
+        "claims": phase1.get("validated_claims") or [],
+        "quality_report": phase1.get("quality_report") or {},
+        "raw_claim_candidates": len(phase1.get("claim_candidates") or []),
+        "raw_claims_merged": len(phase1.get("claims_merged") or []),
+        "rejected_claims": len(phase1.get("rejected_claims") or []),
+    }
 
     purposes = []
     chunk_by_id = {c.chunk_id: c for c in doc.chunks}
@@ -180,7 +218,12 @@ def rebuild_paper(
                 "contexts": contexts,
             }
         )
-    batch_out = classify_citation_purposes_batch(citing_title=citing_title, cites=batch_in, prompt_overrides=schema.get("prompts"))
+    batch_out = classify_citation_purposes_batch(
+        citing_title=citing_title,
+        cites=batch_in,
+        prompt_overrides=schema.get("prompts"),
+        rules=schema.get("rules"),
+    )
     by_id = batch_out.get("by_id") or {}
     for cr in cite_rec.get("cites_resolved") or []:
         cited_paper_id = cr.get("cited_paper_id")
@@ -192,6 +235,19 @@ def rebuild_paper(
     notify("rebuild:neo4j_llm", 0.78, "Writing LLM outputs to Neo4j")
     with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
         client.upsert_logic_steps_and_claims(paper_id=paper_id, logic=logic_claims["logic"], claims=logic_claims["claims"], step_order=step_order)
+        try:
+            quality_report = logic_claims.get("quality_report") or {}
+            client.update_paper_props(
+                paper_id,
+                {
+                    "phase1_quality_json": json.dumps(quality_report, ensure_ascii=False),
+                    "phase1_gate_passed": bool(quality_report.get("gate_passed")),
+                    "phase1_quality_tier": str(quality_report.get("quality_tier") or ""),
+                    "phase1_quality_tier_score": float(quality_report.get("quality_tier_score") or 0.0),
+                },
+            )
+        except Exception:
+            pass
         # Re-apply human evidence overrides (if any) on top of the rebuilt machine graph.
         try:
             client.apply_human_claim_evidence_overrides(paper_id)
@@ -236,13 +292,21 @@ def rebuild_paper(
     return {
         "paper_id": paper_id,
         "source_md_path": md_path,
+        "reference_recovery": reference_recovery,
+        "citation_event_recovery": citation_event_recovery,
         "artifacts_dir": str(out_dir),
         "citations": {
             "refs": len(cite_rec.get("refs") or []),
             "cites_resolved": len(cite_rec.get("cites_resolved") or []),
             "cites_unresolved": len(cite_rec.get("cites_unresolved") or []),
         },
-        "llm": {"purposes": len(purposes), "claims": len(logic_claims.get("claims") or [])},
+        "llm": {
+            "purposes": len(purposes),
+            "claims": len(logic_claims.get("claims") or []),
+            "gate_passed": bool((logic_claims.get("quality_report") or {}).get("gate_passed")),
+            "quality_tier": str((logic_claims.get("quality_report") or {}).get("quality_tier") or ""),
+            "quality_report": logic_claims.get("quality_report") or {},
+        },
     }
 
 
@@ -269,6 +333,22 @@ def replace_paper_from_md_path(
 
     notify("replace:parse", 0.10, "Parsing markdown")
     doc = parse_mineru_markdown(str(md_file))
+    schema_for_recovery = _schema_for_md(doc.paper.md_path)
+    notify("replace:reference_recovery", 0.18, "Recovering references via fallback agent")
+    doc, reference_recovery = recover_references_with_agent(
+        doc,
+        prompt_overrides=schema_for_recovery.get("prompts"),
+        rules=schema_for_recovery.get("rules"),
+    )
+    notify("replace:citation_event_recovery", 0.22, "Recovering citation events from references when needed")
+    doc, citation_event_recovery = recover_citation_events_from_references(
+        doc,
+        rules=schema_for_recovery.get("rules"),
+    )
+    citation_event_recovery["paper_source"] = doc.paper.paper_source
+    citation_event_recovery["paper_id"] = paper_id_for_md_path(doc.paper.md_path, doi=doc.paper.doi)
+    citation_event_recovery["schema_version"] = int(schema_for_recovery.get("version") or 1)
+    citation_event_recovery["schema_paper_type"] = str(schema_for_recovery.get("paper_type") or "research")
     expected_paper_id = paper_id_for_md_path(doc.paper.md_path, doi=doc.paper.doi)
     if expected_paper_id != paper_id:
         raise RuntimeError(f"paper_id mismatch: requested={paper_id!r}, parsed={expected_paper_id!r}")
@@ -332,24 +412,25 @@ def replace_paper_from_md_path(
             )
 
     notify("replace:llm", 0.70, "Running LLM extraction (Logic/Claims/Citation Purposes)")
-    meta = load_canonical_meta(doc.paper.md_path)
-    paper_type = str(meta.get("paper_type") or "research").strip().lower()
-    if paper_type not in {"research", "review"}:
-        paper_type = "research"
-    schema = load_active(paper_type)  # type: ignore[arg-type]
-    steps_sorted = sorted(schema.get("steps") or [], key=lambda x: int((x or {}).get("order") or 0))
-    step_order = [str(s.get("id") or "") for s in steps_sorted if bool((s or {}).get("enabled", True)) and str((s or {}).get("id") or "").strip()]
-    if not step_order:
-        step_order = [str(s.get("id") or "") for s in steps_sorted if str((s or {}).get("id") or "").strip()]
-
-    logic_claims = extract_logic_and_claims_v2(doc, paper_id=paper_id, schema=schema)
-    try:
-        from app.llm.logic_claims_v2 import add_logic_step_evidence
-
-        add_logic_step_evidence(doc, schema=schema, logic=logic_claims["logic"])
-    except Exception:
-        pass
-    add_evidence_and_targets(doc, schema=schema, claims=logic_claims["claims"], cite_rec=cite_rec)
+    schema = _schema_for_md(doc.paper.md_path)
+    phase1_artifacts_dir = _storage_dir() / "derived" / "papers" / _safe_id(paper_id) / "raw_pool"
+    phase1 = run_phase1_extraction(
+        doc=doc,
+        paper_id=paper_id,
+        cite_rec=cite_rec,
+        schema=schema,
+        artifacts_dir=phase1_artifacts_dir,
+        allow_weak=bool(getattr(settings, "phase1_gate_allow_weak", False)),
+    )
+    step_order = list(phase1.get("step_order") or [])
+    logic_claims = {
+        "logic": phase1.get("logic") or {},
+        "claims": phase1.get("validated_claims") or [],
+        "quality_report": phase1.get("quality_report") or {},
+        "raw_claim_candidates": len(phase1.get("claim_candidates") or []),
+        "raw_claims_merged": len(phase1.get("claims_merged") or []),
+        "rejected_claims": len(phase1.get("rejected_claims") or []),
+    }
 
     purposes = []
     chunk_by_id = {c.chunk_id: c for c in doc.chunks}
@@ -378,7 +459,12 @@ def replace_paper_from_md_path(
                 "contexts": contexts,
             }
         )
-    batch_out = classify_citation_purposes_batch(citing_title=citing_title, cites=batch_in, prompt_overrides=schema.get("prompts"))
+    batch_out = classify_citation_purposes_batch(
+        citing_title=citing_title,
+        cites=batch_in,
+        prompt_overrides=schema.get("prompts"),
+        rules=schema.get("rules"),
+    )
     by_id = batch_out.get("by_id") or {}
     for cr in cite_rec.get("cites_resolved") or []:
         cited_paper_id = cr.get("cited_paper_id")
@@ -390,6 +476,19 @@ def replace_paper_from_md_path(
     notify("replace:neo4j_llm", 0.82, "Writing LLM outputs to Neo4j")
     with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
         client.upsert_logic_steps_and_claims(paper_id=paper_id, logic=logic_claims["logic"], claims=logic_claims["claims"], step_order=step_order)
+        try:
+            quality_report = logic_claims.get("quality_report") or {}
+            client.update_paper_props(
+                paper_id,
+                {
+                    "phase1_quality_json": json.dumps(quality_report, ensure_ascii=False),
+                    "phase1_gate_passed": bool(quality_report.get("gate_passed")),
+                    "phase1_quality_tier": str(quality_report.get("quality_tier") or ""),
+                    "phase1_quality_tier_score": float(quality_report.get("quality_tier_score") or 0.0),
+                },
+            )
+        except Exception:
+            pass
         try:
             client.apply_human_claim_evidence_overrides(paper_id)
         except Exception:
@@ -410,7 +509,16 @@ def replace_paper_from_md_path(
 
     write_log(f"replaced {paper_id} from {md_path}")
     notify("replace:done", 1.0, "Done")
-    return {"paper_id": paper_id, "source_md_path": md_path, "claims": len(logic_claims.get('claims') or [])}
+    return {
+        "paper_id": paper_id,
+        "source_md_path": md_path,
+        "reference_recovery": reference_recovery,
+        "citation_event_recovery": citation_event_recovery,
+        "claims": len(logic_claims.get("claims") or []),
+        "gate_passed": bool((logic_claims.get("quality_report") or {}).get("gate_passed")),
+        "quality_tier": str((logic_claims.get("quality_report") or {}).get("quality_tier") or ""),
+        "quality_report": logic_claims.get("quality_report") or {},
+    }
 
 
 def rebuild_global_faiss(progress: ProgressFn | None = None, log: LogFn | None = None) -> dict[str, Any]:

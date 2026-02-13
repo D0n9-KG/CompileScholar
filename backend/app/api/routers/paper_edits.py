@@ -179,21 +179,26 @@ def update_metadata(paper_id: str, req: UpdateMetadataRequest):
 
 
 @router.delete("/{paper_id:path}")
-def delete_ingested_paper(paper_id: str):
+def delete_ingested_paper(paper_id: str, hard_delete: bool = True):
     """
-    User-facing delete: revert an ingested paper back to a stub.
+    User-facing delete.
 
-    - Keep the Paper node so incoming CITES edges remain valid.
-    - Delete owned subgraph (chunks/logic/claims/references/figures) and outgoing cites.
-    - Clear human override blobs + review bookkeeping.
+    hard_delete=true (default):
+    - Delete owned subgraph + Paper node itself from Neo4j.
+    - Remove collection links and all incident relationships.
+
+    hard_delete=false:
+    - Legacy behavior: keep Paper node as stub and clear ingest/editor state.
+
+    In both modes:
     - Remove canonical storage (for DOI papers) and derived artifacts when safely resolvable.
     """
     try:
         with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
             client.ensure_schema()
             paper = client.get_paper_basic(paper_id)
-            if not bool(paper.get("ingested")):
-                return {"ok": True, "already_stub": True}
+            if not bool(paper.get("ingested")) and not hard_delete:
+                return {"ok": True, "already_stub": True, "hard_delete": False}
 
             client.delete_paper_subgraph(paper_id)
             try:
@@ -201,25 +206,28 @@ def delete_ingested_paper(paper_id: str):
             except Exception:
                 pass
 
-            props = {
-                "ingested": False,
-                "source_md_path": "",
-                "storage_dir": None,
-                "review_pending_task_id": None,
-                "review_resolved_task_id": None,
-                "human_meta_json": _dump({}),
-                "human_meta_cleared_json": _dump([]),
-                "human_logic_json": _dump({}),
-                "human_logic_cleared_json": _dump([]),
-                "human_claims_json": _dump({}),
-                "human_claims_cleared_json": _dump([]),
-                "human_cites_purpose_json": _dump({}),
-                "human_cites_purpose_cleared_json": _dump([]),
-                "deleted_at": _utc_now_iso(),
-                "deleted_reason": "user_deleted",
-            }
-            props.update(_append_log(paper, "paper:delete:user_deleted"))
-            client.update_paper_props(paper_id, props)
+            if hard_delete:
+                client.delete_paper_node(paper_id)
+            else:
+                props = {
+                    "ingested": False,
+                    "source_md_path": "",
+                    "storage_dir": None,
+                    "review_pending_task_id": None,
+                    "review_resolved_task_id": None,
+                    "human_meta_json": _dump({}),
+                    "human_meta_cleared_json": _dump([]),
+                    "human_logic_json": _dump({}),
+                    "human_logic_cleared_json": _dump([]),
+                    "human_claims_json": _dump({}),
+                    "human_claims_cleared_json": _dump([]),
+                    "human_cites_purpose_json": _dump({}),
+                    "human_cites_purpose_cleared_json": _dump([]),
+                    "deleted_at": _utc_now_iso(),
+                    "deleted_reason": "user_deleted",
+                }
+                props.update(_append_log(paper, "paper:delete:user_deleted"))
+                client.update_paper_props(paper_id, props)
 
         storage = _storage_root()
         removed = {"canonical_dir": False, "derived_dir": False}
@@ -241,7 +249,7 @@ def delete_ingested_paper(paper_id: str):
         derived = storage / "derived" / "papers" / _safe_id(paper_id)
         removed["derived_dir"] = _safe_rmtree(derived, allowed_root=(storage / "derived" / "papers"))
 
-        return {"ok": True, "removed": removed}
+        return {"ok": True, "removed": removed, "hard_delete": bool(hard_delete)}
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except Exception as exc:

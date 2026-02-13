@@ -11,8 +11,11 @@
 - **图谱入库**：Paper、段落 Chunk、参考文献、引用关系（CITES）等写入 Neo4j
 - **引用网络**：不仅记录“引用了谁”，也支持“引用目的”（多标签 + 置信度）
 - **证据可追溯**：图谱边与回答可回指到 MinerU `md` 的文本片段（chunk + 行号/跨度）
+- **双轨抽取（Phase1）**：`Raw Pool` 保存全候选，`Validated KG` 仅写入通过质量门禁的结果
+- **质量门禁 v2（Phase2）**：新增 `critical_slot_coverage` 与 `conflict_rate`，支持缺口检测与冲突约束
 - **GraphRAG**：向量召回（FAISS）+ 图信息（Neo4j）+ LLM 生成
 - **前端工作台**：导入、论文列表、论文详情、未解析引用、图谱视图、问答、任务等
+- **Schema 全可配**：前端 `Schema` 页面支持规则/提示词细粒度配置 + `Rules JSON`/`Prompts JSON` 任意键扩展
 
 ---
 
@@ -23,7 +26,7 @@ MinerU 输出(md+images)
         |
         v
 backend(FastAPI)  ----->  backend/storage/   (规范化存储：论文源文件、派生物等)
-   |  |  |               backend/runs/      (每次 ingest 的运行产物：IR、crossref、索引等)
+   |  |  |               backend/runs/      (每次 ingest 的运行产物：IR、crossref、Raw Pool、索引等)
    |  |  +----->  FAISS 向量索引
    |  +--------->  Neo4j (Paper/Chunk/CITES/...)
    +------------>  LLM/Embeddings (DeepSeek/SiliconFlow/OpenAI/OpenRouter)
@@ -119,8 +122,44 @@ DEEPSEEK_API_KEY=你的_key
 - `EMBEDDING_MODEL`：向量模型（例如 `BAAI/bge-m3`）
 - `SILICONFLOW_API_KEY`：SiliconFlow key（当 `EMBEDDING_PROVIDER=siliconflow`）
 - `EMBEDDING_API_KEY` / `EMBEDDING_BASE_URL`：可选；统一 embedding key / base url
+- `PHASE1_GATE_ALLOW_WEAK`：是否允许 `weak` 支持的 claim 进入 validated 轨道（默认 `false`）
+
+> Phase2 门禁阈值（如 `phase2_gate_critical_slot_coverage_min`、`phase2_gate_conflict_rate_max`）位于 schema 的 `rules` 中，而非 `.env`。
 
 > 说明：后端会优先读取 `backend/.env`，其次读取根目录 `.env`；两者任选其一即可。
+>
+> 抽取策略的细节参数（如 `phase1_*` / `phase2_*` 规则、各阶段 prompt）请在前端 `Schema` 页面配置并保存版本。
+
+前端 `Schema` 页面可直接配置（含可视化表单 + `Rules JSON` / `Prompts JSON`）：
+- 抽取流程阈值：`phase1_logic_chunks_max`、`phase1_logic_chunk_chars_max`、`phase1_doc_chars_max`、`phase1_claim_*`
+- 质量门禁 v2：`phase2_gate_*`、`phase2_critical_*`、`phase2_conflict_*`（含正负极性词与 stop 词）
+- grounding 评分：`phase1_grounding_*` 全部阈值与分数
+- 引用目的抽取：`citation_purpose_max_*`、`citation_purpose_fallback_score`
+- 提示词：`logic_claims_*`、`evidence_pick_*`、`phase1_logic_bind_*`、`phase1_chunk_claim_extract_*`、`citation_purpose_batch_*`
+
+#### 5.2.2 内置三套抽取配置（重启/换机器仍可用）
+
+项目已内置三套策略模板（写在后端代码中，不依赖本地存储文件），因此：
+- 每次重启服务都可直接使用；
+- 其他人 clone 到新目录后也天然具备同样模板。
+
+三套模板：
+- `high_precision`（高精度）：更严格证据约束与门禁，优先低幻觉、低冲突；
+- `balanced`（均衡）：覆盖率与准确性折中，作为日常默认；
+- `high_recall`（高召回）：扩大候选与抽取范围，便于探索性知识发现。
+
+后端接口：
+- `GET /schema/presets`：列出所有内置模板及中文说明；
+- `POST /schema/presets/apply`：将指定模板应用到当前 schema 草稿（返回新 schema，不自动落库）。
+
+前端用法：
+- 在 `Schema` 页面顶部“内置抽取配置（策略模板）”面板中点击“应用到当前草稿”；
+- 在“版本名称”输入框中填写你希望展示在“切换版本”下拉里的自定义名称；
+- 再点击“保存为新版本并激活”；
+- 对目标论文执行“重建”后，才会按该模板重新抽取。
+- 若某个历史版本不再需要，可在“切换版本”处选中后点击“删除版本”（系统至少保留一个版本）。
+
+> “切换版本”下拉会优先显示你填写的版本名称（并附带 `vN`），便于多人协作时识别配置用途。
 
 ### 5.3 启动 Neo4j（两种方式）
 

@@ -90,7 +90,7 @@ def parse_mineru_markdown(md_path: str) -> DocumentIR:
 
     paper_source = p.parent.name or p.stem
 
-    section: str | None = None
+    section_cursor: str | None = None
     heading_titles: list[str] = []
     authors: list[str] = []
     doi: str | None = None
@@ -161,7 +161,7 @@ def parse_mineru_markdown(md_path: str) -> DocumentIR:
             ref_start = min(tail_refs)
 
     # Build paragraph-like chunks by blank-line separation, but stop parsing at reference section for "content chunks".
-    blocks: list[tuple[int, int, str]] = []
+    blocks: list[tuple[int, int, str, str | None]] = []
     current: list[str] = []
     block_start = 1
     max_line = len(lines)
@@ -173,7 +173,7 @@ def parse_mineru_markdown(md_path: str) -> DocumentIR:
             return
         text = "\n".join(current).strip()
         if text:
-            blocks.append((block_start, end_line, text))
+            blocks.append((block_start, end_line, text, section_cursor))
         current = []
         block_start = end_line + 1
 
@@ -183,9 +183,9 @@ def parse_mineru_markdown(md_path: str) -> DocumentIR:
             break
         if _HEADING_RE.match(line):
             flush_block(idx - 1)
-            section = _normalize_space(_HEADING_RE.match(line).group("title"))  # type: ignore[union-attr]
+            section_cursor = _normalize_space(_HEADING_RE.match(line).group("title"))  # type: ignore[union-attr]
             # headings themselves become tiny chunks so we can point spans at them if needed
-            blocks.append((idx, idx, line.strip()))
+            blocks.append((idx, idx, line.strip(), section_cursor))
             continue
         if line.strip() == "":
             flush_block(idx - 1)
@@ -203,7 +203,7 @@ def parse_mineru_markdown(md_path: str) -> DocumentIR:
         year=year,
     )
 
-    for start, end, text in blocks:
+    for start, end, text, block_section in blocks:
         kind = "heading" if _HEADING_RE.match(text.strip()) else "block"
         chunk_id = _stable_chunk_id(paper_source, str(p), start, end, text)
         span = MdSpan(start_line=start, end_line=end)
@@ -213,7 +213,7 @@ def parse_mineru_markdown(md_path: str) -> DocumentIR:
                 paper_source=paper_source,
                 md_path=str(p),
                 span=span,
-                section=section,
+                section=block_section,
                 kind=kind,
                 text=text,
             )

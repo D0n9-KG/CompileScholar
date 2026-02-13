@@ -20,6 +20,7 @@ class SchemaVersionInfo:
     paper_type: PaperType
     version: int
     path: Path
+    name: str = ""
 
 
 def _backend_root() -> Path:
@@ -99,6 +100,7 @@ def _default_schema(paper_type: PaperType) -> dict[str, Any]:
     return {
         "paper_type": paper_type,
         "version": 1,
+        "name": "默认配置",
         "steps": steps,
         "claim_kinds": claim_kinds,
         "rules": {
@@ -112,6 +114,75 @@ def _default_schema(paper_type: PaperType) -> dict[str, Any]:
             "targets_per_claim_max": 3,
             "require_targets_for_kinds": ["Gap", "Critique", "Limitation", "Comparison"],
             "evidence_verification": "llm",
+            "phase1_claim_worker_count": 3,
+            "phase1_logic_chunks_max": 56,
+            "phase1_logic_chunk_chars_max": 420,
+            "phase1_logic_lexical_topk_min": 6,
+            "phase1_logic_lexical_topk_multiplier": 3,
+            "phase1_logic_evidence_weak_score_threshold": 2.0,
+            "phase1_claim_chunks_max": 36,
+            "phase1_claims_per_chunk_max": 3,
+            "phase1_chunk_chars_max": 1800,
+            "phase1_doc_chars_max": 18000,
+            "phase1_filter_reference_sections": True,
+            "phase1_excluded_section_terms": [],
+            "phase1_evidence_verify_batch_size": 6,
+            "phase1_evidence_lexical_topk": 10,
+            "phase1_evidence_verify_candidates_max": 6,
+            "phase1_gate_supported_ratio_min": 0.5,
+            "phase1_gate_step_coverage_min": 0.4,
+            "phase1_grounding_mode": "lexical",
+            "phase1_grounding_semantic_supported_min": 0.75,
+            "phase1_grounding_semantic_weak_min": 0.55,
+            "phase1_grounding_supported_overlap_min": 0.65,
+            "phase1_grounding_weak_overlap_min": 0.42,
+            "phase1_grounding_supported_score_substring": 0.78,
+            "phase1_grounding_supported_score_overlap": 0.72,
+            "phase1_grounding_weak_score": 0.55,
+            "phase1_grounding_insufficient_score": 0.18,
+            "phase1_grounding_unsupported_score": 0.22,
+            "phase1_grounding_empty_score": 0.0,
+            "phase2_critical_steps": [],
+            "phase2_critical_kinds": [],
+            "phase2_critical_step_kind_map": {},
+            "phase2_auto_step_kind_map_enabled": True,
+            "phase2_auto_step_kind_map_trigger_slots": 12,
+            "phase2_auto_step_kind_map_max_kinds_per_step": 1,
+            "phase2_gate_critical_slot_coverage_min": 0.4,
+            "phase2_gate_conflict_rate_max": 0.35,
+            "phase2_conflict_mode": "lexical",
+            "phase2_conflict_semantic_threshold": 0.75,
+            "phase2_conflict_candidate_max_pairs": 120,
+            "phase2_conflict_shared_tokens_min": 2,
+            "phase2_conflict_samples_max": 8,
+            "phase2_conflict_gate_min_comparable_pairs": 3,
+            "phase2_conflict_gate_min_conflict_pairs": 1,
+            "phase2_quality_tier_strategy": "a1_fail_count",
+            "phase2_quality_tier_yellow_max_failures": 1,
+            "phase2_quality_tier_red_min_failures": 2,
+            "phase2_conflict_positive_terms_en": [],
+            "phase2_conflict_negative_terms_en": [],
+            "phase2_conflict_positive_terms_zh": [],
+            "phase2_conflict_negative_terms_zh": [],
+            "phase2_conflict_stop_terms_en": [],
+            "phase2_conflict_stop_terms_zh": [],
+            "citation_purpose_max_contexts_per_cite": 3,
+            "citation_purpose_max_context_chars": 900,
+            "citation_purpose_max_cites_per_batch": 60,
+            "citation_purpose_max_labels_per_cite": 3,
+            "citation_purpose_fallback_score": 0.4,
+            "reference_recovery_enabled": True,
+            "reference_recovery_trigger_max_existing_refs": 0,
+            "reference_recovery_max_refs": 180,
+            "reference_recovery_doc_chars_max": 48000,
+            "reference_recovery_agent_timeout_sec": 45.0,
+            "citation_event_recovery_enabled": True,
+            "citation_event_recovery_trigger_max_existing_events": 0,
+            "citation_event_recovery_numeric_bracket_enabled": True,
+            "citation_event_recovery_paren_numeric_enabled": False,
+            "citation_event_recovery_author_year_enabled": True,
+            "citation_event_recovery_max_events_per_chunk": 6,
+            "citation_event_recovery_context_chars": 800,
         },
     }
 
@@ -126,6 +197,13 @@ def validate_schema(schema: dict[str, Any]) -> None:
         raise ValueError("steps must be a non-empty list")
     if not isinstance(schema.get("claim_kinds"), list) or not schema["claim_kinds"]:
         raise ValueError("claim_kinds must be a non-empty list")
+    name = schema.get("name")
+    if name is not None:
+        if not isinstance(name, str):
+            raise ValueError("name must be a string")
+        name = name.strip()
+        if len(name) > 80:
+            raise ValueError("name is too long (max 80 chars)")
 
     step_ids: set[str] = set()
     for s in schema["steps"]:
@@ -170,6 +248,257 @@ def validate_schema(schema: dict[str, Any]) -> None:
     tp = int(rules.get("targets_per_claim_max") or 0)
     if tp < 0 or tp > 5:
         raise ValueError("Invalid targets_per_claim_max")
+    wcnt = int(rules.get("phase1_claim_worker_count") or 3)
+    if wcnt < 1 or wcnt > 16:
+        raise ValueError("Invalid phase1_claim_worker_count")
+    logic_chunks = int(rules.get("phase1_logic_chunks_max") or 56)
+    if logic_chunks < 8 or logic_chunks > 300:
+        raise ValueError("Invalid phase1_logic_chunks_max")
+    logic_chunk_chars = int(rules.get("phase1_logic_chunk_chars_max") or 420)
+    if logic_chunk_chars < 120 or logic_chunk_chars > 3000:
+        raise ValueError("Invalid phase1_logic_chunk_chars_max")
+    logic_topk_min = int(rules.get("phase1_logic_lexical_topk_min", 6))
+    if logic_topk_min < 1 or logic_topk_min > 64:
+        raise ValueError("Invalid phase1_logic_lexical_topk_min")
+    logic_topk_multiplier = int(rules.get("phase1_logic_lexical_topk_multiplier", 3))
+    if logic_topk_multiplier < 1 or logic_topk_multiplier > 12:
+        raise ValueError("Invalid phase1_logic_lexical_topk_multiplier")
+    weak_score_threshold = float(rules.get("phase1_logic_evidence_weak_score_threshold", 2.0))
+    if weak_score_threshold < 0.0 or weak_score_threshold > 20.0:
+        raise ValueError("Invalid phase1_logic_evidence_weak_score_threshold")
+    cmax_chunks = int(rules.get("phase1_claim_chunks_max") or 36)
+    if cmax_chunks < 1 or cmax_chunks > 200:
+        raise ValueError("Invalid phase1_claim_chunks_max")
+    cmax_per_chunk = int(rules.get("phase1_claims_per_chunk_max") or 3)
+    if cmax_per_chunk < 1 or cmax_per_chunk > 12:
+        raise ValueError("Invalid phase1_claims_per_chunk_max")
+    chunk_chars = int(rules.get("phase1_chunk_chars_max") or 1800)
+    if chunk_chars < 200 or chunk_chars > 20000:
+        raise ValueError("Invalid phase1_chunk_chars_max")
+    doc_chars = int(rules.get("phase1_doc_chars_max") or 18000)
+    if doc_chars < 2000 or doc_chars > 120000:
+        raise ValueError("Invalid phase1_doc_chars_max")
+    filter_reference_sections = rules.get("phase1_filter_reference_sections", True)
+    if not isinstance(filter_reference_sections, bool):
+        raise ValueError("phase1_filter_reference_sections must be boolean")
+    excluded_section_terms = rules.get("phase1_excluded_section_terms", [])
+    if excluded_section_terms is None:
+        excluded_section_terms = []
+    if not isinstance(excluded_section_terms, list):
+        raise ValueError("phase1_excluded_section_terms must be a list")
+    if len(excluded_section_terms) > 200:
+        raise ValueError("phase1_excluded_section_terms is too long")
+    for item in excluded_section_terms:
+        s = str(item or "").strip()
+        if not s:
+            continue
+        if len(s) > 80:
+            raise ValueError("phase1_excluded_section_terms contains too long term")
+    evidence_batch = int(rules.get("phase1_evidence_verify_batch_size", 6))
+    if evidence_batch < 1 or evidence_batch > 32:
+        raise ValueError("Invalid phase1_evidence_verify_batch_size")
+    evidence_topk = int(rules.get("phase1_evidence_lexical_topk", 10))
+    if evidence_topk < 1 or evidence_topk > 64:
+        raise ValueError("Invalid phase1_evidence_lexical_topk")
+    evidence_verify_candidates = int(rules.get("phase1_evidence_verify_candidates_max", 6))
+    if evidence_verify_candidates < 1 or evidence_verify_candidates > 16:
+        raise ValueError("Invalid phase1_evidence_verify_candidates_max")
+    gate_supported_raw = rules.get("phase1_gate_supported_ratio_min", 0.5)
+    gate_supported = float(gate_supported_raw)
+    if gate_supported < 0.0 or gate_supported > 1.0:
+        raise ValueError("Invalid phase1_gate_supported_ratio_min")
+    gate_coverage_raw = rules.get("phase1_gate_step_coverage_min", 0.4)
+    gate_coverage = float(gate_coverage_raw)
+    if gate_coverage < 0.0 or gate_coverage > 1.0:
+        raise ValueError("Invalid phase1_gate_step_coverage_min")
+    grounding_mode = str(rules.get("phase1_grounding_mode", "lexical") or "").strip().lower()
+    if grounding_mode not in {"lexical", "hybrid", "llm"}:
+        raise ValueError("Invalid phase1_grounding_mode")
+    grounding_semantic_supported_min = float(rules.get("phase1_grounding_semantic_supported_min", 0.75))
+    if grounding_semantic_supported_min < 0.0 or grounding_semantic_supported_min > 1.0:
+        raise ValueError("Invalid phase1_grounding_semantic_supported_min")
+    grounding_semantic_weak_min = float(rules.get("phase1_grounding_semantic_weak_min", 0.55))
+    if grounding_semantic_weak_min < 0.0 or grounding_semantic_weak_min > 1.0:
+        raise ValueError("Invalid phase1_grounding_semantic_weak_min")
+    if grounding_semantic_weak_min > grounding_semantic_supported_min:
+        raise ValueError("phase1_grounding_semantic_weak_min must be <= phase1_grounding_semantic_supported_min")
+    grounding_supported_overlap = float(rules.get("phase1_grounding_supported_overlap_min", 0.65))
+    if grounding_supported_overlap < 0.0 or grounding_supported_overlap > 1.0:
+        raise ValueError("Invalid phase1_grounding_supported_overlap_min")
+    grounding_weak_overlap = float(rules.get("phase1_grounding_weak_overlap_min", 0.42))
+    if grounding_weak_overlap < 0.0 or grounding_weak_overlap > 1.0:
+        raise ValueError("Invalid phase1_grounding_weak_overlap_min")
+    if grounding_weak_overlap > grounding_supported_overlap:
+        raise ValueError("phase1_grounding_weak_overlap_min must be <= phase1_grounding_supported_overlap_min")
+    for key in (
+        "phase1_grounding_supported_score_substring",
+        "phase1_grounding_supported_score_overlap",
+        "phase1_grounding_weak_score",
+        "phase1_grounding_insufficient_score",
+        "phase1_grounding_unsupported_score",
+        "phase1_grounding_empty_score",
+    ):
+        score = float(rules.get(key, 0.5))
+        if score < 0.0 or score > 1.0:
+            raise ValueError(f"Invalid {key}")
+    critical_steps = rules.get("phase2_critical_steps")
+    if critical_steps is not None:
+        if not isinstance(critical_steps, list):
+            raise ValueError("phase2_critical_steps must be a list")
+        for sid in critical_steps:
+            s = str(sid or "").strip()
+            if s and s not in step_ids:
+                raise ValueError(f"Unknown phase2 critical step: {s}")
+    critical_kinds = rules.get("phase2_critical_kinds")
+    if critical_kinds is not None:
+        if not isinstance(critical_kinds, list):
+            raise ValueError("phase2_critical_kinds must be a list")
+        for kid in critical_kinds:
+            k = str(kid or "").strip()
+            if k and k not in kind_ids:
+                raise ValueError(f"Unknown phase2 critical kind: {k}")
+    critical_step_kind_map = rules.get("phase2_critical_step_kind_map")
+    if critical_step_kind_map is not None:
+        if not isinstance(critical_step_kind_map, dict):
+            raise ValueError("phase2_critical_step_kind_map must be an object")
+        for sid_raw, kinds_raw in critical_step_kind_map.items():
+            sid = str(sid_raw or "").strip()
+            if not sid:
+                continue
+            if sid not in step_ids:
+                raise ValueError(f"Unknown phase2 critical step: {sid}")
+            if not isinstance(kinds_raw, list):
+                raise ValueError(f"phase2_critical_step_kind_map[{sid!r}] must be a list")
+            for kid in kinds_raw:
+                k = str(kid or "").strip()
+                if k and k not in kind_ids:
+                    raise ValueError(f"Unknown phase2 critical kind: {k}")
+    auto_step_kind_map_enabled = rules.get("phase2_auto_step_kind_map_enabled", True)
+    if not isinstance(auto_step_kind_map_enabled, bool):
+        raise ValueError("phase2_auto_step_kind_map_enabled must be boolean")
+    auto_step_kind_map_trigger_slots = int(rules.get("phase2_auto_step_kind_map_trigger_slots", 12))
+    if auto_step_kind_map_trigger_slots < 1 or auto_step_kind_map_trigger_slots > 200:
+        raise ValueError("Invalid phase2_auto_step_kind_map_trigger_slots")
+    auto_step_kind_map_max_kinds = int(rules.get("phase2_auto_step_kind_map_max_kinds_per_step", 1))
+    if auto_step_kind_map_max_kinds < 1 or auto_step_kind_map_max_kinds > 6:
+        raise ValueError("Invalid phase2_auto_step_kind_map_max_kinds_per_step")
+    gate_critical = rules.get("phase2_gate_critical_slot_coverage_min", 0.4)
+    try:
+        gate_critical_f = float(gate_critical)
+    except Exception as exc:
+        raise ValueError("Invalid phase2_gate_critical_slot_coverage_min") from exc
+    if gate_critical_f < 0.0 or gate_critical_f > 1.0:
+        raise ValueError("Invalid phase2_gate_critical_slot_coverage_min")
+    gate_conflict = rules.get("phase2_gate_conflict_rate_max", 0.35)
+    try:
+        gate_conflict_f = float(gate_conflict)
+    except Exception as exc:
+        raise ValueError("Invalid phase2_gate_conflict_rate_max") from exc
+    if gate_conflict_f < 0.0 or gate_conflict_f > 1.0:
+        raise ValueError("Invalid phase2_gate_conflict_rate_max")
+    conflict_mode = str(rules.get("phase2_conflict_mode", "lexical") or "").strip().lower()
+    if conflict_mode not in {"lexical", "hybrid", "llm"}:
+        raise ValueError("Invalid phase2_conflict_mode")
+    conflict_semantic_threshold = float(rules.get("phase2_conflict_semantic_threshold", 0.75))
+    if conflict_semantic_threshold < 0.0 or conflict_semantic_threshold > 1.0:
+        raise ValueError("Invalid phase2_conflict_semantic_threshold")
+    conflict_candidate_max_pairs = int(rules.get("phase2_conflict_candidate_max_pairs", 120))
+    if conflict_candidate_max_pairs < 1 or conflict_candidate_max_pairs > 2000:
+        raise ValueError("Invalid phase2_conflict_candidate_max_pairs")
+    quality_tier_strategy = str(rules.get("phase2_quality_tier_strategy", "a1_fail_count") or "").strip().lower()
+    if quality_tier_strategy not in {"a1_fail_count"}:
+        raise ValueError("Invalid phase2_quality_tier_strategy")
+    quality_tier_yellow_max = int(rules.get("phase2_quality_tier_yellow_max_failures", 1))
+    if quality_tier_yellow_max < 0 or quality_tier_yellow_max > 10:
+        raise ValueError("Invalid phase2_quality_tier_yellow_max_failures")
+    quality_tier_red_min = int(rules.get("phase2_quality_tier_red_min_failures", 2))
+    if quality_tier_red_min < 1 or quality_tier_red_min > 10:
+        raise ValueError("Invalid phase2_quality_tier_red_min_failures")
+    if quality_tier_red_min <= quality_tier_yellow_max:
+        raise ValueError("phase2_quality_tier_red_min_failures must be > phase2_quality_tier_yellow_max_failures")
+    conflict_shared_tokens = int(rules.get("phase2_conflict_shared_tokens_min") or 2)
+    if conflict_shared_tokens < 1 or conflict_shared_tokens > 10:
+        raise ValueError("Invalid phase2_conflict_shared_tokens_min")
+    conflict_samples = int(rules.get("phase2_conflict_samples_max") or 8)
+    if conflict_samples < 1 or conflict_samples > 100:
+        raise ValueError("Invalid phase2_conflict_samples_max")
+    conflict_gate_min_comparable_pairs = int(rules.get("phase2_conflict_gate_min_comparable_pairs", 3))
+    if conflict_gate_min_comparable_pairs < 0 or conflict_gate_min_comparable_pairs > 200:
+        raise ValueError("Invalid phase2_conflict_gate_min_comparable_pairs")
+    conflict_gate_min_conflict_pairs = int(rules.get("phase2_conflict_gate_min_conflict_pairs", 1))
+    if conflict_gate_min_conflict_pairs < 0 or conflict_gate_min_conflict_pairs > 200:
+        raise ValueError("Invalid phase2_conflict_gate_min_conflict_pairs")
+    for key in (
+        "phase2_conflict_positive_terms_en",
+        "phase2_conflict_negative_terms_en",
+        "phase2_conflict_positive_terms_zh",
+        "phase2_conflict_negative_terms_zh",
+        "phase2_conflict_stop_terms_en",
+        "phase2_conflict_stop_terms_zh",
+    ):
+        terms = rules.get(key)
+        if terms is None:
+            continue
+        if not isinstance(terms, list):
+            raise ValueError(f"{key} must be a list")
+        if len(terms) > 200:
+            raise ValueError(f"{key} is too long")
+        for item in terms:
+            s = str(item or "").strip()
+            if not s:
+                continue
+            if len(s) > 64:
+                raise ValueError(f"{key} contains too long term")
+    citation_contexts = int(rules.get("citation_purpose_max_contexts_per_cite", 3))
+    if citation_contexts < 1 or citation_contexts > 12:
+        raise ValueError("Invalid citation_purpose_max_contexts_per_cite")
+    citation_chars = int(rules.get("citation_purpose_max_context_chars", 900))
+    if citation_chars < 120 or citation_chars > 8000:
+        raise ValueError("Invalid citation_purpose_max_context_chars")
+    citation_batch_max = int(rules.get("citation_purpose_max_cites_per_batch", 60))
+    if citation_batch_max < 1 or citation_batch_max > 200:
+        raise ValueError("Invalid citation_purpose_max_cites_per_batch")
+    citation_labels_max = int(rules.get("citation_purpose_max_labels_per_cite", 3))
+    if citation_labels_max < 1 or citation_labels_max > 8:
+        raise ValueError("Invalid citation_purpose_max_labels_per_cite")
+    citation_fallback_score = float(rules.get("citation_purpose_fallback_score", 0.4))
+    if citation_fallback_score < 0.0 or citation_fallback_score > 1.0:
+        raise ValueError("Invalid citation_purpose_fallback_score")
+    reference_recovery_enabled = rules.get("reference_recovery_enabled", True)
+    if not isinstance(reference_recovery_enabled, bool):
+        raise ValueError("Invalid reference_recovery_enabled")
+    reference_recovery_trigger_max_existing_refs = int(rules.get("reference_recovery_trigger_max_existing_refs", 0))
+    if reference_recovery_trigger_max_existing_refs < 0 or reference_recovery_trigger_max_existing_refs > 200:
+        raise ValueError("Invalid reference_recovery_trigger_max_existing_refs")
+    reference_recovery_max_refs = int(rules.get("reference_recovery_max_refs", 180))
+    if reference_recovery_max_refs < 1 or reference_recovery_max_refs > 500:
+        raise ValueError("Invalid reference_recovery_max_refs")
+    reference_recovery_doc_chars_max = int(rules.get("reference_recovery_doc_chars_max", 48000))
+    if reference_recovery_doc_chars_max < 1000 or reference_recovery_doc_chars_max > 200000:
+        raise ValueError("Invalid reference_recovery_doc_chars_max")
+    reference_recovery_agent_timeout_sec = float(rules.get("reference_recovery_agent_timeout_sec", 45.0))
+    if reference_recovery_agent_timeout_sec < 0.5 or reference_recovery_agent_timeout_sec > 300.0:
+        raise ValueError("Invalid reference_recovery_agent_timeout_sec")
+    citation_event_recovery_enabled = rules.get("citation_event_recovery_enabled", True)
+    if not isinstance(citation_event_recovery_enabled, bool):
+        raise ValueError("Invalid citation_event_recovery_enabled")
+    citation_event_recovery_trigger = int(rules.get("citation_event_recovery_trigger_max_existing_events", 0))
+    if citation_event_recovery_trigger < 0 or citation_event_recovery_trigger > 50:
+        raise ValueError("Invalid citation_event_recovery_trigger_max_existing_events")
+    for key in (
+        "citation_event_recovery_numeric_bracket_enabled",
+        "citation_event_recovery_paren_numeric_enabled",
+        "citation_event_recovery_author_year_enabled",
+    ):
+        raw = rules.get(key, True if key != "citation_event_recovery_paren_numeric_enabled" else False)
+        if not isinstance(raw, bool):
+            raise ValueError(f"Invalid {key}")
+    citation_event_recovery_max_events_per_chunk = int(rules.get("citation_event_recovery_max_events_per_chunk", 6))
+    if citation_event_recovery_max_events_per_chunk < 1 or citation_event_recovery_max_events_per_chunk > 40:
+        raise ValueError("Invalid citation_event_recovery_max_events_per_chunk")
+    citation_event_recovery_context_chars = int(rules.get("citation_event_recovery_context_chars", 800))
+    if citation_event_recovery_context_chars < 120 or citation_event_recovery_context_chars > 4000:
+        raise ValueError("Invalid citation_event_recovery_context_chars")
     et = str(rules.get("evidence_verification") or "llm")
     if et not in {"llm", "off"}:
         raise ValueError("rules.evidence_verification must be 'llm' or 'off'")
@@ -223,7 +552,13 @@ def list_versions(paper_type: PaperType) -> list[SchemaVersionInfo]:
         m = re.match(r"^v(\d+)\.json$", p.name)
         if not m:
             continue
-        out.append(SchemaVersionInfo(paper_type=paper_type, version=int(m.group(1)), path=p))
+        label = ""
+        try:
+            obj = _read_json(p)
+            label = str(obj.get("name") or "").strip()
+        except Exception:
+            label = ""
+        out.append(SchemaVersionInfo(paper_type=paper_type, version=int(m.group(1)), path=p, name=label))
     out.sort(key=lambda x: x.version, reverse=True)
     return out
 
@@ -251,6 +586,51 @@ def activate_version(paper_type: PaperType, version: int) -> dict[str, Any]:
     s = load_version(paper_type, version)
     _write_json(_active_path(paper_type), {"active_version": int(version)})
     return s
+
+
+def delete_version(paper_type: PaperType, version: int) -> dict[str, Any]:
+    ensure_defaults()
+    v = int(version)
+    p = _version_path(paper_type, v)
+    if not p.exists():
+        raise FileNotFoundError(f"Schema version not found: {paper_type} v{v}")
+
+    versions = list_versions(paper_type)
+    if len(versions) <= 1:
+        raise ValueError("Cannot delete the last schema version")
+
+    active_meta = _read_json(_active_path(paper_type))
+    old_active = int(active_meta.get("active_version") or 1)
+
+    p.unlink(missing_ok=False)
+
+    remaining = list_versions(paper_type)
+    if not remaining:
+        # Safety net: should not happen due to len check above.
+        s = _default_schema(paper_type)
+        _write_json(_version_path(paper_type, 1), s)
+        _write_json(_active_path(paper_type), {"active_version": 1})
+        return {
+            "paper_type": paper_type,
+            "deleted_version": v,
+            "active_version": 1,
+            "active_changed": True,
+        }
+
+    if old_active == v or not _version_path(paper_type, old_active).exists():
+        new_active = int(remaining[0].version)
+        _write_json(_active_path(paper_type), {"active_version": new_active})
+        active_changed = True
+    else:
+        new_active = old_active
+        active_changed = False
+
+    return {
+        "paper_type": paper_type,
+        "deleted_version": v,
+        "active_version": int(new_active),
+        "active_changed": bool(active_changed),
+    }
 
 
 def create_new_version(paper_type: PaperType, schema: dict[str, Any], activate: bool = True) -> dict[str, Any]:

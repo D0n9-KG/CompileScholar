@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 from collections import defaultdict
+import json
 
-from app.crossref.client import CrossrefClient
+from app.crossref.client import CrossrefClient, CrossrefResolveResult
 from app.graph.neo4j_client import paper_id_for_md_path
 from app.ingest.models import DocumentIR
 
@@ -35,8 +36,23 @@ def build_reference_and_cite_records(
     cites_unresolved: list[dict] = []
 
     for ref_num, ref in sorted(ref_by_num.items(), key=lambda x: x[0]):
-        resolve = crossref.resolve_reference(ref.raw)
+        crossref_error: str | None = None
+        try:
+            resolve = crossref.resolve_reference(ref.raw)
+        except Exception as exc:  # noqa: BLE001
+            crossref_error = str(exc)
+            resolve = CrossrefResolveResult(query=ref.raw, topk=[], selected=None, confidence=0.0)
         selected = resolve.selected
+        crossref_json = crossref.dumps(resolve)
+        if crossref_error:
+            try:
+                payload = json.loads(crossref_json)
+                if not isinstance(payload, dict):
+                    payload = {"query": ref.raw}
+            except Exception:  # noqa: BLE001
+                payload = {"query": ref.raw}
+            payload["error"] = crossref_error
+            crossref_json = json.dumps(payload, ensure_ascii=False)
 
         ref_id = f"{paper_id}:{ref_num}"
         refs_out.append(
@@ -47,7 +63,8 @@ def build_reference_and_cite_records(
                 "raw": ref.raw,
                 "resolved_doi": selected.doi if selected else None,
                 "resolve_confidence": resolve.confidence,
-                "crossref_json": crossref.dumps(resolve),
+                "crossref_json": crossref_json,
+                "crossref_error": crossref_error,
                 "resolved_title": selected.title if selected else None,
                 "resolved_year": selected.year if selected else None,
                 "resolved_venue": selected.venue if selected else None,

@@ -1,25 +1,80 @@
 from __future__ import annotations
 
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable
 
 from app.citations.aggregate import build_reference_and_cite_records
+from app.citations.citation_event_recovery import recover_citation_events_from_references
 from app.crossref.client import CrossrefClient
+from app.extraction.orchestrator import run_phase1_extraction
 from app.graph.neo4j_client import Neo4jClient
 from app.graph.neo4j_client import paper_id_for_md_path
 from app.ingest.figures import extract_figures_from_markdown
+from app.ingest.models import DocumentIR
 from app.ingest.paper_meta import load_canonical_meta
 from app.ingest.parse_md import find_mineru_markdowns, parse_mineru_markdown
 from app.llm.citation_purpose import classify_citation_purposes_batch
-from app.llm.logic_claims_v2 import add_evidence_and_targets, extract_logic_and_claims_v2
+from app.llm.reference_recovery import recover_references_with_agent
 from app.schema_store import load_active
 from app.settings import settings
 from app.vector.faiss_store import build_faiss_for_chunks
 
 
 ProgressFn = Callable[[str, float, str | None], None]
+
+
+def _safe_id(s: str) -> str:
+    return re.sub(r"[^A-Za-z0-9_.-]+", "_", str(s or ""))
+
+
+def _paper_type_for_md(md_path: str) -> str:
+    try:
+        meta = load_canonical_meta(md_path)
+        paper_type = str(meta.get("paper_type") or "research").strip().lower()
+        if paper_type not in {"research", "review"}:
+            return "research"
+        return paper_type
+    except Exception:
+        return "research"
+
+
+def _schema_for_md(md_path: str) -> dict:
+    paper_type = _paper_type_for_md(md_path)
+    try:
+        return load_active(paper_type)  # type: ignore[arg-type]
+    except Exception:
+        return load_active("research")  # type: ignore[arg-type]
+
+
+def _write_document_ir(path: Path, doc: DocumentIR) -> None:
+    path.write_text(
+        json.dumps(
+            {
+                "paper": doc.paper.__dict__,
+                "chunks": [
+                    {
+                        **c.__dict__,
+                        "span": c.span.__dict__,
+                    }
+                    for c in doc.chunks
+                ],
+                "references": [r.__dict__ for r in doc.references],
+                "citations": [
+                    {
+                        **ce.__dict__,
+                        "span": ce.span.__dict__,
+                    }
+                    for ce in doc.citations
+                ],
+            },
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
 
 
 def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) -> dict:
@@ -42,31 +97,51 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
         doc = parse_mineru_markdown(md)
         parsed.append(doc)
         out = run_dir / f"{doc.paper.paper_source}.document_ir.json"
-        out.write_text(
-            json.dumps(
-                {
-                    "paper": doc.paper.__dict__,
-                    "chunks": [
-                        {
-                            **c.__dict__,
-                            "span": c.span.__dict__,
-                        }
-                        for c in doc.chunks
-                    ],
-                    "references": [r.__dict__ for r in doc.references],
-                    "citations": [
-                        {
-                            **ce.__dict__,
-                            "span": ce.span.__dict__,
-                        }
-                        for ce in doc.citations
-                    ],
-                },
-                ensure_ascii=False,
-                indent=2,
-            ),
-            encoding="utf-8",
+        _write_document_ir(out, doc)
+
+    notify("ingest:reference_recovery", 0.24, "Recovering references for papers with missing/low parsed refs")
+    reference_recovery: list[dict] = []
+    for idx, doc in enumerate(parsed):
+        schema_for_recovery = _schema_for_md(doc.paper.md_path)
+        before_refs = len(doc.references or [])
+        recovered_doc, rr = recover_references_with_agent(
+            doc,
+            prompt_overrides=schema_for_recovery.get("prompts"),
+            rules=schema_for_recovery.get("rules"),
         )
+        parsed[idx] = recovered_doc
+        rr["paper_source"] = doc.paper.paper_source
+        rr["paper_id"] = paper_id_for_md_path(recovered_doc.paper.md_path, doi=recovered_doc.paper.doi)
+        rr["schema_version"] = int(schema_for_recovery.get("version") or 1)
+        rr["schema_paper_type"] = str(schema_for_recovery.get("paper_type") or "research")
+        reference_recovery.append(rr)
+
+        rr_path = run_dir / f"{doc.paper.paper_source}.reference_recovery.json"
+        rr_path.write_text(json.dumps(rr, ensure_ascii=False, indent=2), encoding="utf-8")
+        if int(rr.get("after_refs") or before_refs) != before_refs:
+            out = run_dir / f"{doc.paper.paper_source}.document_ir.json"
+            _write_document_ir(out, recovered_doc)
+
+    notify("ingest:citation_event_recovery", 0.30, "Recovering citation events from references when needed")
+    citation_event_recovery: list[dict] = []
+    for idx, doc in enumerate(parsed):
+        schema_for_recovery = _schema_for_md(doc.paper.md_path)
+        recovered_doc, cer = recover_citation_events_from_references(
+            doc,
+            rules=schema_for_recovery.get("rules"),
+        )
+        parsed[idx] = recovered_doc
+        cer["paper_source"] = doc.paper.paper_source
+        cer["paper_id"] = paper_id_for_md_path(recovered_doc.paper.md_path, doi=recovered_doc.paper.doi)
+        cer["schema_version"] = int(schema_for_recovery.get("version") or 1)
+        cer["schema_paper_type"] = str(schema_for_recovery.get("paper_type") or "research")
+        citation_event_recovery.append(cer)
+
+        cer_path = run_dir / f"{doc.paper.paper_source}.citation_event_recovery.json"
+        cer_path.write_text(json.dumps(cer, ensure_ascii=False, indent=2), encoding="utf-8")
+        if int(cer.get("after_events") or 0) != int(cer.get("before_events") or 0):
+            out = run_dir / f"{doc.paper.paper_source}.document_ir.json"
+            _write_document_ir(out, recovered_doc)
 
     notify("ingest:crossref", 0.35, "Resolving references via Crossref")
     crossref = CrossrefClient()
@@ -164,19 +239,24 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
             if paper_type not in {"research", "review"}:
                 paper_type = "research"
             schema = load_active(paper_type)  # type: ignore[arg-type]
-            steps_sorted = sorted(schema.get("steps") or [], key=lambda x: int((x or {}).get("order") or 0))
-            step_order = [str(s.get("id") or "") for s in steps_sorted if bool((s or {}).get("enabled", True)) and str((s or {}).get("id") or "").strip()]
-            if not step_order:
-                step_order = [str(s.get("id") or "") for s in steps_sorted if str((s or {}).get("id") or "").strip()]
-
-            logic_claims = extract_logic_and_claims_v2(doc, paper_id=paper_id, schema=schema)
-            try:
-                from app.llm.logic_claims_v2 import add_logic_step_evidence
-
-                add_logic_step_evidence(doc, schema=schema, logic=logic_claims["logic"])
-            except Exception:
-                pass
-            add_evidence_and_targets(doc, schema=schema, claims=logic_claims["claims"], cite_rec=rec)
+            phase1_artifacts_dir = run_dir / "raw_pool" / _safe_id(paper_id)
+            phase1 = run_phase1_extraction(
+                doc=doc,
+                paper_id=str(paper_id),
+                cite_rec=rec,
+                schema=schema,
+                artifacts_dir=phase1_artifacts_dir,
+                allow_weak=bool(getattr(settings, "phase1_gate_allow_weak", False)),
+            )
+            step_order = list(phase1.get("step_order") or [])
+            logic_claims = {
+                "logic": phase1.get("logic") or {},
+                "claims": phase1.get("validated_claims") or [],
+                "quality_report": phase1.get("quality_report") or {},
+                "raw_claim_candidates": len(phase1.get("claim_candidates") or []),
+                "raw_claims_merged": len(phase1.get("claims_merged") or []),
+                "rejected_claims": len(phase1.get("rejected_claims") or []),
+            }
             llm_out = {"paper_id": paper_id, "schema": {"paper_type": paper_type, "version": schema.get("version")}, **logic_claims}
             out = run_dir / f"{doc.paper.paper_source}.llm_imrad.json"
             out.write_text(json.dumps(logic_claims, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -210,7 +290,12 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
                         "contexts": contexts,
                     }
                 )
-            batch_out = classify_citation_purposes_batch(citing_title=citing_title, cites=batch_in, prompt_overrides=schema.get("prompts"))
+            batch_out = classify_citation_purposes_batch(
+                citing_title=citing_title,
+                cites=batch_in,
+                prompt_overrides=schema.get("prompts"),
+                rules=schema.get("rules"),
+            )
             by_id = batch_out.get("by_id") or {}
             for cr in rec.get("cites_resolved") or []:
                 cited_paper_id = cr.get("cited_paper_id")
@@ -228,6 +313,19 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
             if neo4j_written:
                 with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
                     client.upsert_logic_steps_and_claims(paper_id=paper_id, logic=logic_claims["logic"], claims=logic_claims["claims"], step_order=step_order)
+                    try:
+                        quality_report = logic_claims.get("quality_report") or {}
+                        client.update_paper_props(
+                            paper_id,
+                            {
+                                "phase1_quality_json": json.dumps(quality_report, ensure_ascii=False),
+                                "phase1_gate_passed": bool(quality_report.get("gate_passed")),
+                                "phase1_quality_tier": str(quality_report.get("quality_tier") or ""),
+                                "phase1_quality_tier_score": float(quality_report.get("quality_tier_score") or 0.0),
+                            },
+                        )
+                    except Exception:
+                        pass
                     try:
                         client.upsert_proposition_mentions_for_claims(
                             paper_id=paper_id,
@@ -297,10 +395,24 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
             }
             for r in cite_records
         ],
+        "reference_recovery": reference_recovery,
+        "citation_event_recovery": citation_event_recovery,
         "neo4j_written": neo4j_written,
         "neo4j_error": neo4j_error,
         "llm_built": llm_built,
         "llm_error": llm_error,
+        "phase1_quality": [
+            {
+                "paper_id": o.get("paper_id"),
+                "gate_passed": bool((o.get("quality_report") or {}).get("gate_passed")),
+                "quality_tier": str((o.get("quality_report") or {}).get("quality_tier") or ""),
+                "quality_tier_score": (o.get("quality_report") or {}).get("quality_tier_score"),
+                "supported_claim_ratio": (o.get("quality_report") or {}).get("supported_claim_ratio"),
+                "step_coverage_ratio": (o.get("quality_report") or {}).get("step_coverage_ratio"),
+                "validated_claims": len(o.get("claims") or []),
+            }
+            for o in llm_outputs
+        ],
         "faiss_built": faiss_built,
         "faiss_error": faiss_error,
         "faiss_dir": faiss_dir,
