@@ -55,6 +55,11 @@ class Settings(BaseSettings):
         validation_alias=AliasChoices("PHASE1_GATE_ALLOW_WEAK"),
     )
 
+    ingest_llm_max_workers: int = Field(
+        default=4,
+        validation_alias=AliasChoices("INGEST_LLM_MAX_WORKERS"),
+    )
+
     data_root: str = ".."
     storage_dir: str = "storage"
 

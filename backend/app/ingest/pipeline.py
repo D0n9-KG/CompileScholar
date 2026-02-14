@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import json
 import re
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Callable
+from typing import Any, Callable
 
 from app.citations.aggregate import build_reference_and_cite_records
 from app.citations.citation_event_recovery import recover_citation_events_from_references
@@ -47,6 +48,14 @@ def _schema_for_md(md_path: str) -> dict:
         return load_active(paper_type)  # type: ignore[arg-type]
     except Exception:
         return load_active("research")  # type: ignore[arg-type]
+
+
+def _bounded_int(value: Any, *, default: int, lo: int, hi: int) -> int:
+    try:
+        n = int(value)
+    except Exception:
+        n = int(default)
+    return max(lo, min(hi, n))
 
 
 def _write_document_ir(path: Path, doc: DocumentIR) -> None:
@@ -239,132 +248,198 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
     notify("ingest:llm", 0.70, "Running LLM extraction (Logic/Claims/Citation Purposes)")
     llm_built = False
     llm_error = None
-    llm_outputs = []
-    try:
-        # LLM extraction (DeepSeek) + write to Neo4j; if Neo4j isn't available, still write artifacts.
-        for doc, rec in zip(parsed, cite_records):
-            paper_id = rec.get("paper_id")
-            if not paper_id:
+    llm_outputs: list[dict[str, Any]] = []
+    llm_failures: list[str] = []
+
+    def _llm_extract_one(idx: int, doc: DocumentIR, rec: dict[str, Any]) -> dict[str, Any]:
+        paper_id = str(rec["paper_id"])
+
+        meta = load_canonical_meta(doc.paper.md_path)
+        paper_type = str(meta.get("paper_type") or "research").strip().lower()
+        if paper_type not in {"research", "review"}:
+            paper_type = "research"
+        schema = load_active(paper_type)  # type: ignore[arg-type]
+        phase1_artifacts_dir = run_dir / "raw_pool" / _safe_id(paper_id)
+        phase1 = run_phase1_extraction(
+            doc=doc,
+            paper_id=paper_id,
+            cite_rec=rec,
+            schema=schema,
+            artifacts_dir=phase1_artifacts_dir,
+            allow_weak=bool(getattr(settings, "phase1_gate_allow_weak", False)),
+        )
+        step_order = list(phase1.get("step_order") or [])
+        logic_claims = {
+            "logic": phase1.get("logic") or {},
+            "claims": phase1.get("validated_claims") or [],
+            "quality_report": phase1.get("quality_report") or {},
+            "raw_claim_candidates": len(phase1.get("claim_candidates") or []),
+            "raw_claims_merged": len(phase1.get("claims_merged") or []),
+            "rejected_claims": len(phase1.get("rejected_claims") or []),
+        }
+        llm_out = {"paper_id": paper_id, "schema": {"paper_type": paper_type, "version": schema.get("version")}, **logic_claims}
+        out = run_dir / f"{doc.paper.paper_source}.llm_imrad.json"
+        out.write_text(json.dumps(logic_claims, ensure_ascii=False, indent=2), encoding="utf-8")
+
+        purposes = []
+        chunk_by_id = {c.chunk_id: c for c in doc.chunks}
+        citing_title = doc.paper.title or doc.paper.title_alt or doc.paper.paper_source
+        batch_in = []
+        for cr in rec.get("cites_resolved") or []:
+            cited_paper_id = cr.get("cited_paper_id")
+            cited_doi = None
+            if cited_paper_id and str(cited_paper_id).startswith("doi:"):
+                cited_doi = str(cited_paper_id)[4:]
+            cited_title = None
+            for cp in rec.get("cited_papers") or []:
+                if cp.get("paper_id") == cited_paper_id:
+                    cited_title = cp.get("title")
+                    break
+            contexts = []
+            for cid in cr.get("evidence_chunk_ids") or []:
+                ch = chunk_by_id.get(cid)
+                if ch and ch.text:
+                    contexts.append(ch.text)
+            batch_in.append(
+                {
+                    "cited_paper_id": cited_paper_id,
+                    "cited_title": cited_title,
+                    "cited_doi": cited_doi,
+                    "contexts": contexts,
+                }
+            )
+        batch_out = classify_citation_purposes_batch(
+            citing_title=citing_title,
+            cites=batch_in,
+            prompt_overrides=schema.get("prompts"),
+            rules=schema.get("rules"),
+        )
+        by_id = batch_out.get("by_id") or {}
+        for cr in rec.get("cites_resolved") or []:
+            cited_paper_id = cr.get("cited_paper_id")
+            if not cited_paper_id:
                 continue
+            x = by_id.get(str(cited_paper_id)) or {"labels": ["Background"], "scores": [0.4]}
+            purposes.append({"cited_paper_id": cited_paper_id, "labels": x["labels"], "scores": x["scores"]})
+        out2 = run_dir / f"{doc.paper.paper_source}.llm_citation_purposes.json"
+        out2.write_text(json.dumps(purposes, ensure_ascii=False, indent=2), encoding="utf-8")
 
-            meta = load_canonical_meta(doc.paper.md_path)
-            paper_type = str(meta.get("paper_type") or "research").strip().lower()
-            if paper_type not in {"research", "review"}:
-                paper_type = "research"
-            schema = load_active(paper_type)  # type: ignore[arg-type]
-            phase1_artifacts_dir = run_dir / "raw_pool" / _safe_id(paper_id)
-            phase1 = run_phase1_extraction(
-                doc=doc,
-                paper_id=str(paper_id),
-                cite_rec=rec,
-                schema=schema,
-                artifacts_dir=phase1_artifacts_dir,
-                allow_weak=bool(getattr(settings, "phase1_gate_allow_weak", False)),
+        llm_out["citation_purposes"] = purposes
+        return {
+            "idx": idx,
+            "paper_id": paper_id,
+            "paper_year": doc.paper.year,
+            "step_order": step_order,
+            "logic_claims": logic_claims,
+            "citation_purposes": purposes,
+            "llm_out": llm_out,
+        }
+
+    def _write_llm_to_neo4j(item: dict[str, Any]) -> None:
+        paper_id = str(item["paper_id"])
+        logic_claims = dict(item.get("logic_claims") or {})
+        step_order = list(item.get("step_order") or [])
+        purposes = list(item.get("citation_purposes") or [])
+        with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
+            client.upsert_logic_steps_and_claims(
+                paper_id=paper_id,
+                logic=logic_claims.get("logic") or {},
+                claims=logic_claims.get("claims") or [],
+                step_order=step_order,
             )
-            step_order = list(phase1.get("step_order") or [])
-            logic_claims = {
-                "logic": phase1.get("logic") or {},
-                "claims": phase1.get("validated_claims") or [],
-                "quality_report": phase1.get("quality_report") or {},
-                "raw_claim_candidates": len(phase1.get("claim_candidates") or []),
-                "raw_claims_merged": len(phase1.get("claims_merged") or []),
-                "rejected_claims": len(phase1.get("rejected_claims") or []),
-            }
-            llm_out = {"paper_id": paper_id, "schema": {"paper_type": paper_type, "version": schema.get("version")}, **logic_claims}
-            out = run_dir / f"{doc.paper.paper_source}.llm_imrad.json"
-            out.write_text(json.dumps(logic_claims, ensure_ascii=False, indent=2), encoding="utf-8")
-
-            # Citation purpose classification for resolved cites
-            purposes = []
-            chunk_by_id = {c.chunk_id: c for c in doc.chunks}
-            citing_title = doc.paper.title or doc.paper.title_alt or doc.paper.paper_source
-            batch_in = []
-            for cr in rec.get("cites_resolved") or []:
-                cited_paper_id = cr.get("cited_paper_id")
-                cited_doi = None
-                if cited_paper_id and str(cited_paper_id).startswith("doi:"):
-                    cited_doi = str(cited_paper_id)[4:]
-                cited_title = None
-                # Try to locate metadata from cited_papers list
-                for cp in rec.get("cited_papers") or []:
-                    if cp.get("paper_id") == cited_paper_id:
-                        cited_title = cp.get("title")
-                        break
-                contexts = []
-                for cid in cr.get("evidence_chunk_ids") or []:
-                    ch = chunk_by_id.get(cid)
-                    if ch and ch.text:
-                        contexts.append(ch.text)
-                batch_in.append(
+            try:
+                quality_report = logic_claims.get("quality_report") or {}
+                client.update_paper_props(
+                    paper_id,
                     {
-                        "cited_paper_id": cited_paper_id,
-                        "cited_title": cited_title,
-                        "cited_doi": cited_doi,
-                        "contexts": contexts,
-                    }
+                        "phase1_quality_json": json.dumps(quality_report, ensure_ascii=False),
+                        "phase1_gate_passed": bool(quality_report.get("gate_passed")),
+                        "phase1_quality_tier": str(quality_report.get("quality_tier") or ""),
+                        "phase1_quality_tier_score": float(quality_report.get("quality_tier_score") or 0.0),
+                    },
                 )
-            batch_out = classify_citation_purposes_batch(
-                citing_title=citing_title,
-                cites=batch_in,
-                prompt_overrides=schema.get("prompts"),
-                rules=schema.get("rules"),
-            )
-            by_id = batch_out.get("by_id") or {}
-            for cr in rec.get("cites_resolved") or []:
-                cited_paper_id = cr.get("cited_paper_id")
-                if not cited_paper_id:
+            except Exception:
+                pass
+            try:
+                client.upsert_proposition_mentions_for_claims(
+                    paper_id=paper_id,
+                    claims=logic_claims.get("claims") or [],
+                    paper_year=item.get("paper_year"),
+                )
+            except Exception:
+                pass
+            try:
+                client.apply_human_claim_evidence_overrides(paper_id)
+            except Exception:
+                pass
+            try:
+                client.apply_human_logic_step_evidence_overrides(paper_id)
+            except Exception:
+                pass
+            for p in purposes:
+                if not p.get("cited_paper_id"):
                     continue
-                x = by_id.get(str(cited_paper_id)) or {"labels": ["Background"], "scores": [0.4]}
-                purposes.append({"cited_paper_id": cited_paper_id, "labels": x["labels"], "scores": x["scores"]})
-            out2 = run_dir / f"{doc.paper.paper_source}.llm_citation_purposes.json"
-            out2.write_text(json.dumps(purposes, ensure_ascii=False, indent=2), encoding="utf-8")
+                client.update_cites_purposes(
+                    citing_paper_id=paper_id,
+                    cited_paper_id=p["cited_paper_id"],
+                    labels=p["labels"],
+                    scores=p["scores"],
+                )
 
-            llm_out["citation_purposes"] = purposes
-            llm_outputs.append(llm_out)
+    try:
+        jobs = [(idx, doc, rec) for idx, (doc, rec) in enumerate(zip(parsed, cite_records)) if rec.get("paper_id")]
+        total_jobs = len(jobs)
+        if total_jobs == 0:
+            llm_built = True
+        else:
+            configured_workers = _bounded_int(
+                getattr(settings, "ingest_llm_max_workers", 4),
+                default=4,
+                lo=1,
+                hi=16,
+            )
+            max_workers = min(total_jobs, configured_workers)
+            completed = 0
+            outputs_by_idx: dict[int, dict[str, Any]] = {}
+            notify(
+                "ingest:llm",
+                0.70,
+                f"Running LLM extraction (Logic/Claims/Citation Purposes) (0/{total_jobs}, workers={max_workers})",
+            )
+            with ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="ingest-llm") as executor:
+                future_map = {
+                    executor.submit(_llm_extract_one, idx, doc, rec): (idx, rec)
+                    for idx, doc, rec in jobs
+                }
+                for future in as_completed(future_map):
+                    idx, rec = future_map[future]
+                    paper_id = str(rec.get("paper_id") or "")
+                    completed += 1
+                    try:
+                        item = future.result()
+                    except Exception as exc:
+                        llm_failures.append(f"{paper_id}: {exc}")
+                    else:
+                        outputs_by_idx[idx] = dict(item["llm_out"])
+                        if neo4j_written:
+                            try:
+                                _write_llm_to_neo4j(item)
+                            except Exception as exc:
+                                llm_failures.append(f"{paper_id}: neo4j write failed: {exc}")
+                    ratio = completed / total_jobs
+                    notify(
+                        "ingest:llm",
+                        0.70 + (0.20 * ratio),
+                        f"Running LLM extraction (Logic/Claims/Citation Purposes) ({completed}/{total_jobs}, failed={len(llm_failures)})",
+                    )
+            llm_outputs = [outputs_by_idx[i] for i in sorted(outputs_by_idx)]
+            if llm_failures:
+                shown = llm_failures[:5]
+                llm_error = "; ".join(shown)
+                if len(llm_failures) > len(shown):
+                    llm_error = f"{llm_error}; ... ({len(llm_failures)} failures total)"
+            llm_built = not llm_failures
 
-            # Write into Neo4j if available
-            if neo4j_written:
-                with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
-                    client.upsert_logic_steps_and_claims(paper_id=paper_id, logic=logic_claims["logic"], claims=logic_claims["claims"], step_order=step_order)
-                    try:
-                        quality_report = logic_claims.get("quality_report") or {}
-                        client.update_paper_props(
-                            paper_id,
-                            {
-                                "phase1_quality_json": json.dumps(quality_report, ensure_ascii=False),
-                                "phase1_gate_passed": bool(quality_report.get("gate_passed")),
-                                "phase1_quality_tier": str(quality_report.get("quality_tier") or ""),
-                                "phase1_quality_tier_score": float(quality_report.get("quality_tier_score") or 0.0),
-                            },
-                        )
-                    except Exception:
-                        pass
-                    try:
-                        client.upsert_proposition_mentions_for_claims(
-                            paper_id=paper_id,
-                            claims=logic_claims["claims"],
-                            paper_year=doc.paper.year,
-                        )
-                    except Exception:
-                        pass
-                    try:
-                        client.apply_human_claim_evidence_overrides(paper_id)
-                    except Exception:
-                        pass
-                    try:
-                        client.apply_human_logic_step_evidence_overrides(paper_id)
-                    except Exception:
-                        pass
-                    for p in purposes:
-                        if not p.get("cited_paper_id"):
-                            continue
-                        client.update_cites_purposes(
-                            citing_paper_id=paper_id,
-                            cited_paper_id=p["cited_paper_id"],
-                            labels=p["labels"],
-                            scores=p["scores"],
-                        )
-        llm_built = True
     except Exception as exc:  # noqa: BLE001
         llm_error = str(exc)
 
