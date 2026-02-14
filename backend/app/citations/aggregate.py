@@ -11,7 +11,7 @@ from app.ingest.models import DocumentIR
 def build_reference_and_cite_records(
     doc: DocumentIR,
     crossref: CrossrefClient,
-    crossref_confidence_threshold: float = 0.25,
+    crossref_confidence_threshold: float = 0.55,
     max_evidence: int = 5,
 ) -> dict:
     """

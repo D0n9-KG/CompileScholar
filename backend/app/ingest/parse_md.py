@@ -26,6 +26,30 @@ _IN_TEXT_CITATION_RE = re.compile(
 )
 _REF_ENTRY_RE = re.compile(r"^\[(?P<num>\d{1,3})\]\s+(?P<rest>.+?)\s*$")
 
+# For detecting unnumbered references (MLA/APA style)
+_REF_HEADING_RE = re.compile(
+    r"^\s{0,3}(?:#{1,6}\s*)?(references|bibliography|reference list|works cited|参考文献)\s*$",
+    re.IGNORECASE,
+)
+_SECTION_HEADING_RE = re.compile(r"^\s{0,3}#{1,6}\s+")
+
+
+def _looks_like_reference(line: str) -> bool:
+    """Heuristic to detect if a line looks like a reference entry."""
+    if len(line) < 12:
+        return False
+    lower = line.lower()
+    norm = line.strip()
+
+    # Has year pattern
+    has_year = bool(_YEAR_RE.search(norm))
+    # Has doi or common reference markers
+    has_markers = ("doi" in lower) or ("," in norm and "." in norm)
+    # Has publication-like punctuation
+    has_pub_pattern = norm.count(",") >= 2 or (norm.count(".") >= 2 and "." not in norm[-3:])
+
+    return has_year and (has_markers or has_pub_pattern)
+
 
 def _stable_chunk_id(paper_source: str, md_path: str, start_line: int, end_line: int, text: str) -> str:
     h = hashlib.sha256()
@@ -146,9 +170,13 @@ def parse_mineru_markdown(md_path: str) -> DocumentIR:
 
     # Identify reference entries near the end: collect all lines that look like "[n] ..."
     ref_line_idxs: list[int] = []
+    ref_heading_idx: int | None = None
     for idx, line in enumerate(lines, start=1):
         if _REF_ENTRY_RE.match(line.strip()):
             ref_line_idxs.append(idx)
+        # Also detect reference section headings (take last match to avoid early TOC/mentions)
+        if _REF_HEADING_RE.match(line.strip()):
+            ref_heading_idx = idx
 
     ref_start = None
     if ref_line_idxs:
@@ -159,6 +187,9 @@ def parse_mineru_markdown(md_path: str) -> DocumentIR:
         tail_refs = [i for i in ref_line_idxs if i >= cutoff]
         if tail_refs:
             ref_start = min(tail_refs)
+    elif ref_heading_idx:
+        # No numbered refs found, but we have a reference heading - use it
+        ref_start = ref_heading_idx
 
     # Build paragraph-like chunks by blank-line separation, but stop parsing at reference section for "content chunks".
     blocks: list[tuple[int, int, str, str | None]] = []
@@ -236,21 +267,93 @@ def parse_mineru_markdown(md_path: str) -> DocumentIR:
 
     # Parse references (only if detected)
     if ref_start:
+        # Strategy: try numbered first, fallback to unnumbered with multi-line merging
+        numbered_refs: dict[int, str] = {}
+        unnumbered_refs: list[str] = []
+        current_ref = ""
+        current_num: int | None = None
+        in_references = True  # We're already starting from ref_start, so we're in references
+
         for idx in range(ref_start, len(lines) + 1):
             line = lines[idx - 1].strip()
-            m = _REF_ENTRY_RE.match(line)
-            if not m:
+
+            # Skip reference section heading itself
+            if _REF_HEADING_RE.match(line):
+                in_references = True
                 continue
-            num = int(m.group("num"))
-            rest = m.group("rest").strip()
-            references.append(
-                ReferenceEntry(
-                    paper_source=paper_source,
-                    md_path=str(p),
-                    ref_num=num,
-                    raw=rest,
+
+            # Stop at next major section heading
+            if in_references and _SECTION_HEADING_RE.match(line) and not _REF_HEADING_RE.match(line):
+                break
+
+            if not line:
+                # Empty line: save current ref
+                if current_num is not None and current_ref:
+                    numbered_refs[current_num] = current_ref.strip()
+                    current_ref = ""
+                    current_num = None
+                elif current_ref and _looks_like_reference(current_ref):
+                    unnumbered_refs.append(current_ref.strip())
+                    current_ref = ""
+                continue
+
+            # Check for numbered reference
+            m = _REF_ENTRY_RE.match(line)
+            if m:
+                # Save previous reference
+                if current_num is not None and current_ref:
+                    numbered_refs[current_num] = current_ref.strip()
+                elif current_ref and _looks_like_reference(current_ref):
+                    unnumbered_refs.append(current_ref.strip())
+
+                # Start new numbered reference
+                current_num = int(m.group("num"))
+                current_ref = m.group("rest").strip()
+            elif current_num is not None:
+                # Continuation of numbered reference
+                current_ref += " " + line
+            elif _looks_like_reference(line):
+                # Unnumbered refs: if we already hold a full ref-like line, start a new ref.
+                if current_ref and current_num is None and _looks_like_reference(current_ref):
+                    unnumbered_refs.append(current_ref.strip())
+                    current_ref = line
+                elif current_ref:
+                    current_ref += " " + line
+                else:
+                    current_ref = line
+            elif current_ref:
+                # Might be continuation line
+                current_ref += " " + line
+
+        # Save last reference
+        if current_num is not None and current_ref:
+            numbered_refs[current_num] = current_ref.strip()
+        elif current_ref and _looks_like_reference(current_ref):
+            unnumbered_refs.append(current_ref.strip())
+
+        # Build references list
+        if numbered_refs:
+            # Numbered references found - use them
+            for num in sorted(numbered_refs.keys()):
+                references.append(
+                    ReferenceEntry(
+                        paper_source=paper_source,
+                        md_path=str(p),
+                        ref_num=num,
+                        raw=numbered_refs[num],
+                    )
                 )
-            )
+        elif unnumbered_refs:
+            # No numbered refs, use unnumbered with sequential numbering
+            for i, raw in enumerate(unnumbered_refs, start=1):
+                references.append(
+                    ReferenceEntry(
+                        paper_source=paper_source,
+                        md_path=str(p),
+                        ref_num=i,
+                        raw=raw,
+                    )
+                )
 
     return DocumentIR(paper=paper_draft, chunks=chunks, references=references, citations=citations)
 

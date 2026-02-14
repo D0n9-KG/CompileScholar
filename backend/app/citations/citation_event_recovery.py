@@ -180,7 +180,7 @@ def recover_citation_events_from_references(
     before_events = len(doc.citations or [])
     refs = doc.references or []
     ref_nums = {int(r.ref_num) for r in refs if int(r.ref_num) > 0}
-    trigger_max_existing_events = _rule_int(rules, "citation_event_recovery_trigger_max_existing_events", 0, lo=0, hi=50)
+    trigger_max_existing_events = _rule_int(rules, "citation_event_recovery_trigger_max_existing_events", 6, lo=0, hi=50)
     enabled = _rule_bool(rules, "citation_event_recovery_enabled", True)
     numeric_bracket_enabled = _rule_bool(rules, "citation_event_recovery_numeric_bracket_enabled", True)
     paren_numeric_enabled = _rule_bool(rules, "citation_event_recovery_paren_numeric_enabled", False)
@@ -188,12 +188,25 @@ def recover_citation_events_from_references(
     max_events_per_chunk = _rule_int(rules, "citation_event_recovery_max_events_per_chunk", 6, lo=1, hi=40)
     context_chars = _rule_int(rules, "citation_event_recovery_context_chars", 800, lo=120, hi=4000)
 
+    # Calculate dynamic threshold: papers with more references should allow more existing events before skipping
+    # Formula: min(trigger_max + refs*0.15, trigger_max*3)
+    # E.g., paper with 20 refs: min(6 + 3, 18) = 9; paper with 40 refs: min(6 + 6, 18) = 12
+    ref_count = len(refs)
+    dynamic_threshold = max(
+        trigger_max_existing_events,
+        min(
+            trigger_max_existing_events + int(ref_count * 0.15),
+            trigger_max_existing_events * 3,
+        ),
+    )
+
     report: dict[str, Any] = {
         "enabled": enabled,
         "before_events": before_events,
         "after_events": before_events,
         "before_refs": len(refs),
         "trigger_max_existing_events": trigger_max_existing_events,
+        "dynamic_threshold": dynamic_threshold,
         "numeric_bracket_enabled": numeric_bracket_enabled,
         "paren_numeric_enabled": paren_numeric_enabled,
         "author_year_enabled": author_year_enabled,
@@ -209,8 +222,8 @@ def recover_citation_events_from_references(
     if not refs or not ref_nums:
         report["status"] = "no_references"
         return doc, report
-    if before_events > trigger_max_existing_events:
-        report["status"] = "skipped_existing_events"
+    if before_events > dynamic_threshold:
+        report["status"] = "skipped_existing_events_above_dynamic_threshold"
         return doc, report
 
     existing_keys = {(str(c.chunk_id), int(c.cited_ref_num)) for c in (doc.citations or [])}

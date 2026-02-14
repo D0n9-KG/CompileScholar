@@ -79,7 +79,7 @@ def rebuild_evolution_graph(
     progress: ProgressFn | None = None,
     log: LogFn | None = None,
     *,
-    min_similarity: float = 0.90,
+    min_similarity: float = 0.86,
     candidate_limit: int = 50000,
 ) -> dict[str, Any]:
     progress = progress or (lambda stage, p, msg=None: None)
@@ -97,7 +97,7 @@ def rebuild_evolution_graph(
     similarity_floor = float(min_similarity)
     raw_max_similarity = 1.0
     inference_min_similarity = float(min_similarity)
-    inference_accept_threshold = 0.86
+    inference_accept_threshold = 0.82
 
     with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
         pairs = client.list_proposition_candidate_pairs(min_score=min_similarity, limit=candidate_limit)
@@ -109,8 +109,8 @@ def rebuild_evolution_graph(
             raw_max_similarity = max(sims) if sims else 0.0
             if pairs and 0.0 < raw_max_similarity < min_similarity:
                 adaptive_similarity = True
-                inference_min_similarity = 0.78
-                inference_accept_threshold = 0.82
+                inference_min_similarity = 0.74
+                inference_accept_threshold = 0.80
         else:
             sims = [float(p.get("similarity") or 0.0) for p in pairs]
             raw_max_similarity = max(sims) if sims else 0.0

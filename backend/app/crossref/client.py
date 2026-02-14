@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -29,10 +30,23 @@ class CrossrefResolveResult:
 
 
 class CrossrefClient:
+    # DOI pattern: 10.xxxx/...
+    _DOI_RE = re.compile(r"(10\.\d{4,9}/[-._;()/:A-Z0-9]+)", re.IGNORECASE)
+
     def __init__(self, mailto: str | None = None):
         self._session = requests.Session()
         self._mailto = mailto
         self._cache: dict[str, CrossrefResolveResult] = {}
+
+    @classmethod
+    def _extract_doi(cls, raw: str) -> str | None:
+        """Extract DOI from reference text if present."""
+        m = cls._DOI_RE.search(str(raw or ""))
+        if not m:
+            return None
+        # Strip trailing punctuation that might be caught
+        doi = str(m.group(1)).rstrip(").,;]}").lower()
+        return doi
 
     def preflight(self, max_wait_seconds: float = 15.0) -> dict:
         """
@@ -143,6 +157,18 @@ class CrossrefClient:
         key = self._cache_key(query)
         if key in self._cache:
             return self._cache[key]
+
+        # DOI-first strategy: if DOI is present in the reference, query directly
+        doi_hint = self._extract_doi(query)
+        if doi_hint:
+            direct_work = self.get_work_by_doi(doi_hint)
+            if direct_work:
+                # DOI match has confidence 1.0
+                result = CrossrefResolveResult(query=raw, topk=[direct_work], selected=direct_work, confidence=1.0)
+                self._cache[key] = result
+                # Keep pacing consistent with non-DOI path to avoid bursty requests.
+                time.sleep(0.1)
+                return result
 
         data = self._query(query, rows=topk)
         items = data.get("message", {}).get("items", []) or []

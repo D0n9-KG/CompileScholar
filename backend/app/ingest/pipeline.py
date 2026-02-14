@@ -148,7 +148,20 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
     cite_records = []
     for doc in parsed:
         try:
-            rec = build_reference_and_cite_records(doc, crossref=crossref)
+            # Read crossref_confidence_threshold from schema
+            schema_for_crossref = _schema_for_md(doc.paper.md_path)
+            raw_threshold = (schema_for_crossref.get("rules") or {}).get("crossref_confidence_threshold", 0.55)
+            try:
+                crossref_threshold = float(raw_threshold)
+            except Exception:  # noqa: BLE001
+                crossref_threshold = 0.55
+            crossref_threshold = max(0.0, min(1.0, crossref_threshold))
+
+            rec = build_reference_and_cite_records(
+                doc,
+                crossref=crossref,
+                crossref_confidence_threshold=crossref_threshold,
+            )
             cite_records.append(rec)
             out = run_dir / f"{doc.paper.paper_source}.citations.json"
             out.write_text(json.dumps(rec, ensure_ascii=False, indent=2), encoding="utf-8")

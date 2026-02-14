@@ -157,6 +157,7 @@ def _looks_like_reference_line(line: str) -> bool:
 
 
 def _extract_reference_texts_heuristic(markdown_text: str, max_refs: int) -> list[str]:
+    """Extract references with multi-line merging support."""
     lines = (markdown_text or "").splitlines()
     if not lines:
         return []
@@ -167,39 +168,91 @@ def _extract_reference_texts_heuristic(markdown_text: str, max_refs: int) -> lis
         out_no_heading: list[str] = []
         seen_no_heading: set[str] = set()
         tail_window = lines[-600:] if len(lines) > 600 else lines
+        current_ref = ""
         for raw_line in tail_window:
             line = raw_line.strip()
-            if not _looks_like_reference_line(line):
-                continue
-            norm = _normalize_ref(line)
-            if norm in seen_no_heading:
-                continue
-            seen_no_heading.add(norm)
-            out_no_heading.append(norm)
-            if len(out_no_heading) >= max_refs:
-                break
+            # Check if this starts a new reference (has number/bracket prefix)
+            if _REF_PREFIX_RE.match(line):
+                # Save previous reference if valid
+                if current_ref and _looks_like_reference_line(current_ref):
+                    norm = _normalize_ref(current_ref)
+                    if norm not in seen_no_heading and len(norm) >= 12:
+                        seen_no_heading.add(norm)
+                        out_no_heading.append(norm)
+                        if len(out_no_heading) >= max_refs:
+                            break
+                current_ref = line
+            elif current_ref and line and not _SECTION_HEADING_RE.match(line):
+                # Continuation of current reference
+                current_ref += " " + line
+            elif not line:
+                # Empty line: save current ref and reset
+                if current_ref and _looks_like_reference_line(current_ref):
+                    norm = _normalize_ref(current_ref)
+                    if norm not in seen_no_heading and len(norm) >= 12:
+                        seen_no_heading.add(norm)
+                        out_no_heading.append(norm)
+                        if len(out_no_heading) >= max_refs:
+                            break
+                current_ref = ""
+        # Save last reference
+        if current_ref and _looks_like_reference_line(current_ref):
+            norm = _normalize_ref(current_ref)
+            if norm not in seen_no_heading and len(norm) >= 12:
+                seen_no_heading.add(norm)
+                out_no_heading.append(norm)
         return out_no_heading
 
     out: list[str] = []
     seen: set[str] = set()
+    current_ref = ""
     for raw_line in lines[heading_idx + 1 :]:
         line = raw_line.strip()
-        if not line:
-            continue
         lower = line.lower()
+
+        # Stop conditions
         if _SECTION_HEADING_RE.match(line) and not _REF_HEADING_RE.match(line):
             break
         if lower.startswith("corresponding author"):
             break
-        if not _looks_like_reference_line(line):
+
+        if not line:
+            # Empty line: save current ref and reset
+            if current_ref and _looks_like_reference_line(current_ref):
+                norm = _normalize_ref(current_ref)
+                if norm not in seen and len(norm) >= 12:
+                    seen.add(norm)
+                    out.append(norm)
+                    if len(out) >= max_refs:
+                        break
+            current_ref = ""
             continue
-        norm = _normalize_ref(line)
-        if norm in seen:
-            continue
-        seen.add(norm)
-        out.append(norm)
-        if len(out) >= max_refs:
-            break
+
+        # Check if this starts a new reference
+        if _REF_PREFIX_RE.match(line):
+            # Save previous reference if valid
+            if current_ref and _looks_like_reference_line(current_ref):
+                norm = _normalize_ref(current_ref)
+                if norm not in seen and len(norm) >= 12:
+                    seen.add(norm)
+                    out.append(norm)
+                    if len(out) >= max_refs:
+                        break
+            current_ref = line
+        elif current_ref:
+            # Continuation of current reference
+            current_ref += " " + line
+        elif _looks_like_reference_line(line):
+            # Start a reference without explicit numbering
+            current_ref = line
+
+    # Save last reference
+    if current_ref and _looks_like_reference_line(current_ref):
+        norm = _normalize_ref(current_ref)
+        if norm not in seen and len(norm) >= 12:
+            seen.add(norm)
+            out.append(norm)
+
     return out
 
 
@@ -218,13 +271,21 @@ def recover_references_with_agent(
     """
     rules = rules or {}
     before_refs = len(doc.references or [])
-    trigger_max_existing_refs = _rule_int(rules, "reference_recovery_trigger_max_existing_refs", 0, lo=0, hi=200)
+    trigger_max_existing_refs = _rule_int(rules, "reference_recovery_trigger_max_existing_refs", 12, lo=0, hi=200)
+    trigger_min_refs = _rule_int(rules, "reference_recovery_trigger_min_refs", 18, lo=1, hi=500)
+    trigger_min_refs_per_1k_chars = _rule_float(rules, "reference_recovery_trigger_min_refs_per_1k_chars", 0.45, lo=0.0, hi=10.0)
     enabled = _rule_bool(rules, "reference_recovery_enabled", True)
+
+    # Initialize report dict early
     report: dict[str, Any] = {
         "enabled": enabled,
         "before_refs": before_refs,
         "after_refs": before_refs,
         "trigger_max_existing_refs": trigger_max_existing_refs,
+        "trigger_min_refs": trigger_min_refs,
+        "trigger_min_refs_per_1k_chars": trigger_min_refs_per_1k_chars,
+        "doc_chars": 0,
+        "dynamic_threshold": trigger_max_existing_refs,
         "agent_called": False,
         "heuristic_used": False,
         "replaced_existing": False,
@@ -232,19 +293,7 @@ def recover_references_with_agent(
         "error": None,
     }
 
-    if not enabled:
-        report["status"] = "disabled"
-        return doc, report
-
-    if before_refs > trigger_max_existing_refs:
-        report["status"] = "skipped_existing" if trigger_max_existing_refs == 0 else "skipped_existing_above_trigger"
-        return doc, report
-
-    max_refs = _rule_int(rules, "reference_recovery_max_refs", 180, lo=1, hi=500)
-    max_chars = _rule_int(rules, "reference_recovery_doc_chars_max", 48000, lo=1000, hi=200000)
-    agent_timeout_sec = _rule_float(rules, "reference_recovery_agent_timeout_sec", 45.0, lo=0.5, hi=300.0)
-    report["agent_timeout_sec"] = agent_timeout_sec
-
+    # Read markdown to calculate document-based threshold
     md_path = Path(str(doc.paper.md_path or ""))
     if not md_path.exists():
         report["status"] = "error"
@@ -252,6 +301,32 @@ def recover_references_with_agent(
         return doc, report
 
     markdown_text = md_path.read_text(encoding="utf-8", errors="ignore")
+    doc_chars = len(markdown_text)
+
+    # Calculate dynamic threshold: max(static_trigger, min_refs, chars_based_threshold)
+    dynamic_threshold = max(
+        trigger_max_existing_refs,
+        int(trigger_min_refs),
+        int((doc_chars / 1000.0) * trigger_min_refs_per_1k_chars) if doc_chars > 0 else 0,
+    )
+
+    # Update report with calculated values
+    report["doc_chars"] = doc_chars
+    report["dynamic_threshold"] = dynamic_threshold
+
+    if not enabled:
+        report["status"] = "disabled"
+        return doc, report
+
+    if before_refs > dynamic_threshold:
+        report["status"] = "skipped_existing_above_dynamic_threshold"
+        return doc, report
+
+    max_refs = _rule_int(rules, "reference_recovery_max_refs", 180, lo=1, hi=500)
+    max_chars = _rule_int(rules, "reference_recovery_doc_chars_max", 48000, lo=1000, hi=200000)
+    agent_timeout_sec = _rule_float(rules, "reference_recovery_agent_timeout_sec", 110.0, lo=0.5, hi=300.0)
+    report["agent_timeout_sec"] = agent_timeout_sec
+
     markdown_for_agent = _prepare_markdown_for_agent(markdown_text, max_chars=max_chars)
     heuristic_refs = _extract_reference_texts_heuristic(markdown_text, max_refs=max_refs)
     report["markdown_chars_full"] = len(markdown_text)

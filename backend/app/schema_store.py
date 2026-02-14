@@ -470,6 +470,12 @@ def validate_schema(schema: dict[str, Any]) -> None:
     reference_recovery_trigger_max_existing_refs = int(rules.get("reference_recovery_trigger_max_existing_refs", 0))
     if reference_recovery_trigger_max_existing_refs < 0 or reference_recovery_trigger_max_existing_refs > 200:
         raise ValueError("Invalid reference_recovery_trigger_max_existing_refs")
+    reference_recovery_trigger_min_refs = int(rules.get("reference_recovery_trigger_min_refs", 0))
+    if reference_recovery_trigger_min_refs < 0 or reference_recovery_trigger_min_refs > 500:
+        raise ValueError("Invalid reference_recovery_trigger_min_refs")
+    reference_recovery_trigger_min_refs_per_1k_chars = float(rules.get("reference_recovery_trigger_min_refs_per_1k_chars", 0.0))
+    if reference_recovery_trigger_min_refs_per_1k_chars < 0.0 or reference_recovery_trigger_min_refs_per_1k_chars > 10.0:
+        raise ValueError("Invalid reference_recovery_trigger_min_refs_per_1k_chars")
     reference_recovery_max_refs = int(rules.get("reference_recovery_max_refs", 180))
     if reference_recovery_max_refs < 1 or reference_recovery_max_refs > 500:
         raise ValueError("Invalid reference_recovery_max_refs")
@@ -499,6 +505,9 @@ def validate_schema(schema: dict[str, Any]) -> None:
     citation_event_recovery_context_chars = int(rules.get("citation_event_recovery_context_chars", 800))
     if citation_event_recovery_context_chars < 120 or citation_event_recovery_context_chars > 4000:
         raise ValueError("Invalid citation_event_recovery_context_chars")
+    crossref_confidence_threshold = float(rules.get("crossref_confidence_threshold", 0.55))
+    if crossref_confidence_threshold < 0.0 or crossref_confidence_threshold > 1.0:
+        raise ValueError("Invalid crossref_confidence_threshold")
     et = str(rules.get("evidence_verification") or "llm")
     if et not in {"llm", "off"}:
         raise ValueError("rules.evidence_verification must be 'llm' or 'off'")

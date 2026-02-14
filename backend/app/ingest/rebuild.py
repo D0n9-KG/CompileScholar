@@ -114,7 +114,22 @@ def rebuild_paper(
 
     notify("rebuild:crossref", 0.30, "Resolving references via Crossref")
     crossref = CrossrefClient()
-    cite_rec = build_reference_and_cite_records(doc, crossref=crossref)
+    # Read crossref_confidence_threshold from schema
+    try:
+        meta = load_canonical_meta(doc.paper.md_path)
+        paper_type = str(meta.get("paper_type") or "research").strip().lower()
+        if paper_type not in {"research", "review"}:
+            paper_type = "research"
+        schema_for_crossref = load_active(paper_type)  # type: ignore[arg-type]
+        raw_threshold = (schema_for_crossref.get("rules") or {}).get("crossref_confidence_threshold", 0.55)
+        try:
+            crossref_threshold = float(raw_threshold)
+        except Exception:  # noqa: BLE001
+            crossref_threshold = 0.55
+        crossref_threshold = max(0.0, min(1.0, crossref_threshold))
+    except Exception:  # noqa: BLE001
+        crossref_threshold = 0.55
+    cite_rec = build_reference_and_cite_records(doc, crossref=crossref, crossref_confidence_threshold=crossref_threshold)
 
     notify("rebuild:neo4j_clear", 0.42, "Clearing existing subgraph for this paper")
     with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
@@ -355,7 +370,14 @@ def replace_paper_from_md_path(
 
     notify("replace:crossref", 0.25, "Resolving references via Crossref")
     crossref = CrossrefClient()
-    cite_rec = build_reference_and_cite_records(doc, crossref=crossref)
+    # Read crossref_confidence_threshold from schema
+    raw_threshold = (schema_for_recovery.get("rules") or {}).get("crossref_confidence_threshold", 0.55)
+    try:
+        crossref_threshold = float(raw_threshold)
+    except Exception:  # noqa: BLE001
+        crossref_threshold = 0.55
+    crossref_threshold = max(0.0, min(1.0, crossref_threshold))
+    cite_rec = build_reference_and_cite_records(doc, crossref=crossref, crossref_confidence_threshold=crossref_threshold)
 
     notify("replace:neo4j_clear", 0.40, "Clearing existing subgraph for this paper")
     with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:

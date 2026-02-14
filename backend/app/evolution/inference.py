@@ -74,8 +74,8 @@ def infer_relation_type(
     similarity: float,
     target_confidence: float,
     *,
-    min_similarity: float = 0.90,
-    accepted_threshold: float = 0.86,
+    min_similarity: float = 0.86,
+    accepted_threshold: float = 0.82,
 ) -> dict[str, Any] | None:
     sim = clamp01(similarity)
     tgt_conf = clamp01(target_confidence)
@@ -99,17 +99,17 @@ def infer_relation_type(
     challenges = contains_any(tgt, CHALLENGE_MARKERS)
     supports = contains_any(tgt, SUPPORT_MARKERS)
 
-    if supersedes and sim >= 0.93:
+    if supersedes and sim >= 0.90:
         conf = clamp01(base_conf + 0.06)
         status = "accepted" if conf >= accepted_threshold else "pending_review"
         return {"event_type": "SUPERSEDES", "confidence": conf, "strength": conf, "status": status}
 
-    if challenges and sim >= 0.93:
+    if challenges and sim >= 0.90:
         conf = clamp01(base_conf + 0.04)
         status = "accepted" if conf >= accepted_threshold else "pending_review"
         return {"event_type": "CHALLENGES", "confidence": conf, "strength": conf, "status": status}
 
-    if supports and sim >= 0.93:
+    if supports and sim >= 0.89:
         conf = clamp01(base_conf + 0.03)
         status = "accepted" if conf >= accepted_threshold else "pending_review"
         return {"event_type": "SUPPORTS", "confidence": conf, "strength": conf, "status": status}
