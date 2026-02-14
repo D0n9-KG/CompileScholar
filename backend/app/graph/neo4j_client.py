@@ -1092,6 +1092,11 @@ DELETE c
 MATCH (p:Paper {paper_id:$paper_id})-[u:CITES_UNRESOLVED]->()
 DELETE u
 """,
+            # Delete EvidenceEvents belonging to this paper's claims (before deleting claims)
+            """
+MATCH (p:Paper {paper_id:$paper_id})-[:HAS_CLAIM]->(cl:Claim)-[:TRIGGERS_EVENT]->(ev:EvidenceEvent)
+DETACH DELETE ev
+""",
             # Owned sub-nodes
             """
 MATCH (p:Paper {paper_id:$paper_id})-[:HAS_CHUNK]->(c:Chunk)
@@ -1113,6 +1118,13 @@ DETACH DELETE re
             """
 MATCH (p:Paper {paper_id:$paper_id})-[:HAS_FIGURE]->(f:Figure)
 DETACH DELETE f
+""",
+            # Clean up orphaned Propositions (those with no incoming MAPS_TO relationships)
+            # This is safe because Propositions are only accessed via Claims
+            """
+MATCH (pr:Proposition)
+WHERE NOT EXISTS((pr)<-[:MAPS_TO]-())
+DETACH DELETE pr
 """,
         ]
         with self._driver.session() as session:
