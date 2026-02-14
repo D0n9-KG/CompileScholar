@@ -35,10 +35,19 @@ def normalize_proposition_text(text: str) -> str:
 
 
 def proposition_key_for_claim(text: str, step_type: str | None = None, kinds: list[str] | None = None) -> str:
+    """
+    Generate deterministic proposition key based ONLY on normalized text.
+
+    Assertion Layer (P1): Text-only identity ensures that identical claims
+    from different reasoning steps or with different kinds are properly
+    deduplicated. step_type and kinds are now tracked separately in the
+    step_types_seen and kinds_seen arrays on the Proposition node.
+
+    Parameters kept for backward compatibility but are ignored in hash calculation.
+    """
     base = normalize_proposition_text(text)
-    step = (step_type or "").strip().lower()
-    kinds_norm = "|".join(sorted({str(k).strip().lower() for k in (kinds or []) if str(k).strip()}))
-    raw = f"{base}\0{step}\0{kinds_norm}".encode("utf-8", errors="ignore")
+    # Text-only hash for deterministic Assertion Layer identity
+    raw = base.encode("utf-8", errors="ignore")
     return hashlib.sha256(raw).hexdigest()[:24]
 
 
@@ -1723,8 +1732,13 @@ ON CREATE SET pr.prop_key = it.prop_key,
               pr.canonical_text = it.canonical_text,
               pr.created_at = $now
 SET pr.last_seen_at = $now,
-    pr.step_type = coalesce(pr.step_type, it.step_type),
-    pr.kinds = CASE WHEN size(coalesce(pr.kinds, [])) = 0 THEN it.kinds ELSE pr.kinds END
+    pr.step_types_seen = CASE
+        WHEN it.step_type = '' THEN coalesce(pr.step_types_seen, [])
+        WHEN it.step_type IN coalesce(pr.step_types_seen, []) THEN pr.step_types_seen
+        ELSE coalesce(pr.step_types_seen, []) + [it.step_type]
+    END,
+    pr.kinds_seen = reduce(acc = coalesce(pr.kinds_seen, []), k IN it.kinds |
+        CASE WHEN k IN acc THEN acc ELSE acc + [k] END)
 MERGE (cl)-[:MAPS_TO]->(pr)
 MERGE (ev:EvidenceEvent {event_id: it.event_id})
 ON CREATE SET ev.origin = 'mention',
