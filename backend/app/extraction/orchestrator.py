@@ -493,8 +493,22 @@ def _extract_claims_from_chunk_llm(
         text = text[:chunk_chars_max]
     default_system = (
         "Extract atomic claims from one paper chunk. Return STRICT JSON only.\n"
-        "Each claim must be directly supported by the provided chunk text.\n"
-        "Do not invent information outside this chunk.\n"
+        "\n"
+        "GROUNDING:\n"
+        "- Each claim must be directly supported by the provided chunk text.\n"
+        "- Do not invent information outside this chunk.\n"
+        "\n"
+        "SCIENTIFIC VALUE (CRITICAL):\n"
+        "- Extract ONLY scientific contributions, methods, findings, and conclusions.\n"
+        "- DO NOT extract meta-information such as:\n"
+        "  * Author names, affiliations, correspondence addresses\n"
+        "  * Submission/acceptance/publication dates\n"
+        "  * Funding sources, grant numbers, acknowledgments\n"
+        "  * Journal names, DOIs, paper identifiers\n"
+        "  * Conflict of interest statements\n"
+        "  * Dataset availability, code repository links (unless core to the method)\n"
+        "- Focus on WHAT was discovered/proposed, not WHO/WHEN/WHERE published.\n"
+        "- When encountering pure meta-information chunks, output empty claims array.\n"
     )
     default_user = (
         f"Allowed step types: {step_ids}\n"
