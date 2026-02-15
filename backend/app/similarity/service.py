@@ -432,6 +432,8 @@ def update_similarity_for_paper(
 
     claim_idx = {it.node_id: i for i, it in enumerate(claim_items)}
     logic_idx = {it.node_id: i for i, it in enumerate(logic_items)}
+    degradation_events: dict[str, list[str]] = {"claim": [], "logic": []}
+    degraded_kinds: set[str] = set()
 
     progress("similarity:update:fetch", 0.12, f"Fetching effective texts for {pid}")
     with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
@@ -452,9 +454,17 @@ def update_similarity_for_paper(
             return items, x, changed
 
         # Embed only non-empty texts to avoid provider errors.
+        vecs: list[list[float]] = []
         to_embed: list[SimilarityItem] = [u for u in updates if (u.text or "").strip()]
-        vecs = embed.embed_documents([u.text for u in to_embed]) if to_embed else []
-        u_x = _normalize_rows(np.array(vecs, dtype=np.float32)) if to_embed else np.zeros((0, x.shape[1]), dtype=np.float32)
+        if to_embed:
+            try:
+                vecs = embed.embed_documents([u.text for u in to_embed])
+            except Exception as exc:  # noqa: BLE001
+                msg = f"similarity update embedding failed ({kind}); using zero vectors: {exc}"
+                degradation_events.setdefault(kind, []).append(msg)
+                degraded_kinds.add(kind)
+                log(msg)
+        u_x = _normalize_rows(np.array(vecs, dtype=np.float32)) if vecs else np.zeros((0, x.shape[1]), dtype=np.float32)
 
         dim = int(x.shape[1]) if x.ndim == 2 and x.shape[1] else (int(u_x.shape[1]) if u_x.ndim == 2 and u_x.shape[1] else 0)
         if dim <= 0:
@@ -489,24 +499,42 @@ def update_similarity_for_paper(
     claim_items, claim_x, claim_changed = _apply_updates("claim", claim_items, claim_x, claim_idx, new_claims)
     progress("similarity:update:embed_logic", 0.35, "Embedding updated logic steps")
     logic_items, logic_x, logic_changed = _apply_updates("logic", logic_items, logic_x, logic_idx, new_logic)
+    claim_degraded = bool(degradation_events.get("claim"))
+    logic_degraded = bool(degradation_events.get("logic"))
+    embedding_degraded = claim_degraded or logic_degraded
+    claim_mode = "lexical" if claim_degraded else "embedding"
+    logic_mode = "lexical" if logic_degraded else "embedding"
+    claim_degradation_reason = "; ".join(degradation_events.get("claim", []))[:500]
+    logic_degradation_reason = "; ".join(degradation_events.get("logic", []))[:500]
+    degradation_reason = "; ".join(degradation_events.get("claim", []) + degradation_events.get("logic", []))[:500]
+    if embedding_degraded:
+        log(f"similarity update degraded for {pid}: {degradation_reason}")
 
     progress("similarity:update:neighbors", 0.55, "Computing updated neighbors")
     with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
         if claim_items and claim_changed:
             changed_idx = sorted(set(claim_changed))
-            active = [i for i in changed_idx if (claim_items[i].text or "").strip()]
-            cleared = [i for i in changed_idx if not (claim_items[i].text or "").strip()]
+            if claim_degraded:
+                active = []
+                cleared = list(changed_idx)
+            else:
+                active = [i for i in changed_idx if (claim_items[i].text or "").strip()]
+                cleared = [i for i in changed_idx if not (claim_items[i].text or "").strip()]
             batch = []
             if active:
                 idx = _build_index(claim_x)
                 batch.extend(_topk_pairs(idx, claim_x, claim_items, active, top_k=claim_top_k))
             for i in cleared:
                 batch.append({"source": claim_items[i].node_id, "targets": []})
-            client.replace_similar_claim_edges_batch(batch, model=model, built_at=built_at, mode="embedding")
+            client.replace_similar_claim_edges_batch(batch, model=model, built_at=built_at, mode=claim_mode)
         if logic_items and logic_changed:
             changed_idx = sorted(set(logic_changed))
-            active = [i for i in changed_idx if (logic_items[i].text or "").strip()]
-            cleared = [i for i in changed_idx if not (logic_items[i].text or "").strip()]
+            if logic_degraded:
+                active = []
+                cleared = list(changed_idx)
+            else:
+                active = [i for i in changed_idx if (logic_items[i].text or "").strip()]
+                cleared = [i for i in changed_idx if not (logic_items[i].text or "").strip()]
             batch = []
             if active:
                 idx = _build_index(logic_x)
@@ -524,9 +552,9 @@ def update_similarity_for_paper(
                 {
                     "built_at": built_at,
                     "model": model,
-                    "mode": "embedding",
-                    "embedding_degraded": False,
-                    "degradation_reason": "",
+                    "mode": claim_mode,
+                    "embedding_degraded": claim_degraded,
+                    "degradation_reason": claim_degradation_reason,
                 }, ensure_ascii=False),
             encoding="utf-8",
         )
@@ -538,9 +566,9 @@ def update_similarity_for_paper(
                 {
                     "built_at": built_at,
                     "model": model,
-                    "mode": "embedding",
-                    "embedding_degraded": False,
-                    "degradation_reason": "",
+                    "mode": logic_mode,
+                    "embedding_degraded": logic_degraded,
+                    "degradation_reason": logic_degradation_reason,
                 }, ensure_ascii=False),
             encoding="utf-8",
         )
@@ -553,5 +581,9 @@ def update_similarity_for_paper(
         "built_at": built_at,
         "model": model,
         "claims_updated": len(set(claim_changed)),
+        "mode": claim_mode if claim_mode == logic_mode else "mixed",
+        "embedding_degraded": embedding_degraded,
+        "degradation_reason": degradation_reason,
+        "degraded_kinds": sorted(degraded_kinds),
         "logic_steps_updated": len(set(logic_changed)),
     }
