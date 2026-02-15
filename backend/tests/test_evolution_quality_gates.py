@@ -1,4 +1,11 @@
-from app.evolution.service import _compute_evolution_quality_metrics
+from types import SimpleNamespace
+
+import pytest
+
+from app.evolution.service import (
+    _compute_evolution_quality_metrics,
+    _enforce_evolution_quality_gates,
+)
 
 
 def test_compute_coverage_rate():
@@ -92,3 +99,105 @@ def test_zero_denominators():
     assert metrics["covered_propositions"] == 0
     assert metrics["self_loop_count"] == 0
     assert metrics["total_accepted_events"] == 0
+
+
+def test_gate_fails_on_low_coverage():
+    """Gate should fail when coverage is below threshold."""
+    metrics = {
+        "coverage_rate": 0.15,  # 15% < 20%
+        "covered_propositions": 15,
+        "total_propositions": 100,
+        "self_loop_rate": 0.02,
+        "self_loop_count": 2,
+        "total_accepted_events": 100,
+    }
+    gate_settings = SimpleNamespace(
+        evolution_gate_enabled=True,
+        evolution_min_coverage=0.20,
+        evolution_max_self_loop_rate=0.05,
+    )
+
+    with pytest.raises(ValueError) as exc_info:
+        _enforce_evolution_quality_gates(metrics, gate_settings)
+
+    message = str(exc_info.value)
+    assert "coverage rate" in message.lower()
+    assert "15.00%" in message
+    assert "20.00%" in message
+    assert "15/100" in message
+
+
+def test_gate_fails_on_high_self_loops():
+    """Gate should fail when self-loop rate exceeds threshold."""
+    metrics = {
+        "coverage_rate": 0.25,
+        "covered_propositions": 25,
+        "total_propositions": 100,
+        "self_loop_rate": 0.08,  # 8% > 5%
+        "self_loop_count": 8,
+        "total_accepted_events": 100,
+    }
+    gate_settings = SimpleNamespace(
+        evolution_gate_enabled=True,
+        evolution_min_coverage=0.20,
+        evolution_max_self_loop_rate=0.05,
+    )
+
+    with pytest.raises(ValueError) as exc_info:
+        _enforce_evolution_quality_gates(metrics, gate_settings)
+
+    message = str(exc_info.value)
+    assert "self-loop rate" in message.lower()
+    assert "8.00%" in message
+    assert "5.00%" in message
+    assert "8/100" in message
+
+
+def test_gate_passes_with_good_metrics():
+    """Gate should pass when all quality metrics are within thresholds."""
+    metrics = {
+        "coverage_rate": 0.25,  # 25% >= 20%
+        "covered_propositions": 25,
+        "total_propositions": 100,
+        "self_loop_rate": 0.02,  # 2% <= 5%
+        "self_loop_count": 2,
+        "total_accepted_events": 100,
+    }
+    gate_settings = SimpleNamespace(
+        evolution_gate_enabled=True,
+        evolution_min_coverage=0.20,
+        evolution_max_self_loop_rate=0.05,
+    )
+
+    _enforce_evolution_quality_gates(metrics, gate_settings)
+
+
+def test_gate_disabled_allows_all_metrics():
+    """Gate should skip validation when explicitly disabled."""
+    metrics = {
+        "coverage_rate": 0.05,  # Bad, but should be ignored
+        "self_loop_rate": 0.50,  # Bad, but should be ignored
+    }
+    gate_settings = SimpleNamespace(evolution_gate_enabled=False)
+
+    _enforce_evolution_quality_gates(metrics, gate_settings)
+
+
+def test_gate_passes_on_exact_boundaries():
+    """Gate should pass when metrics exactly equal thresholds."""
+    metrics = {
+        "coverage_rate": 0.20,  # Exactly 20%
+        "covered_propositions": 20,
+        "total_propositions": 100,
+        "self_loop_rate": 0.05,  # Exactly 5%
+        "self_loop_count": 5,
+        "total_accepted_events": 100,
+    }
+    gate_settings = SimpleNamespace(
+        evolution_gate_enabled=True,
+        evolution_min_coverage=0.20,
+        evolution_max_self_loop_rate=0.05,
+    )
+
+    # Should pass at boundary
+    _enforce_evolution_quality_gates(metrics, gate_settings)

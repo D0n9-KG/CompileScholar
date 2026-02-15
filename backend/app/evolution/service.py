@@ -123,6 +123,44 @@ def _compute_evolution_quality_metrics(
     }
 
 
+def _enforce_evolution_quality_gates(metrics: dict[str, Any], settings: Any) -> None:
+    """Enforce quality gates for evolution metrics.
+
+    Args:
+        metrics: Quality metrics from _compute_evolution_quality_metrics()
+        settings: Settings with gate configuration
+
+    Raises:
+        ValueError: If quality gates not met
+    """
+    if not getattr(settings, "evolution_gate_enabled", True):
+        return
+
+    min_coverage = float(getattr(settings, "evolution_min_coverage", 0.20))
+    max_self_loop_rate = float(getattr(settings, "evolution_max_self_loop_rate", 0.05))
+
+    coverage_rate = float(metrics.get("coverage_rate") or 0.0)
+    self_loop_rate = float(metrics.get("self_loop_rate") or 0.0)
+    covered_propositions = int(metrics.get("covered_propositions") or 0)
+    total_propositions = int(metrics.get("total_propositions") or 0)
+    self_loop_count = int(metrics.get("self_loop_count") or 0)
+    total_accepted_events = int(metrics.get("total_accepted_events") or 0)
+
+    if coverage_rate < min_coverage:
+        raise ValueError(
+            "Evolution quality gate failed: coverage rate "
+            f"{coverage_rate:.2%} is below minimum {min_coverage:.2%} "
+            f"({covered_propositions}/{total_propositions} covered propositions)."
+        )
+
+    if self_loop_rate > max_self_loop_rate:
+        raise ValueError(
+            "Evolution quality gate failed: self-loop rate "
+            f"{self_loop_rate:.2%} exceeds maximum {max_self_loop_rate:.2%} "
+            f"({self_loop_count}/{total_accepted_events} self-loop accepted events)."
+        )
+
+
 def sync_proposition_mentions_global(progress: ProgressFn | None = None, log: LogFn | None = None) -> dict[str, Any]:
     progress = progress or (lambda stage, p, msg=None: None)
     log = log or (lambda line: None)
