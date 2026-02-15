@@ -55,6 +55,74 @@ def _aggregate_edge_items(events: list[dict], relation_type: str) -> list[dict]:
     return list(agg.values())
 
 
+def _compute_evolution_quality_metrics(
+    inferred_events: list[dict],
+    supports: list[dict],
+    challenges: list[dict],
+    supersedes: list[dict],
+    total_propositions: int
+) -> dict[str, Any]:
+    """Compute quality metrics for evolution rebuild.
+
+    Args:
+        inferred_events: All inferred events (including non-accepted)
+        supports: Aggregated SUPPORTS edges
+        challenges: Aggregated CHALLENGES edges
+        supersedes: Aggregated SUPERSEDES edges
+        total_propositions: Total proposition count from sync
+
+    Returns:
+        Dictionary with:
+        - coverage_rate: Proportion of propositions with relations
+        - covered_propositions: Count of propositions in edges
+        - total_propositions: Total proposition count
+        - self_loop_rate: Proportion of accepted events that are self-loops
+        - self_loop_count: Count of self-loop events
+        - total_accepted_events: Count of accepted relation events
+    """
+    # Collect unique propositions from all edges
+    covered_props: set[str] = set()
+
+    for edge in supports + challenges + supersedes:
+        source_prop_id = str(edge.get("source_prop_id") or "").strip()
+        target_prop_id = str(edge.get("target_prop_id") or "").strip()
+        if source_prop_id:
+            covered_props.add(source_prop_id)
+        if target_prop_id:
+            covered_props.add(target_prop_id)
+
+    covered_count = len(covered_props)
+    total_props = max(0, int(total_propositions or 0))
+    coverage_rate = covered_count / total_props if total_props > 0 else 0.0
+
+    # Count self-loops in accepted inferred events
+    # Note: Exclude events with origin="mention" from self-loop counting
+    accepted_events = [
+        e for e in inferred_events
+        if str(e.get("status") or "").strip() == "accepted"
+        and str(e.get("origin") or "").strip().lower() != "mention"
+    ]
+
+    self_loop_count = 0
+    for e in accepted_events:
+        source_prop_id = str(e.get("source_prop_id") or "").strip()
+        target_prop_id = str(e.get("target_prop_id") or "").strip()
+        if source_prop_id and source_prop_id == target_prop_id:
+            self_loop_count += 1
+
+    total_accepted = len(accepted_events)
+    self_loop_rate = self_loop_count / total_accepted if total_accepted > 0 else 0.0
+
+    return {
+        "coverage_rate": coverage_rate,
+        "covered_propositions": covered_count,
+        "total_propositions": total_props,
+        "self_loop_rate": self_loop_rate,
+        "self_loop_count": self_loop_count,
+        "total_accepted_events": total_accepted,
+    }
+
+
 def sync_proposition_mentions_global(progress: ProgressFn | None = None, log: LogFn | None = None) -> dict[str, Any]:
     progress = progress or (lambda stage, p, msg=None: None)
     log = log or (lambda line: None)
