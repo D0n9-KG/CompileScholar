@@ -6,7 +6,7 @@ from app.evolution.inference import infer_relation_type
 
 
 class EvolutionInferenceTests(unittest.TestCase):
-    def test_identical_claims_are_supports(self) -> None:
+    def test_identical_claims_are_merge(self) -> None:
         out = infer_relation_type(
             source_text="The model reduces error by 10%.",
             target_text="The model reduces error by 10%.",
@@ -15,8 +15,9 @@ class EvolutionInferenceTests(unittest.TestCase):
         )
         self.assertIsNotNone(out)
         assert out is not None
-        self.assertEqual(out["event_type"], "SUPPORTS")
-        self.assertIn(out["status"], {"accepted", "pending_review"})
+        self.assertEqual(out["event_type"], "MERGE")
+        self.assertEqual(out["status"], "accepted")
+        self.assertEqual(out.get("reason"), "text_identity")
 
     def test_supersede_marker_prefers_supersedes(self) -> None:
         out = infer_relation_type(

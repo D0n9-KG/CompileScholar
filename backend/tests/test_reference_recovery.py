@@ -35,18 +35,19 @@ class ReferenceRecoveryTests(unittest.TestCase):
     def tearDown(self) -> None:
         self.tmp.cleanup()
 
-    def test_skips_when_references_already_exist(self) -> None:
+    def test_attempts_recovery_when_existing_refs_below_dynamic_threshold(self) -> None:
         doc = _doc(
             self.md_path,
             refs=[ReferenceEntry(paper_source="p1", md_path=self.md_path, ref_num=1, raw="Foo 2020")],
         )
-        with patch("app.llm.reference_recovery.call_json") as mocked:
+        payload = {"references": [{"raw": "[1] Foo et al. Test Journal (2020)"}]}
+        with patch("app.llm.reference_recovery.call_json", return_value=payload) as mocked:
             out, report = recover_references_with_agent(doc, rules={"reference_recovery_enabled": True})
-        mocked.assert_not_called()
+        mocked.assert_called_once()
         self.assertEqual(len(out.references), 1)
-        self.assertEqual(report.get("status"), "skipped_existing")
+        self.assertEqual(report.get("status"), "kept_existing_not_improved")
 
-    def test_skips_when_existing_refs_above_trigger(self) -> None:
+    def test_skips_when_existing_refs_above_dynamic_threshold(self) -> None:
         doc = _doc(
             self.md_path,
             refs=[
@@ -60,11 +61,13 @@ class ReferenceRecoveryTests(unittest.TestCase):
                 rules={
                     "reference_recovery_enabled": True,
                     "reference_recovery_trigger_max_existing_refs": 1,
+                    "reference_recovery_trigger_min_refs": 1,
+                    "reference_recovery_trigger_min_refs_per_1k_chars": 0.0,
                 },
             )
         mocked.assert_not_called()
         self.assertEqual(len(out.references), 2)
-        self.assertEqual(report.get("status"), "skipped_existing_above_trigger")
+        self.assertEqual(report.get("status"), "skipped_existing_above_dynamic_threshold")
 
     def test_replaces_existing_refs_when_triggered_and_improved(self) -> None:
         doc = _doc(
