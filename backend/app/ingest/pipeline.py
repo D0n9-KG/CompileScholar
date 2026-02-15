@@ -337,16 +337,18 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
             "llm_out": llm_out,
         }
 
-    def _write_llm_to_neo4j(item: dict[str, Any]) -> None:
+    def _write_llm_to_neo4j(item: dict[str, Any]) -> int:
         paper_id = str(item["paper_id"])
         logic_claims = dict(item.get("logic_claims") or {})
+        claims = list(logic_claims.get("claims") or [])
         step_order = list(item.get("step_order") or [])
         purposes = list(item.get("citation_purposes") or [])
+        propositions_written = 0
         with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
             client.upsert_logic_steps_and_claims(
                 paper_id=paper_id,
                 logic=logic_claims.get("logic") or {},
-                claims=logic_claims.get("claims") or [],
+                claims=claims,
                 step_order=step_order,
             )
             try:
@@ -363,11 +365,12 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
             except Exception:
                 pass
             try:
-                client.upsert_proposition_mentions_for_claims(
+                mention_stats = client.upsert_proposition_mentions_for_claims(
                     paper_id=paper_id,
-                    claims=logic_claims.get("claims") or [],
+                    claims=claims,
                     paper_year=item.get("paper_year"),
                 )
+                propositions_written = int((mention_stats or {}).get("propositions") or 0)
             except Exception:
                 pass
             try:
@@ -387,7 +390,9 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
                     labels=p["labels"],
                     scores=p["scores"],
                 )
+        return propositions_written
 
+    propositions_written = 0
     try:
         jobs = [(idx, doc, rec) for idx, (doc, rec) in enumerate(zip(parsed, cite_records)) if rec.get("paper_id")]
         total_jobs = len(jobs)
@@ -425,7 +430,7 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
                         outputs_by_idx[idx] = dict(item["llm_out"])
                         if neo4j_written:
                             try:
-                                _write_llm_to_neo4j(item)
+                                propositions_written += _write_llm_to_neo4j(item)
                             except Exception as exc:
                                 llm_failures.append(f"{paper_id}: neo4j write failed: {exc}")
                     ratio = completed / total_jobs
@@ -463,8 +468,9 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
         "triggered": False,
         "status": "skipped",
         "proposition_candidates": proposition_candidates,
+        "propositions_written": propositions_written,
     }
-    if neo4j_written and proposition_candidates > 0:
+    if neo4j_written and propositions_written > 0:
         notify("ingest:clustering", 0.96, "Clustering propositions into groups")
         clustering["triggered"] = True
         clustering_task_id = f"cluster_{run_id}"

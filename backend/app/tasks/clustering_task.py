@@ -62,8 +62,14 @@ def run_proposition_clustering(task_id: str | None = None) -> dict[str, Any]:
 
         logger.info(f"Found {len(groups)} proposition groups")
 
-        # 4. Write PropositionGroups to Neo4j
+        # 4. Write PropositionGroups to Neo4j (clean rebuild)
         with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
+            cleanup_stats = _clear_existing_proposition_groups(client)
+            logger.info(
+                "Cleared %s old groups and %s IN_GROUP memberships",
+                cleanup_stats["groups_deleted"],
+                cleanup_stats["memberships_deleted"],
+            )
             for group in groups:
                 # Get proposition IDs for this group
                 member_prop_ids = [propositions[i]["prop_id"] for i in group["member_indices"]]
@@ -92,6 +98,28 @@ def run_proposition_clustering(task_id: str | None = None) -> dict[str, Any]:
     except Exception as e:
         logger.error(f"Clustering task failed: {e}", exc_info=True)
         return {"status": "failed", "error": str(e), "groups_created": 0, "propositions_clustered": 0}
+
+
+def _clear_existing_proposition_groups(client: Neo4jClient) -> dict[str, int]:
+    """Remove existing PropositionGroup nodes and IN_GROUP edges before rebuild."""
+    with client._driver.session() as session:
+        rel_summary = session.run(
+            """
+            MATCH (:Proposition)-[r:IN_GROUP]->(:PropositionGroup)
+            DELETE r
+            """
+        ).consume()
+        group_summary = session.run(
+            """
+            MATCH (pg:PropositionGroup)
+            DETACH DELETE pg
+            """
+        ).consume()
+
+    return {
+        "memberships_deleted": int(rel_summary.counters.relationships_deleted or 0),
+        "groups_deleted": int(group_summary.counters.nodes_deleted or 0),
+    }
 
 
 def _create_proposition_group(
