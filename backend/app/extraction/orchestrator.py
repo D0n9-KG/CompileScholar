@@ -1600,6 +1600,55 @@ def run_phase1_extraction(
         )
     _json_dump(artifacts / "claim_candidates.json", {"claims": claim_candidates})
 
+    # P0-5: Filter extraction noise
+    rules = schema.get("rules") or {}
+    noise_filter_stats: dict[str, Any] = {}
+    if _rule_bool(rules, "phase1_noise_filter_enabled", False):
+        raw_count_before_filter = len(claim_candidates)
+        try:
+            from app.extraction.noise_filters import filter_claim_candidates
+
+            filtered_claim_candidates, filter_stats = filter_claim_candidates(claim_candidates, rules)
+            filter_stats = dict(filter_stats or {})
+            noise_filter_stats = {
+                "raw_count": _rule_int(filter_stats, "raw_count", raw_count_before_filter),
+                "filtered_count": _rule_int(filter_stats, "filtered_count", len(filtered_claim_candidates)),
+                "caption_filtered": _rule_int(filter_stats, "caption_filtered", 0),
+                "definition_filtered": _rule_int(filter_stats, "definition_filtered", 0),
+                "filter_rate": _rule_float(filter_stats, "filter_rate", 0.0),
+            }
+            logger.info(
+                "phase1_noise_filter: "
+                "raw=%d "
+                "filtered=%d "
+                "caption=%d "
+                "definition=%d "
+                "rate=%.1f%%",
+                noise_filter_stats.get("raw_count", 0),
+                noise_filter_stats.get("filtered_count", 0),
+                noise_filter_stats.get("caption_filtered", 0),
+                noise_filter_stats.get("definition_filtered", 0),
+                noise_filter_stats.get("filter_rate", 0.0) * 100,
+            )
+
+            _json_dump(
+                artifacts / "claim_candidates_filtered.json",
+                {
+                    "claims": filtered_claim_candidates,
+                    "noise_filter": noise_filter_stats,
+                },
+            )
+            claim_candidates = filtered_claim_candidates
+        except Exception as exc:
+            noise_filter_stats = {"error": str(exc)}
+            logger.warning(
+                "Phase1 noise filter fallback triggered: paper_id=%s raw=%d error=%s",
+                paper_id,
+                raw_count_before_filter,
+                str(exc),
+                exc_info=True,
+            )
+
     claims_merged = _merge_claim_candidates(
         claims=claim_candidates,
         paper_id=paper_id,
@@ -1654,6 +1703,11 @@ def run_phase1_extraction(
         schema=schema,
         rules=dict(schema.get("rules") or {}),
     )
+
+    # Add noise filter stats to quality report
+    if noise_filter_stats:
+        report["noise_filter"] = noise_filter_stats
+
     completeness_judgment = {
         "critical_slot_mode": report.get("critical_slot_mode"),
         "critical_steps": list(report.get("critical_steps") or []),

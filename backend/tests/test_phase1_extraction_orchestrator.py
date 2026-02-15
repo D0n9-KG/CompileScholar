@@ -1413,6 +1413,102 @@ class Phase1ExtractionOrchestratorTests(unittest.TestCase):
         self.assertEqual(logic["Background"]["evidence_chunk_ids"], ["c1"])
         self.assertEqual(logic["Method"]["evidence_chunk_ids"], ["c2"])
 
+    def test_noise_filter_integration_filters_captions_and_definitions(self) -> None:
+        """Test that noise filters are applied during extraction when enabled."""
+        from app.extraction.orchestrator import run_phase1_extraction
+
+        schema = {
+            **self.schema,
+            "rules": {
+                **self.schema.get("rules", {}),
+                "phase1_gate_supported_ratio_min": 0.0,
+                "phase1_gate_step_coverage_min": 0.0,
+                "phase2_gate_critical_slot_coverage_min": 0.0,
+                "phase2_gate_conflict_rate_max": 1.0,
+                "phase1_noise_filter_enabled": True,
+                "phase1_noise_filter_figure_caption_enabled": True,
+                "phase1_noise_filter_pure_definition_enabled": True,
+            },
+        }
+
+        def fake_logic_extractor(*, doc, paper_id, schema):
+            return {
+                "logic": {
+                    "Background": {
+                        "summary": "Background summary",
+                        "confidence": 0.8,
+                        "evidence_chunk_ids": ["c1"],
+                        "evidence_weak": False,
+                    }
+                },
+                "step_order": ["Background"],
+            }
+
+        def fake_claim_extractor(*, doc, paper_id, schema, step_order):
+            return [
+                {
+                    "text": "Figure 1: Experimental setup shows the process.",
+                    "confidence": 0.8,
+                    "step_type": "Background",
+                    "kinds": ["Definition"],
+                    "origin_chunk_id": "c1",
+                    "worker_id": "w1",
+                },
+                {
+                    "text": "Machine learning is a method of data analysis.",
+                    "confidence": 0.75,
+                    "step_type": "Background",
+                    "kinds": ["Definition"],
+                    "origin_chunk_id": "c1",
+                    "worker_id": "w1",
+                },
+                {
+                    "text": "This approach outperforms prior methods significantly.",
+                    "confidence": 0.82,
+                    "step_type": "Background",
+                    "kinds": ["Comparison"],
+                    "origin_chunk_id": "c1",
+                    "worker_id": "w1",
+                },
+            ]
+
+        def fake_judge(*, claims, chunk_by_id, schema):
+            return [
+                {
+                    "canonical_claim_id": c["canonical_claim_id"],
+                    "support_label": "supported",
+                    "judge_score": 0.9,
+                    "reason": "explicit support",
+                }
+                for c in claims
+            ]
+
+        out = run_phase1_extraction(
+            doc=self.doc,
+            paper_id="doi:10.1000/papera",
+            cite_rec=self.cite_rec,
+            schema=schema,
+            artifacts_dir=self.artifacts_dir / "noise_filter_test",
+            logic_extractor=fake_logic_extractor,
+            claim_extractor=fake_claim_extractor,
+            grounding_judge=fake_judge,
+            allow_weak=False,
+        )
+
+        # Verify filter statistics in quality report
+        report = out["quality_report"]
+        self.assertIn("noise_filter", report)
+        filter_stats = report["noise_filter"]
+        self.assertEqual(filter_stats["raw_count"], 3)
+        self.assertEqual(filter_stats["filtered_count"], 1)
+        self.assertEqual(filter_stats["caption_filtered"], 1)
+        self.assertEqual(filter_stats["definition_filtered"], 1)
+        self.assertGreater(filter_stats["filter_rate"], 0.0)
+
+        # Verify only the comparison claim was validated (not filtered)
+        self.assertEqual(len(out["validated_claims"]), 1)
+        self.assertIn("outperforms", out["validated_claims"][0]["text"])
+
 
 if __name__ == "__main__":
     unittest.main()
