@@ -2,7 +2,7 @@
 
 Tests figure/table caption and pure definition detection to filter low-quality claims.
 """
-from app.extraction.noise_filters import is_caption_text, is_pure_definition_text
+from app.extraction.noise_filters import is_caption_text, is_pure_definition_text, filter_claim_candidates
 
 
 def test_detects_figure_caption_with_number():
@@ -121,3 +121,193 @@ def test_rejects_none_and_empty_definition_inputs():
     assert is_pure_definition_text(None) is False
     assert is_pure_definition_text("") is False
     assert is_pure_definition_text(123) is False  # type: ignore[arg-type]
+
+
+# Filter Function Tests
+
+
+def test_filter_claim_candidates_basic():
+    """Test basic filtering removes captions and definitions"""
+    from types import SimpleNamespace
+
+    claims = [
+        {"text": "Valid scientific claim about performance", "confidence": 0.9},
+        {"text": "Figure 1: Experimental setup", "confidence": 0.8},
+        {"text": "Machine learning is a method of analysis", "confidence": 0.7},
+        {"text": "Another valid claim with evidence", "confidence": 0.85},
+    ]
+
+    rules = SimpleNamespace(
+        phase1_noise_filter_enabled=True,
+        phase1_noise_filter_figure_caption_enabled=True,
+        phase1_noise_filter_pure_definition_enabled=True,
+    )
+
+    filtered, stats = filter_claim_candidates(claims, rules)
+
+    assert len(filtered) == 2
+    assert filtered[0]["text"] == "Valid scientific claim about performance"
+    assert filtered[1]["text"] == "Another valid claim with evidence"
+
+    assert stats["raw_count"] == 4
+    assert stats["filtered_count"] == 2
+    assert stats["caption_filtered"] == 1
+    assert stats["definition_filtered"] == 1
+    assert stats["filter_rate"] == 0.5
+
+
+def test_filter_respects_disabled_flags():
+    """Test filtering can be selectively disabled"""
+    from types import SimpleNamespace
+
+    claims = [
+        {"text": "Figure 1: Setup", "confidence": 0.8},
+        {"text": "ML is a method", "confidence": 0.7},
+    ]
+
+    # Only caption filtering enabled
+    rules = SimpleNamespace(
+        phase1_noise_filter_enabled=True,
+        phase1_noise_filter_figure_caption_enabled=True,
+        phase1_noise_filter_pure_definition_enabled=False,
+    )
+
+    filtered, stats = filter_claim_candidates(claims, rules)
+
+    assert len(filtered) == 1  # Only definition remains
+    assert stats["caption_filtered"] == 1
+    assert stats["definition_filtered"] == 0
+
+
+def test_filter_disabled_returns_all():
+    """Test when filtering disabled, all claims returned"""
+    from types import SimpleNamespace
+
+    claims = [
+        {"text": "Figure 1: Setup", "confidence": 0.8},
+        {"text": "ML is a method", "confidence": 0.7},
+    ]
+
+    rules = SimpleNamespace(phase1_noise_filter_enabled=False)
+
+    filtered, stats = filter_claim_candidates(claims, rules)
+
+    assert len(filtered) == 2
+    assert stats["filter_rate"] == 0.0
+
+
+def test_filter_with_dict_rules():
+    """Test filtering works with dict-based rules (production pattern)"""
+    claims = [
+        {"text": "Valid claim", "confidence": 0.9},
+        {"text": "Figure 1: Caption", "confidence": 0.8},
+    ]
+
+    # Dict-based rules like in production
+    rules = {
+        "phase1_noise_filter_enabled": True,
+        "phase1_noise_filter_figure_caption_enabled": True,
+        "phase1_noise_filter_pure_definition_enabled": True,
+    }
+
+    filtered, stats = filter_claim_candidates(claims, rules)
+
+    assert len(filtered) == 1
+    assert stats["caption_filtered"] == 1
+
+
+def test_filter_parses_string_boolean_global_toggle_from_dict():
+    """String 'false' should disable filtering, not evaluate truthy."""
+    claims = [
+        {"text": "Figure 1: Caption", "confidence": 0.8},
+        {"text": "ML is a method", "confidence": 0.7},
+    ]
+    rules = {
+        "phase1_noise_filter_enabled": "false",
+        "phase1_noise_filter_figure_caption_enabled": "true",
+        "phase1_noise_filter_pure_definition_enabled": "true",
+    }
+
+    filtered, stats = filter_claim_candidates(claims, rules)
+
+    assert len(filtered) == 2
+    assert stats["filtered_count"] == 2
+    assert stats["caption_filtered"] == 0
+    assert stats["definition_filtered"] == 0
+    assert stats["filter_rate"] == 0.0
+
+
+def test_filter_parses_string_boolean_per_filter_toggle_from_object():
+    """String booleans should work for attribute-based rules too."""
+    from types import SimpleNamespace
+
+    claims = [
+        {"text": "Figure 1: Setup", "confidence": 0.8},
+        {"text": "ML is a method", "confidence": 0.7},
+        {"text": "Valid claim", "confidence": 0.9},
+    ]
+    rules = SimpleNamespace(
+        phase1_noise_filter_enabled="true",
+        phase1_noise_filter_figure_caption_enabled="off",
+        phase1_noise_filter_pure_definition_enabled="on",
+    )
+
+    filtered, stats = filter_claim_candidates(claims, rules)
+
+    assert [c["text"] for c in filtered] == ["Figure 1: Setup", "Valid claim"]
+    assert stats["caption_filtered"] == 0
+    assert stats["definition_filtered"] == 1
+
+
+def test_filter_invalid_string_boolean_falls_back_to_default():
+    """Unrecognized values should fall back to the provided default."""
+    claims = [
+        {"text": "Figure 1: Setup", "confidence": 0.8},
+        {"text": "Valid claim", "confidence": 0.9},
+    ]
+    rules = {
+        "phase1_noise_filter_enabled": "true",
+        "phase1_noise_filter_figure_caption_enabled": "not-a-bool",
+        "phase1_noise_filter_pure_definition_enabled": "false",
+    }
+    filtered, stats = filter_claim_candidates(claims, rules)
+    assert [c["text"] for c in filtered] == ["Valid claim"]
+    assert stats["caption_filtered"] == 1
+    assert stats["definition_filtered"] == 0
+
+
+def test_filter_parses_numeric_zero_as_false():
+    """Numeric 0 should be parsed as False, not fall back to default True."""
+    claims = [
+        {"text": "Figure 1: Setup", "confidence": 0.8},
+        {"text": "Valid claim", "confidence": 0.9},
+    ]
+    # Numeric 0 with default=True should still be False
+    rules = {
+        "phase1_noise_filter_enabled": True,
+        "phase1_noise_filter_figure_caption_enabled": 0,  # Numeric 0 should disable
+        "phase1_noise_filter_pure_definition_enabled": True,
+    }
+    filtered, stats = filter_claim_candidates(claims, rules)
+    # Caption filter should be DISABLED (0=False), so figure caption should pass
+    assert [c["text"] for c in filtered] == ["Figure 1: Setup", "Valid claim"]
+    assert stats["caption_filtered"] == 0
+    assert stats["definition_filtered"] == 0
+
+
+def test_filter_parses_numeric_one_as_true():
+    """Numeric 1 should be parsed as True."""
+    claims = [
+        {"text": "Figure 1: Setup", "confidence": 0.8},
+        {"text": "Valid claim", "confidence": 0.9},
+    ]
+    rules = {
+        "phase1_noise_filter_enabled": 1,  # Numeric 1 should enable
+        "phase1_noise_filter_figure_caption_enabled": 1,
+        "phase1_noise_filter_pure_definition_enabled": 1,
+    }
+    filtered, stats = filter_claim_candidates(claims, rules)
+    assert [c["text"] for c in filtered] == ["Valid claim"]
+    assert stats["caption_filtered"] == 1
+
+

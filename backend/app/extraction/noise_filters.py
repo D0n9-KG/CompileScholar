@@ -11,6 +11,7 @@ tokens on non-substantive text.
 from __future__ import annotations
 
 import re
+from typing import Any
 
 
 # Pattern: "Figure 1:", "Table 12:", "Fig. 3:"
@@ -141,3 +142,104 @@ def is_pure_definition_text(text: str | None) -> bool:
     # Heuristic: definition if has pattern AND high is/are density
     # OR multiple definition patterns
     return (pattern_count >= 1 and is_are_density > 0.08) or pattern_count >= 2
+
+
+def _get_rule_bool(rules: Any, key: str, default: bool = False) -> bool:
+    """Safely extract boolean rule value from dict or object.
+
+    Handles string representations:
+    "true"/"false", "1"/"0", "yes"/"no", "on"/"off".
+    Aligned with orchestrator.py:_rule_bool() behavior.
+
+    Args:
+        rules: Rules object (dict or object with attributes)
+        key: Rule key/attribute name
+        default: Default value if key not found
+
+    Returns:
+        Parsed boolean value or default
+    """
+    if isinstance(rules, dict):
+        raw = rules.get(key, None)
+    else:
+        raw = getattr(rules, key, None)
+
+    if raw is None:
+        return bool(default)
+    if isinstance(raw, bool):
+        return raw
+
+    s = str(raw).strip().lower()
+    if not s:
+        return bool(default)
+    if s in {"1", "true", "yes", "on"}:
+        return True
+    if s in {"0", "false", "no", "off"}:
+        return False
+    return bool(default)
+
+
+def filter_claim_candidates(
+    claims: list[dict[str, Any]],
+    rules: Any  # SchemaRules, but avoid circular import
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Filter noise claims from candidates.
+
+    Args:
+        claims: List of claim dicts with 'text' field
+        rules: SchemaRules with noise filter configuration (dict or object)
+
+    Returns:
+        (filtered_claims, stats) where stats contains:
+        - raw_count: Original claim count
+        - filtered_count: Remaining after filtering
+        - caption_filtered: Count removed as captions
+        - definition_filtered: Count removed as definitions
+        - filter_rate: Proportion filtered (0.0 - 1.0)
+    """
+    raw_count = len(claims)
+
+    # Quick exit if filtering disabled
+    if not _get_rule_bool(rules, 'phase1_noise_filter_enabled', False):
+        return list(claims), {
+            "raw_count": raw_count,
+            "filtered_count": raw_count,
+            "caption_filtered": 0,
+            "definition_filtered": 0,
+            "filter_rate": 0.0,
+        }
+
+    caption_enabled = _get_rule_bool(rules, 'phase1_noise_filter_figure_caption_enabled', True)
+    definition_enabled = _get_rule_bool(rules, 'phase1_noise_filter_pure_definition_enabled', True)
+
+    filtered = []
+    caption_filtered_count = 0
+    definition_filtered_count = 0
+
+    for claim in claims:
+        text = claim.get("text", "")
+
+        # Check filters
+        if caption_enabled and is_caption_text(text):
+            caption_filtered_count += 1
+            continue
+
+        if definition_enabled and is_pure_definition_text(text):
+            definition_filtered_count += 1
+            continue
+
+        # Passed all filters
+        filtered.append(claim)
+
+    filtered_count = len(filtered)
+    filter_rate = (raw_count - filtered_count) / raw_count if raw_count > 0 else 0.0
+
+    stats = {
+        "raw_count": raw_count,
+        "filtered_count": filtered_count,
+        "caption_filtered": caption_filtered_count,
+        "definition_filtered": definition_filtered_count,
+        "filter_rate": filter_rate,
+    }
+
+    return filtered, stats
