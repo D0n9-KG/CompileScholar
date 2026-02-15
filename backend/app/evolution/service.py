@@ -290,6 +290,26 @@ def rebuild_evolution_graph(
     challenges = _aggregate_edge_items(inferred_events, "CHALLENGES")
     supersedes = _aggregate_edge_items(inferred_events, "SUPERSEDES")
 
+    # P0-6: Compute quality metrics and enforce gates
+    quality_metrics = _compute_evolution_quality_metrics(
+        inferred_events=inferred_events,
+        supports=supports,
+        challenges=challenges,
+        supersedes=supersedes,
+        total_propositions=int(sync_stats.get("propositions") or 0),
+    )
+
+    log(
+        "evolution_quality: "
+        f"coverage={quality_metrics['coverage_rate']:.1%} "
+        f"({quality_metrics['covered_propositions']}/{quality_metrics['total_propositions']}) "
+        f"self_loop={quality_metrics['self_loop_rate']:.1%} "
+        f"({quality_metrics['self_loop_count']}/{quality_metrics['total_accepted_events']})"
+    )
+
+    # Enforce quality gates (raises ValueError if failed)
+    _enforce_evolution_quality_gates(quality_metrics, settings)
+
     with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
         client.replace_inferred_relation_events(inferred_events, built_at=built_at)
         client.replace_proposition_support_edges(supports, built_at=built_at)
@@ -331,5 +351,6 @@ def rebuild_evolution_graph(
             "challenges": len(challenges),
             "supersedes": len(supersedes),
         },
+        "quality_metrics": quality_metrics,
         "states": state_stats,
     }
