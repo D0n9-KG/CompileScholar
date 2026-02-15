@@ -1806,20 +1806,18 @@ MATCH (sp:Proposition {prop_id: it.source_prop_id})
 MATCH (tp:Proposition {prop_id: it.target_prop_id})
 OPTIONAL MATCH (sc:Claim {claim_id: it.source_claim_id})
 OPTIONAL MATCH (tc:Claim {claim_id: it.target_claim_id})
-CREATE (e:EvidenceEvent {
-    event_id: it.event_id,
-    origin: 'inferred_relation',
-    event_type: it.event_type,
-    status: it.status,
-    confidence: it.confidence,
-    strength: it.strength,
-    source_prop_id: it.source_prop_id,
-    target_prop_id: it.target_prop_id,
-    paper_id: it.target_paper_id,
-    claim_id: it.target_claim_id,
-    event_time: it.event_time,
-    created_at: $built_at
-})
+MERGE (e:EvidenceEvent {event_id: it.event_id})
+ON CREATE SET e.origin = 'inferred_relation',
+              e.created_at = $built_at
+SET e.event_type = it.event_type,
+    e.status = it.status,
+    e.confidence = it.confidence,
+    e.strength = it.strength,
+    e.source_prop_id = it.source_prop_id,
+    e.target_prop_id = it.target_prop_id,
+    e.paper_id = it.target_paper_id,
+    e.claim_id = it.target_claim_id,
+    e.event_time = it.event_time
 MERGE (e)-[:FROM_PROPOSITION]->(sp)
 MERGE (e)-[:TO_PROPOSITION]->(tp)
 MERGE (e)-[:ABOUT]->(tp)

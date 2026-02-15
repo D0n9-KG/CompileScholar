@@ -118,6 +118,7 @@ def infer_relation_type(
 
     if sim >= 0.97:
         conf = clamp01(base_conf)
-        return {"event_type": "SUPPORTS", "confidence": conf, "strength": conf, "status": "pending_review"}
+        status = "accepted" if conf >= accepted_threshold else "pending_review"
+        return {"event_type": "SUPPORTS", "confidence": conf, "strength": conf, "status": status}
 
     return None
