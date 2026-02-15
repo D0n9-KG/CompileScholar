@@ -2,11 +2,15 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import re
 from pathlib import Path
 from typing import Any, Callable
 
 from app.ingest.models import DocumentIR
+
+
+logger = logging.getLogger(__name__)
 
 
 LogicExtractorFn = Callable[..., dict[str, Any]]
@@ -987,6 +991,11 @@ def _conflict_stats_lexical(validated: list[dict[str, Any]], rules: dict[str, An
         "conflict_mode_used": "lexical",
         "conflict_candidate_pairs": comparable_pairs,
         "conflict_semantic_judged": 0,
+        "conflict_semantic_coverage_ratio": 0.0,
+        "conflict_semantic_insufficient_pairs": 0,
+        "conflict_semantic_insufficient_ratio": 0.0,
+        "conflict_semantic_missing_pairs": 0,
+        "conflict_semantic_unknown_pair_rows": 0,
         "conflict_semantic_threshold": max(0.0, min(1.0, _rule_float(rules, "phase2_conflict_semantic_threshold", 0.75))),
         "conflict_semantic_fallback": False,
         "conflict_semantic_fallback_reason": "",
@@ -1056,6 +1065,11 @@ def _conflict_stats_semantic(
             "conflict_mode_used": mode,
             "conflict_candidate_pairs": 0,
             "conflict_semantic_judged": 0,
+            "conflict_semantic_coverage_ratio": 0.0,
+            "conflict_semantic_insufficient_pairs": 0,
+            "conflict_semantic_insufficient_ratio": 0.0,
+            "conflict_semantic_missing_pairs": 0,
+            "conflict_semantic_unknown_pair_rows": 0,
             "conflict_semantic_threshold": threshold,
             "conflict_semantic_fallback": False,
             "conflict_semantic_fallback_reason": "",
@@ -1085,21 +1099,70 @@ def _conflict_stats_semantic(
             },
         )
     except Exception as exc:
+        logger.warning(
+            "Conflict semantic fallback triggered: mode=%s candidate_pairs=%d error=%s",
+            mode,
+            comparable_pairs,
+            str(exc),
+        )
         fallback = _conflict_stats_lexical(validated=validated, rules=rules)
         fallback["conflict_semantic_fallback"] = True
         fallback["conflict_semantic_fallback_reason"] = str(exc)
         fallback["conflict_semantic_threshold"] = threshold
         fallback["conflict_candidate_pairs"] = comparable_pairs
+        fallback["conflict_semantic_judged"] = 0
+        fallback["conflict_semantic_coverage_ratio"] = 0.0
+        fallback["conflict_semantic_insufficient_pairs"] = comparable_pairs
+        fallback["conflict_semantic_insufficient_ratio"] = 1.0 if comparable_pairs > 0 else 0.0
+        fallback["conflict_semantic_missing_pairs"] = comparable_pairs
+        fallback["conflict_semantic_unknown_pair_rows"] = 0
         return fallback
 
-    by_pair_id = {str(r.get("pair_id") or ""): r for r in rows if str(r.get("pair_id") or "")}
+    # Build candidate pair ID set for validation
+    candidate_pair_ids = {str(c.get("pair_id") or "").strip() for c in candidates if str(c.get("pair_id") or "").strip()}
+
+    # Filter and validate judgment rows
+    rows_with_pair_id = [
+        r for r in rows if isinstance(r, dict) and str(r.get("pair_id") or "").strip()
+    ]
+    unknown_pair_rows = sum(
+        1 for r in rows_with_pair_id
+        if str(r.get("pair_id") or "").strip() not in candidate_pair_ids
+    )
+
+    # Build judgment map (only for known candidate pairs)
+    by_pair_id = {
+        str(r.get("pair_id") or "").strip(): r
+        for r in rows_with_pair_id
+        if str(r.get("pair_id") or "").strip() in candidate_pair_ids
+    }
+
+    # Process candidates and collect metrics
     conflict_pairs = 0
+    semantic_insufficient_pairs = 0
     samples: list[dict[str, Any]] = []
+
     for c in candidates:
         pid = str(c.get("pair_id") or "")
         row = by_pair_id.get(pid) or {}
+
+        # Defensive label normalization
         label = str(row.get("label") or "insufficient").strip().lower()
-        score = float(row.get("score") or 0.0)
+        if label not in {"contradict", "not_conflict", "insufficient"}:
+            label = "insufficient"
+
+        # Defensive score normalization
+        try:
+            score = float(row.get("score") or 0.0)
+        except Exception:
+            score = 0.0
+        score = max(0.0, min(1.0, score))
+
+        # Track insufficient judgments
+        if label == "insufficient":
+            semantic_insufficient_pairs += 1
+
+        # Identify conflicts
         if label == "contradict" and score >= threshold:
             conflict_pairs += 1
             if len(samples) < max_samples:
@@ -1116,6 +1179,29 @@ def _conflict_stats_semantic(
                         "semantic_reason": str(row.get("reason") or ""),
                     }
                 )
+
+    # Calculate comprehensive metrics
+    semantic_judged = len(by_pair_id)
+    semantic_missing_pairs = max(0, comparable_pairs - semantic_judged)
+    semantic_coverage_ratio = float(semantic_judged) / float(max(1, comparable_pairs))
+    semantic_insufficient_ratio = float(semantic_insufficient_pairs) / float(max(1, comparable_pairs))
+
+    # Structured logging for observability
+    logger.info(
+        (
+            "Conflict semantic metrics: mode=%s candidate_pairs=%d judged=%d coverage=%.4f "
+            "insufficient_pairs=%d insufficient_ratio=%.4f missing_pairs=%d unknown_pair_rows=%d"
+        ),
+        mode,
+        comparable_pairs,
+        semantic_judged,
+        semantic_coverage_ratio,
+        semantic_insufficient_pairs,
+        semantic_insufficient_ratio,
+        semantic_missing_pairs,
+        unknown_pair_rows,
+    )
+
     rate = float(conflict_pairs) / float(max(1, comparable_pairs))
     return {
         "comparable_pairs": comparable_pairs,
@@ -1125,7 +1211,12 @@ def _conflict_stats_semantic(
         "shared_tokens_min": shared_tokens_min,
         "conflict_mode_used": mode,
         "conflict_candidate_pairs": comparable_pairs,
-        "conflict_semantic_judged": len(by_pair_id),
+        "conflict_semantic_judged": semantic_judged,
+        "conflict_semantic_coverage_ratio": semantic_coverage_ratio,
+        "conflict_semantic_insufficient_pairs": semantic_insufficient_pairs,
+        "conflict_semantic_insufficient_ratio": semantic_insufficient_ratio,
+        "conflict_semantic_missing_pairs": semantic_missing_pairs,
+        "conflict_semantic_unknown_pair_rows": unknown_pair_rows,
         "conflict_semantic_threshold": threshold,
         "conflict_semantic_fallback": False,
         "conflict_semantic_fallback_reason": "",
@@ -1431,6 +1522,11 @@ def _quality_report(
         "conflict_mode_used": str(conflict.get("conflict_mode_used") or "lexical"),
         "conflict_candidate_pairs": int(conflict.get("conflict_candidate_pairs") or 0),
         "conflict_semantic_judged": int(conflict.get("conflict_semantic_judged") or 0),
+        "conflict_semantic_coverage_ratio": float(conflict.get("conflict_semantic_coverage_ratio") or 0.0),
+        "conflict_semantic_insufficient_pairs": int(conflict.get("conflict_semantic_insufficient_pairs") or 0),
+        "conflict_semantic_insufficient_ratio": float(conflict.get("conflict_semantic_insufficient_ratio") or 0.0),
+        "conflict_semantic_missing_pairs": int(conflict.get("conflict_semantic_missing_pairs") or 0),
+        "conflict_semantic_unknown_pair_rows": int(conflict.get("conflict_semantic_unknown_pair_rows") or 0),
         "conflict_semantic_threshold": float(conflict.get("conflict_semantic_threshold") or 0.0),
         "conflict_semantic_fallback": bool(conflict.get("conflict_semantic_fallback")),
         "conflict_semantic_fallback_reason": str(conflict.get("conflict_semantic_fallback_reason") or ""),
