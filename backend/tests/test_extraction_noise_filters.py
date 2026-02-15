@@ -1,8 +1,8 @@
 """Tests for extraction noise filters (P0-5).
 
-Tests figure/table caption detection to filter low-quality claims.
+Tests figure/table caption and pure definition detection to filter low-quality claims.
 """
-from app.extraction.noise_filters import is_caption_text
+from app.extraction.noise_filters import is_caption_text, is_pure_definition_text
 
 
 def test_detects_figure_caption_with_number():
@@ -65,3 +65,59 @@ def test_rejects_caption_without_colon():
     """Captions without colon (Figure 1 shows) should be rejected."""
     assert is_caption_text("Figure 1 shows the results") is False
     assert is_caption_text("Table 2 presents the data") is False
+
+
+# Definition Detection Tests
+
+
+def test_detects_is_definition():
+    """`X is a Y` pattern"""
+    assert is_pure_definition_text("Machine learning is a method of data analysis") is True
+    assert is_pure_definition_text("Deep learning is a subset of machine learning") is True
+
+
+def test_detects_refers_to_definition():
+    """`X refers to Y` pattern"""
+    assert is_pure_definition_text("This term refers to the process of optimization") is True
+
+
+def test_detects_defined_as_pattern():
+    """`X is defined as Y` pattern"""
+    assert is_pure_definition_text("Accuracy is defined as the ratio of correct predictions") is True
+
+
+def test_detects_represents_pattern():
+    """`X represents Y` pattern with sufficient is/are density"""
+    # "represents" + "is" gives pattern=1 and density=0.125 (1/8) > 0.08
+    assert is_pure_definition_text("This metric represents what is measured in the study") is True
+
+
+def test_rejects_high_verb_diversity():
+    """Scientific claims with diverse verbs are not definitions"""
+    assert is_pure_definition_text(
+        "The model achieves better performance and reduces errors significantly"
+    ) is False
+
+
+def test_rejects_comparative_statements():
+    """Comparative/causal statements are not definitions"""
+    assert is_pure_definition_text("This approach outperforms previous methods") is False
+    assert is_pure_definition_text("Increasing temperature causes faster reactions") is False
+    # Test inflections
+    assert is_pure_definition_text("The model improves performance significantly") is False
+    assert is_pure_definition_text("This method is leading to better results") is False
+
+
+def test_accepts_definition_with_comparative_substring():
+    """Definitions containing substring matches should still pass if not word-boundary match"""
+    # "moreover" contains "more" but is not comparative
+    assert is_pure_definition_text("Moreover, entropy is a measure of uncertainty") is True
+    # "leadership" contains "lead" but is not causal
+    assert is_pure_definition_text("Leadership is a quality of effective management") is True
+
+
+def test_rejects_none_and_empty_definition_inputs():
+    """None and empty inputs should return False for definition detection"""
+    assert is_pure_definition_text(None) is False
+    assert is_pure_definition_text("") is False
+    assert is_pure_definition_text(123) is False  # type: ignore[arg-type]
