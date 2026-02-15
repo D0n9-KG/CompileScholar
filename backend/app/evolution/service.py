@@ -149,6 +149,14 @@ def rebuild_evolution_graph(
             continue
 
         event_type = str(inferred["event_type"])
+
+        # Handle MERGE events separately (text identity - propositions should be merged, not related)
+        if event_type == "MERGE":
+            # Log merge candidate for post-processing
+            log(f"Merge candidate detected: {source_prop_id} <-> {target_prop_id} (text identity)")
+            # Skip adding to inferred_events - merges are structural changes, not relations
+            continue
+
         event_seed = f"infer\0{source_claim_id}\0{target_claim_id}\0{event_type}"
         event_id = hashlib.sha256(event_seed.encode("utf-8", errors="ignore")).hexdigest()[:32]
         inferred_events.append(

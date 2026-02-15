@@ -87,13 +87,15 @@ def infer_relation_type(
     if not src or not tgt:
         return None
 
+    # Text identity detection: identical normalized text should trigger merge, not relation
+    if src == tgt:
+        # High confidence merge signal (not a relation type)
+        return {"event_type": "MERGE", "confidence": 0.99, "strength": 0.99, "status": "accepted", "reason": "text_identity"}
+
     base_conf = clamp01(0.65 * sim + 0.35 * tgt_conf)
     status = "pending_review"
 
-    if src == tgt and sim >= 0.96:
-        conf = clamp01(base_conf + 0.08)
-        status = "accepted" if conf >= accepted_threshold else "pending_review"
-        return {"event_type": "SUPPORTS", "confidence": conf, "strength": conf, "status": status}
+    # Note: removed "if src == tgt and sim >= 0.96:" block - now handled above as MERGE
 
     supersedes = contains_any(tgt, SUPERSEDE_MARKERS)
     challenges = contains_any(tgt, CHALLENGE_MARKERS)
