@@ -44,7 +44,45 @@ def llm() -> Any:
 
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=0.8, min=0.8, max=4.0))
-def call_json(system: str, user: str) -> dict:
+def _call_text_with_retry(system: str, user: str) -> str:
+    """Call LLM with retry logic and return raw text response."""
     resp = llm().invoke([("system", system), ("user", user)])
-    return _extract_json(resp.content)
+    return str(resp.content or "")
+
+
+def call_text(system: str, user: str, *, use_retry: bool = True) -> str:
+    """
+    Call LLM and return raw text response.
+
+    Args:
+        system: System prompt
+        user: User prompt
+        use_retry: Whether to use retry logic (default: True)
+
+    Returns:
+        Raw text response from LLM
+    """
+    if use_retry:
+        return _call_text_with_retry(system, user)
+    resp = llm().invoke([("system", system), ("user", user)])
+    return str(resp.content or "")
+
+
+def call_json(system: str, user: str, *, use_retry: bool = True) -> dict:
+    """
+    Call LLM and parse JSON response.
+
+    Args:
+        system: System prompt
+        user: User prompt
+        use_retry: Whether to use retry logic (default: True)
+
+    Returns:
+        Parsed JSON dict
+
+    Raises:
+        JSONDecodeError: If response is not valid JSON
+    """
+    raw = call_text(system, user, use_retry=use_retry)
+    return _extract_json(raw)
 

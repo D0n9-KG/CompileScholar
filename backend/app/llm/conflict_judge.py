@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import json
 import re
-import time
 from typing import Any
 
 from json_repair import repair_json
 
 
 _TPL_RE = re.compile(r"\{\{\s*([A-Za-z][A-Za-z0-9_]*)\s*\}\}")
+_JSON_BLOCK_RE = re.compile(r"```json\s*(?P<body>.*?)\s*```", re.DOTALL | re.IGNORECASE)
 _ALLOWED_LABELS = {"contradict", "not_conflict", "insufficient"}
 
 
@@ -37,11 +37,37 @@ def _repair_and_parse(raw_response: str) -> dict[str, Any]:
     """
     Repair and parse potentially malformed JSON using json-repair.
 
+    Extracts JSON from code blocks and attempts repair if direct parsing fails.
     Returns empty dict on failure.
     """
+    text = (raw_response or "").strip()
+    if not text:
+        return {}
+
+    # Try to extract JSON from markdown code block
+    m = _JSON_BLOCK_RE.search(text)
+    if m:
+        text = m.group("body").strip()
+
+    # Try to locate first { ... } if extra text exists
+    if not text.startswith("{"):
+        start = text.find("{")
+        end = text.rfind("}")
+        if start >= 0 and end > start:
+            text = text[start : end + 1]
+
+    # First attempt: direct parse (fast path)
     try:
-        repaired = repair_json(raw_response)
-        return json.loads(repaired)
+        parsed = json.loads(text)
+        return parsed if isinstance(parsed, dict) else {}
+    except Exception:
+        pass
+
+    # Second attempt: use json-repair (slow path for malformed JSON)
+    try:
+        repaired = repair_json(text)
+        parsed = json.loads(repaired)
+        return parsed if isinstance(parsed, dict) else {}
     except Exception:
         return {}
 
@@ -69,22 +95,23 @@ def _judge_single_batch(
     system: str,
     user_template: str,
     default_user_fmt: str,
-    max_retries: int = 3,
 ) -> list[dict[str, Any]]:
     """
-    Judge a single batch of conflict pairs with retry and JSON repair.
+    Judge a single batch of conflict pairs with JSON repair.
+
+    Retry logic is delegated to call_text() at client layer.
+    This avoids retry amplification across multiple layers.
 
     Args:
         batch_pairs: List of pair dicts to judge
         system: System prompt
         user_template: User prompt template (optional)
         default_user_fmt: Default user prompt format string
-        max_retries: Maximum retry attempts
 
     Returns:
         List of judgment dicts with pair_id, label, score, reason
     """
-    from app.llm.client import call_json
+    from app.llm.client import call_text
 
     if not batch_pairs:
         return []
@@ -101,66 +128,47 @@ def _judge_single_batch(
     else:
         user = default_user_fmt.format(pairs_json=json.dumps({"pairs": batch_pairs}, ensure_ascii=False))
 
-    # Retry loop with exponential backoff
-    for attempt in range(max_retries):
+    # Call LLM with retry at client layer
+    try:
+        raw = call_text(system, user, use_retry=True)
+    except Exception:
+        return _mark_batch_insufficient(batch_pairs)
+
+    # Parse and repair JSON if needed
+    out = _repair_and_parse(raw)
+    rows = out.get("items") if isinstance(out, dict) else []
+    if not isinstance(rows, list):
+        return _mark_batch_insufficient(batch_pairs)
+
+    # Parse and validate results
+    result: list[dict[str, Any]] = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        pair_id = str(row.get("pair_id") or "").strip()
+        if not pair_id:
+            continue
+        label = str(row.get("label") or "").strip().lower()
+        if label not in _ALLOWED_LABELS:
+            label = "insufficient"
         try:
-            out = call_json(system, user)
-            rows = out.get("items") or []
+            score = float(row.get("score"))
+        except Exception:
+            score = 0.0
+        score = max(0.0, min(1.0, score))
+        reason = str(row.get("reason") or "").strip()
+        result.append(
+            {
+                "pair_id": pair_id,
+                "label": label,
+                "score": score,
+                "reason": reason,
+            }
+        )
 
-            # Parse and validate results
-            result: list[dict[str, Any]] = []
-            for row in rows:
-                if not isinstance(row, dict):
-                    continue
-                pair_id = str(row.get("pair_id") or "").strip()
-                if not pair_id:
-                    continue
-                label = str(row.get("label") or "").strip().lower()
-                if label not in _ALLOWED_LABELS:
-                    label = "insufficient"
-                try:
-                    score = float(row.get("score"))
-                except Exception:
-                    score = 0.0
-                score = max(0.0, min(1.0, score))
-                reason = str(row.get("reason") or "").strip()
-                result.append(
-                    {
-                        "pair_id": pair_id,
-                        "label": label,
-                        "score": score,
-                        "reason": reason,
-                    }
-                )
-            return result
-
-        except json.JSONDecodeError as e:
-            # Try JSON repair on last attempt
-            if attempt == max_retries - 1:
-                try:
-                    # Attempt to extract raw response and repair
-                    # Note: call_json already handles JSON parsing, so this is a fallback
-                    # In practice, we'd need to modify call_json to return raw response on error
-                    # For now, mark as insufficient
-                    return _mark_batch_insufficient(batch_pairs)
-                except Exception:
-                    return _mark_batch_insufficient(batch_pairs)
-
-            # Exponential backoff
-            wait_time = 2 ** attempt
-            time.sleep(wait_time)
-
-        except Exception as e:
-            # On last attempt, mark as insufficient
-            if attempt == max_retries - 1:
-                return _mark_batch_insufficient(batch_pairs)
-
-            # Exponential backoff
-            wait_time = 2 ** attempt
-            time.sleep(wait_time)
-
-    # Fallback (should not reach here)
-    return _mark_batch_insufficient(batch_pairs)
+    if not result:
+        return _mark_batch_insufficient(batch_pairs)
+    return result
 
 
 def judge_conflict_pairs_batch(*, pairs: list[dict[str, Any]], schema: dict[str, Any]) -> list[dict[str, Any]]:
@@ -213,7 +221,6 @@ def judge_conflict_pairs_batch(*, pairs: list[dict[str, Any]], schema: dict[str,
             system=system,
             user_template=user_template,
             default_user_fmt=default_user_fmt,
-            max_retries=3,
         )
         all_results.extend(batch_results)
 
