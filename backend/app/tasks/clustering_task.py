@@ -50,7 +50,7 @@ def run_proposition_clustering(task_id: str | None = None) -> dict[str, Any]:
 
         # 2. Generate embeddings
         texts = [p["text"] for p in propositions]
-        embedding_model = settings.embedding_model or "text-embedding-3-small"
+        embedding_model = settings.effective_embedding_model() or "text-embedding-3-small"
         embeddings = get_embeddings_batch(texts, model=embedding_model)
 
         logger.info(f"Generated {len(embeddings)} embeddings")
