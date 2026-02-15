@@ -1780,6 +1780,7 @@ WHERE pa.prop_id <> pb.prop_id
 RETURN a.claim_id AS source_claim_id,
        b.claim_id AS target_claim_id,
        a.paper_id AS source_paper_id,
+       coalesce(toLower(s.mode), 'embedding') AS similarity_mode,
        b.paper_id AS target_paper_id,
        a.text AS source_text,
        b.text AS target_text,
@@ -2031,7 +2032,7 @@ LIMIT 200
 
             return {"proposition": proposition, "events": events, "neighbors": neighbors}
 
-    def replace_similar_claim_edges_batch(self, items: list[dict], model: str, built_at: str) -> None:
+    def replace_similar_claim_edges_batch(self, items: list[dict], model: str, built_at: str, mode: str = "embedding") -> None:
         """
         Replace outgoing SIMILAR_CLAIM edges for each source claim.
         Input: [{"source": "<claim_id>", "targets": [{"target":"<claim_id>","score":0.9}, ...]}, ...]
@@ -2047,13 +2048,17 @@ MATCH (b:Claim {claim_id: t.target})
 MERGE (a)-[s:SIMILAR_CLAIM]->(b)
 SET s.score = t.score,
     s.model = $model,
+    s.mode = $mode,
     s.built_at = $built_at
 """
+        mode_norm = str(mode or "embedding").strip().lower()
+        if mode_norm not in {"embedding", "lexical"}:
+            mode_norm = "embedding"
         with self._driver.session() as session:
             # chunk to avoid huge transactions
             batch = list(items or [])
             for i in range(0, len(batch), 200):
-                session.run(cypher, items=batch[i : i + 200], model=str(model), built_at=str(built_at))
+                session.run(cypher, items=batch[i : i + 200], model=str(model), mode=mode_norm, built_at=str(built_at))
 
     def replace_similar_logic_edges_batch(self, items: list[dict], model: str, built_at: str) -> None:
         """

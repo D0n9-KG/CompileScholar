@@ -293,6 +293,7 @@ def rebuild_similarity_global(
         return _normalize_rows(x)
 
     mode = "lexical"
+    degradation_reason = ""
     claim_x = np.zeros((0, 0), dtype=np.float32)
     logic_x = np.zeros((0, 0), dtype=np.float32)
     try:
@@ -309,14 +310,27 @@ def rebuild_similarity_global(
         mode = "lexical"
         claim_x = np.zeros((0, 0), dtype=np.float32)
         logic_x = np.zeros((0, 0), dtype=np.float32)
+        degradation_reason = str(exc).strip()
         log(f"similarity embedding mode unavailable; falling back to lexical mode: {exc}")
+
+    embedding_degraded = mode != "embedding"
+    if embedding_degraded and not degradation_reason:
+        degradation_reason = "embedding_unavailable"
+    degradation_reason = degradation_reason[:500]
+    meta_payload = {
+        "built_at": built_at,
+        "model": model,
+        "mode": mode,
+        "embedding_degraded": embedding_degraded,
+        "degradation_reason": degradation_reason,
+    }
 
     if claims:
         _write_items("claim", claims)
         if mode == "embedding":
             _save_embeddings("claim", claim_x)
         _meta_path("claim").write_text(
-            json.dumps({"built_at": built_at, "model": model, "mode": mode}, ensure_ascii=False),
+            json.dumps(meta_payload, ensure_ascii=False),
             encoding="utf-8",
         )
     if logic:
@@ -324,7 +338,7 @@ def rebuild_similarity_global(
         if mode == "embedding":
             _save_embeddings("logic", logic_x)
         _meta_path("logic").write_text(
-            json.dumps({"built_at": built_at, "model": model, "mode": mode}, ensure_ascii=False),
+            json.dumps(meta_payload, ensure_ascii=False),
             encoding="utf-8",
         )
 
@@ -337,7 +351,7 @@ def rebuild_similarity_global(
         else:
             batch = _lexical_topk_batch(claims, top_k=claim_top_k)
         with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
-            client.replace_similar_claim_edges_batch(batch, model=model, built_at=built_at)
+            client.replace_similar_claim_edges_batch(batch, model=model, built_at=built_at, mode=mode)
 
     progress("similarity:neighbors_logic", 0.75, "Computing logic-step neighbors")
     if logic:
@@ -350,8 +364,20 @@ def rebuild_similarity_global(
             client.replace_similar_logic_edges_batch(batch, model=model, built_at=built_at)
 
     progress("similarity:done", 1.0, "Similarity rebuild done")
-    log(f"similarity rebuilt: mode={mode} claims={len(claims)} logic_steps={len(logic)} model={model}")
-    return {"ok": True, "built_at": built_at, "model": model, "mode": mode, "claims": len(claims), "logic_steps": len(logic)}
+    log(
+        f"similarity rebuilt: mode={mode} claims={len(claims)} logic_steps={len(logic)} "
+        f"model={model} degraded={embedding_degraded}"
+    )
+    return {
+        "ok": True,
+        "built_at": built_at,
+        "model": model,
+        "mode": mode,
+        "embedding_degraded": embedding_degraded,
+        "degradation_reason": degradation_reason,
+        "claims": len(claims),
+        "logic_steps": len(logic),
+    }
 
 
 def update_similarity_for_paper(
@@ -476,7 +502,7 @@ def update_similarity_for_paper(
                 batch.extend(_topk_pairs(idx, claim_x, claim_items, active, top_k=claim_top_k))
             for i in cleared:
                 batch.append({"source": claim_items[i].node_id, "targets": []})
-            client.replace_similar_claim_edges_batch(batch, model=model, built_at=built_at)
+            client.replace_similar_claim_edges_batch(batch, model=model, built_at=built_at, mode="embedding")
         if logic_items and logic_changed:
             changed_idx = sorted(set(logic_changed))
             active = [i for i in changed_idx if (logic_items[i].text or "").strip()]
@@ -494,14 +520,28 @@ def update_similarity_for_paper(
         _write_items("claim", claim_items)
         _save_embeddings("claim", claim_x)
         _meta_path("claim").write_text(
-            json.dumps({"built_at": built_at, "model": model, "mode": "embedding"}, ensure_ascii=False),
+            json.dumps(
+                {
+                    "built_at": built_at,
+                    "model": model,
+                    "mode": "embedding",
+                    "embedding_degraded": False,
+                    "degradation_reason": "",
+                }, ensure_ascii=False),
             encoding="utf-8",
         )
     if logic_items:
         _write_items("logic", logic_items)
         _save_embeddings("logic", logic_x)
         _meta_path("logic").write_text(
-            json.dumps({"built_at": built_at, "model": model, "mode": "embedding"}, ensure_ascii=False),
+            json.dumps(
+                {
+                    "built_at": built_at,
+                    "model": model,
+                    "mode": "embedding",
+                    "embedding_degraded": False,
+                    "degradation_reason": "",
+                }, ensure_ascii=False),
             encoding="utf-8",
         )
 
