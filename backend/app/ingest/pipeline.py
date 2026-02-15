@@ -3,7 +3,8 @@ from __future__ import annotations
 import json
 import logging
 import re
-from concurrent.futures import ThreadPoolExecutor, as_completed
+import time
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
@@ -413,32 +414,91 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
                 0.70,
                 f"Running LLM extraction (Logic/Claims/Citation Purposes) (0/{total_jobs}, workers={max_workers})",
             )
+            heartbeat_seconds = _bounded_int(
+                getattr(settings, "ingest_llm_heartbeat_seconds", 20),
+                default=20,
+                lo=5,
+                hi=120,
+            )
             with ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="ingest-llm") as executor:
                 future_map = {
                     executor.submit(_llm_extract_one, idx, doc, rec): (idx, rec)
                     for idx, doc, rec in jobs
                 }
-                for future in as_completed(future_map):
-                    idx, rec = future_map[future]
-                    paper_id = str(rec.get("paper_id") or "")
-                    completed += 1
-                    try:
-                        item = future.result()
-                    except Exception as exc:
-                        llm_failures.append(f"{paper_id}: {exc}")
-                    else:
+                pending = set(future_map.keys())
+                started_at = {future: time.monotonic() for future in pending}
+
+                while pending:
+                    done, pending = wait(
+                        pending,
+                        timeout=float(heartbeat_seconds),
+                        return_when=FIRST_COMPLETED,
+                    )
+
+                    if not done:
+                        # Heartbeat: no futures completed in this interval
+                        ratio = completed / total_jobs
+                        now = time.monotonic()
+                        slowest_future = max(pending, key=lambda f: now - started_at.get(f, now))
+                        _, slowest_rec = future_map[slowest_future]
+                        slowest_paper_id = str(slowest_rec.get("paper_id") or "")
+                        slowest_secs = int(max(0.0, now - started_at.get(slowest_future, now)))
+                        notify(
+                            "ingest:llm",
+                            0.70 + (0.20 * ratio),
+                            (
+                                "Running LLM extraction (Logic/Claims/Citation Purposes) "
+                                f"({completed}/{total_jobs}, running={len(pending)}, "
+                                f"slowest={slowest_paper_id}:{slowest_secs}s, failed={len(llm_failures)})"
+                            ),
+                        )
+                        continue
+
+                    for future in done:
+                        idx, rec = future_map[future]
+                        paper_id = str(rec.get("paper_id") or "")
+                        completed += 1
+
+                        try:
+                            item = future.result()
+                        except Exception as exc:
+                            llm_failures.append(f"{paper_id}: {exc}")
+                            ratio = completed / total_jobs
+                            notify(
+                                "ingest:llm",
+                                0.70 + (0.20 * ratio),
+                                (
+                                    "Running LLM extraction (Logic/Claims/Citation Purposes) "
+                                    f"({completed}/{total_jobs}, running={len(pending)}, failed={len(llm_failures)})"
+                                ),
+                            )
+                            continue
+
                         outputs_by_idx[idx] = dict(item["llm_out"])
+                        ratio = completed / total_jobs
+                        notify(
+                            "ingest:llm",
+                            0.70 + (0.20 * ratio),
+                            (
+                                "Running LLM extraction (Logic/Claims/Citation Purposes) "
+                                f"({completed}/{total_jobs}, running={len(pending)}, failed={len(llm_failures)})"
+                            ),
+                        )
+
                         if neo4j_written:
                             try:
                                 propositions_written += _write_llm_to_neo4j(item)
                             except Exception as exc:
                                 llm_failures.append(f"{paper_id}: neo4j write failed: {exc}")
-                    ratio = completed / total_jobs
-                    notify(
-                        "ingest:llm",
-                        0.70 + (0.20 * ratio),
-                        f"Running LLM extraction (Logic/Claims/Citation Purposes) ({completed}/{total_jobs}, failed={len(llm_failures)})",
-                    )
+                                ratio = completed / total_jobs
+                                notify(
+                                    "ingest:llm",
+                                    0.70 + (0.20 * ratio),
+                                    (
+                                        "Running LLM extraction (Logic/Claims/Citation Purposes) "
+                                        f"({completed}/{total_jobs}, running={len(pending)}, failed={len(llm_failures)})"
+                                    ),
+                                )
             llm_outputs = [outputs_by_idx[i] for i in sorted(outputs_by_idx)]
             if llm_failures:
                 shown = llm_failures[:5]

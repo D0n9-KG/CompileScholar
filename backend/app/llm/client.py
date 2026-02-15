@@ -33,13 +33,21 @@ def llm() -> Any:
     base_url = settings.effective_llm_base_url()
     if not api_key:
         raise RuntimeError("LLM API key missing (set DEEPSEEK_API_KEY or LLM_API_KEY)")
+
+    try:
+        timeout_seconds = int(getattr(settings, "llm_timeout_seconds", 60) or 60)
+    except Exception:
+        timeout_seconds = 60
+    timeout_seconds = max(10, min(600, timeout_seconds))
+    client_retries = max(0, min(2, int(getattr(settings, "llm_client_max_retries", 0) or 0)))
+
     return ChatOpenAI(
         api_key=api_key,
         base_url=base_url,
         model=settings.llm_model,
         temperature=0,
-        timeout=60,
-        max_retries=2,
+        timeout=timeout_seconds,
+        max_retries=client_retries,
     )
 
 

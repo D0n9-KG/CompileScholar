@@ -68,7 +68,13 @@ def iso_time_for_paper_year(year: int | None) -> str:
 
 class Neo4jClient:
     def __init__(self, uri: str, user: str, password: str):
-        self._driver = GraphDatabase.driver(uri, auth=(user, password))
+        try:
+            connect_timeout = float(getattr(settings, "neo4j_connection_timeout_seconds", 15.0) or 15.0)
+        except Exception:
+            connect_timeout = 15.0
+        connect_timeout = max(1.0, min(120.0, connect_timeout))
+
+        self._driver = GraphDatabase.driver(uri, auth=(user, password), connection_timeout=connect_timeout)
 
     def close(self) -> None:
         self._driver.close()

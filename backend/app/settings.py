@@ -60,6 +60,26 @@ class Settings(BaseSettings):
         validation_alias=AliasChoices("INGEST_LLM_MAX_WORKERS"),
     )
 
+    ingest_llm_heartbeat_seconds: int = Field(
+        default=20,
+        validation_alias=AliasChoices("INGEST_LLM_HEARTBEAT_SECONDS"),
+    )
+
+    llm_timeout_seconds: int = Field(
+        default=60,
+        validation_alias=AliasChoices("LLM_TIMEOUT_SECONDS"),
+    )
+
+    llm_client_max_retries: int = Field(
+        default=0,
+        validation_alias=AliasChoices("LLM_CLIENT_MAX_RETRIES"),
+    )
+
+    neo4j_connection_timeout_seconds: float = Field(
+        default=15.0,
+        validation_alias=AliasChoices("NEO4J_CONNECTION_TIMEOUT_SECONDS"),
+    )
+
     data_root: str = ".."
     storage_dir: str = "storage"
 
