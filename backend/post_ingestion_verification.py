@@ -32,42 +32,42 @@ def run_post_ingestion_verification():
             result = session.run(query).single()
             papers_count = result['count']
             print(f"\nPapers ingested: {papers_count}")
-            print(f"  ✅ Expected: 20" if papers_count == 20 else f"  ⚠️  Expected 20, got {papers_count}")
+            print(f"  [OK] Expected: 20" if papers_count == 20 else f"  [WARN]  Expected 20, got {papers_count}")
 
             # Claims generated
             query = "MATCH (:Paper)-[:HAS_CLAIM]->(c:Claim) RETURN count(c) AS count"
             result = session.run(query).single()
             claims_count = result['count']
             print(f"\nClaims generated: {claims_count}")
-            print(f"  ✅ Target: >0" if claims_count > 0 else f"  ❌ No claims found!")
+            print(f"  [OK] Target: >0" if claims_count > 0 else f"  [FAIL] No claims found!")
 
             # Claims mapped to propositions
             query = "MATCH (c:Claim) WHERE NOT (c)-[:MAPS_TO]->(:Proposition) RETURN count(c) AS count"
             result = session.run(query).single()
             unmapped_claims = result['count']
             print(f"\nUnmapped claims (orphans): {unmapped_claims}")
-            print(f"  ✅ Target: ~0" if unmapped_claims < claims_count * 0.05 else f"  ⚠️  High orphan rate: {unmapped_claims}/{claims_count}")
+            print(f"  [OK] Target: ~0" if unmapped_claims < claims_count * 0.05 else f"  [WARN]  High orphan rate: {unmapped_claims}/{claims_count}")
 
             # Propositions without claims (should be ~0)
             query = "MATCH (pr:Proposition) WHERE NOT (pr)<-[:MAPS_TO]-(:Claim) RETURN count(pr) AS count"
             result = session.run(query).single()
             orphan_props = result['count']
             print(f"\nOrphan propositions (no claims): {orphan_props}")
-            print(f"  ✅ Target: ~0" if orphan_props == 0 else f"  ⚠️  Found {orphan_props} orphan propositions")
+            print(f"  [OK] Target: ~0" if orphan_props == 0 else f"  [WARN]  Found {orphan_props} orphan propositions")
 
             # Logic steps
             query = "MATCH (:Paper)-[:HAS_LOGIC_STEP]->(s:LogicStep) RETURN count(s) AS count"
             result = session.run(query).single()
             logic_steps_count = result['count']
             print(f"\nLogic steps: {logic_steps_count}")
-            print(f"  ✅ Target: >0" if logic_steps_count > 0 else f"  ❌ No logic steps found!")
+            print(f"  [OK] Target: >0" if logic_steps_count > 0 else f"  [FAIL] No logic steps found!")
 
             # References
             query = "MATCH (:Paper)-[:HAS_REFERENCE]->(r:ReferenceEntry) RETURN count(r) AS count"
             result = session.run(query).single()
             refs_count = result['count']
             print(f"\nReferences: {refs_count}")
-            print(f"  ✅ Target: >0" if refs_count > 0 else f"  ⚠️  No references found")
+            print(f"  [OK] Target: >0" if refs_count > 0 else f"  [WARN]  No references found")
 
             # ==================================================================
             # B. Gate Statistics
@@ -87,7 +87,7 @@ def run_post_ingestion_verification():
             print(f"\nPhase1 gate pass rate:")
             print(f"  Passed: {result['passed']}/{result['total']}")
             print(f"  Rate: {result['pass_rate_pct']}%")
-            print(f"  ✅ Target: >80%" if result['pass_rate_pct'] >= 80 else f"  ⚠️  Below 80% target")
+            print(f"  [OK] Target: >80%" if result['pass_rate_pct'] >= 80 else f"  [WARN]  Below 80% target")
 
             # Quality tier distribution
             query = """
@@ -113,9 +113,9 @@ def run_post_ingestion_verification():
             groups_count = result['count']
             print(f"\nProposition groups: {groups_count}")
             if groups_count == 0:
-                print(f"  ❌ No groups found - clustering may not have run")
+                print(f"  [FAIL] No groups found - clustering may not have run")
             else:
-                print(f"  ✅ Clustering completed")
+                print(f"  [OK] Clustering completed")
 
                 # Grouping coverage
                 query = """
@@ -130,7 +130,7 @@ def run_post_ingestion_verification():
                 print(f"\nGrouping coverage:")
                 print(f"  Grouped propositions: {result['grouped_props']}/{result['total_props']}")
                 print(f"  Coverage: {result['coverage_pct']}%")
-                print(f"  ✅ Target: >80%" if result['coverage_pct'] >= 80 else f"  ⚠️  Below 80% target")
+                print(f"  [OK] Target: >80%" if result['coverage_pct'] >= 80 else f"  [WARN]  Below 80% target")
 
             # ==================================================================
             # D. Conflict Detection
@@ -145,9 +145,9 @@ def run_post_ingestion_verification():
             conflicts_count = result['count']
             print(f"\nConflict relationships: {conflicts_count}")
             if conflicts_count == 0:
-                print(f"  ⚠️  No conflicts found - may indicate detection didn't run or no actual conflicts")
+                print(f"  [WARN]  No conflicts found - may indicate detection didn't run or no actual conflicts")
             else:
-                print(f"  ✅ Conflict detection completed")
+                print(f"  [OK] Conflict detection completed")
 
             # ==================================================================
             # SUMMARY
@@ -165,10 +165,10 @@ def run_post_ingestion_verification():
             )
 
             if all_checks_passed:
-                print("\n✅ All integrity checks PASSED")
+                print("\n[OK] All integrity checks PASSED")
                 print("\nNext step: Run quality_eval_20papers.py for detailed quality metrics")
             else:
-                print("\n⚠️  Some checks did not pass - review output above")
+                print("\n[WARN]  Some checks did not pass - review output above")
                 print("\nRecommendation: Investigate issues before running quality evaluation")
 
 
