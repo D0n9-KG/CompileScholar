@@ -55,6 +55,20 @@ class Settings(BaseSettings):
         validation_alias=AliasChoices("PHASE1_GATE_ALLOW_WEAK"),
     )
 
+    # P0-6: Evolution quality gates
+    evolution_gate_enabled: bool = Field(
+        default=True,
+        validation_alias=AliasChoices("EVOLUTION_GATE_ENABLED"),
+    )
+    evolution_min_coverage: float = Field(
+        default=0.20,
+        validation_alias=AliasChoices("EVOLUTION_MIN_COVERAGE"),
+    )
+    evolution_max_self_loop_rate: float = Field(
+        default=0.05,
+        validation_alias=AliasChoices("EVOLUTION_MAX_SELF_LOOP_RATE"),
+    )
+
     ingest_llm_max_workers: int = Field(
         default=4,
         validation_alias=AliasChoices("INGEST_LLM_MAX_WORKERS"),
