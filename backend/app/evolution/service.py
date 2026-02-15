@@ -64,9 +64,9 @@ def sync_proposition_mentions_global(progress: ProgressFn | None = None, log: Lo
                 text = str(r.get("text") or "").strip()
                 if not text:
                     continue
-                step = str(r.get("step_type") or "").strip().lower()
-                kinds = "|".join(sorted(str(x).strip().lower() for x in (r.get("kinds") or []) if str(x).strip()))
-                prop_key = hashlib.sha256(f"{normalize_proposition_text(text)}\0{step}\0{kinds}".encode("utf-8", errors="ignore")).hexdigest()[:24]
+                # Use Assertion Layer text-only key (matches neo4j_client.py)
+                from app.graph.neo4j_client import proposition_key_for_claim
+                prop_key = proposition_key_for_claim(text=text)
                 mapped_props.add(prop_key)
             ratio = idx / max(1, total)
             progress("evolution:sync:mentions", 0.02 + ratio * 0.48, f"Synced proposition mentions: {idx}/{total}")
