@@ -1,4 +1,8 @@
-"""Embedding generation utilities for Proposition clustering."""
+"""
+Alternative embedding implementation using requests library for GPUStack compatibility.
+
+Use this instead of OpenAI SDK when encountering 502 errors with GPUStack.
+"""
 from __future__ import annotations
 
 import requests
@@ -6,16 +10,16 @@ import requests
 from app.settings import settings
 
 
-def get_embeddings_batch(texts: list[str], model: str | None = None) -> list[list[float]]:
+def get_embeddings_batch_requests(texts: list[str], model: str | None = None) -> list[list[float]]:
     """
-    Generate embeddings for a batch of texts using OpenAI-compatible API.
+    Generate embeddings using requests library (GPUStack compatible).
 
-    Uses requests library instead of OpenAI SDK for better compatibility
-    with local embedding services like GPUStack.
+    This is an alternative to the OpenAI SDK implementation that works
+    better with local GPUStack services that may have SDK compatibility issues.
 
     Args:
         texts: List of text strings to embed.
-        model: Embedding model name (default: from settings or text-embedding-3-small)
+        model: Embedding model name (default: from settings)
 
     Returns:
         List of embedding vectors (each is list of floats)
@@ -26,7 +30,7 @@ def get_embeddings_batch(texts: list[str], model: str | None = None) -> list[lis
     if not texts:
         return []
 
-    # Resolve model + credentials from shared settings abstraction
+    # Resolve configuration
     model = model or settings.effective_embedding_model() or "text-embedding-3-small"
     api_key = settings.effective_embedding_api_key()
     if not api_key:
