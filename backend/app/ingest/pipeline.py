@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
@@ -25,6 +26,7 @@ from app.vector.faiss_store import build_faiss_for_chunks
 
 
 ProgressFn = Callable[[str, float, str | None], None]
+logger = logging.getLogger(__name__)
 
 
 def _safe_id(s: str) -> str:
@@ -455,6 +457,33 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
     except Exception as exc:  # noqa: BLE001
         faiss_error = str(exc)
 
+    # Trigger proposition clustering (Task 3.6: Group Layer integration)
+    proposition_candidates = sum(len(o.get("claims") or []) for o in llm_outputs)
+    clustering: dict[str, Any] = {
+        "triggered": False,
+        "status": "skipped",
+        "proposition_candidates": proposition_candidates,
+    }
+    if neo4j_written and proposition_candidates > 0:
+        notify("ingest:clustering", 0.96, "Clustering propositions into groups")
+        clustering["triggered"] = True
+        clustering_task_id = f"cluster_{run_id}"
+        clustering["task_id"] = clustering_task_id
+        try:
+            from app.tasks.clustering_task import run_proposition_clustering
+
+            result = run_proposition_clustering(task_id=clustering_task_id)
+            clustering.update(result)
+            logger.info("Proposition clustering result: %s", result)
+        except Exception as exc:  # noqa: BLE001
+            clustering.update(
+                {
+                    "status": "failed",
+                    "error": str(exc),
+                }
+            )
+            logger.exception("Failed to trigger proposition clustering")
+
     notify("ingest:done", 1.0, "Done")
     return {
         "run_id": run_id,
@@ -504,6 +533,7 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
         "faiss_built": faiss_built,
         "faiss_error": faiss_error,
         "faiss_dir": faiss_dir,
+        "clustering": clustering,
         "artifacts_dir": str(run_dir),
     }
 
