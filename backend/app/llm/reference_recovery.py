@@ -19,6 +19,10 @@ _REF_HEADING_RE = re.compile(
 )
 _SECTION_HEADING_RE = re.compile(r"^\s{0,3}#{1,6}\s+")
 _YEAR_RE = re.compile(r"\b(19|20)\d{2}\b")
+_UNNUMBERED_REF_START_RE = re.compile(
+    r"^\s*[A-Z][A-Za-z'`-]{1,}(?:\s+[A-Z][A-Za-z'`-]{1,}){0,3}\s*,\s*(?:[A-Z](?:[\.\s-]?){0,4}|et\s+al\.?)",
+    re.IGNORECASE,
+)
 
 
 def _rule_int(rules: dict[str, Any], key: str, default: int, *, lo: int, hi: int) -> int:
@@ -156,6 +160,34 @@ def _looks_like_reference_line(line: str) -> bool:
     return bool(_YEAR_RE.search(norm) or ("doi" in lower) or ("," in norm and "." in norm))
 
 
+def _has_reference_anchor(text: str) -> bool:
+    """Check if text has a reference anchor (year or DOI)."""
+    norm = _normalize_ref(text)
+    return bool(_YEAR_RE.search(norm) or ("doi" in norm.lower()))
+
+
+def _should_split_as_new_unnumbered_ref(current_ref: str, line: str) -> bool:
+    """
+    Decide whether `line` should start a NEW unnumbered reference instead of being
+    merged as continuation of `current_ref`.
+
+    Returns True when:
+    - Both current_ref and line look like reference lines
+    - current_ref has a reference anchor (year/DOI)
+    - line starts with author pattern (e.g., "Smith, J." or "et al.")
+    """
+    candidate = str(line or "").strip()
+    if not candidate:
+        return False
+    if not _looks_like_reference_line(candidate):
+        return False
+    if not _looks_like_reference_line(current_ref):
+        return False
+    if not _has_reference_anchor(current_ref):
+        return False
+    return bool(_UNNUMBERED_REF_START_RE.match(candidate))
+
+
 def _extract_reference_texts_heuristic(markdown_text: str, max_refs: int) -> list[str]:
     """Extract references with multi-line merging support."""
     lines = (markdown_text or "").splitlines()
@@ -240,8 +272,20 @@ def _extract_reference_texts_heuristic(markdown_text: str, max_refs: int) -> lis
                         break
             current_ref = line
         elif current_ref:
-            # Continuation of current reference
-            current_ref += " " + line
+            if _should_split_as_new_unnumbered_ref(current_ref, line):
+                # Current reference is complete; next line looks like a new
+                # unnumbered reference entry, so flush then start a new one.
+                if _looks_like_reference_line(current_ref):
+                    norm = _normalize_ref(current_ref)
+                    if norm not in seen and len(norm) >= 12:
+                        seen.add(norm)
+                        out.append(norm)
+                        if len(out) >= max_refs:
+                            break
+                current_ref = line
+            else:
+                # Continuation of current reference
+                current_ref += " " + line
         elif _looks_like_reference_line(line):
             # Start a reference without explicit numbering
             current_ref = line
