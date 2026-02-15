@@ -1,19 +1,18 @@
 """Embedding generation utilities for Proposition clustering."""
 from __future__ import annotations
 
-import os
-from typing import Any
-
 import openai
+
+from app.settings import settings
 
 
 def get_embeddings_batch(texts: list[str], model: str | None = None) -> list[list[float]]:
     """
-    Generate embeddings for a batch of texts using OpenAI API.
+    Generate embeddings for a batch of texts using OpenAI-compatible API.
 
     Args:
-        texts: List of text strings to embed
-        model: Embedding model name (default: text-embedding-3-small)
+        texts: List of text strings to embed.
+        model: Embedding model name (default: from settings or text-embedding-3-small)
 
     Returns:
         List of embedding vectors (each is list of floats)
@@ -21,16 +20,12 @@ def get_embeddings_batch(texts: list[str], model: str | None = None) -> list[lis
     if not texts:
         return []
 
-    # Use default model if not specified
-    model = model or "text-embedding-3-small"
-
-    # Set API key from environment
-    api_key = os.getenv("OPENAI_API_KEY")
+    # Resolve model + credentials from shared settings abstraction
+    model = model or settings.effective_embedding_model() or "text-embedding-3-small"
+    api_key = settings.effective_embedding_api_key()
     if not api_key:
-        raise ValueError("OPENAI_API_KEY environment variable not set")
-
-    # Get base URL from environment (optional)
-    base_url = os.getenv("EMBEDDING_BASE_URL") or None
+        raise ValueError("Embedding API key is not configured")
+    base_url = settings.effective_embedding_base_url()
 
     client = openai.OpenAI(api_key=api_key, base_url=base_url)
 
