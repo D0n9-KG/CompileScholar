@@ -31,10 +31,10 @@ class Settings(BaseSettings):
     )
     openai_api_key: str | None = Field(default=None, validation_alias=AliasChoices("OPENAI_API_KEY"))
 
-    # Embeddings (optional). If not available, system falls back to lexical retrieval.
+    # Embeddings (required for RAG, similarity, clustering, FAISS). System will fail with clear errors if not configured.
     embedding_provider: str | None = Field(
         default=None,
-        description="siliconflow | openai | openrouter | deepseek | (None=disable)",
+        description="siliconflow | openai | openrouter | deepseek | (None will cause errors in core features)",
         validation_alias=AliasChoices("EMBEDDING_PROVIDER"),
     )
     embedding_base_url: str | None = Field(default=None, validation_alias=AliasChoices("EMBEDDING_BASE_URL"))
