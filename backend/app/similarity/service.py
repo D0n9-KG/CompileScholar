@@ -292,31 +292,41 @@ def rebuild_similarity_global(
         x = np.array(vecs, dtype=np.float32)
         return _normalize_rows(x)
 
-    mode = "lexical"
-    degradation_reason = ""
+    # Embedding mode only - with retry logic for transient errors
+    if faiss is None:
+        raise RuntimeError("faiss is not available - embedding mode required")
+
+    embed = _embedding_client()
+    max_retries = 3
+    retry_delay = 5  # seconds
+
     claim_x = np.zeros((0, 0), dtype=np.float32)
     logic_x = np.zeros((0, 0), dtype=np.float32)
-    try:
-        if faiss is None:
-            raise RuntimeError("faiss is not available")
-        embed = _embedding_client()
-        progress("similarity:embed_claims", 0.15, f"Embedding claims ({len(claims)})")
-        claim_x = _embed_items("claim", claims) if claims else np.zeros((0, 0), dtype=np.float32)
-        progress("similarity:embed_logic", 0.30, f"Embedding logic steps ({len(logic)})")
-        logic_x = _embed_items("logic", logic) if logic else np.zeros((0, 0), dtype=np.float32)
-        mode = "embedding"
-    except Exception as exc:  # noqa: BLE001
-        # Common in local/dev environments: embedding provider quota/billing issues, missing keys, etc.
-        mode = "lexical"
-        claim_x = np.zeros((0, 0), dtype=np.float32)
-        logic_x = np.zeros((0, 0), dtype=np.float32)
-        degradation_reason = str(exc).strip()
-        log(f"similarity embedding mode unavailable; falling back to lexical mode: {exc}")
 
-    embedding_degraded = mode != "embedding"
-    if embedding_degraded and not degradation_reason:
-        degradation_reason = "embedding_unavailable"
-    degradation_reason = degradation_reason[:500]
+    for attempt in range(max_retries):
+        try:
+            progress("similarity:embed_claims", 0.15, f"Embedding claims ({len(claims)}) - attempt {attempt + 1}/{max_retries}")
+            claim_x = _embed_items("claim", claims) if claims else np.zeros((0, 0), dtype=np.float32)
+            progress("similarity:embed_logic", 0.30, f"Embedding logic steps ({len(logic)}) - attempt {attempt + 1}/{max_retries}")
+            logic_x = _embed_items("logic", logic) if logic else np.zeros((0, 0), dtype=np.float32)
+            break  # Success - exit retry loop
+        except Exception as exc:  # noqa: BLE001
+            error_msg = str(exc).strip()
+            if attempt < max_retries - 1:
+                log(f"Embedding attempt {attempt + 1}/{max_retries} failed: {error_msg}. Retrying in {retry_delay}s...")
+                import time
+                time.sleep(retry_delay)
+            else:
+                # All retries exhausted - raise error for user to resolve
+                log(f"Embedding failed after {max_retries} attempts: {error_msg}")
+                raise RuntimeError(
+                    f"Similarity rebuild failed: embedding unavailable after {max_retries} attempts. "
+                    f"Error: {error_msg}. Please check embedding API configuration and try again."
+                ) from exc
+
+    mode = "embedding"
+    embedding_degraded = False
+    degradation_reason = ""
     meta_payload = {
         "built_at": built_at,
         "model": model,
@@ -342,24 +352,18 @@ def rebuild_similarity_global(
             encoding="utf-8",
         )
 
-    # Build indexes and compute neighbors
+    # Build indexes and compute neighbors (embedding mode only)
     progress("similarity:neighbors_claims", 0.55, "Computing claim neighbors")
     if claims:
-        if mode == "embedding":
-            claim_index = _build_index(claim_x)
-            batch = _topk_pairs(claim_index, claim_x, claims, list(range(len(claims))), top_k=claim_top_k)
-        else:
-            batch = _lexical_topk_batch(claims, top_k=claim_top_k)
+        claim_index = _build_index(claim_x)
+        batch = _topk_pairs(claim_index, claim_x, claims, list(range(len(claims))), top_k=claim_top_k)
         with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
             client.replace_similar_claim_edges_batch(batch, model=model, built_at=built_at, mode=mode)
 
     progress("similarity:neighbors_logic", 0.75, "Computing logic-step neighbors")
     if logic:
-        if mode == "embedding":
-            logic_index = _build_index(logic_x)
-            batch = _topk_pairs(logic_index, logic_x, logic, list(range(len(logic))), top_k=logic_top_k)
-        else:
-            batch = _lexical_topk_batch(logic, top_k=logic_top_k)
+        logic_index = _build_index(logic_x)
+        batch = _topk_pairs(logic_index, logic_x, logic, list(range(len(logic))), top_k=logic_top_k)
         with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
             client.replace_similar_logic_edges_batch(batch, model=model, built_at=built_at)
 
