@@ -97,7 +97,8 @@ def run_proposition_clustering(task_id: str | None = None) -> dict[str, Any]:
 
     except Exception as e:
         logger.error(f"Clustering task failed: {e}", exc_info=True)
-        return {"status": "failed", "error": str(e), "groups_created": 0, "propositions_clustered": 0}
+        # Re-raise to fail the task properly (don't return success-like payload)
+        raise RuntimeError(f"Proposition clustering failed: {str(e)}") from e
 
 
 def _clear_existing_proposition_groups(client: Neo4jClient) -> dict[str, int]:

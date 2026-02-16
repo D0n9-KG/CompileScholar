@@ -21,8 +21,10 @@ def get_embeddings_batch(texts: list[str], model: str | None = None) -> list[lis
         List of embedding vectors (each is list of floats)
 
     Raises:
-        RuntimeError: If API call fails
+        RuntimeError: If API call fails after retries
     """
+    import time
+
     if not texts:
         return []
 
@@ -44,24 +46,81 @@ def get_embeddings_batch(texts: list[str], model: str | None = None) -> list[lis
         "input": texts,
     }
 
-    # Make API call
-    try:
-        response = requests.post(url, headers=headers, json=payload, timeout=120)
-        response.raise_for_status()
-    except requests.exceptions.HTTPError as e:
-        raise RuntimeError(f"Embedding API error {e.response.status_code}: {e.response.text[:500]}")
-    except requests.exceptions.Timeout:
-        raise RuntimeError("Embedding API timeout after 120s")
-    except requests.exceptions.RequestException as e:
-        raise RuntimeError(f"Embedding API request failed: {str(e)}")
+    # Retry logic for transient errors
+    max_retries = 3
+    retry_delay = 5  # seconds
 
-    # Parse response
-    try:
-        data = response.json()
-        embeddings = [item["embedding"] for item in data["data"]]
-        return embeddings
-    except (KeyError, TypeError, ValueError) as e:
-        raise RuntimeError(f"Embedding API response parse error: {str(e)}")
+    def _is_retryable_error(exc: Exception) -> bool:
+        """Check if error is retryable (transient)."""
+        if isinstance(exc, requests.exceptions.HTTPError):
+            status_code = exc.response.status_code if exc.response else None
+            if isinstance(status_code, int):
+                return status_code in {408, 429, 500, 502, 503, 504}
+        error_text = str(exc).lower()
+        transient_signals = (
+            "502",
+            "503",
+            "504",
+            "timeout",
+            "timed out",
+            "connection reset",
+            "connection aborted",
+            "temporarily unavailable",
+            "rate limit",
+        )
+        return any(signal in error_text for signal in transient_signals)
+
+    # Make API call with retry
+    for attempt in range(max_retries):
+        try:
+            response = requests.post(url, headers=headers, json=payload, timeout=120)
+            response.raise_for_status()
+
+            # Parse response
+            try:
+                data = response.json()
+                embeddings = [item["embedding"] for item in data["data"]]
+                return embeddings
+            except (KeyError, TypeError, ValueError) as e:
+                raise RuntimeError(f"Embedding API response parse error: {str(e)}")
+
+        except requests.exceptions.HTTPError as e:
+            error_msg = f"Embedding API error {e.response.status_code}: {e.response.text[:500]}"
+            retryable = _is_retryable_error(e)
+            if retryable and attempt < max_retries - 1:
+                print(f"Clustering embedding attempt {attempt + 1}/{max_retries} failed: {error_msg}. Retrying in {retry_delay}s...")
+                time.sleep(retry_delay)
+            else:
+                reason = (
+                    f"non-retryable HTTP error on attempt {attempt + 1}/{max_retries}"
+                    if not retryable
+                    else f"embedding unavailable after {max_retries} attempts"
+                )
+                raise RuntimeError(f"Clustering embedding failed: {reason}. Error: {error_msg}")
+
+        except requests.exceptions.Timeout:
+            if attempt < max_retries - 1:
+                print(f"Clustering embedding attempt {attempt + 1}/{max_retries} timed out. Retrying in {retry_delay}s...")
+                time.sleep(retry_delay)
+            else:
+                raise RuntimeError(f"Clustering embedding failed: timeout after {max_retries} attempts (120s each)")
+
+        except requests.exceptions.RequestException as e:
+            error_msg = str(e)
+            retryable = _is_retryable_error(e)
+            if retryable and attempt < max_retries - 1:
+                print(f"Clustering embedding attempt {attempt + 1}/{max_retries} failed: {error_msg}. Retrying in {retry_delay}s...")
+                time.sleep(retry_delay)
+            else:
+                reason = (
+                    f"non-retryable request error on attempt {attempt + 1}/{max_retries}"
+                    if not retryable
+                    else f"embedding unavailable after {max_retries} attempts"
+                )
+                raise RuntimeError(f"Clustering embedding failed: {reason}. Error: {error_msg}")
+
+    # Should never reach here, but defensive
+    raise RuntimeError("Clustering embedding failed: retry loop exited without success or error")
 
 
 def cosine_similarity(vec_a: list[float], vec_b: list[float]) -> float:
