@@ -69,6 +69,12 @@ class Settings(BaseSettings):
         validation_alias=AliasChoices("EVOLUTION_MAX_SELF_LOOP_RATE"),
     )
 
+    # P1-Top3: Group-layer clustering control
+    group_clustering_threshold: float = Field(
+        default=0.85,
+        validation_alias=AliasChoices("GROUP_CLUSTERING_THRESHOLD"),
+    )
+
     ingest_llm_max_workers: int = Field(
         default=4,
         validation_alias=AliasChoices("INGEST_LLM_MAX_WORKERS"),
