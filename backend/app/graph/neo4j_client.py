@@ -182,15 +182,24 @@ MERGE (p)-[:HAS_CHUNK]->(ch)
         steps = []
         for idx, step_type in enumerate(step_order):
             v = (logic or {}).get(step_type) or {}
+
+            # P0 Fix: Defensive filter - skip empty logic steps
+            summary = v.get("summary") or ""
+            evidence_ids = list(v.get("evidence_chunk_ids") or [])
+
+            # Skip if both summary and evidence are empty
+            if not summary.strip() and not evidence_ids:
+                continue
+
             steps.append(
                 {
                     "logic_step_id": f"{paper_id}:{step_type}",
                     "paper_id": paper_id,
                     "step_type": step_type,
                     "order": int(v.get("order") if v.get("order") is not None else idx),
-                    "summary": v.get("summary"),
+                    "summary": summary,
                     "confidence": v.get("confidence"),
-                    "evidence_chunk_ids": list(v.get("evidence_chunk_ids") or []),
+                    "evidence_chunk_ids": evidence_ids,
                     "evidence_weak": bool(v.get("evidence_weak") or False),
                 }
             )

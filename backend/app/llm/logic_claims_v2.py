@@ -349,8 +349,14 @@ def extract_logic_and_claims_v2(doc: DocumentIR, paper_id: str, schema: dict[str
     norm_logic: dict[str, dict[str, Any]] = {}
     for sid in step_ids:
         v = (logic_in.get(sid) if isinstance(logic_in, dict) else {}) or {}
+        summary = str(v.get("summary") or "").strip()
+
+        # P0 Fix: Filter out empty summary logic steps
+        if not summary:
+            continue
+
         norm_logic[sid] = {
-            "summary": str(v.get("summary") or "").strip(),
+            "summary": summary,
             "confidence": float(v.get("confidence") or 0.5),
         }
 

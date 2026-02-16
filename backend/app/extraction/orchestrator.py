@@ -444,7 +444,19 @@ def _default_logic_extractor(*, doc: DocumentIR, paper_id: str, schema: dict[str
         except Exception:
             pass
     step_order = _enabled_step_ids(schema)
-    return {"logic": logic, "step_order": step_order}
+
+    # P0 Fix: Final sanitize - filter empty logic steps
+    # Remove steps with empty summary AND empty evidence
+    filtered_logic = {}
+    for step_id, step_data in logic.items():
+        summary = step_data.get("summary_machine") or step_data.get("summary") or ""
+        evidence = step_data.get("evidence_chunk_ids") or []
+
+        # Keep step if it has either summary or evidence
+        if summary.strip() or evidence:
+            filtered_logic[step_id] = step_data
+
+    return {"logic": filtered_logic, "step_order": step_order}
 
 
 def _priority_chunks(
@@ -1695,6 +1707,14 @@ def run_phase1_extraction(
     _attach_targets_from_citations(validated, cite_rec=cite_rec, schema=schema)
     _attach_targets_from_citations(rejected, cite_rec=cite_rec, schema=schema)
 
+    # P0 Fix: Check for empty logic steps
+    logic_steps_empty_count = 0
+    for step_id, step_data in logic.items():
+        summary = step_data.get("summary_machine") or step_data.get("summary") or ""
+        evidence = step_data.get("evidence_chunk_ids") or []
+        if not summary.strip() and not evidence:
+            logic_steps_empty_count += 1
+
     report = _quality_report(
         claims_merged=claims_merged,
         validated=validated,
@@ -1707,6 +1727,15 @@ def run_phase1_extraction(
     # Add noise filter stats to quality report
     if noise_filter_stats:
         report["noise_filter"] = noise_filter_stats
+
+    # P0 Fix: Add empty logic steps count to report and update gate
+    report["logic_steps_empty_count"] = logic_steps_empty_count
+    if logic_steps_empty_count > 0:
+        # Add to gate fail reasons if empty steps exist
+        gate_fail_reasons = list(report.get("gate_fail_reasons") or [])
+        gate_fail_reasons.append("empty_logic_steps")
+        report["gate_fail_reasons"] = gate_fail_reasons
+        report["gate_passed"] = False
 
     completeness_judgment = {
         "critical_slot_mode": report.get("critical_slot_mode"),
