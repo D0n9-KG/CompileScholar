@@ -436,8 +436,6 @@ def update_similarity_for_paper(
 
     claim_idx = {it.node_id: i for i, it in enumerate(claim_items)}
     logic_idx = {it.node_id: i for i, it in enumerate(logic_items)}
-    degradation_events: dict[str, list[str]] = {"claim": [], "logic": []}
-    degraded_kinds: set[str] = set()
 
     progress("similarity:update:fetch", 0.12, f"Fetching effective texts for {pid}")
     with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
@@ -453,6 +451,8 @@ def update_similarity_for_paper(
     def _apply_updates(
         kind: str, items: list[SimilarityItem], x: np.ndarray, idx_map: dict[str, int], updates: list[SimilarityItem]
     ):
+        import time
+
         changed: list[int] = []
         if not updates:
             return items, x, changed
@@ -461,13 +461,49 @@ def update_similarity_for_paper(
         vecs: list[list[float]] = []
         to_embed: list[SimilarityItem] = [u for u in updates if (u.text or "").strip()]
         if to_embed:
-            try:
-                vecs = embed.embed_documents([u.text for u in to_embed])
-            except Exception as exc:  # noqa: BLE001
-                msg = f"similarity update embedding failed ({kind}); using zero vectors: {exc}"
-                degradation_events.setdefault(kind, []).append(msg)
-                degraded_kinds.add(kind)
-                log(msg)
+            # Retry logic for embedding API (handles transient errors)
+            max_retries = 3
+            retry_delay = 5  # seconds
+
+            def _is_retryable_embedding_error(exc: Exception) -> bool:
+                status_code = getattr(exc, "status_code", None)
+                if isinstance(status_code, int):
+                    return status_code in {408, 429, 500, 502, 503, 504}
+                error_text = str(exc).lower()
+                transient_signals = (
+                    "502",
+                    "503",
+                    "504",
+                    "timeout",
+                    "timed out",
+                    "connection reset",
+                    "connection aborted",
+                    "temporarily unavailable",
+                    "rate limit",
+                )
+                return any(signal in error_text for signal in transient_signals)
+
+            for attempt in range(max_retries):
+                try:
+                    vecs = embed.embed_documents([u.text for u in to_embed])
+                    break  # Success - exit retry loop
+                except Exception as exc:  # noqa: BLE001
+                    error_msg = str(exc).strip()
+                    retryable = _is_retryable_embedding_error(exc)
+                    if retryable and attempt < max_retries - 1:
+                        log(f"similarity update embedding attempt {attempt + 1}/{max_retries} failed ({kind}): {error_msg}. Retrying in {retry_delay}s...")
+                        time.sleep(retry_delay)
+                    else:
+                        reason = (
+                            f"non-retryable embedding error on attempt {attempt + 1}/{max_retries}"
+                            if not retryable
+                            else f"embedding unavailable after {max_retries} attempts"
+                        )
+                        raise RuntimeError(
+                            f"Similarity update failed ({kind}): {reason}. "
+                            f"Error: {error_msg}. Please check embedding API configuration and try again."
+                        ) from exc
+
         u_x = _normalize_rows(np.array(vecs, dtype=np.float32)) if vecs else np.zeros((0, x.shape[1]), dtype=np.float32)
 
         dim = int(x.shape[1]) if x.ndim == 2 and x.shape[1] else (int(u_x.shape[1]) if u_x.ndim == 2 and u_x.shape[1] else 0)
@@ -503,24 +539,16 @@ def update_similarity_for_paper(
     claim_items, claim_x, claim_changed = _apply_updates("claim", claim_items, claim_x, claim_idx, new_claims)
     progress("similarity:update:embed_logic", 0.35, "Embedding updated logic steps")
     logic_items, logic_x, logic_changed = _apply_updates("logic", logic_items, logic_x, logic_idx, new_logic)
-    claim_degraded = bool(degradation_events.get("claim"))
-    logic_degraded = bool(degradation_events.get("logic"))
-    embedding_degraded = claim_degraded or logic_degraded
-    claim_mode = "lexical" if claim_degraded else "embedding"
-    logic_mode = "lexical" if logic_degraded else "embedding"
-    claim_degradation_reason = "; ".join(degradation_events.get("claim", []))[:500]
-    logic_degradation_reason = "; ".join(degradation_events.get("logic", []))[:500]
-    degradation_reason = "; ".join(degradation_events.get("claim", []) + degradation_events.get("logic", []))[:500]
-    if embedding_degraded:
-        log(f"similarity update degraded for {pid}: {degradation_reason}")
+
+    # Mode is always embedding (no lexical fallback)
+    mode = "embedding"
 
     progress("similarity:update:neighbors", 0.55, "Computing updated neighbors")
     with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
         if claim_items and claim_changed:
             changed_idx = sorted(set(claim_changed))
-            if claim_degraded:
-                active = []
-                cleared = list(changed_idx)
+            active = [i for i in changed_idx if (claim_items[i].text or "").strip()]
+            cleared = [i for i in changed_idx if not (claim_items[i].text or "").strip()]
             else:
                 active = [i for i in changed_idx if (claim_items[i].text or "").strip()]
                 cleared = [i for i in changed_idx if not (claim_items[i].text or "").strip()]
@@ -530,15 +558,11 @@ def update_similarity_for_paper(
                 batch.extend(_topk_pairs(idx, claim_x, claim_items, active, top_k=claim_top_k))
             for i in cleared:
                 batch.append({"source": claim_items[i].node_id, "targets": []})
-            client.replace_similar_claim_edges_batch(batch, model=model, built_at=built_at, mode=claim_mode)
+            client.replace_similar_claim_edges_batch(batch, model=model, built_at=built_at, mode=mode)
         if logic_items and logic_changed:
             changed_idx = sorted(set(logic_changed))
-            if logic_degraded:
-                active = []
-                cleared = list(changed_idx)
-            else:
-                active = [i for i in changed_idx if (logic_items[i].text or "").strip()]
-                cleared = [i for i in changed_idx if not (logic_items[i].text or "").strip()]
+            active = [i for i in changed_idx if (logic_items[i].text or "").strip()]
+            cleared = [i for i in changed_idx if not (logic_items[i].text or "").strip()]
             batch = []
             if active:
                 idx = _build_index(logic_x)
@@ -556,9 +580,7 @@ def update_similarity_for_paper(
                 {
                     "built_at": built_at,
                     "model": model,
-                    "mode": claim_mode,
-                    "embedding_degraded": claim_degraded,
-                    "degradation_reason": claim_degradation_reason,
+                    "mode": mode,
                 }, ensure_ascii=False),
             encoding="utf-8",
         )
@@ -570,9 +592,7 @@ def update_similarity_for_paper(
                 {
                     "built_at": built_at,
                     "model": model,
-                    "mode": logic_mode,
-                    "embedding_degraded": logic_degraded,
-                    "degradation_reason": logic_degradation_reason,
+                    "mode": mode,
                 }, ensure_ascii=False),
             encoding="utf-8",
         )
@@ -585,9 +605,6 @@ def update_similarity_for_paper(
         "built_at": built_at,
         "model": model,
         "claims_updated": len(set(claim_changed)),
-        "mode": claim_mode if claim_mode == logic_mode else "mixed",
-        "embedding_degraded": embedding_degraded,
-        "degradation_reason": degradation_reason,
-        "degraded_kinds": sorted(degraded_kinds),
+        "mode": mode,
         "logic_steps_updated": len(set(logic_changed)),
     }
