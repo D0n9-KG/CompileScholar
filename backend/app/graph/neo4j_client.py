@@ -337,8 +337,14 @@ SET c.total_mentions = cr.total_mentions,
     c.ref_nums = cr.ref_nums,
     c.evidence_chunk_ids = cr.evidence_chunk_ids,
     c.evidence_spans = cr.evidence_spans,
-    c.purpose_labels = coalesce(c.purpose_labels, []),
-    c.purpose_scores = coalesce(c.purpose_scores, [])
+    c.purpose_labels = CASE
+        WHEN c.purpose_labels IS NULL OR size(c.purpose_labels) = 0 THEN ['Background']
+        ELSE c.purpose_labels
+    END,
+    c.purpose_scores = CASE
+        WHEN c.purpose_scores IS NULL OR size(c.purpose_scores) = 0 THEN [0.2]
+        ELSE c.purpose_scores
+    END
 WITH p
 UNWIND $cites_unresolved AS cu
 MATCH (re:ReferenceEntry {ref_id: cu.ref_id})
@@ -2156,8 +2162,14 @@ SET c.total_mentions = u.total_mentions,
     c.evidence_chunk_ids = u.evidence_chunk_ids,
     c.evidence_spans = u.evidence_spans,
     c.ref_nums = u.ref_nums,
-    c.purpose_labels = coalesce(c.purpose_labels, []),
-    c.purpose_scores = coalesce(c.purpose_scores, [])
+    c.purpose_labels = CASE
+        WHEN c.purpose_labels IS NULL OR size(c.purpose_labels) = 0 THEN ['Background']
+        ELSE c.purpose_labels
+    END,
+    c.purpose_scores = CASE
+        WHEN c.purpose_scores IS NULL OR size(c.purpose_scores) = 0 THEN [0.2]
+        ELSE c.purpose_scores
+    END
 DELETE u
 SET re.resolved_doi = $cited_paper.doi,
     re.resolve_confidence = 1.0
@@ -2249,8 +2261,14 @@ SET c.total_mentions = coalesce(c.total_mentions, 0) + coalesce(u.total_mentions
     c.ref_nums = ref_nums_merged,
     c.evidence_chunk_ids = evidence_chunk_ids_merged[0..$max_evidence_idx],
     c.evidence_spans = evidence_spans_merged[0..$max_evidence_idx],
-    c.purpose_labels = coalesce(c.purpose_labels, []),
-    c.purpose_scores = coalesce(c.purpose_scores, [])
+    c.purpose_labels = CASE
+        WHEN c.purpose_labels IS NULL OR size(c.purpose_labels) = 0 THEN ['Background']
+        ELSE c.purpose_labels
+    END,
+    c.purpose_scores = CASE
+        WHEN c.purpose_scores IS NULL OR size(c.purpose_scores) = 0 THEN [0.2]
+        ELSE c.purpose_scores
+    END
 DELETE u
 SET re.resolved_doi = $doi,
     re.resolve_confidence = $confidence,
@@ -2289,3 +2307,57 @@ SET c.purpose_labels = $labels,
                 labels=labels,
                 scores=scores,
             )
+
+    def backfill_missing_citation_purposes(
+        self,
+        citing_paper_id: str,
+        default_label: str = "Background",
+        default_score: float = 0.2,
+    ) -> int:
+        """Backfill missing citation purpose labels for all CITES edges of a paper.
+
+        Defense-in-depth: Ensures every CITES edge from a citing paper has non-empty
+        purpose_labels and purpose_scores. This fixes edge cases where purpose labels
+        were not set during initial ingestion or reference resolution.
+
+        Args:
+            citing_paper_id: Paper ID of the citing paper
+            default_label: Default purpose label to use (default: "Background")
+            default_score: Default confidence score (default: 0.2, range: 0.0-1.0)
+
+        Returns:
+            Number of CITES edges that were backfilled
+        """
+        pid = str(citing_paper_id or "").strip()
+        if not pid:
+            return 0
+
+        # Validate and normalize inputs
+        label = str(default_label or "").strip() or "Background"
+        try:
+            score = float(default_score)
+        except (ValueError, TypeError):
+            score = 0.2
+        score = max(0.0, min(1.0, score))  # Clamp to [0.0, 1.0]
+
+        cypher = """
+MATCH (p:Paper {paper_id:$citing_paper_id})-[c:CITES]->(:Paper)
+WHERE c.purpose_labels IS NULL OR size(c.purpose_labels) = 0
+   OR c.purpose_scores IS NULL OR size(c.purpose_scores) = 0
+SET c.purpose_labels = CASE
+        WHEN c.purpose_labels IS NULL OR size(c.purpose_labels) = 0 THEN [$label]
+        ELSE c.purpose_labels
+    END,
+    c.purpose_scores = CASE
+        WHEN c.purpose_scores IS NULL OR size(c.purpose_scores) = 0 THEN [$score]
+        ELSE c.purpose_scores
+    END
+RETURN count(c) AS updated
+"""
+        with self._driver.session() as session:
+            result = session.run(cypher, citing_paper_id=pid, label=label, score=score)
+            row = result.single()
+
+        if not row:
+            return 0
+        return int(row["updated"] or 0)

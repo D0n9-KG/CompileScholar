@@ -391,6 +391,28 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
                     labels=p["labels"],
                     scores=p["scores"],
                 )
+
+            # P1 Fix: Backfill any remaining missing citation purposes (defense-in-depth)
+            # This catches edge cases where purpose labels weren't set during reference resolution
+            try:
+                backfilled_count = client.backfill_missing_citation_purposes(
+                    citing_paper_id=paper_id,
+                    default_label="Background",
+                    default_score=0.2,
+                )
+                if backfilled_count > 0:
+                    logger.info(
+                        "Backfilled %d missing citation purpose labels for paper_id=%s",
+                        backfilled_count,
+                        paper_id,
+                    )
+            except Exception as e:
+                logger.warning(
+                    "Failed to backfill citation purposes for paper_id=%s: %s",
+                    paper_id,
+                    str(e),
+                    exc_info=True,  # Include stack trace for debugging
+                )
         return propositions_written
 
     propositions_written = 0
