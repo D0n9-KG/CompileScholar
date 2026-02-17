@@ -320,51 +320,64 @@ SET e.weak = false
     ) -> None:
         cypher = """
 MATCH (p:Paper {paper_id: $paper_id})
-WITH p
-UNWIND $refs AS r
-MERGE (re:ReferenceEntry {ref_id: r.ref_id})
-SET re += r
-MERGE (p)-[:HAS_REFERENCE]->(re)
-WITH p
-UNWIND $cited_papers AS cp
-MERGE (q:Paper {paper_id: cp.paper_id})
-ON CREATE SET q += cp
-ON MATCH SET
-    q.paper_id = cp.paper_id,
-    q.doi = CASE
-        WHEN cp.doi IS NULL OR trim(toString(cp.doi)) = '' THEN q.doi
-        ELSE cp.doi
-    END,
-    q.title = coalesce(q.title, cp.title),
-    q.authors = coalesce(q.authors, cp.authors),
-    q.year = coalesce(q.year, cp.year),
-    q.abstract = coalesce(q.abstract, cp.abstract),
-    q.paper_source = coalesce(q.paper_source, cp.paper_source),
-    q.md_path = coalesce(q.md_path, cp.md_path)
-WITH p
-UNWIND $cites_resolved AS cr
-MATCH (q:Paper {paper_id: cr.cited_paper_id})
-MERGE (p)-[c:CITES]->(q)
-SET c.total_mentions = cr.total_mentions,
-    c.ref_nums = cr.ref_nums,
-    c.evidence_chunk_ids = cr.evidence_chunk_ids,
-    c.evidence_spans = cr.evidence_spans,
-    c.purpose_labels = CASE
-        WHEN c.purpose_labels IS NULL OR size(c.purpose_labels) = 0 THEN ['Background']
-        ELSE c.purpose_labels
-    END,
-    c.purpose_scores = CASE
-        WHEN c.purpose_scores IS NULL OR size(c.purpose_scores) = 0 THEN [0.2]
-        ELSE c.purpose_scores
-    END
-WITH p
-UNWIND $cites_unresolved AS cu
-MATCH (re:ReferenceEntry {ref_id: cu.ref_id})
-MERGE (p)-[u:CITES_UNRESOLVED]->(re)
-SET u.total_mentions = cu.total_mentions,
-    u.ref_nums = cu.ref_nums,
-    u.evidence_chunk_ids = cu.evidence_chunk_ids,
-    u.evidence_spans = cu.evidence_spans
+CALL {
+    WITH p
+    UNWIND $refs AS r
+    MERGE (re:ReferenceEntry {ref_id: r.ref_id})
+    SET re += r
+    MERGE (p)-[:HAS_REFERENCE]->(re)
+    RETURN count(*) AS refs_written
+}
+CALL {
+    WITH p
+    UNWIND $cited_papers AS cp
+    MERGE (q:Paper {paper_id: cp.paper_id})
+    ON CREATE SET q += cp
+    ON MATCH SET
+        q.paper_id = cp.paper_id,
+        q.doi = CASE
+            WHEN cp.doi IS NULL OR trim(toString(cp.doi)) = '' THEN q.doi
+            ELSE cp.doi
+        END,
+        q.title = coalesce(q.title, cp.title),
+        q.authors = coalesce(q.authors, cp.authors),
+        q.year = coalesce(q.year, cp.year),
+        q.abstract = coalesce(q.abstract, cp.abstract),
+        q.paper_source = coalesce(q.paper_source, cp.paper_source),
+        q.md_path = coalesce(q.md_path, cp.md_path)
+    RETURN count(*) AS cited_papers_written
+}
+CALL {
+    WITH p
+    UNWIND $cites_resolved AS cr
+    MATCH (q:Paper {paper_id: cr.cited_paper_id})
+    MERGE (p)-[c:CITES]->(q)
+    SET c.total_mentions = cr.total_mentions,
+        c.ref_nums = cr.ref_nums,
+        c.evidence_chunk_ids = cr.evidence_chunk_ids,
+        c.evidence_spans = cr.evidence_spans,
+        c.purpose_labels = CASE
+            WHEN c.purpose_labels IS NULL OR size(c.purpose_labels) = 0 THEN ['Background']
+            ELSE c.purpose_labels
+        END,
+        c.purpose_scores = CASE
+            WHEN c.purpose_scores IS NULL OR size(c.purpose_scores) = 0 THEN [0.2]
+            ELSE c.purpose_scores
+        END
+    RETURN count(*) AS cites_resolved_written
+}
+CALL {
+    WITH p
+    UNWIND $cites_unresolved AS cu
+    MATCH (re:ReferenceEntry {ref_id: cu.ref_id})
+    MERGE (p)-[u:CITES_UNRESOLVED]->(re)
+    SET u.total_mentions = cu.total_mentions,
+        u.ref_nums = cu.ref_nums,
+        u.evidence_chunk_ids = cu.evidence_chunk_ids,
+        u.evidence_spans = cu.evidence_spans
+    RETURN count(*) AS cites_unresolved_written
+}
+RETURN p.paper_id AS paper_id
 """
         with self._driver.session() as session:
             session.run(

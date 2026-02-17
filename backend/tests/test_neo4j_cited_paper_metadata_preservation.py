@@ -91,6 +91,40 @@ class TestUpsertCitedPaperMetadataPreservation:
         cypher = _extract_upsert_cypher()
         assert "coalesce(q.md_path, cp.md_path)" in cypher, "md_path must be protected with coalesce"
 
+    def test_independent_call_blocks_prevent_empty_list_short_circuit(self):
+        """
+        Each UNWIND stage must be in an independent CALL { WITH p ... } block.
+
+        Root cause: chained UNWIND via 'WITH p / UNWIND' at outer scope means an
+        empty first list (e.g. $refs=[]) collapses all downstream stages.  Independent
+        CALL blocks guarantee each stage runs regardless of the others.
+        """
+        cypher = _extract_upsert_cypher()
+
+        # Each list must have its own CALL block
+        assert "UNWIND $refs" in cypher
+        assert "UNWIND $cited_papers" in cypher
+        assert "UNWIND $cites_resolved" in cypher
+        assert "UNWIND $cites_unresolved" in cypher
+
+        # Must use at least 4 CALL blocks (one per UNWIND stage)
+        assert cypher.count("CALL {") >= 4, "Each of the four UNWIND stages must be inside its own CALL block"
+
+        # Verify structural integrity: every UNWIND $<list> must appear inside a CALL block.
+        # We detect this by checking that no UNWIND appears OUTSIDE a CALL (i.e., at the outer query level).
+        # A UNWIND at outer level would be preceded by a '}' closing a prior CALL block then a newline,
+        # or immediately after 'WITH p' without an enclosing 'CALL {'.
+        # Simple proxy: count CALL blocks vs UNWIND $param occurrences - they must be equal.
+        call_block_count = cypher.count("CALL {")
+        unwind_param_count = sum(
+            1 for kw in ("$refs", "$cited_papers", "$cites_resolved", "$cites_unresolved")
+            if f"UNWIND {kw}" in cypher
+        )
+        assert call_block_count >= unwind_param_count, (
+            f"Expected at least {unwind_param_count} CALL blocks for {unwind_param_count} UNWIND stages, "
+            f"got {call_block_count}"
+        )
+
 
 # ---------------------------------------------------------------------------
 # Tests for resolve_reference Cypher
