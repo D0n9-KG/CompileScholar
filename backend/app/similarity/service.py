@@ -549,9 +549,6 @@ def update_similarity_for_paper(
             changed_idx = sorted(set(claim_changed))
             active = [i for i in changed_idx if (claim_items[i].text or "").strip()]
             cleared = [i for i in changed_idx if not (claim_items[i].text or "").strip()]
-            else:
-                active = [i for i in changed_idx if (claim_items[i].text or "").strip()]
-                cleared = [i for i in changed_idx if not (claim_items[i].text or "").strip()]
             batch = []
             if active:
                 idx = _build_index(claim_x)
