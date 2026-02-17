@@ -701,7 +701,51 @@ def _merge_claim_candidates(
             str(x.get("claim_key") or ""),
         )
     )
-    return out
+
+    # P1 Fix: Cross-step claim_id collision resolution.
+    # bucket_key includes step_type, but claim_id does not. Same canonical text in
+    # different steps lands in separate buckets but produces the same claim_id.
+    # Strategy: keep the highest-priority step's record, but merge evidence
+    # (kinds, origin_chunk_ids, worker_ids) from lower-priority duplicates so no
+    # evidence is silently discarded.
+    primary: dict[str, dict[str, Any]] = {}  # claim_id → kept item (highest priority)
+    for item in out:
+        claim_id = str(item.get("claim_id") or item.get("canonical_claim_id") or "").strip()
+        if not claim_id:
+            continue
+        if claim_id not in primary:
+            primary[claim_id] = dict(item)
+            # Promote kinds/origin_chunk_ids to mutable for later merging
+            primary[claim_id]["kinds"] = list(item.get("kinds") or [])
+            primary[claim_id]["origin_chunk_ids"] = list(item.get("origin_chunk_ids") or [])
+            primary[claim_id]["worker_ids"] = sorted(item.get("worker_ids") or [])
+        else:
+            kept = primary[claim_id]
+            logger.warning(
+                "Phase1 merge: cross-step claim_id collision claim_id=%s "
+                "discarded_step_type=%s (keeping step_type=%s); merging evidence",
+                claim_id,
+                str(item.get("step_type") or "").strip(),
+                str(kept.get("step_type") or "").strip(),
+            )
+            # Merge evidence from the discarded duplicate into the kept item
+            for k in list(item.get("kinds") or []):
+                if k not in kept["kinds"]:
+                    kept["kinds"].append(k)
+            for cid in list(item.get("origin_chunk_ids") or []):
+                if cid not in kept["origin_chunk_ids"]:
+                    kept["origin_chunk_ids"].append(cid)
+            wids = set(kept.get("worker_ids") or []) | set(item.get("worker_ids") or [])
+            kept["worker_ids"] = sorted(wids)
+            # Keep first origin_chunk_id consistent
+            if kept["origin_chunk_ids"]:
+                kept["origin_chunk_id"] = kept["origin_chunk_ids"][0]
+
+    # Re-apply original sort order (primary dict preserves insertion order = priority order)
+    deduped_out = list(primary.values())
+    # Re-sort items that have no claim_id (edge case: pass-through)
+    no_id = [item for item in out if not str(item.get("claim_id") or item.get("canonical_claim_id") or "").strip()]
+    return deduped_out + no_id
 
 
 def _tokens(s: str, *, stop_tokens: set[str] | None = None) -> list[str]:
