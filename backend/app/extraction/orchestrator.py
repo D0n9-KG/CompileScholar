@@ -1518,6 +1518,7 @@ def _quality_report(
         1 for j in judgments if str(j.get("judge_mode") or "").strip().lower() == "lexical"
     )
     grounding_fallback_count = sum(1 for j in judgments if bool(j.get("judge_fallback")))
+    grounding_semantic_coverage_rate = float(grounding_semantic_judged) / float(max(1, total))
 
     min_supported = _rule_float(rules, "phase1_gate_supported_ratio_min", 0.5)
     min_coverage = _rule_float(rules, "phase1_gate_step_coverage_min", 0.4)
@@ -1525,6 +1526,7 @@ def _quality_report(
     max_conflict = _rule_float(rules, "phase2_gate_conflict_rate_max", 1.0)
     min_conflict_comparable_pairs = max(0, _rule_int(rules, "phase2_conflict_gate_min_comparable_pairs", 3))
     min_conflict_pairs = max(0, _rule_int(rules, "phase2_conflict_gate_min_conflict_pairs", 1))
+    min_semantic_coverage = _rule_float(rules, "phase1_gate_semantic_coverage_min", 0.0)
     comparable_pairs = int(conflict.get("comparable_pairs") or 0)
     conflict_pairs = int(conflict.get("conflict_pairs") or 0)
     conflict_gate_skip_reasons: list[str] = []
@@ -1545,6 +1547,11 @@ def _quality_report(
         gate_fail_reasons.append("critical_slot_coverage")
     if (not conflict_gate_skipped) and float(conflict.get("conflict_rate") or 0.0) > max_conflict:
         gate_fail_reasons.append("conflict_rate")
+    # P1 Fix: Hybrid/semantic grounding coverage gate.
+    # When min_semantic_coverage > 0.0, gate fails if fewer claims went through semantic judgment
+    # than the configured minimum ratio (default: 0.0 = disabled, backwards compatible).
+    if min_semantic_coverage > 0.0 and grounding_semantic_coverage_rate < min_semantic_coverage:
+        gate_fail_reasons.append("semantic_coverage")
     gate_passed = not gate_fail_reasons
     tier_info = _quality_tier_from_failures(gate_fail_reasons, rules=rules)
 
@@ -1559,6 +1566,7 @@ def _quality_report(
         "grounding_mode_used": grounding_mode_used,
         "grounding_semantic_judged": grounding_semantic_judged,
         "grounding_lexical_judged": grounding_lexical_judged,
+        "grounding_semantic_coverage_rate": grounding_semantic_coverage_rate,
         "grounding_fallback_count": grounding_fallback_count,
         "critical_slot_mode": completeness.get("critical_slot_mode"),
         "critical_steps": list(completeness.get("critical_steps") or []),
@@ -1607,6 +1615,7 @@ def _quality_report(
             "phase1_grounding_mode": grounding_mode_used,
             "phase1_grounding_semantic_supported_min": _rule_float(rules, "phase1_grounding_semantic_supported_min", 0.75),
             "phase1_grounding_semantic_weak_min": _rule_float(rules, "phase1_grounding_semantic_weak_min", 0.55),
+            "phase1_gate_semantic_coverage_min": min_semantic_coverage,
             "phase2_conflict_mode": str(conflict.get("conflict_mode_used") or "lexical"),
             "phase2_conflict_semantic_threshold": float(conflict.get("conflict_semantic_threshold") or 0.0),
             "phase2_conflict_gate_min_comparable_pairs": min_conflict_comparable_pairs,
