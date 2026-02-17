@@ -1,12 +1,15 @@
 from __future__ import annotations
 
-import json
+import pytest
 
 from app.similarity import service as similarity_service
 
 
 def test_embedding_502_degradation_is_explicit(monkeypatch, tmp_path):
-    captured: dict[str, str | None] = {"claim_mode": None}
+    """
+    When embedding API returns 502, rebuild_similarity_global raises RuntimeError
+    after exhausting all 3 retries.  No lexical fallback exists in current code.
+    """
 
     class _FakeNeo4jClient:
         def __init__(self, *args, **kwargs) -> None:
@@ -27,40 +30,44 @@ def test_embedding_502_degradation_is_explicit(monkeypatch, tmp_path):
         def list_logic_step_similarity_rows(self, paper_id: str | None = None):
             return []
 
-        def replace_similar_claim_edges_batch(self, items, model, built_at, mode="embedding"):
-            captured["claim_mode"] = mode
-
-        def replace_similar_logic_edges_batch(self, items, model, built_at):
-            return None
-
     class _FailingEmbeddingClient:
         def embed_documents(self, texts):
             raise RuntimeError("Embedding API error 502: Bad Gateway")
 
-    claim_meta_path = tmp_path / "claim_meta.json"
-    logic_meta_path = tmp_path / "logic_meta.json"
+    # Track sleep calls so the test doesn't actually pause for 10 seconds.
+    sleep_calls: list[float] = []
+    monkeypatch.setattr("time.sleep", lambda seconds: sleep_calls.append(seconds))
 
     monkeypatch.setattr(similarity_service, "Neo4jClient", _FakeNeo4jClient)
-    monkeypatch.setattr(similarity_service, "faiss", object())  # ensure degradation is from embedding, not faiss missing
+    # Ensure faiss is non-None so the failure comes from embedding, not from missing faiss.
+    monkeypatch.setattr(similarity_service, "faiss", object())
     monkeypatch.setattr(similarity_service, "_embedding_client", lambda: _FailingEmbeddingClient())
     monkeypatch.setattr(similarity_service, "_write_items", lambda kind, items: None)
     monkeypatch.setattr(similarity_service, "_save_embeddings", lambda kind, x: None)
     monkeypatch.setattr(
         similarity_service,
         "_meta_path",
-        lambda kind: claim_meta_path if kind == "claim" else logic_meta_path,
+        lambda kind: tmp_path / f"{kind}_meta.json",
     )
 
     logs: list[str] = []
-    out = similarity_service.rebuild_similarity_global(log=logs.append)
 
-    assert out["mode"] == "lexical"
-    assert out["embedding_degraded"] is True
-    assert "502" in str(out["degradation_reason"])
-    assert captured["claim_mode"] == "lexical"
-    assert any("falling back to lexical mode" in line for line in logs)
+    with pytest.raises(RuntimeError) as ctx:
+        similarity_service.rebuild_similarity_global(log=logs.append)
 
-    claim_meta = json.loads(claim_meta_path.read_text(encoding="utf-8"))
-    assert claim_meta["mode"] == "lexical"
-    assert claim_meta["embedding_degraded"] is True
-    assert "502" in str(claim_meta["degradation_reason"])
+    error_msg = str(ctx.value)
+    # Error message must mention retries exhausted and the original 502.
+    assert "3 attempts" in error_msg
+    assert "embedding unavailable" in error_msg.lower()
+    assert "502" in error_msg
+
+    # Two sleeps: after attempt 1 and after attempt 2 (not after the final failure).
+    assert sleep_calls == [5, 5]
+
+    # No meta files written – exception occurred before any successful embedding.
+    assert not (tmp_path / "claim_meta.json").exists()
+    assert not (tmp_path / "logic_meta.json").exists()
+
+    # Retry progress was logged.
+    assert any("attempt 1/3" in line.lower() for line in logs)
+    assert any("failed after 3 attempts" in line.lower() for line in logs)

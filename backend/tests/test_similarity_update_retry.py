@@ -1,117 +1,197 @@
 """
-Test retry logic for update_similarity_for_paper (Commit 1: remove lexical fallback)
+Test retry logic for update_similarity_for_paper: embedding retries, no lexical fallback.
+
+These tests exercise the incremental similarity-update path.  The environment is
+set up with mock cached files so update_similarity_for_paper takes the hot path
+(not the rebuild fallthrough) and we can control embedding success/failure via
+monkeypatching _embedding_client.
 """
-import unittest
-from unittest.mock import MagicMock, patch
+from __future__ import annotations
+
+import json
+
 import numpy as np
+import pytest
 
-from app.similarity.service import update_similarity_for_paper
+from app.similarity import service as similarity_service
 
 
-class TestSimilarityUpdateRetry(unittest.TestCase):
-    """Test that update_similarity_for_paper retries embedding failures and never falls back to lexical."""
+# ---------------------------------------------------------------------------
+# Shared environment setup
+# ---------------------------------------------------------------------------
 
-    def test_embedding_retry_success_on_third_attempt(self):
-        """Test that embedding succeeds on 3rd attempt with no degradation."""
-        paper_id = "test_paper_001"
+def _setup_update_similarity_env(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path,
+    claim_rows: list[dict[str, str]],
+    logic_rows: list[dict[str, str]],
+) -> None:
+    """
+    Create minimal on-disk similarity stores so update_similarity_for_paper
+    takes the incremental (hot) code path instead of falling through to
+    rebuild_similarity_global.
+    """
+    claim_items_path = tmp_path / "claim_items.jsonl"
+    logic_items_path = tmp_path / "logic_items.jsonl"
+    claim_meta_path = tmp_path / "claim_meta.json"
+    logic_meta_path = tmp_path / "logic_meta.json"
+    claim_emb_path = tmp_path / "claim_embeddings.npy"
+    logic_emb_path = tmp_path / "logic_embeddings.npy"
 
-        # Mock Neo4j client to return test data
-        with patch("app.similarity.service.Neo4jClient") as mock_neo4j_cls:
-            mock_client = MagicMock()
-            mock_neo4j_cls.return_value.__enter__.return_value = mock_client
+    # Empty item stores (no prior embeddings – new items will be embedded fresh).
+    claim_items_path.write_text("", encoding="utf-8")
+    logic_items_path.write_text("", encoding="utf-8")
 
-            # Setup: claims and logic steps exist
-            mock_client.list_propositions_for_paper.return_value = [
-                {"prop_id": "claim_001", "text": "Test claim 1"}
-            ]
-            mock_client.list_logic_steps_for_paper.return_value = [
-                {"step_id": "logic_001", "description": "Test logic 1"}
-            ]
+    # Meta signals that prior mode was embedding so the hot path is taken.
+    claim_meta_path.write_text(json.dumps({"mode": "embedding"}), encoding="utf-8")
+    logic_meta_path.write_text(json.dumps({"mode": "embedding"}), encoding="utf-8")
 
-            # Mock embedding function to fail twice, then succeed
-            call_count = {"count": 0}
+    # Zero-row embedding matrices (dim=3 to give a valid shape).
+    np.save(str(claim_emb_path), np.zeros((0, 3), dtype=np.float32))
+    np.save(str(logic_emb_path), np.zeros((0, 3), dtype=np.float32))
 
-            def mock_embed(*args, **kwargs):
-                call_count["count"] += 1
-                if call_count["count"] < 3:
-                    raise RuntimeError("Error code: 502")
-                # Success on 3rd call
-                import numpy as np
-                return np.array([[0.1, 0.2, 0.3]])
+    item_paths = {"claim": claim_items_path, "logic": logic_items_path}
+    meta_paths = {"claim": claim_meta_path, "logic": logic_meta_path}
+    emb_paths = {"claim": claim_emb_path, "logic": logic_emb_path}
 
-            with patch("app.similarity.service._embed_items", side_effect=mock_embed):
-                # Should succeed after retry
-                result = update_similarity_for_paper(paper_id)
+    class _FakeNeo4jClient:
+        def __init__(self, *args, **kwargs) -> None:
+            pass
 
-                # Verify no degradation
-                self.assertTrue(result.get("ok"))
-                self.assertEqual(result.get("mode"), "embedding")
-                self.assertIsNone(result.get("degraded_kinds"))
-                self.assertIsNone(result.get("degradation_events"))
+        def __enter__(self):
+            return self
 
-                # Verify retry happened (3 calls total)
-                self.assertEqual(call_count["count"], 3)
+        def __exit__(self, exc_type, exc, tb):
+            return False
 
-    def test_embedding_retry_fails_after_three_attempts(self):
-        """Test that embedding failure after 3 retries raises clear error."""
-        paper_id = "test_paper_002"
+        def list_claim_similarity_rows(self, paper_id: str | None = None):
+            return claim_rows
 
-        with patch("app.similarity.service.Neo4jClient") as mock_neo4j_cls:
-            mock_client = MagicMock()
-            mock_neo4j_cls.return_value.__enter__.return_value = mock_client
+        def list_logic_step_similarity_rows(self, paper_id: str | None = None):
+            return logic_rows
 
-            mock_client.list_propositions_for_paper.return_value = [
-                {"prop_id": "claim_002", "text": "Test claim 2"}
-            ]
-            mock_client.list_logic_steps_for_paper.return_value = []
+        def replace_similar_claim_edges_batch(self, items, model, built_at, mode="embedding"):
+            return None
 
-            # Mock embedding to always fail
-            call_count = {"count": 0}
+        def replace_similar_logic_edges_batch(self, items, model, built_at):
+            return None
 
-            def mock_embed_fail(*args, **kwargs):
-                call_count["count"] += 1
+    monkeypatch.setattr(similarity_service, "Neo4jClient", _FakeNeo4jClient)
+    monkeypatch.setattr(similarity_service, "_items_path", lambda kind: item_paths[kind])
+    monkeypatch.setattr(similarity_service, "_meta_path", lambda kind: meta_paths[kind])
+    monkeypatch.setattr(similarity_service, "_emb_path", lambda kind: emb_paths[kind])
+
+    # Avoid real faiss dependency for neighbor computation.
+    monkeypatch.setattr(similarity_service, "faiss", object())
+    monkeypatch.setattr(similarity_service, "_build_index", lambda _x: object())
+    monkeypatch.setattr(similarity_service, "_topk_pairs", lambda *args, **kwargs: [])
+
+    # Keep file writes non-destructive (items/embeddings; meta writes are tested separately).
+    monkeypatch.setattr(similarity_service, "_write_items", lambda kind, items: None)
+    monkeypatch.setattr(similarity_service, "_save_embeddings", lambda kind, x: None)
+
+
+# ---------------------------------------------------------------------------
+# Tests
+# ---------------------------------------------------------------------------
+
+def test_embedding_retry_success_on_third_attempt(monkeypatch, tmp_path):
+    """Embedding succeeds on 3rd attempt; result shows mode=embedding, no degradation."""
+    paper_id = "test_paper_001"
+    _setup_update_similarity_env(
+        monkeypatch,
+        tmp_path,
+        claim_rows=[{"node_id": "claim_001", "paper_id": paper_id, "text": "Test claim 1"}],
+        logic_rows=[],
+    )
+
+    sleep_calls: list[float] = []
+    monkeypatch.setattr("time.sleep", lambda seconds: sleep_calls.append(seconds))
+
+    call_count = {"count": 0}
+
+    class _FlakyEmbeddingClient:
+        def embed_documents(self, texts):
+            call_count["count"] += 1
+            if call_count["count"] < 3:
                 raise RuntimeError("Error code: 502")
+            return [[0.1, 0.2, 0.3] for _ in texts]
 
-            with patch("app.similarity.service._embed_items", side_effect=mock_embed_fail):
-                # Should raise RuntimeError after 3 attempts
-                with self.assertRaises(RuntimeError) as ctx:
-                    update_similarity_for_paper(paper_id)
+    monkeypatch.setattr(similarity_service, "_embedding_client", lambda: _FlakyEmbeddingClient())
 
-                error_msg = str(ctx.exception)
-                # Verify error mentions attempts and kind
-                self.assertIn("3 attempts", error_msg)
-                self.assertIn("embedding unavailable", error_msg.lower())
+    result = similarity_service.update_similarity_for_paper(paper_id)
 
-                # Verify 3 retries happened
-                self.assertEqual(call_count["count"], 3)
-
-    def test_embedding_never_falls_back_to_lexical(self):
-        """Test that lexical fallback is completely removed - no lexical mode in results."""
-        paper_id = "test_paper_003"
-
-        with patch("app.similarity.service.Neo4jClient") as mock_neo4j_cls:
-            mock_client = MagicMock()
-            mock_neo4j_cls.return_value.__enter__.return_value = mock_client
-
-            mock_client.list_propositions_for_paper.return_value = [
-                {"prop_id": "claim_003", "text": "Test claim 3"}
-            ]
-            mock_client.list_logic_steps_for_paper.return_value = []
-
-            # Success case
-            import numpy as np
-            with patch("app.similarity.service._embed_items", return_value=np.array([[0.1, 0.2, 0.3]])):
-                result = update_similarity_for_paper(paper_id)
-
-                # Verify mode is embedding, never lexical
-                self.assertEqual(result.get("mode"), "embedding")
-                self.assertNotEqual(result.get("mode"), "lexical")
-                self.assertNotEqual(result.get("mode"), "mixed")
-
-                # Verify no degradation fields
-                self.assertNotIn("degraded_kinds", result)
-                self.assertNotIn("degradation_events", result)
+    assert result.get("ok") is True
+    assert result.get("mode") == "embedding"
+    assert "degraded_kinds" not in result
+    assert "degradation_events" not in result
+    # embed_documents called exactly 3 times (2 failures + 1 success)
+    assert call_count["count"] == 3
+    # sleep called after each failure (attempts 1 and 2), but not after success
+    assert sleep_calls == [5, 5]
 
 
-if __name__ == "__main__":
-    unittest.main()
+def test_embedding_retry_fails_after_three_attempts(monkeypatch, tmp_path):
+    """Embedding that always fails raises a clear RuntimeError after 3 attempts."""
+    paper_id = "test_paper_002"
+    _setup_update_similarity_env(
+        monkeypatch,
+        tmp_path,
+        claim_rows=[{"node_id": "claim_002", "paper_id": paper_id, "text": "Test claim 2"}],
+        logic_rows=[],
+    )
+
+    sleep_calls: list[float] = []
+    monkeypatch.setattr("time.sleep", lambda seconds: sleep_calls.append(seconds))
+
+    call_count = {"count": 0}
+
+    class _FailingEmbeddingClient:
+        def embed_documents(self, texts):
+            call_count["count"] += 1
+            raise RuntimeError("Error code: 502")
+
+    monkeypatch.setattr(similarity_service, "_embedding_client", lambda: _FailingEmbeddingClient())
+
+    with pytest.raises(RuntimeError) as ctx:
+        similarity_service.update_similarity_for_paper(paper_id)
+
+    error_msg = str(ctx.value)
+    assert "3 attempts" in error_msg
+    assert "embedding unavailable" in error_msg.lower()
+    # embed_documents was called exactly 3 times
+    assert call_count["count"] == 3
+    # sleep called between retries (after attempt 1 and 2, not after 3)
+    assert sleep_calls == [5, 5]
+
+
+def test_embedding_never_falls_back_to_lexical(monkeypatch, tmp_path):
+    """Successful embedding produces mode=embedding; no lexical fallback in results."""
+    paper_id = "test_paper_003"
+    _setup_update_similarity_env(
+        monkeypatch,
+        tmp_path,
+        claim_rows=[{"node_id": "claim_003", "paper_id": paper_id, "text": "Test claim 3"}],
+        logic_rows=[],
+    )
+
+    # Guard: rebuild should NOT be called since the hot path is set up correctly.
+    def _unexpected_rebuild(*args, **kwargs):
+        raise AssertionError("rebuild_similarity_global should not be called - hot path failed")
+
+    class _StableEmbeddingClient:
+        def embed_documents(self, texts):
+            return [[0.1, 0.2, 0.3] for _ in texts]
+
+    monkeypatch.setattr(similarity_service, "rebuild_similarity_global", _unexpected_rebuild)
+    monkeypatch.setattr(similarity_service, "_embedding_client", lambda: _StableEmbeddingClient())
+    monkeypatch.setattr("time.sleep", lambda seconds: None)
+
+    result = similarity_service.update_similarity_for_paper(paper_id)
+
+    assert result.get("ok") is True
+    assert result.get("mode") == "embedding"
+    assert result.get("mode") != "lexical"
+    assert result.get("mode") != "mixed"
+    assert "degraded_kinds" not in result
+    assert "degradation_events" not in result
