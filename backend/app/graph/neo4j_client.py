@@ -1835,6 +1835,9 @@ WHERE a.paper_id <> b.paper_id
 MATCH (a)-[:MAPS_TO]->(pa:Proposition)
 MATCH (b)-[:MAPS_TO]->(pb:Proposition)
 WHERE pa.prop_id <> pb.prop_id
+OPTIONAL MATCH (sp:Paper {paper_id: a.paper_id})
+OPTIONAL MATCH (tp:Paper {paper_id: b.paper_id})
+OPTIONAL MATCH (sp)-[c:CITES]->(tp)
 RETURN a.claim_id AS source_claim_id,
        b.claim_id AS target_claim_id,
        a.paper_id AS source_paper_id,
@@ -1844,6 +1847,8 @@ RETURN a.claim_id AS source_claim_id,
        b.text AS target_text,
        coalesce(a.confidence, 0.5) AS source_confidence,
        coalesce(b.confidence, 0.5) AS target_confidence,
+       coalesce(c.purpose_labels, []) AS citation_purpose_labels,
+       coalesce(c.purpose_scores, []) AS citation_purpose_scores,
        coalesce(s.score, 0.0) AS similarity,
        pa.prop_id AS source_prop_id,
        pb.prop_id AS target_prop_id

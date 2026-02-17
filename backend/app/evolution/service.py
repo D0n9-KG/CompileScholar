@@ -248,6 +248,8 @@ def rebuild_evolution_graph(
             target_text=str(pair.get("target_text") or ""),
             similarity=raw_similarity,
             target_confidence=float(pair.get("target_confidence") or 0.5),
+            citation_purpose_labels=list(pair.get("citation_purpose_labels") or []),
+            citation_purpose_scores=list(pair.get("citation_purpose_scores") or []),
             min_similarity=pair_min_similarity,
             accepted_threshold=inference_accept_threshold,
         )

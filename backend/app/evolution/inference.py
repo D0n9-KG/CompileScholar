@@ -68,12 +68,30 @@ def contains_any(text: str, markers: list[str]) -> bool:
     return any(m in t for m in markers)
 
 
+def _best_purpose_score(labels: list[str] | None, scores: list[float] | None, wanted: str) -> float:
+    """Return the highest score among citations with the given purpose label."""
+    labs = [str(x).strip() for x in (labels or []) if str(x).strip()]
+    vals = list(scores or [])
+    best = 0.0
+    for idx, label in enumerate(labs):
+        if label != wanted:
+            continue
+        try:
+            raw = float(vals[idx]) if idx < len(vals) else 0.4
+        except Exception:
+            raw = 0.4
+        best = max(best, clamp01(raw))
+    return best
+
+
 def infer_relation_type(
     source_text: str,
     target_text: str,
     similarity: float,
     target_confidence: float,
     *,
+    citation_purpose_labels: list[str] | None = None,
+    citation_purpose_scores: list[float] | None = None,
     min_similarity: float = 0.86,
     accepted_threshold: float = 0.82,
 ) -> dict[str, Any] | None:
@@ -93,7 +111,6 @@ def infer_relation_type(
         return {"event_type": "MERGE", "confidence": 0.99, "strength": 0.99, "status": "accepted", "reason": "text_identity"}
 
     base_conf = clamp01(0.65 * sim + 0.35 * tgt_conf)
-    status = "pending_review"
 
     # Note: removed "if src == tgt and sim >= 0.96:" block - now handled above as MERGE
 
@@ -101,18 +118,27 @@ def infer_relation_type(
     challenges = contains_any(tgt, CHALLENGE_MARKERS)
     supports = contains_any(tgt, SUPPORT_MARKERS)
 
-    if supersedes and sim >= 0.90:
-        conf = clamp01(base_conf + 0.06)
+    # Citation purpose scores from the LLM-extracted citation context.
+    # These are more reliable signals than keyword matching in proposition text.
+    p_supersede = _best_purpose_score(citation_purpose_labels, citation_purpose_scores, "ExtendImprove")
+    p_challenge = _best_purpose_score(citation_purpose_labels, citation_purpose_scores, "CritiqueLimit")
+    p_support = _best_purpose_score(citation_purpose_labels, citation_purpose_scores, "SupportEvidence")
+
+    # SUPERSEDES: keyword match at high similarity OR strong ExtendImprove purpose signal
+    if (supersedes and sim >= 0.90) or (p_supersede >= 0.60 and sim >= 0.86):
+        conf = clamp01(base_conf + 0.06 + 0.05 * p_supersede)
         status = "accepted" if conf >= accepted_threshold else "pending_review"
         return {"event_type": "SUPERSEDES", "confidence": conf, "strength": conf, "status": status}
 
-    if challenges and sim >= 0.90:
-        conf = clamp01(base_conf + 0.04)
+    # CHALLENGES: keyword match at high similarity OR strong CritiqueLimit purpose signal
+    if (challenges and sim >= 0.90) or (p_challenge >= 0.55 and sim >= 0.86):
+        conf = clamp01(base_conf + 0.04 + 0.06 * p_challenge)
         status = "accepted" if conf >= accepted_threshold else "pending_review"
         return {"event_type": "CHALLENGES", "confidence": conf, "strength": conf, "status": status}
 
-    if supports and sim >= 0.89:
-        conf = clamp01(base_conf + 0.03)
+    # SUPPORTS: keyword match OR SupportEvidence purpose signal
+    if (supports and sim >= 0.89) or (p_support >= 0.50 and sim >= 0.88):
+        conf = clamp01(base_conf + 0.03 + 0.04 * p_support)
         status = "accepted" if conf >= accepted_threshold else "pending_review"
         return {"event_type": "SUPPORTS", "confidence": conf, "strength": conf, "status": status}
 

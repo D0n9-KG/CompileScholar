@@ -95,6 +95,16 @@ class Settings(BaseSettings):
         validation_alias=AliasChoices("LLM_CLIENT_MAX_RETRIES"),
     )
 
+    rag_llm_timeout_seconds: int = Field(
+        default=45,
+        validation_alias=AliasChoices("RAG_LLM_TIMEOUT_SECONDS"),
+    )
+
+    rag_llm_max_tokens: int = Field(
+        default=900,
+        validation_alias=AliasChoices("RAG_LLM_MAX_TOKENS"),
+    )
+
     neo4j_connection_timeout_seconds: float = Field(
         default=15.0,
         validation_alias=AliasChoices("NEO4J_CONNECTION_TIMEOUT_SECONDS"),

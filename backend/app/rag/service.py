@@ -157,7 +157,17 @@ def ask(question: str, k: int = 8, scope: dict | None = None) -> dict:
     )
     user = f"Question:\n{question}\n\nEvidence:\n" + "\n\n".join(context_lines)
 
-    llm = ChatOpenAI(api_key=api_key, base_url=base_url, model=settings.llm_model, temperature=0)
+    rag_timeout = max(10, min(180, int(settings.rag_llm_timeout_seconds)))
+    rag_max_tokens = max(128, min(2048, int(settings.rag_llm_max_tokens)))
+    llm = ChatOpenAI(
+        api_key=api_key,
+        base_url=base_url,
+        model=settings.llm_model,
+        temperature=0,
+        timeout=rag_timeout,
+        max_tokens=rag_max_tokens,
+        max_retries=0,
+    )
     msg = llm.invoke([("system", system), ("user", user)])
 
     return {"answer": msg.content, "evidence": evidence, "graph_context": graph_context}
