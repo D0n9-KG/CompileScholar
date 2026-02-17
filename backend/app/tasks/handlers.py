@@ -23,8 +23,16 @@ def handle_ingest_path(
 
     update("ingest:scan", 0.02, f"Scanning markdowns under {root_path}")
 
+    last_progress_marker: tuple[str, str] | None = None
+
     def progress(stage: str, p: float, msg: str | None = None) -> None:
+        nonlocal last_progress_marker
         update(stage, p, msg)
+        marker = (stage, str(msg or ""))
+        if marker == last_progress_marker:
+            return
+        last_progress_marker = marker
+        log(f"[{p:.1%}] {stage} - {msg or ''}".rstrip(" -"))
 
     res = ingest_path(root_path, progress=progress)
     log("ingest done")

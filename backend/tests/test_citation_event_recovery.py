@@ -66,7 +66,7 @@ class CitationEventRecoveryTests(unittest.TestCase):
         self.assertEqual(len(recovered.citations), 1)
         self.assertEqual(int(recovered.citations[0].cited_ref_num), 1)
 
-    def test_skips_when_existing_events_above_trigger(self) -> None:
+    def test_skips_when_existing_events_above_dynamic_threshold(self) -> None:
         paper = _paper()
         existing = CitationEvent(
             paper_source=paper.paper_source,
@@ -86,7 +86,7 @@ class CitationEventRecoveryTests(unittest.TestCase):
             doc,
             rules={"citation_event_recovery_trigger_max_existing_events": 0},
         )
-        self.assertEqual(report.get("status"), "skipped_existing_events")
+        self.assertEqual(report.get("status"), "skipped_existing_events_above_dynamic_threshold")
         self.assertEqual(len(recovered.citations), 1)
 
     def test_ambiguous_author_year_match_is_not_mapped(self) -> None:

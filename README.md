@@ -118,7 +118,7 @@ DEEPSEEK_API_KEY=你的_key
 - `DEEPSEEK_API_KEY` / `OPENAI_API_KEY` / `OPENROUTER_API_KEY`：对应平台 key
 - `LLM_API_KEY`：可选；统一 key（优先级高于 provider-specific key）
 - `LLM_BASE_URL`：可选；自定义 OpenAI-compatible base url
-- `EMBEDDING_PROVIDER`：`siliconflow | openai | openrouter | deepseek | (空=禁用)`（可选）
+- `EMBEDDING_PROVIDER`：`siliconflow | openai | openrouter | deepseek`（必需；用于 RAG/相似度/聚类）
 - `EMBEDDING_MODEL`：向量模型（例如 `BAAI/bge-m3`）
 - `SILICONFLOW_API_KEY`：SiliconFlow key（当 `EMBEDDING_PROVIDER=siliconflow`）
 - `EMBEDDING_API_KEY` / `EMBEDDING_BASE_URL`：可选；统一 embedding key / base url
@@ -379,7 +379,7 @@ server {
 - Neo4j 连不上：确认 `NEO4J_URI`（bolt 7687）与账号密码；检查防火墙/端口占用
 - Neo4j Console 启动报 `store_lock`：通常是数据库已被另一个 Neo4j 进程占用（重复启动导致）。先确认 `http://localhost:7474/browser/` 是否已可访问；若已运行不要再开第二个 `neo4j console`
 - 端口冲突：Windows 开发建议直接用 `run.ps1`（会自动避开被系统保留/占用的端口）
-- Embedding 不可用：可先不配 `EMBEDDING_PROVIDER`（系统会退化到更弱的检索能力），或改用你可用的平台
+- Embedding 不可用：必须配置 `EMBEDDING_PROVIDER` 和对应 API key，否则 RAG/相似度/聚类等核心功能会报错。可选择 SiliconFlow、OpenAI、OpenRouter 等平台
 - 导入慢/失败：先在后端 Swagger（`/docs`）观察任务与报错；检查 MinerU 输出路径是否包含大量无关 md
 
 ---

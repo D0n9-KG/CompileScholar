@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
-from concurrent.futures import ThreadPoolExecutor, as_completed
+import time
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
@@ -25,6 +27,7 @@ from app.vector.faiss_store import build_faiss_for_chunks
 
 
 ProgressFn = Callable[[str, float, str | None], None]
+logger = logging.getLogger(__name__)
 
 
 def _safe_id(s: str) -> str:
@@ -190,9 +193,19 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
         with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
             client.ensure_schema()
             for doc in parsed:
+                # Re-ingest idempotency fix: delete stale subgraph if paper already exists
+                paper_id = paper_id_for_md_path(doc.paper.md_path, doi=doc.paper.doi)
+                try:
+                    client.get_paper_basic(paper_id)
+                except KeyError:
+                    # Paper doesn't exist yet - first ingest, no stale data to clean
+                    pass
+                else:
+                    # Paper exists - delete stale chunks/claims/logic/refs/cites before upserting
+                    client.delete_paper_subgraph(paper_id)
+
                 client.upsert_paper_and_chunks(doc)
                 try:
-                    paper_id = paper_id_for_md_path(doc.paper.md_path, doi=doc.paper.doi)
                     meta = load_canonical_meta(doc.paper.md_path)
                     paper_type = str(meta.get("paper_type") or "research").strip().lower()
                     if paper_type not in {"research", "review"}:
@@ -209,7 +222,6 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
                 except Exception:
                     pass
                 try:
-                    paper_id = paper_id_for_md_path(doc.paper.md_path, doi=doc.paper.doi)
                     figs = extract_figures_from_markdown(paper_id=paper_id, md_path=doc.paper.md_path)
                     client.upsert_figures(
                         paper_id,
@@ -335,16 +347,18 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
             "llm_out": llm_out,
         }
 
-    def _write_llm_to_neo4j(item: dict[str, Any]) -> None:
+    def _write_llm_to_neo4j(item: dict[str, Any]) -> int:
         paper_id = str(item["paper_id"])
         logic_claims = dict(item.get("logic_claims") or {})
+        claims = list(logic_claims.get("claims") or [])
         step_order = list(item.get("step_order") or [])
         purposes = list(item.get("citation_purposes") or [])
+        propositions_written = 0
         with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
             client.upsert_logic_steps_and_claims(
                 paper_id=paper_id,
                 logic=logic_claims.get("logic") or {},
-                claims=logic_claims.get("claims") or [],
+                claims=claims,
                 step_order=step_order,
             )
             try:
@@ -361,11 +375,12 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
             except Exception:
                 pass
             try:
-                client.upsert_proposition_mentions_for_claims(
+                mention_stats = client.upsert_proposition_mentions_for_claims(
                     paper_id=paper_id,
-                    claims=logic_claims.get("claims") or [],
+                    claims=claims,
                     paper_year=item.get("paper_year"),
                 )
+                propositions_written = int((mention_stats or {}).get("propositions") or 0)
             except Exception:
                 pass
             try:
@@ -386,6 +401,30 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
                     scores=p["scores"],
                 )
 
+            # P1 Fix: Backfill any remaining missing citation purposes (defense-in-depth)
+            # This catches edge cases where purpose labels weren't set during reference resolution
+            try:
+                backfilled_count = client.backfill_missing_citation_purposes(
+                    citing_paper_id=paper_id,
+                    default_label="Background",
+                    default_score=0.2,
+                )
+                if backfilled_count > 0:
+                    logger.info(
+                        "Backfilled %d missing citation purpose labels for paper_id=%s",
+                        backfilled_count,
+                        paper_id,
+                    )
+            except Exception as e:
+                logger.warning(
+                    "Failed to backfill citation purposes for paper_id=%s: %s",
+                    paper_id,
+                    str(e),
+                    exc_info=True,  # Include stack trace for debugging
+                )
+        return propositions_written
+
+    propositions_written = 0
     try:
         jobs = [(idx, doc, rec) for idx, (doc, rec) in enumerate(zip(parsed, cite_records)) if rec.get("paper_id")]
         total_jobs = len(jobs)
@@ -406,32 +445,91 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
                 0.70,
                 f"Running LLM extraction (Logic/Claims/Citation Purposes) (0/{total_jobs}, workers={max_workers})",
             )
+            heartbeat_seconds = _bounded_int(
+                getattr(settings, "ingest_llm_heartbeat_seconds", 20),
+                default=20,
+                lo=5,
+                hi=120,
+            )
             with ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="ingest-llm") as executor:
                 future_map = {
                     executor.submit(_llm_extract_one, idx, doc, rec): (idx, rec)
                     for idx, doc, rec in jobs
                 }
-                for future in as_completed(future_map):
-                    idx, rec = future_map[future]
-                    paper_id = str(rec.get("paper_id") or "")
-                    completed += 1
-                    try:
-                        item = future.result()
-                    except Exception as exc:
-                        llm_failures.append(f"{paper_id}: {exc}")
-                    else:
+                pending = set(future_map.keys())
+                started_at = {future: time.monotonic() for future in pending}
+
+                while pending:
+                    done, pending = wait(
+                        pending,
+                        timeout=float(heartbeat_seconds),
+                        return_when=FIRST_COMPLETED,
+                    )
+
+                    if not done:
+                        # Heartbeat: no futures completed in this interval
+                        ratio = completed / total_jobs
+                        now = time.monotonic()
+                        slowest_future = max(pending, key=lambda f: now - started_at.get(f, now))
+                        _, slowest_rec = future_map[slowest_future]
+                        slowest_paper_id = str(slowest_rec.get("paper_id") or "")
+                        slowest_secs = int(max(0.0, now - started_at.get(slowest_future, now)))
+                        notify(
+                            "ingest:llm",
+                            0.70 + (0.20 * ratio),
+                            (
+                                "Running LLM extraction (Logic/Claims/Citation Purposes) "
+                                f"({completed}/{total_jobs}, running={len(pending)}, "
+                                f"slowest={slowest_paper_id}:{slowest_secs}s, failed={len(llm_failures)})"
+                            ),
+                        )
+                        continue
+
+                    for future in done:
+                        idx, rec = future_map[future]
+                        paper_id = str(rec.get("paper_id") or "")
+                        completed += 1
+
+                        try:
+                            item = future.result()
+                        except Exception as exc:
+                            llm_failures.append(f"{paper_id}: {exc}")
+                            ratio = completed / total_jobs
+                            notify(
+                                "ingest:llm",
+                                0.70 + (0.20 * ratio),
+                                (
+                                    "Running LLM extraction (Logic/Claims/Citation Purposes) "
+                                    f"({completed}/{total_jobs}, running={len(pending)}, failed={len(llm_failures)})"
+                                ),
+                            )
+                            continue
+
                         outputs_by_idx[idx] = dict(item["llm_out"])
+                        ratio = completed / total_jobs
+                        notify(
+                            "ingest:llm",
+                            0.70 + (0.20 * ratio),
+                            (
+                                "Running LLM extraction (Logic/Claims/Citation Purposes) "
+                                f"({completed}/{total_jobs}, running={len(pending)}, failed={len(llm_failures)})"
+                            ),
+                        )
+
                         if neo4j_written:
                             try:
-                                _write_llm_to_neo4j(item)
+                                propositions_written += _write_llm_to_neo4j(item)
                             except Exception as exc:
                                 llm_failures.append(f"{paper_id}: neo4j write failed: {exc}")
-                    ratio = completed / total_jobs
-                    notify(
-                        "ingest:llm",
-                        0.70 + (0.20 * ratio),
-                        f"Running LLM extraction (Logic/Claims/Citation Purposes) ({completed}/{total_jobs}, failed={len(llm_failures)})",
-                    )
+                                ratio = completed / total_jobs
+                                notify(
+                                    "ingest:llm",
+                                    0.70 + (0.20 * ratio),
+                                    (
+                                        "Running LLM extraction (Logic/Claims/Citation Purposes) "
+                                        f"({completed}/{total_jobs}, running={len(pending)}, failed={len(llm_failures)})"
+                                    ),
+                                )
             llm_outputs = [outputs_by_idx[i] for i in sorted(outputs_by_idx)]
             if llm_failures:
                 shown = llm_failures[:5]
@@ -454,6 +552,34 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
         faiss_built = True
     except Exception as exc:  # noqa: BLE001
         faiss_error = str(exc)
+
+    # Trigger proposition clustering (Task 3.6: Group Layer integration)
+    proposition_candidates = sum(len(o.get("claims") or []) for o in llm_outputs)
+    clustering: dict[str, Any] = {
+        "triggered": False,
+        "status": "skipped",
+        "proposition_candidates": proposition_candidates,
+        "propositions_written": propositions_written,
+    }
+    if neo4j_written and propositions_written > 0:
+        notify("ingest:clustering", 0.96, "Clustering propositions into groups")
+        clustering["triggered"] = True
+        clustering_task_id = f"cluster_{run_id}"
+        clustering["task_id"] = clustering_task_id
+        try:
+            from app.tasks.clustering_task import run_proposition_clustering
+
+            result = run_proposition_clustering(task_id=clustering_task_id)
+            clustering.update(result)
+            logger.info("Proposition clustering result: %s", result)
+        except Exception as exc:  # noqa: BLE001
+            clustering.update(
+                {
+                    "status": "failed",
+                    "error": str(exc),
+                }
+            )
+            logger.exception("Failed to trigger proposition clustering")
 
     notify("ingest:done", 1.0, "Done")
     return {
@@ -504,6 +630,7 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
         "faiss_built": faiss_built,
         "faiss_error": faiss_error,
         "faiss_dir": faiss_dir,
+        "clustering": clustering,
         "artifacts_dir": str(run_dir),
     }
 

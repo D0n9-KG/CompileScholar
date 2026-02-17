@@ -31,10 +31,10 @@ class Settings(BaseSettings):
     )
     openai_api_key: str | None = Field(default=None, validation_alias=AliasChoices("OPENAI_API_KEY"))
 
-    # Embeddings (optional). If not available, system falls back to lexical retrieval.
+    # Embeddings (required for RAG, similarity, clustering, FAISS). System will fail with clear errors if not configured.
     embedding_provider: str | None = Field(
         default=None,
-        description="siliconflow | openai | openrouter | deepseek | (None=disable)",
+        description="siliconflow | openai | openrouter | deepseek | (None will cause errors in core features)",
         validation_alias=AliasChoices("EMBEDDING_PROVIDER"),
     )
     embedding_base_url: str | None = Field(default=None, validation_alias=AliasChoices("EMBEDDING_BASE_URL"))
@@ -55,9 +55,49 @@ class Settings(BaseSettings):
         validation_alias=AliasChoices("PHASE1_GATE_ALLOW_WEAK"),
     )
 
+    # P0-6: Evolution quality gates
+    evolution_gate_enabled: bool = Field(
+        default=True,
+        validation_alias=AliasChoices("EVOLUTION_GATE_ENABLED"),
+    )
+    evolution_min_coverage: float = Field(
+        default=0.20,
+        validation_alias=AliasChoices("EVOLUTION_MIN_COVERAGE"),
+    )
+    evolution_max_self_loop_rate: float = Field(
+        default=0.05,
+        validation_alias=AliasChoices("EVOLUTION_MAX_SELF_LOOP_RATE"),
+    )
+
+    # P1-Top3: Group-layer clustering control
+    group_clustering_threshold: float = Field(
+        default=0.85,
+        validation_alias=AliasChoices("GROUP_CLUSTERING_THRESHOLD"),
+    )
+
     ingest_llm_max_workers: int = Field(
         default=4,
         validation_alias=AliasChoices("INGEST_LLM_MAX_WORKERS"),
+    )
+
+    ingest_llm_heartbeat_seconds: int = Field(
+        default=20,
+        validation_alias=AliasChoices("INGEST_LLM_HEARTBEAT_SECONDS"),
+    )
+
+    llm_timeout_seconds: int = Field(
+        default=60,
+        validation_alias=AliasChoices("LLM_TIMEOUT_SECONDS"),
+    )
+
+    llm_client_max_retries: int = Field(
+        default=0,
+        validation_alias=AliasChoices("LLM_CLIENT_MAX_RETRIES"),
+    )
+
+    neo4j_connection_timeout_seconds: float = Field(
+        default=15.0,
+        validation_alias=AliasChoices("NEO4J_CONNECTION_TIMEOUT_SECONDS"),
     )
 
     data_root: str = ".."

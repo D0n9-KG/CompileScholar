@@ -2,11 +2,15 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import re
 from pathlib import Path
 from typing import Any, Callable
 
 from app.ingest.models import DocumentIR
+
+
+logger = logging.getLogger(__name__)
 
 
 LogicExtractorFn = Callable[..., dict[str, Any]]
@@ -440,7 +444,19 @@ def _default_logic_extractor(*, doc: DocumentIR, paper_id: str, schema: dict[str
         except Exception:
             pass
     step_order = _enabled_step_ids(schema)
-    return {"logic": logic, "step_order": step_order}
+
+    # P0 Fix: Final sanitize - filter empty logic steps
+    # Remove steps with empty summary AND empty evidence
+    filtered_logic = {}
+    for step_id, step_data in logic.items():
+        summary = step_data.get("summary_machine") or step_data.get("summary") or ""
+        evidence = step_data.get("evidence_chunk_ids") or []
+
+        # Keep step if it has either summary or evidence
+        if summary.strip() or evidence:
+            filtered_logic[step_id] = step_data
+
+    return {"logic": filtered_logic, "step_order": step_order}
 
 
 def _priority_chunks(
@@ -493,8 +509,22 @@ def _extract_claims_from_chunk_llm(
         text = text[:chunk_chars_max]
     default_system = (
         "Extract atomic claims from one paper chunk. Return STRICT JSON only.\n"
-        "Each claim must be directly supported by the provided chunk text.\n"
-        "Do not invent information outside this chunk.\n"
+        "\n"
+        "GROUNDING:\n"
+        "- Each claim must be directly supported by the provided chunk text.\n"
+        "- Do not invent information outside this chunk.\n"
+        "\n"
+        "SCIENTIFIC VALUE (CRITICAL):\n"
+        "- Extract ONLY scientific contributions, methods, findings, and conclusions.\n"
+        "- DO NOT extract meta-information such as:\n"
+        "  * Author names, affiliations, correspondence addresses\n"
+        "  * Submission/acceptance/publication dates\n"
+        "  * Funding sources, grant numbers, acknowledgments\n"
+        "  * Journal names, DOIs, paper identifiers\n"
+        "  * Conflict of interest statements\n"
+        "  * Dataset availability, code repository links (unless core to the method)\n"
+        "- Focus on WHAT was discovered/proposed, not WHO/WHEN/WHERE published.\n"
+        "- When encountering pure meta-information chunks, output empty claims array.\n"
     )
     default_user = (
         f"Allowed step types: {step_ids}\n"
@@ -671,7 +701,51 @@ def _merge_claim_candidates(
             str(x.get("claim_key") or ""),
         )
     )
-    return out
+
+    # P1 Fix: Cross-step claim_id collision resolution.
+    # bucket_key includes step_type, but claim_id does not. Same canonical text in
+    # different steps lands in separate buckets but produces the same claim_id.
+    # Strategy: keep the highest-priority step's record, but merge evidence
+    # (kinds, origin_chunk_ids, worker_ids) from lower-priority duplicates so no
+    # evidence is silently discarded.
+    primary: dict[str, dict[str, Any]] = {}  # claim_id → kept item (highest priority)
+    for item in out:
+        claim_id = str(item.get("claim_id") or item.get("canonical_claim_id") or "").strip()
+        if not claim_id:
+            continue
+        if claim_id not in primary:
+            primary[claim_id] = dict(item)
+            # Promote kinds/origin_chunk_ids to mutable for later merging
+            primary[claim_id]["kinds"] = list(item.get("kinds") or [])
+            primary[claim_id]["origin_chunk_ids"] = list(item.get("origin_chunk_ids") or [])
+            primary[claim_id]["worker_ids"] = sorted(item.get("worker_ids") or [])
+        else:
+            kept = primary[claim_id]
+            logger.warning(
+                "Phase1 merge: cross-step claim_id collision claim_id=%s "
+                "discarded_step_type=%s (keeping step_type=%s); merging evidence",
+                claim_id,
+                str(item.get("step_type") or "").strip(),
+                str(kept.get("step_type") or "").strip(),
+            )
+            # Merge evidence from the discarded duplicate into the kept item
+            for k in list(item.get("kinds") or []):
+                if k not in kept["kinds"]:
+                    kept["kinds"].append(k)
+            for cid in list(item.get("origin_chunk_ids") or []):
+                if cid not in kept["origin_chunk_ids"]:
+                    kept["origin_chunk_ids"].append(cid)
+            wids = set(kept.get("worker_ids") or []) | set(item.get("worker_ids") or [])
+            kept["worker_ids"] = sorted(wids)
+            # Keep first origin_chunk_id consistent
+            if kept["origin_chunk_ids"]:
+                kept["origin_chunk_id"] = kept["origin_chunk_ids"][0]
+
+    # Re-apply original sort order (primary dict preserves insertion order = priority order)
+    deduped_out = list(primary.values())
+    # Re-sort items that have no claim_id (edge case: pass-through)
+    no_id = [item for item in out if not str(item.get("claim_id") or item.get("canonical_claim_id") or "").strip()]
+    return deduped_out + no_id
 
 
 def _tokens(s: str, *, stop_tokens: set[str] | None = None) -> list[str]:
@@ -973,6 +1047,11 @@ def _conflict_stats_lexical(validated: list[dict[str, Any]], rules: dict[str, An
         "conflict_mode_used": "lexical",
         "conflict_candidate_pairs": comparable_pairs,
         "conflict_semantic_judged": 0,
+        "conflict_semantic_coverage_ratio": 0.0,
+        "conflict_semantic_insufficient_pairs": 0,
+        "conflict_semantic_insufficient_ratio": 0.0,
+        "conflict_semantic_missing_pairs": 0,
+        "conflict_semantic_unknown_pair_rows": 0,
         "conflict_semantic_threshold": max(0.0, min(1.0, _rule_float(rules, "phase2_conflict_semantic_threshold", 0.75))),
         "conflict_semantic_fallback": False,
         "conflict_semantic_fallback_reason": "",
@@ -1042,6 +1121,11 @@ def _conflict_stats_semantic(
             "conflict_mode_used": mode,
             "conflict_candidate_pairs": 0,
             "conflict_semantic_judged": 0,
+            "conflict_semantic_coverage_ratio": 0.0,
+            "conflict_semantic_insufficient_pairs": 0,
+            "conflict_semantic_insufficient_ratio": 0.0,
+            "conflict_semantic_missing_pairs": 0,
+            "conflict_semantic_unknown_pair_rows": 0,
             "conflict_semantic_threshold": threshold,
             "conflict_semantic_fallback": False,
             "conflict_semantic_fallback_reason": "",
@@ -1071,21 +1155,70 @@ def _conflict_stats_semantic(
             },
         )
     except Exception as exc:
+        logger.warning(
+            "Conflict semantic fallback triggered: mode=%s candidate_pairs=%d error=%s",
+            mode,
+            comparable_pairs,
+            str(exc),
+        )
         fallback = _conflict_stats_lexical(validated=validated, rules=rules)
         fallback["conflict_semantic_fallback"] = True
         fallback["conflict_semantic_fallback_reason"] = str(exc)
         fallback["conflict_semantic_threshold"] = threshold
         fallback["conflict_candidate_pairs"] = comparable_pairs
+        fallback["conflict_semantic_judged"] = 0
+        fallback["conflict_semantic_coverage_ratio"] = 0.0
+        fallback["conflict_semantic_insufficient_pairs"] = comparable_pairs
+        fallback["conflict_semantic_insufficient_ratio"] = 1.0 if comparable_pairs > 0 else 0.0
+        fallback["conflict_semantic_missing_pairs"] = comparable_pairs
+        fallback["conflict_semantic_unknown_pair_rows"] = 0
         return fallback
 
-    by_pair_id = {str(r.get("pair_id") or ""): r for r in rows if str(r.get("pair_id") or "")}
+    # Build candidate pair ID set for validation
+    candidate_pair_ids = {str(c.get("pair_id") or "").strip() for c in candidates if str(c.get("pair_id") or "").strip()}
+
+    # Filter and validate judgment rows
+    rows_with_pair_id = [
+        r for r in rows if isinstance(r, dict) and str(r.get("pair_id") or "").strip()
+    ]
+    unknown_pair_rows = sum(
+        1 for r in rows_with_pair_id
+        if str(r.get("pair_id") or "").strip() not in candidate_pair_ids
+    )
+
+    # Build judgment map (only for known candidate pairs)
+    by_pair_id = {
+        str(r.get("pair_id") or "").strip(): r
+        for r in rows_with_pair_id
+        if str(r.get("pair_id") or "").strip() in candidate_pair_ids
+    }
+
+    # Process candidates and collect metrics
     conflict_pairs = 0
+    semantic_insufficient_pairs = 0
     samples: list[dict[str, Any]] = []
+
     for c in candidates:
         pid = str(c.get("pair_id") or "")
         row = by_pair_id.get(pid) or {}
+
+        # Defensive label normalization
         label = str(row.get("label") or "insufficient").strip().lower()
-        score = float(row.get("score") or 0.0)
+        if label not in {"contradict", "not_conflict", "insufficient"}:
+            label = "insufficient"
+
+        # Defensive score normalization
+        try:
+            score = float(row.get("score") or 0.0)
+        except Exception:
+            score = 0.0
+        score = max(0.0, min(1.0, score))
+
+        # Track insufficient judgments
+        if label == "insufficient":
+            semantic_insufficient_pairs += 1
+
+        # Identify conflicts
         if label == "contradict" and score >= threshold:
             conflict_pairs += 1
             if len(samples) < max_samples:
@@ -1102,6 +1235,29 @@ def _conflict_stats_semantic(
                         "semantic_reason": str(row.get("reason") or ""),
                     }
                 )
+
+    # Calculate comprehensive metrics
+    semantic_judged = len(by_pair_id)
+    semantic_missing_pairs = max(0, comparable_pairs - semantic_judged)
+    semantic_coverage_ratio = float(semantic_judged) / float(max(1, comparable_pairs))
+    semantic_insufficient_ratio = float(semantic_insufficient_pairs) / float(max(1, comparable_pairs))
+
+    # Structured logging for observability
+    logger.info(
+        (
+            "Conflict semantic metrics: mode=%s candidate_pairs=%d judged=%d coverage=%.4f "
+            "insufficient_pairs=%d insufficient_ratio=%.4f missing_pairs=%d unknown_pair_rows=%d"
+        ),
+        mode,
+        comparable_pairs,
+        semantic_judged,
+        semantic_coverage_ratio,
+        semantic_insufficient_pairs,
+        semantic_insufficient_ratio,
+        semantic_missing_pairs,
+        unknown_pair_rows,
+    )
+
     rate = float(conflict_pairs) / float(max(1, comparable_pairs))
     return {
         "comparable_pairs": comparable_pairs,
@@ -1111,7 +1267,12 @@ def _conflict_stats_semantic(
         "shared_tokens_min": shared_tokens_min,
         "conflict_mode_used": mode,
         "conflict_candidate_pairs": comparable_pairs,
-        "conflict_semantic_judged": len(by_pair_id),
+        "conflict_semantic_judged": semantic_judged,
+        "conflict_semantic_coverage_ratio": semantic_coverage_ratio,
+        "conflict_semantic_insufficient_pairs": semantic_insufficient_pairs,
+        "conflict_semantic_insufficient_ratio": semantic_insufficient_ratio,
+        "conflict_semantic_missing_pairs": semantic_missing_pairs,
+        "conflict_semantic_unknown_pair_rows": unknown_pair_rows,
         "conflict_semantic_threshold": threshold,
         "conflict_semantic_fallback": False,
         "conflict_semantic_fallback_reason": "",
@@ -1357,6 +1518,7 @@ def _quality_report(
         1 for j in judgments if str(j.get("judge_mode") or "").strip().lower() == "lexical"
     )
     grounding_fallback_count = sum(1 for j in judgments if bool(j.get("judge_fallback")))
+    grounding_semantic_coverage_rate = float(grounding_semantic_judged) / float(max(1, total))
 
     min_supported = _rule_float(rules, "phase1_gate_supported_ratio_min", 0.5)
     min_coverage = _rule_float(rules, "phase1_gate_step_coverage_min", 0.4)
@@ -1364,6 +1526,7 @@ def _quality_report(
     max_conflict = _rule_float(rules, "phase2_gate_conflict_rate_max", 1.0)
     min_conflict_comparable_pairs = max(0, _rule_int(rules, "phase2_conflict_gate_min_comparable_pairs", 3))
     min_conflict_pairs = max(0, _rule_int(rules, "phase2_conflict_gate_min_conflict_pairs", 1))
+    min_semantic_coverage = _rule_float(rules, "phase1_gate_semantic_coverage_min", 0.0)
     comparable_pairs = int(conflict.get("comparable_pairs") or 0)
     conflict_pairs = int(conflict.get("conflict_pairs") or 0)
     conflict_gate_skip_reasons: list[str] = []
@@ -1384,6 +1547,11 @@ def _quality_report(
         gate_fail_reasons.append("critical_slot_coverage")
     if (not conflict_gate_skipped) and float(conflict.get("conflict_rate") or 0.0) > max_conflict:
         gate_fail_reasons.append("conflict_rate")
+    # P1 Fix: Hybrid/semantic grounding coverage gate.
+    # When min_semantic_coverage > 0.0, gate fails if fewer claims went through semantic judgment
+    # than the configured minimum ratio (default: 0.0 = disabled, backwards compatible).
+    if min_semantic_coverage > 0.0 and grounding_semantic_coverage_rate < min_semantic_coverage:
+        gate_fail_reasons.append("semantic_coverage")
     gate_passed = not gate_fail_reasons
     tier_info = _quality_tier_from_failures(gate_fail_reasons, rules=rules)
 
@@ -1398,6 +1566,7 @@ def _quality_report(
         "grounding_mode_used": grounding_mode_used,
         "grounding_semantic_judged": grounding_semantic_judged,
         "grounding_lexical_judged": grounding_lexical_judged,
+        "grounding_semantic_coverage_rate": grounding_semantic_coverage_rate,
         "grounding_fallback_count": grounding_fallback_count,
         "critical_slot_mode": completeness.get("critical_slot_mode"),
         "critical_steps": list(completeness.get("critical_steps") or []),
@@ -1417,6 +1586,11 @@ def _quality_report(
         "conflict_mode_used": str(conflict.get("conflict_mode_used") or "lexical"),
         "conflict_candidate_pairs": int(conflict.get("conflict_candidate_pairs") or 0),
         "conflict_semantic_judged": int(conflict.get("conflict_semantic_judged") or 0),
+        "conflict_semantic_coverage_ratio": float(conflict.get("conflict_semantic_coverage_ratio") or 0.0),
+        "conflict_semantic_insufficient_pairs": int(conflict.get("conflict_semantic_insufficient_pairs") or 0),
+        "conflict_semantic_insufficient_ratio": float(conflict.get("conflict_semantic_insufficient_ratio") or 0.0),
+        "conflict_semantic_missing_pairs": int(conflict.get("conflict_semantic_missing_pairs") or 0),
+        "conflict_semantic_unknown_pair_rows": int(conflict.get("conflict_semantic_unknown_pair_rows") or 0),
         "conflict_semantic_threshold": float(conflict.get("conflict_semantic_threshold") or 0.0),
         "conflict_semantic_fallback": bool(conflict.get("conflict_semantic_fallback")),
         "conflict_semantic_fallback_reason": str(conflict.get("conflict_semantic_fallback_reason") or ""),
@@ -1441,6 +1615,7 @@ def _quality_report(
             "phase1_grounding_mode": grounding_mode_used,
             "phase1_grounding_semantic_supported_min": _rule_float(rules, "phase1_grounding_semantic_supported_min", 0.75),
             "phase1_grounding_semantic_weak_min": _rule_float(rules, "phase1_grounding_semantic_weak_min", 0.55),
+            "phase1_gate_semantic_coverage_min": min_semantic_coverage,
             "phase2_conflict_mode": str(conflict.get("conflict_mode_used") or "lexical"),
             "phase2_conflict_semantic_threshold": float(conflict.get("conflict_semantic_threshold") or 0.0),
             "phase2_conflict_gate_min_comparable_pairs": min_conflict_comparable_pairs,
@@ -1490,6 +1665,55 @@ def run_phase1_extraction(
         )
     _json_dump(artifacts / "claim_candidates.json", {"claims": claim_candidates})
 
+    # P0-5: Filter extraction noise
+    rules = schema.get("rules") or {}
+    noise_filter_stats: dict[str, Any] = {}
+    if _rule_bool(rules, "phase1_noise_filter_enabled", False):
+        raw_count_before_filter = len(claim_candidates)
+        try:
+            from app.extraction.noise_filters import filter_claim_candidates
+
+            filtered_claim_candidates, filter_stats = filter_claim_candidates(claim_candidates, rules)
+            filter_stats = dict(filter_stats or {})
+            noise_filter_stats = {
+                "raw_count": _rule_int(filter_stats, "raw_count", raw_count_before_filter),
+                "filtered_count": _rule_int(filter_stats, "filtered_count", len(filtered_claim_candidates)),
+                "caption_filtered": _rule_int(filter_stats, "caption_filtered", 0),
+                "definition_filtered": _rule_int(filter_stats, "definition_filtered", 0),
+                "filter_rate": _rule_float(filter_stats, "filter_rate", 0.0),
+            }
+            logger.info(
+                "phase1_noise_filter: "
+                "raw=%d "
+                "filtered=%d "
+                "caption=%d "
+                "definition=%d "
+                "rate=%.1f%%",
+                noise_filter_stats.get("raw_count", 0),
+                noise_filter_stats.get("filtered_count", 0),
+                noise_filter_stats.get("caption_filtered", 0),
+                noise_filter_stats.get("definition_filtered", 0),
+                noise_filter_stats.get("filter_rate", 0.0) * 100,
+            )
+
+            _json_dump(
+                artifacts / "claim_candidates_filtered.json",
+                {
+                    "claims": filtered_claim_candidates,
+                    "noise_filter": noise_filter_stats,
+                },
+            )
+            claim_candidates = filtered_claim_candidates
+        except Exception as exc:
+            noise_filter_stats = {"error": str(exc)}
+            logger.warning(
+                "Phase1 noise filter fallback triggered: paper_id=%s raw=%d error=%s",
+                paper_id,
+                raw_count_before_filter,
+                str(exc),
+                exc_info=True,
+            )
+
     claims_merged = _merge_claim_candidates(
         claims=claim_candidates,
         paper_id=paper_id,
@@ -1520,7 +1744,12 @@ def run_phase1_extraction(
             "confidence": float(claim.get("confidence") or 0.5),
             "step_type": claim["step_type"],
             "kinds": list(claim.get("kinds") or []),
-            "evidence_chunk_ids": [claim["origin_chunk_id"]] if claim.get("origin_chunk_id") else [],
+            # P2 Fix: Use all accumulated origin_chunk_ids for full evidence chain,
+            # not just the first one. Fallback to origin_chunk_id for compatibility.
+            "evidence_chunk_ids": list(
+                claim.get("origin_chunk_ids")
+                or ([claim["origin_chunk_id"]] if claim.get("origin_chunk_id") else [])
+            ),
             "origin_chunk_ids": list(claim.get("origin_chunk_ids") or []),
             "support_label": label,
             "judge_score": score,
@@ -1536,6 +1765,14 @@ def run_phase1_extraction(
     _attach_targets_from_citations(validated, cite_rec=cite_rec, schema=schema)
     _attach_targets_from_citations(rejected, cite_rec=cite_rec, schema=schema)
 
+    # P0 Fix: Check for empty logic steps
+    logic_steps_empty_count = 0
+    for step_id, step_data in logic.items():
+        summary = step_data.get("summary_machine") or step_data.get("summary") or ""
+        evidence = step_data.get("evidence_chunk_ids") or []
+        if not summary.strip() and not evidence:
+            logic_steps_empty_count += 1
+
     report = _quality_report(
         claims_merged=claims_merged,
         validated=validated,
@@ -1544,6 +1781,20 @@ def run_phase1_extraction(
         schema=schema,
         rules=dict(schema.get("rules") or {}),
     )
+
+    # Add noise filter stats to quality report
+    if noise_filter_stats:
+        report["noise_filter"] = noise_filter_stats
+
+    # P0 Fix: Add empty logic steps count to report and update gate
+    report["logic_steps_empty_count"] = logic_steps_empty_count
+    if logic_steps_empty_count > 0:
+        # Add to gate fail reasons if empty steps exist
+        gate_fail_reasons = list(report.get("gate_fail_reasons") or [])
+        gate_fail_reasons.append("empty_logic_steps")
+        report["gate_fail_reasons"] = gate_fail_reasons
+        report["gate_passed"] = False
+
     completeness_judgment = {
         "critical_slot_mode": report.get("critical_slot_mode"),
         "critical_steps": list(report.get("critical_steps") or []),

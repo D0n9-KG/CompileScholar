@@ -8,7 +8,6 @@ from app.graph.neo4j_client import Neo4jClient
 from app.ingest.paper_meta import load_canonical_meta
 from app.settings import settings
 from app.vector.faiss_store import load_faiss
-from app.rag.retrieval import latest_run_dir, load_chunks_from_run, lexical_retrieve
 
 
 def _runs_dir() -> Path:
@@ -91,71 +90,47 @@ def ask(question: str, k: int = 8, scope: dict | None = None) -> dict:
     # Oversample before scope filtering to reduce "scope starvation".
     oversample = min(100, max(want, want * 5))
 
-    # Prefer FAISS if available; fall back to lexical retrieval (still uses LLM for synthesis).
+    # Use FAISS embedding retrieval (no lexical fallback)
     try:
         store = load_faiss(str(latest_faiss_dir()))
-        docs_and_scores = store.similarity_search_with_score(question, k=oversample)
-        for idx, (doc, score) in enumerate(docs_and_scores, start=1):
-            md = doc.metadata or {}
-            snippet = (doc.page_content or "").strip()
-            snippet = snippet[:1200]
-            if allowed_sources is not None:
-                ps = str(md.get("paper_source") or "").strip()
-                if not ps or ps not in allowed_sources:
-                    continue
-            paper_id = _paper_id_from_md_path(str(md.get("md_path") or "") or None)
-            evidence.append(
-                {
-                    "rank": len(evidence) + 1,
-                    "score": float(score),
-                    "chunk_id": md.get("chunk_id"),
-                    "paper_id": paper_id,
-                    "paper_source": md.get("paper_source"),
-                    "md_path": md.get("md_path"),
-                    "start_line": md.get("start_line"),
-                    "end_line": md.get("end_line"),
-                    "section": md.get("section"),
-                    "kind": md.get("kind"),
-                    "snippet": snippet,
-                    "mode": "faiss",
-                }
-            )
-            context_lines.append(
-                f"[E{len(evidence)}] {md.get('paper_source')} {md.get('md_path')}:{md.get('start_line')}-{md.get('end_line')}\n{snippet}"
-            )
-            if len(evidence) >= want:
-                break
-    except Exception:
-        run_dir = latest_run_dir(_runs_dir())
-        chunks = load_chunks_from_run(run_dir)
-        retrieved = lexical_retrieve(question, chunks, k=oversample)
-        for idx, r in enumerate(retrieved, start=1):
-            if allowed_sources is not None:
-                ps = str(r.paper_source or "").strip()
-                if not ps or ps not in allowed_sources:
-                    continue
-            paper_id = _paper_id_from_md_path(r.md_path)
-            evidence.append(
-                {
-                    "rank": len(evidence) + 1,
-                    "score": r.score,
-                    "chunk_id": r.chunk_id,
-                    "paper_id": paper_id,
-                    "paper_source": r.paper_source,
-                    "md_path": r.md_path,
-                    "start_line": r.start_line,
-                    "end_line": r.end_line,
-                    "section": r.section,
-                    "kind": r.kind,
-                    "snippet": r.snippet,
-                    "mode": "lexical",
-                }
-            )
-            context_lines.append(
-                f"[E{len(evidence)}] {r.paper_source} {r.md_path}:{r.start_line}-{r.end_line}\n{r.snippet}"
-            )
-            if len(evidence) >= want:
-                break
+    except FileNotFoundError as e:
+        # No FAISS index exists - this is a user-facing 404 error
+        raise FileNotFoundError("FAISS index not found. Please run full rebuild first.") from e
+    except Exception as e:
+        # FAISS load/query failed - this is a 500 error
+        raise RuntimeError(f"FAISS retrieval failed: {str(e)}. Please check embedding configuration.") from e
+
+    docs_and_scores = store.similarity_search_with_score(question, k=oversample)
+    for idx, (doc, score) in enumerate(docs_and_scores, start=1):
+        md = doc.metadata or {}
+        snippet = (doc.page_content or "").strip()
+        snippet = snippet[:1200]
+        if allowed_sources is not None:
+            ps = str(md.get("paper_source") or "").strip()
+            if not ps or ps not in allowed_sources:
+                continue
+        paper_id = _paper_id_from_md_path(str(md.get("md_path") or "") or None)
+        evidence.append(
+            {
+                "rank": len(evidence) + 1,
+                "score": float(score),
+                "chunk_id": md.get("chunk_id"),
+                "paper_id": paper_id,
+                "paper_source": md.get("paper_source"),
+                "md_path": md.get("md_path"),
+                "start_line": md.get("start_line"),
+                "end_line": md.get("end_line"),
+                "section": md.get("section"),
+                "kind": md.get("kind"),
+                "snippet": snippet,
+                "mode": "faiss",
+            }
+        )
+        context_lines.append(
+            f"[E{len(evidence)}] {md.get('paper_source')} {md.get('md_path')}:{md.get('start_line')}-{md.get('end_line')}\n{snippet}"
+        )
+        if len(evidence) >= want:
+            break
 
     if allowed_sources is not None and len(evidence) < min(2, want):
         return {

@@ -33,18 +33,64 @@ def llm() -> Any:
     base_url = settings.effective_llm_base_url()
     if not api_key:
         raise RuntimeError("LLM API key missing (set DEEPSEEK_API_KEY or LLM_API_KEY)")
+
+    try:
+        timeout_seconds = int(getattr(settings, "llm_timeout_seconds", 60) or 60)
+    except Exception:
+        timeout_seconds = 60
+    timeout_seconds = max(10, min(600, timeout_seconds))
+    client_retries = max(0, min(2, int(getattr(settings, "llm_client_max_retries", 0) or 0)))
+
     return ChatOpenAI(
         api_key=api_key,
         base_url=base_url,
         model=settings.llm_model,
         temperature=0,
-        timeout=60,
-        max_retries=2,
+        timeout=timeout_seconds,
+        max_retries=client_retries,
     )
 
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=0.8, min=0.8, max=4.0))
-def call_json(system: str, user: str) -> dict:
+def _call_text_with_retry(system: str, user: str) -> str:
+    """Call LLM with retry logic and return raw text response."""
     resp = llm().invoke([("system", system), ("user", user)])
-    return _extract_json(resp.content)
+    return str(resp.content or "")
+
+
+def call_text(system: str, user: str, *, use_retry: bool = True) -> str:
+    """
+    Call LLM and return raw text response.
+
+    Args:
+        system: System prompt
+        user: User prompt
+        use_retry: Whether to use retry logic (default: True)
+
+    Returns:
+        Raw text response from LLM
+    """
+    if use_retry:
+        return _call_text_with_retry(system, user)
+    resp = llm().invoke([("system", system), ("user", user)])
+    return str(resp.content or "")
+
+
+def call_json(system: str, user: str, *, use_retry: bool = True) -> dict:
+    """
+    Call LLM and parse JSON response.
+
+    Args:
+        system: System prompt
+        user: User prompt
+        use_retry: Whether to use retry logic (default: True)
+
+    Returns:
+        Parsed JSON dict
+
+    Raises:
+        JSONDecodeError: If response is not valid JSON
+    """
+    raw = call_text(system, user, use_retry=use_retry)
+    return _extract_json(raw)
 

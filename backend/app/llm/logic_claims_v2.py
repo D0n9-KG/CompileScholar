@@ -272,6 +272,18 @@ def extract_logic_and_claims_v2(doc: DocumentIR, paper_id: str, schema: dict[str
         "- Do NOT invent details, numbers, conditions, or causal claims.\n"
         "- If something is not explicitly supported, omit it (preferred) or lower confidence.\n"
         "\n"
+        "SCIENTIFIC VALUE (CRITICAL):\n"
+        "- Extract ONLY scientific contributions, methods, findings, and conclusions.\n"
+        "- DO NOT extract meta-information such as:\n"
+        "  * Author names, affiliations, correspondence addresses\n"
+        "  * Submission/acceptance/publication dates\n"
+        "  * Funding sources, grant numbers, acknowledgments\n"
+        "  * Journal names, DOIs, paper identifiers\n"
+        "  * Conflict of interest statements\n"
+        "  * Dataset availability, code repository links (unless core to the method)\n"
+        "- Focus on WHAT was discovered/proposed, not WHO/WHEN/WHERE published.\n"
+        "- When encountering pure meta-information chunks, output empty claims array.\n"
+        "\n"
         "LANGUAGE / STYLE:\n"
         "- Use the same language as the paper text.\n"
         "- Write COMPLETE sentences only (no fragments, no missing subjects/verbs).\n"
@@ -337,8 +349,14 @@ def extract_logic_and_claims_v2(doc: DocumentIR, paper_id: str, schema: dict[str
     norm_logic: dict[str, dict[str, Any]] = {}
     for sid in step_ids:
         v = (logic_in.get(sid) if isinstance(logic_in, dict) else {}) or {}
+        summary = str(v.get("summary") or "").strip()
+
+        # P0 Fix: Filter out empty summary logic steps
+        if not summary:
+            continue
+
         norm_logic[sid] = {
-            "summary": str(v.get("summary") or "").strip(),
+            "summary": summary,
             "confidence": float(v.get("confidence") or 0.5),
         }
 

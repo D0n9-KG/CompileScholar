@@ -13,8 +13,23 @@ ProgressFn = Callable[[str, float, str | None], None]
 LogFn = Callable[[str], None]
 
 
+_EMBEDDING_MIN_SIMILARITY = 0.85
+_LEXICAL_MIN_SIMILARITY = 0.70
+_DEFAULT_ACCEPT_THRESHOLD = 0.82
+
+
 def _now_iso() -> str:
     return datetime.now(tz=timezone.utc).isoformat()
+
+
+def _normalize_similarity_mode(raw_mode: Any) -> str:
+    mode = str(raw_mode or "").strip().lower()
+    return "lexical" if mode == "lexical" else "embedding"
+
+
+def _min_similarity_for_mode(mode: str) -> float:
+    normalized = _normalize_similarity_mode(mode)
+    return _LEXICAL_MIN_SIMILARITY if normalized == "lexical" else _EMBEDDING_MIN_SIMILARITY
 
 
 def _aggregate_edge_items(events: list[dict], relation_type: str) -> list[dict]:
@@ -38,6 +53,112 @@ def _aggregate_edge_items(events: list[dict], relation_type: str) -> list[dict]:
         item["score"] = max(float(item["score"]), score)
         item["evidence_count"] = int(item["evidence_count"]) + 1
     return list(agg.values())
+
+
+def _compute_evolution_quality_metrics(
+    inferred_events: list[dict],
+    supports: list[dict],
+    challenges: list[dict],
+    supersedes: list[dict],
+    total_propositions: int
+) -> dict[str, Any]:
+    """Compute quality metrics for evolution rebuild.
+
+    Args:
+        inferred_events: All inferred events (including non-accepted)
+        supports: Aggregated SUPPORTS edges
+        challenges: Aggregated CHALLENGES edges
+        supersedes: Aggregated SUPERSEDES edges
+        total_propositions: Total proposition count from sync
+
+    Returns:
+        Dictionary with:
+        - coverage_rate: Proportion of propositions with relations
+        - covered_propositions: Count of propositions in edges
+        - total_propositions: Total proposition count
+        - self_loop_rate: Proportion of accepted events that are self-loops
+        - self_loop_count: Count of self-loop events
+        - total_accepted_events: Count of accepted relation events
+    """
+    # Collect unique propositions from all edges
+    covered_props: set[str] = set()
+
+    for edge in supports + challenges + supersedes:
+        source_prop_id = str(edge.get("source_prop_id") or "").strip()
+        target_prop_id = str(edge.get("target_prop_id") or "").strip()
+        if source_prop_id:
+            covered_props.add(source_prop_id)
+        if target_prop_id:
+            covered_props.add(target_prop_id)
+
+    covered_count = len(covered_props)
+    total_props = max(0, int(total_propositions or 0))
+    coverage_rate = covered_count / total_props if total_props > 0 else 0.0
+
+    # Count self-loops in accepted inferred events
+    # Note: Exclude events with origin="mention" from self-loop counting
+    accepted_events = [
+        e for e in inferred_events
+        if str(e.get("status") or "").strip() == "accepted"
+        and str(e.get("origin") or "").strip().lower() != "mention"
+    ]
+
+    self_loop_count = 0
+    for e in accepted_events:
+        source_prop_id = str(e.get("source_prop_id") or "").strip()
+        target_prop_id = str(e.get("target_prop_id") or "").strip()
+        if source_prop_id and source_prop_id == target_prop_id:
+            self_loop_count += 1
+
+    total_accepted = len(accepted_events)
+    self_loop_rate = self_loop_count / total_accepted if total_accepted > 0 else 0.0
+
+    return {
+        "coverage_rate": coverage_rate,
+        "covered_propositions": covered_count,
+        "total_propositions": total_props,
+        "self_loop_rate": self_loop_rate,
+        "self_loop_count": self_loop_count,
+        "total_accepted_events": total_accepted,
+    }
+
+
+def _enforce_evolution_quality_gates(metrics: dict[str, Any], settings: Any) -> None:
+    """Enforce quality gates for evolution metrics.
+
+    Args:
+        metrics: Quality metrics from _compute_evolution_quality_metrics()
+        settings: Settings with gate configuration
+
+    Raises:
+        ValueError: If quality gates not met
+    """
+    if not getattr(settings, "evolution_gate_enabled", True):
+        return
+
+    min_coverage = float(getattr(settings, "evolution_min_coverage", 0.20))
+    max_self_loop_rate = float(getattr(settings, "evolution_max_self_loop_rate", 0.05))
+
+    coverage_rate = float(metrics.get("coverage_rate") or 0.0)
+    self_loop_rate = float(metrics.get("self_loop_rate") or 0.0)
+    covered_propositions = int(metrics.get("covered_propositions") or 0)
+    total_propositions = int(metrics.get("total_propositions") or 0)
+    self_loop_count = int(metrics.get("self_loop_count") or 0)
+    total_accepted_events = int(metrics.get("total_accepted_events") or 0)
+
+    if coverage_rate < min_coverage:
+        raise ValueError(
+            "Evolution quality gate failed: coverage rate "
+            f"{coverage_rate:.2%} is below minimum {min_coverage:.2%} "
+            f"({covered_propositions}/{total_propositions} covered propositions)."
+        )
+
+    if self_loop_rate > max_self_loop_rate:
+        raise ValueError(
+            "Evolution quality gate failed: self-loop rate "
+            f"{self_loop_rate:.2%} exceeds maximum {max_self_loop_rate:.2%} "
+            f"({self_loop_count}/{total_accepted_events} self-loop accepted events)."
+        )
 
 
 def sync_proposition_mentions_global(progress: ProgressFn | None = None, log: LogFn | None = None) -> dict[str, Any]:
@@ -64,9 +185,9 @@ def sync_proposition_mentions_global(progress: ProgressFn | None = None, log: Lo
                 text = str(r.get("text") or "").strip()
                 if not text:
                     continue
-                step = str(r.get("step_type") or "").strip().lower()
-                kinds = "|".join(sorted(str(x).strip().lower() for x in (r.get("kinds") or []) if str(x).strip()))
-                prop_key = hashlib.sha256(f"{normalize_proposition_text(text)}\0{step}\0{kinds}".encode("utf-8", errors="ignore")).hexdigest()[:24]
+                # Use Assertion Layer text-only key (matches neo4j_client.py)
+                from app.graph.neo4j_client import proposition_key_for_claim
+                prop_key = proposition_key_for_claim(text=text)
                 mapped_props.add(prop_key)
             ratio = idx / max(1, total)
             progress("evolution:sync:mentions", 0.02 + ratio * 0.48, f"Synced proposition mentions: {idx}/{total}")
@@ -79,7 +200,7 @@ def rebuild_evolution_graph(
     progress: ProgressFn | None = None,
     log: LogFn | None = None,
     *,
-    min_similarity: float = 0.86,
+    min_similarity: float | None = None,
     candidate_limit: int = 50000,
 ) -> dict[str, Any]:
     progress = progress or (lambda stage, p, msg=None: None)
@@ -94,29 +215,24 @@ def rebuild_evolution_graph(
 
     progress("evolution:candidates", 0.55, "Loading similarity candidates")
     adaptive_similarity = False
-    similarity_floor = float(min_similarity)
-    raw_max_similarity = 1.0
-    inference_min_similarity = float(min_similarity)
-    inference_accept_threshold = 0.82
+    explicit_min_similarity = clamp01(float(min_similarity)) if min_similarity is not None else None
+    similarity_floor = float(explicit_min_similarity) if explicit_min_similarity is not None else _LEXICAL_MIN_SIMILARITY
+    inference_min_similarity = float(explicit_min_similarity) if explicit_min_similarity is not None else _EMBEDDING_MIN_SIMILARITY
+    inference_accept_threshold = _DEFAULT_ACCEPT_THRESHOLD
 
     with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
-        pairs = client.list_proposition_candidate_pairs(min_score=min_similarity, limit=candidate_limit)
-        if not pairs and min_similarity > 0.05:
-            fallback_min = 0.05
-            pairs = client.list_proposition_candidate_pairs(min_score=fallback_min, limit=candidate_limit)
-            similarity_floor = fallback_min
-            sims = [float(p.get("similarity") or 0.0) for p in pairs]
-            raw_max_similarity = max(sims) if sims else 0.0
-            if pairs and 0.0 < raw_max_similarity < min_similarity:
-                adaptive_similarity = True
-                inference_min_similarity = 0.74
-                inference_accept_threshold = 0.80
-        else:
-            sims = [float(p.get("similarity") or 0.0) for p in pairs]
-            raw_max_similarity = max(sims) if sims else 0.0
+        pairs = client.list_proposition_candidate_pairs(min_score=similarity_floor, limit=candidate_limit)
+    sims = [float(p.get("similarity") or 0.0) for p in pairs]
+    raw_max_similarity = max(sims) if sims else 0.0
 
     inferred_events: list[dict[str, Any]] = []
+    mode_counts: dict[str, int] = {"embedding": 0, "lexical": 0}
     for pair in pairs:
+        pair_mode = _normalize_similarity_mode(pair.get("similarity_mode"))
+        mode_counts[pair_mode] = int(mode_counts.get(pair_mode, 0)) + 1
+        pair_min_similarity = (
+            float(explicit_min_similarity) if explicit_min_similarity is not None else _min_similarity_for_mode(pair_mode)
+        )
         source_prop_id = str(pair.get("source_prop_id") or "").strip()
         target_prop_id = str(pair.get("target_prop_id") or "").strip()
         source_claim_id = str(pair.get("source_claim_id") or "").strip()
@@ -127,22 +243,26 @@ def rebuild_evolution_graph(
             continue
 
         raw_similarity = float(pair.get("similarity") or 0.0)
-        normalized_similarity = raw_similarity
-        if adaptive_similarity and raw_max_similarity > 1e-8:
-            normalized_similarity = clamp01(raw_similarity / raw_max_similarity)
-
         inferred = infer_relation_type(
             source_text=str(pair.get("source_text") or ""),
             target_text=str(pair.get("target_text") or ""),
-            similarity=normalized_similarity,
+            similarity=raw_similarity,
             target_confidence=float(pair.get("target_confidence") or 0.5),
-            min_similarity=inference_min_similarity,
+            min_similarity=pair_min_similarity,
             accepted_threshold=inference_accept_threshold,
         )
         if not inferred:
             continue
 
         event_type = str(inferred["event_type"])
+
+        # Handle MERGE events separately (text identity - propositions should be merged, not related)
+        if event_type == "MERGE":
+            # Log merge candidate for post-processing
+            log(f"Merge candidate detected: {source_prop_id} <-> {target_prop_id} (text identity)")
+            # Skip adding to inferred_events - merges are structural changes, not relations
+            continue
+
         event_seed = f"infer\0{source_claim_id}\0{target_claim_id}\0{event_type}"
         event_id = hashlib.sha256(event_seed.encode("utf-8", errors="ignore")).hexdigest()[:32]
         inferred_events.append(
@@ -159,8 +279,9 @@ def rebuild_evolution_graph(
                 "source_paper_id": str(pair.get("source_paper_id") or ""),
                 "target_paper_id": str(pair.get("target_paper_id") or ""),
                 "raw_similarity": raw_similarity,
-                "normalized_similarity": normalized_similarity,
+                "normalized_similarity": raw_similarity,
                 "event_time": built_at,
+                "similarity_mode": pair_mode,
             }
         )
 
@@ -168,6 +289,26 @@ def rebuild_evolution_graph(
     supports = _aggregate_edge_items(inferred_events, "SUPPORTS")
     challenges = _aggregate_edge_items(inferred_events, "CHALLENGES")
     supersedes = _aggregate_edge_items(inferred_events, "SUPERSEDES")
+
+    # P0-6: Compute quality metrics and enforce gates
+    quality_metrics = _compute_evolution_quality_metrics(
+        inferred_events=inferred_events,
+        supports=supports,
+        challenges=challenges,
+        supersedes=supersedes,
+        total_propositions=int(sync_stats.get("propositions") or 0),
+    )
+
+    log(
+        "evolution_quality: "
+        f"coverage={quality_metrics['coverage_rate']:.1%} "
+        f"({quality_metrics['covered_propositions']}/{quality_metrics['total_propositions']}) "
+        f"self_loop={quality_metrics['self_loop_rate']:.1%} "
+        f"({quality_metrics['self_loop_count']}/{quality_metrics['total_accepted_events']})"
+    )
+
+    # Enforce quality gates (raises ValueError if failed)
+    _enforce_evolution_quality_gates(quality_metrics, settings)
 
     with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
         client.replace_inferred_relation_events(inferred_events, built_at=built_at)
@@ -181,7 +322,8 @@ def rebuild_evolution_graph(
         "evolution rebuilt: "
         f"events={len(inferred_events)} "
         f"supports={len(supports)} challenges={len(challenges)} supersedes={len(supersedes)} "
-        f"adaptive_similarity={adaptive_similarity}"
+        f"adaptive_similarity={adaptive_similarity} "
+        f"modes={mode_counts}"
     )
     return {
         "ok": True,
@@ -195,11 +337,20 @@ def rebuild_evolution_graph(
             "inference_min_similarity": inference_min_similarity,
             "inference_accept_threshold": inference_accept_threshold,
         },
+        "similarity_modes": mode_counts,
+        "mode_thresholds": {
+            "embedding_min_similarity": _EMBEDDING_MIN_SIMILARITY,
+            "lexical_min_similarity": _LEXICAL_MIN_SIMILARITY,
+            "candidate_floor": similarity_floor,
+            "override_min_similarity": explicit_min_similarity,
+            "accept_threshold": inference_accept_threshold,
+        },
         "events": len(inferred_events),
         "edges": {
             "supports": len(supports),
             "challenges": len(challenges),
             "supersedes": len(supersedes),
         },
+        "quality_metrics": quality_metrics,
         "states": state_stats,
     }

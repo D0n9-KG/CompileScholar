@@ -292,31 +292,55 @@ def rebuild_similarity_global(
         x = np.array(vecs, dtype=np.float32)
         return _normalize_rows(x)
 
-    mode = "lexical"
+    # Embedding mode only - with retry logic for transient errors
+    if faiss is None:
+        raise RuntimeError("faiss is not available - embedding mode required")
+
+    embed = _embedding_client()
+    max_retries = 3
+    retry_delay = 5  # seconds
+
     claim_x = np.zeros((0, 0), dtype=np.float32)
     logic_x = np.zeros((0, 0), dtype=np.float32)
-    try:
-        if faiss is None:
-            raise RuntimeError("faiss is not available")
-        embed = _embedding_client()
-        progress("similarity:embed_claims", 0.15, f"Embedding claims ({len(claims)})")
-        claim_x = _embed_items("claim", claims) if claims else np.zeros((0, 0), dtype=np.float32)
-        progress("similarity:embed_logic", 0.30, f"Embedding logic steps ({len(logic)})")
-        logic_x = _embed_items("logic", logic) if logic else np.zeros((0, 0), dtype=np.float32)
-        mode = "embedding"
-    except Exception as exc:  # noqa: BLE001
-        # Common in local/dev environments: embedding provider quota/billing issues, missing keys, etc.
-        mode = "lexical"
-        claim_x = np.zeros((0, 0), dtype=np.float32)
-        logic_x = np.zeros((0, 0), dtype=np.float32)
-        log(f"similarity embedding mode unavailable; falling back to lexical mode: {exc}")
+
+    for attempt in range(max_retries):
+        try:
+            progress("similarity:embed_claims", 0.15, f"Embedding claims ({len(claims)}) - attempt {attempt + 1}/{max_retries}")
+            claim_x = _embed_items("claim", claims) if claims else np.zeros((0, 0), dtype=np.float32)
+            progress("similarity:embed_logic", 0.30, f"Embedding logic steps ({len(logic)}) - attempt {attempt + 1}/{max_retries}")
+            logic_x = _embed_items("logic", logic) if logic else np.zeros((0, 0), dtype=np.float32)
+            break  # Success - exit retry loop
+        except Exception as exc:  # noqa: BLE001
+            error_msg = str(exc).strip()
+            if attempt < max_retries - 1:
+                log(f"Embedding attempt {attempt + 1}/{max_retries} failed: {error_msg}. Retrying in {retry_delay}s...")
+                import time
+                time.sleep(retry_delay)
+            else:
+                # All retries exhausted - raise error for user to resolve
+                log(f"Embedding failed after {max_retries} attempts: {error_msg}")
+                raise RuntimeError(
+                    f"Similarity rebuild failed: embedding unavailable after {max_retries} attempts. "
+                    f"Error: {error_msg}. Please check embedding API configuration and try again."
+                ) from exc
+
+    mode = "embedding"
+    embedding_degraded = False
+    degradation_reason = ""
+    meta_payload = {
+        "built_at": built_at,
+        "model": model,
+        "mode": mode,
+        "embedding_degraded": embedding_degraded,
+        "degradation_reason": degradation_reason,
+    }
 
     if claims:
         _write_items("claim", claims)
         if mode == "embedding":
             _save_embeddings("claim", claim_x)
         _meta_path("claim").write_text(
-            json.dumps({"built_at": built_at, "model": model, "mode": mode}, ensure_ascii=False),
+            json.dumps(meta_payload, ensure_ascii=False),
             encoding="utf-8",
         )
     if logic:
@@ -324,34 +348,40 @@ def rebuild_similarity_global(
         if mode == "embedding":
             _save_embeddings("logic", logic_x)
         _meta_path("logic").write_text(
-            json.dumps({"built_at": built_at, "model": model, "mode": mode}, ensure_ascii=False),
+            json.dumps(meta_payload, ensure_ascii=False),
             encoding="utf-8",
         )
 
-    # Build indexes and compute neighbors
+    # Build indexes and compute neighbors (embedding mode only)
     progress("similarity:neighbors_claims", 0.55, "Computing claim neighbors")
     if claims:
-        if mode == "embedding":
-            claim_index = _build_index(claim_x)
-            batch = _topk_pairs(claim_index, claim_x, claims, list(range(len(claims))), top_k=claim_top_k)
-        else:
-            batch = _lexical_topk_batch(claims, top_k=claim_top_k)
+        claim_index = _build_index(claim_x)
+        batch = _topk_pairs(claim_index, claim_x, claims, list(range(len(claims))), top_k=claim_top_k)
         with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
-            client.replace_similar_claim_edges_batch(batch, model=model, built_at=built_at)
+            client.replace_similar_claim_edges_batch(batch, model=model, built_at=built_at, mode=mode)
 
     progress("similarity:neighbors_logic", 0.75, "Computing logic-step neighbors")
     if logic:
-        if mode == "embedding":
-            logic_index = _build_index(logic_x)
-            batch = _topk_pairs(logic_index, logic_x, logic, list(range(len(logic))), top_k=logic_top_k)
-        else:
-            batch = _lexical_topk_batch(logic, top_k=logic_top_k)
+        logic_index = _build_index(logic_x)
+        batch = _topk_pairs(logic_index, logic_x, logic, list(range(len(logic))), top_k=logic_top_k)
         with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
             client.replace_similar_logic_edges_batch(batch, model=model, built_at=built_at)
 
     progress("similarity:done", 1.0, "Similarity rebuild done")
-    log(f"similarity rebuilt: mode={mode} claims={len(claims)} logic_steps={len(logic)} model={model}")
-    return {"ok": True, "built_at": built_at, "model": model, "mode": mode, "claims": len(claims), "logic_steps": len(logic)}
+    log(
+        f"similarity rebuilt: mode={mode} claims={len(claims)} logic_steps={len(logic)} "
+        f"model={model} degraded={embedding_degraded}"
+    )
+    return {
+        "ok": True,
+        "built_at": built_at,
+        "model": model,
+        "mode": mode,
+        "embedding_degraded": embedding_degraded,
+        "degradation_reason": degradation_reason,
+        "claims": len(claims),
+        "logic_steps": len(logic),
+    }
 
 
 def update_similarity_for_paper(
@@ -421,14 +451,60 @@ def update_similarity_for_paper(
     def _apply_updates(
         kind: str, items: list[SimilarityItem], x: np.ndarray, idx_map: dict[str, int], updates: list[SimilarityItem]
     ):
+        import time
+
         changed: list[int] = []
         if not updates:
             return items, x, changed
 
         # Embed only non-empty texts to avoid provider errors.
+        vecs: list[list[float]] = []
         to_embed: list[SimilarityItem] = [u for u in updates if (u.text or "").strip()]
-        vecs = embed.embed_documents([u.text for u in to_embed]) if to_embed else []
-        u_x = _normalize_rows(np.array(vecs, dtype=np.float32)) if to_embed else np.zeros((0, x.shape[1]), dtype=np.float32)
+        if to_embed:
+            # Retry logic for embedding API (handles transient errors)
+            max_retries = 3
+            retry_delay = 5  # seconds
+
+            def _is_retryable_embedding_error(exc: Exception) -> bool:
+                status_code = getattr(exc, "status_code", None)
+                if isinstance(status_code, int):
+                    return status_code in {408, 429, 500, 502, 503, 504}
+                error_text = str(exc).lower()
+                transient_signals = (
+                    "502",
+                    "503",
+                    "504",
+                    "timeout",
+                    "timed out",
+                    "connection reset",
+                    "connection aborted",
+                    "temporarily unavailable",
+                    "rate limit",
+                )
+                return any(signal in error_text for signal in transient_signals)
+
+            for attempt in range(max_retries):
+                try:
+                    vecs = embed.embed_documents([u.text for u in to_embed])
+                    break  # Success - exit retry loop
+                except Exception as exc:  # noqa: BLE001
+                    error_msg = str(exc).strip()
+                    retryable = _is_retryable_embedding_error(exc)
+                    if retryable and attempt < max_retries - 1:
+                        log(f"similarity update embedding attempt {attempt + 1}/{max_retries} failed ({kind}): {error_msg}. Retrying in {retry_delay}s...")
+                        time.sleep(retry_delay)
+                    else:
+                        reason = (
+                            f"non-retryable embedding error on attempt {attempt + 1}/{max_retries}"
+                            if not retryable
+                            else f"embedding unavailable after {max_retries} attempts"
+                        )
+                        raise RuntimeError(
+                            f"Similarity update failed ({kind}): {reason}. "
+                            f"Error: {error_msg}. Please check embedding API configuration and try again."
+                        ) from exc
+
+        u_x = _normalize_rows(np.array(vecs, dtype=np.float32)) if vecs else np.zeros((0, x.shape[1]), dtype=np.float32)
 
         dim = int(x.shape[1]) if x.ndim == 2 and x.shape[1] else (int(u_x.shape[1]) if u_x.ndim == 2 and u_x.shape[1] else 0)
         if dim <= 0:
@@ -464,6 +540,9 @@ def update_similarity_for_paper(
     progress("similarity:update:embed_logic", 0.35, "Embedding updated logic steps")
     logic_items, logic_x, logic_changed = _apply_updates("logic", logic_items, logic_x, logic_idx, new_logic)
 
+    # Mode is always embedding (no lexical fallback)
+    mode = "embedding"
+
     progress("similarity:update:neighbors", 0.55, "Computing updated neighbors")
     with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
         if claim_items and claim_changed:
@@ -476,7 +555,7 @@ def update_similarity_for_paper(
                 batch.extend(_topk_pairs(idx, claim_x, claim_items, active, top_k=claim_top_k))
             for i in cleared:
                 batch.append({"source": claim_items[i].node_id, "targets": []})
-            client.replace_similar_claim_edges_batch(batch, model=model, built_at=built_at)
+            client.replace_similar_claim_edges_batch(batch, model=model, built_at=built_at, mode=mode)
         if logic_items and logic_changed:
             changed_idx = sorted(set(logic_changed))
             active = [i for i in changed_idx if (logic_items[i].text or "").strip()]
@@ -494,14 +573,24 @@ def update_similarity_for_paper(
         _write_items("claim", claim_items)
         _save_embeddings("claim", claim_x)
         _meta_path("claim").write_text(
-            json.dumps({"built_at": built_at, "model": model, "mode": "embedding"}, ensure_ascii=False),
+            json.dumps(
+                {
+                    "built_at": built_at,
+                    "model": model,
+                    "mode": mode,
+                }, ensure_ascii=False),
             encoding="utf-8",
         )
     if logic_items:
         _write_items("logic", logic_items)
         _save_embeddings("logic", logic_x)
         _meta_path("logic").write_text(
-            json.dumps({"built_at": built_at, "model": model, "mode": "embedding"}, ensure_ascii=False),
+            json.dumps(
+                {
+                    "built_at": built_at,
+                    "model": model,
+                    "mode": mode,
+                }, ensure_ascii=False),
             encoding="utf-8",
         )
 
@@ -513,5 +602,6 @@ def update_similarity_for_paper(
         "built_at": built_at,
         "model": model,
         "claims_updated": len(set(claim_changed)),
+        "mode": mode,
         "logic_steps_updated": len(set(logic_changed)),
     }

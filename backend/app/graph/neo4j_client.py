@@ -35,10 +35,19 @@ def normalize_proposition_text(text: str) -> str:
 
 
 def proposition_key_for_claim(text: str, step_type: str | None = None, kinds: list[str] | None = None) -> str:
+    """
+    Generate deterministic proposition key based ONLY on normalized text.
+
+    Assertion Layer (P1): Text-only identity ensures that identical claims
+    from different reasoning steps or with different kinds are properly
+    deduplicated. step_type and kinds are now tracked separately in the
+    step_types_seen and kinds_seen arrays on the Proposition node.
+
+    Parameters kept for backward compatibility but are ignored in hash calculation.
+    """
     base = normalize_proposition_text(text)
-    step = (step_type or "").strip().lower()
-    kinds_norm = "|".join(sorted({str(k).strip().lower() for k in (kinds or []) if str(k).strip()}))
-    raw = f"{base}\0{step}\0{kinds_norm}".encode("utf-8", errors="ignore")
+    # Text-only hash for deterministic Assertion Layer identity
+    raw = base.encode("utf-8", errors="ignore")
     return hashlib.sha256(raw).hexdigest()[:24]
 
 
@@ -59,7 +68,13 @@ def iso_time_for_paper_year(year: int | None) -> str:
 
 class Neo4jClient:
     def __init__(self, uri: str, user: str, password: str):
-        self._driver = GraphDatabase.driver(uri, auth=(user, password))
+        try:
+            connect_timeout = float(getattr(settings, "neo4j_connection_timeout_seconds", 15.0) or 15.0)
+        except Exception:
+            connect_timeout = 15.0
+        connect_timeout = max(1.0, min(120.0, connect_timeout))
+
+        self._driver = GraphDatabase.driver(uri, auth=(user, password), connection_timeout=connect_timeout)
 
     def close(self) -> None:
         self._driver.close()
@@ -79,6 +94,7 @@ class Neo4jClient:
             "CREATE CONSTRAINT claim_id_unique IF NOT EXISTS FOR (cl:Claim) REQUIRE cl.claim_id IS UNIQUE",
             "CREATE CONSTRAINT proposition_id_unique IF NOT EXISTS FOR (pr:Proposition) REQUIRE pr.prop_id IS UNIQUE",
             "CREATE CONSTRAINT proposition_key_unique IF NOT EXISTS FOR (pr:Proposition) REQUIRE pr.prop_key IS UNIQUE",
+            "CREATE CONSTRAINT proposition_group_id_unique IF NOT EXISTS FOR (pg:PropositionGroup) REQUIRE pg.group_id IS UNIQUE",
             "CREATE CONSTRAINT evidence_event_id_unique IF NOT EXISTS FOR (ev:EvidenceEvent) REQUIRE ev.event_id IS UNIQUE",
             "CREATE CONSTRAINT figure_id_unique IF NOT EXISTS FOR (f:Figure) REQUIRE f.figure_id IS UNIQUE",
             "CREATE CONSTRAINT collection_id_unique IF NOT EXISTS FOR (co:Collection) REQUIRE co.collection_id IS UNIQUE",
@@ -166,43 +182,61 @@ MERGE (p)-[:HAS_CHUNK]->(ch)
         steps = []
         for idx, step_type in enumerate(step_order):
             v = (logic or {}).get(step_type) or {}
+
+            # P0 Fix: Defensive filter - skip empty logic steps
+            summary = v.get("summary") or ""
+            evidence_ids = list(v.get("evidence_chunk_ids") or [])
+
+            # Skip if both summary and evidence are empty
+            if not summary.strip() and not evidence_ids:
+                continue
+
             steps.append(
                 {
                     "logic_step_id": f"{paper_id}:{step_type}",
                     "paper_id": paper_id,
                     "step_type": step_type,
                     "order": int(v.get("order") if v.get("order") is not None else idx),
-                    "summary": v.get("summary"),
+                    "summary": summary,
                     "confidence": v.get("confidence"),
-                    "evidence_chunk_ids": list(v.get("evidence_chunk_ids") or []),
+                    "evidence_chunk_ids": evidence_ids,
                     "evidence_weak": bool(v.get("evidence_weak") or False),
                 }
             )
         cypher = """
 MATCH (p:Paper {paper_id:$paper_id})
+CALL {
+    WITH p, $steps AS steps
+    UNWIND steps AS s
+    MERGE (ls:LogicStep {logic_step_id: s.logic_step_id})
+    SET ls.paper_id = s.paper_id,
+        ls.step_type = s.step_type,
+        ls.order = s.order,
+        ls.summary = s.summary,
+        ls.confidence = s.confidence
+    MERGE (p)-[:HAS_LOGIC_STEP]->(ls)
+    RETURN count(*) AS logic_steps_written
+}
+CALL {
+    WITH $steps AS steps
+    UNWIND range(0, size(steps)-2) AS i
+    MATCH (a:LogicStep {logic_step_id: steps[i].logic_step_id})
+    MATCH (b:LogicStep {logic_step_id: steps[i+1].logic_step_id})
+    MERGE (a)-[:NEXT]->(b)
+    RETURN count(*) AS next_edges_written
+}
+CALL {
+    WITH $steps AS steps
+    UNWIND steps AS s
+    MATCH (ls:LogicStep {logic_step_id: s.logic_step_id})
+    WITH ls, s
+    UNWIND coalesce(s.evidence_chunk_ids, []) AS cid
+    MATCH (ch:Chunk {chunk_id: cid})
+    MERGE (ls)-[e:EVIDENCED_BY {source:'machine'}]->(ch)
+    SET e.weak = coalesce(s.evidence_weak, false)
+    RETURN count(*) AS logic_step_evidence_written
+}
 WITH p
-UNWIND $steps AS s
-MERGE (ls:LogicStep {logic_step_id: s.logic_step_id})
-SET ls.paper_id = s.paper_id,
-    ls.step_type = s.step_type,
-    ls.order = s.order,
-    ls.summary = s.summary,
-    ls.confidence = s.confidence
-MERGE (p)-[:HAS_LOGIC_STEP]->(ls)
-WITH p, $steps AS steps
-UNWIND range(0, size(steps)-2) AS i
-MATCH (a:LogicStep {logic_step_id: steps[i].logic_step_id})
-MATCH (b:LogicStep {logic_step_id: steps[i+1].logic_step_id})
-MERGE (a)-[:NEXT]->(b)
-WITH p, steps
-UNWIND steps AS s
-MATCH (ls:LogicStep {logic_step_id: s.logic_step_id})
-WITH p, ls, s
-UNWIND coalesce(s.evidence_chunk_ids, []) AS cid
-MATCH (ch:Chunk {chunk_id: cid})
-MERGE (ls)-[e:EVIDENCED_BY {source:'machine'}]->(ch)
-SET e.weak = coalesce(s.evidence_weak, false)
-WITH DISTINCT p
 UNWIND $claims AS c
 MERGE (cl:Claim {claim_id: c.claim_id})
 SET cl.paper_id = $paper_id,
@@ -215,17 +249,26 @@ SET cl.paper_id = $paper_id,
     cl.targets_paper_ids = coalesce(c.targets_paper_ids, [])
 MERGE (p)-[:HAS_CLAIM]->(cl)
 WITH cl, c, $paper_id AS paper_id
-MATCH (ls:LogicStep {logic_step_id: paper_id + ':' + c.step_type})
-MERGE (ls)-[:HAS_CLAIM]->(cl)
-WITH cl, c
-UNWIND coalesce(c.evidence_chunk_ids, []) AS cid
-MATCH (ch:Chunk {chunk_id: cid})
-MERGE (cl)-[e:EVIDENCED_BY {source:'machine'}]->(ch)
-SET e.weak = coalesce(c.evidence_weak, false)
-WITH cl, c
-UNWIND coalesce(c.targets_paper_ids, []) AS tid
-MATCH (tp:Paper {paper_id: tid})
-MERGE (cl)-[:TARGETS_PAPER]->(tp)
+OPTIONAL MATCH (ls:LogicStep {logic_step_id: paper_id + ':' + c.step_type})
+FOREACH (_ IN CASE WHEN ls IS NULL THEN [] ELSE [1] END |
+    MERGE (ls)-[:HAS_CLAIM]->(cl)
+)
+CALL {
+    WITH cl, c
+    UNWIND coalesce(c.evidence_chunk_ids, []) AS cid
+    MATCH (ch:Chunk {chunk_id: cid})
+    MERGE (cl)-[e:EVIDENCED_BY {source:'machine'}]->(ch)
+    SET e.weak = coalesce(c.evidence_weak, false)
+    RETURN count(*) AS claim_evidence_written
+}
+CALL {
+    WITH cl, c
+    UNWIND coalesce(c.targets_paper_ids, []) AS tid
+    MATCH (tp:Paper {paper_id: tid})
+    MERGE (cl)-[:TARGETS_PAPER]->(tp)
+    RETURN count(*) AS claim_targets_written
+}
+RETURN count(*) AS claims_written
 """
         with self._driver.session() as session:
             session.run(cypher, paper_id=paper_id, steps=steps, claims=claims)
@@ -295,33 +338,64 @@ SET e.weak = false
     ) -> None:
         cypher = """
 MATCH (p:Paper {paper_id: $paper_id})
-WITH p
-UNWIND $refs AS r
-MERGE (re:ReferenceEntry {ref_id: r.ref_id})
-SET re += r
-MERGE (p)-[:HAS_REFERENCE]->(re)
-WITH p
-UNWIND $cited_papers AS cp
-MERGE (q:Paper {paper_id: cp.paper_id})
-SET q += cp
-WITH p
-UNWIND $cites_resolved AS cr
-MATCH (q:Paper {paper_id: cr.cited_paper_id})
-MERGE (p)-[c:CITES]->(q)
-SET c.total_mentions = cr.total_mentions,
-    c.ref_nums = cr.ref_nums,
-    c.evidence_chunk_ids = cr.evidence_chunk_ids,
-    c.evidence_spans = cr.evidence_spans,
-    c.purpose_labels = coalesce(c.purpose_labels, []),
-    c.purpose_scores = coalesce(c.purpose_scores, [])
-WITH p
-UNWIND $cites_unresolved AS cu
-MATCH (re:ReferenceEntry {ref_id: cu.ref_id})
-MERGE (p)-[u:CITES_UNRESOLVED]->(re)
-SET u.total_mentions = cu.total_mentions,
-    u.ref_nums = cu.ref_nums,
-    u.evidence_chunk_ids = cu.evidence_chunk_ids,
-    u.evidence_spans = cu.evidence_spans
+CALL {
+    WITH p
+    UNWIND $refs AS r
+    MERGE (re:ReferenceEntry {ref_id: r.ref_id})
+    SET re += r
+    MERGE (p)-[:HAS_REFERENCE]->(re)
+    RETURN count(*) AS refs_written
+}
+CALL {
+    WITH p
+    UNWIND $cited_papers AS cp
+    MERGE (q:Paper {paper_id: cp.paper_id})
+    ON CREATE SET q += cp
+    ON MATCH SET
+        q.paper_id = cp.paper_id,
+        q.doi = CASE
+            WHEN cp.doi IS NULL OR trim(toString(cp.doi)) = '' THEN q.doi
+            ELSE cp.doi
+        END,
+        q.title = coalesce(q.title, cp.title),
+        q.authors = coalesce(q.authors, cp.authors),
+        q.year = coalesce(q.year, cp.year),
+        q.abstract = coalesce(q.abstract, cp.abstract),
+        q.paper_source = coalesce(q.paper_source, cp.paper_source),
+        q.md_path = coalesce(q.md_path, cp.md_path)
+    RETURN count(*) AS cited_papers_written
+}
+CALL {
+    WITH p
+    UNWIND $cites_resolved AS cr
+    MATCH (q:Paper {paper_id: cr.cited_paper_id})
+    MERGE (p)-[c:CITES]->(q)
+    SET c.total_mentions = cr.total_mentions,
+        c.ref_nums = cr.ref_nums,
+        c.evidence_chunk_ids = cr.evidence_chunk_ids,
+        c.evidence_spans = cr.evidence_spans,
+        c.purpose_labels = CASE
+            WHEN c.purpose_labels IS NULL OR size(c.purpose_labels) = 0 THEN ['Background']
+            ELSE c.purpose_labels
+        END,
+        c.purpose_scores = CASE
+            WHEN c.purpose_scores IS NULL OR size(c.purpose_scores) = 0 THEN [0.2]
+            ELSE c.purpose_scores
+        END
+    RETURN count(*) AS cites_resolved_written
+}
+CALL {
+    WITH p
+    UNWIND $cites_unresolved AS cu
+    MATCH (re:ReferenceEntry {ref_id: cu.ref_id})
+    MERGE (p)-[u:CITES_UNRESOLVED]->(re)
+    SET u.total_mentions = cu.total_mentions,
+        u.ref_nums = cu.ref_nums,
+        u.evidence_chunk_ids = cu.evidence_chunk_ids,
+        u.evidence_spans = cu.evidence_spans
+    RETURN count(*) AS cites_unresolved_written
+}
+RETURN p.paper_id AS paper_id
 """
         with self._driver.session() as session:
             session.run(
@@ -1723,8 +1797,13 @@ ON CREATE SET pr.prop_key = it.prop_key,
               pr.canonical_text = it.canonical_text,
               pr.created_at = $now
 SET pr.last_seen_at = $now,
-    pr.step_type = coalesce(pr.step_type, it.step_type),
-    pr.kinds = CASE WHEN size(coalesce(pr.kinds, [])) = 0 THEN it.kinds ELSE pr.kinds END
+    pr.step_types_seen = CASE
+        WHEN it.step_type = '' THEN coalesce(pr.step_types_seen, [])
+        WHEN it.step_type IN coalesce(pr.step_types_seen, []) THEN pr.step_types_seen
+        ELSE coalesce(pr.step_types_seen, []) + [it.step_type]
+    END,
+    pr.kinds_seen = reduce(acc = coalesce(pr.kinds_seen, []), k IN it.kinds |
+        CASE WHEN k IN acc THEN acc ELSE acc + [k] END)
 MERGE (cl)-[:MAPS_TO]->(pr)
 MERGE (ev:EvidenceEvent {event_id: it.event_id})
 ON CREATE SET ev.origin = 'mention',
@@ -1759,6 +1838,7 @@ WHERE pa.prop_id <> pb.prop_id
 RETURN a.claim_id AS source_claim_id,
        b.claim_id AS target_claim_id,
        a.paper_id AS source_paper_id,
+       coalesce(toLower(s.mode), 'embedding') AS similarity_mode,
        b.paper_id AS target_paper_id,
        a.text AS source_text,
        b.text AS target_text,
@@ -1784,20 +1864,18 @@ MATCH (sp:Proposition {prop_id: it.source_prop_id})
 MATCH (tp:Proposition {prop_id: it.target_prop_id})
 OPTIONAL MATCH (sc:Claim {claim_id: it.source_claim_id})
 OPTIONAL MATCH (tc:Claim {claim_id: it.target_claim_id})
-CREATE (e:EvidenceEvent {
-    event_id: it.event_id,
-    origin: 'inferred_relation',
-    event_type: it.event_type,
-    status: it.status,
-    confidence: it.confidence,
-    strength: it.strength,
-    source_prop_id: it.source_prop_id,
-    target_prop_id: it.target_prop_id,
-    paper_id: it.target_paper_id,
-    claim_id: it.target_claim_id,
-    event_time: it.event_time,
-    created_at: $built_at
-})
+MERGE (e:EvidenceEvent {event_id: it.event_id})
+ON CREATE SET e.origin = 'inferred_relation',
+              e.created_at = $built_at
+SET e.event_type = it.event_type,
+    e.status = it.status,
+    e.confidence = it.confidence,
+    e.strength = it.strength,
+    e.source_prop_id = it.source_prop_id,
+    e.target_prop_id = it.target_prop_id,
+    e.paper_id = it.target_paper_id,
+    e.claim_id = it.target_claim_id,
+    e.event_time = it.event_time
 MERGE (e)-[:FROM_PROPOSITION]->(sp)
 MERGE (e)-[:TO_PROPOSITION]->(tp)
 MERGE (e)-[:ABOUT]->(tp)
@@ -2010,7 +2088,7 @@ LIMIT 200
 
             return {"proposition": proposition, "events": events, "neighbors": neighbors}
 
-    def replace_similar_claim_edges_batch(self, items: list[dict], model: str, built_at: str) -> None:
+    def replace_similar_claim_edges_batch(self, items: list[dict], model: str, built_at: str, mode: str = "embedding") -> None:
         """
         Replace outgoing SIMILAR_CLAIM edges for each source claim.
         Input: [{"source": "<claim_id>", "targets": [{"target":"<claim_id>","score":0.9}, ...]}, ...]
@@ -2026,13 +2104,17 @@ MATCH (b:Claim {claim_id: t.target})
 MERGE (a)-[s:SIMILAR_CLAIM]->(b)
 SET s.score = t.score,
     s.model = $model,
+    s.mode = $mode,
     s.built_at = $built_at
 """
+        mode_norm = str(mode or "embedding").strip().lower()
+        if mode_norm not in {"embedding", "lexical"}:
+            mode_norm = "embedding"
         with self._driver.session() as session:
             # chunk to avoid huge transactions
             batch = list(items or [])
             for i in range(0, len(batch), 200):
-                session.run(cypher, items=batch[i : i + 200], model=str(model), built_at=str(built_at))
+                session.run(cypher, items=batch[i : i + 200], model=str(model), mode=mode_norm, built_at=str(built_at))
 
     def replace_similar_logic_edges_batch(self, items: list[dict], model: str, built_at: str) -> None:
         """
@@ -2117,14 +2199,32 @@ LIMIT $limit_total
         cypher = """
 MATCH (p:Paper)-[u:CITES_UNRESOLVED]->(re:ReferenceEntry {ref_id:$ref_id})
 MERGE (q:Paper {paper_id:$cited_paper.paper_id})
-SET q += $cited_paper
+ON CREATE SET q += $cited_paper
+ON MATCH SET
+    q.paper_id = $cited_paper.paper_id,
+    q.doi = CASE
+        WHEN $cited_paper.doi IS NULL OR trim(toString($cited_paper.doi)) = '' THEN q.doi
+        ELSE $cited_paper.doi
+    END,
+    q.title = coalesce(q.title, $cited_paper.title),
+    q.authors = coalesce(q.authors, $cited_paper.authors),
+    q.year = coalesce(q.year, $cited_paper.year),
+    q.abstract = coalesce(q.abstract, $cited_paper.abstract),
+    q.paper_source = coalesce(q.paper_source, $cited_paper.paper_source),
+    q.md_path = coalesce(q.md_path, $cited_paper.md_path)
 MERGE (p)-[c:CITES]->(q)
 SET c.total_mentions = u.total_mentions,
     c.evidence_chunk_ids = u.evidence_chunk_ids,
     c.evidence_spans = u.evidence_spans,
     c.ref_nums = u.ref_nums,
-    c.purpose_labels = coalesce(c.purpose_labels, []),
-    c.purpose_scores = coalesce(c.purpose_scores, [])
+    c.purpose_labels = CASE
+        WHEN c.purpose_labels IS NULL OR size(c.purpose_labels) = 0 THEN ['Background']
+        ELSE c.purpose_labels
+    END,
+    c.purpose_scores = CASE
+        WHEN c.purpose_scores IS NULL OR size(c.purpose_scores) = 0 THEN [0.2]
+        ELSE c.purpose_scores
+    END
 DELETE u
 SET re.resolved_doi = $cited_paper.doi,
     re.resolve_confidence = 1.0
@@ -2216,8 +2316,14 @@ SET c.total_mentions = coalesce(c.total_mentions, 0) + coalesce(u.total_mentions
     c.ref_nums = ref_nums_merged,
     c.evidence_chunk_ids = evidence_chunk_ids_merged[0..$max_evidence_idx],
     c.evidence_spans = evidence_spans_merged[0..$max_evidence_idx],
-    c.purpose_labels = coalesce(c.purpose_labels, []),
-    c.purpose_scores = coalesce(c.purpose_scores, [])
+    c.purpose_labels = CASE
+        WHEN c.purpose_labels IS NULL OR size(c.purpose_labels) = 0 THEN ['Background']
+        ELSE c.purpose_labels
+    END,
+    c.purpose_scores = CASE
+        WHEN c.purpose_scores IS NULL OR size(c.purpose_scores) = 0 THEN [0.2]
+        ELSE c.purpose_scores
+    END
 DELETE u
 SET re.resolved_doi = $doi,
     re.resolve_confidence = $confidence,
@@ -2256,3 +2362,57 @@ SET c.purpose_labels = $labels,
                 labels=labels,
                 scores=scores,
             )
+
+    def backfill_missing_citation_purposes(
+        self,
+        citing_paper_id: str,
+        default_label: str = "Background",
+        default_score: float = 0.2,
+    ) -> int:
+        """Backfill missing citation purpose labels for all CITES edges of a paper.
+
+        Defense-in-depth: Ensures every CITES edge from a citing paper has non-empty
+        purpose_labels and purpose_scores. This fixes edge cases where purpose labels
+        were not set during initial ingestion or reference resolution.
+
+        Args:
+            citing_paper_id: Paper ID of the citing paper
+            default_label: Default purpose label to use (default: "Background")
+            default_score: Default confidence score (default: 0.2, range: 0.0-1.0)
+
+        Returns:
+            Number of CITES edges that were backfilled
+        """
+        pid = str(citing_paper_id or "").strip()
+        if not pid:
+            return 0
+
+        # Validate and normalize inputs
+        label = str(default_label or "").strip() or "Background"
+        try:
+            score = float(default_score)
+        except (ValueError, TypeError):
+            score = 0.2
+        score = max(0.0, min(1.0, score))  # Clamp to [0.0, 1.0]
+
+        cypher = """
+MATCH (p:Paper {paper_id:$citing_paper_id})-[c:CITES]->(:Paper)
+WHERE c.purpose_labels IS NULL OR size(c.purpose_labels) = 0
+   OR c.purpose_scores IS NULL OR size(c.purpose_scores) = 0
+SET c.purpose_labels = CASE
+        WHEN c.purpose_labels IS NULL OR size(c.purpose_labels) = 0 THEN [$label]
+        ELSE c.purpose_labels
+    END,
+    c.purpose_scores = CASE
+        WHEN c.purpose_scores IS NULL OR size(c.purpose_scores) = 0 THEN [$score]
+        ELSE c.purpose_scores
+    END
+RETURN count(c) AS updated
+"""
+        with self._driver.session() as session:
+            result = session.run(cypher, citing_paper_id=pid, label=label, score=score)
+            row = result.single()
+
+        if not row:
+            return 0
+        return int(row["updated"] or 0)

@@ -2,16 +2,31 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { apiGet, apiPost } from '../api'
 
-type PropositionRow = {
+type PropositionGroupRow = {
+  group_id: string
+  label_text?: string
+  proposition_count?: number
+  actual_prop_count?: number
+  paper_count?: number
+  embedding_model?: string
+  model_version?: string
+  similarity_threshold?: number
+  clustering_method?: string
+  build_status?: string
+  updated_at?: string
+  created_at?: string
+}
+
+type GroupMemberRow = {
   prop_id: string
   canonical_text?: string
+  similarity_score?: number
+  paper_count?: number
   current_state?: string
   current_score?: number
-  mention_count?: number
-  supports?: number
-  challenges?: number
-  supersedes?: number
 }
+
+type GroupDetail = PropositionGroupRow & { propositions?: GroupMemberRow[] }
 
 type HotspotRow = {
   prop_id: string
@@ -73,11 +88,14 @@ function eventLabel(kind: string | undefined) {
 }
 
 export default function EvolutionPage() {
-  const [propositions, setPropositions] = useState<PropositionRow[]>([])
+  const [groups, setGroups] = useState<PropositionGroupRow[]>([])
+  const [selectedGroupId, setSelectedGroupId] = useState<string>('')
+  const [groupDetail, setGroupDetail] = useState<GroupDetail | null>(null)
+  const [groupBusy, setGroupBusy] = useState<boolean>(false)
+  const [selectedPropId, setSelectedPropId] = useState<string>('')
+
   const [hotspots, setHotspots] = useState<HotspotRow[]>([])
-  const [selectedId, setSelectedId] = useState<string>('')
   const [detail, setDetail] = useState<PropositionDetail | null>(null)
-  const [stateFilter, setStateFilter] = useState<string>('all')
   const [searchQ, setSearchQ] = useState<string>('')
   const [busy, setBusy] = useState<boolean>(false)
   const [detailBusy, setDetailBusy] = useState<boolean>(false)
@@ -85,18 +103,39 @@ export default function EvolutionPage() {
   const [error, setError] = useState<string>('')
   const [info, setInfo] = useState<string>('')
 
-  async function loadPropositions() {
+  async function loadGroups() {
     const qs = new URLSearchParams()
     qs.set('limit', '300')
-    if (stateFilter !== 'all') qs.set('state', stateFilter)
     if (searchQ.trim()) qs.set('q', searchQ.trim())
-    const res = await apiGet<{ propositions: PropositionRow[] }>(`/evolution/propositions?${qs.toString()}`)
-    const items = res.propositions ?? []
-    setPropositions(items)
-    if (!selectedId && items.length) {
-      setSelectedId(items[0].prop_id)
-    } else if (selectedId && !items.some((x) => x.prop_id === selectedId)) {
-      setSelectedId(items[0]?.prop_id ?? '')
+    const res = await apiGet<{ groups: PropositionGroupRow[] }>(`/evolution/groups?${qs.toString()}`)
+    const items = res.groups ?? []
+    setGroups(items)
+    if (!selectedGroupId && items.length) {
+      setSelectedGroupId(items[0].group_id)
+    } else if (selectedGroupId && !items.some((x) => x.group_id === selectedGroupId)) {
+      setSelectedGroupId(items[0]?.group_id ?? '')
+    }
+  }
+
+  async function loadGroupDetail(groupId: string) {
+    const gid = String(groupId || '').trim()
+    if (!gid) {
+      setGroupDetail(null)
+      setSelectedPropId('')
+      return
+    }
+    setGroupBusy(true)
+    try {
+      const data = await apiGet<GroupDetail>(`/evolution/group/${encodeURIComponent(gid)}?limit_propositions=200`)
+      setGroupDetail(data)
+      const members = data.propositions ?? []
+      if (!selectedPropId && members.length) {
+        setSelectedPropId(members[0].prop_id)
+      } else if (selectedPropId && !members.some((m) => m.prop_id === selectedPropId)) {
+        setSelectedPropId(members[0]?.prop_id ?? '')
+      }
+    } finally {
+      setGroupBusy(false)
     }
   }
 
@@ -124,7 +163,7 @@ export default function EvolutionPage() {
     setBusy(true)
     setError('')
     try {
-      await Promise.all([loadPropositions(), loadHotspots()])
+      await Promise.all([loadGroups(), loadHotspots()])
     } catch (e: unknown) {
       setError(String((e as { message?: unknown } | null)?.message ?? e))
     } finally {
@@ -132,13 +171,19 @@ export default function EvolutionPage() {
     }
   }
 
-  async function submitRebuildEvolution() {
+  async function submitRebuildGroups() {
     setActionBusy(true)
     setError('')
     setInfo('')
     try {
-      const res = await apiPost<{ task_id: string }>('/tasks/rebuild/evolution', {})
-      setInfo(`已提交演化重算任务：${res.task_id ?? ''}`)
+      const res = await apiPost<{ status?: string; groups_created?: number; propositions_clustered?: number; error?: string }>(
+        '/evolution/rebuild-groups',
+        {},
+      )
+      setInfo(
+        `Groups rebuilt: status=${res.status ?? '-'}, groups=${res.groups_created ?? 0}, propositions=${res.propositions_clustered ?? 0}` +
+          (res.error ? `, error=${res.error}` : ''),
+      )
     } catch (e: unknown) {
       setError(String((e as { message?: unknown } | null)?.message ?? e))
     } finally {
@@ -152,50 +197,40 @@ export default function EvolutionPage() {
   }, [])
 
   useEffect(() => {
-    loadPropositions().catch((e: unknown) => setError(String((e as { message?: unknown } | null)?.message ?? e)))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stateFilter])
+    loadGroupDetail(selectedGroupId).catch((e: unknown) => setError(String((e as { message?: unknown } | null)?.message ?? e)))
+  }, [selectedGroupId])
 
   useEffect(() => {
-    loadDetail(selectedId).catch((e: unknown) => setError(String((e as { message?: unknown } | null)?.message ?? e)))
-  }, [selectedId])
+    loadDetail(selectedPropId).catch((e: unknown) => setError(String((e as { message?: unknown } | null)?.message ?? e)))
+  }, [selectedPropId])
 
   const counts = useMemo(() => {
-    const out = { total: propositions.length, stable: 0, challenged: 0, superseded: 0 }
-    for (const p of propositions) {
-      const s = String(p.current_state ?? '').toLowerCase()
-      if (s === 'stable') out.stable += 1
-      else if (s === 'challenged') out.challenged += 1
-      else if (s === 'superseded') out.superseded += 1
+    let propositionTotal = 0
+    for (const g of groups) {
+      propositionTotal += Number(g.actual_prop_count ?? g.proposition_count ?? 0)
     }
-    return out
-  }, [propositions])
+    return { groups: groups.length, propositions: propositionTotal }
+  }, [groups])
 
   return (
     <div className="page">
       <div className="pageHeader">
         <div>
           <h2 className="pageTitle">演化追踪</h2>
-          <div className="pageSubtitle">跨论文命题状态、冲突热点与事件时间线</div>
+          <div className="pageSubtitle">Group-level clustering + proposition event timeline</div>
         </div>
         <div className="pageActions">
           <span className="pill">
-            <span className="kicker">命题</span> {counts.total}
+            <span className="kicker">Groups</span> {counts.groups}
           </span>
           <span className="pill">
-            <span className="kicker">稳定</span> {counts.stable}
-          </span>
-          <span className="pill">
-            <span className="kicker">受挑战</span> {counts.challenged}
-          </span>
-          <span className="pill">
-            <span className="kicker">被替代</span> {counts.superseded}
+            <span className="kicker">Props</span> {counts.propositions}
           </span>
           <button className="btn" disabled={busy || actionBusy} onClick={() => refreshAll().catch(() => {})}>
             {busy ? '加载中…' : '刷新'}
           </button>
-          <button className="btn btnPrimary" disabled={actionBusy} onClick={submitRebuildEvolution}>
-            {actionBusy ? '提交中…' : '重算演化关系/状态'}
+          <button className="btn btnPrimary" disabled={actionBusy} onClick={submitRebuildGroups}>
+            {actionBusy ? 'Submitting...' : 'Rebuild Groups'}
           </button>
         </div>
       </div>
@@ -206,17 +241,11 @@ export default function EvolutionPage() {
       <div className="panel">
         <div className="panelHeader">
           <div className="split">
-            <div className="panelTitle">过滤</div>
+            <div className="panelTitle">Search Groups</div>
             <div className="row" style={{ gap: 8 }}>
-              <select className="select" style={{ width: 160 }} value={stateFilter} onChange={(e) => setStateFilter(e.target.value)}>
-                <option value="all">全部状态</option>
-                <option value="stable">稳定</option>
-                <option value="challenged">受挑战</option>
-                <option value="superseded">被替代</option>
-              </select>
-              <input className="input" style={{ width: 320, maxWidth: '70vw' }} value={searchQ} onChange={(e) => setSearchQ(e.target.value)} placeholder="按命题文本搜索…" />
-              <button className="btn" disabled={busy} onClick={() => loadPropositions().catch(() => {})}>
-                搜索
+              <input className="input" style={{ width: 420, maxWidth: '70vw' }} value={searchQ} onChange={(e) => setSearchQ(e.target.value)} placeholder="Search by group label text..." />
+              <button className="btn" disabled={busy} onClick={() => loadGroups().catch(() => {})}>
+                Search
               </button>
             </div>
           </div>
@@ -226,41 +255,74 @@ export default function EvolutionPage() {
       <div style={{ display: 'grid', gridTemplateColumns: '360px 1fr 380px', gap: 12, alignItems: 'start' }}>
         <div className="panel">
           <div className="panelHeader">
-            <div className="panelTitle">命题列表</div>
+            <div className="panelTitle">命题组列表</div>
           </div>
           <div className="panelBody">
             <div className="list">
-              {propositions.map((p) => (
+              {groups.map((g) => (
                 <button
-                  key={p.prop_id}
-                  className={`itemCard ${selectedId === p.prop_id ? 'itemCardActive' : ''}`}
+                  key={g.group_id}
+                  className={`itemCard ${selectedGroupId === g.group_id ? 'itemCardActive' : ''}`}
                   style={{ textAlign: 'left', width: '100%', cursor: 'pointer' }}
-                  onClick={() => setSelectedId(p.prop_id)}
+                  onClick={() => setSelectedGroupId(g.group_id)}
                 >
-                  <div className="itemTitle">{p.canonical_text || p.prop_id}</div>
+                  <div className="itemTitle">{g.label_text || g.group_id}</div>
                   <div className="itemMeta">
-                    状态: {stateLabel(p.current_state)} · 分值: {Number(p.current_score ?? 0).toFixed(3)} · 提及: {p.mention_count ?? 0}
+                    Group: {g.group_id} · Propositions: {Number(g.actual_prop_count ?? g.proposition_count ?? 0)} · Papers:{' '}
+                    {g.paper_count ?? 0}
                   </div>
                 </button>
               ))}
             </div>
-            {!propositions.length && <div className="metaLine">暂无命题数据。</div>}
+            {!groups.length && <div className="metaLine">No groups found.</div>}
           </div>
         </div>
 
         <div className="panel">
           <div className="panelHeader">
-            <div className="panelTitle">事件时间线</div>
+            <div className="panelTitle">组内命题 / 事件时间线</div>
           </div>
           <div className="panelBody">
-            {!selectedId && <div className="metaLine">请先从左侧选择一个命题。</div>}
-            {selectedId && detailBusy && <div className="metaLine">加载命题详情中…</div>}
-            {selectedId && !detailBusy && detail && (
+            {!selectedGroupId && <div className="metaLine">Select a group from the left panel.</div>}
+            {selectedGroupId && groupBusy && <div className="metaLine">Loading group details...</div>}
+            {selectedGroupId && !groupBusy && groupDetail && (
+              <div className="stack">
+                <div className="itemCard">
+                  <div className="itemTitle">{groupDetail.label_text || groupDetail.group_id}</div>
+                  <div className="itemMeta">
+                    Group ID: {groupDetail.group_id} · Propositions:{' '}
+                    {Number(groupDetail.actual_prop_count ?? groupDetail.proposition_count ?? 0)} · Paper count:{' '}
+                    {groupDetail.paper_count ?? 0}
+                  </div>
+                </div>
+                <div className="list">
+                  {(groupDetail.propositions ?? []).map((p) => (
+                    <button
+                      key={p.prop_id}
+                      className={`itemCard ${selectedPropId === p.prop_id ? 'itemCardActive' : ''}`}
+                      style={{ textAlign: 'left', width: '100%', cursor: 'pointer' }}
+                      onClick={() => setSelectedPropId(p.prop_id)}
+                    >
+                      <div className="itemTitle">{p.canonical_text || p.prop_id}</div>
+                      <div className="itemMeta">
+                        Similarity: {Number(p.similarity_score ?? 0).toFixed(3)} · State: {stateLabel(p.current_state)} · Score:{' '}
+                        {Number(p.current_score ?? 0).toFixed(3)}
+                      </div>
+                    </button>
+                  ))}
+                  {!groupDetail.propositions?.length && <div className="metaLine">No propositions in this group.</div>}
+                </div>
+              </div>
+            )}
+
+            {!selectedPropId && <div className="metaLine">Select a proposition to view timeline.</div>}
+            {selectedPropId && detailBusy && <div className="metaLine">Loading proposition detail...</div>}
+            {selectedPropId && !detailBusy && detail && (
               <div className="stack">
                 <div className="itemCard">
                   <div className="itemTitle">{detail.proposition?.canonical_text || detail.proposition?.prop_id}</div>
                   <div className="itemMeta">
-                    状态: {stateLabel(detail.proposition?.current_state)} · 分值: {Number(detail.proposition?.current_score ?? 0).toFixed(3)}
+                    State: {stateLabel(detail.proposition?.current_state)} · Score: {Number(detail.proposition?.current_score ?? 0).toFixed(3)}
                   </div>
                 </div>
                 <div className="list">
@@ -275,14 +337,14 @@ export default function EvolutionPage() {
                       </div>
                       {(ev.paper_title || ev.paper_id) && (
                         <div className="itemMeta">
-                          来源论文: {ev.paper_title || ev.paper_id}
+                          Source paper: {ev.paper_title || ev.paper_id}
                           {ev.paper_year ? ` (${ev.paper_year})` : ''}
                         </div>
                       )}
                       {ev.claim_text && <div className="itemBody">{ev.claim_text}</div>}
                     </div>
                   ))}
-                  {!detail.events?.length && <div className="metaLine">没有事件记录。</div>}
+                  {!detail.events?.length && <div className="metaLine">No events.</div>}
                 </div>
               </div>
             )}
@@ -299,7 +361,7 @@ export default function EvolutionPage() {
                 <div key={h.prop_id} className="itemCard">
                   <div className="split">
                     <div className="itemTitle">{h.canonical_text || h.prop_id}</div>
-                    <button className="btn btnSmall" onClick={() => setSelectedId(h.prop_id)}>
+                    <button className="btn btnSmall" onClick={() => setSelectedPropId(h.prop_id)}>
                       查看
                     </button>
                   </div>
@@ -319,4 +381,3 @@ export default function EvolutionPage() {
     </div>
   )
 }
-

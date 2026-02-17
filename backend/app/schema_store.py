@@ -183,6 +183,9 @@ def _default_schema(paper_type: PaperType) -> dict[str, Any]:
             "citation_event_recovery_author_year_enabled": True,
             "citation_event_recovery_max_events_per_chunk": 6,
             "citation_event_recovery_context_chars": 800,
+            "phase1_noise_filter_enabled": True,
+            "phase1_noise_filter_figure_caption_enabled": True,
+            "phase1_noise_filter_pure_definition_enabled": True,
         },
     }
 
@@ -505,6 +508,14 @@ def validate_schema(schema: dict[str, Any]) -> None:
     citation_event_recovery_context_chars = int(rules.get("citation_event_recovery_context_chars", 800))
     if citation_event_recovery_context_chars < 120 or citation_event_recovery_context_chars > 4000:
         raise ValueError("Invalid citation_event_recovery_context_chars")
+    for key in (
+        "phase1_noise_filter_enabled",
+        "phase1_noise_filter_figure_caption_enabled",
+        "phase1_noise_filter_pure_definition_enabled",
+    ):
+        raw = rules.get(key, True)
+        if not isinstance(raw, bool):
+            raise ValueError(f"Invalid {key}")
     crossref_confidence_threshold = float(rules.get("crossref_confidence_threshold", 0.55))
     if crossref_confidence_threshold < 0.0 or crossref_confidence_threshold > 1.0:
         raise ValueError("Invalid crossref_confidence_threshold")
