@@ -1744,7 +1744,12 @@ def run_phase1_extraction(
             "confidence": float(claim.get("confidence") or 0.5),
             "step_type": claim["step_type"],
             "kinds": list(claim.get("kinds") or []),
-            "evidence_chunk_ids": [claim["origin_chunk_id"]] if claim.get("origin_chunk_id") else [],
+            # P2 Fix: Use all accumulated origin_chunk_ids for full evidence chain,
+            # not just the first one. Fallback to origin_chunk_id for compatibility.
+            "evidence_chunk_ids": list(
+                claim.get("origin_chunk_ids")
+                or ([claim["origin_chunk_id"]] if claim.get("origin_chunk_id") else [])
+            ),
             "origin_chunk_ids": list(claim.get("origin_chunk_ids") or []),
             "support_label": label,
             "judge_score": score,
