@@ -328,7 +328,19 @@ MERGE (p)-[:HAS_REFERENCE]->(re)
 WITH p
 UNWIND $cited_papers AS cp
 MERGE (q:Paper {paper_id: cp.paper_id})
-SET q += cp
+ON CREATE SET q += cp
+ON MATCH SET
+    q.paper_id = cp.paper_id,
+    q.doi = CASE
+        WHEN cp.doi IS NULL OR trim(toString(cp.doi)) = '' THEN q.doi
+        ELSE cp.doi
+    END,
+    q.title = coalesce(q.title, cp.title),
+    q.authors = coalesce(q.authors, cp.authors),
+    q.year = coalesce(q.year, cp.year),
+    q.abstract = coalesce(q.abstract, cp.abstract),
+    q.paper_source = coalesce(q.paper_source, cp.paper_source),
+    q.md_path = coalesce(q.md_path, cp.md_path)
 WITH p
 UNWIND $cites_resolved AS cr
 MATCH (q:Paper {paper_id: cr.cited_paper_id})
@@ -2156,7 +2168,19 @@ LIMIT $limit_total
         cypher = """
 MATCH (p:Paper)-[u:CITES_UNRESOLVED]->(re:ReferenceEntry {ref_id:$ref_id})
 MERGE (q:Paper {paper_id:$cited_paper.paper_id})
-SET q += $cited_paper
+ON CREATE SET q += $cited_paper
+ON MATCH SET
+    q.paper_id = $cited_paper.paper_id,
+    q.doi = CASE
+        WHEN $cited_paper.doi IS NULL OR trim(toString($cited_paper.doi)) = '' THEN q.doi
+        ELSE $cited_paper.doi
+    END,
+    q.title = coalesce(q.title, $cited_paper.title),
+    q.authors = coalesce(q.authors, $cited_paper.authors),
+    q.year = coalesce(q.year, $cited_paper.year),
+    q.abstract = coalesce(q.abstract, $cited_paper.abstract),
+    q.paper_source = coalesce(q.paper_source, $cited_paper.paper_source),
+    q.md_path = coalesce(q.md_path, $cited_paper.md_path)
 MERGE (p)-[c:CITES]->(q)
 SET c.total_mentions = u.total_mentions,
     c.evidence_chunk_ids = u.evidence_chunk_ids,
