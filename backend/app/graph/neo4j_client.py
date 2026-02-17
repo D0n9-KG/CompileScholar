@@ -205,29 +205,38 @@ MERGE (p)-[:HAS_CHUNK]->(ch)
             )
         cypher = """
 MATCH (p:Paper {paper_id:$paper_id})
+CALL {
+    WITH p, $steps AS steps
+    UNWIND steps AS s
+    MERGE (ls:LogicStep {logic_step_id: s.logic_step_id})
+    SET ls.paper_id = s.paper_id,
+        ls.step_type = s.step_type,
+        ls.order = s.order,
+        ls.summary = s.summary,
+        ls.confidence = s.confidence
+    MERGE (p)-[:HAS_LOGIC_STEP]->(ls)
+    RETURN count(*) AS logic_steps_written
+}
+CALL {
+    WITH $steps AS steps
+    UNWIND range(0, size(steps)-2) AS i
+    MATCH (a:LogicStep {logic_step_id: steps[i].logic_step_id})
+    MATCH (b:LogicStep {logic_step_id: steps[i+1].logic_step_id})
+    MERGE (a)-[:NEXT]->(b)
+    RETURN count(*) AS next_edges_written
+}
+CALL {
+    WITH $steps AS steps
+    UNWIND steps AS s
+    MATCH (ls:LogicStep {logic_step_id: s.logic_step_id})
+    WITH ls, s
+    UNWIND coalesce(s.evidence_chunk_ids, []) AS cid
+    MATCH (ch:Chunk {chunk_id: cid})
+    MERGE (ls)-[e:EVIDENCED_BY {source:'machine'}]->(ch)
+    SET e.weak = coalesce(s.evidence_weak, false)
+    RETURN count(*) AS logic_step_evidence_written
+}
 WITH p
-UNWIND $steps AS s
-MERGE (ls:LogicStep {logic_step_id: s.logic_step_id})
-SET ls.paper_id = s.paper_id,
-    ls.step_type = s.step_type,
-    ls.order = s.order,
-    ls.summary = s.summary,
-    ls.confidence = s.confidence
-MERGE (p)-[:HAS_LOGIC_STEP]->(ls)
-WITH p, $steps AS steps
-UNWIND range(0, size(steps)-2) AS i
-MATCH (a:LogicStep {logic_step_id: steps[i].logic_step_id})
-MATCH (b:LogicStep {logic_step_id: steps[i+1].logic_step_id})
-MERGE (a)-[:NEXT]->(b)
-WITH p, steps
-UNWIND steps AS s
-MATCH (ls:LogicStep {logic_step_id: s.logic_step_id})
-WITH p, ls, s
-UNWIND coalesce(s.evidence_chunk_ids, []) AS cid
-MATCH (ch:Chunk {chunk_id: cid})
-MERGE (ls)-[e:EVIDENCED_BY {source:'machine'}]->(ch)
-SET e.weak = coalesce(s.evidence_weak, false)
-WITH DISTINCT p
 UNWIND $claims AS c
 MERGE (cl:Claim {claim_id: c.claim_id})
 SET cl.paper_id = $paper_id,
@@ -240,17 +249,26 @@ SET cl.paper_id = $paper_id,
     cl.targets_paper_ids = coalesce(c.targets_paper_ids, [])
 MERGE (p)-[:HAS_CLAIM]->(cl)
 WITH cl, c, $paper_id AS paper_id
-MATCH (ls:LogicStep {logic_step_id: paper_id + ':' + c.step_type})
-MERGE (ls)-[:HAS_CLAIM]->(cl)
-WITH cl, c
-UNWIND coalesce(c.evidence_chunk_ids, []) AS cid
-MATCH (ch:Chunk {chunk_id: cid})
-MERGE (cl)-[e:EVIDENCED_BY {source:'machine'}]->(ch)
-SET e.weak = coalesce(c.evidence_weak, false)
-WITH cl, c
-UNWIND coalesce(c.targets_paper_ids, []) AS tid
-MATCH (tp:Paper {paper_id: tid})
-MERGE (cl)-[:TARGETS_PAPER]->(tp)
+OPTIONAL MATCH (ls:LogicStep {logic_step_id: paper_id + ':' + c.step_type})
+FOREACH (_ IN CASE WHEN ls IS NULL THEN [] ELSE [1] END |
+    MERGE (ls)-[:HAS_CLAIM]->(cl)
+)
+CALL {
+    WITH cl, c
+    UNWIND coalesce(c.evidence_chunk_ids, []) AS cid
+    MATCH (ch:Chunk {chunk_id: cid})
+    MERGE (cl)-[e:EVIDENCED_BY {source:'machine'}]->(ch)
+    SET e.weak = coalesce(c.evidence_weak, false)
+    RETURN count(*) AS claim_evidence_written
+}
+CALL {
+    WITH cl, c
+    UNWIND coalesce(c.targets_paper_ids, []) AS tid
+    MATCH (tp:Paper {paper_id: tid})
+    MERGE (cl)-[:TARGETS_PAPER]->(tp)
+    RETURN count(*) AS claim_targets_written
+}
+RETURN count(*) AS claims_written
 """
         with self._driver.session() as session:
             session.run(cypher, paper_id=paper_id, steps=steps, claims=claims)
