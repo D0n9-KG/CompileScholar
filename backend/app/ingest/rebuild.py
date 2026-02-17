@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
 
@@ -133,8 +134,17 @@ def rebuild_paper(
 
     notify("rebuild:neo4j_clear", 0.42, "Clearing existing subgraph for this paper")
     notify("rebuild:neo4j_write", 0.50, "Writing rebuilt data to Neo4j")
+    rebuild_started_at = datetime.now(tz=timezone.utc).isoformat()
     with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
         client.ensure_schema()
+        # Mark rebuild in-progress BEFORE deleting, so a partial rebuild is detectable
+        try:
+            client.update_paper_props(
+                paper_id,
+                {"paper_rebuild_status": "rebuilding", "paper_rebuild_started_at": rebuild_started_at},
+            )
+        except Exception:
+            pass
         client.delete_paper_subgraph(paper_id)
         client.upsert_paper_and_chunks(doc)
         try:
@@ -279,6 +289,17 @@ def rebuild_paper(
                 labels=p["labels"],
                 scores=p["scores"],
             )
+        # Mark rebuild complete
+        try:
+            client.update_paper_props(
+                paper_id,
+                {
+                    "paper_rebuild_status": "ready",
+                    "paper_rebuild_finished_at": datetime.now(tz=timezone.utc).isoformat(),
+                },
+            )
+        except Exception:
+            pass
 
     notify("rebuild:artifacts", 0.86, "Writing rebuilt artifacts to storage")
     out_dir = _storage_dir() / "derived" / "papers" / _safe_id(paper_id)
@@ -379,8 +400,17 @@ def replace_paper_from_md_path(
 
     notify("replace:neo4j_clear", 0.40, "Clearing existing subgraph for this paper")
     notify("replace:neo4j_write", 0.52, "Writing rebuilt data to Neo4j")
+    replace_started_at = datetime.now(tz=timezone.utc).isoformat()
     with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
         client.ensure_schema()
+        # Mark rebuild in-progress BEFORE deleting, so a partial rebuild is detectable
+        try:
+            client.update_paper_props(
+                paper_id,
+                {"paper_rebuild_status": "rebuilding", "paper_rebuild_started_at": replace_started_at},
+            )
+        except Exception:
+            pass
         client.delete_paper_subgraph(paper_id)
         client.upsert_paper_and_chunks(doc)
         try:
@@ -524,6 +554,17 @@ def replace_paper_from_md_path(
                 labels=p["labels"],
                 scores=p["scores"],
             )
+        # Mark rebuild complete
+        try:
+            client.update_paper_props(
+                paper_id,
+                {
+                    "paper_rebuild_status": "ready",
+                    "paper_rebuild_finished_at": datetime.now(tz=timezone.utc).isoformat(),
+                },
+            )
+        except Exception:
+            pass
 
     write_log(f"replaced {paper_id} from {md_path}")
     notify("replace:done", 1.0, "Done")
