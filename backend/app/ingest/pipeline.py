@@ -193,9 +193,19 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
         with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
             client.ensure_schema()
             for doc in parsed:
+                # Re-ingest idempotency fix: delete stale subgraph if paper already exists
+                paper_id = paper_id_for_md_path(doc.paper.md_path, doi=doc.paper.doi)
+                try:
+                    client.get_paper_basic(paper_id)
+                except KeyError:
+                    # Paper doesn't exist yet - first ingest, no stale data to clean
+                    pass
+                else:
+                    # Paper exists - delete stale chunks/claims/logic/refs/cites before upserting
+                    client.delete_paper_subgraph(paper_id)
+
                 client.upsert_paper_and_chunks(doc)
                 try:
-                    paper_id = paper_id_for_md_path(doc.paper.md_path, doi=doc.paper.doi)
                     meta = load_canonical_meta(doc.paper.md_path)
                     paper_type = str(meta.get("paper_type") or "research").strip().lower()
                     if paper_type not in {"research", "review"}:
@@ -212,7 +222,6 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
                 except Exception:
                     pass
                 try:
-                    paper_id = paper_id_for_md_path(doc.paper.md_path, doi=doc.paper.doi)
                     figs = extract_figures_from_markdown(paper_id=paper_id, md_path=doc.paper.md_path)
                     client.upsert_figures(
                         paper_id,
