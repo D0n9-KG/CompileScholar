@@ -1,11 +1,14 @@
 from __future__ import annotations
 
-from collections import defaultdict
 import json
+import logging
+from collections import defaultdict
 
 from app.crossref.client import CrossrefClient, CrossrefResolveResult
 from app.graph.neo4j_client import paper_id_for_md_path
-from app.ingest.models import DocumentIR
+from app.ingest.models import DocumentIR, ReferenceEntry
+
+logger = logging.getLogger(__name__)
 
 
 def build_reference_and_cite_records(
@@ -25,7 +28,18 @@ def build_reference_and_cite_records(
 
     paper_id = paper_id_for_md_path(doc.paper.md_path, doi=doc.paper.doi)
 
-    ref_by_num = {r.ref_num: r for r in doc.references}
+    ref_by_num: dict[int, ReferenceEntry] = {}
+    for ref in doc.references:
+        if ref.ref_num in ref_by_num:
+            logger.warning(
+                "Duplicate ref_num %d in paper %s (paper_source=%r): "
+                "keeping first occurrence, skipping subsequent.",
+                ref.ref_num,
+                paper_id,
+                doc.paper.paper_source,
+            )
+            continue
+        ref_by_num[ref.ref_num] = ref
     cite_events_by_ref: dict[int, list] = defaultdict(list)
     for ce in doc.citations:
         cite_events_by_ref[ce.cited_ref_num].append(ce)
