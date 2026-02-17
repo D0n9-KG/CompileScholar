@@ -132,12 +132,10 @@ def rebuild_paper(
     cite_rec = build_reference_and_cite_records(doc, crossref=crossref, crossref_confidence_threshold=crossref_threshold)
 
     notify("rebuild:neo4j_clear", 0.42, "Clearing existing subgraph for this paper")
+    notify("rebuild:neo4j_write", 0.50, "Writing rebuilt data to Neo4j")
     with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
         client.ensure_schema()
         client.delete_paper_subgraph(paper_id)
-
-    notify("rebuild:neo4j_write", 0.50, "Writing rebuilt data to Neo4j")
-    with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
         client.upsert_paper_and_chunks(doc)
         try:
             meta = load_canonical_meta(doc.paper.md_path)
@@ -380,12 +378,10 @@ def replace_paper_from_md_path(
     cite_rec = build_reference_and_cite_records(doc, crossref=crossref, crossref_confidence_threshold=crossref_threshold)
 
     notify("replace:neo4j_clear", 0.40, "Clearing existing subgraph for this paper")
+    notify("replace:neo4j_write", 0.52, "Writing rebuilt data to Neo4j")
     with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
         client.ensure_schema()
         client.delete_paper_subgraph(paper_id)
-
-    notify("replace:neo4j_write", 0.52, "Writing rebuilt data to Neo4j")
-    with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
         client.upsert_paper_and_chunks(doc)
         try:
             meta = load_canonical_meta(doc.paper.md_path)
