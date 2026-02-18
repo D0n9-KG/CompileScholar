@@ -504,6 +504,8 @@ def update_similarity_for_paper(
             raise RuntimeError("Similarity store dimension mismatch; rebuild required")
 
         vec_by_id = {u.node_id: u_x[i] for i, u in enumerate(to_embed)}
+        base_rows = int(x.shape[0])
+        pending_rows: list[np.ndarray] = []
 
         for u in updates:
             node_id = u.node_id
@@ -513,17 +515,19 @@ def update_similarity_for_paper(
             if node_id in idx_map:
                 i = idx_map[node_id]
                 items[i] = SimilarityItem(kind=kind, node_id=node_id, paper_id=u.paper_id, text=u.text)
-                if vec is not None:
-                    x[i] = vec
+                if i < base_rows:
+                    x[i] = vec if vec is not None else np.zeros((dim,), dtype=np.float32)
                 else:
-                    x[i] = np.zeros((dim,), dtype=np.float32)
+                    pending_rows[i - base_rows] = (vec.reshape(1, -1) if vec is not None else np.zeros((1, dim), dtype=np.float32))
                 changed.append(i)
             else:
                 idx_map[node_id] = len(items)
                 items.append(SimilarityItem(kind=kind, node_id=node_id, paper_id=u.paper_id, text=u.text))
-                row = vec.reshape(1, -1) if vec is not None else np.zeros((1, dim), dtype=np.float32)
-                x = np.vstack([x, row])
+                pending_rows.append(vec.reshape(1, -1) if vec is not None else np.zeros((1, dim), dtype=np.float32))
                 changed.append(len(items) - 1)
+
+        if pending_rows:
+            x = np.vstack([x, np.vstack(pending_rows)])
         return items, x, changed
 
     progress("similarity:update:embed_claims", 0.25, "Embedding updated claims")

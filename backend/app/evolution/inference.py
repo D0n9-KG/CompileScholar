@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import re
 from typing import Any
 
@@ -16,8 +17,6 @@ SUPPORT_MARKERS = [
 ]
 CHALLENGE_MARKERS = [
     "however",
-    "but",
-    "not",
     "fails to",
     "cannot",
     "limitation",
@@ -48,6 +47,19 @@ SUPERSEDE_MARKERS = [
     "显著提升",
 ]
 
+# High-ambiguity English challenge words matched via word boundary (not substring)
+# to avoid false positives like "notation" or "notable".
+_CHALLENGE_WORD_MARKERS = frozenset({"not", "but"})
+
+# Relation-type inference thresholds (embedding similarity space)
+_SUPERSEDE_KW_THRESH = 0.90
+_SUPERSEDE_PURPOSE_THRESH = 0.86
+_CHALLENGE_KW_THRESH = 0.90
+_CHALLENGE_PURPOSE_THRESH = 0.86
+_SUPPORT_KW_THRESH = 0.89
+_SUPPORT_PURPOSE_THRESH = 0.88
+_HIGH_SIM_THRESH = 0.97
+
 
 _WS_RE = re.compile(r"\s+")
 
@@ -60,12 +72,21 @@ def normalize_proposition_text(text: str) -> str:
 
 
 def clamp01(x: float) -> float:
-    return max(0.0, min(1.0, float(x)))
+    v = float(x)
+    return max(0.0, min(1.0, v)) if math.isfinite(v) else 0.0
 
 
 def contains_any(text: str, markers: list[str]) -> bool:
     t = text or ""
     return any(m in t for m in markers)
+
+
+def _contains_word(text: str, word: str) -> bool:
+    """Return True if *word* appears as a whole word in *text* (ASCII word boundary)."""
+    t = text or ""
+    if not t or not word:
+        return False
+    return re.search(rf"\b{re.escape(word)}\b", t) is not None
 
 
 def _best_purpose_score(labels: list[str] | None, scores: list[float] | None, wanted: str) -> float:
@@ -112,10 +133,10 @@ def infer_relation_type(
 
     base_conf = clamp01(0.65 * sim + 0.35 * tgt_conf)
 
-    # Note: removed "if src == tgt and sim >= 0.96:" block - now handled above as MERGE
-
     supersedes = contains_any(tgt, SUPERSEDE_MARKERS)
-    challenges = contains_any(tgt, CHALLENGE_MARKERS)
+    challenges = contains_any(tgt, CHALLENGE_MARKERS) or any(
+        _contains_word(tgt, w) for w in _CHALLENGE_WORD_MARKERS
+    )
     supports = contains_any(tgt, SUPPORT_MARKERS)
 
     # Citation purpose scores from the LLM-extracted citation context.
@@ -124,34 +145,26 @@ def infer_relation_type(
     p_challenge = _best_purpose_score(citation_purpose_labels, citation_purpose_scores, "CritiqueLimit")
     p_support = _best_purpose_score(citation_purpose_labels, citation_purpose_scores, "SupportEvidence")
 
-    supersede_kw_thresh = 0.90
-    supersede_purpose_thresh = 0.86
-    challenge_kw_thresh = 0.90
-    challenge_purpose_thresh = 0.86
-    support_kw_thresh = 0.89
-    support_purpose_thresh = 0.88
-    high_sim_thresh = 0.97
-
     # SUPERSEDES: keyword match at high similarity OR strong ExtendImprove purpose signal
-    if (supersedes and sim >= supersede_kw_thresh) or (p_supersede >= 0.60 and sim >= supersede_purpose_thresh):
+    if (supersedes and sim >= _SUPERSEDE_KW_THRESH) or (p_supersede >= 0.60 and sim >= _SUPERSEDE_PURPOSE_THRESH):
         conf = clamp01(base_conf + 0.06 + 0.05 * p_supersede)
         status = "accepted" if conf >= accepted_threshold else "pending_review"
         return {"event_type": "SUPERSEDES", "confidence": conf, "strength": conf, "status": status}
 
     # CHALLENGES: keyword match at high similarity OR strong CritiqueLimit purpose signal
-    if (challenges and sim >= challenge_kw_thresh) or (p_challenge >= 0.55 and sim >= challenge_purpose_thresh):
+    if (challenges and sim >= _CHALLENGE_KW_THRESH) or (p_challenge >= 0.55 and sim >= _CHALLENGE_PURPOSE_THRESH):
         conf = clamp01(base_conf + 0.04 + 0.06 * p_challenge)
         status = "accepted" if conf >= accepted_threshold else "pending_review"
         return {"event_type": "CHALLENGES", "confidence": conf, "strength": conf, "status": status}
 
     # SUPPORTS: keyword match OR SupportEvidence purpose signal
-    if (supports and sim >= support_kw_thresh) or (p_support >= 0.50 and sim >= support_purpose_thresh):
+    if (supports and sim >= _SUPPORT_KW_THRESH) or (p_support >= 0.50 and sim >= _SUPPORT_PURPOSE_THRESH):
         conf = clamp01(base_conf + 0.03 + 0.04 * p_support)
         status = "accepted" if conf >= accepted_threshold else "pending_review"
         return {"event_type": "SUPPORTS", "confidence": conf, "strength": conf, "status": status}
 
     # High similarity alone suggests SUPPORTS
-    if sim >= high_sim_thresh:
+    if sim >= _HIGH_SIM_THRESH:
         conf = clamp01(base_conf)
         status = "accepted" if conf >= accepted_threshold else "pending_review"
         return {"event_type": "SUPPORTS", "confidence": conf, "strength": conf, "status": status}

@@ -209,12 +209,12 @@ def rebuild_evolution_graph(
 
     with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
         pairs = client.list_proposition_candidate_pairs(min_score=similarity_floor, limit=candidate_limit)
-    sims = [float(p.get("similarity") or 0.0) for p in pairs]
-    raw_max_similarity = max(sims) if sims else 0.0
+
+    min_similarity_threshold = float(explicit_min_similarity) if explicit_min_similarity is not None else _EMBEDDING_MIN_SIMILARITY
+    raw_max_similarity = 0.0
 
     inferred_events: list[dict[str, Any]] = []
     for pair in pairs:
-        pair_min_similarity = float(explicit_min_similarity) if explicit_min_similarity is not None else _EMBEDDING_MIN_SIMILARITY
         source_prop_id = str(pair.get("source_prop_id") or "").strip()
         target_prop_id = str(pair.get("target_prop_id") or "").strip()
         source_claim_id = str(pair.get("source_claim_id") or "").strip()
@@ -225,6 +225,7 @@ def rebuild_evolution_graph(
             continue
 
         raw_similarity = float(pair.get("similarity") or 0.0)
+        raw_max_similarity = max(raw_max_similarity, raw_similarity)
         inferred = infer_relation_type(
             source_text=str(pair.get("source_text") or ""),
             target_text=str(pair.get("target_text") or ""),
@@ -232,7 +233,7 @@ def rebuild_evolution_graph(
             target_confidence=float(pair.get("target_confidence") or 0.5),
             citation_purpose_labels=list(pair.get("citation_purpose_labels") or []),
             citation_purpose_scores=list(pair.get("citation_purpose_scores") or []),
-            min_similarity=pair_min_similarity,
+            min_similarity=min_similarity_threshold,
             accepted_threshold=inference_accept_threshold,
         )
         if not inferred:
