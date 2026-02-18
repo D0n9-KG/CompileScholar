@@ -353,8 +353,25 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
         claims = list(logic_claims.get("claims") or [])
         step_order = list(item.get("step_order") or [])
         purposes = list(item.get("citation_purposes") or [])
+        quality_report = logic_claims.get("quality_report") or {}
+        gate_passed = bool(quality_report.get("gate_passed"))
         propositions_written = 0
         with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
+            if not gate_passed:
+                try:
+                    client.update_paper_props(
+                        paper_id,
+                        {
+                            "paper_rebuild_status": "gate_failed",
+                            "phase1_gate_passed": False,
+                            "phase1_quality_json": json.dumps(quality_report, ensure_ascii=False),
+                            "phase1_quality_tier": str(quality_report.get("quality_tier") or ""),
+                            "phase1_quality_tier_score": float(quality_report.get("quality_tier_score") or 0.0),
+                        },
+                    )
+                except Exception:
+                    pass
+                return 0
             client.upsert_logic_steps_and_claims(
                 paper_id=paper_id,
                 logic=logic_claims.get("logic") or {},
