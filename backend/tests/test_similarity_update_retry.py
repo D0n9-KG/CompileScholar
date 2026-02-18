@@ -128,7 +128,9 @@ def test_embedding_retry_success_on_third_attempt(monkeypatch, tmp_path):
     # embed_documents called exactly 3 times (2 failures + 1 success)
     assert call_count["count"] == 3
     # sleep called after each failure (attempts 1 and 2), but not after success
-    assert sleep_calls == [5, 5]
+    # 502 is a transient error → exponential backoff: attempt 0 = 5.0s, attempt 1 = 10.0s
+    expected_sleeps = [similarity_service._backoff_delay(i) for i in range(2)]
+    assert sleep_calls == expected_sleeps
 
 
 def test_embedding_retry_fails_after_three_attempts(monkeypatch, tmp_path):

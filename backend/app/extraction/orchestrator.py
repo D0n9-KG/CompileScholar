@@ -584,7 +584,7 @@ def _default_claim_extractor(
     schema: dict[str, Any],
     step_order: list[str],
     logic: dict[str, Any],
-) -> list[dict[str, Any]]:
+) -> dict[str, Any]:
     rules = schema.get("rules") or {}
     max_chunks = int(rules.get("phase1_claim_chunks_max") or 36)
     max_claims_per_chunk = int(rules.get("phase1_claims_per_chunk_max") or 3)
@@ -595,6 +595,7 @@ def _default_claim_extractor(
 
     candidates: list[dict[str, Any]] = []
     chunks = _priority_chunks(doc, logic=logic, max_chunks=max_chunks, rules=rules)
+    chunk_fail_count = 0
     worker_count = max(1, int(rules.get("phase1_claim_worker_count") or 3))
     for idx, chunk in enumerate(chunks):
         chunk_id = str(chunk.get("chunk_id") or "").strip()
@@ -610,6 +611,7 @@ def _default_claim_extractor(
                 schema=schema,
             )
         except Exception:
+            chunk_fail_count += 1
             continue
         for r in rows:
             candidates.append(
@@ -622,7 +624,11 @@ def _default_claim_extractor(
                     "worker_id": f"w{(idx % worker_count) + 1}",
                 }
             )
-    return candidates
+    return {
+        "candidates": candidates,
+        "chunk_total": len(chunks),
+        "chunk_fail_count": chunk_fail_count,
+    }
 
 
 def _merge_claim_candidates(
@@ -1678,14 +1684,23 @@ def run_phase1_extraction(
     step_order = list(logic_out.get("step_order") or _enabled_step_ids(schema))
     _json_dump(artifacts / "logic_steps.json", {"logic": logic, "step_order": step_order})
 
+    chunk_extraction_stats: dict[str, Any] = {}
     if claim_extractor is None:
-        claim_candidates = _default_claim_extractor(
+        extractor_out = _default_claim_extractor(
             doc=doc,
             paper_id=paper_id,
             schema=schema,
             step_order=step_order,
             logic=logic,
         )
+        claim_candidates = extractor_out["candidates"]
+        chunk_extraction_stats = {
+            "chunk_total": extractor_out["chunk_total"],
+            "chunk_fail_count": extractor_out["chunk_fail_count"],
+            "chunk_fail_rate": (
+                extractor_out["chunk_fail_count"] / max(1, extractor_out["chunk_total"])
+            ),
+        }
     else:
         claim_candidates = claim_extractor(
             doc=doc,
@@ -1834,6 +1849,10 @@ def run_phase1_extraction(
     # Add noise filter stats to quality report
     if noise_filter_stats:
         report["noise_filter"] = noise_filter_stats
+
+    # Add chunk extraction stats (fail rate observability)
+    if chunk_extraction_stats:
+        report["chunk_extraction"] = chunk_extraction_stats
 
     # P0 Fix: Add empty logic steps count to report and update gate
     report["logic_steps_empty_count"] = logic_steps_empty_count
