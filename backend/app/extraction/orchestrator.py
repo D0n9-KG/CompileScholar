@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import difflib
 import hashlib
 import json
 import logging
@@ -521,6 +522,89 @@ def _validate_claim_span(chunk_text: str, char_start: Any, char_end: Any) -> tup
     return (s, e)
 
 
+def _collapse_ws_with_map(text: str) -> tuple[str, list[int]]:
+    """Collapse consecutive whitespace to single spaces and keep source index map.
+
+    Returns (collapsed_text, source_index_map) where source_index_map[i] is the
+    index in the original text corresponding to collapsed_text[i].
+    """
+    out_chars: list[str] = []
+    out_to_src: list[int] = []
+    pending_space = False
+    for src_idx, ch in enumerate(text or ""):
+        if ch.isspace():
+            if out_chars:  # Don't add leading space
+                pending_space = True
+            continue
+        if pending_space:
+            out_chars.append(" ")
+            out_to_src.append(src_idx)
+            pending_space = False
+        out_chars.append(ch)
+        out_to_src.append(src_idx)
+    return ("".join(out_chars), out_to_src)
+
+
+def _find_claim_span(claim_text: str, chunk_text: str) -> tuple[int, int]:
+    """Find best-effort character span for claim_text inside chunk_text.
+
+    Uses a progressive fallback strategy:
+    1. Exact substring match
+    2. Case-insensitive exact match
+    3. Whitespace-normalized exact match
+    4. Conservative fuzzy matching via difflib (for light paraphrases)
+
+    Returns (start_index, end_index) or (-1, -1) if no reasonable match found.
+    """
+    claim = _norm_text(claim_text)
+    chunk = str(chunk_text or "")
+    if not claim or not chunk:
+        return (-1, -1)
+
+    # Strategy 1: Exact match
+    pos = chunk.find(claim)
+    if pos >= 0:
+        return (pos, pos + len(claim))
+
+    # Strategy 2: Case-insensitive exact match
+    pos = chunk.lower().find(claim.lower())
+    if pos >= 0:
+        return (pos, pos + len(claim))
+
+    # Strategy 3: Whitespace-normalized exact match
+    claim_c, _ = _collapse_ws_with_map(claim)
+    chunk_c, chunk_map = _collapse_ws_with_map(chunk)
+    if not claim_c or not chunk_c or not chunk_map:
+        return (-1, -1)
+
+    pos = chunk_c.find(claim_c)
+    if pos < 0:
+        pos = chunk_c.lower().find(claim_c.lower())
+    if pos >= 0 and (pos + len(claim_c)) <= len(chunk_map):
+        start = chunk_map[pos]
+        end = chunk_map[pos + len(claim_c) - 1] + 1
+        return (start, end)
+
+    # Strategy 4: Fuzzy fallback (for light paraphrases, punctuation differences)
+    matcher = difflib.SequenceMatcher(
+        a=claim_c.lower(),
+        b=chunk_c.lower(),
+        autojunk=False,
+    )
+    match = matcher.find_longest_match(0, len(claim_c), 0, len(chunk_c))
+    coverage = float(match.size) / float(max(1, len(claim_c)))
+    min_match_chars = 12 if len(claim_c) >= 24 else max(6, len(claim_c) // 2)
+
+    # Conservative thresholds: 72% coverage and minimum character match
+    if match.size >= min_match_chars and coverage >= 0.72:
+        if match.b < len(chunk_map) and (match.b + match.size - 1) < len(chunk_map):
+            start = chunk_map[match.b]
+            end = chunk_map[match.b + match.size - 1] + 1
+            return (start, end)
+
+    return (-1, -1)
+
+
 def _extract_claims_from_chunk_llm(
     *,
     chunk_text: str,
@@ -545,7 +629,7 @@ def _extract_claims_from_chunk_llm(
         "GROUNDING:\n"
         "- Each claim must be directly supported by the provided chunk text.\n"
         "- Do not invent information outside this chunk.\n"
-        "- Provide char_start/char_end as byte offsets into the chunk text where the claim is grounded.\n"
+        "- Keep wording close to the original chunk text for evidence traceability.\n"
         "\n"
         "SCIENTIFIC VALUE (CRITICAL):\n"
         "- Extract ONLY scientific contributions, methods, findings, and conclusions.\n"
@@ -566,7 +650,7 @@ def _extract_claims_from_chunk_llm(
         "Chunk text:\n"
         f"{text}\n\n"
         "Output JSON schema:\n"
-        '{ "claims": [ {"text":"...", "step_type":"Background", "claim_kinds":["Definition"], "confidence":0.0, "char_start":0, "char_end":50} ] }'
+        '{ "claims": [ {"text":"...", "step_type":"Background", "claim_kinds":["Definition"], "confidence":0.0} ] }'
     )
     system = str(prompts.get("phase1_chunk_claim_extract_system") or "").strip() or default_system
     user_t = str(prompts.get("phase1_chunk_claim_extract_user_template") or "").strip()
@@ -606,7 +690,7 @@ def _extract_claims_from_chunk_llm(
         except Exception:
             conf = 0.5
         conf = max(0.0, min(1.0, conf))
-        span_start, span_end = _validate_claim_span(text, row.get("char_start"), row.get("char_end"))
+        span_start, span_end = _find_claim_span(text_v, text)
         clean.append({
             "text": text_v,
             "step_type": step_type,
@@ -680,6 +764,7 @@ def _merge_claim_candidates(
     paper_id: str,
     doi: str | None,
     step_order: list[str],
+    chunk_by_id: dict[str, str] | None = None,
 ) -> list[dict[str, Any]]:
     step_rank = {s: i for i, s in enumerate(step_order)}
     buckets: dict[str, dict[str, Any]] = {}
@@ -730,12 +815,28 @@ def _merge_claim_candidates(
         texts = list(bucket["texts"])
         texts.sort(key=len, reverse=True)
         canonical_text = texts[0] if texts else ""
+
         # Find the span corresponding to the canonical text from span_candidates
         canonical_span_start, canonical_span_end = -1, -1
         for cand_text, cand_start, cand_end in bucket.get("span_candidates") or []:
-            if cand_text == canonical_text:
+            if cand_text == canonical_text and cand_start >= 0 and cand_end > cand_start:
                 canonical_span_start, canonical_span_end = cand_start, cand_end
                 break
+
+        # Fallback: use fuzzy matching to locate canonical text in source chunks
+        if canonical_span_start < 0 and chunk_by_id:
+            for cid in bucket.get("origin_chunk_ids") or []:
+                chunk_text = str(chunk_by_id.get(str(cid).strip()) or "")
+                if not chunk_text:
+                    continue
+                s, e = _find_claim_span(canonical_text, chunk_text)
+                if s >= 0 and e > s:
+                    canonical_span_start, canonical_span_end = s, e
+                    logger.debug(
+                        "Recovered span via fuzzy match: chunk_id=%s span=(%d,%d)",
+                        cid, s, e
+                    )
+                    break
         claim_key = _claim_key_for(doi=doi_s, paper_id=paper_id, text=canonical_text)
         claim_id = _claim_id_for(paper_id=paper_id, claim_key=claim_key)
         n = max(1, int(bucket["confidence_n"]))
@@ -1816,15 +1917,16 @@ def run_phase1_extraction(
                 exc_info=True,
             )
 
+    chunk_by_id = {c.chunk_id: c.text for c in doc.chunks}
     claims_merged = _merge_claim_candidates(
         claims=claim_candidates,
         paper_id=paper_id,
         doi=(doc.paper.doi or ""),
         step_order=step_order,
+        chunk_by_id=chunk_by_id,
     )
     _json_dump(artifacts / "claims_merged.json", {"claims": claims_merged})
 
-    chunk_by_id = {c.chunk_id: c.text for c in doc.chunks}
     judge_fn = grounding_judge or _default_grounding_judge
     judgments = judge_fn(claims=claims_merged, chunk_by_id=chunk_by_id, schema=schema)
     _json_dump(artifacts / "grounding_judgment.json", {"judgments": judgments})
