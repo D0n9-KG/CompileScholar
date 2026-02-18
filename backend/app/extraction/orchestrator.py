@@ -1527,6 +1527,13 @@ def _quality_report(
     min_conflict_comparable_pairs = max(0, _rule_int(rules, "phase2_conflict_gate_min_comparable_pairs", 3))
     min_conflict_pairs = max(0, _rule_int(rules, "phase2_conflict_gate_min_conflict_pairs", 1))
     min_semantic_coverage = _rule_float(rules, "phase1_gate_semantic_coverage_min", 0.0)
+    critical_slot_bypass_enabled = _rule_bool(rules, "phase2_gate_critical_slot_bypass_excellent", False)
+    critical_slot_bypass_supported_min = _rule_float(
+        rules,
+        "phase2_gate_critical_slot_bypass_supported_min",
+        0.95,
+    )
+    critical_slot_bypass_excellent = critical_slot_bypass_enabled and supported_ratio >= critical_slot_bypass_supported_min and step_coverage >= 1.0
     comparable_pairs = int(conflict.get("comparable_pairs") or 0)
     conflict_pairs = int(conflict.get("conflict_pairs") or 0)
     conflict_gate_skip_reasons: list[str] = []
@@ -1543,7 +1550,7 @@ def _quality_report(
         gate_fail_reasons.append("supported_claim_ratio")
     if step_coverage < min_coverage:
         gate_fail_reasons.append("step_coverage_ratio")
-    if float(completeness.get("critical_slot_coverage") or 0.0) < min_critical:
+    if (not critical_slot_bypass_excellent) and float(completeness.get("critical_slot_coverage") or 0.0) < min_critical:
         gate_fail_reasons.append("critical_slot_coverage")
     if (not conflict_gate_skipped) and float(conflict.get("conflict_rate") or 0.0) > max_conflict:
         gate_fail_reasons.append("conflict_rate")
@@ -1575,6 +1582,7 @@ def _quality_report(
         "critical_slots_total": int(completeness.get("critical_slots_total") or 0),
         "critical_slots_covered": int(completeness.get("critical_slots_covered") or 0),
         "critical_slot_coverage": float(completeness.get("critical_slot_coverage") or 0.0),
+        "critical_slot_bypass_excellent": critical_slot_bypass_excellent,
         "missing_critical_slots": list(completeness.get("missing_critical_slots") or []),
         "slot_claim_counts": dict(completeness.get("slot_claim_counts") or {}),
         "step_claim_counts": dict(completeness.get("step_claim_counts") or {}),
@@ -1611,6 +1619,8 @@ def _quality_report(
             "phase1_gate_supported_ratio_min": min_supported,
             "phase1_gate_step_coverage_min": min_coverage,
             "phase2_gate_critical_slot_coverage_min": min_critical,
+            "phase2_gate_critical_slot_bypass_excellent": critical_slot_bypass_enabled,
+            "phase2_gate_critical_slot_bypass_supported_min": critical_slot_bypass_supported_min,
             "phase2_gate_conflict_rate_max": max_conflict,
             "phase1_grounding_mode": grounding_mode_used,
             "phase1_grounding_semantic_supported_min": _rule_float(rules, "phase1_grounding_semantic_supported_min", 0.75),
