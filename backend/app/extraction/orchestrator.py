@@ -1496,6 +1496,7 @@ def _quality_report(
     validated: list[dict[str, Any]],
     judgments: list[dict[str, Any]],
     step_order: list[str],
+    logic_steps_coverage_ratio: float | None = None,
     schema: dict[str, Any],
     rules: dict[str, Any],
 ) -> dict[str, Any]:
@@ -1506,8 +1507,22 @@ def _quality_report(
     unsupported = sum(1 for x in labels if x == "unsupported")
     supported_ratio = float(supported) / float(max(1, total))
     steps_all = [s for s in step_order if s]
-    validated_steps = {str(c.get("step_type") or "").strip() for c in validated if str(c.get("step_type") or "").strip()}
+    steps_set = set(steps_all)
+    validated_steps = {
+        st for c in validated
+        if (st := str(c.get("step_type") or "").strip()) and st in steps_set
+    }
     step_coverage = float(len(validated_steps)) / float(max(1, len(steps_all)))
+    # Logic steps coverage: fraction of steps that have a non-empty logic summary.
+    # Used for the excellent bypass so that software/theory papers with full logic
+    # structure but concentrated claims can still pass the gate.
+    if logic_steps_coverage_ratio is not None:
+        try:
+            logic_steps_coverage = max(0.0, min(1.0, float(logic_steps_coverage_ratio)))
+        except Exception:
+            logic_steps_coverage = step_coverage
+    else:
+        logic_steps_coverage = step_coverage
     completeness = _completeness_stats(validated=validated, step_order=step_order, schema=schema, rules=rules)
     conflict = _conflict_stats(validated=validated, rules=rules, schema=schema)
     grounding_mode_used = _rule_choice(rules, "phase1_grounding_mode", ("lexical", "hybrid", "llm"), "lexical")
@@ -1533,7 +1548,11 @@ def _quality_report(
         "phase2_gate_critical_slot_bypass_supported_min",
         0.95,
     )
-    critical_slot_bypass_excellent = critical_slot_bypass_enabled and supported_ratio >= critical_slot_bypass_supported_min and step_coverage >= 1.0
+    critical_slot_bypass_excellent = (
+        critical_slot_bypass_enabled
+        and supported_ratio >= critical_slot_bypass_supported_min
+        and logic_steps_coverage >= 1.0
+    )
     comparable_pairs = int(conflict.get("comparable_pairs") or 0)
     conflict_pairs = int(conflict.get("conflict_pairs") or 0)
     conflict_gate_skip_reasons: list[str] = []
@@ -1570,6 +1589,7 @@ def _quality_report(
         "unsupported_claims": unsupported,
         "supported_claim_ratio": supported_ratio,
         "step_coverage_ratio": step_coverage,
+        "logic_steps_coverage_ratio": logic_steps_coverage,
         "grounding_mode_used": grounding_mode_used,
         "grounding_semantic_judged": grounding_semantic_judged,
         "grounding_lexical_judged": grounding_lexical_judged,
@@ -1775,6 +1795,24 @@ def run_phase1_extraction(
     _attach_targets_from_citations(validated, cite_rec=cite_rec, schema=schema)
     _attach_targets_from_citations(rejected, cite_rec=cite_rec, schema=schema)
 
+    # Compute logic steps coverage ratio: fraction of schema steps that have a
+    # non-empty summary or evidence in the logic extraction output.
+    # Uses step_order (full schema step list) as the denominator, consistent with
+    # step_coverage_ratio.  This is used by the excellent bypass so that papers
+    # whose claims concentrate in fewer steps (e.g. software/theory papers) can
+    # still pass the gate when their logic structure is fully populated.
+    _step_ids_all = [str(s or "").strip() for s in step_order if str(s or "").strip()]
+    _logic_steps_covered = sum(
+        1
+        for _sid in _step_ids_all
+        if (
+            bool((logic.get(_sid) or {}).get("summary_machine", "").strip())
+            or bool((logic.get(_sid) or {}).get("summary", "").strip())
+            or bool((logic.get(_sid) or {}).get("evidence_chunk_ids"))
+        )
+    )
+    logic_steps_coverage_ratio = float(_logic_steps_covered) / float(max(1, len(_step_ids_all)))
+
     # P0 Fix: Check for empty logic steps
     logic_steps_empty_count = 0
     for step_id, step_data in logic.items():
@@ -1788,6 +1826,7 @@ def run_phase1_extraction(
         validated=validated,
         judgments=judgments,
         step_order=step_order,
+        logic_steps_coverage_ratio=logic_steps_coverage_ratio,
         schema=schema,
         rules=dict(schema.get("rules") or {}),
     )
