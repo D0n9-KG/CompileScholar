@@ -14,7 +14,7 @@ LogFn = Callable[[str], None]
 
 
 _EMBEDDING_MIN_SIMILARITY = 0.85
-_LEXICAL_MIN_SIMILARITY = 0.70
+_LEXICAL_MIN_SIMILARITY = 0.40  # Lower for lexical mode to capture more candidates
 _DEFAULT_ACCEPT_THRESHOLD = 0.82
 
 
@@ -252,6 +252,7 @@ def rebuild_evolution_graph(
             citation_purpose_scores=list(pair.get("citation_purpose_scores") or []),
             min_similarity=pair_min_similarity,
             accepted_threshold=inference_accept_threshold,
+            mode=pair_mode,
         )
         if not inferred:
             continue

@@ -94,6 +94,7 @@ def infer_relation_type(
     citation_purpose_scores: list[float] | None = None,
     min_similarity: float = 0.86,
     accepted_threshold: float = 0.82,
+    mode: str = "embedding",
 ) -> dict[str, Any] | None:
     sim = clamp01(similarity)
     tgt_conf = clamp01(target_confidence)
@@ -124,25 +125,36 @@ def infer_relation_type(
     p_challenge = _best_purpose_score(citation_purpose_labels, citation_purpose_scores, "CritiqueLimit")
     p_support = _best_purpose_score(citation_purpose_labels, citation_purpose_scores, "SupportEvidence")
 
+    # Mode-aware similarity thresholds: lexical similarity scores are inherently lower than embedding scores
+    is_lexical = str(mode).lower() == "lexical"
+    supersede_kw_thresh = 0.60 if is_lexical else 0.90
+    supersede_purpose_thresh = 0.50 if is_lexical else 0.86
+    challenge_kw_thresh = 0.60 if is_lexical else 0.90
+    challenge_purpose_thresh = 0.50 if is_lexical else 0.86
+    support_kw_thresh = 0.45 if is_lexical else 0.89
+    support_purpose_thresh = 0.45 if is_lexical else 0.88
+    high_sim_thresh = 0.60 if is_lexical else 0.97
+
     # SUPERSEDES: keyword match at high similarity OR strong ExtendImprove purpose signal
-    if (supersedes and sim >= 0.90) or (p_supersede >= 0.60 and sim >= 0.86):
+    if (supersedes and sim >= supersede_kw_thresh) or (p_supersede >= 0.60 and sim >= supersede_purpose_thresh):
         conf = clamp01(base_conf + 0.06 + 0.05 * p_supersede)
         status = "accepted" if conf >= accepted_threshold else "pending_review"
         return {"event_type": "SUPERSEDES", "confidence": conf, "strength": conf, "status": status}
 
     # CHALLENGES: keyword match at high similarity OR strong CritiqueLimit purpose signal
-    if (challenges and sim >= 0.90) or (p_challenge >= 0.55 and sim >= 0.86):
+    if (challenges and sim >= challenge_kw_thresh) or (p_challenge >= 0.55 and sim >= challenge_purpose_thresh):
         conf = clamp01(base_conf + 0.04 + 0.06 * p_challenge)
         status = "accepted" if conf >= accepted_threshold else "pending_review"
         return {"event_type": "CHALLENGES", "confidence": conf, "strength": conf, "status": status}
 
     # SUPPORTS: keyword match OR SupportEvidence purpose signal
-    if (supports and sim >= 0.89) or (p_support >= 0.50 and sim >= 0.88):
+    if (supports and sim >= support_kw_thresh) or (p_support >= 0.50 and sim >= support_purpose_thresh):
         conf = clamp01(base_conf + 0.03 + 0.04 * p_support)
         status = "accepted" if conf >= accepted_threshold else "pending_review"
         return {"event_type": "SUPPORTS", "confidence": conf, "strength": conf, "status": status}
 
-    if sim >= 0.97:
+    # High similarity alone suggests SUPPORTS
+    if sim >= high_sim_thresh:
         conf = clamp01(base_conf)
         status = "accepted" if conf >= accepted_threshold else "pending_review"
         return {"event_type": "SUPPORTS", "confidence": conf, "strength": conf, "status": status}
