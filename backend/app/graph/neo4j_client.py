@@ -1884,6 +1884,8 @@ SET e.event_type = it.event_type,
     e.target_prop_id = it.target_prop_id,
     e.paper_id = it.target_paper_id,
     e.claim_id = it.target_claim_id,
+    e.raw_similarity = coalesce(it.raw_similarity, 0.0),
+    e.inference_version = coalesce(it.inference_version, 'v1'),
     e.event_time = it.event_time
 MERGE (e)-[:FROM_PROPOSITION]->(sp)
 MERGE (e)-[:TO_PROPOSITION]->(tp)

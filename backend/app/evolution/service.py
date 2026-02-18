@@ -265,6 +265,7 @@ def rebuild_evolution_graph(
                 "target_paper_id": str(pair.get("target_paper_id") or ""),
                 "raw_similarity": raw_similarity,
                 "normalized_similarity": raw_similarity,
+                "inference_version": "v1",
                 "event_time": built_at,
             }
         )
