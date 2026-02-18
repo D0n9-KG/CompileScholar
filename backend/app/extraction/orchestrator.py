@@ -663,8 +663,8 @@ def _default_claim_extractor(
                     "kinds": list(r.get("kinds") or []),
                     "origin_chunk_id": chunk_id,
                     "worker_id": f"w{(idx % worker_count) + 1}",
-                    "span_start": int(r.get("span_start") or -1),
-                    "span_end": int(r.get("span_end") or -1),
+                    "span_start": int(r["span_start"]) if r.get("span_start") is not None else -1,
+                    "span_end": int(r["span_end"]) if r.get("span_end") is not None else -1,
                 }
             )
     return {
@@ -701,9 +701,15 @@ def _merge_claim_candidates(
                 "worker_ids": set(),
                 "confidence_sum": 0.0,
                 "confidence_n": 0,
+                "span_candidates": [],  # track (text, span_start, span_end) for each variant
             }
         b = buckets[bucket_key]
         b["texts"].append(text)
+        b["span_candidates"].append((
+            c.get("text", ""),  # original text (not normalized)
+            int(c.get("span_start", -1)),
+            int(c.get("span_end", -1)),
+        ))
         b["kinds"].update(str(x).strip() for x in (c.get("kinds") or []) if str(x).strip())
         cid = str(c.get("origin_chunk_id") or "").strip()
         if cid and cid not in b["origin_chunk_ids"]:
@@ -724,6 +730,12 @@ def _merge_claim_candidates(
         texts = list(bucket["texts"])
         texts.sort(key=len, reverse=True)
         canonical_text = texts[0] if texts else ""
+        # Find the span corresponding to the canonical text from span_candidates
+        canonical_span_start, canonical_span_end = -1, -1
+        for cand_text, cand_start, cand_end in bucket.get("span_candidates") or []:
+            if cand_text == canonical_text:
+                canonical_span_start, canonical_span_end = cand_start, cand_end
+                break
         claim_key = _claim_key_for(doi=doi_s, paper_id=paper_id, text=canonical_text)
         claim_id = _claim_id_for(paper_id=paper_id, claim_key=claim_key)
         n = max(1, int(bucket["confidence_n"]))
@@ -740,6 +752,8 @@ def _merge_claim_candidates(
                 "origin_chunk_id": str(bucket["origin_chunk_ids"][0]) if bucket["origin_chunk_ids"] else "",
                 "worker_ids": sorted(bucket["worker_ids"]),
                 "confidence": float(bucket["confidence_sum"]) / float(n),
+                "span_start": canonical_span_start,
+                "span_end": canonical_span_end,
             }
         )
 

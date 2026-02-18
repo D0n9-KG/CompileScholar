@@ -134,7 +134,7 @@ def test_embedding_retry_success_on_third_attempt(monkeypatch, tmp_path):
 
 
 def test_embedding_retry_fails_after_three_attempts(monkeypatch, tmp_path):
-    """Embedding that always fails raises a clear RuntimeError after 3 attempts."""
+    """Embedding that always fails with stable error raises RuntimeError after 3 attempts."""
     paper_id = "test_paper_002"
     _setup_update_similarity_env(
         monkeypatch,
@@ -151,7 +151,8 @@ def test_embedding_retry_fails_after_three_attempts(monkeypatch, tmp_path):
     class _FailingEmbeddingClient:
         def embed_documents(self, texts):
             call_count["count"] += 1
-            raise RuntimeError("Error code: 502")
+            # Use 400 (stable error) instead of 502 (transient) for 3-attempt test
+            raise RuntimeError("Error code: 400")
 
     monkeypatch.setattr(similarity_service, "_embedding_client", lambda: _FailingEmbeddingClient())
 
@@ -159,12 +160,13 @@ def test_embedding_retry_fails_after_three_attempts(monkeypatch, tmp_path):
         similarity_service.update_similarity_for_paper(paper_id)
 
     error_msg = str(ctx.value)
+    # 400 is stable → _STABLE_MAX=3 attempts
     assert "3 attempts" in error_msg
     assert "embedding unavailable" in error_msg.lower()
     # embed_documents was called exactly 3 times
     assert call_count["count"] == 3
-    # sleep called between retries (after attempt 1 and 2, not after 3)
-    assert sleep_calls == [5, 5]
+    # stable error: sleep with fixed _STABLE_DELAY=5.0 between retries
+    assert sleep_calls == [similarity_service._STABLE_DELAY, similarity_service._STABLE_DELAY]
 
 
 def test_embedding_never_falls_back_to_lexical(monkeypatch, tmp_path):
