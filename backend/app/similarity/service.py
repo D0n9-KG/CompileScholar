@@ -14,7 +14,7 @@ try:
 except Exception:  # noqa: BLE001
     faiss = None  # type: ignore[assignment]
 import numpy as np
-from langchain_openai import OpenAIEmbeddings
+from langchain_core.embeddings import Embeddings
 
 from app.graph.neo4j_client import Neo4jClient
 from app.settings import settings
@@ -132,15 +132,15 @@ def _meta_path(kind: str) -> Path:
     raise ValueError(f"unknown kind: {kind}")
 
 
-def _embedding_client() -> OpenAIEmbeddings:
+def _embedding_client() -> Embeddings:
     """Create embedding client with provider compatibility fixes.
 
-    Uses same configuration as FAISS (check_embedding_ctx_length=False,
-    encoding_format=float) to avoid 502 errors with certain providers.
-    Disables SDK retries since we have outer retry loop (max 8 attempts).
+    Uses same configuration as FAISS (direct requests, not OpenAI SDK) to avoid
+    502 errors with certain providers.
+    Disables adapter retries since we have outer retry loop (max 8 attempts).
     """
     from app.vector.faiss_store import _create_provider_compatible_embeddings
-    # Disable SDK retries to avoid double-retry with outer loop (_TRANSIENT_MAX=8)
+    # Disable adapter retries to avoid double-retry with outer loop (_TRANSIENT_MAX=8)
     return _create_provider_compatible_embeddings(max_retries=0)
 
 
