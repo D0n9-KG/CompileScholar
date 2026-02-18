@@ -30,6 +30,13 @@ _TRANSIENT_KEYWORDS = frozenset([
     "too many requests", "bad gateway", "temporarily unavailable",
 ])
 
+# Retry budgets for embedding API calls:
+#   transient (503/502/429): up to 8 total attempts, exponential back-off (5 s → 60 s)
+#   other errors           : up to 3 total attempts, fixed 5-second gap
+_TRANSIENT_MAX = 8
+_STABLE_MAX = 3
+_STABLE_DELAY = 5.0
+
 
 def _is_transient_error(exc: Exception) -> bool:
     """Return True when *exc* is a temporary, retriable condition.
@@ -304,13 +311,6 @@ def rebuild_similarity_global(
         vecs = embed.embed_documents(texts)
         return _normalize_rows(np.array(vecs, dtype=np.float32))
 
-    # Retry budgets:
-    #   transient (503/502/429): up to 8 total attempts, exponential back-off (5 s → 60 s)
-    #   other errors           : up to 3 total attempts, fixed 5-second gap
-    _TRANSIENT_MAX = 8
-    _STABLE_MAX = 3
-    _STABLE_DELAY = 5.0
-
     attempt = 0
     while True:
         try:
@@ -460,8 +460,6 @@ def update_similarity_for_paper(
     def _apply_updates(
         kind: str, items: list[SimilarityItem], x: np.ndarray, idx_map: dict[str, int], updates: list[SimilarityItem]
     ):
-        import time
-
         changed: list[int] = []
         if not updates:
             return items, x, changed
@@ -469,48 +467,32 @@ def update_similarity_for_paper(
         # Embed only non-empty texts to avoid provider errors.
         vecs: list[list[float]] = []
         to_embed: list[SimilarityItem] = [u for u in updates if (u.text or "").strip()]
+
         if to_embed:
-            # Retry logic for embedding API (handles transient errors)
-            max_retries = 3
-            retry_delay = 5  # seconds
-
-            def _is_retryable_embedding_error(exc: Exception) -> bool:
-                status_code = getattr(exc, "status_code", None)
-                if isinstance(status_code, int):
-                    return status_code in {408, 429, 500, 502, 503, 504}
-                error_text = str(exc).lower()
-                transient_signals = (
-                    "502",
-                    "503",
-                    "504",
-                    "timeout",
-                    "timed out",
-                    "connection reset",
-                    "connection aborted",
-                    "temporarily unavailable",
-                    "rate limit",
-                )
-                return any(signal in error_text for signal in transient_signals)
-
-            for attempt in range(max_retries):
+            texts = [u.text for u in to_embed]
+            attempt = 0
+            while True:
                 try:
-                    vecs = embed.embed_documents([u.text for u in to_embed])
-                    break  # Success - exit retry loop
+                    vecs = embed.embed_documents(texts)
+                    break
                 except Exception as exc:  # noqa: BLE001
                     error_msg = str(exc).strip()
-                    retryable = _is_retryable_embedding_error(exc)
-                    if retryable and attempt < max_retries - 1:
-                        log(f"similarity update embedding attempt {attempt + 1}/{max_retries} failed ({kind}): {error_msg}. Retrying in {retry_delay}s...")
-                        time.sleep(retry_delay)
-                    else:
-                        reason = (
-                            f"non-retryable embedding error on attempt {attempt + 1}/{max_retries}"
-                            if not retryable
-                            else f"embedding unavailable after {max_retries} attempts"
+                    transient = _is_transient_error(exc)
+                    max_tries = _TRANSIENT_MAX if transient else _STABLE_MAX
+                    error_label = "transient" if transient else "stable"
+                    attempt += 1
+
+                    if attempt < max_tries:
+                        wait = _backoff_delay(attempt - 1) if transient else _STABLE_DELAY
+                        log(
+                            f"Similarity update embedding attempt {attempt}/{max_tries} failed ({kind}) "
+                            f"[{error_label}]: {error_msg}. Retrying in {wait:.0f}s..."
                         )
+                        time.sleep(wait)
+                    else:
                         raise RuntimeError(
-                            f"Similarity update failed ({kind}): {reason}. "
-                            f"Error: {error_msg}. Please check embedding API configuration and try again."
+                            f"Similarity update failed ({kind}): embedding unavailable after {attempt} attempts "
+                            f"[{error_label}]. Error: {error_msg}"
                         ) from exc
 
         u_x = _normalize_rows(np.array(vecs, dtype=np.float32)) if vecs else np.zeros((0, x.shape[1]), dtype=np.float32)
@@ -549,7 +531,6 @@ def update_similarity_for_paper(
     progress("similarity:update:embed_logic", 0.35, "Embedding updated logic steps")
     logic_items, logic_x, logic_changed = _apply_updates("logic", logic_items, logic_x, logic_idx, new_logic)
 
-    mode = "embedding"
     mode = "embedding"
 
     progress("similarity:update:neighbors", 0.55, "Computing updated neighbors")

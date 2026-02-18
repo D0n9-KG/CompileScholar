@@ -5,12 +5,23 @@ import pytest
 from app.similarity import service as similarity_service
 
 
-def test_embedding_502_degradation_is_explicit(monkeypatch, tmp_path):
+@pytest.mark.parametrize(
+    ("status_code", "error_label", "attempts_attr"),
+    [
+        (502, "transient", "_TRANSIENT_MAX"),
+        (400, "stable", "_STABLE_MAX"),
+    ],
+)
+def test_embedding_retry_policy_is_explicit(
+    monkeypatch,
+    tmp_path,
+    status_code: int,
+    error_label: str,
+    attempts_attr: str,
+):
     """
-    When embedding API returns 502, rebuild_similarity_global raises RuntimeError
-    after exhausting all 3 retries.  No lexical fallback exists in current code.
+    rebuild_similarity_global should follow the shared retry policy for transient/stable errors.
     """
-
     class _FakeNeo4jClient:
         def __init__(self, *args, **kwargs) -> None:
             pass
@@ -31,10 +42,10 @@ def test_embedding_502_degradation_is_explicit(monkeypatch, tmp_path):
             return []
 
     class _FailingEmbeddingClient:
-        def embed_documents(self, texts):
-            raise RuntimeError("Embedding API error 502: Bad Gateway")
+        def embed_documents(self, texts):  # noqa: ANN001
+            raise RuntimeError(f"Embedding API error {status_code}: injected failure")
 
-    # Track sleep calls so the test doesn't actually pause for 10 seconds.
+    # Track sleep calls so the test never actually sleeps.
     sleep_calls: list[float] = []
     monkeypatch.setattr("time.sleep", lambda seconds: sleep_calls.append(seconds))
 
@@ -56,18 +67,25 @@ def test_embedding_502_degradation_is_explicit(monkeypatch, tmp_path):
         similarity_service.rebuild_similarity_global(log=logs.append)
 
     error_msg = str(ctx.value)
-    # Error message must mention retries exhausted and the original 502.
-    assert "3 attempts" in error_msg
-    assert "embedding unavailable" in error_msg.lower()
-    assert "502" in error_msg
+    expected_attempts = int(getattr(similarity_service, attempts_attr))
 
-    # Two sleeps: after attempt 1 and after attempt 2 (not after the final failure).
-    assert sleep_calls == [5, 5]
+    assert f"failed after {expected_attempts} attempts" in error_msg.lower()
+    assert f"[{error_label}]" in error_msg.lower()
+    assert str(status_code) in error_msg
 
-    # No meta files written – exception occurred before any successful embedding.
+    if error_label == "transient":
+        expected_sleeps = [similarity_service._backoff_delay(i) for i in range(expected_attempts - 1)]
+    else:
+        expected_sleeps = [similarity_service._STABLE_DELAY] * (expected_attempts - 1)
+    assert sleep_calls == expected_sleeps
+
+    # No meta files written: exception occurred before any successful embedding.
     assert not (tmp_path / "claim_meta.json").exists()
     assert not (tmp_path / "logic_meta.json").exists()
 
-    # Retry progress was logged.
-    assert any("attempt 1/3" in line.lower() for line in logs)
-    assert any("failed after 3 attempts" in line.lower() for line in logs)
+    # Retry progress logs should include attempt counters.
+    assert any(f"attempt 1/{expected_attempts}" in line.lower() for line in logs)
+    if expected_attempts > 1:
+        assert any(
+            f"attempt {expected_attempts - 1}/{expected_attempts}" in line.lower() for line in logs
+        )

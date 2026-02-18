@@ -97,18 +97,18 @@ def infer_relation_type(
 ) -> dict[str, Any] | None:
     sim = clamp01(similarity)
     tgt_conf = clamp01(target_confidence)
-    if sim < min_similarity:
-        return None
 
     src = normalize_proposition_text(source_text)
     tgt = normalize_proposition_text(target_text)
     if not src or not tgt:
         return None
 
-    # Text identity detection: identical normalized text should trigger merge, not relation
+    # Text identity is highest-priority rule: merge even if similarity is low/noisy.
     if src == tgt:
-        # High confidence merge signal (not a relation type)
         return {"event_type": "MERGE", "confidence": 0.99, "strength": 0.99, "status": "accepted", "reason": "text_identity"}
+
+    if sim < min_similarity:
+        return None
 
     base_conf = clamp01(0.65 * sim + 0.35 * tgt_conf)
 
