@@ -489,6 +489,38 @@ def _priority_chunks(
     return [{"chunk_id": c.chunk_id, "text": c.text, "section": c.section} for c in ordered[: max(1, int(max_chunks))]]
 
 
+def _truncate_to_sentence_boundary(text: str, max_chars: int) -> str:
+    """Truncate *text* at a sentence boundary not exceeding *max_chars* characters.
+
+    Tries common sentence-ending punctuation (both ASCII and CJK). Falls back
+    to a hard character truncation when no boundary is found in the window.
+    """
+    if len(text) <= max_chars:
+        return text
+    window = text[:max_chars]
+    for punct in (".", "。", "!", "?", "！", "？", ";", "；"):
+        pos = window.rfind(punct)
+        if pos > max_chars // 2:  # at least half the budget must be used
+            return window[: pos + 1].rstrip()
+    return window
+
+
+def _validate_claim_span(chunk_text: str, char_start: Any, char_end: Any) -> tuple[int, int]:
+    """Validate LLM-provided span indices against *chunk_text*.
+
+    Returns the validated ``(char_start, char_end)`` tuple, or ``(-1, -1)``
+    when the span is invalid (out-of-bounds, reversed, or non-integer).
+    """
+    try:
+        s, e = int(char_start), int(char_end)
+    except (TypeError, ValueError):
+        return (-1, -1)
+    n = len(chunk_text)
+    if s < 0 or e <= s or e > n:
+        return (-1, -1)
+    return (s, e)
+
+
 def _extract_claims_from_chunk_llm(
     *,
     chunk_text: str,
@@ -506,13 +538,14 @@ def _extract_claims_from_chunk_llm(
         return []
     chunk_chars_max = max(200, min(12000, _rule_int(rules, "phase1_chunk_chars_max", 1800)))
     if len(text) > chunk_chars_max:
-        text = text[:chunk_chars_max]
+        text = _truncate_to_sentence_boundary(text, chunk_chars_max)
     default_system = (
         "Extract atomic claims from one paper chunk. Return STRICT JSON only.\n"
         "\n"
         "GROUNDING:\n"
         "- Each claim must be directly supported by the provided chunk text.\n"
         "- Do not invent information outside this chunk.\n"
+        "- Provide char_start/char_end as byte offsets into the chunk text where the claim is grounded.\n"
         "\n"
         "SCIENTIFIC VALUE (CRITICAL):\n"
         "- Extract ONLY scientific contributions, methods, findings, and conclusions.\n"
@@ -533,7 +566,7 @@ def _extract_claims_from_chunk_llm(
         "Chunk text:\n"
         f"{text}\n\n"
         "Output JSON schema:\n"
-        '{ "claims": [ {"text":"...", "step_type":"Background", "claim_kinds":["Definition"], "confidence":0.0} ] }'
+        '{ "claims": [ {"text":"...", "step_type":"Background", "claim_kinds":["Definition"], "confidence":0.0, "char_start":0, "char_end":50} ] }'
     )
     system = str(prompts.get("phase1_chunk_claim_extract_system") or "").strip() or default_system
     user_t = str(prompts.get("phase1_chunk_claim_extract_user_template") or "").strip()
@@ -573,7 +606,15 @@ def _extract_claims_from_chunk_llm(
         except Exception:
             conf = 0.5
         conf = max(0.0, min(1.0, conf))
-        clean.append({"text": text_v, "step_type": step_type, "kinds": kinds, "confidence": conf})
+        span_start, span_end = _validate_claim_span(text, row.get("char_start"), row.get("char_end"))
+        clean.append({
+            "text": text_v,
+            "step_type": step_type,
+            "kinds": kinds,
+            "confidence": conf,
+            "span_start": span_start,
+            "span_end": span_end,
+        })
     return clean
 
 
@@ -622,6 +663,8 @@ def _default_claim_extractor(
                     "kinds": list(r.get("kinds") or []),
                     "origin_chunk_id": chunk_id,
                     "worker_id": f"w{(idx % worker_count) + 1}",
+                    "span_start": int(r.get("span_start") or -1),
+                    "span_end": int(r.get("span_end") or -1),
                 }
             )
     return {

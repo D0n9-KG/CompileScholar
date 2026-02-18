@@ -125,9 +125,10 @@ def test_truncate_chinese_punctuation():
     from app.extraction.orchestrator import _truncate_to_sentence_boundary
 
     text = "这是第一句话。这是第二句话，包含更多内容。这是第三句话结尾。"
-    result = _truncate_to_sentence_boundary(text, max_chars=20)
+    # max_chars=10: window "这是第一句话。这是第", half=5, "。" at pos 6 > 5 → truncates at boundary
+    result = _truncate_to_sentence_boundary(text, max_chars=10)
     assert result.endswith("。")
-    assert len(result) <= 20
+    assert len(result) <= 10
 
 
 # ---------------------------------------------------------------------------

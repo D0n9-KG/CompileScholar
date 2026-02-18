@@ -247,7 +247,9 @@ SET cl.paper_id = $paper_id,
     cl.step_type = c.step_type,
     cl.kinds = coalesce(c.kinds, []),
     cl.evidence_weak = coalesce(c.evidence_weak, false),
-    cl.targets_paper_ids = coalesce(c.targets_paper_ids, [])
+    cl.targets_paper_ids = coalesce(c.targets_paper_ids, []),
+    cl.evidence_span_start = coalesce(c.span_start, -1),
+    cl.evidence_span_end = coalesce(c.span_end, -1)
 MERGE (p)-[:HAS_CLAIM]->(cl)
 WITH cl, c, $paper_id AS paper_id
 OPTIONAL MATCH (ls:LogicStep {logic_step_id: paper_id + ':' + c.step_type})
