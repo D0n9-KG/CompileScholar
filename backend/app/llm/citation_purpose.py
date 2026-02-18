@@ -198,6 +198,8 @@ def classify_citation_purposes_batch(
       - cited_doi (optional)
       - contexts: list[str]
     """
+    if batch_size <= 0:
+        raise ValueError(f"batch_size must be >= 1, got {batch_size}")
     rule_map = rules if isinstance(rules, dict) else {}
     max_contexts = _rule_int(
         rule_map,

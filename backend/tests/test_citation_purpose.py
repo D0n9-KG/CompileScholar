@@ -102,3 +102,19 @@ def test_invalid_labels_filtered_to_unknown(monkeypatch):
     result = cp.classify_citation_purposes_batch("Test", cites)
     entry = result["by_id"]["doi:10.1234"]
     assert entry["labels"] == ["Unknown"]
+
+
+def test_batch_size_zero_raises_value_error():
+    """batch_size=0 should raise ValueError before any LLM call."""
+    from app.llm import citation_purpose as cp
+
+    with pytest.raises(ValueError, match="batch_size"):
+        cp.classify_citation_purposes_batch("Test", [], batch_size=0)
+
+
+def test_batch_size_negative_raises_value_error():
+    """batch_size=-5 should raise ValueError before any LLM call."""
+    from app.llm import citation_purpose as cp
+
+    with pytest.raises(ValueError, match="batch_size"):
+        cp.classify_citation_purposes_batch("Test", [], batch_size=-5)
