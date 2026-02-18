@@ -252,7 +252,7 @@ def rebuild_paper(
         cited_paper_id = cr.get("cited_paper_id")
         if not cited_paper_id:
             continue
-        x = by_id.get(str(cited_paper_id)) or {"labels": ["Background"], "scores": [0.4]}
+        x = by_id.get(str(cited_paper_id)) or {"labels": ["Unknown"], "scores": [0.0]}
         purposes.append({"cited_paper_id": cited_paper_id, "labels": x["labels"], "scores": x["scores"]})
 
     notify("rebuild:neo4j_llm", 0.78, "Writing LLM outputs to Neo4j")
@@ -518,7 +518,7 @@ def replace_paper_from_md_path(
         cited_paper_id = cr.get("cited_paper_id")
         if not cited_paper_id:
             continue
-        x = by_id.get(str(cited_paper_id)) or {"labels": ["Background"], "scores": [0.4]}
+        x = by_id.get(str(cited_paper_id)) or {"labels": ["Unknown"], "scores": [0.0]}
         purposes.append({"cited_paper_id": cited_paper_id, "labels": x["labels"], "scores": x["scores"]})
 
     notify("replace:neo4j_llm", 0.82, "Writing LLM outputs to Neo4j")

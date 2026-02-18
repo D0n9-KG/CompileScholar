@@ -19,6 +19,7 @@ PURPOSE_LABELS = [
     "CritiqueLimit",
     "ExtendImprove",
     "FutureDirection",
+    "Unknown",  # LLM classification failed or returned invalid labels
 ]
 
 _TPL_RE = re.compile(r"\{\{\s*([A-Za-z][A-Za-z0-9_]*)\s*\}\}")
@@ -107,6 +108,78 @@ def classify_citation_purpose(
     return {"labels": [p[0] for p in pairs], "scores": [p[1] for p in pairs], "raw": out}
 
 
+def _classify_batch_page(
+    *,
+    batch_items: list[dict],
+    citing_title: str,
+    system: str,
+    user_template: str,
+    fallback_score: float,
+    max_labels: int,
+) -> dict[str, Any]:
+    """Run one LLM call for a batch page and return {cited_paper_id: {labels, scores}}."""
+    if user_template:
+        user = _render_template(
+            user_template,
+            {
+                "citing_title": citing_title,
+                "cites_json": json.dumps({"cites": batch_items}, ensure_ascii=False),
+                "allowed_labels": ", ".join(PURPOSE_LABELS),
+            },
+        )
+    else:
+        user = (
+            f"Citing paper title: {citing_title}\n\n"
+            "For each citation, you are given the cited paper metadata (may be empty) and context snippets.\n"
+            "Input JSON:\n"
+            + json.dumps({"cites": batch_items}, ensure_ascii=False)
+            + "\n\n"
+            "Output JSON schema:\n"
+            "{\n"
+            '  "cites": [\n'
+            '    {"cited_paper_id": "doi:10....", "labels": ["MethodUse"], "scores":[0.72]}\n'
+            "  ]\n"
+            "}\n"
+        )
+
+    out = call_json(system, user)
+    rows = out.get("cites") or []
+    by_id: dict[str, dict] = {}
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        cited_paper_id = row.get("cited_paper_id")
+        if not cited_paper_id:
+            continue
+        labels = row.get("labels") or []
+        scores = row.get("scores") or []
+        if not isinstance(labels, list) or not labels:
+            labels = ["Unknown"]
+        if not isinstance(scores, list) or len(scores) != len(labels):
+            scores = [fallback_score] * len(labels)
+        clean_labels = []
+        clean_scores = []
+        for l, s in zip(labels, scores):
+            if l not in PURPOSE_LABELS:
+                continue
+            try:
+                ss = float(s)
+            except Exception:
+                ss = fallback_score
+            ss = max(0.0, min(1.0, ss))
+            clean_labels.append(l)
+            clean_scores.append(ss)
+        if not clean_labels:
+            clean_labels = ["Unknown"]
+            clean_scores = [0.0]
+        pairs = sorted(zip(clean_labels, clean_scores), key=lambda x: x[1], reverse=True)[:max_labels]
+        by_id[str(cited_paper_id)] = {
+            "labels": [p[0] for p in pairs],
+            "scores": [p[1] for p in pairs],
+        }
+    return {"by_id": by_id, "raw": out}
+
+
 def classify_citation_purposes_batch(
     citing_title: str,
     cites: list[dict],
@@ -114,9 +187,10 @@ def classify_citation_purposes_batch(
     max_context_chars: int = 900,
     prompt_overrides: dict[str, Any] | None = None,
     rules: dict[str, Any] | None = None,
+    batch_size: int = 12,
 ) -> dict:
     """
-    Classify purposes for many (A->B) citations in ONE LLM call.
+    Classify purposes for many (A->B) citations, paginating into batches of batch_size.
 
     `cites` items:
       - cited_paper_id
@@ -161,8 +235,10 @@ def classify_citation_purposes_batch(
         hi=1.0,
     )
 
-    items = []
-    for c in cites[:max_cites]:
+    # Build sanitised item list (cap at max_cites)
+    effective_cites = cites[:max_cites]
+    items: list[dict] = []
+    for c in effective_cites:
         ctxs = [x.strip() for x in (c.get("contexts") or []) if x and x.strip()]
         ctxs = [x[:max_context_len] for x in ctxs][:max_contexts]
         items.append(
@@ -181,69 +257,23 @@ def classify_citation_purposes_batch(
         "Be conservative: if evidence is weak, use Background/Summary with low confidence.\n"
         f"Allowed labels: {', '.join(PURPOSE_LABELS)}"
     )
-    default_user = (
-        f"Citing paper title: {citing_title}\n\n"
-        "For each citation, you are given the cited paper metadata (may be empty) and context snippets.\n"
-        "Input JSON:\n"
-        + json.dumps({"cites": items}, ensure_ascii=False)
-        + "\n\n"
-        "Output JSON schema:\n"
-        "{\n"
-        '  "cites": [\n'
-        '    {"cited_paper_id": "doi:10....", "labels": ["MethodUse"], "scores":[0.72]}\n'
-        "  ]\n"
-        "}\n"
-    )
-
     ov = prompt_overrides if isinstance(prompt_overrides, dict) else {}
     system = str(ov.get("citation_purpose_batch_system") or "").strip() or default_system
-    user_t = str(ov.get("citation_purpose_batch_user_template") or "").strip()
-    if user_t:
-        user = _render_template(
-            user_t,
-            {
-                "citing_title": citing_title,
-                "cites_json": json.dumps({"cites": items}, ensure_ascii=False),
-                "allowed_labels": ", ".join(PURPOSE_LABELS),
-            },
-        )
-    else:
-        user = default_user
+    user_template = str(ov.get("citation_purpose_batch_user_template") or "").strip()
 
-    out = call_json(system, user)
-    rows = out.get("cites") or []
     by_id: dict[str, dict] = {}
-    for row in rows:
-        if not isinstance(row, dict):
-            continue
-        cited_paper_id = row.get("cited_paper_id")
-        if not cited_paper_id:
-            continue
-        labels = row.get("labels") or []
-        scores = row.get("scores") or []
-        if not isinstance(labels, list) or not labels:
-            labels = ["Background"]
-        if not isinstance(scores, list) or len(scores) != len(labels):
-            scores = [fallback_score] * len(labels)
-        clean_labels = []
-        clean_scores = []
-        for l, s in zip(labels, scores):
-            if l not in PURPOSE_LABELS:
-                continue
-            try:
-                ss = float(s)
-            except Exception:
-                ss = fallback_score
-            ss = max(0.0, min(1.0, ss))
-            clean_labels.append(l)
-            clean_scores.append(ss)
-        if not clean_labels:
-            clean_labels = ["Background"]
-            clean_scores = [fallback_score]
-        pairs = sorted(zip(clean_labels, clean_scores), key=lambda x: x[1], reverse=True)[:max_labels]
-        by_id[str(cited_paper_id)] = {
-            "labels": [p[0] for p in pairs],
-            "scores": [p[1] for p in pairs],
-        }
+    all_raw: list[Any] = []
+    for batch_start in range(0, len(items), batch_size):
+        batch = items[batch_start : batch_start + batch_size]
+        page_result = _classify_batch_page(
+            batch_items=batch,
+            citing_title=citing_title,
+            system=system,
+            user_template=user_template,
+            fallback_score=fallback_score,
+            max_labels=max_labels,
+        )
+        by_id.update(page_result["by_id"])
+        all_raw.append(page_result["raw"])
 
-    return {"by_id": by_id, "raw": out}
+    return {"by_id": by_id, "raw": all_raw}
