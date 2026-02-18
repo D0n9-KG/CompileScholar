@@ -205,8 +205,9 @@ MERGE (p)-[:HAS_CHUNK]->(ch)
             )
         cypher = """
 MATCH (p:Paper {paper_id:$paper_id})
+WITH p, $steps AS steps
 CALL {
-    WITH p, $steps AS steps
+    WITH p, steps
     UNWIND steps AS s
     MERGE (ls:LogicStep {logic_step_id: s.logic_step_id})
     SET ls.paper_id = s.paper_id,
@@ -218,7 +219,7 @@ CALL {
     RETURN count(*) AS logic_steps_written
 }
 CALL {
-    WITH $steps AS steps
+    WITH steps
     UNWIND range(0, size(steps)-2) AS i
     MATCH (a:LogicStep {logic_step_id: steps[i].logic_step_id})
     MATCH (b:LogicStep {logic_step_id: steps[i+1].logic_step_id})
@@ -226,7 +227,7 @@ CALL {
     RETURN count(*) AS next_edges_written
 }
 CALL {
-    WITH $steps AS steps
+    WITH steps
     UNWIND steps AS s
     MATCH (ls:LogicStep {logic_step_id: s.logic_step_id})
     WITH ls, s
@@ -253,6 +254,7 @@ OPTIONAL MATCH (ls:LogicStep {logic_step_id: paper_id + ':' + c.step_type})
 FOREACH (_ IN CASE WHEN ls IS NULL THEN [] ELSE [1] END |
     MERGE (ls)-[:HAS_CLAIM]->(cl)
 )
+WITH cl, c
 CALL {
     WITH cl, c
     UNWIND coalesce(c.evidence_chunk_ids, []) AS cid
