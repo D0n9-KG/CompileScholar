@@ -49,9 +49,11 @@ def build_faiss_for_chunks(chunks: list[Chunk], out_dir: str) -> dict:
         for c in chunks
     ]
 
-    # Retry logic for embedding API (handles transient 502 errors)
-    max_retries = 3
-    retry_delay = 5  # seconds
+    # Incremental FAISS build: batch-level retry to avoid restarting all chunks on transient errors.
+    batch_size = 64
+    max_batch_retries = 5
+    base_retry_delay = 5  # seconds (exponential backoff: 5, 10, 20, 40, 80)
+    total_batches = (len(texts) + batch_size - 1) // batch_size
     store = None
 
     def _is_retryable_embedding_error(exc: Exception) -> bool:
@@ -72,26 +74,45 @@ def build_faiss_for_chunks(chunks: list[Chunk], out_dir: str) -> dict:
         )
         return any(signal in error_text for signal in transient_signals)
 
-    for attempt in range(max_retries):
-        try:
-            store = FAISS.from_texts(texts=texts, embedding=embeddings, metadatas=metadatas)
-            break  # Success - exit retry loop
-        except Exception as exc:  # noqa: BLE001
-            error_msg = str(exc).strip()
-            retryable = _is_retryable_embedding_error(exc)
-            if retryable and attempt < max_retries - 1:
-                print(f"FAISS build attempt {attempt + 1}/{max_retries} failed: {error_msg}. Retrying in {retry_delay}s...")
-                time.sleep(retry_delay)
-            else:
-                reason = (
-                    f"non-retryable embedding error on attempt {attempt + 1}/{max_retries}"
-                    if not retryable
-                    else f"embedding unavailable after {max_retries} attempts"
-                )
-                raise RuntimeError(
-                    f"FAISS index build failed: {reason}. "
-                    f"Error: {error_msg}. Please check embedding API configuration and try again."
-                ) from exc
+    for batch_idx in range(total_batches):
+        start = batch_idx * batch_size
+        end = min(start + batch_size, len(texts))
+        batch_texts = texts[start:end]
+        batch_metadatas = metadatas[start:end]
+
+        for attempt in range(max_batch_retries):
+            try:
+                # First batch initializes the FAISS store; subsequent batches append incrementally.
+                if store is None:
+                    store = FAISS.from_texts(texts=batch_texts, embedding=embeddings, metadatas=batch_metadatas)
+                else:
+                    store.add_texts(texts=batch_texts, metadatas=batch_metadatas)
+
+                print(f"批次 {batch_idx + 1}/{total_batches} 已完成")
+                break
+            except Exception as exc:  # noqa: BLE001
+                error_msg = str(exc).strip()
+                retryable = _is_retryable_embedding_error(exc)
+                retry_delay = base_retry_delay * (2 ** attempt)
+                if retryable and attempt < max_batch_retries - 1:
+                    print(
+                        f"FAISS batch {batch_idx + 1}/{total_batches} "
+                        f"attempt {attempt + 1}/{max_batch_retries} failed: {error_msg}. "
+                        f"Retrying in {retry_delay}s..."
+                    )
+                    time.sleep(retry_delay)
+                else:
+                    reason = (
+                        f"non-retryable embedding error at batch {batch_idx + 1}/{total_batches}, "
+                        f"attempt {attempt + 1}/{max_batch_retries}"
+                        if not retryable
+                        else f"embedding unavailable at batch {batch_idx + 1}/{total_batches} "
+                        f"after {max_batch_retries} attempts"
+                    )
+                    raise RuntimeError(
+                        f"FAISS index build failed: {reason}. "
+                        f"Error: {error_msg}. Please check embedding API configuration and try again."
+                    ) from exc
 
     if store is None:
         raise RuntimeError("FAISS index build failed: retry loop exited without creating an index")
