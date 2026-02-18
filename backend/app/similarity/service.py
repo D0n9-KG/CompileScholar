@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import json
+import math
 import re
+import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -19,6 +21,59 @@ from app.settings import settings
 
 
 _TOKEN_RE = re.compile(r"[A-Za-z]+|\d+|[\u4e00-\u9fff]+")
+
+# ---------------------------------------------------------------------------
+# Embedding retry helpers
+# ---------------------------------------------------------------------------
+
+_TRANSIENT_HTTP_CODES = frozenset({429, 502, 503})
+_TRANSIENT_KEYWORDS = frozenset([
+    "service unavailable", "rate limit", "overloaded",
+    "too many requests", "bad gateway", "temporarily unavailable",
+])
+
+
+def _is_transient_error(exc: Exception) -> bool:
+    """Return True when *exc* is a temporary, retriable condition.
+
+    Checks HTTP 429 / 502 / 503 via exception attributes, then falls back to
+    keyword matching on the stringified exception message.  Configuration
+    errors (401, 403, 404 …) are treated as non-transient.
+    """
+    # Inspect .status / .status_code directly (openai, httpx, requests …)
+    for attr in ("status", "status_code"):
+        code = getattr(exc, attr, None)
+        if code is not None:
+            try:
+                if int(code) in _TRANSIENT_HTTP_CODES:
+                    return True
+            except (TypeError, ValueError):
+                pass
+
+    # .response.status_code (requests / httpx pattern)
+    response = getattr(exc, "response", None)
+    if response is not None:
+        code = getattr(response, "status_code", None)
+        if code is not None:
+            try:
+                if int(code) in _TRANSIENT_HTTP_CODES:
+                    return True
+            except (TypeError, ValueError):
+                pass
+
+    # Numeric code embedded in message string, e.g. "HTTP Error 503 …"
+    m = re.search(r"\b([45]\d{2})\b", str(exc))
+    if m and int(m.group(1)) in _TRANSIENT_HTTP_CODES:
+        return True
+
+    # Keyword scan as last resort
+    msg = str(exc).lower()
+    return any(kw in msg for kw in _TRANSIENT_KEYWORDS)
+
+
+def _backoff_delay(attempt: int, base: float = 5.0, factor: float = 2.0, cap: float = 60.0) -> float:
+    """Exponential back-off: ``base * factor**attempt``, capped at *cap* seconds."""
+    return min(base * math.pow(factor, attempt), cap)
 
 
 def _tokens(s: str) -> list[str]:
@@ -286,7 +341,6 @@ def rebuild_similarity_global(
         ]
 
     # Try embedding mode first; fall back to lexical similarity when embedding API is unavailable.
-    import time
     mode = "embedding"
     embedding_degraded = False
     degradation_reason = ""
@@ -307,25 +361,52 @@ def rebuild_similarity_global(
                 vecs = embed.embed_documents(texts)
                 return _normalize_rows(np.array(vecs, dtype=np.float32))
 
-            max_retries = 3
-            retry_delay = 5  # seconds
-            for attempt in range(max_retries):
+            # Retry budgets:
+            #   transient (503/502/429): up to 8 total attempts, exponential back-off (5 s → 60 s)
+            #   other errors           : up to 3 total attempts, fixed 5-second gap → fall back to lexical
+            _TRANSIENT_MAX = 8
+            _STABLE_MAX = 3
+            _STABLE_DELAY = 5.0
+
+            attempt = 0
+            while True:
                 try:
-                    progress("similarity:embed_claims", 0.15, f"Embedding {len(claims)} claims - attempt {attempt + 1}/{max_retries}")
+                    progress(
+                        "similarity:embed_claims", 0.15,
+                        f"Embedding {len(claims)} claims (attempt {attempt + 1})",
+                    )
                     claim_x = _embed_items(claims) if claims else np.zeros((0, 0), dtype=np.float32)
-                    progress("similarity:embed_logic", 0.30, f"Embedding {len(logic)} logic steps - attempt {attempt + 1}/{max_retries}")
+                    progress(
+                        "similarity:embed_logic", 0.30,
+                        f"Embedding {len(logic)} logic steps (attempt {attempt + 1})",
+                    )
                     logic_x = _embed_items(logic) if logic else np.zeros((0, 0), dtype=np.float32)
-                    break
+                    break  # success
+
                 except Exception as exc:  # noqa: BLE001
                     error_msg = str(exc).strip()
-                    if attempt < max_retries - 1:
-                        log(f"Embedding attempt {attempt + 1}/{max_retries} failed: {error_msg}. Retrying in {retry_delay}s...")
-                        time.sleep(retry_delay)
+                    transient = _is_transient_error(exc)
+                    max_tries = _TRANSIENT_MAX if transient else _STABLE_MAX
+                    error_label = "transient" if transient else "stable"
+                    attempt += 1
+
+                    if attempt < max_tries:
+                        wait = _backoff_delay(attempt - 1) if transient else _STABLE_DELAY
+                        log(
+                            f"Embedding attempt {attempt}/{max_tries} failed [{error_label}]: "
+                            f"{error_msg}. Retrying in {wait:.0f}s…"
+                        )
+                        time.sleep(wait)
                     else:
-                        log(f"Embedding failed after {max_retries} attempts: {error_msg}. Falling back to lexical similarity.")
+                        log(
+                            f"Embedding failed after {attempt} attempts [{error_label}]: "
+                            f"{error_msg}. Falling back to lexical similarity."
+                        )
                         mode = "lexical"
                         embedding_degraded = True
                         degradation_reason = error_msg
+                        break
+
         except Exception as exc:  # noqa: BLE001
             # _embedding_client() itself failed (missing key/model config)
             error_msg = str(exc).strip()
