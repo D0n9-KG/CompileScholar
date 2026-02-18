@@ -10,30 +10,51 @@ from app.ingest.models import Chunk
 from app.settings import settings
 
 
-def build_faiss_for_chunks(chunks: list[Chunk], out_dir: str) -> dict:
+def _create_provider_compatible_embeddings(*, max_retries: int | None = None) -> OpenAIEmbeddings:
+    """Create OpenAIEmbeddings instance with provider compatibility fixes.
+
+    Addresses 502 errors with certain embedding providers by:
+    - Disabling tokenization (check_embedding_ctx_length=False) to send string arrays
+    - Using float encoding instead of base64 (model_kwargs={"encoding_format": "float"})
+    - Optionally disabling SDK retries when batch-level retry is present
+
+    Args:
+        max_retries: SDK retry count (None = use SDK default ~3, 0 = disable)
+
+    Returns:
+        Configured OpenAIEmbeddings instance
+    """
     api_key = settings.effective_embedding_api_key()
     base_url = settings.effective_embedding_base_url()
     model = settings.effective_embedding_model()
     if not model:
-        raise RuntimeError("EMBEDDING_MODEL is not set; FAISS disabled")
+        raise RuntimeError("EMBEDDING_MODEL is not set")
     if not api_key:
-        raise RuntimeError(
-            "Embedding API key is required to build FAISS index (set EMBEDDING_PROVIDER=siliconflow and SILICONFLOW_API_KEY)"
-        )
+        raise RuntimeError("Embedding API key is required")
+
+    kwargs = {
+        "api_key": api_key,
+        "base_url": base_url,
+        "model": model,
+        "chunk_size": 64,
+        "check_embedding_ctx_length": False,  # Avoid token ID arrays
+        "model_kwargs": {"encoding_format": "float"},  # Avoid base64
+    }
+    if max_retries is not None:
+        kwargs["max_retries"] = max_retries
+
+    return OpenAIEmbeddings(**kwargs)
+
+
+def build_faiss_for_chunks(chunks: list[Chunk], out_dir: str) -> dict:
     if not chunks:
         raise RuntimeError("FAISS index build failed: no chunks available to index")
 
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
 
-    # Some providers (e.g., SiliconFlow) limit embedding batch size (e.g., 64).
-    # LangChain's OpenAIEmbeddings supports chunk_size to control embed_documents batching.
-    embeddings = OpenAIEmbeddings(
-        api_key=api_key,
-        base_url=base_url,
-        model=model,
-        chunk_size=64,
-    )
+    # Disable SDK retries since we have batch-level retry with exponential backoff
+    embeddings = _create_provider_compatible_embeddings(max_retries=0)
 
     texts = [c.text for c in chunks]
     metadatas = [
@@ -121,17 +142,6 @@ def build_faiss_for_chunks(chunks: list[Chunk], out_dir: str) -> dict:
 
 
 def load_faiss(out_dir: str) -> FAISS:
-    api_key = settings.effective_embedding_api_key()
-    base_url = settings.effective_embedding_base_url()
-    model = settings.effective_embedding_model()
-    if not model:
-        raise RuntimeError("EMBEDDING_MODEL is not set; FAISS disabled")
-    if not api_key:
-        raise RuntimeError("Embedding API key is required to load FAISS index")
-    embeddings = OpenAIEmbeddings(
-        api_key=api_key,
-        base_url=base_url,
-        model=model,
-        chunk_size=64,
-    )
+    # Keep SDK retries for online query path (transient errors during retrieval)
+    embeddings = _create_provider_compatible_embeddings()
     return FAISS.load_local(out_dir, embeddings, allow_dangerous_deserialization=True)

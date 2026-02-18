@@ -133,14 +133,15 @@ def _meta_path(kind: str) -> Path:
 
 
 def _embedding_client() -> OpenAIEmbeddings:
-    api_key = settings.effective_embedding_api_key()
-    base_url = settings.effective_embedding_base_url()
-    model = settings.effective_embedding_model()
-    if not model:
-        raise RuntimeError("EMBEDDING_MODEL is not set; similarity disabled")
-    if not api_key:
-        raise RuntimeError("Embedding API key is required to build similarity indexes")
-    return OpenAIEmbeddings(api_key=api_key, base_url=base_url, model=model, chunk_size=64)
+    """Create embedding client with provider compatibility fixes.
+
+    Uses same configuration as FAISS (check_embedding_ctx_length=False,
+    encoding_format=float) to avoid 502 errors with certain providers.
+    Disables SDK retries since we have outer retry loop (max 8 attempts).
+    """
+    from app.vector.faiss_store import _create_provider_compatible_embeddings
+    # Disable SDK retries to avoid double-retry with outer loop (_TRANSIENT_MAX=8)
+    return _create_provider_compatible_embeddings(max_retries=0)
 
 
 def _normalize_rows(x: np.ndarray) -> np.ndarray:
