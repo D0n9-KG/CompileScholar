@@ -331,7 +331,7 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
             cited_paper_id = cr.get("cited_paper_id")
             if not cited_paper_id:
                 continue
-            x = by_id.get(str(cited_paper_id)) or {"labels": ["Background"], "scores": [0.4]}
+            x = by_id.get(str(cited_paper_id)) or {"labels": ["Unknown"], "scores": [0.0]}
             purposes.append({"cited_paper_id": cited_paper_id, "labels": x["labels"], "scores": x["scores"]})
         out2 = run_dir / f"{doc.paper.paper_source}.llm_citation_purposes.json"
         out2.write_text(json.dumps(purposes, ensure_ascii=False, indent=2), encoding="utf-8")
