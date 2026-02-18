@@ -555,6 +555,39 @@ def replace_paper_from_md_path(
         purposes.append({"cited_paper_id": cited_paper_id, "labels": x["labels"], "scores": x["scores"]})
 
     notify("replace:neo4j_llm", 0.82, "Writing LLM outputs to Neo4j")
+
+    # Phase1 gate: if quality gate failed, skip canonical Claim/LogicStep write.
+    quality_report = logic_claims.get("quality_report") or {}
+    gate_passed = bool(quality_report.get("gate_passed"))
+    if not gate_passed:
+        with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
+            try:
+                client.update_paper_props(
+                    paper_id,
+                    {
+                        "paper_rebuild_status": "gate_failed",
+                        "phase1_gate_passed": False,
+                        "phase1_quality_tier": str(quality_report.get("quality_tier") or ""),
+                        "phase1_quality_tier_score": float(quality_report.get("quality_tier_score") or 0.0),
+                        "phase1_quality_json": json.dumps(quality_report, ensure_ascii=False),
+                    },
+                )
+            except Exception:
+                pass
+        notify(
+            "replace:gate_failed",
+            0.84,
+            f"Phase1 gate failed (tier={quality_report.get('quality_tier')}), skipping canonical write",
+        )
+        write_log(f"gate_failed: paper_id={paper_id} tier={quality_report.get('quality_tier')}")
+        return {
+            "paper_id": paper_id,
+            "source_md_path": md_path,
+            "gate_passed": False,
+            "quality_report": quality_report,
+            "skipped_canonical_write": True,
+        }
+
     with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
         client.upsert_logic_steps_and_claims(paper_id=paper_id, logic=logic_claims["logic"], claims=logic_claims["claims"], step_order=step_order)
         try:
