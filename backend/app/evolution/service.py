@@ -14,22 +14,11 @@ LogFn = Callable[[str], None]
 
 
 _EMBEDDING_MIN_SIMILARITY = 0.85
-_LEXICAL_MIN_SIMILARITY = 0.40  # Lower for lexical mode to capture more candidates
 _DEFAULT_ACCEPT_THRESHOLD = 0.82
 
 
 def _now_iso() -> str:
     return datetime.now(tz=timezone.utc).isoformat()
-
-
-def _normalize_similarity_mode(raw_mode: Any) -> str:
-    mode = str(raw_mode or "").strip().lower()
-    return "lexical" if mode == "lexical" else "embedding"
-
-
-def _min_similarity_for_mode(mode: str) -> float:
-    normalized = _normalize_similarity_mode(mode)
-    return _LEXICAL_MIN_SIMILARITY if normalized == "lexical" else _EMBEDDING_MIN_SIMILARITY
 
 
 def _aggregate_edge_items(events: list[dict], relation_type: str) -> list[dict]:
@@ -214,10 +203,8 @@ def rebuild_evolution_graph(
     sync_stats = sync_proposition_mentions_global(progress=progress, log=log)
 
     progress("evolution:candidates", 0.55, "Loading similarity candidates")
-    adaptive_similarity = False
     explicit_min_similarity = clamp01(float(min_similarity)) if min_similarity is not None else None
-    similarity_floor = float(explicit_min_similarity) if explicit_min_similarity is not None else _LEXICAL_MIN_SIMILARITY
-    inference_min_similarity = float(explicit_min_similarity) if explicit_min_similarity is not None else _EMBEDDING_MIN_SIMILARITY
+    similarity_floor = float(explicit_min_similarity) if explicit_min_similarity is not None else _EMBEDDING_MIN_SIMILARITY
     inference_accept_threshold = _DEFAULT_ACCEPT_THRESHOLD
 
     with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
@@ -226,13 +213,8 @@ def rebuild_evolution_graph(
     raw_max_similarity = max(sims) if sims else 0.0
 
     inferred_events: list[dict[str, Any]] = []
-    mode_counts: dict[str, int] = {"embedding": 0, "lexical": 0}
     for pair in pairs:
-        pair_mode = _normalize_similarity_mode(pair.get("similarity_mode"))
-        mode_counts[pair_mode] = int(mode_counts.get(pair_mode, 0)) + 1
-        pair_min_similarity = (
-            float(explicit_min_similarity) if explicit_min_similarity is not None else _min_similarity_for_mode(pair_mode)
-        )
+        pair_min_similarity = float(explicit_min_similarity) if explicit_min_similarity is not None else _EMBEDDING_MIN_SIMILARITY
         source_prop_id = str(pair.get("source_prop_id") or "").strip()
         target_prop_id = str(pair.get("target_prop_id") or "").strip()
         source_claim_id = str(pair.get("source_claim_id") or "").strip()
@@ -252,7 +234,6 @@ def rebuild_evolution_graph(
             citation_purpose_scores=list(pair.get("citation_purpose_scores") or []),
             min_similarity=pair_min_similarity,
             accepted_threshold=inference_accept_threshold,
-            mode=pair_mode,
         )
         if not inferred:
             continue
@@ -284,7 +265,6 @@ def rebuild_evolution_graph(
                 "raw_similarity": raw_similarity,
                 "normalized_similarity": raw_similarity,
                 "event_time": built_at,
-                "similarity_mode": pair_mode,
             }
         )
 
@@ -324,29 +304,19 @@ def rebuild_evolution_graph(
     log(
         "evolution rebuilt: "
         f"events={len(inferred_events)} "
-        f"supports={len(supports)} challenges={len(challenges)} supersedes={len(supersedes)} "
-        f"adaptive_similarity={adaptive_similarity} "
-        f"modes={mode_counts}"
+        f"supports={len(supports)} challenges={len(challenges)} supersedes={len(supersedes)}"
     )
     return {
         "ok": True,
         "built_at": built_at,
         "sync": sync_stats,
         "candidates": len(pairs),
-        "adaptive_similarity": {
-            "enabled": adaptive_similarity,
+        "similarity": {
             "pair_similarity_floor": similarity_floor,
             "pair_raw_max_similarity": raw_max_similarity,
-            "inference_min_similarity": inference_min_similarity,
             "inference_accept_threshold": inference_accept_threshold,
-        },
-        "similarity_modes": mode_counts,
-        "mode_thresholds": {
             "embedding_min_similarity": _EMBEDDING_MIN_SIMILARITY,
-            "lexical_min_similarity": _LEXICAL_MIN_SIMILARITY,
-            "candidate_floor": similarity_floor,
             "override_min_similarity": explicit_min_similarity,
-            "accept_threshold": inference_accept_threshold,
         },
         "events": len(inferred_events),
         "edges": {

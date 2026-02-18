@@ -20,8 +20,6 @@ from app.graph.neo4j_client import Neo4jClient
 from app.settings import settings
 
 
-_TOKEN_RE = re.compile(r"[A-Za-z]+|\d+|[\u4e00-\u9fff]+")
-
 # ---------------------------------------------------------------------------
 # Embedding retry helpers
 # ---------------------------------------------------------------------------
@@ -74,57 +72,6 @@ def _is_transient_error(exc: Exception) -> bool:
 def _backoff_delay(attempt: int, base: float = 5.0, factor: float = 2.0, cap: float = 60.0) -> float:
     """Exponential back-off: ``base * factor**attempt``, capped at *cap* seconds."""
     return min(base * math.pow(factor, attempt), cap)
-
-
-def _tokens(s: str) -> list[str]:
-    toks = _TOKEN_RE.findall((s or "").lower())
-    out: list[str] = []
-    for t in toks:
-        if re.fullmatch(r"[\u4e00-\u9fff]+", t) and len(t) > 2:
-            out.extend(list(t))
-        else:
-            out.append(t)
-    return [t for t in out if t and t not in {"the", "and", "of", "to", "in", "a", "an"}]
-
-
-def _lexical_topk_batch(items: list["SimilarityItem"], top_k: int) -> list[dict[str, Any]]:
-    """
-    Lexical fallback when embeddings are unavailable.
-    Uses a token inverted index + cosine over binary token vectors.
-    """
-    top_k = max(1, int(top_k))
-    toks = [set(_tokens(it.text)) for it in items]
-    inv: dict[str, list[int]] = {}
-    for i, ts in enumerate(toks):
-        for t in ts:
-            inv.setdefault(t, []).append(i)
-
-    out: list[dict[str, Any]] = []
-    for i, it in enumerate(items):
-        ts = toks[i]
-        if not ts:
-            out.append({"source": it.node_id, "targets": []})
-            continue
-        cand: dict[int, int] = {}
-        for t in ts:
-            for j in inv.get(t, []):
-                if j == i:
-                    continue
-                cand[j] = cand.get(j, 0) + 1
-        scored: list[tuple[float, int]] = []
-        denom_i = float(max(1, len(ts)))
-        for j, inter in cand.items():
-            if items[j].paper_id == it.paper_id:
-                continue
-            denom = (denom_i * float(max(1, len(toks[j])))) ** 0.5
-            score = float(inter) / denom if denom else 0.0
-            if score <= 0:
-                continue
-            scored.append((score, j))
-        scored.sort(key=lambda x: x[0], reverse=True)
-        targets = [{"target": items[j].node_id, "score": float(score)} for score, j in scored[:top_k]]
-        out.append({"source": it.node_id, "targets": targets})
-    return out
 
 
 def _utc_now_iso() -> str:
@@ -340,141 +287,107 @@ def rebuild_similarity_global(
             for r in (client.list_logic_step_similarity_rows() or [])
         ]
 
-    # Try embedding mode first; fall back to lexical similarity when embedding API is unavailable.
     mode = "embedding"
-    embedding_degraded = False
-    degradation_reason = ""
     claim_x = np.zeros((0, 0), dtype=np.float32)
     logic_x = np.zeros((0, 0), dtype=np.float32)
 
     if faiss is None:
-        mode = "lexical"
-        embedding_degraded = True
-        degradation_reason = "faiss library not available"
-        log("faiss unavailable; falling back to lexical similarity")
-    else:
+        raise RuntimeError(
+            "faiss library is not available; embedding-based similarity requires faiss. "
+            "Install it with: pip install faiss-cpu"
+        )
+
+    embed = _embedding_client()
+
+    def _embed_items(items: list[SimilarityItem]) -> np.ndarray:
+        texts = [it.text for it in items]
+        vecs = embed.embed_documents(texts)
+        return _normalize_rows(np.array(vecs, dtype=np.float32))
+
+    # Retry budgets:
+    #   transient (503/502/429): up to 8 total attempts, exponential back-off (5 s → 60 s)
+    #   other errors           : up to 3 total attempts, fixed 5-second gap
+    _TRANSIENT_MAX = 8
+    _STABLE_MAX = 3
+    _STABLE_DELAY = 5.0
+
+    attempt = 0
+    while True:
         try:
-            embed = _embedding_client()
-
-            def _embed_items(items: list[SimilarityItem]) -> np.ndarray:
-                texts = [it.text for it in items]
-                vecs = embed.embed_documents(texts)
-                return _normalize_rows(np.array(vecs, dtype=np.float32))
-
-            # Retry budgets:
-            #   transient (503/502/429): up to 8 total attempts, exponential back-off (5 s → 60 s)
-            #   other errors           : up to 3 total attempts, fixed 5-second gap → fall back to lexical
-            _TRANSIENT_MAX = 8
-            _STABLE_MAX = 3
-            _STABLE_DELAY = 5.0
-
-            attempt = 0
-            while True:
-                try:
-                    progress(
-                        "similarity:embed_claims", 0.15,
-                        f"Embedding {len(claims)} claims (attempt {attempt + 1})",
-                    )
-                    claim_x = _embed_items(claims) if claims else np.zeros((0, 0), dtype=np.float32)
-                    progress(
-                        "similarity:embed_logic", 0.30,
-                        f"Embedding {len(logic)} logic steps (attempt {attempt + 1})",
-                    )
-                    logic_x = _embed_items(logic) if logic else np.zeros((0, 0), dtype=np.float32)
-                    break  # success
-
-                except Exception as exc:  # noqa: BLE001
-                    error_msg = str(exc).strip()
-                    transient = _is_transient_error(exc)
-                    max_tries = _TRANSIENT_MAX if transient else _STABLE_MAX
-                    error_label = "transient" if transient else "stable"
-                    attempt += 1
-
-                    if attempt < max_tries:
-                        wait = _backoff_delay(attempt - 1) if transient else _STABLE_DELAY
-                        log(
-                            f"Embedding attempt {attempt}/{max_tries} failed [{error_label}]: "
-                            f"{error_msg}. Retrying in {wait:.0f}s…"
-                        )
-                        time.sleep(wait)
-                    else:
-                        log(
-                            f"Embedding failed after {attempt} attempts [{error_label}]: "
-                            f"{error_msg}. Falling back to lexical similarity."
-                        )
-                        mode = "lexical"
-                        embedding_degraded = True
-                        degradation_reason = error_msg
-                        break
+            progress(
+                "similarity:embed_claims", 0.15,
+                f"Embedding {len(claims)} claims (attempt {attempt + 1})",
+            )
+            claim_x = _embed_items(claims) if claims else np.zeros((0, 0), dtype=np.float32)
+            progress(
+                "similarity:embed_logic", 0.30,
+                f"Embedding {len(logic)} logic steps (attempt {attempt + 1})",
+            )
+            logic_x = _embed_items(logic) if logic else np.zeros((0, 0), dtype=np.float32)
+            break  # success
 
         except Exception as exc:  # noqa: BLE001
-            # _embedding_client() itself failed (missing key/model config)
             error_msg = str(exc).strip()
-            log(f"Embedding client unavailable: {error_msg}. Falling back to lexical similarity.")
-            mode = "lexical"
-            embedding_degraded = True
-            degradation_reason = error_msg
+            transient = _is_transient_error(exc)
+            max_tries = _TRANSIENT_MAX if transient else _STABLE_MAX
+            error_label = "transient" if transient else "stable"
+            attempt += 1
+
+            if attempt < max_tries:
+                wait = _backoff_delay(attempt - 1) if transient else _STABLE_DELAY
+                log(
+                    f"Embedding attempt {attempt}/{max_tries} failed [{error_label}]: "
+                    f"{error_msg}. Retrying in {wait:.0f}s…"
+                )
+                time.sleep(wait)
+            else:
+                raise RuntimeError(
+                    f"Embedding failed after {attempt} attempts [{error_label}]: {error_msg}"
+                ) from exc
 
     meta_payload = {
         "built_at": built_at,
         "model": model,
         "mode": mode,
-        "embedding_degraded": embedding_degraded,
-        "degradation_reason": degradation_reason,
     }
 
     if claims:
         _write_items("claim", claims)
-        if mode == "embedding":
-            _save_embeddings("claim", claim_x)
+        _save_embeddings("claim", claim_x)
         _meta_path("claim").write_text(
             json.dumps(meta_payload, ensure_ascii=False),
             encoding="utf-8",
         )
     if logic:
         _write_items("logic", logic)
-        if mode == "embedding":
-            _save_embeddings("logic", logic_x)
+        _save_embeddings("logic", logic_x)
         _meta_path("logic").write_text(
             json.dumps(meta_payload, ensure_ascii=False),
             encoding="utf-8",
         )
 
-    # Build indexes and compute cross-paper neighbors; use FAISS in embedding mode, lexical fallback otherwise.
+    # Build FAISS indexes and compute cross-paper neighbors.
     progress("similarity:neighbors_claims", 0.55, "Computing claim neighbors")
     if claims:
-        if mode == "embedding":
-            claim_index = _build_index(claim_x)
-            batch = _topk_pairs(claim_index, claim_x, claims, list(range(len(claims))), top_k=claim_top_k)
-        else:
-            progress("similarity:neighbors_claims", 0.55, f"Computing claim neighbors (lexical, {len(claims)} items)")
-            batch = _lexical_topk_batch(claims, top_k=claim_top_k)
+        claim_index = _build_index(claim_x)
+        batch = _topk_pairs(claim_index, claim_x, claims, list(range(len(claims))), top_k=claim_top_k)
         with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
             client.replace_similar_claim_edges_batch(batch, model=model, built_at=built_at, mode=mode)
 
     progress("similarity:neighbors_logic", 0.75, "Computing logic-step neighbors")
     if logic:
-        if mode == "embedding":
-            logic_index = _build_index(logic_x)
-            batch = _topk_pairs(logic_index, logic_x, logic, list(range(len(logic))), top_k=logic_top_k)
-        else:
-            progress("similarity:neighbors_logic", 0.75, f"Computing logic neighbors (lexical, {len(logic)} items)")
-            batch = _lexical_topk_batch(logic, top_k=logic_top_k)
+        logic_index = _build_index(logic_x)
+        batch = _topk_pairs(logic_index, logic_x, logic, list(range(len(logic))), top_k=logic_top_k)
         with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
             client.replace_similar_logic_edges_batch(batch, model=model, built_at=built_at)
 
     progress("similarity:done", 1.0, "Similarity rebuild done")
-    log(
-        f"similarity rebuilt: mode={mode} claims={len(claims)} logic_steps={len(logic)} "
-        f"model={model} degraded={embedding_degraded}"
-    )
+    log(f"similarity rebuilt: claims={len(claims)} logic_steps={len(logic)} model={model}")
     return {
         "ok": True,
         "built_at": built_at,
         "model": model,
         "mode": mode,
-        "embedding_degraded": embedding_degraded,
-        "degradation_reason": degradation_reason,
         "claims": len(claims),
         "logic_steps": len(logic),
     }
@@ -636,7 +549,7 @@ def update_similarity_for_paper(
     progress("similarity:update:embed_logic", 0.35, "Embedding updated logic steps")
     logic_items, logic_x, logic_changed = _apply_updates("logic", logic_items, logic_x, logic_idx, new_logic)
 
-    # Mode is always embedding (no lexical fallback)
+    mode = "embedding"
     mode = "embedding"
 
     progress("similarity:update:neighbors", 0.55, "Computing updated neighbors")
