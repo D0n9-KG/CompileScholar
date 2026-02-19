@@ -14,6 +14,7 @@ from app.ingest.models import (
     PaperDraft,
     ReferenceEntry,
 )
+from app.text_normalization import normalize_ingested_markdown
 
 
 _HEADING_RE = re.compile(r"^(?P<hashes>#{1,6})\s+(?P<title>.+?)\s*$")
@@ -109,7 +110,9 @@ def parse_mineru_markdown(md_path: str) -> DocumentIR:
         raise FileNotFoundError(f"Markdown not found: {md_path}")
 
     # MinerU output is sometimes not strictly UTF-8; ignore errors to keep pipeline robust.
-    raw = p.read_text(encoding="utf-8", errors="ignore")
+    raw = normalize_ingested_markdown(
+        p.read_text(encoding="utf-8", errors="ignore")
+    )
     lines = raw.splitlines()
 
     paper_source = p.parent.name or p.stem

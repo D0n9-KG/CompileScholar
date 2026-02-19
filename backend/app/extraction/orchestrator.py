@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from app.ingest.models import DocumentIR
+from app.text_normalization import fold_symbol_confusables
 
 
 logger = logging.getLogger(__name__)
@@ -553,6 +554,7 @@ def _find_claim_span(claim_text: str, chunk_text: str) -> tuple[int, int]:
     2. Case-insensitive exact match
     3. Whitespace-normalized exact match
     4. Conservative fuzzy matching via difflib (for light paraphrases)
+    5. Token-window matching (for paraphrased/reordered claims)
 
     Returns (start_index, end_index) or (-1, -1) if no reasonable match found.
     """
@@ -561,19 +563,23 @@ def _find_claim_span(claim_text: str, chunk_text: str) -> tuple[int, int]:
     if not claim or not chunk:
         return (-1, -1)
 
+    # Symbol folding is 1:1 char mapping, so offsets remain stable.
+    claim_fold = fold_symbol_confusables(claim)
+    chunk_fold = fold_symbol_confusables(chunk)
+
     # Strategy 1: Exact match
-    pos = chunk.find(claim)
+    pos = chunk_fold.find(claim_fold)
     if pos >= 0:
-        return (pos, pos + len(claim))
+        return (pos, pos + len(claim_fold))
 
     # Strategy 2: Case-insensitive exact match
-    pos = chunk.lower().find(claim.lower())
+    pos = chunk_fold.lower().find(claim_fold.lower())
     if pos >= 0:
-        return (pos, pos + len(claim))
+        return (pos, pos + len(claim_fold))
 
     # Strategy 3: Whitespace-normalized exact match
-    claim_c, _ = _collapse_ws_with_map(claim)
-    chunk_c, chunk_map = _collapse_ws_with_map(chunk)
+    claim_c, _ = _collapse_ws_with_map(claim_fold)
+    chunk_c, chunk_map = _collapse_ws_with_map(chunk_fold)
     if not claim_c or not chunk_c or not chunk_map:
         return (-1, -1)
 
