@@ -22,42 +22,6 @@ GroundingJudgeFn = Callable[..., list[dict[str, Any]]]
 _WS_RE = re.compile(r"\s+")
 _TOKEN_RE = re.compile(r"[A-Za-z]+|\d+|[\u4e00-\u9fff]+")
 _TPL_RE = re.compile(r"\{\{\s*([A-Za-z][A-Za-z0-9_]*)\s*\}\}")
-_FORMULA_HINT_RE = re.compile(r"[$\\_^]|[₀₁₂₃₄₅₆₇₈₉⁰¹²³⁴⁵⁶⁷⁸⁹α-ωΑ-Ω]")
-_LATEX_WRAPPER_COMMANDS = ("mathrm", "mathbf", "boldsymbol", "mathit", "operatorname", "text")
-_LATEX_SYMBOL_MAP = {
-    "alpha": "α", "beta": "β", "gamma": "γ", "delta": "δ",
-    "epsilon": "ε", "varepsilon": "ε", "theta": "θ", "vartheta": "θ",
-    "lambda": "λ", "mu": "μ", "rho": "ρ", "sigma": "σ",
-    "phi": "φ", "varphi": "φ", "omega": "ω",
-    "Gamma": "Γ", "Delta": "Δ", "Theta": "Θ", "Lambda": "Λ",
-    "Sigma": "Σ", "Phi": "Φ", "Omega": "Ω",
-}
-_LATEX_OPERATOR_MAP = {
-    "leqslant": "<=", "leq": "<=", "geqslant": ">=", "geq": ">=",
-    "times": "*", "cdot": "*",
-}
-_UNICODE_SUBSCRIPT_MAP = {
-    "₀": "0", "₁": "1", "₂": "2", "₃": "3", "₄": "4",
-    "₅": "5", "₆": "6", "₇": "7", "₈": "8", "₉": "9",
-    "₊": "+", "₋": "-", "₌": "=", "₍": "(", "₎": ")",
-    "ₐ": "a", "ₑ": "e", "ₕ": "h", "ᵢ": "i", "ⱼ": "j",
-    "ₖ": "k", "ₗ": "l", "ₘ": "m", "ₙ": "n", "ₒ": "o",
-    "ₚ": "p", "ᵣ": "r", "ₛ": "s", "ₜ": "t", "ᵤ": "u",
-    "ᵥ": "v", "ₓ": "x",
-}
-_UNICODE_SUPERSCRIPT_MAP = {
-    "⁰": "0", "¹": "1", "²": "2", "³": "3", "⁴": "4",
-    "⁵": "5", "⁶": "6", "⁷": "7", "⁸": "8", "⁹": "9",
-    "⁺": "+", "⁻": "-", "⁼": "=", "⁽": "(", "⁾": ")",
-    "ᵃ": "a", "ᵇ": "b", "ᶜ": "c", "ᵈ": "d", "ᵉ": "e",
-    "ᶠ": "f", "ᵍ": "g", "ʰ": "h", "ᶦ": "i", "ʲ": "j",
-    "ᵏ": "k", "ˡ": "l", "ᵐ": "m", "ⁿ": "n", "ᵒ": "o",
-    "ᵖ": "p", "ʳ": "r", "ˢ": "s", "ᵗ": "t", "ᵘ": "u",
-    "ᵛ": "v", "ʷ": "w", "ˣ": "x", "ʸ": "y", "ᶻ": "z",
-}
-_UNICODE_SUBSCRIPT_RE = re.compile("[" + re.escape("".join(_UNICODE_SUBSCRIPT_MAP.keys())) + "]+")
-_UNICODE_SUPERSCRIPT_RE = re.compile("[" + re.escape("".join(_UNICODE_SUPERSCRIPT_MAP.keys())) + "]+")
-_OCR_SPACED_LATIN_RE = re.compile(r"\b(?:[A-Za-z]\s+){2,}[A-Za-z]\b")
 _STOP_TOKENS = {
     "the",
     "and",
@@ -266,95 +230,8 @@ def _render_template(template: str, vars: dict[str, Any]) -> str:
     return _TPL_RE.sub(_sub, template or "")
 
 
-def _collapse_ocr_token_spaces(text: str) -> str:
-    """Remove OCR-induced spaces within tokens."""
-    s = str(text or "")
-    # Remove spaces between digits
-    s = re.sub(r"(?<=\d)\s+(?=\d)", "", s)
-    # Remove spaces in spaced-out Latin words (e.g., "s i g m a" -> "sigma")
-    s = _OCR_SPACED_LATIN_RE.sub(lambda m: m.group(0).replace(" ", ""), s)
-    return _WS_RE.sub(" ", s).strip()
-
-
-def _normalize_script_body(body: str) -> str:
-    """Normalize subscript/superscript content."""
-    s = _collapse_ocr_token_spaces(body)
-    # Convert Unicode sub/superscripts to ASCII
-    s = "".join(_UNICODE_SUBSCRIPT_MAP.get(ch, _UNICODE_SUPERSCRIPT_MAP.get(ch, ch)) for ch in s)
-    return s.replace("{", "").replace("}", "")
-
-
-def _replace_unicode_subscript(m: re.Match[str]) -> str:
-    """Convert Unicode subscripts to _notation."""
-    return "_" + "".join(_UNICODE_SUBSCRIPT_MAP.get(ch, ch) for ch in m.group(0))
-
-
-def _replace_unicode_superscript(m: re.Match[str]) -> str:
-    """Convert Unicode superscripts to ^notation."""
-    return "^" + "".join(_UNICODE_SUPERSCRIPT_MAP.get(ch, ch) for ch in m.group(0))
-
-
-def _normalize_formula_text(text: str) -> str:
-    """Normalize mathematical formulas for matching."""
-    s = str(text or "")
-
-    # Remove LaTeX delimiters
-    s = s.replace("$$", " ").replace("$", " ")
-
-    # Normalize dashes and multiplication symbols
-    s = s.replace("−", "-").replace("–", "-").replace("—", "-")
-    s = s.replace("×", "*").replace("·", "*").replace("⋅", "*")
-    s = s.replace("µ", "μ")
-
-    # Remove LaTeX spacing commands
-    s = re.sub(r"\\(?:left|right|!|,|;|:)", "", s)
-    s = re.sub(r"\\tag\s*\{[^{}]*\}", "", s)
-
-    # Unwrap LaTeX wrapper commands (mathrm, mathbf, etc.)
-    for _ in range(3):  # Multiple passes for nested commands
-        before = s
-        for cmd in _LATEX_WRAPPER_COMMANDS:
-            s = re.sub(
-                rf"\\{cmd}\s*\{{\s*([^{{}}]*?)\s*\}}",
-                lambda m: _collapse_ocr_token_spaces(m.group(1)),
-                s,
-            )
-        if s == before:
-            break
-
-    # Replace LaTeX symbols with Unicode equivalents
-    for cmd, rep in sorted(_LATEX_SYMBOL_MAP.items(), key=lambda kv: -len(kv[0])):
-        s = re.sub(rf"\\{cmd}\b", rep, s)
-    for cmd, rep in _LATEX_OPERATOR_MAP.items():
-        s = re.sub(rf"\\{cmd}\b", rep, s)
-
-    # Normalize subscripts and superscripts
-    s = re.sub(r"_\{\s*([^{}]+?)\s*\}", lambda m: "_" + _normalize_script_body(m.group(1)), s)
-    s = re.sub(r"\^\{\s*([^{}]+?)\s*\}", lambda m: "^" + _normalize_script_body(m.group(1)), s)
-    s = _UNICODE_SUBSCRIPT_RE.sub(_replace_unicode_subscript, s)
-    s = _UNICODE_SUPERSCRIPT_RE.sub(_replace_unicode_superscript, s)
-
-    # Remove spaces around operators and brackets
-    s = re.sub(r"\s*([_^=+\-*/(),{}\[\]])\s*", r"\1", s)
-
-    # Remove spaces in numbers
-    s = re.sub(r"(?<=\.)\s+(?=\d)", "", s)
-    s = re.sub(r"(?<=\d)\s+(?=\d)", "", s)
-
-    # Remove OCR-induced spaces in Latin words
-    s = _OCR_SPACED_LATIN_RE.sub(lambda m: m.group(0).replace(" ", ""), s)
-
-    # Clean up LaTeX command spacing
-    s = re.sub(r"\\([A-Za-z]+)\s*\{", r"\\\1{", s)
-
-    return _WS_RE.sub(" ", s).strip()
-
-
 def _norm_text(text: str) -> str:
     s = _WS_RE.sub(" ", (text or "").strip())
-    # Apply formula normalization if text contains formula hints
-    if _FORMULA_HINT_RE.search(s):
-        s = _normalize_formula_text(s)
     while s and s[-1] in ".;。；":
         s = s[:-1].rstrip()
     return s
