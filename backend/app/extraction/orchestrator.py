@@ -602,6 +602,69 @@ def _find_claim_span(claim_text: str, chunk_text: str) -> tuple[int, int]:
             end = chunk_map[match.b + match.size - 1] + 1
             return (start, end)
 
+    # Strategy 5: Token-window matching (for paraphrased/reordered claims)
+    # Split into tokens and find best matching window in chunk
+    claim_tokens = claim_c.lower().split()
+    chunk_tokens = chunk_c.lower().split()
+
+    if len(claim_tokens) >= 3 and len(chunk_tokens) >= 3:
+        best_score = 0.0
+        best_window_start = -1
+        best_window_end = -1
+
+        # Try different window sizes (1-2 sentences)
+        for window_size in range(min(len(claim_tokens), 30), max(2, len(claim_tokens) // 2), -1):
+            for i in range(len(chunk_tokens) - window_size + 1):
+                window_tokens = chunk_tokens[i:i + window_size]
+
+                # Calculate token set similarity (Jaccard)
+                claim_set = set(claim_tokens)
+                window_set = set(window_tokens)
+                intersection = len(claim_set & window_set)
+                union = len(claim_set | window_set)
+
+                if union > 0:
+                    jaccard = float(intersection) / float(union)
+
+                    # Also check token coverage
+                    coverage = float(intersection) / float(len(claim_set))
+
+                    # Combined score: prioritize coverage, then Jaccard
+                    score = coverage * 0.7 + jaccard * 0.3
+
+                    if score > best_score and coverage >= 0.6:
+                        best_score = score
+                        best_window_start = i
+                        best_window_end = i + window_size
+
+        # If found a good match, map back to character positions
+        if best_window_start >= 0 and best_score >= 0.5:
+            # Find character positions of the token window
+            # Reconstruct position by counting tokens in chunk_c
+            char_pos = 0
+            token_idx = 0
+            start_char = -1
+            end_char = -1
+
+            for token in chunk_c.split():
+                if token_idx == best_window_start:
+                    start_char = char_pos
+                if token_idx == best_window_end:
+                    end_char = char_pos
+                    break
+                char_pos += len(token) + 1  # +1 for space
+                token_idx += 1
+
+            # Handle last token
+            if end_char == -1 and token_idx == best_window_end:
+                end_char = len(chunk_c)
+
+            # Map back to original chunk positions
+            if start_char >= 0 and end_char > start_char and start_char < len(chunk_map) and (end_char - 1) < len(chunk_map):
+                start = chunk_map[start_char]
+                end = chunk_map[min(end_char - 1, len(chunk_map) - 1)] + 1
+                return (start, end)
+
     return (-1, -1)
 
 
