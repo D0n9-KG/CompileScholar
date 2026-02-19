@@ -563,10 +563,15 @@ def _find_claim_span(claim_text: str, chunk_text: str) -> tuple[int, int]:
     if not claim or not chunk:
         return (-1, -1)
 
-    # Formula normalization is applied symmetrically for matching only (view-only, not stored)
-    from app.text_normalization import normalize_formula_for_matching
-    claim_norm = normalize_formula_for_matching(claim)
-    chunk_norm = normalize_formula_for_matching(chunk)
+    # Formula normalization with fallback (symmetric, view-only)
+    try:
+        from app.text_normalization import normalize_formula_for_matching
+        claim_norm = normalize_formula_for_matching(claim)
+        chunk_norm = normalize_formula_for_matching(chunk)
+    except Exception:
+        # Fallback to original text if normalization fails
+        claim_norm = claim
+        chunk_norm = chunk
 
     # Strategy 1: Exact match
     pos = chunk_norm.find(claim_norm)

@@ -89,31 +89,36 @@ def normalize_formula_for_matching(text: str) -> str:
     """
     s = text or ""
 
-    # Remove LaTeX commands (keep content)
-    s = re.sub(r"\\mathrm\{([^}]+)\}", r"\1", s)
-    s = re.sub(r"\\text\{([^}]+)\}", r"\1", s)
-    s = re.sub(r"\\mathbf\{([^}]+)\}", r"\1", s)
-    s = re.sub(r"\\operatorname\{([^}]+)\}", r"\1", s)
+    # Remove LaTeX commands (keep content) - allow optional spaces
+    s = re.sub(r"\\mathrm\s*\{([^}]+)\}", r"\1", s)
+    s = re.sub(r"\\text\s*\{([^}]+)\}", r"\1", s)
+    s = re.sub(r"\\mathbf\s*\{([^}]+)\}", r"\1", s)
+    s = re.sub(r"\\operatorname\s*\{([^}]+)\}", r"\1", s)
 
     # Remove spaces around formula elements (but keep sentence spaces)
     # Pattern: space between single char and digit/symbol
     s = re.sub(r"([α-ωΑ-Ωθσμγβ])\s+([0-9])", r"\1\2", s)
     s = re.sub(r"([0-9])\s+([α-ωΑ-Ωθσμγβ])", r"\1\2", s)
 
-    # Greek letter normalization (bidirectional)
-    greek_map = {
-        "theta": "θ", "Theta": "Θ",
-        "alpha": "α", "Alpha": "Α",
-        "beta": "β", "Beta": "Β",
-        "gamma": "γ", "Gamma": "Γ",
-        "delta": "δ", "Delta": "Δ",
-        "epsilon": "ε", "Epsilon": "Ε",
-        "mu": "μ", "Mu": "Μ",
-        "sigma": "σ", "Sigma": "Σ",
-        "omega": "ω", "Omega": "Ω",
-    }
-
-    for latin, greek in greek_map.items():
-        s = s.replace(latin, greek)
+    # Greek letter normalization with word boundaries (only LaTeX-style)
+    # Only replace when preceded by backslash to avoid false positives
+    s = re.sub(r"\\theta\b", "θ", s)
+    s = re.sub(r"\\Theta\b", "Θ", s)
+    s = re.sub(r"\\alpha\b", "α", s)
+    s = re.sub(r"\\Alpha\b", "Α", s)
+    s = re.sub(r"\\beta\b", "β", s)
+    s = re.sub(r"\\Beta\b", "Β", s)
+    s = re.sub(r"\\gamma\b", "γ", s)
+    s = re.sub(r"\\Gamma\b", "Γ", s)
+    s = re.sub(r"\\delta\b", "δ", s)
+    s = re.sub(r"\\Delta\b", "Δ", s)
+    s = re.sub(r"\\epsilon\b", "ε", s)
+    s = re.sub(r"\\Epsilon\b", "Ε", s)
+    s = re.sub(r"\\mu\b", "μ", s)
+    s = re.sub(r"\\Mu\b", "Μ", s)
+    s = re.sub(r"\\sigma\b", "σ", s)
+    s = re.sub(r"\\Sigma\b", "Σ", s)
+    s = re.sub(r"\\omega\b", "ω", s)
+    s = re.sub(r"\\Omega\b", "Ω", s)
 
     return s

@@ -510,7 +510,21 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
                         try:
                             item = future.result()
                         except Exception as exc:
+                            logger.exception(f"LLM extraction failed for {paper_id}")
                             llm_failures.append(f"{paper_id}: {exc}")
+
+                            # Write detailed error to file for debugging
+                            try:
+                                error_file = run_dir / f"{paper_id}.llm_error.txt"
+                                error_file.write_text(
+                                    f"Paper: {paper_id}\n"
+                                    f"Error: {exc}\n"
+                                    f"Type: {type(exc).__name__}\n",
+                                    encoding="utf-8"
+                                )
+                            except Exception:
+                                pass  # Don't fail if error logging fails
+
                             ratio = completed / total_jobs
                             notify(
                                 "ingest:llm",
