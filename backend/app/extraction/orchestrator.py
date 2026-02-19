@@ -563,23 +563,24 @@ def _find_claim_span(claim_text: str, chunk_text: str) -> tuple[int, int]:
     if not claim or not chunk:
         return (-1, -1)
 
-    # Symbol folding is 1:1 char mapping, so offsets remain stable.
-    claim_fold = fold_symbol_confusables(claim)
-    chunk_fold = fold_symbol_confusables(chunk)
+    # Formula normalization is applied symmetrically for matching only (view-only, not stored)
+    from app.text_normalization import normalize_formula_for_matching
+    claim_norm = normalize_formula_for_matching(claim)
+    chunk_norm = normalize_formula_for_matching(chunk)
 
     # Strategy 1: Exact match
-    pos = chunk_fold.find(claim_fold)
+    pos = chunk_norm.find(claim_norm)
     if pos >= 0:
-        return (pos, pos + len(claim_fold))
+        return (pos, pos + len(claim_norm))
 
     # Strategy 2: Case-insensitive exact match
-    pos = chunk_fold.lower().find(claim_fold.lower())
+    pos = chunk_norm.lower().find(claim_norm.lower())
     if pos >= 0:
-        return (pos, pos + len(claim_fold))
+        return (pos, pos + len(claim_norm))
 
     # Strategy 3: Whitespace-normalized exact match
-    claim_c, _ = _collapse_ws_with_map(claim_fold)
-    chunk_c, chunk_map = _collapse_ws_with_map(chunk_fold)
+    claim_c, _ = _collapse_ws_with_map(claim_norm)
+    chunk_c, chunk_map = _collapse_ws_with_map(chunk_norm)
     if not claim_c or not chunk_c or not chunk_map:
         return (-1, -1)
 

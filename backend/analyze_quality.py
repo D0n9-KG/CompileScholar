@@ -3,8 +3,8 @@ import json
 from pathlib import Path
 from collections import Counter
 
-runs_dir = Path("C:/Users/D0n9/Desktop/LogicKG/backend/runs/20260218T175148Z")
-papers = ["01_1478","03_491","05_340","07_1605","09_1007","11_251","12_1606","15_1396","16_569","20_142"]
+runs_dir = Path("C:/Users/D0n9/Desktop/LogicKG/backend/runs/20260219T101216Z")
+papers = ["01_1478","02_1050","03_491","04_1228","05_340","07_1605","09_1007","11_251","12_1606","15_1396"]
 
 print("=== CLAIMS 质量分析 ===")
 total_claims = 0

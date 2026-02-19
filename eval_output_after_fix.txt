@@ -1,0 +1,106 @@
+后端地址: http://localhost:8000
+
+[Phase A] 获取论文列表...
+  共 20 篇论文
+  [1/20] 分析 17_1634...
+  [2/20] 分析 02_1050...
+  [3/20] 分析 03_491...
+  [4/20] 分析 10_1712...
+  [5/20] 分析 04_1228...
+  [6/20] 分析 13_2334...
+  [7/20] 分析 18_3098...
+  [8/20] 分析 19_185...
+  [9/20] 分析 08_2560...
+  [10/20] 分析 06_1739...
+  [11/20] 分析 11_251...
+  [12/20] 分析 20_142...
+  [13/20] 分析 01_1478...
+  [14/20] 分析 05_340...
+  [15/20] 分析 12_1606...
+  [16/20] 分析 15_1396...
+  [17/20] 分析 07_1605...
+  [18/20] 分析 14_1485...
+  [19/20] 分析 16_569...
+  [20/20] 分析 09_1007...
+
+[Phase B] 演化关系分析...
+
+[Phase C] RAG 测试跳过（--skip-rag）
+
+══════════════════════════════════════════════════════════════════════
+  LogicKG DEM 20 篇质量评测报告
+══════════════════════════════════════════════════════════════════════
+
+【A. 摄入 & Phase1 Gate】
+  论文总数       : 20
+  摄入错误       : 0
+  Gate 通过      : 18 / 20  (90%)
+    质量等级 green     : 18 篇
+    质量等级 yellow    : 2 篇
+  Gate 失败原因分布:
+    critical_slot_coverage: 2 次
+
+【B. Logic Steps 完整性】
+  平均覆盖步骤数 : 5.8 / 6
+  平均 step_coverage_ratio: 78.33%
+  全6步覆盖论文  : 17 / 20
+  各步骤缺失次数:
+    Background  :  0 篇缺失  --------------------
+    Problem     :  0 篇缺失  --------------------
+    Method      :  0 篇缺失  --------------------
+    Experiment  :  3 篇缺失  ###-----------------
+    Result      :  0 篇缺失  --------------------
+    Conclusion  :  0 篇缺失  --------------------
+
+【C. Claims 质量】
+  平均 Claims 数          : 73.8
+  平均 supported_ratio    : 98.17%
+  平均 critical_slot_cov  : 59.38%
+  平均 evidence_weak 比例 : 0.00%
+  平均 conflict_rate      : 0.0108
+
+【D. 引用解析质量】
+  总引用解析数   : 661 resolved / 79 unresolved
+  整体解析率     : 89.32%
+  引用目的标签分布:
+    Background               : 369
+    MethodUse                : 298
+    SupportEvidence          : 135
+    Survey                   : 98
+    Theory                   : 93
+    BaselineCompare          : 65
+    DataTool                 : 56
+    CritiqueLimit            : 37
+
+【E. 演化关系质量】
+  总命题数       : 1000
+  关系覆盖率     : 100.00%
+  总关系数       : 1129
+    SUPPORTS       : 1129
+    CHALLENGES     : 0
+    SUPERSEDES     : 0
+  自环率         : 0.0000
+  命题状态分布   : {'stable': 1000}
+
+【F. RAG 问答质量】
+  测试题数       : 0
+  有效回答数     : 0 / 0
+  平均检索证据数 : 0.0
+
+【论文级明细】
+  source          gate  tier    steps supp%  crit%  res%  claims
+  ──────────────────────────────────────────────────────────────
+Traceback (most recent call last):
+  File "C:\Users\D0n9\Desktop\LogicKG\eval_quality.py", line 463, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\D0n9\Desktop\LogicKG\eval_quality.py", line 454, in main
+    report = print_report(paper_results, evolution_result, rag_results)
+  File "C:\Users\D0n9\Desktop\LogicKG\eval_quality.py", line 378, in print_report
+    print(f"  {src:15s} {gate:5s} {tier:7s} {steps:5s} "
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          f"{fmt(supp,'5.0%'):6s} {fmt(crit,'5.0%'):6s} "
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          f"{fmt(res,'4.0%'):5s} {claims:6d}")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'gbk' codec can't encode character '\u2713' in position 18: illegal multibyte sequence

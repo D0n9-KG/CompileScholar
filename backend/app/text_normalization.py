@@ -1,6 +1,8 @@
 """Text normalization utilities for encoding recovery and symbol folding."""
 from __future__ import annotations
 
+import re
+
 # Markers commonly seen when UTF-8 text is mis-decoded as GBK/CP936.
 # We keep this conservative and only use it as a trigger heuristic.
 _MOJIBAKE_MARKERS = (
@@ -72,3 +74,46 @@ def normalize_ingested_markdown(text: str) -> str:
 def fold_symbol_confusables(text: str) -> str:
     """Span-matching-only symbol folding (no semantic rewrite)."""
     return (text or "").translate(_SYMBOL_CONFUSABLES)
+
+
+def normalize_formula_for_matching(text: str) -> str:
+    """Formula normalization for span matching only (symmetric, view-only).
+
+    Handles common formula format differences:
+    - LaTeX commands: \\mathrm{}, \\text{}, \\mathbf{}, \\operatorname{}
+    - Spaces in formulas: "σ 1" vs "σ1"
+    - Greek letter variants: θ/theta, α/alpha, β/beta, γ/gamma, μ/mu, σ/sigma
+
+    This is applied symmetrically to both claim and chunk during matching,
+    but does NOT modify stored text.
+    """
+    s = text or ""
+
+    # Remove LaTeX commands (keep content)
+    s = re.sub(r"\\mathrm\{([^}]+)\}", r"\1", s)
+    s = re.sub(r"\\text\{([^}]+)\}", r"\1", s)
+    s = re.sub(r"\\mathbf\{([^}]+)\}", r"\1", s)
+    s = re.sub(r"\\operatorname\{([^}]+)\}", r"\1", s)
+
+    # Remove spaces around formula elements (but keep sentence spaces)
+    # Pattern: space between single char and digit/symbol
+    s = re.sub(r"([α-ωΑ-Ωθσμγβ])\s+([0-9])", r"\1\2", s)
+    s = re.sub(r"([0-9])\s+([α-ωΑ-Ωθσμγβ])", r"\1\2", s)
+
+    # Greek letter normalization (bidirectional)
+    greek_map = {
+        "theta": "θ", "Theta": "Θ",
+        "alpha": "α", "Alpha": "Α",
+        "beta": "β", "Beta": "Β",
+        "gamma": "γ", "Gamma": "Γ",
+        "delta": "δ", "Delta": "Δ",
+        "epsilon": "ε", "Epsilon": "Ε",
+        "mu": "μ", "Mu": "Μ",
+        "sigma": "σ", "Sigma": "Σ",
+        "omega": "ω", "Omega": "Ω",
+    }
+
+    for latin, greek in greek_map.items():
+        s = s.replace(latin, greek)
+
+    return s
