@@ -1955,6 +1955,8 @@ def run_phase1_extraction(
                 or ([claim["origin_chunk_id"]] if claim.get("origin_chunk_id") else [])
             ),
             "origin_chunk_ids": list(claim.get("origin_chunk_ids") or []),
+            "span_start": int(claim.get("span_start") or -1),
+            "span_end": int(claim.get("span_end") or -1),
             "support_label": label,
             "judge_score": score,
             "judge_reason": reason,
