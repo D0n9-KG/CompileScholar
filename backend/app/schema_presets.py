@@ -528,6 +528,12 @@ def _prompts_high_precision() -> dict[str, str]:
             "- Skip uncertain items.\n"
             "- Keep numbers/symbols/units unchanged.\n"
             "\n"
+            "EVIDENCE QUOTE (REQUIRED):\n"
+            "- evidence_quote is REQUIRED for every claim.\n"
+            "- evidence_quote must be copied VERBATIM from chunk text (no paraphrase, no symbol rewrite).\n"
+            "- Length must be 20-220 characters.\n"
+            "- If valid quote cannot be produced, DO NOT output that claim.\n"
+            "\n"
             "SCIENTIFIC VALUE (CRITICAL):\n"
             "- Extract ONLY scientific contributions, methods, findings, and conclusions.\n"
             "- DO NOT extract meta-information such as:\n"
@@ -544,7 +550,7 @@ def _prompts_high_precision() -> dict[str, str]:
             "Mode: HIGH_PRECISION chunk extraction.\n"
             "Allowed step types: {{step_ids}}\nAllowed claim kinds: {{kind_ids}}\nMax claims: {{max_claims}}\n\n"
             "Chunk text:\n{{chunk_text}}\n\n"
-            'Output JSON schema: { "claims": [ {"text":"...","step_type":"Background","claim_kinds":["Definition"],"confidence":0.0} ] }\n'
+            'Output JSON schema: { "claims": [ {"text":"...","evidence_quote":"...","step_type":"Background","claim_kinds":["Definition"],"confidence":0.0} ] }\n'
         ),
         "phase1_grounding_judge_system": (
             "You are a strict claim-grounding judge for scientific IE.\n"
@@ -678,6 +684,12 @@ def _prompts_balanced() -> dict[str, str]:
             "- Each claim must be grounded in this chunk.\n"
             "- Do not invent information outside this chunk.\n"
             "\n"
+            "EVIDENCE QUOTE (REQUIRED):\n"
+            "- evidence_quote is REQUIRED for every claim.\n"
+            "- evidence_quote must be copied VERBATIM from chunk text (no paraphrase, no symbol rewrite).\n"
+            "- Length must be 20-220 characters.\n"
+            "- If valid quote cannot be produced, DO NOT output that claim.\n"
+            "\n"
             "SCIENTIFIC VALUE (CRITICAL):\n"
             "- Extract ONLY scientific contributions, methods, findings, and conclusions.\n"
             "- DO NOT extract meta-information such as:\n"
@@ -694,7 +706,7 @@ def _prompts_balanced() -> dict[str, str]:
             "Mode: BALANCED chunk extraction.\n"
             "Allowed step types: {{step_ids}}\nAllowed claim kinds: {{kind_ids}}\nMax claims: {{max_claims}}\n\n"
             "Chunk text:\n{{chunk_text}}\n\n"
-            'Output JSON schema: { "claims": [ {"text":"...","step_type":"Background","claim_kinds":["Definition"],"confidence":0.0} ] }\n'
+            'Output JSON schema: { "claims": [ {"text":"...","evidence_quote":"...","step_type":"Background","claim_kinds":["Definition"],"confidence":0.0} ] }\n'
         ),
         "phase1_grounding_judge_system": (
             "You are a claim-grounding judge for scientific IE.\n"
@@ -828,6 +840,12 @@ def _prompts_high_recall() -> dict[str, str]:
             "- Include secondary findings, conditions, and caveats when text supports them.\n"
             "- Avoid exact duplicates.\n"
             "\n"
+            "EVIDENCE QUOTE (REQUIRED):\n"
+            "- evidence_quote is REQUIRED for every claim.\n"
+            "- evidence_quote must be copied VERBATIM from chunk text (no paraphrase, no symbol rewrite).\n"
+            "- Length must be 20-220 characters.\n"
+            "- If valid quote cannot be produced, DO NOT output that claim.\n"
+            "\n"
             "SCIENTIFIC VALUE (CRITICAL):\n"
             "- Extract ONLY scientific contributions, methods, findings, and conclusions.\n"
             "- DO NOT extract meta-information such as:\n"
@@ -844,7 +862,7 @@ def _prompts_high_recall() -> dict[str, str]:
             "Mode: HIGH_RECALL chunk extraction.\n"
             "Allowed step types: {{step_ids}}\nAllowed claim kinds: {{kind_ids}}\nMax claims: {{max_claims}}\n\n"
             "Chunk text:\n{{chunk_text}}\n\n"
-            'Output JSON schema: { "claims": [ {"text":"...","step_type":"Background","claim_kinds":["Definition","Result"],"confidence":0.0} ] }\n'
+            'Output JSON schema: { "claims": [ {"text":"...","evidence_quote":"...","step_type":"Background","claim_kinds":["Definition","Result"],"confidence":0.0} ] }\n'
         ),
         "phase1_grounding_judge_system": (
             "You are a high-recall claim-grounding judge for scientific IE.\n"
