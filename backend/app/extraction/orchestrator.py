@@ -1687,6 +1687,7 @@ def _quality_report(
     judgments: list[dict[str, Any]],
     step_order: list[str],
     logic_steps_coverage_ratio: float | None = None,
+    logic_covered_steps: set[str] | None = None,
     schema: dict[str, Any],
     rules: dict[str, Any],
 ) -> dict[str, Any]:
@@ -1713,6 +1714,13 @@ def _quality_report(
             logic_steps_coverage = step_coverage
     else:
         logic_steps_coverage = step_coverage
+    logic_covered_steps_set = {
+        sid for sid in (logic_covered_steps or set())
+        if sid in steps_set
+    }
+    if not logic_covered_steps_set and logic_steps_coverage >= 1.0:
+        logic_covered_steps_set = set(steps_set)
+    validated_steps_missing_logic = sorted(validated_steps - logic_covered_steps_set)
     completeness = _completeness_stats(validated=validated, step_order=step_order, schema=schema, rules=rules)
     conflict = _conflict_stats(validated=validated, rules=rules, schema=schema)
     grounding_mode_used = _rule_choice(rules, "phase1_grounding_mode", ("lexical", "hybrid", "llm"), "lexical")
@@ -1747,14 +1755,30 @@ def _quality_report(
         "phase2_gate_critical_slot_bypass_supported_min",
         0.95,
     )
+    logic_steps_coverage_min = max(
+        0.0,
+        min(1.0, _rule_float(rules, "phase2_gate_logic_steps_coverage_min", 0.83)),
+    )
+    logic_steps_guard_validated_enabled = _rule_bool(
+        rules,
+        "phase2_gate_logic_steps_guard_validated",
+        True,
+    )
+    logic_steps_guard_validated_ready = (
+        (not logic_steps_guard_validated_enabled)
+        or (not validated_steps)
+        or (not validated_steps_missing_logic)
+    )
 
     # Shared "excellent" eligibility:
     # - supported_ratio high enough
-    # - logic step structure is fully populated
+    # - logic step structure reaches configurable threshold
+    # - (optional) all validated-claim steps have logic coverage
     # This condition is reused by both bypass paths to keep criteria consistent.
     excellent_bypass_ready = (
         supported_ratio >= critical_slot_bypass_supported_min
-        and logic_steps_coverage >= 1.0
+        and logic_steps_coverage >= logic_steps_coverage_min
+        and logic_steps_guard_validated_ready
     )
     critical_slot_bypass_excellent = critical_slot_bypass_enabled and excellent_bypass_ready
     step_coverage_bypass_excellent = step_coverage_bypass_enabled and excellent_bypass_ready
@@ -1796,6 +1820,10 @@ def _quality_report(
         "supported_claim_ratio": supported_ratio,
         "step_coverage_ratio": step_coverage,
         "logic_steps_coverage_ratio": logic_steps_coverage,
+        "logic_covered_steps_count": len(logic_covered_steps_set),
+        "validated_steps_missing_logic": validated_steps_missing_logic,
+        "logic_steps_guard_validated_enabled": logic_steps_guard_validated_enabled,
+        "logic_steps_guard_validated_ready": logic_steps_guard_validated_ready,
         "grounding_mode_used": grounding_mode_used,
         "grounding_semantic_judged": grounding_semantic_judged,
         "grounding_lexical_judged": grounding_lexical_judged,
@@ -1848,6 +1876,8 @@ def _quality_report(
             "phase2_gate_critical_slot_coverage_min": min_critical,
             "phase2_gate_critical_slot_bypass_excellent": critical_slot_bypass_enabled,
             "phase2_gate_step_coverage_bypass_excellent": step_coverage_bypass_enabled,
+            "phase2_gate_logic_steps_coverage_min": logic_steps_coverage_min,
+            "phase2_gate_logic_steps_guard_validated": logic_steps_guard_validated_enabled,
             "phase2_gate_critical_slot_bypass_supported_min": critical_slot_bypass_supported_min,
             "phase2_gate_conflict_rate_max": max_conflict,
             "phase1_grounding_mode": grounding_mode_used,
@@ -2023,16 +2053,16 @@ def run_phase1_extraction(
     # whose claims concentrate in fewer steps (e.g. software/theory papers) can
     # still pass the gate when their logic structure is fully populated.
     _step_ids_all = [str(s or "").strip() for s in step_order if str(s or "").strip()]
-    _logic_steps_covered = sum(
-        1
+    logic_covered_steps = {
+        _sid
         for _sid in _step_ids_all
         if (
             bool((logic.get(_sid) or {}).get("summary_machine", "").strip())
             or bool((logic.get(_sid) or {}).get("summary", "").strip())
             or bool((logic.get(_sid) or {}).get("evidence_chunk_ids"))
         )
-    )
-    logic_steps_coverage_ratio = float(_logic_steps_covered) / float(max(1, len(_step_ids_all)))
+    }
+    logic_steps_coverage_ratio = float(len(logic_covered_steps)) / float(max(1, len(_step_ids_all)))
 
     # P0 Fix: Check for empty logic steps
     logic_steps_empty_count = 0
@@ -2048,6 +2078,7 @@ def run_phase1_extraction(
         judgments=judgments,
         step_order=step_order,
         logic_steps_coverage_ratio=logic_steps_coverage_ratio,
+        logic_covered_steps=logic_covered_steps,
         schema=schema,
         rules=dict(schema.get("rules") or {}),
     )

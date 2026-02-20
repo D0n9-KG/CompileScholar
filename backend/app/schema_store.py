@@ -151,6 +151,8 @@ def _default_schema(paper_type: PaperType) -> dict[str, Any]:
             "phase2_gate_critical_slot_coverage_min": 0.4,
             # Backward-compatible default: disabled unless schema explicitly enables it.
             "phase2_gate_step_coverage_bypass_excellent": False,
+            "phase2_gate_logic_steps_coverage_min": 0.83,
+            "phase2_gate_logic_steps_guard_validated": True,
             "phase2_gate_conflict_rate_max": 0.35,
             "phase2_conflict_mode": "lexical",
             "phase2_conflict_semantic_threshold": 0.75,
@@ -397,6 +399,17 @@ def validate_schema(schema: dict[str, Any]) -> None:
     gate_step_coverage_bypass = rules.get("phase2_gate_step_coverage_bypass_excellent", False)
     if not isinstance(gate_step_coverage_bypass, bool):
         raise ValueError("phase2_gate_step_coverage_bypass_excellent must be boolean")
+    gate_logic_steps_coverage_min = rules.get("phase2_gate_logic_steps_coverage_min", 0.83)
+    try:
+        gate_logic_steps_coverage_min_f = float(gate_logic_steps_coverage_min)
+    except Exception as exc:
+        raise ValueError("Invalid phase2_gate_logic_steps_coverage_min") from exc
+    if gate_logic_steps_coverage_min_f < 0.0 or gate_logic_steps_coverage_min_f > 1.0:
+        raise ValueError("Invalid phase2_gate_logic_steps_coverage_min")
+    gate_logic_steps_guard_validated = rules.get("phase2_gate_logic_steps_guard_validated", True)
+    if not isinstance(gate_logic_steps_guard_validated, bool):
+        raise ValueError("phase2_gate_logic_steps_guard_validated must be boolean")
+
     gate_conflict = rules.get("phase2_gate_conflict_rate_max", 0.35)
     try:
         gate_conflict_f = float(gate_conflict)
