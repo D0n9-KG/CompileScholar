@@ -153,6 +153,16 @@ def _default_schema(paper_type: PaperType) -> dict[str, Any]:
             "phase2_gate_step_coverage_bypass_excellent": False,
             "phase2_gate_logic_steps_coverage_min": 0.83,
             "phase2_gate_logic_steps_guard_validated": True,
+            "phase2_gate_critical_slot_bypass_min_coverage": 0.35,
+            "phase2_gate_critical_slot_bypass_min_critical_steps_with_claims": 2,
+            "phase2_gate_critical_slot_bypass_require_result_or_conclusion": True,
+            "phase2_gate_critical_slot_bypass_min_result_like_claims": 1,
+            "phase2_gate_critical_slot_bypass_min_result_like_ratio": 0.0,
+            "phase2_gate_step_bypass_min_critical_steps_with_claims": 2,
+            "phase2_gate_step_bypass_require_non_method_claim": True,
+            "phase2_gate_base_min_non_method_critical_claims": 0,
+            "phase2_gate_base_min_result_like_claims": 0,
+            "phase2_gate_base_min_result_like_ratio": 0.0,
             "phase2_gate_conflict_rate_max": 0.35,
             "phase2_conflict_mode": "lexical",
             "phase2_conflict_semantic_threshold": 0.75,
@@ -409,6 +419,62 @@ def validate_schema(schema: dict[str, Any]) -> None:
     gate_logic_steps_guard_validated = rules.get("phase2_gate_logic_steps_guard_validated", True)
     if not isinstance(gate_logic_steps_guard_validated, bool):
         raise ValueError("phase2_gate_logic_steps_guard_validated must be boolean")
+
+    gate_step_bypass_min_critical_steps = int(
+        rules.get("phase2_gate_step_bypass_min_critical_steps_with_claims", 2)
+    )
+    if gate_step_bypass_min_critical_steps < 1 or gate_step_bypass_min_critical_steps > 10:
+        raise ValueError("Invalid phase2_gate_step_bypass_min_critical_steps_with_claims")
+    gate_step_bypass_require_non_method_claim = rules.get("phase2_gate_step_bypass_require_non_method_claim", True)
+    if not isinstance(gate_step_bypass_require_non_method_claim, bool):
+        raise ValueError("phase2_gate_step_bypass_require_non_method_claim must be boolean")
+
+    gate_critical_slot_bypass_min_coverage = rules.get("phase2_gate_critical_slot_bypass_min_coverage", 0.35)
+    try:
+        gate_critical_slot_bypass_min_coverage_f = float(gate_critical_slot_bypass_min_coverage)
+    except Exception as exc:
+        raise ValueError("Invalid phase2_gate_critical_slot_bypass_min_coverage") from exc
+    if gate_critical_slot_bypass_min_coverage_f < 0.0 or gate_critical_slot_bypass_min_coverage_f > 1.0:
+        raise ValueError("Invalid phase2_gate_critical_slot_bypass_min_coverage")
+
+    gate_critical_slot_bypass_min_critical_steps = int(
+        rules.get("phase2_gate_critical_slot_bypass_min_critical_steps_with_claims", 2)
+    )
+    if (
+        gate_critical_slot_bypass_min_critical_steps < 1
+        or gate_critical_slot_bypass_min_critical_steps > 10
+    ):
+        raise ValueError("Invalid phase2_gate_critical_slot_bypass_min_critical_steps_with_claims")
+    gate_critical_slot_bypass_require_result_or_conclusion = rules.get(
+        "phase2_gate_critical_slot_bypass_require_result_or_conclusion", True
+    )
+    if not isinstance(gate_critical_slot_bypass_require_result_or_conclusion, bool):
+        raise ValueError("phase2_gate_critical_slot_bypass_require_result_or_conclusion must be boolean")
+
+    gate_critical_slot_bypass_min_result_like_claims = int(
+        rules.get("phase2_gate_critical_slot_bypass_min_result_like_claims", 1)
+    )
+    if gate_critical_slot_bypass_min_result_like_claims < 0 or gate_critical_slot_bypass_min_result_like_claims > 200:
+        raise ValueError("Invalid phase2_gate_critical_slot_bypass_min_result_like_claims")
+    gate_critical_slot_bypass_min_result_like_ratio = float(
+        rules.get("phase2_gate_critical_slot_bypass_min_result_like_ratio", 0.0)
+    )
+    if gate_critical_slot_bypass_min_result_like_ratio < 0.0 or gate_critical_slot_bypass_min_result_like_ratio > 1.0:
+        raise ValueError("Invalid phase2_gate_critical_slot_bypass_min_result_like_ratio")
+
+    gate_base_min_non_method_critical_claims = int(
+        rules.get("phase2_gate_base_min_non_method_critical_claims", 0)
+    )
+    if gate_base_min_non_method_critical_claims < 0 or gate_base_min_non_method_critical_claims > 200:
+        raise ValueError("Invalid phase2_gate_base_min_non_method_critical_claims")
+    gate_base_min_result_like_claims = int(
+        rules.get("phase2_gate_base_min_result_like_claims", 0)
+    )
+    if gate_base_min_result_like_claims < 0 or gate_base_min_result_like_claims > 200:
+        raise ValueError("Invalid phase2_gate_base_min_result_like_claims")
+    gate_base_min_result_like_ratio = float(rules.get("phase2_gate_base_min_result_like_ratio", 0.0))
+    if gate_base_min_result_like_ratio < 0.0 or gate_base_min_result_like_ratio > 1.0:
+        raise ValueError("Invalid phase2_gate_base_min_result_like_ratio")
 
     gate_conflict = rules.get("phase2_gate_conflict_rate_max", 0.35)
     try:

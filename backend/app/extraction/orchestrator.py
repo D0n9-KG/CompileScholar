@@ -1742,6 +1742,16 @@ def _quality_report(
     min_semantic_coverage = _rule_float(rules, "phase1_gate_semantic_coverage_min", 0.0)
 
     critical_slot_bypass_enabled = _rule_bool(rules, "phase2_gate_critical_slot_bypass_excellent", False)
+    step_bypass_min_critical_steps_with_claims = max(
+        1,
+        _rule_int(rules, "phase2_gate_step_bypass_min_critical_steps_with_claims", 2),
+    )
+    step_bypass_require_non_method_claim = _rule_bool(
+        rules,
+        "phase2_gate_step_bypass_require_non_method_claim",
+        True,
+    )
+
     # P0: optional extension for step_coverage gate bypass.
     # Backward-compatible default is False, so old behavior remains unchanged
     # unless schema explicitly enables this flag.
@@ -1755,6 +1765,40 @@ def _quality_report(
         "phase2_gate_critical_slot_bypass_supported_min",
         0.95,
     )
+    critical_slot_bypass_min_coverage = max(
+        0.0,
+        min(1.0, _rule_float(rules, "phase2_gate_critical_slot_bypass_min_coverage", 0.35)),
+    )
+    critical_slot_bypass_min_critical_steps_with_claims = max(
+        1,
+        _rule_int(rules, "phase2_gate_critical_slot_bypass_min_critical_steps_with_claims", 2),
+    )
+    critical_slot_bypass_require_result_or_conclusion = _rule_bool(
+        rules,
+        "phase2_gate_critical_slot_bypass_require_result_or_conclusion",
+        True,
+    )
+    critical_slot_bypass_min_result_like_claims = max(
+        1,
+        _rule_int(rules, "phase2_gate_critical_slot_bypass_min_result_like_claims", 1),
+    )
+    critical_slot_bypass_min_result_like_ratio = max(
+        0.0,
+        min(1.0, _rule_float(rules, "phase2_gate_critical_slot_bypass_min_result_like_ratio", 0.0)),
+    )
+    base_min_non_method_critical_claims = max(
+        0,
+        _rule_int(rules, "phase2_gate_base_min_non_method_critical_claims", 0),
+    )
+    base_min_result_like_claims = max(
+        0,
+        _rule_int(rules, "phase2_gate_base_min_result_like_claims", 0),
+    )
+    base_min_result_like_ratio = max(
+        0.0,
+        min(1.0, _rule_float(rules, "phase2_gate_base_min_result_like_ratio", 0.0)),
+    )
+
     logic_steps_coverage_min = max(
         0.0,
         min(1.0, _rule_float(rules, "phase2_gate_logic_steps_coverage_min", 0.83)),
@@ -1770,6 +1814,32 @@ def _quality_report(
         or (not validated_steps_missing_logic)
     )
 
+    critical_step_claim_counts = dict(completeness.get("step_claim_counts") or {})
+    critical_steps_cfg = [
+        str(step_id).strip()
+        for step_id in (completeness.get("critical_steps") or [])
+        if str(step_id).strip()
+    ]
+    critical_steps_with_claims = sum(
+        1 for step_id in critical_steps_cfg if int(critical_step_claim_counts.get(step_id) or 0) > 0
+    )
+    method_like_steps = [step_id for step_id in critical_steps_cfg if "method" in step_id.lower()]
+    non_method_critical_claims = sum(
+        int(count or 0)
+        for step_id, count in critical_step_claim_counts.items()
+        if step_id not in method_like_steps
+    )
+    result_like_steps = [
+        step_id
+        for step_id in critical_steps_cfg
+        if ("result" in step_id.lower() or "conclusion" in step_id.lower())
+    ]
+    result_like_claims = sum(
+        int(critical_step_claim_counts.get(step_id) or 0)
+        for step_id in result_like_steps
+    )
+    result_like_ratio = float(result_like_claims) / float(max(1, len(validated)))
+
     # Shared "excellent" eligibility:
     # - supported_ratio high enough
     # - logic step structure reaches configurable threshold
@@ -1780,8 +1850,30 @@ def _quality_report(
         and logic_steps_coverage >= logic_steps_coverage_min
         and logic_steps_guard_validated_ready
     )
-    critical_slot_bypass_excellent = critical_slot_bypass_enabled and excellent_bypass_ready
-    step_coverage_bypass_excellent = step_coverage_bypass_enabled and excellent_bypass_ready
+    step_coverage_bypass_ready = (
+        excellent_bypass_ready
+        and critical_steps_with_claims >= step_bypass_min_critical_steps_with_claims
+        and (
+            (not step_bypass_require_non_method_claim)
+            or (not method_like_steps)
+            or (non_method_critical_claims > 0)
+        )
+    )
+    critical_slot_bypass_ready = (
+        excellent_bypass_ready
+        and float(completeness.get("critical_slot_coverage") or 0.0) >= critical_slot_bypass_min_coverage
+        and critical_steps_with_claims >= critical_slot_bypass_min_critical_steps_with_claims
+        and (
+            (not critical_slot_bypass_require_result_or_conclusion)
+            or (not result_like_steps)
+            or (
+                result_like_claims >= critical_slot_bypass_min_result_like_claims
+                and result_like_ratio >= critical_slot_bypass_min_result_like_ratio
+            )
+        )
+    )
+    critical_slot_bypass_excellent = critical_slot_bypass_enabled and critical_slot_bypass_ready
+    step_coverage_bypass_excellent = step_coverage_bypass_enabled and step_coverage_bypass_ready
 
     comparable_pairs = int(conflict.get("comparable_pairs") or 0)
     conflict_pairs = int(conflict.get("conflict_pairs") or 0)
@@ -1803,6 +1895,12 @@ def _quality_report(
         gate_fail_reasons.append("critical_slot_coverage")
     if (not conflict_gate_skipped) and float(conflict.get("conflict_rate") or 0.0) > max_conflict:
         gate_fail_reasons.append("conflict_rate")
+    if non_method_critical_claims < base_min_non_method_critical_claims:
+        gate_fail_reasons.append("non_method_critical_claims")
+    if result_like_claims < base_min_result_like_claims:
+        gate_fail_reasons.append("result_like_claims")
+    if result_like_ratio < base_min_result_like_ratio:
+        gate_fail_reasons.append("result_like_ratio")
     # P1 Fix: Hybrid/semantic grounding coverage gate.
     # When min_semantic_coverage > 0.0, gate fails if fewer claims went through semantic judgment
     # than the configured minimum ratio (default: 0.0 = disabled, backwards compatible).
@@ -1838,6 +1936,10 @@ def _quality_report(
         "critical_slot_coverage": float(completeness.get("critical_slot_coverage") or 0.0),
         "critical_slot_bypass_excellent": critical_slot_bypass_excellent,
         "step_coverage_bypass_excellent": step_coverage_bypass_excellent,
+        "critical_steps_with_claims": critical_steps_with_claims,
+        "non_method_critical_claims": non_method_critical_claims,
+        "result_like_claims": result_like_claims,
+        "result_like_ratio": result_like_ratio,
         "missing_critical_slots": list(completeness.get("missing_critical_slots") or []),
         "slot_claim_counts": dict(completeness.get("slot_claim_counts") or {}),
         "step_claim_counts": dict(completeness.get("step_claim_counts") or {}),
@@ -1879,7 +1981,17 @@ def _quality_report(
             "phase2_gate_logic_steps_coverage_min": logic_steps_coverage_min,
             "phase2_gate_logic_steps_guard_validated": logic_steps_guard_validated_enabled,
             "phase2_gate_critical_slot_bypass_supported_min": critical_slot_bypass_supported_min,
+            "phase2_gate_critical_slot_bypass_min_coverage": critical_slot_bypass_min_coverage,
+            "phase2_gate_critical_slot_bypass_min_critical_steps_with_claims": critical_slot_bypass_min_critical_steps_with_claims,
+            "phase2_gate_critical_slot_bypass_require_result_or_conclusion": critical_slot_bypass_require_result_or_conclusion,
+            "phase2_gate_critical_slot_bypass_min_result_like_claims": critical_slot_bypass_min_result_like_claims,
+            "phase2_gate_critical_slot_bypass_min_result_like_ratio": critical_slot_bypass_min_result_like_ratio,
+            "phase2_gate_step_bypass_min_critical_steps_with_claims": step_bypass_min_critical_steps_with_claims,
+            "phase2_gate_step_bypass_require_non_method_claim": step_bypass_require_non_method_claim,
             "phase2_gate_conflict_rate_max": max_conflict,
+            "phase2_gate_base_min_non_method_critical_claims": base_min_non_method_critical_claims,
+            "phase2_gate_base_min_result_like_claims": base_min_result_like_claims,
+            "phase2_gate_base_min_result_like_ratio": base_min_result_like_ratio,
             "phase1_grounding_mode": grounding_mode_used,
             "phase1_grounding_semantic_supported_min": _rule_float(rules, "phase1_grounding_semantic_supported_min", 0.75),
             "phase1_grounding_semantic_weak_min": _rule_float(rules, "phase1_grounding_semantic_weak_min", 0.55),
