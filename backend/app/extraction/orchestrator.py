@@ -1704,8 +1704,8 @@ def _quality_report(
     }
     step_coverage = float(len(validated_steps)) / float(max(1, len(steps_all)))
     # Logic steps coverage: fraction of steps that have a non-empty logic summary.
-    # Used for the excellent bypass so that software/theory papers with full logic
-    # structure but concentrated claims can still pass the gate.
+    # Used by "excellent" bypass rules so that software/theory papers with full
+    # logic structure but concentrated claims can still pass quality gates.
     if logic_steps_coverage_ratio is not None:
         try:
             logic_steps_coverage = max(0.0, min(1.0, float(logic_steps_coverage_ratio)))
@@ -1732,17 +1732,33 @@ def _quality_report(
     min_conflict_comparable_pairs = max(0, _rule_int(rules, "phase2_conflict_gate_min_comparable_pairs", 3))
     min_conflict_pairs = max(0, _rule_int(rules, "phase2_conflict_gate_min_conflict_pairs", 1))
     min_semantic_coverage = _rule_float(rules, "phase1_gate_semantic_coverage_min", 0.0)
+
     critical_slot_bypass_enabled = _rule_bool(rules, "phase2_gate_critical_slot_bypass_excellent", False)
+    # P0: optional extension for step_coverage gate bypass.
+    # Backward-compatible default is False, so old behavior remains unchanged
+    # unless schema explicitly enables this flag.
+    step_coverage_bypass_enabled = _rule_bool(
+        rules,
+        "phase2_gate_step_coverage_bypass_excellent",
+        False,
+    )
     critical_slot_bypass_supported_min = _rule_float(
         rules,
         "phase2_gate_critical_slot_bypass_supported_min",
         0.95,
     )
-    critical_slot_bypass_excellent = (
-        critical_slot_bypass_enabled
-        and supported_ratio >= critical_slot_bypass_supported_min
+
+    # Shared "excellent" eligibility:
+    # - supported_ratio high enough
+    # - logic step structure is fully populated
+    # This condition is reused by both bypass paths to keep criteria consistent.
+    excellent_bypass_ready = (
+        supported_ratio >= critical_slot_bypass_supported_min
         and logic_steps_coverage >= 1.0
     )
+    critical_slot_bypass_excellent = critical_slot_bypass_enabled and excellent_bypass_ready
+    step_coverage_bypass_excellent = step_coverage_bypass_enabled and excellent_bypass_ready
+
     comparable_pairs = int(conflict.get("comparable_pairs") or 0)
     conflict_pairs = int(conflict.get("conflict_pairs") or 0)
     conflict_gate_skip_reasons: list[str] = []
@@ -1757,7 +1773,7 @@ def _quality_report(
         gate_fail_reasons.append("no_claims")
     if supported_ratio < min_supported:
         gate_fail_reasons.append("supported_claim_ratio")
-    if step_coverage < min_coverage:
+    if (not step_coverage_bypass_excellent) and step_coverage < min_coverage:
         gate_fail_reasons.append("step_coverage_ratio")
     if (not critical_slot_bypass_excellent) and float(completeness.get("critical_slot_coverage") or 0.0) < min_critical:
         gate_fail_reasons.append("critical_slot_coverage")
@@ -1793,6 +1809,7 @@ def _quality_report(
         "critical_slots_covered": int(completeness.get("critical_slots_covered") or 0),
         "critical_slot_coverage": float(completeness.get("critical_slot_coverage") or 0.0),
         "critical_slot_bypass_excellent": critical_slot_bypass_excellent,
+        "step_coverage_bypass_excellent": step_coverage_bypass_excellent,
         "missing_critical_slots": list(completeness.get("missing_critical_slots") or []),
         "slot_claim_counts": dict(completeness.get("slot_claim_counts") or {}),
         "step_claim_counts": dict(completeness.get("step_claim_counts") or {}),
@@ -1830,6 +1847,7 @@ def _quality_report(
             "phase1_gate_step_coverage_min": min_coverage,
             "phase2_gate_critical_slot_coverage_min": min_critical,
             "phase2_gate_critical_slot_bypass_excellent": critical_slot_bypass_enabled,
+            "phase2_gate_step_coverage_bypass_excellent": step_coverage_bypass_enabled,
             "phase2_gate_critical_slot_bypass_supported_min": critical_slot_bypass_supported_min,
             "phase2_gate_conflict_rate_max": max_conflict,
             "phase1_grounding_mode": grounding_mode_used,
@@ -2000,7 +2018,8 @@ def run_phase1_extraction(
     # Compute logic steps coverage ratio: fraction of schema steps that have a
     # non-empty summary or evidence in the logic extraction output.
     # Uses step_order (full schema step list) as the denominator, consistent with
-    # step_coverage_ratio.  This is used by the excellent bypass so that papers
+    # step_coverage_ratio. This is used by excellent bypass rules (critical-slot
+    # and optional step-coverage bypass) so that papers
     # whose claims concentrate in fewer steps (e.g. software/theory papers) can
     # still pass the gate when their logic structure is fully populated.
     _step_ids_all = [str(s or "").strip() for s in step_order if str(s or "").strip()]

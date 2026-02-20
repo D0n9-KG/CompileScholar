@@ -149,6 +149,8 @@ def _default_schema(paper_type: PaperType) -> dict[str, Any]:
             "phase2_auto_step_kind_map_trigger_slots": 12,
             "phase2_auto_step_kind_map_max_kinds_per_step": 1,
             "phase2_gate_critical_slot_coverage_min": 0.4,
+            # Backward-compatible default: disabled unless schema explicitly enables it.
+            "phase2_gate_step_coverage_bypass_excellent": False,
             "phase2_gate_conflict_rate_max": 0.35,
             "phase2_conflict_mode": "lexical",
             "phase2_conflict_semantic_threshold": 0.75,
@@ -392,6 +394,9 @@ def validate_schema(schema: dict[str, Any]) -> None:
         raise ValueError("Invalid phase2_gate_critical_slot_coverage_min") from exc
     if gate_critical_f < 0.0 or gate_critical_f > 1.0:
         raise ValueError("Invalid phase2_gate_critical_slot_coverage_min")
+    gate_step_coverage_bypass = rules.get("phase2_gate_step_coverage_bypass_excellent", False)
+    if not isinstance(gate_step_coverage_bypass, bool):
+        raise ValueError("phase2_gate_step_coverage_bypass_excellent must be boolean")
     gate_conflict = rules.get("phase2_gate_conflict_rate_max", 0.35)
     try:
         gate_conflict_f = float(gate_conflict)
