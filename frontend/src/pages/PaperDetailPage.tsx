@@ -22,6 +22,11 @@ type PaperCore = {
   review_resolved_task_id?: string | null
   review_needs_review?: boolean
   review_pending_count?: number
+
+  phase1_quality?: Record<string, unknown>
+  phase1_gate_passed?: boolean
+  phase1_quality_tier?: string
+  phase1_quality_tier_score?: number
 }
 
 type PaperDetail = {
@@ -236,10 +241,10 @@ export default function PaperDetailPage() {
   const { paperId } = useParams()
   const id = paperId ? decodeURIComponent(paperId) : ''
 
-  type PaperTab = 'logic' | 'claims' | 'cites' | 'figures'
+  type PaperTab = 'logic' | 'claims' | 'cites' | 'figures' | 'content'
   const [searchParams, setSearchParams] = useSearchParams()
   const tab0 = String(searchParams.get('tab') || 'logic') as PaperTab
-  const tab: PaperTab = (['logic', 'claims', 'cites', 'figures'] as const).includes(tab0) ? tab0 : 'logic'
+  const tab: PaperTab = (['logic', 'claims', 'cites', 'figures', 'content'] as const).includes(tab0) ? tab0 : 'logic'
   function selectTab(t: PaperTab) {
     const next = new URLSearchParams(searchParams)
     next.set('tab', t)
@@ -296,6 +301,32 @@ export default function PaperDetailPage() {
   >([])
   const [evidenceSelected, setEvidenceSelected] = useState<Record<string, boolean>>({})
   const [evidenceExpanded, setEvidenceExpanded] = useState<Record<string, boolean>>({})
+
+  const [mdContent, setMdContent] = useState<string | null>(null)
+  const [mdLoading, setMdLoading] = useState<boolean>(false)
+  const [mdError, setMdError] = useState<string>('')
+
+  // Reset markdown content when paper changes
+  useEffect(() => {
+    setMdContent(null)
+    setMdError('')
+  }, [id])
+
+  useEffect(() => {
+    if (tab !== 'content' || !id || mdContent !== null || mdLoading) return
+    let cancelled = false
+    setMdLoading(true)
+    setMdError('')
+    fetch(`${apiBaseUrl()}/papers/${encodeURIComponent(id)}/content`)
+      .then((res) => {
+        if (!res.ok) throw new Error(res.status === 404 ? '该论文暂无原文 Markdown' : `加载失败 (${res.status})`)
+        return res.text()
+      })
+      .then((text) => { if (!cancelled) setMdContent(text) })
+      .catch((e: unknown) => { if (!cancelled) setMdError(String((e as { message?: unknown } | null)?.message ?? e)) })
+      .finally(() => { if (!cancelled) setMdLoading(false) })
+    return () => { cancelled = true }
+  }, [tab, id, mdContent, mdLoading])
 
   async function refresh() {
     const r = await apiGet<PaperDetail>(`/graph/paper/${encodeURIComponent(id)}`)
@@ -984,6 +1015,18 @@ export default function PaperDetailPage() {
             <div className="paperDetailSummaryValue">{reviewPendingCount}</div>
             <div className="metaLine">{reviewNeedsReview ? 'Need human arbitration' : 'No pending review'}</div>
           </div>
+          {detail.paper.ingested && (
+            <div className="paperDetailSummaryCard">
+              <div className="kicker">Quality</div>
+              <div className="paperDetailSummaryValue" style={{ color: detail.paper.phase1_gate_passed ? '#22c55e' : '#ef4444' }}>
+                {detail.paper.phase1_gate_passed ? '✓ Pass' : '✗ Fail'}
+              </div>
+              <div className="metaLine">
+                {detail.paper.phase1_quality_tier || '—'}
+                {typeof detail.paper.phase1_quality_tier_score === 'number' ? ` (${detail.paper.phase1_quality_tier_score.toFixed(1)})` : ''}
+              </div>
+            </div>
+          )}
           {rebuildTaskId && (
             <div className="paperDetailSummaryCard">
               <div className="kicker">Rebuild Task</div>
@@ -1035,6 +1078,9 @@ export default function PaperDetailPage() {
            <button className={`chip ${tab === 'figures' ? 'chipActive' : ''}`} onClick={() => selectTab('figures')}>
              图片
            </button>
+           <button className={`chip ${tab === 'content' ? 'chipActive' : ''}`} onClick={() => selectTab('content')}>
+             原文
+           </button>
          </div>
 
          {!detail.paper.ingested && stats.chunks === 0 && (
@@ -1055,6 +1101,19 @@ export default function PaperDetailPage() {
                    开始裁决
                  </button>
                </div>
+             </div>
+           )}
+
+           {detail.paper.ingested && detail.paper.phase1_gate_passed === false && detail.paper.phase1_quality && (
+             <div className="infoBox paperDetailCallout" style={{ borderLeft: '4px solid #ef4444' }}>
+               <div style={{ fontWeight: 850, marginBottom: 6 }}>质量门控未通过 — {detail.paper.phase1_quality_tier || 'unknown'}</div>
+               {Array.isArray((detail.paper.phase1_quality as Record<string, unknown>)?.gate_fail_reasons) && (
+                 <ul style={{ margin: '4px 0 0 16px', padding: 0 }}>
+                   {((detail.paper.phase1_quality as Record<string, unknown>).gate_fail_reasons as unknown[]).map((r, i) => (
+                     <li key={i} className="metaLine">{String(r ?? '')}</li>
+                   ))}
+                 </ul>
+               )}
              </div>
            )}
 
@@ -1450,6 +1509,24 @@ export default function PaperDetailPage() {
                   </div>
                   {figureGroups.length === 0 && <div className="metaLine">未找到图片。</div>}
                   <div className="hint">点击缩略图放大；图注从 md 相邻文本/图注块抽取。</div>
+                </div>
+              </div>
+            )}
+
+            {tab === 'content' && (
+              <div className="panel">
+                <div className="panelHeader">
+                  <div className="panelTitle">原文 Markdown</div>
+                </div>
+                <div className="panelBody">
+                  {mdLoading && <div className="metaLine">加载中…</div>}
+                  {mdError && <div className="errorBox">{mdError}</div>}
+                  {mdContent !== null && !mdLoading && (
+                    <MarkdownView markdown={mdContent} paperId={paperIdForImages} />
+                  )}
+                  {mdContent === null && !mdLoading && !mdError && (
+                    <div className="metaLine">暂无原文内容。</div>
+                  )}
                 </div>
               </div>
             )}

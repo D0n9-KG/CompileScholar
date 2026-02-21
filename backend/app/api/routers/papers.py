@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, PlainTextResponse
 
 from app.settings import settings
 
@@ -42,13 +42,13 @@ def _safe_rel(rel: str) -> str:
     return "/".join(parts)
 
 
+# Images route first (more specific — has /images/ fixed segment)
 @router.get("/{paper_id:path}/images/{rel_path:path}")
 def get_paper_image(paper_id: str, rel_path: str):
     try:
         base = _canonical_dir_for_paper_id(paper_id)
         rel = _safe_rel(rel_path)
         p = (base / "images" / rel).resolve()
-        # ensure under base/images
         root = (base / "images").resolve()
         p.relative_to(root)
         if not p.exists() or not p.is_file():
@@ -62,3 +62,26 @@ def get_paper_image(paper_id: str, rel_path: str):
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
+
+@router.get("/{paper_id:path}/content")
+def get_paper_content(paper_id: str):
+    """Return the original markdown content for a paper."""
+    try:
+        base = _canonical_dir_for_paper_id(paper_id)
+        md_file: Path | None = None
+        for name in ("paper.md", "source.md", "content.md"):
+            candidate = base / name
+            if candidate.exists() and candidate.is_file():
+                md_file = candidate
+                break
+        if md_file is None:
+            raise FileNotFoundError(f"No markdown file found for {paper_id}")
+        md_file.resolve().relative_to(base.resolve())
+        text = md_file.read_text(encoding="utf-8", errors="replace")
+        return PlainTextResponse(text, media_type="text/plain; charset=utf-8")
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
