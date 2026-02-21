@@ -2218,6 +2218,13 @@ def run_phase1_extraction(
         gate_fail_reasons.append("empty_logic_steps")
         report["gate_fail_reasons"] = gate_fail_reasons
         report["gate_passed"] = False
+        # P0-3 Fix: Recalculate quality_tier to stay consistent with gate_passed
+        tier_info = _quality_tier_from_failures(gate_fail_reasons, rules=rules)
+        report["quality_tier_strategy"] = str(tier_info.get("quality_tier_strategy") or "a1_fail_count")
+        report["quality_tier"] = str(tier_info.get("quality_tier") or "red")
+        report["quality_tier_fail_count"] = int(tier_info.get("quality_tier_fail_count") or 0)
+        report["quality_tier_reasons"] = list(tier_info.get("quality_tier_reasons") or [])
+        report["quality_tier_score"] = float(tier_info.get("quality_tier_score") or 0.0)
 
     completeness_judgment = {
         "critical_slot_mode": report.get("critical_slot_mode"),
