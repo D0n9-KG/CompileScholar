@@ -128,9 +128,10 @@ def _build_system_prompt(domain_prompt: str | None = None) -> str:
         domain = "You are a scientific research assistant."
     return (
         f"{domain}\n"
-        "Answer ONLY using the provided evidence snippets and graph context.\n"
+        "Answer ONLY using the provided evidence snippets, validated claims, and graph context.\n"
         "If evidence is insufficient, say what is missing.\n"
         "Cite evidence by referencing the evidence ids like [E1], [E2].\n"
+        "When referencing validated claims, use their claim id like [CL:abc123].\n"
         "When graph context is provided, use it to enrich your answer with "
         "structural relationships (citations, logic steps, claims)."
     )
@@ -197,6 +198,60 @@ def _format_graph_context(graph_context: list[dict[str, Any]] | None) -> str:
     if not lines:
         return ""
     return header + "\n" + "\n".join(lines)
+
+
+def _format_structured_knowledge(knowledge: dict[str, list[dict[str, Any]]] | None) -> str:
+    """Format claims and logic steps into a text block for the LLM prompt.
+
+    Each claim includes its claim_id so the LLM can reference it in the answer,
+    enabling frontend traceability (e.g. [CL:abc123]).
+    """
+    if not knowledge:
+        return ""
+    parts: list[str] = []
+
+    # Logic steps
+    steps = knowledge.get("logic_steps") or []
+    if steps:
+        step_lines = []
+        for s in steps[:20]:
+            st = str(s.get("step_type") or "").strip()
+            summary = str(s.get("summary") or "").strip()
+            ps = str(s.get("paper_source") or "").strip()
+            if st and summary:
+                if len(summary) > 300:
+                    summary = summary[:297] + "..."
+                step_lines.append(f"  [{ps}] {st}: {summary}")
+        if step_lines:
+            parts.append("Logic Steps:\n" + "\n".join(step_lines))
+
+    # Claims
+    claims = knowledge.get("claims") or []
+    if claims:
+        claim_lines = []
+        for c in claims[:30]:
+            cid = str(c.get("claim_id") or "").strip()
+            text = str(c.get("text") or "").strip()
+            st = str(c.get("step_type") or "").strip()
+            conf = c.get("confidence")
+            ps = str(c.get("paper_source") or "").strip()
+            if cid and text:
+                if len(text) > 300:
+                    text = text[:297] + "..."
+                conf_str = (
+                    f" (conf={conf:.2f})"
+                    if isinstance(conf, (int, float)) and not isinstance(conf, bool)
+                    else ""
+                )
+                scope = "/".join(part for part in (ps, st) if part)
+                scope_str = f" [{scope}]" if scope else ""
+                claim_lines.append(f"  [CL:{cid}]{scope_str}{conf_str} {text}")
+        if claim_lines:
+            parts.append("Validated Claims:\n" + "\n".join(claim_lines))
+
+    if not parts:
+        return ""
+    return "\n\n".join(parts)
 
 
 def ask(
@@ -303,24 +358,38 @@ def ask(
             "answer": "",
             "evidence": evidence,
             "graph_context": None,
+            "structured_knowledge": None,
             "insufficient_scope_evidence": True,
             "message": "当前范围内证据不足以回答该问题，请扩大范围或调整问题。",
         }
 
-    # ── Graph context ──
+    # ── Graph context + structured knowledge ──
     graph_context = None
+    structured_knowledge = None
     if evidence:
-        try:
-            paper_sources = list({e["paper_source"] for e in evidence if e.get("paper_source")})
-            with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
-                graph_context = client.get_citation_context_by_paper_source(paper_sources, limit=50)
-        except Exception:
-            graph_context = None
+        paper_sources = list({e["paper_source"] for e in evidence if e.get("paper_source")})
+        if paper_sources:
+            try:
+                with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
+                    try:
+                        graph_context = client.get_citation_context_by_paper_source(paper_sources, limit=50)
+                    except Exception:
+                        graph_context = None
+                    try:
+                        structured_knowledge = client.get_structured_knowledge_for_papers(paper_sources)
+                    except Exception:
+                        structured_knowledge = None
+            except Exception:
+                graph_context = None
+                structured_knowledge = None
 
-    # ── LLM generation (with graph context in prompt) ──
+    # ── LLM generation (with graph context + structured knowledge in prompt) ──
     system = _build_system_prompt(domain_prompt)
     graph_block = _format_graph_context(graph_context)
+    knowledge_block = _format_structured_knowledge(structured_knowledge)
     user_parts = [f"Question:\n{question}", "Evidence:\n" + "\n\n".join(context_lines)]
+    if knowledge_block:
+        user_parts.append(knowledge_block)
     if graph_block:
         user_parts.append(graph_block)
     user = "\n\n".join(user_parts)
@@ -342,5 +411,6 @@ def ask(
         "answer": msg.content,
         "evidence": evidence,
         "graph_context": graph_context,
+        "structured_knowledge": structured_knowledge,
         "retrieval_mode": "hybrid" if lexical_results else "faiss",
     }

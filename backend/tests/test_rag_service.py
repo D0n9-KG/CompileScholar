@@ -5,6 +5,7 @@ from app.rag.service import (
     _rrf_fuse,
     _build_system_prompt,
     _format_graph_context,
+    _format_structured_knowledge,
     _stringify_graph_value,
 )
 
@@ -192,3 +193,99 @@ def test_stringify_graph_value_truncates():
     result = _stringify_graph_value(long, max_chars=100)
     assert len(result) <= 100
     assert result.endswith("...")
+
+
+# ── Structured knowledge formatting ──
+
+
+def test_format_structured_knowledge_none():
+    assert _format_structured_knowledge(None) == ""
+
+
+def test_format_structured_knowledge_empty():
+    assert _format_structured_knowledge({"claims": [], "logic_steps": []}) == ""
+
+
+def test_format_structured_knowledge_logic_steps():
+    knowledge = {
+        "claims": [],
+        "logic_steps": [
+            {"step_type": "Method", "summary": "Uses DEM simulation", "paper_source": "paper-A"},
+            {"step_type": "Result", "summary": "Accuracy improved", "paper_source": "paper-A"},
+        ],
+    }
+    result = _format_structured_knowledge(knowledge)
+    assert "Logic Steps:" in result
+    assert "Method" in result
+    assert "DEM simulation" in result
+
+
+def test_format_structured_knowledge_claims_with_ids():
+    knowledge = {
+        "claims": [
+            {
+                "claim_id": "abc123",
+                "text": "DEM outperforms FEM in granular flow",
+                "step_type": "Result",
+                "confidence": 0.92,
+                "paper_source": "paper-A",
+            },
+        ],
+        "logic_steps": [],
+    }
+    result = _format_structured_knowledge(knowledge)
+    assert "Validated Claims:" in result
+    assert "[CL:abc123]" in result
+    assert "DEM outperforms FEM" in result
+    assert "0.92" in result
+
+
+def test_format_structured_knowledge_skips_claims_without_id():
+    knowledge = {
+        "claims": [
+            {
+                "claim_id": "",
+                "text": "Untraceable claim",
+                "step_type": "Result",
+                "paper_source": "paper-A",
+            },
+        ],
+        "logic_steps": [],
+    }
+    assert _format_structured_knowledge(knowledge) == ""
+
+
+def test_format_structured_knowledge_truncates_long_text():
+    long_text = "x" * 500
+    knowledge = {
+        "claims": [
+            {"claim_id": "abc123", "text": long_text, "step_type": "Result", "paper_source": "p1"},
+        ],
+        "logic_steps": [
+            {"step_type": "Method", "summary": long_text, "paper_source": "p1"},
+        ],
+    }
+    result = _format_structured_knowledge(knowledge)
+    assert "..." in result
+    assert "x" * 320 not in result
+
+
+def test_format_structured_knowledge_combined():
+    knowledge = {
+        "claims": [
+            {"claim_id": "c1", "text": "Claim text", "step_type": "Method",
+             "confidence": 0.8, "paper_source": "p1"},
+        ],
+        "logic_steps": [
+            {"step_type": "Background", "summary": "Context info", "paper_source": "p1"},
+        ],
+    }
+    result = _format_structured_knowledge(knowledge)
+    assert "Logic Steps:" in result
+    assert "Validated Claims:" in result
+
+
+def test_build_system_prompt_mentions_claims():
+    """System prompt should instruct LLM to reference claim IDs."""
+    prompt = _build_system_prompt()
+    assert "[CL:" in prompt

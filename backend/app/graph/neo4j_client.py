@@ -432,6 +432,51 @@ LIMIT $limit
             rows = session.run(cypher, paper_sources=paper_sources, limit=limit)
             return [dict(r) for r in rows]
 
+    def get_structured_knowledge_for_papers(
+        self, paper_sources: list[str], *, max_claims: int = 30, max_steps: int = 20,
+    ) -> dict[str, list[dict]]:
+        """Fetch validated claims and logic steps for papers (used by RAG).
+
+        Returns:
+            {"claims": [...], "logic_steps": [...]}
+        """
+        if not paper_sources:
+            return {"claims": [], "logic_steps": []}
+
+        claims_cypher = """
+MATCH (p:Paper)-[:HAS_CLAIM]->(cl:Claim)
+WHERE p.paper_source IN $paper_sources
+  AND coalesce(trim(toString(cl.claim_id)), '') <> ''
+RETURN cl.claim_id AS claim_id,
+       cl.text AS text,
+       cl.step_type AS step_type,
+       cl.kinds AS kinds,
+       cl.confidence AS confidence,
+       cl.evidence_quote AS evidence_quote,
+       p.paper_source AS paper_source
+ORDER BY coalesce(cl.confidence, -1.0) DESC,
+         p.paper_source ASC,
+         cl.claim_id ASC
+LIMIT $limit
+"""
+        steps_cypher = """
+MATCH (p:Paper)-[:HAS_LOGIC_STEP]->(s:LogicStep)
+WHERE p.paper_source IN $paper_sources
+RETURN s.step_type AS step_type,
+       s.summary AS summary,
+       s.confidence AS confidence,
+       s.order AS step_order,
+       p.paper_source AS paper_source
+ORDER BY coalesce(s.order, 999) ASC,
+         p.paper_source ASC,
+         s.step_type ASC
+LIMIT $limit
+"""
+        with self._driver.session() as session:
+            claims = [dict(r) for r in session.run(claims_cypher, paper_sources=paper_sources, limit=max_claims)]
+            steps = [dict(r) for r in session.run(steps_cypher, paper_sources=paper_sources, limit=max_steps)]
+        return {"claims": claims, "logic_steps": steps}
+
     def list_papers(self, limit: int = 50, collection_id: str | None = None) -> list[dict]:
         cid = (collection_id or "").strip()
         if cid:
