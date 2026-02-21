@@ -1365,7 +1365,7 @@ class Phase1ExtractionOrchestratorTests(unittest.TestCase):
             },
         }
 
-        with patch("app.llm.client.call_json", return_value={"claims": [{"text": "A defined claim.", "step_type": "Background", "claim_kinds": ["Definition"], "confidence": 0.8}]}) as call_json:
+        with patch("app.llm.client.call_json", return_value={"claims": [{"text": "A defined claim.", "evidence_quote": "ABCDEFGHIJKLMNOPQRST", "step_type": "Background", "claim_kinds": ["Definition"], "confidence": 0.8}]}) as call_json:
             out = _extract_claims_from_chunk_llm(
                 chunk_text="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
                 step_ids=["Background"],
@@ -1428,6 +1428,7 @@ class Phase1ExtractionOrchestratorTests(unittest.TestCase):
                 "phase1_noise_filter_enabled": True,
                 "phase1_noise_filter_figure_caption_enabled": True,
                 "phase1_noise_filter_pure_definition_enabled": True,
+                "phase1_noise_filter_context_aware": False,
             },
         }
 
