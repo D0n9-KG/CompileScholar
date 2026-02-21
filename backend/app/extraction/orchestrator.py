@@ -2007,6 +2007,13 @@ def _quality_report(
         conflict_gate_skip_reasons.append("low_conflict_pairs")
     conflict_gate_skipped = bool(conflict_gate_skip_reasons)
 
+    # Multi-evidence coverage: fraction of validated claims backed by 2+ chunks
+    multi_evidence_count = sum(
+        1 for c in validated
+        if len(c.get("origin_chunk_ids") or []) >= 2
+    )
+    multi_evidence_coverage_ratio = float(multi_evidence_count) / float(max(1, len(validated)))
+
     gate_fail_reasons: list[str] = []
     if total <= 0:
         gate_fail_reasons.append("no_claims")
@@ -2051,6 +2058,8 @@ def _quality_report(
         "grounding_semantic_coverage_rate": grounding_semantic_coverage_rate,
         "grounding_fallback_count": grounding_fallback_count,
         "grounding_fallback_warning": grounding_fallback_count > 0,
+        "multi_evidence_count": multi_evidence_count,
+        "multi_evidence_coverage_ratio": multi_evidence_coverage_ratio,
         "critical_slot_mode": completeness.get("critical_slot_mode"),
         "critical_steps": list(completeness.get("critical_steps") or []),
         "critical_kinds": list(completeness.get("critical_kinds") or []),
