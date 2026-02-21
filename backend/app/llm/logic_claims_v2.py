@@ -263,6 +263,21 @@ def extract_logic_and_claims_v2(doc: DocumentIR, paper_id: str, schema: dict[str
     body = "\n\n".join(str(c.text or "") for c in source_chunks)
     body = _shorten(body, max_chars=doc_chars_max)
 
+    # Build chunk catalog for evidence binding (1.5-step mode)
+    chunk_catalog_max = _rule_int(rules, "phase1_logic_chunks_max", 56, lo=8, hi=200)
+    chunk_chars_max = _rule_int(rules, "phase1_logic_chunk_chars_max", 420, lo=120, hi=1200)
+    chunk_catalog: list[dict[str, str]] = []
+    for c in source_chunks:
+        cid = str(getattr(c, "chunk_id", "") or "").strip()
+        sec = str(getattr(c, "section", "") or "").strip()
+        txt = _WS_RE.sub(" ", str(c.text or "").strip())
+        if cid and txt:
+            chunk_catalog.append({"chunk_id": cid, "section": sec, "text": txt[:chunk_chars_max]})
+        if len(chunk_catalog) >= chunk_catalog_max:
+            break
+    chunk_id_set = {c["chunk_id"] for c in chunk_catalog}
+    chunk_catalog_lines = "\n".join(f"- {c['chunk_id']} | {c['section']} | {c['text']}" for c in chunk_catalog)
+
     default_system = (
         "You extract a paper's reasoning structure for a research knowledge graph.\n"
         "Return STRICT JSON only (no prose, no Markdown).\n"
@@ -293,6 +308,7 @@ def extract_logic_and_claims_v2(doc: DocumentIR, paper_id: str, schema: dict[str
         "1) logic: for EACH allowed step_type, write a DETAILED mini-paragraph summary.\n"
         "   - 2–6 complete sentences (NOT a single sentence).\n"
         "   - Include key entities, methods, assumptions/conditions, and important numbers/definitions if present.\n"
+        "   - Include evidence_chunk_ids: a list of chunk IDs from the chunk catalog that directly support this summary.\n"
         "2) claims: write concise, atomic KEY POINTS.\n"
         "   - 1–2 complete sentences each.\n"
         "   - Each claim must be specific and directly supported by the text.\n"
@@ -310,10 +326,12 @@ def extract_logic_and_claims_v2(doc: DocumentIR, paper_id: str, schema: dict[str
         f"Target number of claims: {cmin}-{cmax}\n\n"
         "Paper text (extracted from Markdown):\n"
         f"{body}\n\n"
+        "Chunk catalog (use chunk_id values for evidence_chunk_ids):\n"
+        f"{chunk_catalog_lines}\n\n"
         "Output JSON schema (STRICT):\n"
         "{\n"
         '  "logic": {\n'
-        '    "<StepType>": {"summary": "2-6 full sentences...", "confidence": 0.0}\n'
+        '    "<StepType>": {"summary": "2-6 full sentences...", "confidence": 0.0, "evidence_chunk_ids": ["c1", "c2"]}\n'
         "  },\n"
         '  "claims": [\n'
         '    {"text":"1-2 full sentences...","confidence":0.0,"step_type":"<StepType>","claim_kinds":["KindA","KindB"]}\n'
@@ -337,6 +355,7 @@ def extract_logic_and_claims_v2(doc: DocumentIR, paper_id: str, schema: dict[str
                 "cmin": cmin,
                 "cmax": cmax,
                 "body": body,
+                "chunk_catalog_lines": chunk_catalog_lines,
             },
         )
     else:
@@ -361,9 +380,18 @@ def extract_logic_and_claims_v2(doc: DocumentIR, paper_id: str, schema: dict[str
         if not summary:
             continue
 
+        # 1.5-step: extract evidence_chunk_ids from LLM output, validate against catalog
+        raw_eids = v.get("evidence_chunk_ids") or []
+        validated_eids: list[str] = []
+        for eid in raw_eids:
+            s = str(eid or "").strip()
+            if s and s in chunk_id_set and s not in validated_eids:
+                validated_eids.append(s)
+
         norm_logic[sid] = {
             "summary": summary,
             "confidence": float(v.get("confidence") or 0.5),
+            "evidence_chunk_ids": validated_eids,
         }
 
     allowed_steps = set(step_ids)

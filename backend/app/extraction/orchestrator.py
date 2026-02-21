@@ -435,15 +435,23 @@ def _default_logic_extractor(*, doc: DocumentIR, paper_id: str, schema: dict[str
 
     out = extract_logic_and_claims_v2(doc=doc, paper_id=paper_id, schema=schema)
     logic = out.get("logic") or {}
-    try:
-        bound = _bind_logic_step_evidence_llm(doc=doc, schema=schema, logic=logic)
-        if not bound:
-            raise RuntimeError("No logic evidence bound by llm")
-    except Exception:
+
+    # 1.5-step: check if LLM already provided evidence_chunk_ids
+    steps_needing_evidence = sum(
+        1 for v in logic.values()
+        if isinstance(v, dict) and v.get("summary", "").strip() and not v.get("evidence_chunk_ids")
+    )
+    if steps_needing_evidence > 0:
+        # Fallback: bind evidence via separate LLM call or lexical heuristic
         try:
-            add_logic_step_evidence(doc=doc, schema=schema, logic=logic)
+            bound = _bind_logic_step_evidence_llm(doc=doc, schema=schema, logic=logic)
+            if not bound:
+                raise RuntimeError("No logic evidence bound by llm")
         except Exception:
-            pass
+            try:
+                add_logic_step_evidence(doc=doc, schema=schema, logic=logic)
+            except Exception:
+                pass
     step_order = _enabled_step_ids(schema)
 
     # P0 Fix: Final sanitize - filter empty logic steps
