@@ -309,7 +309,7 @@ def validate_schema(schema: dict[str, Any]) -> None:
     if weak_score_threshold < 0.0 or weak_score_threshold > 20.0:
         raise ValueError("Invalid phase1_logic_evidence_weak_score_threshold")
     cmax_chunks = int(rules.get("phase1_claim_chunks_max") or 36)
-    if cmax_chunks < 1 or cmax_chunks > 200:
+    if cmax_chunks < 1 or cmax_chunks > 9999:
         raise ValueError("Invalid phase1_claim_chunks_max")
     cmax_per_chunk = int(rules.get("phase1_claims_per_chunk_max") or 3)
     if cmax_per_chunk < 1 or cmax_per_chunk > 12:
@@ -354,7 +354,7 @@ def validate_schema(schema: dict[str, Any]) -> None:
     if gate_coverage < 0.0 or gate_coverage > 1.0:
         raise ValueError("Invalid phase1_gate_step_coverage_min")
     grounding_mode = str(rules.get("phase1_grounding_mode", "lexical") or "").strip().lower()
-    if grounding_mode not in {"lexical", "hybrid", "llm"}:
+    if grounding_mode not in {"skip", "lexical", "hybrid", "llm"}:
         raise ValueError("Invalid phase1_grounding_mode")
     grounding_semantic_supported_min = float(rules.get("phase1_grounding_semantic_supported_min", 0.75))
     if grounding_semantic_supported_min < 0.0 or grounding_semantic_supported_min > 1.0:

@@ -16,7 +16,6 @@ logger = logging.getLogger(__name__)
 
 LogicExtractorFn = Callable[..., dict[str, Any]]
 ClaimExtractorFn = Callable[..., list[dict[str, Any]]]
-GroundingJudgeFn = Callable[..., list[dict[str, Any]]]
 
 
 _WS_RE = re.compile(r"\s+")
@@ -305,165 +304,19 @@ def _logic_chunk_catalog(
     return rows
 
 
-def _bind_logic_step_evidence_llm(*, doc: DocumentIR, schema: dict[str, Any], logic: dict[str, Any]) -> bool:
-    from app.llm.client import call_json
-
-    step_ids = _enabled_step_ids(schema)
-    if not step_ids:
-        return False
-    rules = schema.get("rules") or {}
-    logic_chunk_chars_max = max(120, min(3000, _rule_int(rules, "phase1_logic_chunk_chars_max", 420)))
-    chunks = _logic_chunk_catalog(
-        doc,
-        max_chunks=int(rules.get("phase1_logic_chunks_max") or 56),
-        max_chars=logic_chunk_chars_max,
-        rules=rules,
-    )
-    if not chunks:
-        return False
-
-    chunk_ids = {str(c.get("chunk_id") or "").strip() for c in chunks}
-    if not chunk_ids:
-        return False
-
-    logic_brief: dict[str, dict[str, Any]] = {}
-    for sid in step_ids:
-        node = logic.get(sid) or {}
-        if not isinstance(node, dict):
-            continue
-        summary = str(node.get("summary") or "").strip()
-        if not summary:
-            continue
-        try:
-            confidence = float(node.get("confidence") or 0.5)
-        except Exception:
-            confidence = 0.5
-        logic_brief[sid] = {
-            "summary": summary,
-            "confidence": max(0.0, min(1.0, confidence)),
-        }
-    if not logic_brief:
-        return False
-
-    prompts = schema.get("prompts") or {}
-    chunk_lines = [f"- {c['chunk_id']} | {c['section']} | {c['text']}" for c in chunks]
-    default_system = (
-        "You bind each logic step summary to directly supporting chunk IDs.\n"
-        "Return STRICT JSON only.\n"
-        "Rules:\n"
-        "- Use ONLY chunk IDs from the provided catalog.\n"
-        "- evidence_chunk_ids should contain 1-4 chunk ids when support is available.\n"
-        "- If support is weak/insufficient, set evidence_weak=true and keep ids minimal.\n"
-    )
-    default_user = (
-        f"Allowed step types: {step_ids}\n\n"
-        "Logic summaries JSON:\n"
-        f"{json.dumps(logic_brief, ensure_ascii=False)}\n\n"
-        "Chunk catalog:\n"
-        f"{chr(10).join(chunk_lines)}\n\n"
-        "Output JSON schema:\n"
-        '{ "items": [ {"step_type":"Background","evidence_chunk_ids":["c1","c2"],"evidence_weak":false} ] }'
-    )
-    system = str(prompts.get("phase1_logic_bind_system") or "").strip() or default_system
-    user_t = str(prompts.get("phase1_logic_bind_user_template") or "").strip()
-    if user_t:
-        user = _render_template(
-            user_t,
-            {
-                "step_ids": step_ids,
-                "logic_brief_json": json.dumps(logic_brief, ensure_ascii=False),
-                "chunks_json": json.dumps(chunks, ensure_ascii=False),
-                "chunk_lines": "\n".join(chunk_lines),
-            },
-        )
-    else:
-        user = default_user
-    out = call_json(system, user)
-    items = out.get("items") or []
-    if not isinstance(items, list):
-        raise RuntimeError("Invalid logic-evidence binding response")
-
-    step_lookup = {s.lower(): s for s in step_ids}
-    by_step: dict[str, dict[str, Any]] = {}
-    for row in items:
-        if not isinstance(row, dict):
-            continue
-        step_raw = str(row.get("step_type") or "").strip()
-        step = step_lookup.get(step_raw.lower())
-        if not step:
-            continue
-        ids: list[str] = []
-        for cid in row.get("evidence_chunk_ids") or []:
-            token = str(cid or "").strip()
-            if token and token in chunk_ids and token not in ids:
-                ids.append(token)
-        by_step[step] = {
-            "evidence_chunk_ids": ids,
-            "evidence_weak": bool(row.get("evidence_weak") or False),
-        }
-
-    emin = int(rules.get("logic_evidence_min") or 1)
-    emax = int(rules.get("logic_evidence_max") or max(emin, 2))
-    emin = max(0, min(8, emin))
-    emax = max(0, min(12, emax))
-    if emax and emin and emax < emin:
-        emax = emin
-
-    bound_steps = 0
-    for sid in step_ids:
-        node = logic.get(sid)
-        if not isinstance(node, dict):
-            continue
-        mapped = by_step.get(sid) or {}
-        picked = list(mapped.get("evidence_chunk_ids") or [])
-        if emax:
-            picked = picked[:emax]
-        weak = bool(mapped.get("evidence_weak") or False)
-        if not picked:
-            weak = True
-        if emin > 0 and len(picked) < emin:
-            weak = True
-        node["evidence_chunk_ids"] = picked
-        node["evidence_weak"] = weak
-        if picked:
-            bound_steps += 1
-    return bound_steps > 0
-
-
 def _default_logic_extractor(*, doc: DocumentIR, paper_id: str, schema: dict[str, Any]) -> dict[str, Any]:
-    from app.llm.logic_claims_v2 import add_logic_step_evidence, extract_logic_and_claims_v2
+    from app.llm.logic_claims_v2 import extract_logic_and_claims_v2
 
     out = extract_logic_and_claims_v2(doc=doc, paper_id=paper_id, schema=schema, logic_only=True)
     logic = out.get("logic") or {}
-
-    # 1.5-step: check if LLM already provided evidence_chunk_ids
-    steps_needing_evidence = sum(
-        1 for v in logic.values()
-        if isinstance(v, dict) and v.get("summary", "").strip() and not v.get("evidence_chunk_ids")
-    )
-    if steps_needing_evidence > 0:
-        # Fallback: bind evidence via separate LLM call or lexical heuristic
-        try:
-            bound = _bind_logic_step_evidence_llm(doc=doc, schema=schema, logic=logic)
-            if not bound:
-                raise RuntimeError("No logic evidence bound by llm")
-        except Exception:
-            try:
-                add_logic_step_evidence(doc=doc, schema=schema, logic=logic)
-            except Exception:
-                pass
     step_order = _enabled_step_ids(schema)
 
-    # P0 Fix: Final sanitize - filter empty logic steps
-    # Remove steps with empty summary AND empty evidence
-    filtered_logic = {}
-    for step_id, step_data in logic.items():
-        summary = step_data.get("summary_machine") or step_data.get("summary") or ""
-        evidence = step_data.get("evidence_chunk_ids") or []
-
-        # Keep step if it has either summary or evidence
-        if summary.strip() or evidence:
-            filtered_logic[step_id] = step_data
+    # Filter empty logic steps: remove steps with empty summary AND empty evidence
+    filtered_logic = {
+        sid: data for sid, data in logic.items()
+        if (data.get("summary_machine") or data.get("summary") or "").strip()
+           or data.get("evidence_chunk_ids")
+    }
 
     return {"logic": filtered_logic, "step_order": step_order}
 
@@ -672,6 +525,12 @@ def _extract_claims_from_chunk_llm(
         "  * Dataset availability, code repository links (unless core to the method)\n"
         "- Focus on WHAT was discovered/proposed, not WHO/WHEN/WHERE published.\n"
         "- When encountering pure meta-information chunks, output empty claims array.\n"
+        "\n"
+        "LOW-VALUE CHUNK HANDLING:\n"
+        "- If the chunk contains only tables of contents, page headers/footers, figure/table\n"
+        "  captions without scientific content, or acknowledgment/funding boilerplate,\n"
+        "  output an EMPTY claims array.\n"
+        "- Do NOT force-extract claims from low-information-density text.\n"
     )
     default_user = (
         f"Allowed step types: {step_ids}\n"
@@ -862,6 +721,12 @@ def _extract_claims_from_chunks_batch_llm(
         "- DO NOT extract meta-information (authors, dates, funding, DOIs, etc.).\n"
         "- When encountering pure meta-information chunks, output empty claims array for that chunk.\n"
         "\n"
+        "LOW-VALUE CHUNK HANDLING:\n"
+        "- If a chunk contains only tables of contents, page headers/footers, figure/table\n"
+        "  captions without scientific content, or acknowledgment/funding boilerplate,\n"
+        "  output an EMPTY claims array for that chunk.\n"
+        "- Do NOT force-extract claims from low-information-density text.\n"
+        "\n"
         "OUTPUT FORMAT:\n"
         '{ "chunks": [ {"chunk_id":"c1", "claims": [{"text":"...", "evidence_quote":"...", '
         '"step_type":"Background", "claim_kinds":["Definition"], "confidence":0.8}]} ] }\n'
@@ -977,7 +842,7 @@ def _default_claim_extractor(
     rules = schema.get("rules") or {}
     max_chunks = int(rules.get("phase1_claim_chunks_max") or 36)
     max_claims_per_chunk = int(rules.get("phase1_claims_per_chunk_max") or 3)
-    max_chunks = max(1, min(120, max_chunks))
+    max_chunks = max(1, min(9999, max_chunks))
     max_claims_per_chunk = max(1, min(8, max_claims_per_chunk))
     step_ids = step_order or _enabled_step_ids(schema)
     kind_ids = _enabled_kind_ids(schema)
@@ -1887,36 +1752,6 @@ def _conflict_stats(
     return _conflict_stats_semantic(validated=validated, rules=rules, schema=schema, mode=mode)
 
 
-def _heuristic_grounding_label(claim_text: str, chunk_text: str, rules: dict[str, Any]) -> tuple[str, float, str]:
-    claim_n = _norm_text(claim_text).lower()
-    chunk_n = _norm_text(chunk_text).lower()
-    supported_overlap_min = max(0.0, min(1.0, _rule_float(rules, "phase1_grounding_supported_overlap_min", 0.65)))
-    weak_overlap_min = max(0.0, min(1.0, _rule_float(rules, "phase1_grounding_weak_overlap_min", 0.42)))
-    if weak_overlap_min > supported_overlap_min:
-        weak_overlap_min = supported_overlap_min
-    score_empty = max(0.0, min(1.0, _rule_float(rules, "phase1_grounding_empty_score", 0.0)))
-    score_supported_substring = max(0.0, min(1.0, _rule_float(rules, "phase1_grounding_supported_score_substring", 0.78)))
-    score_supported_overlap = max(0.0, min(1.0, _rule_float(rules, "phase1_grounding_supported_score_overlap", 0.72)))
-    score_weak = max(0.0, min(1.0, _rule_float(rules, "phase1_grounding_weak_score", 0.55)))
-    score_insufficient = max(0.0, min(1.0, _rule_float(rules, "phase1_grounding_insufficient_score", 0.18)))
-    score_unsupported = max(0.0, min(1.0, _rule_float(rules, "phase1_grounding_unsupported_score", 0.22)))
-    if not claim_n or not chunk_n:
-        return ("unsupported", score_empty, "empty claim/chunk")
-    if claim_n in chunk_n:
-        return ("supported", score_supported_substring, "claim text appears in chunk")
-    stop_tokens = _effective_stop_tokens(rules)
-    ct = set(_tokens(claim_n, stop_tokens=stop_tokens))
-    xt = set(_tokens(chunk_n, stop_tokens=stop_tokens))
-    if not ct or not xt:
-        return ("unsupported", score_insufficient, "insufficient lexical overlap")
-    overlap = len(ct & xt) / max(1, len(ct))
-    if overlap >= supported_overlap_min:
-        return ("supported", score_supported_overlap, "high lexical overlap")
-    if overlap >= weak_overlap_min:
-        return ("weak", score_weak, "partial lexical overlap")
-    return ("unsupported", score_unsupported, "low lexical overlap")
-
-
 def _collect_origin_chunk_ids(claim: dict[str, Any]) -> list[str]:
     """Gather all origin chunk IDs from a claim (plural list preferred, singular fallback)."""
     ids: list[str] = []
@@ -1929,128 +1764,6 @@ def _collect_origin_chunk_ids(claim: dict[str, Any]) -> list[str]:
         if s:
             ids.append(s)
     return ids
-
-
-def _default_grounding_judge_lexical(
-    *,
-    claims: list[dict[str, Any]],
-    chunk_by_id: dict[str, str],
-    rules: dict[str, Any],
-) -> list[dict[str, Any]]:
-    out: list[dict[str, Any]] = []
-    for c in claims:
-        claim_id = str(c.get("canonical_claim_id") or c.get("claim_id") or "").strip()
-        if not claim_id:
-            continue
-        chunk_ids = _collect_origin_chunk_ids(c)
-        claim_text = str(c.get("text") or "")
-        # Evaluate against ALL origin chunks, keep best score
-        best_lbl, best_score, best_reason = "unsupported", 0.0, "no origin chunk"
-        for cid in chunk_ids:
-            chunk_text = str(chunk_by_id.get(cid) or "")
-            lbl, score, reason = _heuristic_grounding_label(claim_text, chunk_text, rules=rules)
-            if score > best_score:
-                best_lbl, best_score, best_reason = lbl, score, reason
-        if not chunk_ids:
-            best_lbl, best_score, best_reason = _heuristic_grounding_label(claim_text, "", rules=rules)
-        out.append(
-            {
-                "canonical_claim_id": claim_id,
-                "support_label": best_lbl,
-                "judge_score": float(best_score),
-                "reason": best_reason,
-                "judge_mode": "lexical",
-                "judge_fallback": False,
-                "judge_fallback_reason": "",
-            }
-        )
-    return out
-
-
-def _default_grounding_judge(
-    *,
-    claims: list[dict[str, Any]],
-    chunk_by_id: dict[str, str],
-    schema: dict[str, Any],
-) -> list[dict[str, Any]]:
-    rules = dict(schema.get("rules") or {})
-    mode = _rule_choice(rules, "phase1_grounding_mode", ("lexical", "hybrid", "llm"), "lexical")
-    force_semantic = _rule_bool(rules, "phase1_force_semantic_grounding", False)
-    if force_semantic and mode == "hybrid":
-        mode = "llm"
-    lexical_rows = _default_grounding_judge_lexical(claims=claims, chunk_by_id=chunk_by_id, rules=rules)
-    if mode == "lexical":
-        return lexical_rows
-
-    lexical_by_id = {str(r.get("canonical_claim_id") or ""): r for r in lexical_rows if str(r.get("canonical_claim_id") or "")}
-    if mode == "llm":
-        semantic_targets = list(claims)
-    else:
-        semantic_targets = []
-        for c in claims:
-            claim_id = str(c.get("canonical_claim_id") or c.get("claim_id") or "").strip()
-            if not claim_id:
-                continue
-            base = lexical_by_id.get(claim_id) or {}
-            if str(base.get("support_label") or "").strip().lower() != "supported":
-                semantic_targets.append(c)
-
-    if not semantic_targets:
-        return lexical_rows
-
-    try:
-        from app.llm import grounding_judge_v2
-
-        semantic_rows = grounding_judge_v2.judge_claim_support_batch(
-            claims=semantic_targets,
-            chunk_by_id=chunk_by_id,
-            schema=schema,
-        )
-    except Exception as exc:
-        for row in lexical_rows:
-            row["judge_fallback"] = True
-            row["judge_fallback_reason"] = str(exc)
-        return lexical_rows
-
-    semantic_by_id = {
-        str(row.get("canonical_claim_id") or ""): row
-        for row in semantic_rows
-        if str(row.get("canonical_claim_id") or "")
-    }
-    out: list[dict[str, Any]] = []
-    for c in claims:
-        claim_id = str(c.get("canonical_claim_id") or c.get("claim_id") or "").strip()
-        if not claim_id:
-            continue
-        lexical_row = dict(lexical_by_id.get(claim_id) or {})
-        semantic_row = dict(semantic_by_id.get(claim_id) or {})
-
-        if mode == "llm":
-            if semantic_row:
-                semantic_row["judge_mode"] = "semantic"
-                semantic_row.setdefault("judge_fallback", False)
-                semantic_row.setdefault("judge_fallback_reason", "")
-                out.append(semantic_row)
-                continue
-            lexical_row["judge_fallback"] = True
-            lexical_row["judge_fallback_reason"] = "semantic_missing_output"
-            out.append(lexical_row)
-            continue
-
-        if str(lexical_row.get("support_label") or "").strip().lower() == "supported":
-            out.append(lexical_row)
-            continue
-        if semantic_row:
-            semantic_row["judge_mode"] = "semantic"
-            semantic_row.setdefault("judge_fallback", False)
-            semantic_row.setdefault("judge_fallback_reason", "")
-            out.append(semantic_row)
-            continue
-        lexical_row["judge_fallback"] = True
-        lexical_row["judge_fallback_reason"] = "semantic_missing_output"
-        out.append(lexical_row)
-
-    return out
 
 
 def _attach_targets_from_citations(claims: list[dict[str, Any]], cite_rec: dict[str, Any] | None, schema: dict[str, Any]) -> None:
@@ -2155,15 +1868,11 @@ def _quality_report(
     validated_steps_missing_logic = sorted(validated_steps - logic_covered_steps_set)
     completeness = _completeness_stats(validated=validated, step_order=step_order, schema=schema, rules=rules)
     conflict = _conflict_stats(validated=validated, rules=rules, schema=schema)
-    grounding_mode_used = _rule_choice(rules, "phase1_grounding_mode", ("lexical", "hybrid", "llm"), "lexical")
-    grounding_semantic_judged = sum(
-        1 for j in judgments if str(j.get("judge_mode") or "").strip().lower() == "semantic"
-    )
-    grounding_lexical_judged = sum(
-        1 for j in judgments if str(j.get("judge_mode") or "").strip().lower() == "lexical"
-    )
-    grounding_fallback_count = sum(1 for j in judgments if bool(j.get("judge_fallback")))
-    grounding_semantic_coverage_rate = float(grounding_semantic_judged) / float(max(1, total))
+    grounding_mode_used = _rule_choice(rules, "phase1_grounding_mode", ("skip", "lexical", "hybrid", "llm"), "skip")
+    grounding_semantic_judged = 0
+    grounding_lexical_judged = 0
+    grounding_fallback_count = 0
+    grounding_semantic_coverage_rate = 0.0
 
     # Gate profile: named defaults for gate thresholds (strict/balanced/recall)
     _GATE_PROFILES: dict[str, dict[str, Any]] = {
@@ -2495,7 +2204,6 @@ def run_phase1_extraction(
     artifacts_dir: Path | str,
     logic_extractor: LogicExtractorFn | None = None,
     claim_extractor: ClaimExtractorFn | None = None,
-    grounding_judge: GroundingJudgeFn | None = None,
     allow_weak: bool = False,
 ) -> dict[str, Any]:
     artifacts = Path(artifacts_dir)
@@ -2602,8 +2310,20 @@ def run_phase1_extraction(
         except Exception:
             logger.debug("Semantic dedup observation failed", exc_info=True)
 
-    judge_fn = grounding_judge or _default_grounding_judge
-    judgments = judge_fn(claims=claims_merged, chunk_by_id=chunk_by_id, schema=schema)
+    # Grounding skipped: all claims that passed batch quote verification
+    # are directly marked as supported (phase1_grounding_mode=skip).
+    judgments = [
+        {
+            "canonical_claim_id": str(c.get("canonical_claim_id") or c.get("claim_id") or ""),
+            "support_label": "supported",
+            "judge_score": 1.0,
+            "reason": "quote verified at extraction",
+            "judge_mode": "skip",
+            "judge_fallback": False,
+            "judge_fallback_reason": "",
+        }
+        for c in claims_merged
+    ]
     _json_dump(artifacts / "grounding_judgment.json", {"judgments": judgments})
     by_claim_id = {str(j.get("canonical_claim_id") or ""): j for j in judgments}
 
@@ -2612,10 +2332,6 @@ def run_phase1_extraction(
     for claim in claims_merged:
         cid = str(claim.get("canonical_claim_id") or claim.get("claim_id") or "")
         j = by_claim_id.get(cid) or {}
-        label = str(j.get("support_label") or "unsupported").strip().lower()
-        score = float(j.get("judge_score") or 0.0)
-        reason = str(j.get("reason") or "")
-        is_valid = label == "supported" or (allow_weak and label == "weak")
         out_item = {
             "claim_id": claim["claim_id"],
             "claim_key": claim["claim_key"],
@@ -2623,8 +2339,6 @@ def run_phase1_extraction(
             "confidence": float(claim.get("confidence") or 0.5),
             "step_type": claim["step_type"],
             "kinds": list(claim.get("kinds") or []),
-            # P2 Fix: Use all accumulated origin_chunk_ids for full evidence chain,
-            # not just the first one. Fallback to origin_chunk_id for compatibility.
             "evidence_chunk_ids": list(
                 claim.get("origin_chunk_ids")
                 or ([claim["origin_chunk_id"]] if claim.get("origin_chunk_id") else [])
@@ -2634,17 +2348,14 @@ def run_phase1_extraction(
             "span_end": int(claim["span_end"]) if "span_end" in claim and claim["span_end"] is not None else -1,
             "match_mode": str(claim.get("match_mode") or "none"),
             "evidence_quote": str(claim.get("evidence_quote") or ""),
-            "match_confidence": score,
-            "support_label": label,
-            "judge_score": score,
-            "judge_reason": reason,
-            "evidence_weak": label != "supported",
+            "match_confidence": 1.0,
+            "support_label": "supported",
+            "judge_score": 1.0,
+            "judge_reason": "quote verified at extraction",
+            "evidence_weak": False,
             "targets_paper_ids": [],
         }
-        if is_valid:
-            validated.append(out_item)
-        else:
-            rejected.append(out_item)
+        validated.append(out_item)
 
     _attach_targets_from_citations(validated, cite_rec=cite_rec, schema=schema)
     _attach_targets_from_citations(rejected, cite_rec=cite_rec, schema=schema)

@@ -122,7 +122,6 @@ def test_layer2_default_logic_extractor_final_sanitize(monkeypatch):
         }
 
     monkeypatch.setattr("app.llm.logic_claims_v2.extract_logic_and_claims_v2", _fake_extract)
-    monkeypatch.setattr("app.extraction.orchestrator._bind_logic_step_evidence_llm", lambda **kwargs: True)
 
     out = _default_logic_extractor(
         doc=_doc(),
@@ -178,16 +177,6 @@ def test_layer4_orchestrator_quality_gate_marks_empty_logic_steps(tmp_path):
             }
         ]
 
-    def _grounding_judge(*, claims, chunk_by_id, schema):
-        return [
-            {
-                "canonical_claim_id": claims[0]["canonical_claim_id"],
-                "support_label": "supported",
-                "judge_score": 0.95,
-                "reason": "directly supported",
-            }
-        ]
-
     out = run_phase1_extraction(
         doc=_doc(),
         paper_id="doi:10.1000/papera",
@@ -196,7 +185,6 @@ def test_layer4_orchestrator_quality_gate_marks_empty_logic_steps(tmp_path):
         artifacts_dir=tmp_path / "phase1",
         logic_extractor=_logic_extractor,
         claim_extractor=_claim_extractor,
-        grounding_judge=_grounding_judge,
         allow_weak=False,
     )
     report = out["quality_report"]

@@ -11,7 +11,8 @@ class LogicStepItem(BaseModel):
     model_config = ConfigDict(extra="allow")
     summary: str = ""
     confidence: float = Field(default=0.5, ge=0.0, le=1.0)
-    evidence_chunk_ids: list[str] = Field(default_factory=list)
+    evidence_chunk_ids: list[str] = Field(default_factory=list)  # backward compat
+    evidence_quotes: list[str] = Field(default_factory=list)     # new: verbatim quotes
 
 
 class LogicClaimItem(BaseModel):

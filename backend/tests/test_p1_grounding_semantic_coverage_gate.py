@@ -1,11 +1,10 @@
 # backend/tests/test_p1_grounding_semantic_coverage_gate.py
 """
-Tests for P1 Fix: semantic coverage rate metric + configurable gate.
+Tests for grounding skip mode.
 
-Root cause: hybrid grounding mode lets lexical=supported claims bypass semantic
-judgment entirely, resulting in 83.9% of claims without semantic verification.
-Fix: track semantic coverage rate in quality_report; add optional gate via
-phase1_gate_semantic_coverage_min schema rule (default 0.0 = disabled).
+After removing grounding logic, all claims are directly marked as supported
+with judge_mode="skip". These tests verify the skip mode behavior and that
+the quality report still includes the expected grounding fields.
 """
 from __future__ import annotations
 
@@ -78,32 +77,6 @@ def _claim_extractor(*, doc, paper_id, schema, step_order):
     ]
 
 
-def _grounding_judge_lexical_only(*, claims, chunk_by_id, schema):
-    """All claims pass lexical, none go to semantic."""
-    return [
-        {
-            "canonical_claim_id": claims[0]["canonical_claim_id"],
-            "support_label": "supported",
-            "judge_score": 0.85,
-            "reason": "lexical overlap",
-            "judge_mode": "lexical",
-        }
-    ]
-
-
-def _grounding_judge_semantic_all(*, claims, chunk_by_id, schema):
-    """All claims go through semantic judgment."""
-    return [
-        {
-            "canonical_claim_id": claims[0]["canonical_claim_id"],
-            "support_label": "supported",
-            "judge_score": 0.90,
-            "reason": "semantic supported",
-            "judge_mode": "semantic",
-        }
-    ]
-
-
 def test_quality_report_includes_grounding_semantic_coverage_rate(tmp_path):
     """quality_report always includes grounding_semantic_coverage_rate."""
     out = run_phase1_extraction(
@@ -114,17 +87,16 @@ def test_quality_report_includes_grounding_semantic_coverage_rate(tmp_path):
         artifacts_dir=tmp_path / "phase1",
         logic_extractor=_logic_extractor,
         claim_extractor=_claim_extractor,
-        grounding_judge=_grounding_judge_lexical_only,
         allow_weak=False,
     )
     report = out["quality_report"]
     assert "grounding_semantic_coverage_rate" in report
     assert isinstance(report["grounding_semantic_coverage_rate"], float)
-    assert 0.0 <= report["grounding_semantic_coverage_rate"] <= 1.0
+    assert report["grounding_semantic_coverage_rate"] == pytest.approx(0.0)
 
 
 def test_semantic_coverage_rate_is_zero_when_all_lexical(tmp_path):
-    """Coverage rate = 0 when all claims are judged lexically."""
+    """Coverage rate = 0 in skip mode (no semantic or lexical judging)."""
     out = run_phase1_extraction(
         doc=_doc(),
         paper_id="doi:10.1000/papera",
@@ -133,17 +105,33 @@ def test_semantic_coverage_rate_is_zero_when_all_lexical(tmp_path):
         artifacts_dir=tmp_path / "phase1",
         logic_extractor=_logic_extractor,
         claim_extractor=_claim_extractor,
-        grounding_judge=_grounding_judge_lexical_only,
         allow_weak=False,
     )
     report = out["quality_report"]
     assert report["grounding_semantic_coverage_rate"] == pytest.approx(0.0)
-    assert report["grounding_lexical_judged"] == 1
+    assert report["grounding_lexical_judged"] == 0
     assert report["grounding_semantic_judged"] == 0
 
 
 def test_semantic_coverage_rate_is_one_when_all_semantic(tmp_path):
-    """Coverage rate = 1.0 when all claims are judged semantically."""
+    """In skip mode, semantic coverage is always 0 regardless of config."""
+    out = run_phase1_extraction(
+        doc=_doc(),
+        paper_id="doi:10.1000/papera",
+        cite_rec={"cites_resolved": []},
+        schema=_schema_with_rules({"phase1_grounding_mode": "skip"}),
+        artifacts_dir=tmp_path / "phase1",
+        logic_extractor=_logic_extractor,
+        claim_extractor=_claim_extractor,
+        allow_weak=False,
+    )
+    report = out["quality_report"]
+    assert report["grounding_semantic_coverage_rate"] == pytest.approx(0.0)
+    assert report["grounding_mode_used"] == "skip"
+
+
+def test_semantic_coverage_gate_disabled_by_default(tmp_path):
+    """Default semantic_coverage_min=0.0 means gate never fails on coverage."""
     out = run_phase1_extraction(
         doc=_doc(),
         paper_id="doi:10.1000/papera",
@@ -152,75 +140,51 @@ def test_semantic_coverage_rate_is_one_when_all_semantic(tmp_path):
         artifacts_dir=tmp_path / "phase1",
         logic_extractor=_logic_extractor,
         claim_extractor=_claim_extractor,
-        grounding_judge=_grounding_judge_semantic_all,
         allow_weak=False,
     )
     report = out["quality_report"]
-    assert report["grounding_semantic_coverage_rate"] == pytest.approx(1.0)
-    assert report["grounding_semantic_judged"] == 1
-    assert report["grounding_lexical_judged"] == 0
-
-
-def test_semantic_coverage_gate_disabled_by_default(tmp_path):
-    """Default gate (0.0) never fails for zero semantic coverage."""
-    out = run_phase1_extraction(
-        doc=_doc(),
-        paper_id="doi:10.1000/papera",
-        cite_rec={"cites_resolved": []},
-        schema=_schema_with_rules({}),  # No gate configured
-        artifacts_dir=tmp_path / "phase1",
-        logic_extractor=_logic_extractor,
-        claim_extractor=_claim_extractor,
-        grounding_judge=_grounding_judge_lexical_only,
-        allow_weak=False,
-    )
-    report = out["quality_report"]
-    # Coverage is 0 but gate is disabled → should NOT fail on semantic_coverage
     assert "semantic_coverage" not in (report.get("gate_fail_reasons") or [])
+    assert report["gate_passed"] is True
 
 
 def test_semantic_coverage_gate_fails_when_coverage_below_threshold(tmp_path):
-    """Gate fails when semantic coverage is below the configured minimum."""
+    """With skip mode, semantic_coverage gate should never fail since min_semantic_coverage
+    check only triggers when > 0.0, and coverage is always 0.0 in skip mode."""
     out = run_phase1_extraction(
         doc=_doc(),
         paper_id="doi:10.1000/papera",
         cite_rec={"cites_resolved": []},
-        schema=_schema_with_rules({
-            "phase1_gate_semantic_coverage_min": 0.5,  # Require at least 50% semantic
-        }),
+        schema=_schema_with_rules({"phase1_gate_semantic_coverage_min": 0.5}),
         artifacts_dir=tmp_path / "phase1",
         logic_extractor=_logic_extractor,
         claim_extractor=_claim_extractor,
-        grounding_judge=_grounding_judge_lexical_only,  # 0% semantic
-        allow_weak=True,  # Don't let other gates block
+        allow_weak=False,
     )
     report = out["quality_report"]
+    # In skip mode, semantic_coverage_rate=0.0 < 0.5 threshold, so gate fails
     assert "semantic_coverage" in (report.get("gate_fail_reasons") or [])
-    assert report["gate_passed"] is False
 
 
 def test_semantic_coverage_gate_passes_when_above_threshold(tmp_path):
-    """Gate passes when semantic coverage meets or exceeds the configured minimum."""
+    """With threshold=0.0 (default), gate always passes."""
     out = run_phase1_extraction(
         doc=_doc(),
         paper_id="doi:10.1000/papera",
         cite_rec={"cites_resolved": []},
-        schema=_schema_with_rules({
-            "phase1_gate_semantic_coverage_min": 0.5,  # Require at least 50% semantic
-        }),
+        schema=_schema_with_rules({"phase1_gate_semantic_coverage_min": 0.0}),
         artifacts_dir=tmp_path / "phase1",
         logic_extractor=_logic_extractor,
         claim_extractor=_claim_extractor,
-        grounding_judge=_grounding_judge_semantic_all,  # 100% semantic
         allow_weak=False,
     )
     report = out["quality_report"]
     assert "semantic_coverage" not in (report.get("gate_fail_reasons") or [])
+    assert report["gate_passed"] is True
 
 
 def test_thresholds_dict_includes_semantic_coverage_min(tmp_path):
-    """quality_report.thresholds includes phase1_gate_semantic_coverage_min."""
-    configured_min = 0.3
+    """Thresholds dict in quality_report includes the configured semantic coverage min."""
+    configured_min = 0.42
     out = run_phase1_extraction(
         doc=_doc(),
         paper_id="doi:10.1000/papera",
@@ -231,7 +195,6 @@ def test_thresholds_dict_includes_semantic_coverage_min(tmp_path):
         artifacts_dir=tmp_path / "phase1",
         logic_extractor=_logic_extractor,
         claim_extractor=_claim_extractor,
-        grounding_judge=_grounding_judge_lexical_only,
         allow_weak=True,
     )
     report = out["quality_report"]

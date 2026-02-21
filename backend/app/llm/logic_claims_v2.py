@@ -84,11 +84,36 @@ def _split_chunks_into_segments(chunks: list, max_chars: int) -> list[list]:
     return segments
 
 
+def _match_quotes_to_chunks(quotes: list[str], source_chunks: list) -> list[str]:
+    """Match verbatim evidence quotes to chunk IDs using find_span_by_quote."""
+    from app.extraction.orchestrator import find_span_by_quote
+
+    matched_ids: list[str] = []
+    for quote in quotes:
+        quote_s = str(quote or "").strip()
+        if not quote_s:
+            continue
+        for chunk in source_chunks:
+            if isinstance(chunk, dict):
+                text = str(chunk.get("text", "") or "")
+                cid = str(chunk.get("chunk_id", "") or "").strip()
+            else:
+                text = str(getattr(chunk, "text", "") or "")
+                cid = str(getattr(chunk, "chunk_id", "") or "").strip()
+            if not text or not cid:
+                continue
+            _, _, mode = find_span_by_quote(quote_s, text)
+            if mode in ("exact", "normalized"):
+                if cid not in matched_ids:
+                    matched_ids.append(cid)
+                break
+    return matched_ids
+
+
 def _merge_segmented_logic(
     all_logic: list[dict[str, dict[str, Any]]],
-    chunk_id_set: set[str],
 ) -> dict[str, dict[str, Any]]:
-    """Merge logic steps from multiple segments. Higher confidence wins; evidence IDs are unioned."""
+    """Merge logic steps from multiple segments. Higher confidence wins; evidence fields are unioned."""
     merged: dict[str, dict[str, Any]] = {}
     for logic in all_logic:
         for sid, v in logic.items():
@@ -98,19 +123,26 @@ def _merge_segmented_logic(
             if not summary:
                 continue
             conf = float(v.get("confidence") or 0.5)
-            eids = [str(e) for e in (v.get("evidence_chunk_ids") or []) if str(e).strip() in chunk_id_set]
+            eids = [str(e) for e in (v.get("evidence_chunk_ids") or []) if str(e).strip()]
+            equotes = [str(q) for q in (v.get("evidence_quotes") or []) if str(q).strip()]
             if sid not in merged:
-                merged[sid] = {"summary": summary, "confidence": conf, "evidence_chunk_ids": list(eids)}
+                merged[sid] = {
+                    "summary": summary,
+                    "confidence": conf,
+                    "evidence_chunk_ids": list(eids),
+                    "evidence_quotes": list(equotes),
+                }
             else:
                 existing = merged[sid]
-                # Keep longer/higher-confidence summary
                 if conf > existing["confidence"] or (conf == existing["confidence"] and len(summary) > len(existing["summary"])):
                     existing["summary"] = summary
                     existing["confidence"] = conf
-                # Union evidence chunk IDs
                 for eid in eids:
                     if eid not in existing["evidence_chunk_ids"]:
                         existing["evidence_chunk_ids"].append(eid)
+                for eq in equotes:
+                    if eq not in existing.get("evidence_quotes", []):
+                        existing.setdefault("evidence_quotes", []).append(eq)
     return merged
 
 
@@ -321,34 +353,16 @@ def extract_logic_and_claims_v2(
     if not source_chunks:
         source_chunks = [c for c in doc.chunks if str(getattr(c, "kind", "") or "") != "heading" and str(c.text or "").strip()]
 
-    # Build full chunk catalog for evidence binding (shared across segments)
-    chunk_catalog_max = _rule_int(rules, "phase1_logic_chunks_max", 56, lo=8, hi=200)
-    chunk_chars_max = _rule_int(rules, "phase1_logic_chunk_chars_max", 420, lo=120, hi=1200)
-    chunk_catalog: list[dict[str, str]] = []
-    for c in source_chunks:
-        cid = str(getattr(c, "chunk_id", "") or "").strip()
-        sec = str(getattr(c, "section", "") or "").strip()
-        txt = _WS_RE.sub(" ", str(c.text or "").strip())
-        if cid and txt:
-            chunk_catalog.append({"chunk_id": cid, "section": sec, "text": txt[:chunk_chars_max]})
-        if len(chunk_catalog) >= chunk_catalog_max:
-            break
-    chunk_id_set = {c["chunk_id"] for c in chunk_catalog}
-
     full_body = "\n\n".join(str(c.text or "") for c in source_chunks)
     needs_segmentation = len(full_body) > doc_chars_max
 
     # --- Helper: run one extraction pass on a body segment ---
     def _run_one_pass(
         segment_body: str,
-        segment_catalog: list[dict[str, str]],
         claim_min: int,
         claim_max: int,
     ) -> tuple[dict[str, dict[str, Any]], list[dict[str, Any]]]:
         seg_body = _shorten(segment_body, max_chars=doc_chars_max)
-        seg_catalog_lines = "\n".join(
-            f"- {c['chunk_id']} | {c['section']} | {c['text']}" for c in segment_catalog
-        )
 
         default_system = (
             "You extract a paper's reasoning structure for a research knowledge graph.\n"
@@ -380,7 +394,7 @@ def extract_logic_and_claims_v2(
             "1) logic: for EACH allowed step_type, write a DETAILED mini-paragraph summary.\n"
             "   - 2-6 complete sentences (NOT a single sentence).\n"
             "   - Include key entities, methods, assumptions/conditions, and important numbers/definitions if present.\n"
-            "   - Include evidence_chunk_ids: a list of chunk IDs from the chunk catalog that directly support this summary.\n"
+            "   - Include evidence_quotes: 1-3 verbatim quotes (20-200 chars each) copied directly from the paper text that support this summary.\n"
             + (
                 "2) claims: write concise, atomic KEY POINTS.\n"
                 "   - 1-2 complete sentences each.\n"
@@ -402,12 +416,10 @@ def extract_logic_and_claims_v2(
                 f"Allowed step types: {step_ids}\n\n"
                 "Paper text (extracted from Markdown):\n"
                 f"{seg_body}\n\n"
-                "Chunk catalog (use chunk_id values for evidence_chunk_ids):\n"
-                f"{seg_catalog_lines}\n\n"
                 "Output JSON schema (STRICT):\n"
                 "{\n"
                 '  "logic": {\n'
-                '    "<StepType>": {"summary": "2-6 full sentences...", "confidence": 0.0, "evidence_chunk_ids": ["c1", "c2"]}\n'
+                '    "<StepType>": {"summary": "2-6 full sentences...", "confidence": 0.0, "evidence_quotes": ["verbatim quote..."]}\n'
                 "  }\n"
                 "}\n"
             )
@@ -419,12 +431,10 @@ def extract_logic_and_claims_v2(
                 f"Target number of claims: {claim_min}-{claim_max}\n\n"
                 "Paper text (extracted from Markdown):\n"
                 f"{seg_body}\n\n"
-                "Chunk catalog (use chunk_id values for evidence_chunk_ids):\n"
-                f"{seg_catalog_lines}\n\n"
                 "Output JSON schema (STRICT):\n"
                 "{\n"
                 '  "logic": {\n'
-                '    "<StepType>": {"summary": "2-6 full sentences...", "confidence": 0.0, "evidence_chunk_ids": ["c1", "c2"]}\n'
+                '    "<StepType>": {"summary": "2-6 full sentences...", "confidence": 0.0, "evidence_quotes": ["verbatim quote..."]}\n'
                 "  },\n"
                 '  "claims": [\n'
                 '    {"text":"1-2 full sentences...","confidence":0.0,"step_type":"<StepType>","claim_kinds":["KindA","KindB"]}\n'
@@ -448,7 +458,6 @@ def extract_logic_and_claims_v2(
                     "cmin": claim_min,
                     "cmax": claim_max,
                     "body": seg_body,
-                    "chunk_catalog_lines": seg_catalog_lines,
                 },
             )
         else:
@@ -470,16 +479,23 @@ def extract_logic_and_claims_v2(
             summary = str(v.get("summary") or "").strip()
             if not summary:
                 continue
-            raw_eids = v.get("evidence_chunk_ids") or []
-            validated_eids: list[str] = []
-            for eid in raw_eids:
+            # Read evidence_quotes from LLM output, match to chunks programmatically
+            raw_quotes = v.get("evidence_quotes") or []
+            if not isinstance(raw_quotes, list):
+                raw_quotes = [raw_quotes] if isinstance(raw_quotes, str) else []
+            evidence_quotes = [str(q).strip() for q in raw_quotes if str(q).strip()]
+            matched_chunk_ids = _match_quotes_to_chunks(evidence_quotes, source_chunks)
+            # Also accept legacy evidence_chunk_ids if they exist in source chunks
+            source_cid_set = {str(getattr(c, "chunk_id", "") or "").strip() for c in source_chunks}
+            for eid in (v.get("evidence_chunk_ids") or []):
                 s = str(eid or "").strip()
-                if s and s in chunk_id_set and s not in validated_eids:
-                    validated_eids.append(s)
+                if s and s in source_cid_set and s not in matched_chunk_ids:
+                    matched_chunk_ids.append(s)
             seg_logic[sid] = {
                 "summary": summary,
                 "confidence": float(v.get("confidence") or 0.5),
-                "evidence_chunk_ids": validated_eids,
+                "evidence_chunk_ids": matched_chunk_ids,
+                "evidence_quotes": evidence_quotes,
             }
 
         seg_claims: list[dict[str, Any]] = []
@@ -517,7 +533,7 @@ def extract_logic_and_claims_v2(
 
     # Single-pass or segmented extraction
     if not needs_segmentation:
-        norm_logic, norm_claims = _run_one_pass(full_body, chunk_catalog, cmin, cmax)
+        norm_logic, norm_claims = _run_one_pass(full_body, cmin, cmax)
     else:
         segments = _split_chunks_into_segments(source_chunks, doc_chars_max)
         all_segment_logic: list[dict[str, dict[str, Any]]] = []
@@ -526,15 +542,10 @@ def extract_logic_and_claims_v2(
         claims_max_per_segment = max(8, cmax // max(1, len(segments)))
         for seg_chunks in segments:
             seg_body = "\n\n".join(str(c.text or "") for c in seg_chunks)
-            # Build segment-local catalog (subset of full catalog)
-            seg_chunk_ids = {str(getattr(c, "chunk_id", "") or "").strip() for c in seg_chunks}
-            seg_catalog = [cc for cc in chunk_catalog if cc["chunk_id"] in seg_chunk_ids]
-            if not seg_catalog:
-                seg_catalog = chunk_catalog  # fallback to full catalog
-            seg_logic, seg_claims = _run_one_pass(seg_body, seg_catalog, claims_per_segment, claims_max_per_segment)
+            seg_logic, seg_claims = _run_one_pass(seg_body, claims_per_segment, claims_max_per_segment)
             all_segment_logic.append(seg_logic)
             norm_claims.extend(seg_claims)
-        norm_logic = _merge_segmented_logic(all_segment_logic, chunk_id_set)
+        norm_logic = _merge_segmented_logic(all_segment_logic)
 
     return {"logic": norm_logic, "claims": norm_claims, "raw": {}}
 

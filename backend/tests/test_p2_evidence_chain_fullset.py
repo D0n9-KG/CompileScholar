@@ -75,18 +75,6 @@ def _logic_extractor(*, doc, paper_id, schema):
     }
 
 
-def _grounding_judge(*, claims, chunk_by_id, schema):
-    return [
-        {
-            "canonical_claim_id": c["canonical_claim_id"],
-            "support_label": "supported",
-            "judge_score": 0.9,
-            "reason": "test",
-        }
-        for c in claims
-    ]
-
-
 def test_single_origin_chunk_preserved_in_evidence():
     """Single origin_chunk_id is still preserved in evidence_chunk_ids."""
     import tempfile
@@ -113,7 +101,7 @@ def test_single_origin_chunk_preserved_in_evidence():
             artifacts_dir=Path(tmpdir) / "phase1",
             logic_extractor=_logic_extractor,
             claim_extractor=_claim_extractor,
-            grounding_judge=_grounding_judge,
+
             allow_weak=False,
         )
 
@@ -157,7 +145,7 @@ def test_multiple_origin_chunks_all_in_evidence(tmp_path):
         artifacts_dir=tmp_path / "phase1",
         logic_extractor=_logic_extractor,
         claim_extractor=_claim_extractor,
-        grounding_judge=_grounding_judge,
+
         allow_weak=False,
     )
 
@@ -204,7 +192,7 @@ def test_cross_step_collision_evidence_merged_in_final_output(tmp_path):
         artifacts_dir=tmp_path / "phase1",
         logic_extractor=_logic_extractor,
         claim_extractor=_claim_extractor,
-        grounding_judge=_grounding_judge,
+
         allow_weak=False,
     )
 
