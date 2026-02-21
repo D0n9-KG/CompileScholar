@@ -96,11 +96,16 @@ def get_paper_content(paper_id: str):
 # Export
 # ---------------------------------------------------------------------------
 
+def _bib_escape(value: str) -> str:
+    """Escape special characters for BibTeX field values."""
+    return value.replace("\\", "\\\\").replace("{", "\\{").replace("}", "\\}").replace("\n", " ")
+
+
 def _export_bibtex(detail: dict[str, Any]) -> str:
     """Generate BibTeX entry from paper detail."""
     paper = detail.get("paper") or {}
     doi = str(paper.get("doi") or "").strip()
-    title = str(paper.get("title") or "Untitled").strip()
+    title = _bib_escape(str(paper.get("title") or "Untitled").strip())
     year = paper.get("year")
     authors = paper.get("authors")
     key = doi.replace("/", "_").replace(".", "_") if doi else "unknown"
@@ -109,11 +114,11 @@ def _export_bibtex(detail: dict[str, Any]) -> str:
     if year:
         lines.append(f"  year = {{{year}}},")
     if doi:
-        lines.append(f"  doi = {{{doi}}},")
+        lines.append(f"  doi = {{{_bib_escape(doi)}}},")
     if isinstance(authors, list) and authors:
-        lines.append(f"  author = {{{' and '.join(str(a) for a in authors)}}},")
+        lines.append(f"  author = {{{_bib_escape(' and '.join(str(a) for a in authors))}}},")
     elif isinstance(authors, str) and authors.strip():
-        lines.append(f"  author = {{{authors.strip()}}},")
+        lines.append(f"  author = {{{_bib_escape(authors.strip())}}},")
     lines.append("}")
     return "\n".join(lines) + "\n"
 
@@ -129,7 +134,7 @@ def _export_csv(detail: dict[str, Any]) -> str:
             str(claim.get("text") or ""),
             str(claim.get("step_type") or ""),
             str(claim.get("confidence") or ""),
-            ";".join(claim.get("kinds") or []),
+            ";".join(str(k) for k in (claim.get("kinds") or [])),
         ])
     return buf.getvalue()
 

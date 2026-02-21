@@ -305,18 +305,21 @@ export default function PaperDetailPage() {
   const [mdContent, setMdContent] = useState<string | null>(null)
   const [mdLoading, setMdLoading] = useState<boolean>(false)
   const [mdError, setMdError] = useState<string>('')
+  const [mdFetched, setMdFetched] = useState<boolean>(false)
 
   // Reset markdown content when paper changes
   useEffect(() => {
     setMdContent(null)
     setMdError('')
+    setMdFetched(false)
   }, [id])
 
   useEffect(() => {
-    if (tab !== 'content' || !id || mdContent !== null || mdLoading) return
+    if (tab !== 'content' || !id || mdFetched) return
     let cancelled = false
     setMdLoading(true)
     setMdError('')
+    setMdFetched(true)
     fetch(`${apiBaseUrl()}/papers/${encodeURIComponent(id)}/content`)
       .then((res) => {
         if (!res.ok) throw new Error(res.status === 404 ? '该论文暂无原文 Markdown' : `加载失败 (${res.status})`)
@@ -326,7 +329,7 @@ export default function PaperDetailPage() {
       .catch((e: unknown) => { if (!cancelled) setMdError(String((e as { message?: unknown } | null)?.message ?? e)) })
       .finally(() => { if (!cancelled) setMdLoading(false) })
     return () => { cancelled = true }
-  }, [tab, id, mdContent, mdLoading])
+  }, [tab, id, mdFetched])
 
   async function refresh() {
     const r = await apiGet<PaperDetail>(`/graph/paper/${encodeURIComponent(id)}`)

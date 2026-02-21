@@ -16,6 +16,7 @@ from app.api.routers.papers import (
     _doi_sanitized,
     _export_bibtex,
     _export_csv,
+    _bib_escape,
     _safe_rel,
 )
 
@@ -176,3 +177,23 @@ def test_export_csv_no_claims():
     reader = csv.reader(io.StringIO(text))
     rows = list(reader)
     assert len(rows) == 1  # header only
+
+
+# ── _bib_escape ──
+
+def test_bib_escape_braces_and_backslash():
+    assert _bib_escape("a{b}c") == "a\\{b\\}c"
+    assert _bib_escape("x\\y") == "x\\\\y"
+
+def test_bib_escape_newline():
+    assert _bib_escape("line1\nline2") == "line1 line2"
+
+def test_bib_escape_plain_text():
+    assert _bib_escape("Hello World") == "Hello World"
+
+def test_export_bibtex_escapes_special_chars():
+    """BibTeX output should escape braces/newlines in title and authors."""
+    detail = {"paper": {"doi": "10.1/x", "title": "A {B} Title\nMore", "authors": ["O'Brien"]}}
+    bib = _export_bibtex(detail)
+    assert "A \\{B\\} Title More" in bib
+    assert "O'Brien" in bib
