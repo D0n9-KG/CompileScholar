@@ -118,6 +118,34 @@ def _judge_one_batch(
     return result, fallback_used
 
 
+def _split_by_char_budget(
+    items: list[dict[str, Any]],
+    *,
+    chars_max: int,
+    count_max: int,
+) -> list[list[dict[str, Any]]]:
+    """Split payload items into batches by character budget and hard count limit.
+
+    Each batch accumulates items until either the total chunk_text length exceeds
+    chars_max or the item count reaches count_max.
+    """
+    batches: list[list[dict[str, Any]]] = []
+    current: list[dict[str, Any]] = []
+    current_chars = 0
+    for item in items:
+        item_chars = len(str(item.get("chunk_text") or ""))
+        # Start new batch if adding this item would exceed budget (unless batch is empty)
+        if current and (current_chars + item_chars > chars_max or len(current) >= count_max):
+            batches.append(current)
+            current = []
+            current_chars = 0
+        current.append(item)
+        current_chars += item_chars
+    if current:
+        batches.append(current)
+    return batches
+
+
 def judge_claim_support_batch(
     *,
     claims: list[dict[str, Any]],
@@ -134,6 +162,13 @@ def judge_claim_support_batch(
     if weak_min > supported_min:
         weak_min = supported_min
     batch_size = _rule_int(rules, "phase1_grounding_batch_size", 20)
+
+    # Character budget for batching (Phase 1.2)
+    try:
+        chars_max = int(rules.get("phase1_grounding_batch_chars_max", 15000))
+    except Exception:
+        chars_max = 15000
+    chars_max = max(5000, min(30000, chars_max))
 
     evidence_top_k = _rule_int(rules, "phase1_grounding_evidence_top_k", 3)
     evidence_chunk_chars_max = _rule_int(rules, "phase1_grounding_evidence_chunk_chars_max", 2000)
@@ -191,23 +226,63 @@ def judge_claim_support_batch(
     system = str(prompts.get("phase1_grounding_judge_system") or "").strip() or default_system
     user_template = str(prompts.get("phase1_grounding_judge_user_template") or "").strip()
 
-    # Split into batches
-    all_results: list[dict[str, Any]] = []
-    fallback_count = 0
-    total_batches = (len(payload_items) + batch_size - 1) // batch_size
-    for i in range(0, len(payload_items), batch_size):
-        batch = payload_items[i : i + batch_size]
-        batch_results, fallback_used = _judge_one_batch(
+    # Split by character budget (Phase 1.2) instead of fixed count
+    batches = _split_by_char_budget(payload_items, chars_max=chars_max, count_max=batch_size)
+
+    def _run_batch(batch: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], bool]:
+        return _judge_one_batch(
             batch_items=batch,
             system=system,
             user_template=user_template,
             supported_min=supported_min,
             weak_min=weak_min,
         )
-        all_results.extend(batch_results)
-        if fallback_used:
-            fallback_count += 1
 
+    # Parallel execution (Phase 2.2)
+    from concurrent.futures import ThreadPoolExecutor
+
+    from app.settings import settings as app_settings
+
+    max_workers = min(app_settings.phase1_grounding_max_workers, len(batches))
+    max_workers = max(1, max_workers)
+
+    all_results: list[dict[str, Any]] = []
+    fallback_count = 0
+
+    if max_workers == 1 or len(batches) <= 1:
+        for batch in batches:
+            batch_results, fallback_used = _run_batch(batch)
+            all_results.extend(batch_results)
+            if fallback_used:
+                fallback_count += 1
+    else:
+        indexed_results: list[tuple[int, list[dict[str, Any]], bool]] = []
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = {executor.submit(_run_batch, b): bi for bi, b in enumerate(batches)}
+            for future in futures:
+                bi = futures[future]
+                try:
+                    batch_results, fallback_used = future.result()
+                except Exception:
+                    batch_results, fallback_used = [], True
+                indexed_results.append((bi, batch_results, fallback_used))
+        indexed_results.sort(key=lambda x: x[0])
+        for _bi, batch_results, fallback_used in indexed_results:
+            all_results.extend(batch_results)
+            if fallback_used:
+                fallback_count += 1
+
+    # Retry missing IDs in small batches (Phase 1.2 defense)
+    returned_ids = {str(r.get("canonical_claim_id") or "") for r in all_results}
+    missing_items = [item for item in payload_items if item["canonical_claim_id"] not in returned_ids]
+    if missing_items:
+        retry_batch_size = max(5, batch_size // 2)
+        for i in range(0, len(missing_items), retry_batch_size):
+            retry_batch = missing_items[i : i + retry_batch_size]
+            retry_results, _ = _run_batch(retry_batch)
+            all_results.extend(retry_results)
+
+    total_batches = len(batches)
     if fallback_count > 0:
         logger.warning(
             "Grounding: %d/%d batches failed (fallback), %d claims judged out of %d",

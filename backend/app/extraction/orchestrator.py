@@ -744,6 +744,228 @@ def _extract_claims_from_chunk_llm(
     return clean
 
 
+def _validate_batch_claims_for_chunk(
+    *,
+    raw_claims: list[dict[str, Any]],
+    chunk_text: str,
+    step_set: set[str],
+    kind_set: set[str],
+    max_claims: int,
+) -> tuple[list[dict[str, Any]], int]:
+    """Validate claims from a batch response against a specific chunk's text.
+
+    Returns (valid_claims, quote_mismatch_count).
+    """
+    clean: list[dict[str, Any]] = []
+    quote_mismatch = 0
+    for row in raw_claims[: max(1, max_claims)]:
+        if not isinstance(row, dict):
+            continue
+        text_v = str(row.get("text") or "").strip()
+        evidence_quote = str(row.get("evidence_quote") or "").strip()
+        step_type = str(row.get("step_type") or "").strip()
+        if not text_v or step_type not in step_set or not evidence_quote:
+            continue
+        kinds: list[str] = []
+        for k in row.get("claim_kinds") or []:
+            kk = str(k or "").strip()
+            if kk and kk in kind_set and kk not in kinds:
+                kinds.append(kk)
+        try:
+            conf = float(row.get("confidence") or 0.5)
+        except Exception:
+            conf = 0.5
+        conf = max(0.0, min(1.0, conf))
+        span_start, span_end, match_mode = find_span_by_quote(evidence_quote, chunk_text)
+        if span_start < 0 or span_end <= span_start:
+            quote_mismatch += 1
+            continue
+        clean.append({
+            "text": text_v,
+            "evidence_quote": evidence_quote,
+            "step_type": step_type,
+            "kinds": kinds,
+            "confidence": conf,
+            "span_start": span_start,
+            "span_end": span_end,
+            "match_mode": match_mode,
+        })
+    return clean, quote_mismatch
+
+
+def _extract_claims_from_chunks_batch_llm(
+    *,
+    chunks: list[dict[str, str]],
+    step_ids: list[str],
+    kind_ids: list[str],
+    max_claims_per_chunk: int,
+    schema: dict[str, Any],
+) -> dict[str, Any]:
+    """Extract claims from multiple chunks in a single LLM call.
+
+    Args:
+        chunks: List of {"chunk_id": ..., "text": ...} dicts.
+        step_ids: Allowed logic step types.
+        kind_ids: Allowed claim kinds.
+        max_claims_per_chunk: Max claims per chunk.
+        schema: Active schema dict.
+
+    Returns:
+        {
+            "results": {chunk_id: list[dict]},  # validated claims per chunk
+            "failed_chunk_ids": list[str],       # chunks needing single-retry
+            "quote_mismatch_count": int,
+            "unknown_chunk_id_count": int,
+        }
+    """
+    from app.llm.client import call_json, call_validated_json
+    from app.llm.schemas import ChunkClaimsBatchResponse
+
+    rules = schema.get("rules") or {}
+    prompts = schema.get("prompts") or {}
+    chunk_chars_max = max(200, min(12000, _rule_int(rules, "phase1_chunk_chars_max", 1800)))
+
+    # Prepare chunk texts (truncated)
+    input_chunks: list[dict[str, str]] = []
+    input_chunk_ids: set[str] = set()
+    for c in chunks:
+        cid = str(c.get("chunk_id") or "").strip()
+        text = (c.get("text") or "").strip()
+        if not cid or not text:
+            continue
+        if len(text) > chunk_chars_max:
+            text = _truncate_to_sentence_boundary(text, chunk_chars_max)
+        input_chunks.append({"chunk_id": cid, "text": text})
+        input_chunk_ids.add(cid)
+
+    if not input_chunks:
+        return {"results": {}, "failed_chunk_ids": [], "quote_mismatch_count": 0, "unknown_chunk_id_count": 0}
+
+    # Build prompt
+    chunks_block = "\n\n".join(
+        f"--- CHUNK [{c['chunk_id']}] ---\n{c['text']}" for c in input_chunks
+    )
+    default_system = (
+        "Extract atomic claims from MULTIPLE paper chunks. Return STRICT JSON only.\n"
+        "\n"
+        "GROUNDING:\n"
+        "- Each claim must be directly supported by its chunk text.\n"
+        "- Do not invent information outside the chunk.\n"
+        "\n"
+        "EVIDENCE QUOTE (REQUIRED):\n"
+        "- evidence_quote must be copied VERBATIM from the chunk text (no paraphrase).\n"
+        "- Length must be 20-220 characters.\n"
+        "- If valid quote cannot be produced, DO NOT output that claim.\n"
+        "\n"
+        "SCIENTIFIC VALUE (CRITICAL):\n"
+        "- Extract ONLY scientific contributions, methods, findings, and conclusions.\n"
+        "- DO NOT extract meta-information (authors, dates, funding, DOIs, etc.).\n"
+        "- When encountering pure meta-information chunks, output empty claims array for that chunk.\n"
+        "\n"
+        "OUTPUT FORMAT:\n"
+        '{ "chunks": [ {"chunk_id":"c1", "claims": [{"text":"...", "evidence_quote":"...", '
+        '"step_type":"Background", "claim_kinds":["Definition"], "confidence":0.8}]} ] }\n'
+        "You MUST output one entry per input chunk_id, even if claims is empty."
+    )
+    default_user = (
+        f"Allowed step types: {step_ids}\n"
+        f"Allowed claim kinds: {kind_ids}\n"
+        f"Max claims per chunk: {max_claims_per_chunk}\n\n"
+        f"{chunks_block}\n\n"
+        "Output JSON with one entry per chunk_id."
+    )
+    system = str(prompts.get("phase1_chunk_claim_extract_system") or "").strip() or default_system
+    user_t = str(prompts.get("phase1_chunk_claim_batch_user_template") or "").strip()
+    if user_t:
+        user = _render_template(
+            user_t,
+            {
+                "step_ids": step_ids,
+                "kind_ids": kind_ids,
+                "max_claims_per_chunk": max_claims_per_chunk,
+                "chunks_block": chunks_block,
+                "chunk_count": len(input_chunks),
+            },
+        )
+    else:
+        user = default_user
+
+    # Call LLM
+    try:
+        validated = call_validated_json(system, user, ChunkClaimsBatchResponse)
+        out = validated.model_dump()
+    except Exception:
+        try:
+            out = call_json(system, user)
+        except Exception:
+            # Total batch failure
+            return {
+                "results": {},
+                "failed_chunk_ids": list(input_chunk_ids),
+                "quote_mismatch_count": 0,
+                "unknown_chunk_id_count": 0,
+            }
+
+    # Parse and validate per-chunk
+    step_set = set(step_ids)
+    kind_set = set(kind_ids)
+    raw_chunks = out.get("chunks") or []
+    if not isinstance(raw_chunks, list):
+        return {
+            "results": {},
+            "failed_chunk_ids": list(input_chunk_ids),
+            "quote_mismatch_count": 0,
+            "unknown_chunk_id_count": 0,
+        }
+
+    results: dict[str, list[dict[str, Any]]] = {}
+    total_quote_mismatch = 0
+    unknown_chunk_id_count = 0
+    seen_chunk_ids: set[str] = set()
+
+    # Build chunk_id -> text lookup
+    text_by_id = {c["chunk_id"]: c["text"] for c in input_chunks}
+
+    for entry in raw_chunks:
+        if not isinstance(entry, dict):
+            continue
+        cid = str(entry.get("chunk_id") or "").strip()
+        if not cid:
+            continue
+        if cid not in input_chunk_ids:
+            unknown_chunk_id_count += 1
+            continue
+        seen_chunk_ids.add(cid)
+        raw_claims = entry.get("claims") or []
+        if not isinstance(raw_claims, list):
+            raw_claims = []
+        chunk_text = text_by_id.get(cid, "")
+        valid_claims, mismatches = _validate_batch_claims_for_chunk(
+            raw_claims=raw_claims,
+            chunk_text=chunk_text,
+            step_set=step_set,
+            kind_set=kind_set,
+            max_claims=max_claims_per_chunk,
+        )
+        total_quote_mismatch += mismatches
+        # Quality gate: if quote_match_rate < 50% for this chunk, mark as failed
+        total_attempted = len([r for r in raw_claims if isinstance(r, dict) and str(r.get("text") or "").strip()])
+        if total_attempted > 0 and len(valid_claims) / total_attempted < 0.5:
+            # Too many mismatches — fallback to single extraction for this chunk
+            continue
+        results[cid] = valid_claims
+
+    # Chunks not seen in output → need single-retry
+    failed_chunk_ids = [cid for cid in input_chunk_ids if cid not in results]
+
+    return {
+        "results": results,
+        "failed_chunk_ids": failed_chunk_ids,
+        "quote_mismatch_count": total_quote_mismatch,
+        "unknown_chunk_id_count": unknown_chunk_id_count,
+    }
+
+
 def _default_claim_extractor(
     *,
     doc: DocumentIR,
@@ -760,45 +982,168 @@ def _default_claim_extractor(
     step_ids = step_order or _enabled_step_ids(schema)
     kind_ids = _enabled_kind_ids(schema)
 
+    batch_size = max(1, min(12, int(rules.get("phase1_claim_batch_size") or 6)))
+
     candidates: list[dict[str, Any]] = []
     chunks = _priority_chunks(doc, logic=logic, max_chunks=max_chunks, rules=rules)
     chunk_fail_count = 0
     worker_count = max(1, int(rules.get("phase1_claim_worker_count") or 3))
-    for idx, chunk in enumerate(chunks):
+
+    # Stats for batch extraction
+    batch_quote_mismatch_count = 0
+    batch_unknown_chunk_id_count = 0
+    batch_fallback_chunk_count = 0
+
+    # Prepare valid chunk list
+    valid_chunks: list[dict[str, Any]] = []
+    for chunk in chunks:
         chunk_id = str(chunk.get("chunk_id") or "").strip()
         chunk_text = str(chunk.get("text") or "")
-        if not chunk_id or not chunk_text.strip():
-            continue
-        try:
-            rows = _extract_claims_from_chunk_llm(
-                chunk_text=chunk_text,
-                step_ids=step_ids,
-                kind_ids=kind_ids,
-                max_claims=max_claims_per_chunk,
-                schema=schema,
-            )
-        except Exception:
+        if chunk_id and chunk_text.strip():
+            valid_chunks.append({"chunk_id": chunk_id, "text": chunk_text, "_idx": len(valid_chunks)})
+
+    # Group into batches
+    chunk_batches: list[list[dict[str, Any]]] = []
+    for i in range(0, len(valid_chunks), batch_size):
+        chunk_batches.append(valid_chunks[i : i + batch_size])
+
+    def _process_batch(batch: list[dict[str, Any]]) -> dict[str, Any]:
+        """Process a single batch with tiered fallback. Returns per-chunk results."""
+        batch_input = [{"chunk_id": c["chunk_id"], "text": c["text"]} for c in batch]
+
+        # Try full batch
+        result = _extract_claims_from_chunks_batch_llm(
+            chunks=batch_input,
+            step_ids=step_ids,
+            kind_ids=kind_ids,
+            max_claims_per_chunk=max_claims_per_chunk,
+            schema=schema,
+        )
+
+        failed_ids = set(result.get("failed_chunk_ids") or [])
+        per_chunk = dict(result.get("results") or {})
+        stats = {
+            "quote_mismatch": result.get("quote_mismatch_count", 0),
+            "unknown_chunk_id": result.get("unknown_chunk_id_count", 0),
+            "fallback_chunks": 0,
+        }
+
+        if not failed_ids:
+            return {"per_chunk": per_chunk, "stats": stats}
+
+        # Tiered fallback: try half-batch for failed chunks
+        failed_batch = [c for c in batch if c["chunk_id"] in failed_ids]
+        if len(failed_batch) > 1:
+            half = max(1, len(failed_batch) // 2)
+            for sub_start in range(0, len(failed_batch), half):
+                sub_batch = failed_batch[sub_start : sub_start + half]
+                sub_input = [{"chunk_id": c["chunk_id"], "text": c["text"]} for c in sub_batch]
+                sub_result = _extract_claims_from_chunks_batch_llm(
+                    chunks=sub_input,
+                    step_ids=step_ids,
+                    kind_ids=kind_ids,
+                    max_claims_per_chunk=max_claims_per_chunk,
+                    schema=schema,
+                )
+                for cid, claims in (sub_result.get("results") or {}).items():
+                    per_chunk[cid] = claims
+                    failed_ids.discard(cid)
+                stats["quote_mismatch"] += sub_result.get("quote_mismatch_count", 0)
+                stats["unknown_chunk_id"] += sub_result.get("unknown_chunk_id_count", 0)
+
+        # Final fallback: single-chunk extraction for remaining failures
+        for c in batch:
+            if c["chunk_id"] not in failed_ids:
+                continue
+            try:
+                rows = _extract_claims_from_chunk_llm(
+                    chunk_text=c["text"],
+                    step_ids=step_ids,
+                    kind_ids=kind_ids,
+                    max_claims=max_claims_per_chunk,
+                    schema=schema,
+                )
+                per_chunk[c["chunk_id"]] = rows
+                stats["fallback_chunks"] += 1
+            except Exception:
+                stats["fallback_chunks"] += 1
+
+        return {"per_chunk": per_chunk, "stats": stats}
+
+    # Execute batches with parallel workers
+    from concurrent.futures import ThreadPoolExecutor
+
+    from app.settings import settings as app_settings
+
+    max_workers = min(app_settings.phase1_chunk_claim_max_workers, len(chunk_batches))
+    max_workers = max(1, max_workers)
+
+    batch_results: list[tuple[int, dict[str, Any]]] = []
+    if max_workers == 1 or len(chunk_batches) <= 1:
+        # Sequential path
+        for bi, batch in enumerate(chunk_batches):
+            br = _process_batch(batch)
+            batch_results.append((bi, br))
+    else:
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = {executor.submit(_process_batch, b): bi for bi, b in enumerate(chunk_batches)}
+            for future in futures:
+                bi = futures[future]
+                try:
+                    br = future.result()
+                except Exception:
+                    br = {"per_chunk": {}, "stats": {"quote_mismatch": 0, "unknown_chunk_id": 0, "fallback_chunks": 0}}
+                batch_results.append((bi, br))
+
+    # Merge results in deterministic order
+    batch_results.sort(key=lambda x: x[0])
+    chunk_idx_map = {c["chunk_id"]: c["_idx"] for c in valid_chunks}
+
+    for _bi, br in batch_results:
+        stats = br.get("stats") or {}
+        batch_quote_mismatch_count += stats.get("quote_mismatch", 0)
+        batch_unknown_chunk_id_count += stats.get("unknown_chunk_id", 0)
+        batch_fallback_chunk_count += stats.get("fallback_chunks", 0)
+        per_chunk = br.get("per_chunk") or {}
+        # Sort by chunk index for deterministic candidate ordering
+        sorted_chunks = sorted(per_chunk.items(), key=lambda kv: chunk_idx_map.get(kv[0], 0))
+        for cid, rows in sorted_chunks:
+            idx = chunk_idx_map.get(cid, 0)
+            for r in rows:
+                candidates.append(
+                    {
+                        "text": r["text"],
+                        "evidence_quote": str(r.get("evidence_quote") or ""),
+                        "confidence": r["confidence"],
+                        "step_type": r["step_type"],
+                        "kinds": list(r.get("kinds") or []),
+                        "origin_chunk_id": cid,
+                        "worker_id": f"w{(idx % worker_count) + 1}",
+                        "span_start": int(r["span_start"]) if r.get("span_start") is not None else -1,
+                        "span_end": int(r["span_end"]) if r.get("span_end") is not None else -1,
+                        "match_mode": str(r.get("match_mode") or ""),
+                    }
+                )
+
+    # Count chunks with no output as failures
+    all_output_chunk_ids = set()
+    for _bi, br in batch_results:
+        all_output_chunk_ids.update((br.get("per_chunk") or {}).keys())
+    for c in valid_chunks:
+        if c["chunk_id"] not in all_output_chunk_ids:
             chunk_fail_count += 1
-            continue
-        for r in rows:
-            candidates.append(
-                {
-                    "text": r["text"],
-                    "evidence_quote": str(r.get("evidence_quote") or ""),
-                    "confidence": r["confidence"],
-                    "step_type": r["step_type"],
-                    "kinds": list(r.get("kinds") or []),
-                    "origin_chunk_id": chunk_id,
-                    "worker_id": f"w{(idx % worker_count) + 1}",
-                    "span_start": int(r["span_start"]) if r.get("span_start") is not None else -1,
-                    "span_end": int(r["span_end"]) if r.get("span_end") is not None else -1,
-                    "match_mode": str(r.get("match_mode") or ""),
-                }
-            )
+
     return {
         "candidates": candidates,
         "chunk_total": len(chunks),
         "chunk_fail_count": chunk_fail_count,
+        "chunk_extraction_stats": {
+            "batch_size": batch_size,
+            "batch_count": len(chunk_batches),
+            "batch_quote_mismatch_count": batch_quote_mismatch_count,
+            "batch_unknown_chunk_id_count": batch_unknown_chunk_id_count,
+            "batch_fallback_chunk_count": batch_fallback_chunk_count,
+        },
     }
 
 

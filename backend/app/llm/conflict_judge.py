@@ -180,13 +180,37 @@ def _judge_single_batch(
     return result
 
 
+def _split_conflict_by_char_budget(
+    pairs: list[dict[str, Any]],
+    *,
+    chars_max: int,
+    count_max: int,
+) -> list[list[dict[str, Any]]]:
+    """Split conflict pairs into batches by character budget and hard count limit."""
+    batches: list[list[dict[str, Any]]] = []
+    current: list[dict[str, Any]] = []
+    current_chars = 0
+    for pair in pairs:
+        pair_chars = len(json.dumps(pair, ensure_ascii=False))
+        if current and (current_chars + pair_chars > chars_max or len(current) >= count_max):
+            batches.append(current)
+            current = []
+            current_chars = 0
+        current.append(pair)
+        current_chars += pair_chars
+    if current:
+        batches.append(current)
+    return batches
+
+
 def judge_conflict_pairs_batch(*, pairs: list[dict[str, Any]], schema: dict[str, Any]) -> list[dict[str, Any]]:
     """
-    Judge conflict pairs in small batches with retry and error tolerance.
+    Judge conflict pairs with character-budget batching and parallel execution.
 
-    Improvements over original:
-    - Small batch size (15 pairs) for better LLM performance
-    - Retry with exponential backoff
+    Improvements:
+    - Character-budget batching prevents context explosion (Phase 1.3)
+    - Parallel batch execution via ThreadPoolExecutor (Phase 2.3)
+    - Small batch size for better LLM performance
     - JSON repair for malformed responses
     - Graceful degradation (mark as 'insufficient' on failure)
     """
@@ -199,6 +223,14 @@ def judge_conflict_pairs_batch(*, pairs: list[dict[str, Any]], schema: dict[str,
     # Configuration
     max_pairs = _rule_int(rules, "phase2_conflict_candidate_max_pairs", 120, lo=1, hi=2000)
     batch_size = _rule_int(rules, "phase2_conflict_batch_size", 15, lo=5, hi=50)
+
+    # Character budget (Phase 1.3)
+    try:
+        chars_max = int(rules.get("phase2_conflict_batch_chars_max", 12000))
+    except Exception:
+        chars_max = 12000
+    chars_max = max(4000, min(25000, chars_max))
+
     safe_pairs = list(pairs[:max_pairs])
 
     # Prompts
@@ -221,16 +253,43 @@ def judge_conflict_pairs_batch(*, pairs: list[dict[str, Any]], schema: dict[str,
     system = str(prompts.get("phase2_conflict_judge_system") or "").strip() or default_system
     user_template = str(prompts.get("phase2_conflict_judge_user_template") or "").strip()
 
-    # Process in small batches
-    all_results: list[dict[str, Any]] = []
-    for i in range(0, len(safe_pairs), batch_size):
-        batch = safe_pairs[i : i + batch_size]
-        batch_results = _judge_single_batch(
+    # Split by character budget (Phase 1.3)
+    batches = _split_conflict_by_char_budget(safe_pairs, chars_max=chars_max, count_max=batch_size)
+
+    def _run_batch(batch: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        return _judge_single_batch(
             batch_pairs=batch,
             system=system,
             user_template=user_template,
             default_user_fmt=default_user_fmt,
         )
-        all_results.extend(batch_results)
+
+    # Parallel execution (Phase 2.3)
+    from concurrent.futures import ThreadPoolExecutor
+
+    from app.settings import settings as app_settings
+
+    max_workers = min(app_settings.phase2_conflict_max_workers, len(batches))
+    max_workers = max(1, max_workers)
+
+    all_results: list[dict[str, Any]] = []
+
+    if max_workers == 1 or len(batches) <= 1:
+        for batch in batches:
+            all_results.extend(_run_batch(batch))
+    else:
+        indexed_results: list[tuple[int, list[dict[str, Any]]]] = []
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = {executor.submit(_run_batch, b): bi for bi, b in enumerate(batches)}
+            for future in futures:
+                bi = futures[future]
+                try:
+                    batch_results = future.result()
+                except Exception:
+                    batch_results = _mark_batch_insufficient(batches[bi])
+                indexed_results.append((bi, batch_results))
+        indexed_results.sort(key=lambda x: x[0])
+        for _bi, batch_results in indexed_results:
+            all_results.extend(batch_results)
 
     return all_results

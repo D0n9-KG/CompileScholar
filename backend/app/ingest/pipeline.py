@@ -148,48 +148,87 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
         _write_document_ir(out, doc)
 
     notify("ingest:reference_recovery", 0.24, "Recovering references for papers with missing/low parsed refs")
-    reference_recovery: list[dict] = []
-    for idx, doc in enumerate(parsed):
+    reference_recovery: list[dict] = [{} for _ in parsed]
+
+    def _recover_refs(idx: int, doc: DocumentIR) -> tuple[int, DocumentIR, dict]:
         schema_for_recovery = _schema_for_md(doc.paper.md_path, doc=doc)
-        before_refs = len(doc.references or [])
         recovered_doc, rr = recover_references_with_agent(
             doc,
             prompt_overrides=schema_for_recovery.get("prompts"),
             rules=schema_for_recovery.get("rules"),
         )
-        parsed[idx] = recovered_doc
         rr["paper_source"] = doc.paper.paper_source
         rr["paper_id"] = paper_id_for_md_path(recovered_doc.paper.md_path, doi=recovered_doc.paper.doi)
         rr["schema_version"] = int(schema_for_recovery.get("version") or 1)
         rr["schema_paper_type"] = str(schema_for_recovery.get("paper_type") or "research")
-        reference_recovery.append(rr)
+        return idx, recovered_doc, rr
 
+    pre_llm_workers = min(settings.ingest_pre_llm_max_workers, len(parsed))
+    pre_llm_workers = max(1, pre_llm_workers)
+
+    if pre_llm_workers == 1 or len(parsed) <= 1:
+        for idx, doc in enumerate(parsed):
+            _, recovered_doc, rr = _recover_refs(idx, doc)
+            parsed[idx] = recovered_doc
+            reference_recovery[idx] = rr
+    else:
+        from concurrent.futures import ThreadPoolExecutor as _PreLLMPool
+
+        with _PreLLMPool(max_workers=pre_llm_workers) as executor:
+            futures = [executor.submit(_recover_refs, idx, doc) for idx, doc in enumerate(parsed)]
+            for future in futures:
+                idx, recovered_doc, rr = future.result()
+                parsed[idx] = recovered_doc
+                reference_recovery[idx] = rr
+
+    # Write artifacts (serial — I/O is fast, keeps ordering deterministic)
+    for idx, rr in enumerate(reference_recovery):
+        doc = parsed[idx]
+        before_refs = len(doc.references or [])
         rr_path = run_dir / f"{doc.paper.paper_source}.reference_recovery.json"
         rr_path.write_text(json.dumps(rr, ensure_ascii=False, indent=2), encoding="utf-8")
         if int(rr.get("after_refs") or before_refs) != before_refs:
             out = run_dir / f"{doc.paper.paper_source}.document_ir.json"
-            _write_document_ir(out, recovered_doc)
+            _write_document_ir(out, doc)
+
+    # ── Stage barrier: all reference recovery complete before citation event recovery ──
 
     notify("ingest:citation_event_recovery", 0.30, "Recovering citation events from references when needed")
-    citation_event_recovery: list[dict] = []
-    for idx, doc in enumerate(parsed):
+    citation_event_recovery: list[dict] = [{} for _ in parsed]
+
+    def _recover_events(idx: int, doc: DocumentIR) -> tuple[int, DocumentIR, dict]:
         schema_for_recovery = _schema_for_md(doc.paper.md_path, doc=doc)
         recovered_doc, cer = recover_citation_events_from_references(
             doc,
             rules=schema_for_recovery.get("rules"),
         )
-        parsed[idx] = recovered_doc
         cer["paper_source"] = doc.paper.paper_source
         cer["paper_id"] = paper_id_for_md_path(recovered_doc.paper.md_path, doi=recovered_doc.paper.doi)
         cer["schema_version"] = int(schema_for_recovery.get("version") or 1)
         cer["schema_paper_type"] = str(schema_for_recovery.get("paper_type") or "research")
-        citation_event_recovery.append(cer)
+        return idx, recovered_doc, cer
 
+    if pre_llm_workers == 1 or len(parsed) <= 1:
+        for idx, doc in enumerate(parsed):
+            _, recovered_doc, cer = _recover_events(idx, doc)
+            parsed[idx] = recovered_doc
+            citation_event_recovery[idx] = cer
+    else:
+        with _PreLLMPool(max_workers=pre_llm_workers) as executor:
+            futures = [executor.submit(_recover_events, idx, doc) for idx, doc in enumerate(parsed)]
+            for future in futures:
+                idx, recovered_doc, cer = future.result()
+                parsed[idx] = recovered_doc
+                citation_event_recovery[idx] = cer
+
+    # Write artifacts (serial)
+    for idx, cer in enumerate(citation_event_recovery):
+        doc = parsed[idx]
         cer_path = run_dir / f"{doc.paper.paper_source}.citation_event_recovery.json"
         cer_path.write_text(json.dumps(cer, ensure_ascii=False, indent=2), encoding="utf-8")
         if int(cer.get("after_events") or 0) != int(cer.get("before_events") or 0):
             out = run_dir / f"{doc.paper.paper_source}.document_ir.json"
-            _write_document_ir(out, recovered_doc)
+            _write_document_ir(out, doc)
 
     notify("ingest:crossref", 0.35, "Resolving references via Crossref")
     crossref = CrossrefClient()

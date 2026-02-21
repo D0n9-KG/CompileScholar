@@ -47,6 +47,22 @@ class ChunkClaimsResponse(BaseModel):
     claims: list[ChunkClaimItem] = Field(default_factory=list)
 
 
+# ── Batch chunk claim extraction (orchestrator._extract_claims_from_chunks_batch_llm) ──
+
+
+class ChunkClaimsBatchItem(BaseModel):
+    """Claims extracted from a single chunk within a batch response."""
+    model_config = ConfigDict(extra="allow")
+    chunk_id: str = ""
+    claims: list[ChunkClaimItem] = Field(default_factory=list)
+
+
+class ChunkClaimsBatchResponse(BaseModel):
+    """Response from multi-chunk batch claim extraction."""
+    model_config = ConfigDict(extra="allow")
+    chunks: list[ChunkClaimsBatchItem] = Field(default_factory=list)
+
+
 # ── Grounding judge (grounding_judge_v2.py) ──
 
 

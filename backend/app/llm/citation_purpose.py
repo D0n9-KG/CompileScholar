@@ -187,7 +187,7 @@ def classify_citation_purposes_batch(
     max_context_chars: int = 900,
     prompt_overrides: dict[str, Any] | None = None,
     rules: dict[str, Any] | None = None,
-    batch_size: int = 12,
+    batch_size: int = 25,
 ) -> dict:
     """
     Classify purposes for many (A->B) citations, paginating into batches of batch_size.

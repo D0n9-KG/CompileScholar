@@ -184,38 +184,32 @@ def build_faiss_for_chunks(chunks: list[Chunk], out_dir: str) -> dict:
         for c in chunks
     ]
 
-    # Incremental FAISS build: batch-level retry to avoid restarting all chunks on transient errors.
+    # ── Phase 2.5: Dual-stage embed parallelization ──
+    # Stage 1: Parallel embedding computation
+    # Stage 2: Serial FAISS index construction (not thread-safe)
+
     batch_size = 64
     max_batch_retries = 5
     base_retry_delay = 5  # seconds (exponential backoff: 5, 10, 20, 40, 80)
     total_batches = (len(texts) + batch_size - 1) // batch_size
-    store = None
 
-    for batch_idx in range(total_batches):
+    def _embed_one_batch(batch_idx: int) -> tuple[int, list[list[float]]]:
+        """Embed a single batch with retry logic. Returns (batch_idx, vectors)."""
         start = batch_idx * batch_size
         end = min(start + batch_size, len(texts))
         batch_texts = texts[start:end]
-        batch_metadatas = metadatas[start:end]
 
         for attempt in range(max_batch_retries):
             try:
-                # First batch initializes the FAISS store; subsequent batches append incrementally.
-                if store is None:
-                    store = FAISS.from_texts(
-                        texts=batch_texts, embedding=embeddings, metadatas=batch_metadatas
-                    )
-                else:
-                    store.add_texts(texts=batch_texts, metadatas=batch_metadatas)
-
-                print(f"Batch {batch_idx + 1}/{total_batches} completed")
-                break
-            except Exception as exc:  # noqa: BLE001
+                vectors = embeddings.embed_documents(batch_texts)
+                return batch_idx, vectors
+            except Exception as exc:
                 error_msg = str(exc).strip()
                 retryable = _is_retryable_embedding_error(exc)
                 retry_delay = base_retry_delay * (2 ** attempt)
                 if retryable and attempt < max_batch_retries - 1:
                     print(
-                        f"FAISS batch {batch_idx + 1}/{total_batches} "
+                        f"FAISS embed batch {batch_idx + 1}/{total_batches} "
                         f"attempt {attempt + 1}/{max_batch_retries} failed: {error_msg}. "
                         f"Retrying in {retry_delay}s..."
                     )
@@ -233,8 +227,51 @@ def build_faiss_for_chunks(chunks: list[Chunk], out_dir: str) -> dict:
                         f"Error: {error_msg}. Please check embedding API configuration and try again."
                     ) from exc
 
+        raise AssertionError("unreachable")  # pragma: no cover
+
+    # Stage 1: Parallel embedding
+    from concurrent.futures import ThreadPoolExecutor
+
+    embed_workers = min(settings.faiss_embed_max_workers, total_batches)
+    embed_workers = max(1, embed_workers)
+
+    all_vectors: list[tuple[int, list[list[float]]]] = []
+    if embed_workers == 1 or total_batches <= 1:
+        for bi in range(total_batches):
+            all_vectors.append(_embed_one_batch(bi))
+            print(f"Embed batch {bi + 1}/{total_batches} completed")
+    else:
+        with ThreadPoolExecutor(max_workers=embed_workers) as executor:
+            futures = {executor.submit(_embed_one_batch, bi): bi for bi in range(total_batches)}
+            for future in futures:
+                bi = futures[future]
+                idx, vectors = future.result()  # propagate exceptions
+                all_vectors.append((idx, vectors))
+                print(f"Embed batch {idx + 1}/{total_batches} completed")
+
+    # Sort by batch index for deterministic ordering
+    all_vectors.sort(key=lambda x: x[0])
+
+    # Stage 2: Serial FAISS index construction
+    store = None
+    for batch_idx, vectors in all_vectors:
+        start = batch_idx * batch_size
+        end = min(start + batch_size, len(texts))
+        batch_texts = texts[start:end]
+        batch_metadatas = metadatas[start:end]
+        text_embeddings = list(zip(batch_texts, vectors))
+
+        if store is None:
+            store = FAISS.from_embeddings(
+                text_embeddings=text_embeddings,
+                embedding=embeddings,
+                metadatas=batch_metadatas,
+            )
+        else:
+            store.add_embeddings(text_embeddings=text_embeddings, metadatas=batch_metadatas)
+
     if store is None:
-        raise RuntimeError("FAISS index build failed: retry loop exited without creating an index")
+        raise RuntimeError("FAISS index build failed: no embeddings produced")
     store.save_local(str(out))
     return {"chunks_indexed": len(chunks), "dir": str(out)}
 

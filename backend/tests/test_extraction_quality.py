@@ -46,7 +46,18 @@ def test_chunk_fail_count_recorded_in_result(monkeypatch):
             raise RuntimeError("injected LLM failure")
         return [{"text": "result", "step_type": "Method", "kinds": [], "confidence": 0.8}]
 
+    # Force batch extraction to fail so all chunks fall back to single-chunk path
+    def _batch_always_fail(**kwargs):
+        chunks = kwargs.get("chunks") or []
+        return {
+            "results": {},
+            "failed_chunk_ids": [c["chunk_id"] for c in chunks],
+            "quote_mismatch_count": 0,
+            "unknown_chunk_id_count": 0,
+        }
+
     monkeypatch.setattr(orchestrator, "_extract_claims_from_chunk_llm", _failing_extract)
+    monkeypatch.setattr(orchestrator, "_extract_claims_from_chunks_batch_llm", _batch_always_fail)
 
     doc = _make_doc(n_chunks=4)
     result = orchestrator._default_claim_extractor(
@@ -74,7 +85,18 @@ def test_chunk_fail_count_zero_on_success(monkeypatch):
     def _ok_extract(**kwargs):
         return [{"text": "some result", "step_type": "Method", "kinds": [], "confidence": 0.8}]
 
+    # Force batch to fail so single-chunk path is used
+    def _batch_always_fail(**kwargs):
+        chunks = kwargs.get("chunks") or []
+        return {
+            "results": {},
+            "failed_chunk_ids": [c["chunk_id"] for c in chunks],
+            "quote_mismatch_count": 0,
+            "unknown_chunk_id_count": 0,
+        }
+
     monkeypatch.setattr(orchestrator, "_extract_claims_from_chunk_llm", _ok_extract)
+    monkeypatch.setattr(orchestrator, "_extract_claims_from_chunks_batch_llm", _batch_always_fail)
 
     doc = _make_doc(n_chunks=3)
     result = orchestrator._default_claim_extractor(

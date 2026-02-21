@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import logging
 import re
+import threading
 from typing import Any, TypeVar
 
 from pydantic import BaseModel, ValidationError
@@ -16,6 +17,20 @@ _T = TypeVar("_T", bound=BaseModel)
 
 
 _JSON_BLOCK_RE = re.compile(r"```json\s*(?P<body>.*?)\s*```", re.DOTALL | re.IGNORECASE)
+
+# ── Global LLM concurrency limiter (Phase 3) ──
+_LLM_SEMAPHORE: threading.Semaphore | None = None
+_LLM_SEMAPHORE_LOCK = threading.Lock()
+
+
+def _get_semaphore() -> threading.Semaphore:
+    """Lazy-init global LLM concurrency semaphore (thread-safe)."""
+    global _LLM_SEMAPHORE
+    if _LLM_SEMAPHORE is None:
+        with _LLM_SEMAPHORE_LOCK:
+            if _LLM_SEMAPHORE is None:
+                _LLM_SEMAPHORE = threading.Semaphore(settings.llm_global_max_concurrent)
+    return _LLM_SEMAPHORE
 
 
 def _extract_json(text: str) -> dict:
@@ -68,6 +83,9 @@ def call_text(system: str, user: str, *, use_retry: bool = True) -> str:
     """
     Call LLM and return raw text response.
 
+    Acquires the global concurrency semaphore before invoking the LLM,
+    ensuring total in-flight LLM calls never exceed llm_global_max_concurrent.
+
     Args:
         system: System prompt
         user: User prompt
@@ -76,10 +94,15 @@ def call_text(system: str, user: str, *, use_retry: bool = True) -> str:
     Returns:
         Raw text response from LLM
     """
-    if use_retry:
-        return _call_text_with_retry(system, user)
-    resp = llm().invoke([("system", system), ("user", user)])
-    return str(resp.content or "")
+    sem = _get_semaphore()
+    sem.acquire()
+    try:
+        if use_retry:
+            return _call_text_with_retry(system, user)
+        resp = llm().invoke([("system", system), ("user", user)])
+        return str(resp.content or "")
+    finally:
+        sem.release()
 
 
 def call_json(system: str, user: str, *, use_retry: bool = True) -> dict:

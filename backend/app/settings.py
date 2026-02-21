@@ -110,6 +110,38 @@ class Settings(BaseSettings):
         validation_alias=AliasChoices("NEO4J_CONNECTION_TIMEOUT_SECONDS"),
     )
 
+    # ── Parallel processing controls ──
+
+    phase1_chunk_claim_max_workers: int = Field(
+        default=4, ge=1, le=8,
+        validation_alias=AliasChoices("PHASE1_CHUNK_CLAIM_MAX_WORKERS"),
+    )
+
+    phase1_grounding_max_workers: int = Field(
+        default=2, ge=1, le=6,
+        validation_alias=AliasChoices("PHASE1_GROUNDING_MAX_WORKERS"),
+    )
+
+    phase2_conflict_max_workers: int = Field(
+        default=3, ge=1, le=6,
+        validation_alias=AliasChoices("PHASE2_CONFLICT_MAX_WORKERS"),
+    )
+
+    ingest_pre_llm_max_workers: int = Field(
+        default=4, ge=1, le=8,
+        validation_alias=AliasChoices("INGEST_PRE_LLM_MAX_WORKERS"),
+    )
+
+    faiss_embed_max_workers: int = Field(
+        default=3, ge=1, le=6,
+        validation_alias=AliasChoices("FAISS_EMBED_MAX_WORKERS"),
+    )
+
+    llm_global_max_concurrent: int = Field(
+        default=16, ge=1, le=32,
+        validation_alias=AliasChoices("LLM_GLOBAL_MAX_CONCURRENT"),
+    )
+
     data_root: str = ".."
     storage_dir: str = "storage"
 
