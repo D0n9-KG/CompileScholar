@@ -1,12 +1,18 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
-from typing import Any
+from typing import Any, TypeVar
 
+from pydantic import BaseModel, ValidationError
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from app.settings import settings
+
+logger = logging.getLogger(__name__)
+
+_T = TypeVar("_T", bound=BaseModel)
 
 
 _JSON_BLOCK_RE = re.compile(r"```json\s*(?P<body>.*?)\s*```", re.DOTALL | re.IGNORECASE)
@@ -93,4 +99,63 @@ def call_json(system: str, user: str, *, use_retry: bool = True) -> dict:
     """
     raw = call_text(system, user, use_retry=use_retry)
     return _extract_json(raw)
+
+
+def call_validated_json(
+    system: str,
+    user: str,
+    model_class: type[_T],
+    *,
+    max_retries: int = 1,
+    use_retry: bool = True,
+) -> _T:
+    """
+    Call LLM, parse JSON, and validate against a Pydantic model.
+
+    On validation failure, retries once with the error message appended
+    to the system prompt to guide the LLM toward correct output.
+
+    Args:
+        system: System prompt
+        user: User prompt
+        model_class: Pydantic BaseModel subclass to validate against
+        max_retries: Number of validation retries (default: 1)
+        use_retry: Whether to use LLM-level retry logic
+
+    Returns:
+        Validated Pydantic model instance
+
+    Raises:
+        ValidationError: If validation fails after all retries
+    """
+    last_error: ValidationError | None = None
+    for attempt in range(1 + max_retries):
+        try:
+            if attempt == 0:
+                raw_dict = call_json(system, user, use_retry=use_retry)
+            else:
+                # Append validation error to system prompt for correction
+                error_hint = (
+                    f"\n\n[VALIDATION ERROR from previous attempt — please fix]\n"
+                    f"{last_error}\n"
+                    f"Return corrected JSON."
+                )
+                raw_dict = call_json(system + error_hint, user, use_retry=use_retry)
+            return model_class.model_validate(raw_dict)
+        except ValidationError as exc:
+            last_error = exc
+            logger.warning(
+                "LLM output validation failed (attempt %d/%d, model=%s): %s",
+                attempt + 1, 1 + max_retries, model_class.__name__, exc,
+            )
+        except Exception as exc:
+            # JSON parse failure etc. — wrap as validation error context
+            logger.warning(
+                "LLM call/parse failed (attempt %d/%d): %s",
+                attempt + 1, 1 + max_retries, exc,
+            )
+            if attempt >= max_retries:
+                raise
+    # All retries exhausted — raise last validation error
+    raise last_error  # type: ignore[misc]
 

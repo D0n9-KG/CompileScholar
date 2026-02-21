@@ -39,7 +39,7 @@ def judge_claim_support_batch(
     if not claims:
         return []
 
-    from app.llm.client import call_json
+    from app.llm.client import call_json, call_validated_json
 
     rules = dict(schema.get("rules") or {})
     prompts = dict(schema.get("prompts") or {})
@@ -96,7 +96,13 @@ def judge_claim_support_batch(
     else:
         user = default_user
 
-    out = call_json(system, user)
+    from app.llm.schemas import GroundingJudgeResponse
+
+    try:
+        validated = call_validated_json(system, user, GroundingJudgeResponse)
+        out = validated.model_dump()
+    except Exception:
+        out = call_json(system, user)
     rows = out.get("items") or []
     result: list[dict[str, Any]] = []
     for row in rows:

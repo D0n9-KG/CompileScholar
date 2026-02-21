@@ -62,7 +62,8 @@ class LogicClaimsChunkFilterTests(unittest.TestCase):
             "prompts": {},
         }
 
-        with patch("app.llm.logic_claims_v2.call_json", return_value={"logic": {}, "claims": []}) as mocked:
+        with patch("app.llm.logic_claims_v2.call_validated_json", side_effect=Exception("skip")), \
+             patch("app.llm.logic_claims_v2.call_json", return_value={"logic": {}, "claims": []}) as mocked:
             extract_logic_and_claims_v2(doc=doc, paper_id="doi:10.1000/papera", schema=schema)
 
         user_prompt = str(mocked.call_args[0][1])

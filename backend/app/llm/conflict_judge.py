@@ -136,6 +136,15 @@ def _judge_single_batch(
 
     # Parse and repair JSON if needed
     out = _repair_and_parse(raw)
+
+    # Validate with Pydantic (best-effort, fallback to raw dict)
+    try:
+        from app.llm.schemas import ConflictJudgeResponse
+        validated = ConflictJudgeResponse.model_validate(out)
+        out = validated.model_dump()
+    except Exception:
+        pass  # proceed with raw repaired dict
+
     rows = out.get("items") if isinstance(out, dict) else []
     if not isinstance(rows, list):
         return _mark_batch_insufficient(batch_pairs)

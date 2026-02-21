@@ -99,6 +99,7 @@ def test_layer1_extract_logic_filters_empty_summary(monkeypatch):
             "claims": [],
         }
 
+    monkeypatch.setattr("app.llm.logic_claims_v2.call_validated_json", lambda *a, **kw: (_ for _ in ()).throw(Exception("skip")))
     monkeypatch.setattr("app.llm.logic_claims_v2.call_json", _fake_call_json)
 
     out = extract_logic_and_claims_v2(

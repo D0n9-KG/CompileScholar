@@ -6,7 +6,7 @@ import re
 from typing import Any
 
 from app.ingest.models import DocumentIR
-from app.llm.client import call_json
+from app.llm.client import call_json, call_validated_json
 
 
 _WS_RE = re.compile(r"\s+")
@@ -342,7 +342,13 @@ def extract_logic_and_claims_v2(doc: DocumentIR, paper_id: str, schema: dict[str
     else:
         user = default_user
 
-    out = call_json(system, user)
+    from app.llm.schemas import LogicClaimsResponse
+
+    try:
+        validated = call_validated_json(system, user, LogicClaimsResponse)
+        out = validated.model_dump()
+    except Exception:
+        out = call_json(system, user)
     logic_in = out.get("logic") or {}
     claims_in = out.get("claims") or []
 
@@ -494,7 +500,13 @@ def add_evidence_and_targets(
                     )
                 else:
                     user = default_user
-                out = call_json(system, user)
+                from app.llm.schemas import EvidencePickResponse
+
+                try:
+                    validated_ep = call_validated_json(system, user, EvidencePickResponse)
+                    out = validated_ep.model_dump()
+                except Exception:
+                    out = call_json(system, user)
                 items = out.get("items") or []
                 if isinstance(items, list):
                     for it in items:

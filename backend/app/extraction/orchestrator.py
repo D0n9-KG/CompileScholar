@@ -688,7 +688,14 @@ def _extract_claims_from_chunk_llm(
         )
     else:
         user = default_user
-    out = call_json(system, user)
+    from app.llm.client import call_validated_json
+    from app.llm.schemas import ChunkClaimsResponse
+
+    try:
+        validated = call_validated_json(system, user, ChunkClaimsResponse)
+        out = validated.model_dump()
+    except Exception:
+        out = call_json(system, user)
     rows = out.get("claims") or []
     if not isinstance(rows, list):
         return []
