@@ -1073,11 +1073,9 @@ LIMIT 500
 
             schema = None
             try:
-                from app.schema_store import load_version
+                from app.schema_store import load_version, normalize_paper_type
 
-                pt = str(paper.get("schema_paper_type") or paper.get("paper_type") or "research").strip().lower()
-                if pt not in {"research", "review"}:
-                    pt = "research"
+                pt = normalize_paper_type(paper.get("schema_paper_type") or paper.get("paper_type"))
                 v = int(paper.get("schema_version") or 1)
                 schema = load_version(pt, v)  # type: ignore[arg-type]
             except Exception:

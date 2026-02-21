@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { apiDelete, apiGet, apiPost } from '../api'
 
-type PaperType = 'research' | 'review'
+type PaperType = 'research' | 'review' | 'software' | 'theoretical' | 'case_study'
 
 type Schema = {
   paper_type: PaperType
@@ -777,6 +777,9 @@ export default function SchemaPage() {
           >
             <option value="research">研究型(Research)</option>
             <option value="review">综述型(Review)</option>
+            <option value="software">软件型(Software)</option>
+            <option value="theoretical">理论型(Theoretical)</option>
+            <option value="case_study">案例型(Case Study)</option>
           </select>
           <button
             className="btn"

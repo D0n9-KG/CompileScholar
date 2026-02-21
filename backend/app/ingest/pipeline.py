@@ -21,7 +21,7 @@ from app.ingest.paper_meta import load_canonical_meta
 from app.ingest.parse_md import find_mineru_markdowns, parse_mineru_markdown
 from app.llm.citation_purpose import classify_citation_purposes_batch
 from app.llm.reference_recovery import recover_references_with_agent
-from app.schema_store import load_active
+from app.schema_store import load_active, normalize_paper_type
 from app.settings import settings
 from app.vector.faiss_store import build_faiss_for_chunks
 
@@ -34,19 +34,53 @@ def _safe_id(s: str) -> str:
     return re.sub(r"[^A-Za-z0-9_.-]+", "_", str(s or ""))
 
 
-def _paper_type_for_md(md_path: str) -> str:
-    try:
-        meta = load_canonical_meta(md_path)
-        paper_type = str(meta.get("paper_type") or "research").strip().lower()
-        if paper_type not in {"research", "review"}:
-            return "research"
-        return paper_type
-    except Exception:
-        return "research"
+# 同一 ingest 批次内缓存 paper_type 结果，避免重复 LLM 调用
+_paper_type_cache: dict[str, str] = {}
 
 
-def _schema_for_md(md_path: str) -> dict:
-    paper_type = _paper_type_for_md(md_path)
+def _paper_type_cache_clear() -> None:
+    """Clear the per-batch paper type cache (call at batch start)."""
+    _paper_type_cache.clear()
+
+
+def _paper_type_for_md(md_path: str, doc: DocumentIR | None = None) -> str:
+    """Detect paper type: cache > meta.json > LLM > rule-based > 'research'."""
+    cache_key = str(md_path)
+    if cache_key in _paper_type_cache:
+        return _paper_type_cache[cache_key]
+
+    meta = load_canonical_meta(md_path)
+    meta_pt = str(meta.get("paper_type") or "").strip().lower() or None
+
+    result: str | None = None
+    if doc is not None:
+        try:
+            from app.llm.paper_type_classifier import (
+                classify_paper_type,
+                extract_abstract_from_chunks,
+                extract_section_headings_from_chunks,
+            )
+            title = doc.paper.title or doc.paper.title_alt or ""
+            abstract = extract_abstract_from_chunks(doc.chunks)
+            headings = extract_section_headings_from_chunks(doc.chunks)
+            result = classify_paper_type(
+                title=title,
+                abstract=abstract,
+                section_headings=headings,
+                meta_paper_type=meta_pt,
+            )
+        except Exception:
+            logger.warning("paper_type classification failed for %s", md_path, exc_info=True)
+
+    if result is None:
+        result = normalize_paper_type(meta_pt)
+
+    _paper_type_cache[cache_key] = result
+    return result
+
+
+def _schema_for_md(md_path: str, doc: DocumentIR | None = None) -> dict:
+    paper_type = _paper_type_for_md(md_path, doc=doc)
     try:
         return load_active(paper_type)  # type: ignore[arg-type]
     except Exception:
@@ -97,6 +131,8 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
     if not md_files:
         raise FileNotFoundError("No markdown files provided")
 
+    _paper_type_cache_clear()
+
     notify("ingest:init", 0.06, "Preparing run directory")
     run_id = datetime.now(tz=timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     run_dir = Path(__file__).resolve().parents[2] / "runs" / run_id
@@ -114,7 +150,7 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
     notify("ingest:reference_recovery", 0.24, "Recovering references for papers with missing/low parsed refs")
     reference_recovery: list[dict] = []
     for idx, doc in enumerate(parsed):
-        schema_for_recovery = _schema_for_md(doc.paper.md_path)
+        schema_for_recovery = _schema_for_md(doc.paper.md_path, doc=doc)
         before_refs = len(doc.references or [])
         recovered_doc, rr = recover_references_with_agent(
             doc,
@@ -137,7 +173,7 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
     notify("ingest:citation_event_recovery", 0.30, "Recovering citation events from references when needed")
     citation_event_recovery: list[dict] = []
     for idx, doc in enumerate(parsed):
-        schema_for_recovery = _schema_for_md(doc.paper.md_path)
+        schema_for_recovery = _schema_for_md(doc.paper.md_path, doc=doc)
         recovered_doc, cer = recover_citation_events_from_references(
             doc,
             rules=schema_for_recovery.get("rules"),
@@ -161,7 +197,7 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
     for doc in parsed:
         try:
             # Read crossref_confidence_threshold from schema
-            schema_for_crossref = _schema_for_md(doc.paper.md_path)
+            schema_for_crossref = _schema_for_md(doc.paper.md_path, doc=doc)
             raw_threshold = (schema_for_crossref.get("rules") or {}).get("crossref_confidence_threshold", 0.55)
             try:
                 crossref_threshold = float(raw_threshold)
@@ -206,10 +242,7 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
 
                 client.upsert_paper_and_chunks(doc)
                 try:
-                    meta = load_canonical_meta(doc.paper.md_path)
-                    paper_type = str(meta.get("paper_type") or "research").strip().lower()
-                    if paper_type not in {"research", "review"}:
-                        paper_type = "research"
+                    paper_type = _paper_type_for_md(doc.paper.md_path, doc=doc)
                     schema = load_active(paper_type)  # type: ignore[arg-type]
                     client.update_paper_props(
                         paper_id,
@@ -266,10 +299,7 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
     def _llm_extract_one(idx: int, doc: DocumentIR, rec: dict[str, Any]) -> dict[str, Any]:
         paper_id = str(rec["paper_id"])
 
-        meta = load_canonical_meta(doc.paper.md_path)
-        paper_type = str(meta.get("paper_type") or "research").strip().lower()
-        if paper_type not in {"research", "review"}:
-            paper_type = "research"
+        paper_type = _paper_type_for_md(doc.paper.md_path, doc=doc)
         schema = load_active(paper_type)  # type: ignore[arg-type]
         phase1_artifacts_dir = run_dir / "raw_pool" / _safe_id(paper_id)
         phase1 = run_phase1_extraction(

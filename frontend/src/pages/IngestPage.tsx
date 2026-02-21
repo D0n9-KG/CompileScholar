@@ -807,6 +807,9 @@ export default function IngestPage() {
                         >
                           <option value="research">研究型(Research)</option>
                           <option value="review">综述型(Review)</option>
+                          <option value="software">软件型(Software)</option>
+                          <option value="theoretical">理论型(Theoretical)</option>
+                          <option value="case_study">案例型(Case Study)</option>
                         </select>
                       </div>
                       <div className="row" style={{ marginTop: 10 }}>
@@ -851,6 +854,9 @@ export default function IngestPage() {
                         >
                           <option value="research">研究型(Research)</option>
                           <option value="review">综述型(Review)</option>
+                          <option value="software">软件型(Software)</option>
+                          <option value="theoretical">理论型(Theoretical)</option>
+                          <option value="case_study">案例型(Case Study)</option>
                         </select>
                       </div>
                       <div className="row" style={{ marginTop: 10 }}>

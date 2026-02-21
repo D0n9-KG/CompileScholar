@@ -257,7 +257,7 @@ def upload_set_doi(req: UploadSetDoiRequest):
 class UploadSetPaperTypeRequest(BaseModel):
     upload_id: str
     unit_id: str
-    paper_type: str = Field(pattern="^(research|review)$")
+    paper_type: str = Field(pattern="^(research|review|software|theoretical|case_study)$")
 
 
 @router.post("/upload/set_paper_type")

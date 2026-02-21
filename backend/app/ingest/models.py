@@ -47,6 +47,7 @@ class PaperDraft:
     authors: list[str]
     doi: str | None
     year: int | None
+    paper_type: str | None = None
 
 
 @dataclass(frozen=True)

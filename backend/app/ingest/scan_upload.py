@@ -10,6 +10,7 @@ from typing import Any
 from app.crossref.client import CrossrefClient
 from app.graph.neo4j_client import Neo4jClient
 from app.ingest.parse_md import parse_mineru_markdown
+from app.schema_store import normalize_paper_type
 from app.ingest.upload_store import (
     assembled_root,
     extracted_root,
@@ -75,9 +76,7 @@ def scan_upload(upload_id: str) -> dict[str, Any]:
 
         unit_id = safe_relpath(md_rel)
         doi_override = overrides.get(unit_id)
-        paper_type = (paper_type_overrides.get(unit_id) or "research").strip().lower()
-        if paper_type not in {"research", "review"}:
-            paper_type = "research"
+        paper_type = normalize_paper_type(paper_type_overrides.get(unit_id))
         try:
             doc = parse_mineru_markdown(str(md_path))
         except Exception as exc:  # noqa: BLE001

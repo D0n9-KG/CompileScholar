@@ -12,6 +12,7 @@ from app.graph.neo4j_client import paper_id_for_md_path
 from app.ingest.pipeline import ingest_markdowns
 from app.ingest.rebuild import replace_paper_from_md_path
 from app.ingest.scan_upload import scan_upload
+from app.schema_store import normalize_paper_type, _PAPER_TYPE_SET
 from app.ingest.upload_store import (
     assembled_root,
     extracted_root,
@@ -99,9 +100,7 @@ def copy_unit_to_canonical(upload_id: str, unit: dict[str, Any], replace: bool =
     can_md.write_text(raw, encoding="utf-8")
 
     # Write canonical meta.json (used to preserve paper_type and provenance across rebuilds).
-    paper_type = str(unit.get("paper_type") or "research").strip().lower()
-    if paper_type not in {"research", "review"}:
-        paper_type = "research"
+    paper_type = normalize_paper_type(unit.get("paper_type"))
     meta = {
         "doi": doi,
         "paper_type": paper_type,
@@ -149,7 +148,7 @@ def set_doi_override(upload_id: str, unit_id: str, doi: str) -> dict[str, Any]:
 
 def set_paper_type_override(upload_id: str, unit_id: str, paper_type: str) -> dict[str, Any]:
     pt = str(paper_type or "").strip().lower()
-    if pt not in {"research", "review"}:
+    if pt not in _PAPER_TYPE_SET:
         raise ValueError(f"Invalid paper_type: {paper_type!r}")
     paper_type_overrides_set(upload_id, unit_id, pt)
     return scan_upload(upload_id)

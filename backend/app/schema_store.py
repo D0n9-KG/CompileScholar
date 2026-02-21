@@ -4,12 +4,36 @@ import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from app.settings import settings
 
 
-PaperType = Literal["research", "review"]
+PaperType = Literal["research", "review", "software", "theoretical", "case_study"]
+PAPER_TYPES: tuple[str, ...] = ("research", "review", "software", "theoretical", "case_study")
+_PAPER_TYPE_SET: frozenset[str] = frozenset(PAPER_TYPES)
+
+# 每种论文类型的默认 critical steps（用于 schema 预填充和 _base_rule_patch 查表）
+DEFAULT_CRITICAL_STEPS: dict[str, tuple[str, ...]] = {
+    "research": ("Problem", "Method", "Experiment", "Result", "Conclusion"),
+    "review": ("Scope", "Taxonomy", "Comparison", "Gap", "Conclusion"),
+    "software": ("Problem", "Method", "Result", "Conclusion"),
+    "theoretical": ("Problem", "Method", "Result", "Conclusion"),
+    "case_study": ("Background", "Problem", "Method", "Result", "Conclusion"),
+}
+
+
+def coerce_paper_type(value: Any) -> PaperType | None:
+    """尝试将任意值转为合法 PaperType，失败返回 None。"""
+    raw = str(value or "").strip().lower()
+    if raw in _PAPER_TYPE_SET:
+        return cast(PaperType, raw)
+    return None
+
+
+def normalize_paper_type(value: Any, *, default: PaperType = "research") -> PaperType:
+    """将任意值转为合法 PaperType，无效时返回 default。"""
+    return coerce_paper_type(value) or default
 
 _ID_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_-]{0,47}$")
 _PROMPT_KEY_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_-]{0,63}$")
@@ -62,16 +86,7 @@ def _write_json(path: Path, obj: Any) -> None:
 
 def _default_schema(paper_type: PaperType) -> dict[str, Any]:
     # NOTE: IDs are stable ASCII slugs. Labels are editable.
-    if paper_type == "research":
-        steps = [
-            {"id": "Background", "label_zh": "背景", "label_en": "Background", "enabled": True, "order": 0},
-            {"id": "Problem", "label_zh": "问题", "label_en": "Problem", "enabled": True, "order": 1},
-            {"id": "Method", "label_zh": "方法", "label_en": "Method", "enabled": True, "order": 2},
-            {"id": "Experiment", "label_zh": "实验", "label_en": "Experiment", "enabled": True, "order": 3},
-            {"id": "Result", "label_zh": "结果", "label_en": "Result", "enabled": True, "order": 4},
-            {"id": "Conclusion", "label_zh": "结论", "label_en": "Conclusion", "enabled": True, "order": 5},
-        ]
-    else:
+    if paper_type == "review":
         # Review papers: default to a "review-ish" chain but keep it editable.
         steps = [
             {"id": "Background", "label_zh": "背景", "label_en": "Background", "enabled": True, "order": 0},
@@ -80,6 +95,16 @@ def _default_schema(paper_type: PaperType) -> dict[str, Any]:
             {"id": "Comparison", "label_zh": "对比/综述", "label_en": "Comparison", "enabled": True, "order": 3},
             {"id": "Gap", "label_zh": "研究缺口", "label_en": "Gap", "enabled": True, "order": 4},
             {"id": "Conclusion", "label_zh": "总结与展望", "label_en": "Conclusion", "enabled": True, "order": 5},
+        ]
+    else:
+        # research / software / theoretical / case_study 共享 research steps
+        steps = [
+            {"id": "Background", "label_zh": "背景", "label_en": "Background", "enabled": True, "order": 0},
+            {"id": "Problem", "label_zh": "问题", "label_en": "Problem", "enabled": True, "order": 1},
+            {"id": "Method", "label_zh": "方法", "label_en": "Method", "enabled": True, "order": 2},
+            {"id": "Experiment", "label_zh": "实验", "label_en": "Experiment", "enabled": True, "order": 3},
+            {"id": "Result", "label_zh": "结果", "label_en": "Result", "enabled": True, "order": 4},
+            {"id": "Conclusion", "label_zh": "结论", "label_en": "Conclusion", "enabled": True, "order": 5},
         ]
 
     claim_kinds = [
@@ -142,7 +167,7 @@ def _default_schema(paper_type: PaperType) -> dict[str, Any]:
             "phase1_grounding_insufficient_score": 0.18,
             "phase1_grounding_unsupported_score": 0.22,
             "phase1_grounding_empty_score": 0.0,
-            "phase2_critical_steps": [],
+            "phase2_critical_steps": list(DEFAULT_CRITICAL_STEPS.get(paper_type, DEFAULT_CRITICAL_STEPS["research"])),
             "phase2_critical_kinds": [],
             "phase2_critical_step_kind_map": {},
             "phase2_auto_step_kind_map_enabled": True,
@@ -208,8 +233,8 @@ def validate_schema(schema: dict[str, Any]) -> None:
     if not isinstance(schema, dict):
         raise ValueError("schema must be an object")
     paper_type = schema.get("paper_type")
-    if paper_type not in {"research", "review"}:
-        raise ValueError("paper_type must be 'research' or 'review'")
+    if paper_type not in _PAPER_TYPE_SET:
+        raise ValueError(f"paper_type must be one of: {', '.join(PAPER_TYPES)}")
     if not isinstance(schema.get("steps"), list) or not schema["steps"]:
         raise ValueError("steps must be a non-empty list")
     if not isinstance(schema.get("claim_kinds"), list) or not schema["claim_kinds"]:
@@ -630,8 +655,8 @@ def validate_schema(schema: dict[str, Any]) -> None:
 
 
 def ensure_defaults() -> None:
-    for pt in ("research", "review"):
-        paper_type = pt  # type: ignore[assignment]
+    for pt in PAPER_TYPES:
+        paper_type: PaperType = pt  # type: ignore[assignment]
         d = _paper_type_dir(paper_type)
         if not _active_path(paper_type).exists():
             s = _default_schema(paper_type)

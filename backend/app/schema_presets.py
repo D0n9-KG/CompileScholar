@@ -161,12 +161,10 @@ def _union_from_step_kind_map(step_kind_map: dict[str, list[str]]) -> list[str]:
     return out
 
 
-def _base_rule_patch(step_ids: list[str], kind_ids: list[str]) -> dict[str, Any]:
-    review_like = "Scope" in step_ids and "Taxonomy" in step_ids and "Comparison" in step_ids
-    if review_like:
-        preferred_steps = ["Scope", "Taxonomy", "Comparison", "Gap", "Conclusion"]
-    else:
-        preferred_steps = ["Problem", "Method", "Experiment", "Result", "Conclusion"]
+def _base_rule_patch(step_ids: list[str], kind_ids: list[str], paper_type: str = "research") -> dict[str, Any]:
+    from app.schema_store import DEFAULT_CRITICAL_STEPS
+    # 从注册表查表获取 preferred critical steps，不再用 review_like 启发式
+    preferred_steps = list(DEFAULT_CRITICAL_STEPS.get(paper_type, DEFAULT_CRITICAL_STEPS["research"]))
     critical_steps = _pick_priority(step_ids, preferred_steps, fallback_count=3)
     critical_step_kind_map = _build_critical_step_kind_map(
         critical_steps=critical_steps,
@@ -219,8 +217,8 @@ def _base_rule_patch(step_ids: list[str], kind_ids: list[str]) -> dict[str, Any]
     }
 
 
-def _rules_high_precision(step_ids: list[str], kind_ids: list[str]) -> dict[str, Any]:
-    patch = _base_rule_patch(step_ids, kind_ids)
+def _rules_high_precision(step_ids: list[str], kind_ids: list[str], paper_type: str = "research") -> dict[str, Any]:
+    patch = _base_rule_patch(step_ids, kind_ids, paper_type=paper_type)
     patch.update(
         {
             "claims_per_paper_min": 14,
@@ -293,8 +291,8 @@ def _rules_high_precision(step_ids: list[str], kind_ids: list[str]) -> dict[str,
     return patch
 
 
-def _rules_balanced(step_ids: list[str], kind_ids: list[str]) -> dict[str, Any]:
-    patch = _base_rule_patch(step_ids, kind_ids)
+def _rules_balanced(step_ids: list[str], kind_ids: list[str], paper_type: str = "research") -> dict[str, Any]:
+    patch = _base_rule_patch(step_ids, kind_ids, paper_type=paper_type)
     patch.update(
         {
             "claims_per_paper_min": 22,
@@ -371,8 +369,8 @@ def _rules_balanced(step_ids: list[str], kind_ids: list[str]) -> dict[str, Any]:
     return patch
 
 
-def _rules_high_recall(step_ids: list[str], kind_ids: list[str]) -> dict[str, Any]:
-    patch = _base_rule_patch(step_ids, kind_ids)
+def _rules_high_recall(step_ids: list[str], kind_ids: list[str], paper_type: str = "research") -> dict[str, Any]:
+    patch = _base_rule_patch(step_ids, kind_ids, paper_type=paper_type)
     patch.update(
         {
             "claims_per_paper_min": 36,
@@ -926,12 +924,12 @@ def _prompts_for(preset_id: PresetId) -> dict[str, str]:
     return _prompts_balanced()
 
 
-def _rules_for(preset_id: PresetId, *, step_ids: list[str], kind_ids: list[str]) -> dict[str, Any]:
+def _rules_for(preset_id: PresetId, *, step_ids: list[str], kind_ids: list[str], paper_type: str = "research") -> dict[str, Any]:
     if preset_id == "high_precision":
-        return _rules_high_precision(step_ids, kind_ids)
+        return _rules_high_precision(step_ids, kind_ids, paper_type=paper_type)
     if preset_id == "high_recall":
-        return _rules_high_recall(step_ids, kind_ids)
-    return _rules_balanced(step_ids, kind_ids)
+        return _rules_high_recall(step_ids, kind_ids, paper_type=paper_type)
+    return _rules_balanced(step_ids, kind_ids, paper_type=paper_type)
 
 
 def list_schema_presets() -> list[dict[str, Any]]:
@@ -972,9 +970,10 @@ def apply_schema_preset(schema: dict[str, Any], *, preset_id: PresetId) -> dict[
     out = copy.deepcopy(schema)
     step_ids = _enabled_step_ids(out)
     kind_ids = _enabled_kind_ids(out)
+    paper_type = str(out.get("paper_type") or "research").strip().lower()
 
     rules = dict(out.get("rules") or {})
-    rules.update(_rules_for(preset_id, step_ids=step_ids, kind_ids=kind_ids))
+    rules.update(_rules_for(preset_id, step_ids=step_ids, kind_ids=kind_ids, paper_type=paper_type))
     rules["phase2_critical_steps"] = _filter_known(list(rules.get("phase2_critical_steps") or []), step_ids)
     rules["phase2_critical_kinds"] = _filter_known(list(rules.get("phase2_critical_kinds") or []), kind_ids)
     raw_map = rules.get("phase2_critical_step_kind_map") or {}

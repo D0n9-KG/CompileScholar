@@ -12,7 +12,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 from app.graph.neo4j_client import Neo4jClient
-from app.schema_store import load_active, load_version
+from app.schema_store import load_active, load_version, normalize_paper_type
 from app.settings import settings
 from app.tasks.manager import task_manager
 from app.tasks.models import TaskType
@@ -63,9 +63,7 @@ def _append_log(paper: dict, line: str) -> dict:
 
 
 def _load_schema_for_paper(paper: dict) -> dict[str, Any]:
-    pt = str(paper.get("schema_paper_type") or paper.get("paper_type") or "research").strip().lower()
-    if pt not in {"research", "review"}:
-        pt = "research"
+    pt = normalize_paper_type(paper.get("schema_paper_type") or paper.get("paper_type"))
     try:
         v = int(paper.get("schema_version") or 1)
         return load_version(pt, v)  # type: ignore[arg-type]

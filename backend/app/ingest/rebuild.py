@@ -18,7 +18,7 @@ from app.ingest.models import Chunk, MdSpan
 from app.ingest.parse_md import parse_mineru_markdown
 from app.llm.citation_purpose import classify_citation_purposes_batch
 from app.llm.reference_recovery import recover_references_with_agent
-from app.schema_store import load_active
+from app.schema_store import load_active, normalize_paper_type
 from app.settings import settings
 from app.vector.faiss_store import build_faiss_for_chunks
 
@@ -44,10 +44,7 @@ def _safe_id(s: str) -> str:
 def _paper_type_for_md(md_path: str) -> str:
     try:
         meta = load_canonical_meta(md_path)
-        paper_type = str(meta.get("paper_type") or "research").strip().lower()
-        if paper_type not in {"research", "review"}:
-            return "research"
-        return paper_type
+        return normalize_paper_type(meta.get("paper_type"))
     except Exception:
         return "research"
 
@@ -118,9 +115,7 @@ def rebuild_paper(
     # Read crossref_confidence_threshold from schema
     try:
         meta = load_canonical_meta(doc.paper.md_path)
-        paper_type = str(meta.get("paper_type") or "research").strip().lower()
-        if paper_type not in {"research", "review"}:
-            paper_type = "research"
+        paper_type = normalize_paper_type(meta.get("paper_type"))
         schema_for_crossref = load_active(paper_type)  # type: ignore[arg-type]
         raw_threshold = (schema_for_crossref.get("rules") or {}).get("crossref_confidence_threshold", 0.55)
         try:
@@ -149,9 +144,7 @@ def rebuild_paper(
         client.upsert_paper_and_chunks(doc)
         try:
             meta = load_canonical_meta(doc.paper.md_path)
-            paper_type = str(meta.get("paper_type") or "research").strip().lower()
-            if paper_type not in {"research", "review"}:
-                paper_type = "research"
+            paper_type = normalize_paper_type(meta.get("paper_type"))
             schema = load_active(paper_type)  # type: ignore[arg-type]
             client.update_paper_props(
                 paper_id,
@@ -448,9 +441,7 @@ def replace_paper_from_md_path(
         client.upsert_paper_and_chunks(doc)
         try:
             meta = load_canonical_meta(doc.paper.md_path)
-            paper_type = str(meta.get("paper_type") or "research").strip().lower()
-            if paper_type not in {"research", "review"}:
-                paper_type = "research"
+            paper_type = normalize_paper_type(meta.get("paper_type"))
             schema = load_active(paper_type)  # type: ignore[arg-type]
             client.update_paper_props(
                 paper_id,
