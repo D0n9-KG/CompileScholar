@@ -802,6 +802,48 @@ def _default_claim_extractor(
     }
 
 
+def _observe_semantic_duplicates(
+    claims: list[dict[str, Any]],
+    *,
+    rules: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """Observation-only: find claim pairs with high embedding similarity. Does NOT merge."""
+    threshold = _rule_float(rules, "phase1_dedup_similarity_threshold", 0.92)
+    max_claims = _rule_int(rules, "phase1_dedup_max_claims", 200)
+    if len(claims) < 2 or len(claims) > max_claims:
+        return []
+    texts = [str(c.get("text") or "") for c in claims]
+    try:
+        from app.similarity.embedding import get_embeddings_batch
+        embeddings = get_embeddings_batch(texts)
+    except Exception:
+        logger.debug("Semantic dedup observation skipped: embedding unavailable", exc_info=True)
+        return []
+    if len(embeddings) != len(texts):
+        return []
+    # Pairwise cosine similarity (brute force, small N)
+    import math
+    def _cosine(a: list[float], b: list[float]) -> float:
+        dot = sum(x * y for x, y in zip(a, b))
+        na = math.sqrt(sum(x * x for x in a)) or 1e-9
+        nb = math.sqrt(sum(x * x for x in b)) or 1e-9
+        return dot / (na * nb)
+
+    pairs: list[dict[str, Any]] = []
+    for i in range(len(claims)):
+        for j in range(i + 1, len(claims)):
+            sim = _cosine(embeddings[i], embeddings[j])
+            if sim >= threshold:
+                pairs.append({
+                    "claim_a_id": str(claims[i].get("canonical_claim_id") or claims[i].get("claim_id") or ""),
+                    "claim_b_id": str(claims[j].get("canonical_claim_id") or claims[j].get("claim_id") or ""),
+                    "text_a": texts[i][:200],
+                    "text_b": texts[j][:200],
+                    "similarity": round(sim, 4),
+                })
+    return pairs
+
+
 def _merge_claim_candidates(
     *,
     claims: list[dict[str, Any]],
@@ -2195,6 +2237,17 @@ def run_phase1_extraction(
     )
     _json_dump(artifacts / "claims_merged.json", {"claims": claims_merged})
 
+    # P1-12: Semantic dedup observation (log only, no merging)
+    dedup_log: list[dict[str, Any]] = []
+    if _rule_bool(rules, "phase1_dedup_observation_enabled", False):
+        try:
+            dedup_log = _observe_semantic_duplicates(claims_merged, rules=rules)
+            if dedup_log:
+                _json_dump(artifacts / "dedup_observation.json", {"pairs": dedup_log, "count": len(dedup_log)})
+                logger.info("Semantic dedup observation: %d potential duplicate pairs found", len(dedup_log))
+        except Exception:
+            logger.debug("Semantic dedup observation failed", exc_info=True)
+
     judge_fn = grounding_judge or _default_grounding_judge
     judgments = judge_fn(claims=claims_merged, chunk_by_id=chunk_by_id, schema=schema)
     _json_dump(artifacts / "grounding_judgment.json", {"judgments": judgments})
@@ -2283,6 +2336,13 @@ def run_phase1_extraction(
     # Add noise filter stats to quality report
     if noise_filter_stats:
         report["noise_filter"] = noise_filter_stats
+
+    # P1-12: Add dedup observation stats
+    if dedup_log:
+        report["dedup_observation"] = {
+            "potential_duplicate_pairs": len(dedup_log),
+            "threshold": _rule_float(rules, "phase1_dedup_similarity_threshold", 0.92),
+        }
 
     # Add chunk extraction stats (fail rate observability)
     if chunk_extraction_stats:
