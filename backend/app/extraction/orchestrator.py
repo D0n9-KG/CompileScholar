@@ -1934,6 +1934,7 @@ def _quality_report(
         "grounding_lexical_judged": grounding_lexical_judged,
         "grounding_semantic_coverage_rate": grounding_semantic_coverage_rate,
         "grounding_fallback_count": grounding_fallback_count,
+        "grounding_fallback_warning": grounding_fallback_count > 0,
         "critical_slot_mode": completeness.get("critical_slot_mode"),
         "critical_steps": list(completeness.get("critical_steps") or []),
         "critical_kinds": list(completeness.get("critical_kinds") or []),
