@@ -433,7 +433,7 @@ def _bind_logic_step_evidence_llm(*, doc: DocumentIR, schema: dict[str, Any], lo
 def _default_logic_extractor(*, doc: DocumentIR, paper_id: str, schema: dict[str, Any]) -> dict[str, Any]:
     from app.llm.logic_claims_v2 import add_logic_step_evidence, extract_logic_and_claims_v2
 
-    out = extract_logic_and_claims_v2(doc=doc, paper_id=paper_id, schema=schema)
+    out = extract_logic_and_claims_v2(doc=doc, paper_id=paper_id, schema=schema, logic_only=True)
     logic = out.get("logic") or {}
 
     # 1.5-step: check if LLM already provided evidence_chunk_ids

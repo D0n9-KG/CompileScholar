@@ -112,7 +112,7 @@ def test_layer1_extract_logic_filters_empty_summary(monkeypatch):
 
 
 def test_layer2_default_logic_extractor_final_sanitize(monkeypatch):
-    def _fake_extract(*, doc, paper_id, schema):
+    def _fake_extract(*, doc, paper_id, schema, **kwargs):
         return {
             "logic": {
                 "Background": {"summary": "", "evidence_chunk_ids": []},

@@ -284,11 +284,19 @@ def add_logic_step_evidence(doc: DocumentIR, schema: dict[str, Any], logic: dict
     return logic
 
 
-def extract_logic_and_claims_v2(doc: DocumentIR, paper_id: str, schema: dict[str, Any], max_chars: int = 18000) -> dict[str, Any]:
+def extract_logic_and_claims_v2(
+    doc: DocumentIR,
+    paper_id: str,
+    schema: dict[str, Any],
+    max_chars: int = 18000,
+    *,
+    logic_only: bool = False,
+) -> dict[str, Any]:
     """
     Schema-driven extraction:
     - logic chain: summaries for enabled steps
     - claims: 24-48 (or fewer if evidence is insufficient), each bound to exactly one step + multi-select kinds
+    When logic_only=True, skip claim extraction to save tokens (claims come from chunk-level extractor).
     """
     title = doc.paper.title or doc.paper.title_alt or doc.paper.paper_source
     authors = ", ".join(doc.paper.authors[:8]) if doc.paper.authors else ""
@@ -373,35 +381,56 @@ def extract_logic_and_claims_v2(doc: DocumentIR, paper_id: str, schema: dict[str
             "   - 2-6 complete sentences (NOT a single sentence).\n"
             "   - Include key entities, methods, assumptions/conditions, and important numbers/definitions if present.\n"
             "   - Include evidence_chunk_ids: a list of chunk IDs from the chunk catalog that directly support this summary.\n"
-            "2) claims: write concise, atomic KEY POINTS.\n"
-            "   - 1-2 complete sentences each.\n"
-            "   - Each claim must be specific and directly supported by the text.\n"
-            "   - Avoid duplicating the logic summaries verbatim.\n"
-            "\n"
-            "SCHEMA RULES:\n"
-            "- Each claim MUST belong to exactly ONE step_type (from the allowed list).\n"
-            "- Each claim MUST have claim_kinds as a LIST (multi-select) chosen from allowed kinds (prefer 1-3 kinds).\n"
-            "- Confidence values must be in [0,1].\n"
+            + (
+                "2) claims: write concise, atomic KEY POINTS.\n"
+                "   - 1-2 complete sentences each.\n"
+                "   - Each claim must be specific and directly supported by the text.\n"
+                "   - Avoid duplicating the logic summaries verbatim.\n"
+                "\n"
+                "SCHEMA RULES:\n"
+                "- Each claim MUST belong to exactly ONE step_type (from the allowed list).\n"
+                "- Each claim MUST have claim_kinds as a LIST (multi-select) chosen from allowed kinds (prefer 1-3 kinds).\n"
+                "- Confidence values must be in [0,1].\n"
+                if not logic_only else
+                "\nOutput logic steps ONLY. Do NOT output claims.\n"
+                "- Confidence values must be in [0,1].\n"
+            )
         )
-        default_user = (
-            f"Paper metadata:\nTitle: {title}\nAuthors: {authors}\nYear: {year}\nDOI: {doi}\n\n"
-            f"Allowed step types: {step_ids}\n"
-            f"Allowed claim kinds: {kind_ids}\n"
-            f"Target number of claims: {claim_min}-{claim_max}\n\n"
-            "Paper text (extracted from Markdown):\n"
-            f"{seg_body}\n\n"
-            "Chunk catalog (use chunk_id values for evidence_chunk_ids):\n"
-            f"{seg_catalog_lines}\n\n"
-            "Output JSON schema (STRICT):\n"
-            "{\n"
-            '  "logic": {\n'
-            '    "<StepType>": {"summary": "2-6 full sentences...", "confidence": 0.0, "evidence_chunk_ids": ["c1", "c2"]}\n'
-            "  },\n"
-            '  "claims": [\n'
-            '    {"text":"1-2 full sentences...","confidence":0.0,"step_type":"<StepType>","claim_kinds":["KindA","KindB"]}\n'
-            "  ]\n"
-            "}\n"
-        )
+        if logic_only:
+            default_user = (
+                f"Paper metadata:\nTitle: {title}\nAuthors: {authors}\nYear: {year}\nDOI: {doi}\n\n"
+                f"Allowed step types: {step_ids}\n\n"
+                "Paper text (extracted from Markdown):\n"
+                f"{seg_body}\n\n"
+                "Chunk catalog (use chunk_id values for evidence_chunk_ids):\n"
+                f"{seg_catalog_lines}\n\n"
+                "Output JSON schema (STRICT):\n"
+                "{\n"
+                '  "logic": {\n'
+                '    "<StepType>": {"summary": "2-6 full sentences...", "confidence": 0.0, "evidence_chunk_ids": ["c1", "c2"]}\n'
+                "  }\n"
+                "}\n"
+            )
+        else:
+            default_user = (
+                f"Paper metadata:\nTitle: {title}\nAuthors: {authors}\nYear: {year}\nDOI: {doi}\n\n"
+                f"Allowed step types: {step_ids}\n"
+                f"Allowed claim kinds: {kind_ids}\n"
+                f"Target number of claims: {claim_min}-{claim_max}\n\n"
+                "Paper text (extracted from Markdown):\n"
+                f"{seg_body}\n\n"
+                "Chunk catalog (use chunk_id values for evidence_chunk_ids):\n"
+                f"{seg_catalog_lines}\n\n"
+                "Output JSON schema (STRICT):\n"
+                "{\n"
+                '  "logic": {\n'
+                '    "<StepType>": {"summary": "2-6 full sentences...", "confidence": 0.0, "evidence_chunk_ids": ["c1", "c2"]}\n'
+                "  },\n"
+                '  "claims": [\n'
+                '    {"text":"1-2 full sentences...","confidence":0.0,"step_type":"<StepType>","claim_kinds":["KindA","KindB"]}\n'
+                "  ]\n"
+                "}\n"
+            )
 
         prompts = schema.get("prompts") or {}
         system = str(prompts.get("logic_claims_system") or "").strip() or default_system
@@ -454,34 +483,35 @@ def extract_logic_and_claims_v2(doc: DocumentIR, paper_id: str, schema: dict[str
             }
 
         seg_claims: list[dict[str, Any]] = []
-        for c in claims_in:
-            if not isinstance(c, dict):
-                continue
-            text = str(c.get("text") or "").strip()
-            if not text:
-                continue
-            step_type = str(c.get("step_type") or "").strip()
-            if step_type not in allowed_steps:
-                continue
-            kinds_raw = c.get("claim_kinds")
-            kinds: list[str] = []
-            if isinstance(kinds_raw, list):
-                for k in kinds_raw:
-                    kk = str(k or "").strip()
-                    if kk and kk in allowed_kinds and kk not in kinds:
-                        kinds.append(kk)
-            conf = float(c.get("confidence") or 0.5)
-            key = _claim_key_for(doi, text) if doi else hashlib.sha256((paper_id + "\0" + text).encode("utf-8", errors="ignore")).hexdigest()[:24]
-            seg_claims.append(
-                {
-                    "claim_key": key,
-                    "claim_id": _claim_id_for(paper_id, key),
-                    "text": text,
-                    "confidence": conf,
-                    "step_type": step_type,
-                    "kinds": kinds,
-                }
-            )
+        if not logic_only:
+            for c in claims_in:
+                if not isinstance(c, dict):
+                    continue
+                text = str(c.get("text") or "").strip()
+                if not text:
+                    continue
+                step_type = str(c.get("step_type") or "").strip()
+                if step_type not in allowed_steps:
+                    continue
+                kinds_raw = c.get("claim_kinds")
+                kinds: list[str] = []
+                if isinstance(kinds_raw, list):
+                    for k in kinds_raw:
+                        kk = str(k or "").strip()
+                        if kk and kk in allowed_kinds and kk not in kinds:
+                            kinds.append(kk)
+                conf = float(c.get("confidence") or 0.5)
+                key = _claim_key_for(doi, text) if doi else hashlib.sha256((paper_id + "\0" + text).encode("utf-8", errors="ignore")).hexdigest()[:24]
+                seg_claims.append(
+                    {
+                        "claim_key": key,
+                        "claim_id": _claim_id_for(paper_id, key),
+                        "text": text,
+                        "confidence": conf,
+                        "step_type": step_type,
+                        "kinds": kinds,
+                    }
+                )
         return seg_logic, seg_claims
     # --- End helper ---
 
