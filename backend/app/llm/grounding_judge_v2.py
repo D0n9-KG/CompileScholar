@@ -135,19 +135,40 @@ def judge_claim_support_batch(
         weak_min = supported_min
     batch_size = _rule_int(rules, "phase1_grounding_batch_size", 20)
 
+    evidence_top_k = _rule_int(rules, "phase1_grounding_evidence_top_k", 3)
+    evidence_chunk_chars_max = _rule_int(rules, "phase1_grounding_evidence_chunk_chars_max", 2000)
+
     payload_items: list[dict[str, Any]] = []
     for claim in claims:
         claim_id = str(claim.get("canonical_claim_id") or claim.get("claim_id") or "").strip()
         if not claim_id:
             continue
-        chunk_id = str(claim.get("origin_chunk_id") or "").strip()
-        chunk_text = str(chunk_by_id.get(chunk_id) or "")
+        # Collect all origin chunk IDs (plural preferred, singular fallback)
+        chunk_ids: list[str] = []
+        for cid in claim.get("origin_chunk_ids") or []:
+            s = str(cid).strip()
+            if s and s not in chunk_ids:
+                chunk_ids.append(s)
+        if not chunk_ids:
+            s = str(claim.get("origin_chunk_id") or "").strip()
+            if s:
+                chunk_ids.append(s)
+        # Build evidence texts for top-k chunks
+        evidence_texts: list[str] = []
+        for cid in chunk_ids[:evidence_top_k]:
+            txt = str(chunk_by_id.get(cid) or "").strip()
+            if txt:
+                evidence_texts.append(txt[:evidence_chunk_chars_max])
+        # Backward-compatible: single chunk_text for single-chunk claims
+        combined_text = "\n---\n".join(evidence_texts) if evidence_texts else ""
         payload_items.append(
             {
                 "canonical_claim_id": claim_id,
                 "claim_text": str(claim.get("text") or ""),
-                "origin_chunk_id": chunk_id,
-                "chunk_text": chunk_text,
+                "origin_chunk_id": chunk_ids[0] if chunk_ids else "",
+                "origin_chunk_ids": chunk_ids[:evidence_top_k],
+                "chunk_text": combined_text,
+                "evidence_count": len(evidence_texts),
             }
         )
     if not payload_items:
@@ -156,11 +177,13 @@ def judge_claim_support_batch(
     default_system = (
         "You are a scientific grounding judge.\n"
         "Return STRICT JSON only.\n"
-        "For each claim, compare with the provided chunk text and classify support:\n"
-        "- supported: claim is directly supported.\n"
+        "For each claim, compare with the provided chunk text(s) and classify support.\n"
+        "When multiple evidence chunks are provided (separated by ---), consider ALL of them jointly.\n"
+        "Labels:\n"
+        "- supported: claim is directly supported by the evidence.\n"
         "- weak: partially supported / ambiguous.\n"
-        "- unsupported: not supported.\n"
-        "- contradicted: chunk contradicts claim.\n"
+        "- unsupported: not supported by any evidence.\n"
+        "- contradicted: evidence contradicts claim.\n"
         "Provide score in [0,1] and a short reason."
     )
     system = str(prompts.get("phase1_grounding_judge_system") or "").strip() or default_system

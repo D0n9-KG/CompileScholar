@@ -1517,6 +1517,20 @@ def _heuristic_grounding_label(claim_text: str, chunk_text: str, rules: dict[str
     return ("unsupported", score_unsupported, "low lexical overlap")
 
 
+def _collect_origin_chunk_ids(claim: dict[str, Any]) -> list[str]:
+    """Gather all origin chunk IDs from a claim (plural list preferred, singular fallback)."""
+    ids: list[str] = []
+    for cid in claim.get("origin_chunk_ids") or []:
+        s = str(cid).strip()
+        if s and s not in ids:
+            ids.append(s)
+    if not ids:
+        s = str(claim.get("origin_chunk_id") or "").strip()
+        if s:
+            ids.append(s)
+    return ids
+
+
 def _default_grounding_judge_lexical(
     *,
     claims: list[dict[str, Any]],
@@ -1528,15 +1542,23 @@ def _default_grounding_judge_lexical(
         claim_id = str(c.get("canonical_claim_id") or c.get("claim_id") or "").strip()
         if not claim_id:
             continue
-        origin_chunk_id = str(c.get("origin_chunk_id") or "").strip()
-        chunk_text = str(chunk_by_id.get(origin_chunk_id) or "")
-        lbl, score, reason = _heuristic_grounding_label(str(c.get("text") or ""), chunk_text, rules=rules)
+        chunk_ids = _collect_origin_chunk_ids(c)
+        claim_text = str(c.get("text") or "")
+        # Evaluate against ALL origin chunks, keep best score
+        best_lbl, best_score, best_reason = "unsupported", 0.0, "no origin chunk"
+        for cid in chunk_ids:
+            chunk_text = str(chunk_by_id.get(cid) or "")
+            lbl, score, reason = _heuristic_grounding_label(claim_text, chunk_text, rules=rules)
+            if score > best_score:
+                best_lbl, best_score, best_reason = lbl, score, reason
+        if not chunk_ids:
+            best_lbl, best_score, best_reason = _heuristic_grounding_label(claim_text, "", rules=rules)
         out.append(
             {
                 "canonical_claim_id": claim_id,
-                "support_label": lbl,
-                "judge_score": float(score),
-                "reason": reason,
+                "support_label": best_lbl,
+                "judge_score": float(best_score),
+                "reason": best_reason,
                 "judge_mode": "lexical",
                 "judge_fallback": False,
                 "judge_fallback_reason": "",
@@ -1553,6 +1575,9 @@ def _default_grounding_judge(
 ) -> list[dict[str, Any]]:
     rules = dict(schema.get("rules") or {})
     mode = _rule_choice(rules, "phase1_grounding_mode", ("lexical", "hybrid", "llm"), "lexical")
+    force_semantic = _rule_bool(rules, "phase1_force_semantic_grounding", False)
+    if force_semantic and mode == "hybrid":
+        mode = "llm"
     lexical_rows = _default_grounding_judge_lexical(claims=claims, chunk_by_id=chunk_by_id, rules=rules)
     if mode == "lexical":
         return lexical_rows
