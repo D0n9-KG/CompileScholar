@@ -1778,13 +1778,49 @@ def _quality_report(
     grounding_fallback_count = sum(1 for j in judgments if bool(j.get("judge_fallback")))
     grounding_semantic_coverage_rate = float(grounding_semantic_judged) / float(max(1, total))
 
-    min_supported = _rule_float(rules, "phase1_gate_supported_ratio_min", 0.5)
-    min_coverage = _rule_float(rules, "phase1_gate_step_coverage_min", 0.4)
-    min_critical = _rule_float(rules, "phase2_gate_critical_slot_coverage_min", min_coverage)
-    max_conflict = _rule_float(rules, "phase2_gate_conflict_rate_max", 1.0)
+    # Gate profile: named defaults for gate thresholds (strict/balanced/recall)
+    _GATE_PROFILES: dict[str, dict[str, Any]] = {
+        "strict": {
+            "phase1_gate_supported_ratio_min": 0.72,
+            "phase1_gate_step_coverage_min": 0.55,
+            "phase2_gate_critical_slot_coverage_min": 0.65,
+            "phase2_gate_conflict_rate_max": 0.20,
+            "phase1_gate_semantic_coverage_min": 0.3,
+            "phase2_gate_logic_steps_coverage_min": 0.90,
+        },
+        "balanced": {
+            "phase1_gate_supported_ratio_min": 0.50,
+            "phase1_gate_step_coverage_min": 0.40,
+            "phase2_gate_critical_slot_coverage_min": 0.40,
+            "phase2_gate_conflict_rate_max": 1.0,
+            "phase1_gate_semantic_coverage_min": 0.0,
+            "phase2_gate_logic_steps_coverage_min": 0.83,
+        },
+        "recall": {
+            "phase1_gate_supported_ratio_min": 0.30,
+            "phase1_gate_step_coverage_min": 0.25,
+            "phase2_gate_critical_slot_coverage_min": 0.20,
+            "phase2_gate_conflict_rate_max": 1.0,
+            "phase1_gate_semantic_coverage_min": 0.0,
+            "phase2_gate_logic_steps_coverage_min": 0.67,
+        },
+    }
+    gate_profile_name = str(rules.get("gate_profile") or "balanced").strip().lower()
+    gate_defaults = _GATE_PROFILES.get(gate_profile_name, _GATE_PROFILES["balanced"])
+
+    def _gated_float(key: str, fallback: float) -> float:
+        return _rule_float(rules, key, gate_defaults.get(key, fallback))
+
+    def _gated_bool(key: str, fallback: bool) -> bool:
+        return _rule_bool(rules, key, fallback)
+
+    min_supported = _gated_float("phase1_gate_supported_ratio_min", 0.5)
+    min_coverage = _gated_float("phase1_gate_step_coverage_min", 0.4)
+    min_critical = _gated_float("phase2_gate_critical_slot_coverage_min", min_coverage)
+    max_conflict = _gated_float("phase2_gate_conflict_rate_max", 1.0)
     min_conflict_comparable_pairs = max(0, _rule_int(rules, "phase2_conflict_gate_min_comparable_pairs", 3))
     min_conflict_pairs = max(0, _rule_int(rules, "phase2_conflict_gate_min_conflict_pairs", 1))
-    min_semantic_coverage = _rule_float(rules, "phase1_gate_semantic_coverage_min", 0.0)
+    min_semantic_coverage = _gated_float("phase1_gate_semantic_coverage_min", 0.0)
 
     critical_slot_bypass_enabled = _rule_bool(rules, "phase2_gate_critical_slot_bypass_excellent", False)
     step_bypass_min_critical_steps_with_claims = max(
@@ -1846,7 +1882,7 @@ def _quality_report(
 
     logic_steps_coverage_min = max(
         0.0,
-        min(1.0, _rule_float(rules, "phase2_gate_logic_steps_coverage_min", 0.83)),
+        min(1.0, _gated_float("phase2_gate_logic_steps_coverage_min", 0.83)),
     )
     logic_steps_guard_validated_enabled = _rule_bool(
         rules,
@@ -2019,6 +2055,7 @@ def _quality_report(
         "quality_tier_yellow_max_failures": int(tier_info.get("quality_tier_yellow_max_failures") or 1),
         "quality_tier_red_min_failures": int(tier_info.get("quality_tier_red_min_failures") or 2),
         "thresholds": {
+            "gate_profile": gate_profile_name,
             "phase1_gate_supported_ratio_min": min_supported,
             "phase1_gate_step_coverage_min": min_coverage,
             "phase2_gate_critical_slot_coverage_min": min_critical,
