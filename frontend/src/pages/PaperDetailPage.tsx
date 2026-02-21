@@ -983,6 +983,23 @@ export default function PaperDetailPage() {
           <button className="btn btnPrimary" disabled={rebuildBusy} onClick={startRebuild}>
             {rebuildBusy ? '提交中…' : '重建（异步）'}
           </button>
+          {detail && (
+            <select
+              className="btn"
+              defaultValue=""
+              onChange={(e) => {
+                const fmt = e.target.value
+                if (!fmt) return
+                e.target.value = ''
+                window.open(`${apiBaseUrl()}/papers/${encodeURIComponent(id)}/export?format=${fmt}`, '_blank')
+              }}
+            >
+              <option value="" disabled>导出…</option>
+              <option value="json">JSON</option>
+              <option value="csv">CSV (Claims)</option>
+              <option value="bibtex">BibTeX</option>
+            </select>
+          )}
         </div>
       </div>
 

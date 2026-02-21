@@ -1,12 +1,17 @@
 from __future__ import annotations
 
+import csv
+import io
+import json
 import mimetypes
 import re
 from pathlib import Path
+from typing import Any
 
-from fastapi import APIRouter, HTTPException
-from fastapi.responses import FileResponse, PlainTextResponse
+from fastapi import APIRouter, HTTPException, Query
+from fastapi.responses import FileResponse, PlainTextResponse, Response
 
+from app.graph.neo4j_client import Neo4jClient
 from app.settings import settings
 
 
@@ -85,3 +90,83 @@ def get_paper_content(paper_id: str):
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+# ---------------------------------------------------------------------------
+# Export
+# ---------------------------------------------------------------------------
+
+def _export_bibtex(detail: dict[str, Any]) -> str:
+    """Generate BibTeX entry from paper detail."""
+    paper = detail.get("paper") or {}
+    doi = str(paper.get("doi") or "").strip()
+    title = str(paper.get("title") or "Untitled").strip()
+    year = paper.get("year")
+    authors = paper.get("authors")
+    key = doi.replace("/", "_").replace(".", "_") if doi else "unknown"
+    lines = [f"@article{{{key},"]
+    lines.append(f"  title = {{{title}}},")
+    if year:
+        lines.append(f"  year = {{{year}}},")
+    if doi:
+        lines.append(f"  doi = {{{doi}}},")
+    if isinstance(authors, list) and authors:
+        lines.append(f"  author = {{{' and '.join(str(a) for a in authors)}}},")
+    elif isinstance(authors, str) and authors.strip():
+        lines.append(f"  author = {{{authors.strip()}}},")
+    lines.append("}")
+    return "\n".join(lines) + "\n"
+
+
+def _export_csv(detail: dict[str, Any]) -> str:
+    """Generate CSV with claims from paper detail."""
+    buf = io.StringIO()
+    writer = csv.writer(buf)
+    writer.writerow(["claim_key", "text", "step_type", "confidence", "kinds"])
+    for claim in detail.get("claims") or []:
+        writer.writerow([
+            str(claim.get("claim_key") or ""),
+            str(claim.get("text") or ""),
+            str(claim.get("step_type") or ""),
+            str(claim.get("confidence") or ""),
+            ";".join(claim.get("kinds") or []),
+        ])
+    return buf.getvalue()
+
+
+@router.get("/{paper_id:path}/export")
+def export_paper(
+    paper_id: str,
+    format: str = Query(default="json", pattern="^(json|csv|bibtex)$"),
+):
+    """Export paper data in json, csv, or bibtex format."""
+    try:
+        with Neo4jClient(
+            settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password,
+        ) as client:
+            detail = client.get_paper_detail(paper_id)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    if format == "bibtex":
+        text = _export_bibtex(detail)
+        return Response(
+            content=text,
+            media_type="application/x-bibtex; charset=utf-8",
+            headers={"Content-Disposition": "attachment; filename=paper.bib"},
+        )
+    if format == "csv":
+        text = _export_csv(detail)
+        return Response(
+            content=text,
+            media_type="text/csv; charset=utf-8",
+            headers={"Content-Disposition": "attachment; filename=claims.csv"},
+        )
+    # json (default)
+    return Response(
+        content=json.dumps(detail, ensure_ascii=False, default=str, indent=2),
+        media_type="application/json; charset=utf-8",
+        headers={"Content-Disposition": "attachment; filename=paper.json"},
+    )

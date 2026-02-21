@@ -1,6 +1,9 @@
-"""Tests for papers API endpoints (P2-16)."""
+"""Tests for papers API endpoints (P2-16, P2-17)."""
 from __future__ import annotations
 
+import csv
+import io
+import json
 import re
 import tempfile
 from pathlib import Path
@@ -11,6 +14,8 @@ import pytest
 from app.api.routers.papers import (
     _canonical_dir_for_paper_id,
     _doi_sanitized,
+    _export_bibtex,
+    _export_csv,
     _safe_rel,
 )
 
@@ -111,3 +116,63 @@ def test_get_paper_content_no_md_file():
             with pytest.raises(HTTPException) as exc_info:
                 get_paper_content("doi:10.1000/test")
             assert exc_info.value.status_code == 404
+
+
+# ── Export helpers ──
+
+_SAMPLE_DETAIL: dict = {
+    "paper": {
+        "paper_id": "doi:10.1000/test",
+        "doi": "10.1000/test",
+        "title": "A Test Paper",
+        "year": 2024,
+        "authors": ["Alice", "Bob"],
+    },
+    "claims": [
+        {"claim_key": "c1", "text": "Claim one", "step_type": "Method", "confidence": 0.9, "kinds": ["Definition", "Comparison"]},
+        {"claim_key": "c2", "text": "Claim two", "step_type": "Result", "confidence": 0.8, "kinds": []},
+    ],
+    "logic_steps": [],
+    "outgoing_cites": [],
+}
+
+
+def test_export_bibtex_basic():
+    bib = _export_bibtex(_SAMPLE_DETAIL)
+    assert "@article{" in bib
+    assert "title = {A Test Paper}" in bib
+    assert "year = {2024}" in bib
+    assert "doi = {10.1000/test}" in bib
+    assert "Alice and Bob" in bib
+
+
+def test_export_bibtex_no_authors():
+    detail = {"paper": {"doi": "10.1000/x", "title": "T"}}
+    bib = _export_bibtex(detail)
+    assert "author" not in bib
+    assert "title = {T}" in bib
+
+
+def test_export_bibtex_empty_paper():
+    bib = _export_bibtex({"paper": {}})
+    assert "@article{unknown," in bib
+    assert "title = {Untitled}" in bib
+
+
+def test_export_csv_basic():
+    text = _export_csv(_SAMPLE_DETAIL)
+    reader = csv.reader(io.StringIO(text))
+    rows = list(reader)
+    assert rows[0] == ["claim_key", "text", "step_type", "confidence", "kinds"]
+    assert len(rows) == 3  # header + 2 claims
+    assert rows[1][0] == "c1"
+    assert rows[1][4] == "Definition;Comparison"
+    assert rows[2][0] == "c2"
+    assert rows[2][4] == ""
+
+
+def test_export_csv_no_claims():
+    text = _export_csv({"paper": {}, "claims": []})
+    reader = csv.reader(io.StringIO(text))
+    rows = list(reader)
+    assert len(rows) == 1  # header only
