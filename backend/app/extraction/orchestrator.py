@@ -2288,6 +2288,21 @@ def run_phase1_extraction(
     if chunk_extraction_stats:
         report["chunk_extraction"] = chunk_extraction_stats
 
+    # P1-11: chunk_fail_rate gate check
+    chunk_fail_rate_max = _rule_float(rules, "phase1_gate_chunk_fail_rate_max", 0.3)
+    chunk_fail_rate = float(chunk_extraction_stats.get("chunk_fail_rate") or 0.0) if chunk_extraction_stats else 0.0
+    if chunk_fail_rate > chunk_fail_rate_max:
+        gate_fail_reasons = list(report.get("gate_fail_reasons") or [])
+        gate_fail_reasons.append("chunk_fail_rate")
+        report["gate_fail_reasons"] = gate_fail_reasons
+        report["gate_passed"] = False
+        tier_info = _quality_tier_from_failures(gate_fail_reasons, rules=rules)
+        report["quality_tier_strategy"] = str(tier_info.get("quality_tier_strategy") or "a1_fail_count")
+        report["quality_tier"] = str(tier_info.get("quality_tier") or "red")
+        report["quality_tier_fail_count"] = int(tier_info.get("quality_tier_fail_count") or 0)
+        report["quality_tier_reasons"] = list(tier_info.get("quality_tier_reasons") or [])
+        report["quality_tier_score"] = float(tier_info.get("quality_tier_score") or 0.0)
+
     # P0 Fix: Add empty logic steps count to report and update gate
     report["logic_steps_empty_count"] = logic_steps_empty_count
     if logic_steps_empty_count > 0:
