@@ -153,12 +153,14 @@ def judge_claim_support_batch(
             s = str(claim.get("origin_chunk_id") or "").strip()
             if s:
                 chunk_ids.append(s)
-        # Build evidence texts for top-k chunks
+        # Build evidence texts for top-k chunks (filter missing before slicing)
         evidence_texts: list[str] = []
-        for cid in chunk_ids[:evidence_top_k]:
+        for cid in chunk_ids:
             txt = str(chunk_by_id.get(cid) or "").strip()
             if txt:
                 evidence_texts.append(txt[:evidence_chunk_chars_max])
+                if len(evidence_texts) >= evidence_top_k:
+                    break
         # Backward-compatible: single chunk_text for single-chunk claims
         combined_text = "\n---\n".join(evidence_texts) if evidence_texts else ""
         payload_items.append(

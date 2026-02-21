@@ -821,7 +821,7 @@ def _merge_claim_candidates(
                 "worker_ids": set(),
                 "confidence_sum": 0.0,
                 "confidence_n": 0,
-                "span_candidates": [],  # track (text, span_start, span_end, match_mode)
+                "span_candidates": [],  # track (text, span_start, span_end, match_mode, evidence_quote)
             }
         b = buckets[bucket_key]
         b["texts"].append(text)
@@ -830,6 +830,7 @@ def _merge_claim_candidates(
             int(c.get("span_start", -1)),
             int(c.get("span_end", -1)),
             str(c.get("match_mode") or ""),
+            str(c.get("evidence_quote") or ""),
         ))
         b["kinds"].update(str(x).strip() for x in (c.get("kinds") or []) if str(x).strip())
         cid = str(c.get("origin_chunk_id") or "").strip()
@@ -855,18 +856,21 @@ def _merge_claim_candidates(
         # Find the span corresponding to the canonical text from span_candidates
         canonical_span_start, canonical_span_end = -1, -1
         canonical_match_mode = "none"
-        for cand_text, cand_start, cand_end, cand_mode in bucket.get("span_candidates") or []:
+        canonical_evidence_quote = ""
+        for cand_text, cand_start, cand_end, cand_mode, cand_quote in bucket.get("span_candidates") or []:
             if cand_text == canonical_text and cand_start >= 0 and cand_end > cand_start:
                 canonical_span_start, canonical_span_end = cand_start, cand_end
                 canonical_match_mode = str(cand_mode or "none")
+                canonical_evidence_quote = str(cand_quote or "")
                 break
 
         # Fallback: pick any valid span if canonical text has no span
         if canonical_span_start < 0:
-            for _cand_text, cand_start, cand_end, cand_mode in bucket.get("span_candidates") or []:
+            for _cand_text, cand_start, cand_end, cand_mode, cand_quote in bucket.get("span_candidates") or []:
                 if cand_start >= 0 and cand_end > cand_start:
                     canonical_span_start, canonical_span_end = cand_start, cand_end
                     canonical_match_mode = str(cand_mode or "none")
+                    canonical_evidence_quote = str(cand_quote or "")
                     break
 
         claim_key = _claim_key_for(doi=doi_s, paper_id=paper_id, text=canonical_text)
@@ -888,6 +892,7 @@ def _merge_claim_candidates(
                 "span_start": canonical_span_start,
                 "span_end": canonical_span_end,
                 "match_mode": canonical_match_mode,
+                "evidence_quote": canonical_evidence_quote,
             }
         )
 
@@ -2176,6 +2181,8 @@ def run_phase1_extraction(
             "span_start": int(claim["span_start"]) if "span_start" in claim and claim["span_start"] is not None else -1,
             "span_end": int(claim["span_end"]) if "span_end" in claim and claim["span_end"] is not None else -1,
             "match_mode": str(claim.get("match_mode") or "none"),
+            "evidence_quote": str(claim.get("evidence_quote") or ""),
+            "match_confidence": score,
             "support_label": label,
             "judge_score": score,
             "judge_reason": reason,
