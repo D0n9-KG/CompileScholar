@@ -113,7 +113,10 @@ def handle_rebuild_all(
     update: Callable[[str, float, str | None], None],
     log: Callable[[str], None],
 ) -> dict[str, Any]:
-    # Keep local imports to avoid circular dependencies during startup.
+    import threading
+    import time
+    from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
+
     from app.graph.neo4j_client import Neo4jClient
     from app.settings import settings
 
@@ -127,25 +130,47 @@ def handle_rebuild_all(
         return {"ok": True, "papers": 0}
 
     total = len(paper_ids)
-    span = 0.85 / max(1, total)
-    for idx, paper_id in enumerate(paper_ids, start=1):
-        base = (idx - 1) * span
+    max_workers = min(total, getattr(settings, "ingest_llm_max_workers", 4))
+    completed_count = 0
+    failed_count = 0
+    lock = threading.Lock()
+    start_time = time.monotonic()
 
-        def progress(stage: str, p: float, msg: str | None = None) -> None:
-            label = msg
-            if msg:
-                label = f"[{idx}/{total}] {paper_id}: {msg}"
-            update(stage, base + span * float(max(0.0, min(1.0, p))), label)
+    def _rebuild_one(paper_id: str) -> str:
+        nonlocal completed_count, failed_count
+        try:
+            rebuild_paper(paper_id, progress=None, log=log)
+            with lock:
+                completed_count += 1
+                elapsed = int(time.monotonic() - start_time)
+                p = 0.02 + 0.83 * completed_count / total
+                update(
+                    "rebuild:all:llm",
+                    p,
+                    f"Rebuilt {completed_count}/{total} (failed={failed_count}, elapsed={elapsed}s)",
+                )
+            return paper_id
+        except Exception as exc:
+            with lock:
+                failed_count += 1
+                completed_count += 1
+            log(f"FAILED {paper_id}: {exc}")
+            return paper_id
 
-        progress("rebuild:paper", 0.02, "Rebuilding paper")
-        rebuild_paper(paper_id, progress=progress, log=log)
+    update("rebuild:all:llm", 0.02, f"Rebuilding {total} papers (workers={max_workers})")
+    with ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="rebuild-all") as executor:
+        futures = {executor.submit(_rebuild_one, pid): pid for pid in paper_ids}
+        while futures:
+            done, _ = wait(futures, timeout=20, return_when=FIRST_COMPLETED)
+            for f in done:
+                futures.pop(f, None)
 
     def progress_faiss(stage: str, p: float, msg: str | None = None) -> None:
         update(stage, 0.85 + 0.15 * float(max(0.0, min(1.0, p))), msg)
 
     progress_faiss("rebuild:faiss", 0.05, "Rebuilding global FAISS index")
     res = rebuild_global_faiss(progress=progress_faiss, log=log)
-    return {"ok": True, "papers": total, "faiss": res}
+    return {"ok": True, "papers": total, "failed": failed_count, "faiss": res}
 
 
 def handle_rebuild_similarity(

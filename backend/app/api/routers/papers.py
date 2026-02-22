@@ -26,13 +26,29 @@ def _doi_sanitized(doi: str) -> str:
 
 
 def _canonical_dir_for_paper_id(paper_id: str) -> Path:
-    if not paper_id.startswith("doi:"):
-        raise FileNotFoundError("Only DOI papers have canonical image storage")
-    doi = paper_id[4:]
-    p = Path(__file__).resolve().parents[3] / settings.storage_dir / "papers" / "doi" / _doi_sanitized(doi)
+    if paper_id.startswith("doi:"):
+        doi = paper_id[4:]
+        p = Path(__file__).resolve().parents[3] / settings.storage_dir / "papers" / "doi" / _doi_sanitized(doi)
+        if p.exists():
+            return p
+    # Fallback: resolve from Neo4j source_md_path
+    return _source_dir_from_neo4j(paper_id)
+
+
+def _source_dir_from_neo4j(paper_id: str) -> Path:
+    """Look up source_md_path in Neo4j and return its parent directory."""
+    try:
+        with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
+            paper = client.get_paper_basic(paper_id)
+    except KeyError:
+        raise FileNotFoundError(f"Paper not found: {paper_id}")
+    md_path = str(paper.get("source_md_path") or "").strip()
+    if not md_path:
+        raise FileNotFoundError(f"No source path found for {paper_id}")
+    p = Path(md_path)
     if not p.exists():
-        raise FileNotFoundError(f"Canonical paper directory not found for {paper_id}")
-    return p
+        raise FileNotFoundError(f"Source file not found on disk: {md_path}")
+    return p.parent
 
 
 def _safe_rel(rel: str) -> str:

@@ -65,7 +65,7 @@ def test_safe_rel_rejects_special_chars():
 # ── _canonical_dir_for_paper_id ──
 
 def test_canonical_dir_rejects_non_doi():
-    with pytest.raises(FileNotFoundError, match="Only DOI"):
+    with pytest.raises(FileNotFoundError, match="not found"):
         _canonical_dir_for_paper_id("sha256:abc123")
 
 def test_canonical_dir_not_found():
