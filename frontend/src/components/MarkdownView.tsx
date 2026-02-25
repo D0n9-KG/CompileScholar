@@ -1,5 +1,6 @@
 import ReactMarkdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
+import rehypeRaw from 'rehype-raw'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import remarkBreaks from 'remark-breaks'
@@ -63,7 +64,7 @@ export default function MarkdownView({ markdown, paperId, className }: Props) {
     <div className={`markdown ${className ?? ''}`.trim()}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
-        rehypePlugins={[rehypeKatex]}
+        rehypePlugins={[rehypeRaw, rehypeKatex]}
         urlTransform={(url, key) => {
           if (key === 'href') return safeLinkHref(url)
           if (key === 'src') return rewriteImageSrc(safeMediaSrc(url), paperId)

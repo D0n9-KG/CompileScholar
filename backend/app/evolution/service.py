@@ -5,7 +5,12 @@ from datetime import datetime, timezone
 from typing import Any, Callable
 
 from app.evolution.inference import clamp01, infer_relation_type
-from app.graph.neo4j_client import Neo4jClient, normalize_proposition_text
+from app.graph.neo4j_client import (
+    Neo4jClient,
+    normalize_proposition_text,
+    proposition_id_for_key,
+    proposition_key_for_claim,
+)
 from app.settings import settings
 
 
@@ -148,6 +153,71 @@ def _enforce_evolution_quality_gates(metrics: dict[str, Any], settings: Any) -> 
             f"{self_loop_rate:.2%} exceeds maximum {max_self_loop_rate:.2%} "
             f"({self_loop_count}/{total_accepted_events} self-loop accepted events)."
         )
+
+
+def create_propositions_for_textbook(
+    textbook_id: str,
+    progress: ProgressFn | None = None,
+    log: LogFn | None = None,
+) -> dict[str, Any]:
+    """Map eligible KnowledgeEntities to Propositions.
+
+    Only proposition-type entities (theory, equation, method, model,
+    condition) are mapped.  Each gets a Proposition node with
+    ``source_type='textbook'`` and ``current_state='stable'``.
+
+    The canonical_text is built from ``name + ': ' + description``
+    (or just ``name`` if no description).  This ensures the Proposition
+    participates in cross-source similarity matching with paper claims.
+    """
+    progress = progress or (lambda stage, p, msg=None: None)
+    log = log or (lambda line: None)
+
+    progress("textbook:propositions:load", 0.02, f"Loading entities for {textbook_id}")
+    with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
+        entities = client.list_knowledge_entities_for_propositions(textbook_id)
+
+    if not entities:
+        log(f"No proposition-eligible entities found for textbook {textbook_id}")
+        return {"entities": 0, "propositions": 0}
+
+    log(f"Found {len(entities)} proposition-eligible entities")
+
+    items: list[dict] = []
+    for ent in entities:
+        name = str(ent.get("name") or "").strip()
+        desc = str(ent.get("description") or "").strip()
+        etype = str(ent.get("entity_type") or "").strip()
+        if not name:
+            continue
+
+        # Build canonical text: "name: description" or just "name"
+        raw_text = f"{name}: {desc}" if desc else name
+        canonical = normalize_proposition_text(raw_text)
+        if not canonical:
+            continue
+
+        prop_key = proposition_key_for_claim(text=raw_text)
+        prop_id = proposition_id_for_key(prop_key)
+
+        items.append({
+            "entity_id": str(ent["entity_id"]),
+            "prop_id": prop_id,
+            "prop_key": prop_key,
+            "canonical_text": canonical,
+            "source_type": f"textbook:{etype}" if etype else "textbook",
+        })
+
+    if not items:
+        return {"entities": 0, "propositions": 0}
+
+    progress("textbook:propositions:write", 0.50, f"Creating {len(items)} propositions")
+    with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
+        stats = client.upsert_proposition_for_entity(items)
+
+    log(f"Textbook propositions created: {stats}")
+    progress("textbook:propositions:done", 1.0, "Textbook proposition mapping complete")
+    return stats
 
 
 def sync_proposition_mentions_global(progress: ProgressFn | None = None, log: LogFn | None = None) -> dict[str, Any]:

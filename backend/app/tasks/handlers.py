@@ -5,6 +5,7 @@ from typing import Any, Callable
 from app.ingest.pipeline import ingest_path
 from app.ingest.rebuild import rebuild_global_faiss, rebuild_paper
 from app.ingest.upload_actions import commit_ready, replace_with_new
+from app.ingest.textbook_pipeline import ingest_textbook
 from app.evolution.service import rebuild_evolution_graph
 from app.graph.neo4j_client import Neo4jClient
 from app.settings import settings
@@ -214,6 +215,25 @@ def handle_update_similarity_paper(
         update(stage, p, msg)
 
     return update_similarity_for_paper(paper_id, progress=progress, log=log)
+
+
+def handle_ingest_textbook(
+    task_id: str,
+    update: Callable[[str, float, str | None], None],
+    log: Callable[[str], None],
+) -> dict[str, Any]:
+    payload = _load_payload(task_id)
+    md_path = str(payload.get("path") or "").strip()
+    if not md_path:
+        raise ValueError("Missing path")
+    metadata = dict(payload.get("metadata") or {})
+
+    update("textbook:start", 0.01, f"Starting textbook ingestion: {md_path}")
+
+    def progress(stage: str, p: float, msg: str | None = None) -> None:
+        update(stage, p, msg)
+
+    return ingest_textbook(md_path, metadata, progress=progress, log=log)
 
 
 def _load_payload(task_id: str) -> dict[str, Any]:

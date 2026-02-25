@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { apiBaseUrl, apiGet, apiPatch, apiPost } from '../api'
 import MarkdownView from '../components/MarkdownView'
@@ -237,6 +237,154 @@ function taskStageLabel(stage: string | null | undefined) {
   return s
 }
 
+type HighlightRange = { start: number; end: number } | null
+
+function OriginalTextPanel({
+  paperId,
+  mode,
+  onClose,
+  highlightRange,
+  onPopout,
+}: {
+  paperId: string
+  mode: 'sidebar' | 'fullwidth' | 'modal'
+  onClose?: () => void
+  highlightRange?: HighlightRange
+  onPopout?: () => void
+}) {
+  const [content, setContent] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [err, setErr] = useState('')
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const hlRef = useRef<HTMLDivElement>(null)
+  const fadeTimer = useRef<number | null>(null)
+  const [fading, setFading] = useState(false)
+  const prepareContentLoad = useCallback(() => {
+    setContent(null)
+    setLoading(true)
+    setErr('')
+  }, [])
+  const resetFading = useCallback(() => {
+    setFading(false)
+  }, [])
+
+  useEffect(() => {
+    if (!paperId) return
+    let cancelled = false
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    prepareContentLoad()
+    fetch(`${apiBaseUrl()}/papers/${encodeURIComponent(paperId)}/content`)
+      .then((res) => {
+        if (!res.ok) throw new Error(res.status === 404 ? '该论文暂无原文 Markdown' : `加载失败 (${res.status})`)
+        return res.text()
+      })
+      .then((text) => { if (!cancelled) setContent(text) })
+      .catch((e: unknown) => { if (!cancelled) setErr(String((e as { message?: unknown } | null)?.message ?? e)) })
+      .finally(() => { if (!cancelled) setLoading(false) })
+    return () => { cancelled = true }
+  }, [paperId, prepareContentLoad])
+
+  // Scroll highlight into view within the scroll container only
+  // Re-trigger when loading finishes (content may not be in DOM yet on first fire)
+  useEffect(() => {
+    if (!highlightRange || loading) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    resetFading()
+    const raf = requestAnimationFrame(() => {
+      const container = scrollContainerRef.current
+      const el = hlRef.current
+      if (container && el) {
+        const containerRect = container.getBoundingClientRect()
+        const elRect = el.getBoundingClientRect()
+        const offset = elRect.top - containerRect.top + container.scrollTop - containerRect.height / 3
+        container.scrollTo({ top: Math.max(0, offset), behavior: 'smooth' })
+      }
+    })
+    if (fadeTimer.current) clearTimeout(fadeTimer.current)
+    fadeTimer.current = window.setTimeout(() => setFading(true), 3000)
+    return () => {
+      cancelAnimationFrame(raf)
+      if (fadeTimer.current) clearTimeout(fadeTimer.current)
+    }
+  }, [highlightRange, loading, resetFading])
+
+  // Split content into 3 segments for highlighting
+  const segments = useMemo(() => {
+    if (!content || !highlightRange) return null
+    const lines = content.split('\n')
+    const s = Math.max(0, highlightRange.start - 1)
+    const e = Math.min(lines.length, highlightRange.end)
+    return {
+      before: lines.slice(0, s).join('\n'),
+      highlight: lines.slice(s, e).join('\n'),
+      after: lines.slice(e).join('\n'),
+    }
+  }, [content, highlightRange])
+
+  const renderContent = () => {
+    if (loading) return <div className="metaLine">加载中...</div>
+    if (err) return <div className="errorBox">{err}</div>
+    if (content === null && !loading && !err) return <div className="metaLine">暂无原文内容。</div>
+    if (!content) return null
+
+    if (segments) {
+      return (
+        <>
+          {segments.before && <MarkdownView markdown={segments.before} paperId={paperId} />}
+          <div ref={hlRef} className={`pdHighlightBlock${fading ? ' pdHighlightBlock--fade' : ''}`}>
+            <MarkdownView markdown={segments.highlight} paperId={paperId} />
+          </div>
+          {segments.after && <MarkdownView markdown={segments.after} paperId={paperId} />}
+        </>
+      )
+    }
+    return <MarkdownView markdown={content} paperId={paperId} />
+  }
+
+  if (mode === 'modal') {
+    return (
+      <div className="modalOverlay" onClick={onClose}>
+        <div className="modal" style={{ maxWidth: 900 }} onClick={(e) => e.stopPropagation()}>
+          <div className="modalHeader">
+            <div className="modalTitle">原文 Markdown</div>
+            <button className="btn btnSmall" onClick={onClose}>关闭</button>
+          </div>
+          <div className="modalBody" ref={scrollContainerRef}>{renderContent()}</div>
+        </div>
+      </div>
+    )
+  }
+
+  if (mode === 'fullwidth') {
+    return (
+      <div className="panel">
+        <div className="panelHeader">
+          <div className="split">
+            <div className="panelTitle">原文 Markdown</div>
+            {onPopout && <button className="btn btnSmall" onClick={onPopout}>弹出窗口</button>}
+          </div>
+        </div>
+        <div className="panelBody" ref={scrollContainerRef}>{renderContent()}</div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="pdWorkspaceSidebar">
+      <div className="pdSidebarHeader">
+        <span className="panelTitle">原文</span>
+        <div className="row" style={{ gap: 6 }}>
+          {onPopout && <button className="btn btnSmall" onClick={onPopout}>弹出</button>}
+          {onClose && <button className="btn btnSmall" onClick={onClose}>关闭</button>}
+        </div>
+      </div>
+      <div className="pdSidebarBody" ref={scrollContainerRef}>
+        {renderContent()}
+      </div>
+    </div>
+  )
+}
+
 export default function PaperDetailPage() {
   const { paperId } = useParams()
   const id = paperId ? decodeURIComponent(paperId) : ''
@@ -245,11 +393,30 @@ export default function PaperDetailPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const tab0 = String(searchParams.get('tab') || 'logic') as PaperTab
   const tab: PaperTab = (['logic', 'claims', 'cites', 'figures', 'content'] as const).includes(tab0) ? tab0 : 'logic'
+  const isPinned = searchParams.get('pin') === '1'
   function selectTab(t: PaperTab) {
     const next = new URLSearchParams(searchParams)
     next.set('tab', t)
     setSearchParams(next, { replace: true })
   }
+  function togglePin(force?: boolean) {
+    const next = new URLSearchParams(searchParams)
+    const val = force !== undefined ? force : !isPinned
+    if (val) { next.set('pin', '1') } else { next.delete('pin') }
+    setSearchParams(next, { replace: true })
+  }
+
+  const [highlightRange, setHighlightRange] = useState<HighlightRange>(null)
+  const [showContentModal, setShowContentModal] = useState(false)
+
+  function locateEvidence(startLine?: number | null, endLine?: number | null) {
+    if (typeof startLine !== 'number') return
+    togglePin(true)
+    setHighlightRange({ start: startLine, end: endLine ?? startLine })
+  }
+
+  // Reset highlight and modal when paper changes
+  useEffect(() => { setHighlightRange(null); setShowContentModal(false) }, [id])
 
   const [detail, setDetail] = useState<PaperDetail | null>(null)
   const [error, setError] = useState<string>('')
@@ -302,34 +469,7 @@ export default function PaperDetailPage() {
   const [evidenceSelected, setEvidenceSelected] = useState<Record<string, boolean>>({})
   const [evidenceExpanded, setEvidenceExpanded] = useState<Record<string, boolean>>({})
 
-  const [mdContent, setMdContent] = useState<string | null>(null)
-  const [mdLoading, setMdLoading] = useState<boolean>(false)
-  const [mdError, setMdError] = useState<string>('')
-  const [mdFetched, setMdFetched] = useState<boolean>(false)
-
-  // Reset markdown content when paper changes
-  useEffect(() => {
-    setMdContent(null)
-    setMdError('')
-    setMdFetched(false)
-  }, [id])
-
-  useEffect(() => {
-    if (tab !== 'content' || !id || mdFetched) return
-    let cancelled = false
-    setMdLoading(true)
-    setMdError('')
-    setMdFetched(true)
-    fetch(`${apiBaseUrl()}/papers/${encodeURIComponent(id)}/content`)
-      .then((res) => {
-        if (!res.ok) throw new Error(res.status === 404 ? '该论文暂无原文 Markdown' : `加载失败 (${res.status})`)
-        return res.text()
-      })
-      .then((text) => { if (!cancelled) setMdContent(text) })
-      .catch((e: unknown) => { if (!cancelled) setMdError(String((e as { message?: unknown } | null)?.message ?? e)) })
-      .finally(() => { if (!cancelled) setMdLoading(false) })
-    return () => { cancelled = true }
-  }, [tab, id, mdFetched])
+  // md state removed — OriginalTextPanel handles its own fetch
 
   async function refresh() {
     const r = await apiGet<PaperDetail>(`/graph/paper/${encodeURIComponent(id)}`)
@@ -956,7 +1096,7 @@ export default function PaperDetailPage() {
   if (!id) return <div className="page">Missing paper id</div>
 
   return (
-    <div className="page paperDetailPage">
+    <div className={`page paperDetailPage${isPinned ? ' paperDetailPage--wide' : ''}`}>
       <div className="pageHeader paperDetailHeader">
         <div>
           <h2 className="pageTitle">论文</h2>
@@ -1098,15 +1238,24 @@ export default function PaperDetailPage() {
            <button className={`chip ${tab === 'figures' ? 'chipActive' : ''}`} onClick={() => selectTab('figures')}>
              图片
            </button>
-           <button className={`chip ${tab === 'content' ? 'chipActive' : ''}`} onClick={() => selectTab('content')}>
-             原文
+           {!isPinned && (
+             <button className={`chip ${tab === 'content' ? 'chipActive' : ''}`} onClick={() => selectTab('content')}>
+               原文
+             </button>
+           )}
+           <button
+             className={`pdPinBtn${isPinned ? ' pdPinBtn--active' : ''}`}
+             onClick={() => togglePin()}
+             title={isPinned ? '关闭原文侧边栏' : '固定原文侧边栏'}
+           >
+             {isPinned ? '📌 取消固定' : '📌 固定原文'}
            </button>
          </div>
 
          {!detail.paper.ingested && stats.chunks === 0 && (
            <div className="infoBox paperDetailCallout">
              <div style={{ fontWeight: 850, marginBottom: 6 }}>该论文目前仅包含元数据（{TERMS.stub}），尚未导入 MinerU Markdown。</div>
-             <div className="metaLine">建议回到“图谱”页，在节点信息抽屉中上传该论文的 MinerU 输出进行补全导入。</div>
+             <div className="metaLine">建议回到"图谱"页，在节点信息抽屉中上传该论文的 MinerU 输出进行补全导入。</div>
              </div>
            )}
 
@@ -1181,91 +1330,107 @@ export default function PaperDetailPage() {
              </div>
            )}
 
-           <div className="stack paperDetailContentStack">
-             {tab === 'logic' && (
-              <div className="panel">
-                <div className="panelHeader">
-                  <div className="panelTitle">逻辑步骤</div>
-                </div>
+            <div className={`pdWorkspace${isPinned && tab !== 'content' ? ' pdWorkspace--pinned' : ''}`}>
+            <div className="pdWorkspaceMain stack paperDetailContentStack">
+              {tab === 'logic' && (
+               <div className="panel pdReadPanel pdReadPanel--logic">
+                 <div className="panelHeader">
+                   <div className="panelTitle">逻辑步骤</div>
+                 </div>
                 <div className="panelBody">
-                  <div className="list">
-                    {(detail.logic_steps ?? []).map((s, idx) => (
-                      <div key={`${s.step_type}:${idx}`} className="itemCard">
-                        <div className="split">
-                          <div className="itemTitle">{stepLabel(detail.schema ?? null, s.step_type)}</div>
-                          <div className="row" style={{ gap: 8, justifyContent: 'flex-end' }}>
-                            <span className="badge" title="机器置信度">
-                              {(Number(s.confidence ?? 0) || 0).toFixed(2)}
-                            </span>
-                            <span className={s.source === 'human' ? 'badge badgeOk' : s.source === 'cleared' ? 'badge badgeDanger' : 'badge'} title={`source=${s.source}`}>
-                              {s.source === 'human' ? '人工' : s.source === 'cleared' ? '清空' : '机器'}
-                            </span>
-                            <button className="btn btnSmall" onClick={() => openLogicEvidenceEditor(s)}>
-                              证据(Evidence)
-                            </button>
-                            <button
-                              className="btn btnSmall"
-                              onClick={() => {
-                                const open = !logicEdit[s.step_type]
-                                setLogicEdit((m) => ({ ...m, [s.step_type]: open }))
-                                if (open) setLogicDraft((m) => ({ ...m, [s.step_type]: String(s.summary ?? '') }))
-                              }}
-                            >
-                              {logicEdit[s.step_type] ? '关闭编辑' : '编辑'}
-                            </button>
+                  <div className="logicTimeline">
+                    {(detail.logic_steps ?? [])
+                      .slice()
+                      .sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
+                      .map((s, idx, arr) => {
+                      const total = arr.length
+                      const isLast = idx === total - 1
+                      const evList = (s.evidence ?? []) as Array<{ chunk_id: string; snippet?: string; weak?: boolean; start_line?: number | null; end_line?: number | null }>
+                      return (
+                        <div key={`${s.step_type}:${idx}`} className="logicStep">
+                          <div className="logicStepIndicator">
+                            <div className={`logicStepNum logicStepNum--${s.step_type}`}>{idx + 1}</div>
+                            {!isLast && <div className="logicStepConnector" />}
                           </div>
-                        </div>
-                        {!logicEdit[s.step_type] ? (
-                            <div>
-                            <div className="itemBody">
-                              <MarkdownView markdown={s.summary || '（空）'} paperId={paperIdForImages} />
-                            </div>
-                            {((s.evidence ?? []) as Array<{ chunk_id: string; snippet?: string; weak?: boolean }>).length > 0 && (
-                              <div style={{ marginTop: 10 }}>
-                                <div className="metaLine">证据(Evidence)</div>
-                                <div className="list" style={{ marginTop: 8 }}>
-                                  {((s.evidence ?? []) as Array<{ chunk_id: string; snippet?: string; weak?: boolean }>).map((e) => (
-                                    <div key={e.chunk_id} className="itemCard" style={{ background: 'rgba(255,255,255,0.02)' }}>
-                                      <div className="itemMeta">
-                                        <code>{e.chunk_id}</code> {e.weak ? <span className="badge badgeWarn">弱</span> : null}
-                                      </div>
-                                      <div className="itemBody">
-                                        <MarkdownView markdown={String(e.snippet ?? '')} paperId={paperIdForImages} />
-                                      </div>
-                                    </div>
-                                  ))}
+                          <div className="logicStepContent">
+                            <div className="itemCard">
+                              <div className="split">
+                                <div className="itemTitle">
+                                  {stepLabel(detail.schema ?? null, s.step_type)}
+                                  <span className="metaLine" style={{ marginLeft: 8, display: 'inline' }}>{idx + 1}/{total}</span>
+                                </div>
+                                <div className="row" style={{ gap: 8, justifyContent: 'flex-end' }}>
+                                  <span className="badge" title="机器置信度">
+                                    {(Number(s.confidence ?? 0) || 0).toFixed(2)}
+                                  </span>
+                                  <span className={s.source === 'human' ? 'badge badgeOk' : s.source === 'cleared' ? 'badge badgeDanger' : 'badge'} title={`source=${s.source}`}>
+                                    {s.source === 'human' ? '人工' : s.source === 'cleared' ? '清空' : '机器'}
+                                  </span>
+                                  <button className="btn btnSmall" onClick={() => openLogicEvidenceEditor(s)}>
+                                    证据(Evidence)
+                                  </button>
+                                  <button
+                                    className="btn btnSmall"
+                                    onClick={() => {
+                                      const open = !logicEdit[s.step_type]
+                                      setLogicEdit((m) => ({ ...m, [s.step_type]: open }))
+                                      if (open) setLogicDraft((m) => ({ ...m, [s.step_type]: String(s.summary ?? '') }))
+                                    }}
+                                  >
+                                    {logicEdit[s.step_type] ? '关闭编辑' : '编辑'}
+                                  </button>
                                 </div>
                               </div>
-                            )}
-                          </div>
-                        ) : (
-                          <div style={{ marginTop: 10 }}>
-                            <textarea
-                              className="textarea"
-                              name={`logic_draft_${s.step_type}`}
-                              value={logicDraft[s.step_type] ?? ''}
-                              onChange={(e) => setLogicDraft((m) => ({ ...m, [s.step_type]: e.target.value }))}
-                            />
-                            <div className="row" style={{ marginTop: 10 }}>
-                              <button className="btn btnPrimary" onClick={() => saveLogic(s.step_type)}>
-                                保存
-                              </button>
-                              <button className="btn" onClick={() => restoreMachineLogic(s.step_type)}>
-                                恢复机器
-                              </button>
-                              <button className="btn btnDanger" onClick={() => clearLogic(s.step_type)}>
-                                清空（不保留）
-                              </button>
+                              {!logicEdit[s.step_type] ? (
+                                <div>
+                                  <div className="itemBody">
+                                    <MarkdownView markdown={s.summary || '（空）'} paperId={paperIdForImages} />
+                                  </div>
+                                  {evList.length > 0 && (
+                                    <div style={{ marginTop: 10 }}>
+                                      <div className="metaLine">证据 ({evList.length})</div>
+                                      <div className="list" style={{ marginTop: 8 }}>
+                                        {evList.map((e) => (
+                                          <div key={e.chunk_id} className={`itemCard itemCard--evidence${typeof e.start_line === 'number' ? ' itemCard--clickable' : ''}`} onClick={() => locateEvidence(e.start_line, e.end_line)}>
+                                            <div className="itemMeta">
+                                              <code>{e.chunk_id}</code> {e.weak ? <span className="badge badgeWarn">弱</span> : null}
+                                              {typeof e.start_line === 'number' && <span> · 行 {e.start_line}-{e.end_line ?? e.start_line}</span>}
+                                              {typeof e.start_line === 'number' && <button className="evidenceLocateBtn" onClick={(ev) => { ev.stopPropagation(); locateEvidence(e.start_line, e.end_line) }}>定位原文</button>}
+                                            </div>
+                                            <div className="itemBody">
+                                              <MarkdownView markdown={String(e.snippet ?? '')} paperId={paperIdForImages} />
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                <div style={{ marginTop: 10 }}>
+                                  <textarea
+                                    className="textarea"
+                                    name={`logic_draft_${s.step_type}`}
+                                    value={logicDraft[s.step_type] ?? ''}
+                                    onChange={(e) => setLogicDraft((m) => ({ ...m, [s.step_type]: e.target.value }))}
+                                  />
+                                  <div className="row" style={{ marginTop: 10 }}>
+                                    <button className="btn btnPrimary" onClick={() => saveLogic(s.step_type)}>保存</button>
+                                    <button className="btn" onClick={() => restoreMachineLogic(s.step_type)}>恢复机器</button>
+                                    <button className="btn btnDanger" onClick={() => clearLogic(s.step_type)}>清空（不保留）</button>
+                                  </div>
+                                  {reviewNeedsReview && s.source !== 'machine' && (
+                                    <div className="hint" style={{ marginTop: 8 }}>
+                                      本项在上次重建后需要裁决：机器候选可在"待裁决"抽屉中查看对比。
+                                    </div>
+                                  )}
+                                </div>
+                              )}
                             </div>
-                            {reviewNeedsReview && s.source !== 'machine' && (
-                              <div className="hint" style={{ marginTop: 8 }}>
-                                本项在上次重建后需要裁决：机器候选可在“待裁决”抽屉中查看对比。
-                              </div>
-                            )}
                           </div>
-                        )}
-                      </div>
-                    ))}
+                        </div>
+                      )
+                    })}
                   </div>
                   {(detail.logic_steps ?? []).length === 0 && <div className="metaLine">暂无逻辑步骤。</div>}
                 </div>
@@ -1273,7 +1438,7 @@ export default function PaperDetailPage() {
             )}
 
             {tab === 'claims' && (
-              <div className="panel">
+              <div className="panel pdReadPanel pdReadPanel--claims">
                 <div className="panelHeader">
                   <div className="split">
                     <div className="panelTitle">要点</div>
@@ -1289,104 +1454,96 @@ export default function PaperDetailPage() {
                     <div className="hint">保存后会生成稳定的 claim_key，用于后续重建对齐与裁决。</div>
                   </div>
                   <div className="list">
-                    {(detail.claims ?? []).map((c) => {
-                      const key = c.claim_key
-                      const src = String(c.source ?? 'machine')
-                      const isEditing = !!claimEdit[key]
-                      const stepType = String(c.step_type ?? '')
-                      const kinds = (c.kinds ?? []) as string[]
-                      const evidence = (c.evidence ?? []) as Array<{ chunk_id: string; snippet?: string; weak?: boolean }>
-                      const targets = (c.targets ?? []) as Array<{ paper_id: string; doi?: string | null; title?: string | null }>
-                      return (
-                        <div key={key} className="itemCard">
-                          <div className="split">
-                            <div className="itemTitle" style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-                              要点 <code>{key}</code>
-                              <span className={src === 'human' ? 'badge badgeOk' : src === 'cleared' ? 'badge badgeDanger' : 'badge'}>{src === 'human' ? '人工' : src === 'cleared' ? '清空' : '机器'}</span>
-                              {stepType && <span className="badge">{stepLabel(detail.schema ?? null, stepType)}</span>}
-                              {kinds.slice(0, 6).map((k) => (
-                                <span key={k} className="badge" title={k}>
-                                  {kindLabel(detail.schema ?? null, k)}
-                                </span>
-                              ))}
-                            </div>
-                            <div className="row" style={{ gap: 8, justifyContent: 'flex-end' }}>
-                              <span className="badge" title="机器置信度">
-                                {(Number(c.confidence ?? 0) || 0).toFixed(2)}
-                              </span>
-                              <button className="btn btnSmall" onClick={() => openClaimEvidenceEditor(c)}>
-                                证据(Evidence)
-                              </button>
-                              <button
-                                className="btn btnSmall"
-                                onClick={() => {
-                                  const open = !isEditing
-                                  setClaimEdit((m) => ({ ...m, [key]: open }))
-                                  if (open) setClaimDraft((m) => ({ ...m, [key]: String(c.text ?? '') }))
-                                }}
-                              >
-                                {isEditing ? '关闭编辑' : '编辑'}
-                              </button>
-                            </div>
+                    {(() => {
+                      const claims = detail.claims ?? []
+                      const grouped: Record<string, NonNullable<PaperDetail['claims']>[number][]> = {}
+                      for (const c of claims) {
+                        const st = String(c.step_type ?? '') || '_ungrouped'
+                        if (!grouped[st]) grouped[st] = []
+                        grouped[st].push(c)
+                      }
+                      const entries = Object.entries(grouped)
+                      return entries.map(([st, items]) => (
+                        <div key={st}>
+                          <div className="claimsGroupDivider">
+                            {st === '_ungrouped' ? '未分类' : stepLabel(detail.schema ?? null, st)}
+                            {' '}({items.length})
                           </div>
-
-                          {!isEditing ? (
-                            <div>
-                              <div className="itemBody">
-                                <MarkdownView markdown={c.text || '（空）'} paperId={paperIdForImages} />
-                              </div>
-                              {evidence.length > 0 && (
-                                <div style={{ marginTop: 10 }}>
-                                  <div className="metaLine">证据(Evidence)</div>
-                                  <div className="list" style={{ marginTop: 8 }}>
-                                    {evidence.map((e) => (
-                                      <div key={e.chunk_id} className="itemCard" style={{ background: 'rgba(255,255,255,0.02)' }}>
-                                        <div className="itemMeta">
-                                          <code>{e.chunk_id}</code> {e.weak ? <span className="badge badgeWarn">弱</span> : null}
-                                        </div>
-                                        <div className="itemBody">
-                                          <MarkdownView markdown={String(e.snippet ?? '')} paperId={paperIdForImages} />
-                                        </div>
-                                      </div>
+                          {items.map((c) => {
+                            const key = c.claim_key
+                            const src = String(c.source ?? 'machine')
+                            const isEditing = !!claimEdit[key]
+                            const kinds = (c.kinds ?? []) as string[]
+                            const evidence = (c.evidence ?? []) as Array<{ chunk_id: string; snippet?: string; weak?: boolean; start_line?: number | null; end_line?: number | null }>
+                            const targets = (c.targets ?? []) as Array<{ paper_id: string; doi?: string | null; title?: string | null }>
+                            return (
+                              <div key={key} className="itemCard">
+                                <div className="split">
+                                  <div className="itemTitle" style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+                                    要点 <code>{key}</code>
+                                    <span className={src === 'human' ? 'badge badgeOk' : src === 'cleared' ? 'badge badgeDanger' : 'badge'}>{src === 'human' ? '人工' : src === 'cleared' ? '清空' : '机器'}</span>
+                                    {kinds.slice(0, 6).map((k) => (
+                                      <span key={k} className="badge" title={k}>{kindLabel(detail.schema ?? null, k)}</span>
                                     ))}
                                   </div>
-                                </div>
-                              )}
-                              {targets.length > 0 && (
-                                <div style={{ marginTop: 10 }}>
-                                  <div className="metaLine">对齐目标(Targets)</div>
-                                  <div className="list" style={{ marginTop: 8 }}>
-                                    {targets.map((t) => (
-                                      <div key={t.paper_id} className="itemCard" style={{ background: 'rgba(255,255,255,0.02)' }}>
-                                        <div className="itemMeta">
-                                          <code>{t.paper_id}</code> {t.doi ? ` · ${t.doi}` : ''}
-                                        </div>
-                                        <div className="itemBody">{t.title ?? ''}</div>
-                                      </div>
-                                    ))}
+                                  <div className="row" style={{ gap: 8, justifyContent: 'flex-end' }}>
+                                    <span className="badge" title="机器置信度">{(Number(c.confidence ?? 0) || 0).toFixed(2)}</span>
+                                    <button className="btn btnSmall" onClick={() => openClaimEvidenceEditor(c)}>证据(Evidence)</button>
+                                    <button className="btn btnSmall" onClick={() => { const open = !isEditing; setClaimEdit((m) => ({ ...m, [key]: open })); if (open) setClaimDraft((m) => ({ ...m, [key]: String(c.text ?? '') })) }}>
+                                      {isEditing ? '关闭编辑' : '编辑'}
+                                    </button>
                                   </div>
                                 </div>
-                              )}
-                            </div>
-                          ) : (
-                            <div style={{ marginTop: 10 }}>
-                              <textarea className="textarea" name={`claim_draft_${key}`} value={claimDraft[key] ?? ''} onChange={(e) => setClaimDraft((m) => ({ ...m, [key]: e.target.value }))} />
-                              <div className="row" style={{ marginTop: 10 }}>
-                                <button className="btn btnPrimary" onClick={() => saveClaim(key)}>
-                                  保存
-                                </button>
-                                <button className="btn" onClick={() => restoreMachineClaim(key)}>
-                                  恢复机器
-                                </button>
-                                <button className="btn btnDanger" onClick={() => clearClaim(key)}>
-                                  清空（不保留）
-                                </button>
+                                {!isEditing ? (
+                                  <div>
+                                    <div className="itemBody"><MarkdownView markdown={c.text || '（空）'} paperId={paperIdForImages} /></div>
+                                    {evidence.length > 0 && (
+                                      <div style={{ marginTop: 10 }}>
+                                        <div className="metaLine">证据 ({evidence.length})</div>
+                                        <div className="list" style={{ marginTop: 8 }}>
+                                          {evidence.map((e) => (
+                                            <div key={e.chunk_id} className={`itemCard itemCard--evidence${typeof e.start_line === 'number' ? ' itemCard--clickable' : ''}`} onClick={() => locateEvidence(e.start_line, e.end_line)}>
+                                              <div className="itemMeta">
+                                                <code>{e.chunk_id}</code> {e.weak ? <span className="badge badgeWarn">弱</span> : null}
+                                                {typeof e.start_line === 'number' && <span> · 行 {e.start_line}-{e.end_line ?? e.start_line}</span>}
+                                                {typeof e.start_line === 'number' && <button className="evidenceLocateBtn" onClick={(ev) => { ev.stopPropagation(); locateEvidence(e.start_line, e.end_line) }}>定位原文</button>}
+                                              </div>
+                                              <div className="itemBody"><MarkdownView markdown={String(e.snippet ?? '')} paperId={paperIdForImages} /></div>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+                                    {targets.length > 0 && (
+                                      <div style={{ marginTop: 10 }}>
+                                        <div className="metaLine">对齐目标(Targets)</div>
+                                        <div className="list" style={{ marginTop: 8 }}>
+                                          {targets.map((t) => (
+                                            <div key={t.paper_id} className="itemCard itemCard--evidence">
+                                              <div className="itemMeta"><code>{t.paper_id}</code> {t.doi ? ` · ${t.doi}` : ''}</div>
+                                              <div className="itemBody">{t.title ?? ''}</div>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <div style={{ marginTop: 10 }}>
+                                    <textarea className="textarea" name={`claim_draft_${key}`} value={claimDraft[key] ?? ''} onChange={(e) => setClaimDraft((m) => ({ ...m, [key]: e.target.value }))} />
+                                    <div className="row" style={{ marginTop: 10 }}>
+                                      <button className="btn btnPrimary" onClick={() => saveClaim(key)}>保存</button>
+                                      <button className="btn" onClick={() => restoreMachineClaim(key)}>恢复机器</button>
+                                      <button className="btn btnDanger" onClick={() => clearClaim(key)}>清空（不保留）</button>
+                                    </div>
+                                  </div>
+                                )}
                               </div>
-                            </div>
-                          )}
+                            )
+                          })}
                         </div>
-                      )
-                    })}
+                      ))
+                    })()}
                   </div>
                   {(detail.claims ?? []).length === 0 && <div className="metaLine">暂无要点。</div>}
                 </div>
@@ -1534,24 +1691,18 @@ export default function PaperDetailPage() {
             )}
 
             {tab === 'content' && (
-              <div className="panel">
-                <div className="panelHeader">
-                  <div className="panelTitle">原文 Markdown</div>
-                </div>
-                <div className="panelBody">
-                  {mdLoading && <div className="metaLine">加载中…</div>}
-                  {mdError && <div className="errorBox">{mdError}</div>}
-                  {mdContent !== null && !mdLoading && (
-                    <MarkdownView markdown={mdContent} paperId={paperIdForImages} />
-                  )}
-                  {mdContent === null && !mdLoading && !mdError && (
-                    <div className="metaLine">暂无原文内容。</div>
-                  )}
-                </div>
-              </div>
+              <OriginalTextPanel paperId={id} mode="fullwidth" highlightRange={highlightRange} onPopout={() => setShowContentModal(true)} />
             )}
           </div>
+          {isPinned && tab !== 'content' && (
+            <OriginalTextPanel paperId={id} mode="sidebar" onClose={() => togglePin(false)} highlightRange={highlightRange} onPopout={() => setShowContentModal(true)} />
+          )}
+          </div>
         </>
+      )}
+
+      {showContentModal && (
+        <OriginalTextPanel paperId={id} mode="modal" onClose={() => setShowContentModal(false)} highlightRange={highlightRange} />
       )}
 
       {activeFigureGroup && (
@@ -1614,7 +1765,7 @@ export default function PaperDetailPage() {
                 </button>
               </div>
               <div className="hint" style={{ marginTop: 10 }}>
-                复选框不限数量；保存后会作为“人工证据”覆盖机器证据，并在重建后可继续保留。
+                复选框不限数量；保存后会作为"人工证据"覆盖机器证据，并在重建后可继续保留。
               </div>
               <div className="list" style={{ marginTop: 12 }}>
                 {evidenceResults.map((c) => {

@@ -2,7 +2,7 @@ import { Link, NavLink, Outlet } from 'react-router-dom'
 import { apiBaseUrl } from '../api'
 import './layout.css'
 
-type NavIconName = 'ingest' | 'papers' | 'unresolved' | 'graph' | 'evolution' | 'ask' | 'tasks' | 'schema'
+type NavIconName = 'ingest' | 'papers' | 'unresolved' | 'textbooks' | 'graph' | 'evolution' | 'ask' | 'tasks' | 'schema'
 
 type NavSection = {
   title: string
@@ -20,6 +20,7 @@ const navSections: NavSection[] = [
       { to: '/ingest', label: '导入', icon: 'ingest' },
       { to: '/papers', label: '论文', icon: 'papers' },
       { to: '/unresolved', label: '待解析引用', icon: 'unresolved' },
+      { to: '/textbooks', label: '教科书', icon: 'textbooks' },
     ],
   },
   {
@@ -55,6 +56,14 @@ function iconPath(icon: NavIconName) {
         <>
           <path d="M10 3h10a1 1 0 0 1 1 1v15a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" />
           <path d="M4 7h4v12H6a2 2 0 0 1-2-2V7Zm9 4h4m-4 4h2" />
+        </>
+      )
+    case 'textbooks':
+      return (
+        <>
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" />
+          <path d="M8 7h8m-8 4h6" />
         </>
       )
     case 'graph':

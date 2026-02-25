@@ -9,10 +9,12 @@
 ## 1. 你将获得什么
 
 - **图谱入库**：Paper、段落 Chunk、参考文献、引用关系（CITES）等写入 Neo4j
-- **引用网络**：不仅记录“引用了谁”，也支持“引用目的”（多标签 + 置信度）
+- **引用网络**：不仅记录”引用了谁”，也支持”引用目的”（多标签 + 置信度）
 - **证据可追溯**：图谱边与回答可回指到 MinerU `md` 的文本片段（chunk + 行号/跨度）
+  - **v8 新特性**: Evidence Quote 机制，100% 的 claims 可精确定位到原文位置
 - **双轨抽取（Phase1）**：`Raw Pool` 保存全候选，`Validated KG` 仅写入通过质量门禁的结果
-- **质量门禁 v2（Phase2）**：新增 `critical_slot_coverage` 与 `conflict_rate`，支持缺口检测与冲突约束
+- **质量门禁 v8（Phase2）**：支持 `critical_slot_coverage`、`conflict_rate`、`logic_steps_coverage` 等多维度质量评估
+  - **v8 新特性**: 智能 bypass 机制，适配软件/理论/综述等不同类型论文
 - **GraphRAG**：向量召回（FAISS）+ 图信息（Neo4j）+ LLM 生成
 - **前端工作台**：导入、论文列表、论文详情、未解析引用、图谱视图、问答、任务等
 - **Schema 全可配**：前端 `Schema` 页面支持规则/提示词细粒度配置 + `Rules JSON`/`Prompts JSON` 任意键扩展
@@ -384,6 +386,21 @@ server {
 
 ---
 
-## 9. License
+## 9. 版本历史
+
+### v8 (2026-02-20)
+**核心改进**:
+- **Evidence Quote 架构**: Span 定位准确率从 59.8% 提升至 100%
+- **质量门禁优化**: 适配软件/理论/综述类论文,通过率从 70% 提升至 90%
+
+**详细说明**: 参见项目内部文档 `docs/releases/2026-02-20-round8-evidence-quote-and-p03-gate.md`
+
+**关键提交**:
+- `337d344` - Round 8: Evidence Quote based span extraction
+- `55f8df8` - P0.3: Add base gate for Result/non-Method claims
+
+---
+
+## 10. License
 
 如需开源发布，请补充许可证（LICENSE）与贡献指南（CONTRIBUTING）。

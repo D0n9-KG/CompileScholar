@@ -106,6 +106,12 @@ class Neo4jClient:
             "CREATE INDEX evidence_event_type IF NOT EXISTS FOR (ev:EvidenceEvent) ON (ev.event_type)",
             "CREATE INDEX evidence_event_status IF NOT EXISTS FOR (ev:EvidenceEvent) ON (ev.status)",
             "CREATE INDEX collection_name IF NOT EXISTS FOR (co:Collection) ON (co.name)",
+            # ── Textbook sub-graph constraints & indexes ──
+            "CREATE CONSTRAINT textbook_id_unique IF NOT EXISTS FOR (t:Textbook) REQUIRE t.textbook_id IS UNIQUE",
+            "CREATE CONSTRAINT chapter_id_unique IF NOT EXISTS FOR (tc:TextbookChapter) REQUIRE tc.chapter_id IS UNIQUE",
+            "CREATE CONSTRAINT entity_id_unique IF NOT EXISTS FOR (ke:KnowledgeEntity) REQUIRE ke.entity_id IS UNIQUE",
+            "CREATE INDEX entity_name IF NOT EXISTS FOR (ke:KnowledgeEntity) ON (ke.name)",
+            "CREATE INDEX entity_type IF NOT EXISTS FOR (ke:KnowledgeEntity) ON (ke.entity_type)",
         ]
         with self._driver.session() as session:
             for s in stmts:
@@ -2473,3 +2479,341 @@ RETURN count(c) AS updated
         if not row:
             return 0
         return int(row["updated"] or 0)
+
+    # ──────────────────────────────────────────────────────────────────────
+    # Textbook sub-graph CRUD
+    # ──────────────────────────────────────────────────────────────────────
+
+    def upsert_textbook(
+        self,
+        textbook_id: str,
+        title: str,
+        authors: list[str] | None = None,
+        year: int | None = None,
+        edition: str | None = None,
+        doc_type: str = "textbook",
+        source_dir: str | None = None,
+        total_chapters: int = 0,
+    ) -> None:
+        cypher = """
+MERGE (t:Textbook {textbook_id: $textbook_id})
+SET t.title          = $title,
+    t.authors        = $authors,
+    t.year           = $year,
+    t.edition        = $edition,
+    t.doc_type       = $doc_type,
+    t.source_dir     = $source_dir,
+    t.total_chapters = $total_chapters,
+    t.ingested       = datetime()
+"""
+        with self._driver.session() as session:
+            session.run(
+                cypher,
+                textbook_id=str(textbook_id),
+                title=str(title or ""),
+                authors=[str(a) for a in (authors or []) if str(a).strip()],
+                year=int(year) if year is not None else None,
+                edition=str(edition) if edition else None,
+                doc_type=str(doc_type or "textbook"),
+                source_dir=str(source_dir) if source_dir else None,
+                total_chapters=int(total_chapters or 0),
+            )
+
+    def upsert_textbook_chapter(
+        self,
+        chapter_id: str,
+        textbook_id: str,
+        chapter_num: int,
+        title: str,
+        youtu_graph_file: str | None = None,
+        entity_count: int = 0,
+        relation_count: int = 0,
+    ) -> None:
+        cypher = """
+MATCH (t:Textbook {textbook_id: $textbook_id})
+MERGE (c:TextbookChapter {chapter_id: $chapter_id})
+SET c.chapter_num      = $chapter_num,
+    c.title            = $title,
+    c.youtu_graph_file = $youtu_graph_file,
+    c.entity_count     = $entity_count,
+    c.relation_count   = $relation_count
+MERGE (t)-[:HAS_CHAPTER]->(c)
+"""
+        with self._driver.session() as session:
+            session.run(
+                cypher,
+                chapter_id=str(chapter_id),
+                textbook_id=str(textbook_id),
+                chapter_num=int(chapter_num),
+                title=str(title or ""),
+                youtu_graph_file=str(youtu_graph_file) if youtu_graph_file else None,
+                entity_count=int(entity_count or 0),
+                relation_count=int(relation_count or 0),
+            )
+
+    def create_knowledge_entities(self, entities: list[dict]) -> int:
+        """Batch-create KnowledgeEntity nodes. Returns count created."""
+        if not entities:
+            return 0
+        cypher = """
+UNWIND $rows AS r
+MERGE (e:KnowledgeEntity {entity_id: r.entity_id})
+SET e.name              = r.name,
+    e.entity_type       = r.entity_type,
+    e.description       = r.description,
+    e.attributes        = r.attributes,
+    e.source_chapter_id = r.source_chapter_id
+RETURN count(e) AS cnt
+"""
+        rows = []
+        for ent in entities:
+            eid = str(ent.get("entity_id") or "").strip()
+            if not eid:
+                continue
+            rows.append({
+                "entity_id": eid,
+                "name": str(ent.get("name") or ""),
+                "entity_type": str(ent.get("entity_type") or "unknown"),
+                "description": str(ent.get("description") or ""),
+                "attributes": str(ent.get("attributes") or "{}"),
+                "source_chapter_id": str(ent.get("source_chapter_id") or ""),
+            })
+        if not rows:
+            return 0
+        total = 0
+        batch_size = 200
+        with self._driver.session() as session:
+            for i in range(0, len(rows), batch_size):
+                batch = rows[i : i + batch_size]
+                result = session.run(cypher, rows=batch)
+                row = result.single()
+                total += int(row["cnt"]) if row else 0
+        return total
+
+    def create_entity_relations(self, relations: list[dict]) -> int:
+        """Batch-create RELATES_TO edges between KnowledgeEntity nodes."""
+        if not relations:
+            return 0
+        cypher = """
+UNWIND $rows AS r
+MATCH (a:KnowledgeEntity {entity_id: r.start_id})
+MATCH (b:KnowledgeEntity {entity_id: r.end_id})
+MERGE (a)-[rel:RELATES_TO {rel_type: r.rel_type}]->(b)
+RETURN count(rel) AS cnt
+"""
+        rows = []
+        for rel in relations:
+            sid = str(rel.get("start_id") or "").strip()
+            eid = str(rel.get("end_id") or "").strip()
+            if not sid or not eid:
+                continue
+            rows.append({
+                "start_id": sid,
+                "end_id": eid,
+                "rel_type": str(rel.get("rel_type") or "related_to"),
+            })
+        if not rows:
+            return 0
+        total = 0
+        batch_size = 200
+        with self._driver.session() as session:
+            for i in range(0, len(rows), batch_size):
+                batch = rows[i : i + batch_size]
+                result = session.run(cypher, rows=batch)
+                row = result.single()
+                total += int(row["cnt"]) if row else 0
+        return total
+
+    def link_chapter_entities(self, chapter_id: str, entity_ids: list[str]) -> int:
+        """Create HAS_ENTITY edges from TextbookChapter to KnowledgeEntity nodes."""
+        if not entity_ids:
+            return 0
+        cypher = """
+MATCH (c:TextbookChapter {chapter_id: $chapter_id})
+UNWIND $entity_ids AS eid
+MATCH (e:KnowledgeEntity {entity_id: eid})
+MERGE (c)-[:HAS_ENTITY]->(e)
+RETURN count(*) AS cnt
+"""
+        with self._driver.session() as session:
+            result = session.run(cypher, chapter_id=str(chapter_id), entity_ids=[str(e) for e in entity_ids])
+            row = result.single()
+        return int(row["cnt"]) if row else 0
+
+    def list_textbooks(self, limit: int = 100) -> list[dict]:
+        cypher = """
+MATCH (t:Textbook)
+OPTIONAL MATCH (t)-[:HAS_CHAPTER]->(c:TextbookChapter)
+WITH t, count(c) AS ch_count,
+     coalesce(sum(c.entity_count), 0) AS total_entities
+RETURN t.textbook_id   AS textbook_id,
+       t.title          AS title,
+       t.authors        AS authors,
+       t.year           AS year,
+       t.edition        AS edition,
+       t.doc_type       AS doc_type,
+       t.total_chapters AS total_chapters,
+       ch_count         AS chapter_count,
+       total_entities   AS entity_count,
+       t.ingested       AS ingested
+ORDER BY t.ingested DESC
+LIMIT $limit
+"""
+        with self._driver.session() as session:
+            return [dict(r) for r in session.run(cypher, limit=int(limit))]
+
+    def get_textbook_detail(self, textbook_id: str) -> dict:
+        cypher_tb = """
+MATCH (t:Textbook {textbook_id: $textbook_id})
+RETURN t.textbook_id   AS textbook_id,
+       t.title          AS title,
+       t.authors        AS authors,
+       t.year           AS year,
+       t.edition        AS edition,
+       t.doc_type       AS doc_type,
+       t.source_dir     AS source_dir,
+       t.total_chapters AS total_chapters,
+       t.ingested       AS ingested
+"""
+        cypher_ch = """
+MATCH (t:Textbook {textbook_id: $textbook_id})-[:HAS_CHAPTER]->(c:TextbookChapter)
+RETURN c.chapter_id      AS chapter_id,
+       c.chapter_num     AS chapter_num,
+       c.title           AS title,
+       c.entity_count    AS entity_count,
+       c.relation_count  AS relation_count,
+       c.youtu_graph_file AS youtu_graph_file
+ORDER BY c.chapter_num
+"""
+        with self._driver.session() as session:
+            row = session.run(cypher_tb, textbook_id=str(textbook_id)).single()
+            if not row:
+                raise KeyError(f"Textbook not found: {textbook_id}")
+            tb = dict(row)
+            chapters = [dict(r) for r in session.run(cypher_ch, textbook_id=str(textbook_id))]
+        tb["chapters"] = chapters
+        return tb
+
+    def get_chapter_entities(self, chapter_id: str, limit: int = 500) -> dict:
+        cypher_ents = """
+MATCH (c:TextbookChapter {chapter_id: $chapter_id})-[:HAS_ENTITY]->(e:KnowledgeEntity)
+RETURN e.entity_id   AS entity_id,
+       e.name        AS name,
+       e.entity_type AS entity_type,
+       e.description AS description,
+       e.attributes  AS attributes
+ORDER BY e.name
+LIMIT $limit
+"""
+        cypher_rels = """
+MATCH (c:TextbookChapter {chapter_id: $chapter_id})-[:HAS_ENTITY]->(e1:KnowledgeEntity)
+MATCH (e1)-[r:RELATES_TO]->(e2:KnowledgeEntity)<-[:HAS_ENTITY]-(c)
+RETURN e1.entity_id AS source_id,
+       e2.entity_id AS target_id,
+       r.rel_type   AS rel_type
+"""
+        with self._driver.session() as session:
+            entities = [dict(r) for r in session.run(cypher_ents, chapter_id=str(chapter_id), limit=int(limit))]
+            relations = [dict(r) for r in session.run(cypher_rels, chapter_id=str(chapter_id))]
+        return {"entities": entities, "relations": relations}
+
+    def get_textbook_entities(self, textbook_id: str, limit: int = 2000) -> list[dict]:
+        cypher = """
+MATCH (t:Textbook {textbook_id: $textbook_id})-[:HAS_CHAPTER]->(c:TextbookChapter)-[:HAS_ENTITY]->(e:KnowledgeEntity)
+WITH DISTINCT e, c
+RETURN e.entity_id   AS entity_id,
+       e.name        AS name,
+       e.entity_type AS entity_type,
+       e.description AS description,
+       e.attributes  AS attributes,
+       c.chapter_id  AS chapter_id,
+       c.title       AS chapter_title
+ORDER BY c.chapter_num, e.name
+LIMIT $limit
+"""
+        with self._driver.session() as session:
+            return [dict(r) for r in session.run(cypher, textbook_id=str(textbook_id), limit=int(limit))]
+
+    def delete_textbook(self, textbook_id: str) -> dict:
+        """Cascade-delete a textbook within a single transaction.
+
+        Only deletes entities exclusively owned by this textbook (not shared
+        with other textbooks).
+        """
+        def _tx(tx):
+            # 1) Delete entities that belong ONLY to this textbook's chapters
+            r1 = tx.run("""
+MATCH (t:Textbook {textbook_id: $tid})-[:HAS_CHAPTER]->(c:TextbookChapter)-[:HAS_ENTITY]->(e:KnowledgeEntity)
+WHERE NOT EXISTS {
+    MATCH (other:TextbookChapter)-[:HAS_ENTITY]->(e)
+    WHERE other.chapter_id <> c.chapter_id
+    AND NOT EXISTS { MATCH (t)-[:HAS_CHAPTER]->(other) }
+}
+DETACH DELETE e
+RETURN count(e) AS cnt
+""", tid=str(textbook_id)).single()
+            # 2) Delete chapters
+            r2 = tx.run("""
+MATCH (t:Textbook {textbook_id: $tid})-[:HAS_CHAPTER]->(c:TextbookChapter)
+DETACH DELETE c
+RETURN count(c) AS cnt
+""", tid=str(textbook_id)).single()
+            # 3) Delete textbook node
+            r3 = tx.run("""
+MATCH (t:Textbook {textbook_id: $tid})
+DETACH DELETE t
+RETURN count(t) AS cnt
+""", tid=str(textbook_id)).single()
+            return {
+                "deleted_entities": int(r1["cnt"]) if r1 else 0,
+                "deleted_chapters": int(r2["cnt"]) if r2 else 0,
+                "deleted_textbook": int(r3["cnt"]) if r3 else 0,
+            }
+
+        with self._driver.session() as session:
+            return session.execute_write(_tx)
+
+    def list_knowledge_entities_for_propositions(self, textbook_id: str, limit: int = 5000) -> list[dict]:
+        """List KnowledgeEntities eligible for Proposition mapping.
+
+        Only proposition-type entities are returned: theory, equation,
+        method, model, condition (entities that make assertive claims).
+        """
+        cypher = """
+MATCH (t:Textbook {textbook_id: $textbook_id})-[:HAS_CHAPTER]->(c:TextbookChapter)-[:HAS_ENTITY]->(e:KnowledgeEntity)
+WHERE e.entity_type IN ['theory', 'equation', 'method', 'model', 'condition']
+RETURN DISTINCT e.entity_id   AS entity_id,
+       e.name                 AS name,
+       e.entity_type          AS entity_type,
+       e.description          AS description,
+       c.chapter_id           AS chapter_id
+ORDER BY e.name
+LIMIT $limit
+"""
+        with self._driver.session() as session:
+            return [dict(r) for r in session.run(cypher, textbook_id=str(textbook_id), limit=int(limit))]
+
+    def upsert_proposition_for_entity(self, items: list[dict]) -> dict[str, int]:
+        """Create Proposition nodes from KnowledgeEntities and MAPS_TO edges.
+
+        Each item: {entity_id, prop_id, prop_key, canonical_text, source_type}
+        """
+        if not items:
+            return {"entities": 0, "propositions": 0}
+        cypher = """
+UNWIND $items AS it
+MATCH (e:KnowledgeEntity {entity_id: it.entity_id})
+MERGE (pr:Proposition {prop_id: it.prop_id})
+ON CREATE SET pr.prop_key        = it.prop_key,
+              pr.canonical_text   = it.canonical_text,
+              pr.created_at       = $now,
+              pr.source_type      = it.source_type,
+              pr.current_state    = 'stable'
+SET pr.last_seen_at = $now
+MERGE (e)-[:MAPS_TO]->(pr)
+RETURN count(DISTINCT pr) AS prop_cnt
+"""
+        with self._driver.session() as session:
+            result = session.run(cypher, items=items, now=datetime.now(tz=timezone.utc).isoformat())
+            row = result.single()
+        return {"entities": len(items), "propositions": int(row["prop_cnt"]) if row else 0}

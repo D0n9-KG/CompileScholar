@@ -24,6 +24,7 @@ class TaskType(str, Enum):
     rebuild_similarity = "rebuild_similarity"
     rebuild_evolution = "rebuild_evolution"
     update_similarity_paper = "update_similarity_paper"
+    ingest_textbook = "ingest_textbook"
 
 
 def utc_now_iso() -> str:

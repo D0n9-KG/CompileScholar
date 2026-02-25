@@ -11,6 +11,8 @@ import EvolutionPage from './pages/EvolutionPage'
 import SchemaPage from './pages/SchemaPage'
 import TasksPage from './pages/TasksPage'
 import UnresolvedPage from './pages/UnresolvedPage'
+import TextbooksPage from './pages/TextbooksPage'
+import TextbookDetailPage from './pages/TextbookDetailPage'
 
 export default function App() {
   return (
@@ -25,6 +27,8 @@ export default function App() {
           <Route path="/papers" element={<PapersPage />} />
           <Route path="/paper/:paperId" element={<PaperDetailPage />} />
           <Route path="/unresolved" element={<UnresolvedPage />} />
+          <Route path="/textbooks" element={<TextbooksPage />} />
+          <Route path="/textbooks/:textbookId" element={<TextbookDetailPage />} />
           <Route path="/ask" element={<AskPage />} />
           <Route path="/tasks" element={<TasksPage />} />
           <Route path="/schema" element={<SchemaPage />} />

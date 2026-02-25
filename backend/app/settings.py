@@ -145,6 +145,31 @@ class Settings(BaseSettings):
     data_root: str = ".."
     storage_dir: str = "storage"
 
+    # ── Textbook / autoyoutu integration ──
+
+    autoyoutu_dir: str = Field(
+        default="",
+        description="Path to autoyoutu project directory",
+        validation_alias=AliasChoices("AUTOYOUTU_DIR"),
+    )
+    youtu_ssh_host: str = Field(
+        default="", validation_alias=AliasChoices("YOUTU_SSH_HOST"),
+    )
+    youtu_ssh_user: str = Field(
+        default="", validation_alias=AliasChoices("YOUTU_SSH_USER"),
+    )
+    youtu_ssh_key_path: str = Field(
+        default="", validation_alias=AliasChoices("YOUTU_SSH_KEY_PATH"),
+    )
+    textbook_youtu_schema: str = Field(
+        default="textbook_dem",
+        validation_alias=AliasChoices("TEXTBOOK_YOUTU_SCHEMA"),
+    )
+    textbook_chapter_max_tokens: int = Field(
+        default=8000, ge=1000, le=64000,
+        validation_alias=AliasChoices("TEXTBOOK_CHAPTER_MAX_TOKENS"),
+    )
+
     def effective_llm_api_key(self) -> str | None:
         if self.llm_api_key:
             return self.llm_api_key
