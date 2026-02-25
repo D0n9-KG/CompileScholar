@@ -8,6 +8,7 @@ from pathlib import Path
 
 from neo4j import GraphDatabase
 
+from app.fusion.schema import FUSION_SCHEMA_STATEMENTS
 from app.ingest.models import DocumentIR
 from app.settings import settings
 
@@ -113,6 +114,7 @@ class Neo4jClient:
             "CREATE INDEX entity_name IF NOT EXISTS FOR (ke:KnowledgeEntity) ON (ke.name)",
             "CREATE INDEX entity_type IF NOT EXISTS FOR (ke:KnowledgeEntity) ON (ke.entity_type)",
         ]
+        stmts.extend(FUSION_SCHEMA_STATEMENTS)
         with self._driver.session() as session:
             for s in stmts:
                 session.run(s)
@@ -2599,6 +2601,17 @@ UNWIND $rows AS r
 MATCH (a:KnowledgeEntity {entity_id: r.start_id})
 MATCH (b:KnowledgeEntity {entity_id: r.end_id})
 MERGE (a)-[rel:RELATES_TO {rel_type: r.rel_type}]->(b)
+SET rel.source_chunk_id = CASE
+        WHEN r.source_chunk_id IS NULL OR trim(toString(r.source_chunk_id)) = '' THEN rel.source_chunk_id
+        ELSE r.source_chunk_id
+    END,
+    rel.evidence_quote = CASE
+        WHEN r.evidence_quote IS NULL OR trim(toString(r.evidence_quote)) = '' THEN rel.evidence_quote
+        ELSE r.evidence_quote
+    END,
+    rel.char_start = coalesce(r.char_start, rel.char_start),
+    rel.char_end = coalesce(r.char_end, rel.char_end),
+    rel.confidence = coalesce(r.confidence, rel.confidence)
 RETURN count(rel) AS cnt
 """
         rows = []
@@ -2611,6 +2624,11 @@ RETURN count(rel) AS cnt
                 "start_id": sid,
                 "end_id": eid,
                 "rel_type": str(rel.get("rel_type") or "related_to"),
+                "source_chunk_id": str(rel.get("source_chunk_id") or "").strip() or None,
+                "evidence_quote": str(rel.get("evidence_quote") or "").strip() or None,
+                "char_start": int(rel["char_start"]) if rel.get("char_start") is not None else None,
+                "char_end": int(rel["char_end"]) if rel.get("char_end") is not None else None,
+                "confidence": float(rel["confidence"]) if rel.get("confidence") is not None else None,
             })
         if not rows:
             return 0

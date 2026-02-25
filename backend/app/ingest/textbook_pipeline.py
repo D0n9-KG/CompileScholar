@@ -22,6 +22,7 @@ from typing import Any, Callable
 
 from app.graph.neo4j_client import Neo4jClient
 from app.ingest.graph_importer import import_youtu_graph
+from app.ingest.textbook_extractor_local import extract_textbook_graph_local
 from app.ingest.textbook_splitter import ChapterUnit, split_textbook_md
 from app.settings import settings
 
@@ -246,37 +247,35 @@ def ingest_textbook(
                 ch_md = ch_dir / f"chapter_{ch.chapter_num:03d}.md"
                 ch_md.write_text(ch.body, encoding="utf-8")
 
-                # Run autoyoutu pipeline (subprocess)
-                graph_json = _run_autoyoutu_pipeline(ch_md, ch_dir, log)
+                # Run local extractor and persist graph JSON for traceability.
+                progress(
+                    "textbook:extract:local",
+                    ch_progress_base + 0.2 * (1 / max(1, len(chapters))),
+                    f"Extracting local graph for chapter {ch.chapter_num}",
+                )
+                graph_payload = extract_textbook_graph_local(ch.body, chapter_id=ch_id)
+                graph_json = ch_dir / f"graph_ch{ch.chapter_num:03d}.json"
+                graph_json.write_text(json.dumps(graph_payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
-                entity_count = 0
-                relation_count = 0
-                community_count = 0
-                stored_graph_path: str | None = None
+                dest_name = f"graph_ch{ch.chapter_num:03d}.json"
+                stored = storage_base / dest_name
+                shutil.copy2(str(graph_json), str(stored))
+                stored_graph_path = str(stored)
 
-                if graph_json and graph_json.is_file():
-                    # Copy graph JSON to persistent storage
-                    dest_name = f"graph_ch{ch.chapter_num:03d}.json"
-                    stored = storage_base / dest_name
-                    shutil.copy2(str(graph_json), str(stored))
-                    stored_graph_path = str(stored)
-
-                    progress(
-                        "textbook:import",
-                        ch_progress_base + 0.4 * (1 / max(1, len(chapters))),
-                        f"Importing graph for chapter {ch.chapter_num}",
-                    )
-                    result = import_youtu_graph(
-                        graph_json_path=str(graph_json),
-                        textbook_id=tb_id,
-                        chapter_id=ch_id,
-                        neo4j_client=client,
-                    )
-                    entity_count = result.get("entity_count", 0)
-                    relation_count = result.get("relation_count", 0)
-                    community_count = result.get("community_count", 0)
-                else:
-                    log(f"WARNING: No graph produced for chapter {ch.chapter_num}")
+                progress(
+                    "textbook:import",
+                    ch_progress_base + 0.4 * (1 / max(1, len(chapters))),
+                    f"Importing graph for chapter {ch.chapter_num}",
+                )
+                result = import_youtu_graph(
+                    graph_json_path=str(graph_json),
+                    textbook_id=tb_id,
+                    chapter_id=ch_id,
+                    neo4j_client=client,
+                )
+                entity_count = result.get("entity_count", 0)
+                relation_count = result.get("relation_count", 0)
+                community_count = result.get("community_count", 0)
 
                 # Update chapter node with counts and graph file path
                 client.upsert_textbook_chapter(

@@ -172,6 +172,11 @@ def import_youtu_graph(
             "start_id": mapped_src,
             "end_id": mapped_tgt,
             "rel_type": str(edge.get("relation") or edge.get("type") or "related_to"),
+            "source_chunk_id": str(edge.get("source_chunk_id") or ""),
+            "evidence_quote": str(edge.get("evidence_quote") or ""),
+            "char_start": edge.get("char_start"),
+            "char_end": edge.get("char_end"),
+            "confidence": edge.get("confidence"),
         })
 
     # --- Write to Neo4j ---

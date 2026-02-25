@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
@@ -35,15 +37,6 @@ class FusionLinkRequest(BaseModel):
 @router.post("/ingest")
 def ingest_textbook(req: IngestTextbookRequest):
     """Submit a textbook ingestion task."""
-    # Validate autoyoutu is configured
-    from pathlib import Path
-    autoyoutu_dir = settings.autoyoutu_dir.strip()
-    if not autoyoutu_dir or not Path(autoyoutu_dir).is_dir():
-        raise HTTPException(
-            status_code=400,
-            detail=f"AUTOYOUTU_DIR not configured or not found: '{autoyoutu_dir}'. "
-                   "Set AUTOYOUTU_DIR in .env to the autoyoutu project directory.",
-        )
     if not Path(req.path).is_file():
         raise HTTPException(status_code=400, detail=f"Markdown file not found: {req.path}")
     try:
