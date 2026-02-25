@@ -28,8 +28,20 @@ task_plan.md
 progress.md
 findings.md
 
-# Docs (transient dev notes)
-docs/
+# Docs (track formal docs only, ignore ad-hoc notes by default)
+docs/*
+!docs/
+!docs/neo4j-setup.md
+!docs/plans/
+!docs/plans/**
+!docs/migrations/
+!docs/migrations/**
+!docs/benchmarks/
+!docs/benchmarks/**
+!docs/runbooks/
+!docs/runbooks/**
+!docs/releases/
+!docs/releases/**
 
 # Node / Frontend
 node_modules/

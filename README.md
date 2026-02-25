@@ -259,6 +259,24 @@ curl -X POST 'http://127.0.0.1:8000/ingest/path' \
 
 > 其余路由可直接在 Swagger 中查看（Graph、Papers、Tasks、Schema 等）。
 
+### 6.4 Fusion 一次性切换（执行中）
+
+当前版本进入 `Fusion` 重构切换窗口，基线已归档：
+
+- 基线提交：`cf93fb3`
+- 基线标签：`pre-fusion-rebuild-2026-02-25`
+
+计划在质量门禁通过后移除的旧入口：
+
+- API：`/evolution/*`、`/tasks/rebuild/evolution`、`/textbooks/fusion/link`
+- 前端：`/evolution`
+- 后端：`app/evolution/*` 与 `Proposition` 旧链路
+
+切换与回滚细则见：
+
+- `docs/plans/2026-02-25-fusion-one-shot-rebuild-plan.md`
+- `docs/migrations/2026-02-25-fusion-cutover-checklist.md`
+
 ---
 
 ## 7. 部署到服务器（推荐做法：Neo4j Docker + 后端 systemd + 前端 Nginx）
