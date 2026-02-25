@@ -23,6 +23,13 @@ backend/storage/
 logs/
 dev_pids.json
 
+# Keep schema evolution storage contract docs under version control.
+!backend/storage/
+backend/storage/*
+!backend/storage/schema/
+backend/storage/schema/*
+!backend/storage/schema/README.md
+
 # Temp session files
 task_plan.md
 progress.md

@@ -170,6 +170,20 @@ class Settings(BaseSettings):
         validation_alias=AliasChoices("TEXTBOOK_CHAPTER_MAX_TOKENS"),
     )
 
+    # Fusion schema evolution gates
+    schema_evolution_enabled: bool = Field(
+        default=True,
+        validation_alias=AliasChoices("SCHEMA_EVOLUTION_ENABLED"),
+    )
+    schema_evolution_t_high: float = Field(
+        default=0.85,
+        validation_alias=AliasChoices("SCHEMA_EVOLUTION_T_HIGH"),
+    )
+    schema_evolution_t_mid: float = Field(
+        default=0.60,
+        validation_alias=AliasChoices("SCHEMA_EVOLUTION_T_MID"),
+    )
+
     def effective_llm_api_key(self) -> str | None:
         if self.llm_api_key:
             return self.llm_api_key
