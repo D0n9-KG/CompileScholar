@@ -2658,6 +2658,137 @@ RETURN count(*) AS cnt
             row = result.single()
         return int(row["cnt"]) if row else 0
 
+    def create_fusion_explains_edges(self, links: list[dict]) -> int:
+        """Create or update EXPLAINS edges between LogicStep and KnowledgeEntity."""
+        if not links:
+            return 0
+        cypher = """
+UNWIND $rows AS r
+MATCH (ls:LogicStep {logic_step_id: r.logic_step_id})
+MATCH (e:KnowledgeEntity {entity_id: r.entity_id})
+MERGE (ls)-[rel:EXPLAINS]->(e)
+SET rel.score = coalesce(r.score, rel.score),
+    rel.reasons = coalesce(r.reasons, rel.reasons),
+    rel.evidence_chunk_ids = coalesce(r.evidence_chunk_ids, rel.evidence_chunk_ids),
+    rel.source_chapter_id = CASE
+        WHEN r.source_chapter_id IS NULL OR trim(toString(r.source_chapter_id)) = '' THEN rel.source_chapter_id
+        ELSE r.source_chapter_id
+    END,
+    rel.updated_at = datetime()
+RETURN count(rel) AS cnt
+"""
+        rows = []
+        for link in links:
+            sid = str(link.get("logic_step_id") or "").strip()
+            eid = str(link.get("entity_id") or "").strip()
+            if not sid or not eid:
+                continue
+            rows.append(
+                {
+                    "logic_step_id": sid,
+                    "entity_id": eid,
+                    "score": float(link["score"]) if link.get("score") is not None else None,
+                    "reasons": [str(x) for x in (link.get("reasons") or []) if str(x).strip()],
+                    "evidence_chunk_ids": [
+                        str(x) for x in (link.get("evidence_chunk_ids") or []) if str(x).strip()
+                    ],
+                    "source_chapter_id": str(link.get("source_chapter_id") or "").strip() or None,
+                }
+            )
+        if not rows:
+            return 0
+        with self._driver.session() as session:
+            result = session.run(cypher, rows=rows)
+            row = result.single()
+        return int(row["cnt"]) if row else 0
+
+    def upsert_fusion_communities(self, communities: list[dict]) -> int:
+        """Write FusionCommunity nodes and IN_COMMUNITY memberships."""
+        if not communities:
+            return 0
+
+        cypher = """
+UNWIND $rows AS r
+MERGE (fc:FusionCommunity {community_id: r.community_id})
+SET fc.title = r.title,
+    fc.confidence = r.confidence,
+    fc.representative_evidence = r.representative_evidence,
+    fc.updated_at = datetime()
+WITH fc, r
+UNWIND r.member_ids AS member_id
+OPTIONAL MATCH (ls:LogicStep {logic_step_id: member_id})
+OPTIONAL MATCH (cl:Claim {claim_id: member_id})
+OPTIONAL MATCH (ke:KnowledgeEntity {entity_id: member_id})
+WITH fc, r, coalesce(ls, cl, ke) AS m
+WHERE m IS NOT NULL
+MERGE (m)-[ic:IN_COMMUNITY]->(fc)
+SET ic.weight = r.weight
+RETURN count(DISTINCT fc) AS cnt
+"""
+        rows = []
+        for item in communities:
+            cid = str(item.get("community_id") or "").strip()
+            if not cid:
+                continue
+            members = [str(x).strip() for x in (item.get("member_ids") or []) if str(x).strip()]
+            if not members:
+                continue
+            rows.append(
+                {
+                    "community_id": cid,
+                    "title": str(item.get("title") or cid),
+                    "confidence": float(item.get("confidence") or 0.0),
+                    "representative_evidence": str(item.get("representative_evidence") or ""),
+                    "member_ids": members,
+                    "weight": float(item.get("weight") or 1.0),
+                }
+            )
+        if not rows:
+            return 0
+        with self._driver.session() as session:
+            result = session.run(cypher, rows=rows)
+            row = result.single()
+        return int(row["cnt"]) if row else 0
+
+    def upsert_fusion_keywords(self, keyword_rows: list[dict]) -> int:
+        """Write FusionKeyword nodes and HAS_KEYWORD edges from FusionCommunity."""
+        if not keyword_rows:
+            return 0
+        cypher = """
+UNWIND $rows AS r
+MATCH (fc:FusionCommunity {community_id: r.community_id})
+MERGE (fk:FusionKeyword {keyword_id: r.keyword_id})
+SET fk.keyword = r.keyword,
+    fk.weight = r.weight,
+    fk.updated_at = datetime()
+MERGE (fc)-[hk:HAS_KEYWORD]->(fk)
+SET hk.rank = r.rank,
+    hk.weight = r.weight
+RETURN count(hk) AS cnt
+"""
+        rows = []
+        for item in keyword_rows:
+            cid = str(item.get("community_id") or "").strip()
+            kid = str(item.get("keyword_id") or "").strip()
+            keyword = str(item.get("keyword") or "").strip()
+            if not cid or not kid or not keyword:
+                continue
+            rows.append(
+                {
+                    "community_id": cid,
+                    "keyword_id": kid,
+                    "keyword": keyword,
+                    "rank": int(item.get("rank") or 0),
+                    "weight": float(item.get("weight") or 0.0),
+                }
+            )
+        if not rows:
+            return 0
+        with self._driver.session() as session:
+            result = session.run(cypher, rows=rows)
+            row = result.single()
+        return int(row["cnt"]) if row else 0
+
     def list_textbooks(self, limit: int = 100) -> list[dict]:
         cypher = """
 MATCH (t:Textbook)
