@@ -75,6 +75,11 @@ class Settings(BaseSettings):
         validation_alias=AliasChoices("INGEST_LLM_HEARTBEAT_SECONDS"),
     )
 
+    ingest_defer_citation_purposes: bool = Field(
+        default=True,
+        validation_alias=AliasChoices("INGEST_DEFER_CITATION_PURPOSES"),
+    )
+
     llm_timeout_seconds: int = Field(
         default=60,
         validation_alias=AliasChoices("LLM_TIMEOUT_SECONDS"),

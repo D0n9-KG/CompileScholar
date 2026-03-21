@@ -72,7 +72,7 @@ def classify_paper_type(
     meta_paper_type: str | None = None,
 ) -> PaperType:
     """
-    Classify paper type with priority: meta.json > LLM > rule-based fallback.
+    Classify paper type with priority: meta.json > obvious rule-based result > LLM > research fallback.
 
     Args:
         title: Paper title
@@ -95,7 +95,14 @@ def classify_paper_type(
     title = (title or "").strip() or "(untitled)"
     abstract = (abstract or "").strip()
 
-    # Priority 2: LLM classification
+    # Priority 2: obvious rule-based result.
+    # For strongly signalled non-research papers we can skip the LLM call entirely.
+    rule_result = _rule_based_classify(title, abstract, sections)
+    if rule_result != "research":
+        logger.info("paper_type from rules: %s", rule_result)
+        return rule_result
+
+    # Priority 3: LLM classification for ambiguous papers that still look like generic research.
     try:
         from app.llm.client import call_text
 
@@ -115,10 +122,9 @@ def classify_paper_type(
     except Exception:
         logger.warning("LLM paper_type classification failed, falling back to rules", exc_info=True)
 
-    # Priority 3: Rule-based fallback
-    result = _rule_based_classify(title, abstract, sections)
-    logger.info("paper_type from rules: %s", result)
-    return result
+    # Priority 4: rule-based fallback (usually 'research' for ambiguous papers).
+    logger.info("paper_type from rules: %s", rule_result)
+    return rule_result
 
 
 def extract_abstract_from_chunks(chunks: list[Any]) -> str:

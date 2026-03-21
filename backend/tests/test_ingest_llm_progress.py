@@ -326,3 +326,82 @@ def test_ingest_llm_propagates_active_paper_count_for_single_paper_bursting(monk
     pipeline.ingest_markdowns(["dummy-1.md", "dummy-2.md"])
 
     assert seen_active_papers == [2, 2]
+
+
+def test_ingest_llm_can_defer_citation_purpose_enrichment(monkeypatch):  # noqa: ANN001, ANN201
+    docs = [_mock_document(index) for index in range(1)]
+    docs_iter = iter(docs)
+
+    monkeypatch.setattr(pipeline, "Neo4jClient", lambda *args, **kwargs: _FakeNeo4jClient())  # noqa: ARG005
+    monkeypatch.setattr(pipeline, "parse_mineru_markdown", lambda _md: next(docs_iter))
+    monkeypatch.setattr(
+        pipeline,
+        "recover_references_with_agent",
+        lambda doc, **kwargs: (doc, {"before_refs": 0, "after_refs": 0}),  # noqa: ARG005
+    )
+    monkeypatch.setattr(
+        pipeline,
+        "recover_citation_events_from_references",
+        lambda doc, **kwargs: (doc, {"before_events": 0, "after_events": 0}),  # noqa: ARG005
+    )
+    monkeypatch.setattr(pipeline, "CrossrefClient", lambda: object())
+    monkeypatch.setattr(
+        pipeline,
+        "build_reference_and_cite_records",
+        lambda doc, **kwargs: {  # noqa: ARG005
+            "paper_id": paper_id_for_md_path(doc.paper.md_path, doi=doc.paper.doi),
+            "refs": [],
+            "cited_papers": [],
+            "cites_resolved": [],
+            "cites_unresolved": [],
+        },
+    )
+    monkeypatch.setattr(pipeline, "load_canonical_meta", lambda _path: {"paper_type": "research"})
+    monkeypatch.setattr(
+        pipeline,
+        "load_active",
+        lambda _paper_type: {"version": 1, "paper_type": "research", "rules": {}, "prompts": {}},
+    )
+    monkeypatch.setattr(pipeline, "extract_figures_from_markdown", lambda **kwargs: [])  # noqa: ARG005
+    monkeypatch.setattr(pipeline, "build_faiss_for_chunks", lambda *args, **kwargs: None)  # noqa: ARG005
+    monkeypatch.setattr(pipeline, "build_faiss_for_rows", lambda *args, **kwargs: None)  # noqa: ARG005
+    monkeypatch.setattr(pipeline, "build_community_corpus_rows", lambda *args, **kwargs: [])  # noqa: ARG005
+    monkeypatch.setattr(pipeline, "_write_document_ir", lambda *args, **kwargs: None)  # noqa: ARG005
+    monkeypatch.setattr(Path, "write_text", lambda self, *args, **kwargs: 0)  # noqa: ARG005
+    monkeypatch.setattr(
+        pipeline,
+        "merge_runtime_config",
+        lambda _overrides: {
+            "ingest_pre_llm_max_workers": 1,
+            "ingest_llm_max_workers": 1,
+            "llm_global_max_concurrent": 12,
+            "ingest_defer_citation_purposes": True,
+        },
+    )
+    monkeypatch.setattr(
+        pipeline,
+        "run_phase1_extraction",
+        lambda **kwargs: {  # noqa: ARG005
+            "logic": {"steps": []},
+            "validated_claims": [],
+            "quality_report": {
+                "gate_passed": True,
+                "quality_tier": "green",
+                "quality_tier_score": 0.92,
+            },
+            "claim_candidates": [],
+            "claims_merged": [],
+            "rejected_claims": [],
+            "step_order": [],
+        },
+    )
+
+    def _should_not_run(**kwargs):  # noqa: ANN003
+        raise AssertionError("citation purpose enrichment should be deferred off the ingest hot path")
+
+    monkeypatch.setattr(pipeline, "classify_citation_purposes_batch", _should_not_run)
+
+    out = pipeline.ingest_markdowns(["dummy-1.md"])
+
+    assert out["llm_built"] is True
+    assert out["llm_error"] is None

@@ -115,7 +115,7 @@ def _llm_progress_message(
     ]
     if oldest_active and oldest_active[0]:
         parts.append(f"oldest_active={oldest_active[0]}:{oldest_active[1]}s")
-    return "Running LLM extraction (Logic/Claims/Citation Purposes) (" + ", ".join(parts) + ")"
+    return "Running LLM extraction (Logic/Claims; citation enrichment optional) (" + ", ".join(parts) + ")"
 
 
 def _write_document_ir(path: Path, doc: DocumentIR) -> None:
@@ -359,7 +359,7 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
     except Exception as exc:  # noqa: BLE001
         neo4j_error = str(exc)
 
-    notify("ingest:llm", 0.70, "Running LLM extraction (Logic/Claims/Citation Purposes)")
+    notify("ingest:llm", 0.70, "Running LLM extraction (Logic/Claims)")
     llm_built = False
     llm_error = None
     llm_outputs: list[dict[str, Any]] = []
@@ -367,6 +367,7 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
 
     def _llm_extract_one(idx: int, doc: DocumentIR, rec: dict[str, Any]) -> dict[str, Any]:
         paper_id = str(rec["paper_id"])
+        defer_citation_purposes = bool(runtime.get("ingest_defer_citation_purposes", True))
 
         paper_type = _paper_type_for_md(doc.paper.md_path, doc=doc)
         schema = load_active(paper_type)  # type: ignore[arg-type]
@@ -393,49 +394,51 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
         out.write_text(json.dumps(logic_claims, ensure_ascii=False, indent=2), encoding="utf-8")
 
         purposes = []
-        chunk_by_id = {c.chunk_id: c for c in doc.chunks}
-        citing_title = doc.paper.title or doc.paper.title_alt or doc.paper.paper_source
-        batch_in = []
-        for cr in rec.get("cites_resolved") or []:
-            cited_paper_id = cr.get("cited_paper_id")
-            cited_doi = None
-            if cited_paper_id and str(cited_paper_id).startswith("doi:"):
-                cited_doi = str(cited_paper_id)[4:]
-            cited_title = None
-            for cp in rec.get("cited_papers") or []:
-                if cp.get("paper_id") == cited_paper_id:
-                    cited_title = cp.get("title")
-                    break
-            contexts = []
-            for cid in cr.get("evidence_chunk_ids") or []:
-                ch = chunk_by_id.get(cid)
-                if ch and ch.text:
-                    contexts.append(ch.text)
-            batch_in.append(
-                {
-                    "cited_paper_id": cited_paper_id,
-                    "cited_title": cited_title,
-                    "cited_doi": cited_doi,
-                    "contexts": contexts,
-                }
+        if not defer_citation_purposes:
+            chunk_by_id = {c.chunk_id: c for c in doc.chunks}
+            citing_title = doc.paper.title or doc.paper.title_alt or doc.paper.paper_source
+            batch_in = []
+            for cr in rec.get("cites_resolved") or []:
+                cited_paper_id = cr.get("cited_paper_id")
+                cited_doi = None
+                if cited_paper_id and str(cited_paper_id).startswith("doi:"):
+                    cited_doi = str(cited_paper_id)[4:]
+                cited_title = None
+                for cp in rec.get("cited_papers") or []:
+                    if cp.get("paper_id") == cited_paper_id:
+                        cited_title = cp.get("title")
+                        break
+                contexts = []
+                for cid in cr.get("evidence_chunk_ids") or []:
+                    ch = chunk_by_id.get(cid)
+                    if ch and ch.text:
+                        contexts.append(ch.text)
+                batch_in.append(
+                    {
+                        "cited_paper_id": cited_paper_id,
+                        "cited_title": cited_title,
+                        "cited_doi": cited_doi,
+                        "contexts": contexts,
+                    }
+                )
+            batch_out = classify_citation_purposes_batch(
+                citing_title=citing_title,
+                cites=batch_in,
+                prompt_overrides=schema.get("prompts"),
+                rules=schema.get("rules"),
             )
-        batch_out = classify_citation_purposes_batch(
-            citing_title=citing_title,
-            cites=batch_in,
-            prompt_overrides=schema.get("prompts"),
-            rules=schema.get("rules"),
-        )
-        by_id = batch_out.get("by_id") or {}
-        for cr in rec.get("cites_resolved") or []:
-            cited_paper_id = cr.get("cited_paper_id")
-            if not cited_paper_id:
-                continue
-            x = by_id.get(str(cited_paper_id)) or {"labels": ["Unknown"], "scores": [0.0]}
-            purposes.append({"cited_paper_id": cited_paper_id, "labels": x["labels"], "scores": x["scores"]})
-        out2 = run_dir / f"{doc.paper.paper_source}.llm_citation_purposes.json"
-        out2.write_text(json.dumps(purposes, ensure_ascii=False, indent=2), encoding="utf-8")
+            by_id = batch_out.get("by_id") or {}
+            for cr in rec.get("cites_resolved") or []:
+                cited_paper_id = cr.get("cited_paper_id")
+                if not cited_paper_id:
+                    continue
+                x = by_id.get(str(cited_paper_id)) or {"labels": ["Unknown"], "scores": [0.0]}
+                purposes.append({"cited_paper_id": cited_paper_id, "labels": x["labels"], "scores": x["scores"]})
+            out2 = run_dir / f"{doc.paper.paper_source}.llm_citation_purposes.json"
+            out2.write_text(json.dumps(purposes, ensure_ascii=False, indent=2), encoding="utf-8")
 
         llm_out["citation_purposes"] = purposes
+        llm_out["citation_purposes_deferred"] = defer_citation_purposes
         return {
             "idx": idx,
             "paper_id": paper_id,
@@ -443,6 +446,7 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
             "step_order": step_order,
             "logic_claims": logic_claims,
             "citation_purposes": purposes,
+            "citation_purposes_deferred": defer_citation_purposes,
             "llm_out": llm_out,
         }
 
@@ -452,6 +456,7 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
         claims = list(logic_claims.get("claims") or [])
         step_order = list(item.get("step_order") or [])
         purposes = list(item.get("citation_purposes") or [])
+        purposes_deferred = bool(item.get("citation_purposes_deferred"))
         quality_report = logic_claims.get("quality_report") or {}
         gate_passed = bool(quality_report.get("gate_passed"))
         with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
@@ -497,37 +502,38 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
                 client.apply_human_logic_step_evidence_overrides(paper_id)
             except Exception:
                 pass
-            for p in purposes:
-                if not p.get("cited_paper_id"):
-                    continue
-                client.update_cites_purposes(
-                    citing_paper_id=paper_id,
-                    cited_paper_id=p["cited_paper_id"],
-                    labels=p["labels"],
-                    scores=p["scores"],
-                )
-
-            # P1 Fix: Backfill any remaining missing citation purposes (defense-in-depth)
-            # This catches edge cases where purpose labels weren't set during reference resolution
-            try:
-                backfilled_count = client.backfill_missing_citation_purposes(
-                    citing_paper_id=paper_id,
-                    default_label="Background",
-                    default_score=0.2,
-                )
-                if backfilled_count > 0:
-                    logger.info(
-                        "Backfilled %d missing citation purpose labels for paper_id=%s",
-                        backfilled_count,
-                        paper_id,
+            if not purposes_deferred:
+                for p in purposes:
+                    if not p.get("cited_paper_id"):
+                        continue
+                    client.update_cites_purposes(
+                        citing_paper_id=paper_id,
+                        cited_paper_id=p["cited_paper_id"],
+                        labels=p["labels"],
+                        scores=p["scores"],
                     )
-            except Exception as e:
-                logger.warning(
-                    "Failed to backfill citation purposes for paper_id=%s: %s",
-                    paper_id,
-                    str(e),
-                    exc_info=True,  # Include stack trace for debugging
-                )
+
+                # P1 Fix: Backfill any remaining missing citation purposes (defense-in-depth)
+                # This catches edge cases where purpose labels weren't set during reference resolution
+                try:
+                    backfilled_count = client.backfill_missing_citation_purposes(
+                        citing_paper_id=paper_id,
+                        default_label="Background",
+                        default_score=0.2,
+                    )
+                    if backfilled_count > 0:
+                        logger.info(
+                            "Backfilled %d missing citation purpose labels for paper_id=%s",
+                            backfilled_count,
+                            paper_id,
+                        )
+                except Exception as e:
+                    logger.warning(
+                        "Failed to backfill citation purposes for paper_id=%s: %s",
+                        paper_id,
+                        str(e),
+                        exc_info=True,  # Include stack trace for debugging
+                    )
 
     try:
         jobs = [(idx, doc, rec) for idx, (doc, rec) in enumerate(zip(parsed, cite_records)) if rec.get("paper_id")]

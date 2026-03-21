@@ -37,7 +37,7 @@ _RUNTIME_FLOAT_LIMITS: dict[str, tuple[float, float, float]] = {
     "neo4j_connection_timeout_seconds": (15.0, 1.0, 120.0),
     "crossref_min_interval_seconds": (0.12, 0.0, 5.0),
 }
-_RUNTIME_BOOL_FIELDS = {"phase1_gate_allow_weak"}
+_RUNTIME_BOOL_FIELDS = {"phase1_gate_allow_weak", "ingest_defer_citation_purposes"}
 _COMMUNITY_INT_LIMITS: dict[str, tuple[int, int, int]] = {
     "global_community_max_nodes": (50000, 100, 500000),
     "global_community_max_edges": (100000, 100, 1000000),
@@ -115,6 +115,7 @@ _FIELD_ENV_KEYS: dict[str, tuple[str, ...]] = {
     "embedding_model": ("EMBEDDING_MODEL",),
     "siliconflow_api_key": ("SILICONFLOW_API_KEY", "SILICON_FLOW_API_KEY", "SILICONCLOUD_API_KEY"),
     "phase1_gate_allow_weak": ("PHASE1_GATE_ALLOW_WEAK",),
+    "ingest_defer_citation_purposes": ("INGEST_DEFER_CITATION_PURPOSES",),
     "group_clustering_threshold": ("GROUP_CLUSTERING_THRESHOLD",),
     "group_clustering_method": ("GROUP_CLUSTERING_METHOD",),
     "ingest_llm_max_workers": ("INGEST_LLM_MAX_WORKERS",),
@@ -265,6 +266,7 @@ def _default_runtime() -> dict[str, Any]:
             getattr(settings, "crossref_min_interval_seconds", _RUNTIME_FLOAT_LIMITS["crossref_min_interval_seconds"][0])
         ),
         "phase1_gate_allow_weak": bool(getattr(settings, "phase1_gate_allow_weak", False)),
+        "ingest_defer_citation_purposes": True,
     }
 
 
