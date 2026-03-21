@@ -47,6 +47,11 @@ class ScanUploadDoiStrategyTests(unittest.TestCase):
         (unit_dir / "images" / "fig1.png").write_bytes(b"\x89PNG\r\n\x1a\n")
         (unit_dir / md_name).write_text(content, encoding="utf-8")
 
+    def _write_flat_md(self, upload_id: str, rel_path: str, content: str) -> None:
+        md_path = assembled_root(upload_id) / rel_path
+        md_path.parent.mkdir(parents=True, exist_ok=True)
+        md_path.write_text(content, encoding="utf-8")
+
     @patch("app.ingest.scan_upload.Neo4jClient")
     def test_extract_only_keeps_need_doi_without_doi_line(self, mock_neo4j) -> None:
         upload_id = "u_extract"
@@ -150,6 +155,68 @@ class ScanUploadDoiStrategyTests(unittest.TestCase):
         self.assertEqual(units[0].get("status"), "ready")
         self.assertEqual(units[0].get("doi"), "10.1007/s10035-013-0409-9")
         mock_crossref.resolve_reference.assert_called_once()
+
+    @patch("app.ingest.scan_upload.Neo4jClient")
+    @patch("app.ingest.scan_upload.CrossrefClient")
+    def test_title_crossref_detects_flat_markdown_files_as_individual_units(self, mock_crossref_cls, mock_neo4j_cls) -> None:
+        upload_id = "u_crossref_flat_files"
+        self._write_manifest(upload_id, "title_crossref")
+        self._write_flat_md(
+            upload_id,
+            "output/paper-a.md",
+            "# Flat Paper A\n\nAlice\n\nBody text.\n",
+        )
+        self._write_flat_md(
+            upload_id,
+            "output/paper-b.md",
+            "# Flat Paper B\n\nBob\n\nBody text.\n",
+        )
+
+        selected = CrossrefWork(
+            doi="10.1234/flat-paper-a",
+            title="Flat Paper A",
+            year=2025,
+            venue="Journal Y",
+            authors=["Alice"],
+            score=92.0,
+        )
+        mock_crossref = mock_crossref_cls.return_value
+
+        def _resolve(query: str):
+            if query == "Flat Paper A":
+                return CrossrefResolveResult(
+                    query=query,
+                    topk=[selected],
+                    selected=selected,
+                    confidence=0.92,
+                )
+            return CrossrefResolveResult(
+                query=query,
+                topk=[],
+                selected=None,
+                confidence=0.0,
+            )
+
+        mock_crossref.resolve_reference.side_effect = _resolve
+        mock_neo4j = mock_neo4j_cls.return_value.__enter__.return_value
+        mock_neo4j.get_paper_basic.side_effect = KeyError("not found")
+
+        out = scan_upload(upload_id)
+
+        units = sorted(out.get("units") or [], key=lambda item: str(item.get("md_rel_path") or ""))
+        self.assertEqual(len(units), 2)
+
+        self.assertEqual(units[0].get("unit_id"), "output/paper-a.md")
+        self.assertEqual(units[0].get("unit_rel_dir"), "output")
+        self.assertEqual(units[0].get("status"), "ready")
+        self.assertEqual(units[0].get("doi"), "10.1234/flat-paper-a")
+
+        self.assertEqual(units[1].get("unit_id"), "output/paper-b.md")
+        self.assertEqual(units[1].get("unit_rel_dir"), "output")
+        self.assertEqual(units[1].get("status"), "need_doi")
+        self.assertIsNone(units[1].get("doi"))
+
+        self.assertEqual(mock_crossref.resolve_reference.call_count, 2)
 
 
 if __name__ == "__main__":

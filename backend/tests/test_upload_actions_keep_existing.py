@@ -91,6 +91,12 @@ class KeepExistingTests(unittest.TestCase):
         (unit_dir / "images" / "fig1.png").write_bytes(b"\x89PNG\r\n\x1a\n")
         return unit_dir
 
+    def _write_staged_flat_md(self, upload_id: str, rel_path: str) -> Path:
+        md_path = assembled_root(upload_id) / rel_path
+        md_path.parent.mkdir(parents=True, exist_ok=True)
+        md_path.write_text("# demo\n", encoding="utf-8")
+        return md_path
+
     def test_keep_existing_uses_cached_scan_without_full_rescan(self) -> None:
         upload_id = "u_keep_existing"
         self._write_manifest(upload_id)
@@ -107,6 +113,61 @@ class KeepExistingTests(unittest.TestCase):
 
         persisted = json.loads(scan_path(upload_id).read_text(encoding="utf-8"))
         self.assertEqual([u.get("unit_id") for u in persisted.get("units") or []], ["paperB/paper.md"])
+
+    def test_keep_existing_removes_only_selected_flat_markdown_file(self) -> None:
+        upload_id = "u_keep_existing_flat"
+        self._write_manifest(upload_id)
+        scan_path(upload_id).parent.mkdir(parents=True, exist_ok=True)
+        scan_path(upload_id).write_text(
+            json.dumps(
+                {
+                    "upload_id": upload_id,
+                    "mode": "folder",
+                    "doi_strategy": "title_crossref",
+                    "root": str(assembled_root(upload_id)),
+                    "units": [
+                        {
+                            "unit_id": "output/paperA.md",
+                            "unit_rel_dir": "output",
+                            "md_rel_path": "output/paperA.md",
+                            "doi": "10.1000/a",
+                            "title": "Paper A",
+                            "year": 2024,
+                            "paper_type": "research",
+                            "status": "conflict",
+                            "error": None,
+                            "existing_paper_id": "doi:10.1000/a",
+                        },
+                        {
+                            "unit_id": "output/paperB.md",
+                            "unit_rel_dir": "output",
+                            "md_rel_path": "output/paperB.md",
+                            "doi": "10.1000/b",
+                            "title": "Paper B",
+                            "year": 2025,
+                            "paper_type": "research",
+                            "status": "ready",
+                            "error": None,
+                            "existing_paper_id": None,
+                        },
+                    ],
+                    "errors": [],
+                },
+                ensure_ascii=False,
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+
+        removed_md = self._write_staged_flat_md(upload_id, "output/paperA.md")
+        kept_md = self._write_staged_flat_md(upload_id, "output/paperB.md")
+
+        with patch("app.ingest.upload_actions.scan_upload", side_effect=AssertionError("unexpected rescan")):
+            out = keep_existing(upload_id, "output/paperA.md")
+
+        self.assertFalse(removed_md.exists())
+        self.assertTrue(kept_md.exists())
+        self.assertEqual([u.get("unit_id") for u in out.get("units") or []], ["output/paperB.md"])
 
 
 if __name__ == "__main__":

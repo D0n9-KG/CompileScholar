@@ -126,17 +126,49 @@ def copy_unit_to_canonical(upload_id: str, unit: dict[str, Any], replace: bool =
 
 
 def _delete_staged_unit(upload_id: str, unit: dict[str, Any]) -> None:
-    root = staging_root(upload_id)
-    unit_dir = safe_relpath(str(unit.get("unit_rel_dir") or ""))
-    p = root / unit_dir
-    if not p.exists():
-        return
-    # Safety: ensure p is within root
+    root = staging_root(upload_id).resolve()
+    md_rel = safe_relpath(str(unit.get("md_rel_path") or ""))
+    md_path = (root / md_rel).resolve()
+    unit_dir_rel = safe_relpath(str(unit.get("unit_rel_dir") or ".")) if str(unit.get("unit_rel_dir") or "").strip() != "." else "."
+    unit_dir = root if unit_dir_rel == "." else (root / unit_dir_rel).resolve()
+
+    # Safety: ensure target paths are within root
     try:
-        p.resolve().relative_to(root.resolve())
+        md_path.relative_to(root)
+        unit_dir.relative_to(root)
     except Exception:
         raise RuntimeError("Refuse to delete path outside staging root")
-    shutil.rmtree(p, ignore_errors=True)
+
+    if unit_dir.exists():
+        md_files_in_unit_dir = sorted(path.resolve() for path in unit_dir.glob("*.md") if path.is_file())
+        if len(md_files_in_unit_dir) == 1 and md_path in md_files_in_unit_dir:
+            shutil.rmtree(unit_dir, ignore_errors=True)
+            return
+
+    if not md_path.exists():
+        return
+
+    referenced_local_assets = _extract_md_image_paths(md_path)
+    md_path.unlink(missing_ok=True)
+
+    md_parent = md_path.parent
+    for rel in sorted(referenced_local_assets):
+        asset_path = (md_parent / rel).resolve()
+        try:
+            asset_path.relative_to(root)
+        except Exception:
+            continue
+        if asset_path.exists() and asset_path.is_file():
+            asset_path.unlink(missing_ok=True)
+
+    current = md_parent
+    while current != root:
+        try:
+            next(current.iterdir())
+            break
+        except StopIteration:
+            current.rmdir()
+            current = current.parent
 
 
 def _load_cached_scan(upload_id: str) -> dict[str, Any] | None:

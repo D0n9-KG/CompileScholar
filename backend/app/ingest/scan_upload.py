@@ -70,20 +70,7 @@ def scan_upload(upload_id: str) -> dict[str, Any]:
     errors: list[dict[str, Any]] = []
     pending_crossref: list[tuple[int, str, str]] = []
 
-    # Detect candidate paper folders: directory containing exactly one *.md and an images/ sibling folder
-    for d in sorted({p.parent for p in root.rglob("*.md")}):
-        try:
-            rel_dir = d.relative_to(root).as_posix()
-        except Exception:
-            continue
-        images_dir = d / "images"
-        if not images_dir.exists() or not images_dir.is_dir():
-            continue
-        md_files = list(d.glob("*.md"))
-        if len(md_files) != 1:
-            errors.append({"unit_dir": rel_dir, "error": f"Expected 1 md file, found {len(md_files)}"})
-            continue
-        md_path = md_files[0]
+    def _append_unit(md_path: Path, rel_dir: str) -> None:
         md_rel = md_path.relative_to(root).as_posix()
 
         unit_id = safe_relpath(md_rel)
@@ -105,7 +92,7 @@ def scan_upload(upload_id: str) -> dict[str, Any]:
                     error=str(exc),
                 )
             )
-            continue
+            return
 
         doi = (doi_override or doc.paper.doi or "").strip().lower() or None
         if not doi and crossref:
@@ -127,6 +114,40 @@ def scan_upload(upload_id: str) -> dict[str, Any]:
                 status="need_doi" if not doi else "ready",
             )
         )
+
+    assigned_md_paths: set[Path] = set()
+    rejected_md_paths: set[Path] = set()
+
+    # Detect legacy paper folders first: directory containing exactly one *.md and an images/ sibling folder.
+    for d in sorted({p.parent for p in root.rglob("*.md")}):
+        try:
+            rel_dir = d.relative_to(root).as_posix()
+        except Exception:
+            continue
+        images_dir = d / "images"
+        md_files = [path for path in d.glob("*.md") if path.is_file()]
+        if not images_dir.exists() or not images_dir.is_dir():
+            continue
+        if len(md_files) != 1:
+            errors.append({"unit_dir": rel_dir, "error": f"Expected 1 md file, found {len(md_files)}"})
+            rejected_md_paths.update(path.resolve() for path in md_files)
+            continue
+        md_path = md_files[0]
+        assigned_md_paths.add(md_path.resolve())
+        _append_unit(md_path, rel_dir)
+
+    # Remaining markdown files are treated as standalone paper units.
+    # This supports flat batches like output/*.md while preserving the existing
+    # folder-with-images convention for legacy MinerU uploads.
+    for md_path in sorted(path for path in root.rglob("*.md") if path.is_file()):
+        resolved = md_path.resolve()
+        if resolved in assigned_md_paths or resolved in rejected_md_paths:
+            continue
+        try:
+            rel_dir = md_path.parent.relative_to(root).as_posix() or "."
+        except Exception:
+            rel_dir = "."
+        _append_unit(md_path, rel_dir)
 
     def _resolve_title_doi(index: int, rel_dir: str, query: str) -> tuple[int, str, str | None]:
         try:
