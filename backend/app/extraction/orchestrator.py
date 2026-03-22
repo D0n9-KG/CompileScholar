@@ -864,7 +864,10 @@ def _default_claim_extractor(
     logic: dict[str, Any],
 ) -> dict[str, Any]:
     rules = schema.get("rules") or {}
-    max_chunks = int(rules.get("phase1_claim_chunks_max") or 36)
+    runtime = merge_runtime_config({})
+    schema_max_chunks = int(rules.get("phase1_claim_chunks_max") or 36)
+    runtime_chunk_cap = int(runtime.get("phase1_claim_chunks_runtime_cap") or schema_max_chunks)
+    max_chunks = min(schema_max_chunks, max(1, runtime_chunk_cap))
     max_claims_per_chunk = int(rules.get("phase1_claims_per_chunk_max") or 3)
     max_chunks = max(1, min(9999, max_chunks))
     max_claims_per_chunk = max(1, min(8, max_claims_per_chunk))
@@ -877,6 +880,7 @@ def _default_claim_extractor(
 
     candidates: list[dict[str, Any]] = []
     chunks = _priority_chunks(doc, logic=logic, max_chunks=max_chunks, rules=rules)
+    chunks = list(chunks[:max_chunks])
     chunk_fail_count = 0
     worker_count = max(1, int(rules.get("phase1_claim_worker_count") or 3))
 
@@ -971,7 +975,6 @@ def _default_claim_extractor(
     from app.llm.client import recommend_llm_subtask_workers, submit_with_current_llm_context
     from app.settings import settings as app_settings
 
-    runtime = merge_runtime_config({})
     max_workers = recommend_llm_subtask_workers(
         configured=int(runtime.get("phase1_chunk_claim_max_workers") or app_settings.phase1_chunk_claim_max_workers),
         batch_count=len(chunk_batches),

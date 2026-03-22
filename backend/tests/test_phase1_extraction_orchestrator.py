@@ -289,6 +289,79 @@ class Phase1ExtractionOrchestratorTests(unittest.TestCase):
         self.assertEqual(len(out["validated_claims"]), 1)
         self.assertEqual(out["validated_claims"][0]["targets_paper_ids"], ["doi:10.2000/refa"])
 
+    def test_default_claim_extractor_respects_runtime_chunk_cap(self) -> None:
+        from app.extraction.orchestrator import _default_claim_extractor
+
+        doc = DocumentIR(
+            paper=PaperDraft(
+                paper_source="paperB",
+                md_path="C:/tmp/paperB/source.md",
+                title="Paper B",
+                title_alt=None,
+                authors=["Bob"],
+                doi=None,
+                year=2024,
+            ),
+            chunks=[
+                Chunk(
+                    chunk_id=f"c{i}",
+                    paper_source="paperB",
+                    md_path="C:/tmp/paperB/source.md",
+                    span=MdSpan(start_line=i, end_line=i),
+                    section="Method",
+                    kind="block",
+                    text=f"Chunk {i} says the method improves the baseline with controlled evidence.",
+                )
+                for i in range(12)
+            ],
+            references=[],
+            citations=[],
+        )
+        schema = {
+            "paper_type": "research",
+            "version": 1,
+            "steps": [{"id": "Method", "enabled": True, "order": 0}],
+            "claim_kinds": [{"id": "Comparison", "enabled": True}],
+            "rules": {
+                "phase1_claim_chunks_max": 9999,
+                "phase1_claims_per_chunk_max": 1,
+            },
+        }
+        seen_chunk_ids: list[str] = []
+
+        def fake_batch_llm(*, chunks, step_ids, kind_ids, max_claims_per_chunk, schema):
+            seen_chunk_ids.extend([str(c.get("chunk_id") or "") for c in chunks])
+            return {
+                "results": {str(c["chunk_id"]): [] for c in chunks},
+                "failed_chunk_ids": [],
+                "quote_mismatch_count": 0,
+                "unknown_chunk_id_count": 0,
+            }
+
+        with patch("app.extraction.orchestrator._priority_chunks") as priority_mock, patch(
+            "app.extraction.orchestrator._extract_claims_from_chunks_batch_llm",
+            side_effect=fake_batch_llm,
+        ), patch(
+            "app.extraction.orchestrator.merge_runtime_config",
+            return_value={"phase1_claim_chunks_runtime_cap": 5, "phase1_chunk_claim_max_workers": 1},
+        ):
+            priority_mock.return_value = [
+                {"chunk_id": chunk.chunk_id, "text": chunk.text}
+                for chunk in doc.chunks
+            ]
+
+            out = _default_claim_extractor(
+                doc=doc,
+                paper_id="paperB",
+                schema=schema,
+                step_order=["Method"],
+                logic={},
+            )
+
+        self.assertEqual(out["chunk_total"], 5)
+        self.assertEqual(len(set(seen_chunk_ids)), 5)
+        self.assertEqual(sorted(set(seen_chunk_ids)), [f"c{i}" for i in range(5)])
+
     def test_quality_report_includes_completeness_and_missing_slots(self) -> None:
         from app.extraction.orchestrator import run_phase1_extraction
 

@@ -20,6 +20,7 @@ _LLM_WORKER_INT_LIMITS: dict[str, tuple[int, int, int]] = {
 
 _RUNTIME_LIMITS: dict[str, tuple[int, int, int]] = {
     "ingest_llm_max_workers": (5, 1, 32),
+    "phase1_claim_chunks_runtime_cap": (48, 1, 512),
     "phase1_chunk_claim_max_workers": (4, 1, 8),
     "phase1_grounding_max_workers": (3, 1, 6),
     "phase2_conflict_max_workers": (3, 1, 6),
@@ -120,6 +121,7 @@ _FIELD_ENV_KEYS: dict[str, tuple[str, ...]] = {
     "group_clustering_method": ("GROUP_CLUSTERING_METHOD",),
     "ingest_llm_max_workers": ("INGEST_LLM_MAX_WORKERS",),
     "ingest_llm_heartbeat_seconds": ("INGEST_LLM_HEARTBEAT_SECONDS",),
+    "phase1_claim_chunks_runtime_cap": ("PHASE1_CLAIM_CHUNKS_RUNTIME_CAP",),
     "llm_timeout_seconds": ("LLM_TIMEOUT_SECONDS",),
     "llm_client_max_retries": ("LLM_CLIENT_MAX_RETRIES",),
     "rag_llm_timeout_seconds": ("RAG_LLM_TIMEOUT_SECONDS",),
@@ -229,6 +231,9 @@ def _default_similarity() -> dict[str, Any]:
 def _default_runtime() -> dict[str, Any]:
     return {
         "ingest_llm_max_workers": int(getattr(settings, "ingest_llm_max_workers", _RUNTIME_LIMITS["ingest_llm_max_workers"][0])),
+        "phase1_claim_chunks_runtime_cap": int(
+            getattr(settings, "phase1_claim_chunks_runtime_cap", _RUNTIME_LIMITS["phase1_claim_chunks_runtime_cap"][0])
+        ),
         "phase1_chunk_claim_max_workers": int(
             getattr(settings, "phase1_chunk_claim_max_workers", _RUNTIME_LIMITS["phase1_chunk_claim_max_workers"][0])
         ),

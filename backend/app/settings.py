@@ -122,6 +122,11 @@ class Settings(BaseSettings):
         validation_alias=AliasChoices("PHASE1_CHUNK_CLAIM_MAX_WORKERS"),
     )
 
+    phase1_claim_chunks_runtime_cap: int = Field(
+        default=48, ge=1, le=512,
+        validation_alias=AliasChoices("PHASE1_CLAIM_CHUNKS_RUNTIME_CAP"),
+    )
+
     phase1_grounding_max_workers: int = Field(
         default=3, ge=1, le=6,
         validation_alias=AliasChoices("PHASE1_GROUNDING_MAX_WORKERS"),

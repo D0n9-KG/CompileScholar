@@ -178,3 +178,24 @@ def test_merge_runtime_config_respects_explicit_ingest_env_override(monkeypatch,
     runtime = config_store.merge_runtime_config({})
 
     assert runtime["ingest_llm_max_workers"] == 6
+
+
+def test_merge_runtime_config_includes_claim_chunk_cap(monkeypatch, tmp_path):
+    import app.ops_config_store as config_store
+
+    monkeypatch.setattr(config_store, "_CONFIG_PATH_OVERRIDE", tmp_path / "config_center.json")
+    monkeypatch.delenv("PHASE1_CLAIM_CHUNKS_RUNTIME_CAP", raising=False)
+
+    config_store.save_profile(
+        {
+            "modules": {
+                "runtime": {
+                    "phase1_claim_chunks_runtime_cap": 48,
+                },
+            }
+        }
+    )
+
+    runtime = config_store.merge_runtime_config({})
+
+    assert runtime["phase1_claim_chunks_runtime_cap"] == 48
