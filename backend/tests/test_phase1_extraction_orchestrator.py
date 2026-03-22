@@ -1513,6 +1513,42 @@ class Phase1ExtractionOrchestratorTests(unittest.TestCase):
         self.assertEqual(len(out["validated_claims"]), 1)
         self.assertIn("outperforms", out["validated_claims"][0]["text"])
 
+    def test_run_phase1_paper_logic_trace_compiles_canonical_trace(self) -> None:
+        from app.extraction.orchestrator import run_phase1_paper_logic_trace
+
+        def fake_logic_extractor(*, doc, paper_id, schema):
+            return {
+                "logic": {
+                    "Method": {
+                        "summary": "We propose a graph encoder for retrieval.",
+                        "confidence": 0.88,
+                        "evidence_chunk_ids": ["c2"],
+                        "evidence_weak": False,
+                    }
+                },
+                "step_order": ["Method"],
+            }
+
+        def fake_claim_extractor(*, doc, paper_id, schema, step_order):
+            return []
+
+        out = run_phase1_paper_logic_trace(
+            doc=self.doc,
+            paper_id="doi:10.1000/papera",
+            cite_rec=self.cite_rec,
+            schema=self.schema,
+            artifacts_dir=self.artifacts_dir / "paper_logic_trace",
+            logic_extractor=fake_logic_extractor,
+            claim_extractor=fake_claim_extractor,
+            allow_weak=False,
+        )
+
+        trace = out["paper_logic_trace"]
+        self.assertEqual(trace.paper_metadata.paper_id, "doi:10.1000/papera")
+        self.assertEqual(trace.canonical_core.moves[0].role, "method")
+        self.assertEqual(trace.canonical_core.moves[0].act_type, "propose_method")
+        self.assertTrue((self.artifacts_dir / "paper_logic_trace" / "paper_logic_trace.json").exists())
+
 
 if __name__ == "__main__":
     unittest.main()

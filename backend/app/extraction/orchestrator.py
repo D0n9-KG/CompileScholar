@@ -2514,3 +2514,165 @@ def run_phase1_extraction(
         "rejected_claims": rejected,
         "quality_report": report,
     }
+
+
+def _move_role_for_step(step_id: str) -> str:
+    normalized = str(step_id or "").strip().lower()
+    mapping = {
+        'problem': 'problem',
+        'background': 'background',
+        'hypothesis': 'hypothesis',
+        'method': 'method',
+        'experiment': 'experiment',
+        'result': 'result',
+        'conclusion': 'interpretation',
+        'interpretation': 'interpretation',
+        'limitation': 'limitation',
+        'future_work': 'future_work',
+        'future work': 'future_work',
+    }
+    return mapping.get(normalized, 'background')
+
+
+def _move_act_type_for_step(step_id: str) -> str:
+    normalized = str(step_id or "").strip().lower()
+    mapping = {
+        'problem': 'define_task',
+        'background': 'identify_gap',
+        'hypothesis': 'formulate_hypothesis',
+        'method': 'propose_method',
+        'experiment': 'run_experiment',
+        'result': 'report_effect',
+        'conclusion': 'explain_mechanism',
+        'interpretation': 'explain_mechanism',
+        'limitation': 'state_limitation',
+        'future_work': 'suggest_extension',
+        'future work': 'suggest_extension',
+    }
+    return mapping.get(normalized, 'define_task')
+
+
+def _build_compiler_inputs_from_phase1(
+    *,
+    doc: DocumentIR,
+    paper_id: str,
+    cite_rec: dict[str, Any] | None,
+    phase1_out: dict[str, Any],
+) -> dict[str, Any]:
+    logic = dict(phase1_out.get("logic") or {})
+    step_order = list(phase1_out.get("step_order") or [])
+    chunk_by_id = {chunk.chunk_id: chunk for chunk in doc.chunks}
+
+    evidence_rows: list[dict[str, Any]] = []
+    for step_index, step_id in enumerate(step_order, start=1):
+        step_logic = dict(logic.get(step_id) or {})
+        summary = str(step_logic.get("summary_machine") or step_logic.get("summary") or "").strip()
+        evidence_chunk_ids = [
+            str(item).strip()
+            for item in (step_logic.get("evidence_chunk_ids") or [])
+            if str(item).strip()
+        ]
+        move_id = f"{paper_id}:move:{step_id.lower()}"
+        for chunk_id in evidence_chunk_ids:
+            chunk = chunk_by_id.get(chunk_id)
+            if chunk is None:
+                continue
+            evidence_rows.append(
+                {
+                    "anchor_id": f"{move_id}:anchor:{chunk_id}",
+                    "paper_id": paper_id,
+                    "source_ref": chunk_id,
+                    "modality": "text",
+                    "section_path": [str(chunk.section or "").strip()] if str(chunk.section or "").strip() else [],
+                    "locator": {
+                        "chunk_id": chunk.chunk_id,
+                        "start_line": chunk.span.start_line,
+                        "end_line": chunk.span.end_line,
+                    },
+                    "quote": str(chunk.text or "").strip(),
+                    "citation_ids": [],
+                    "support_type": "direct",
+                    "weak": bool(step_logic.get("evidence_weak") or False),
+                    "move_id": move_id,
+                    "sequence_no": step_index,
+                    "role_hint": _move_role_for_step(step_id),
+                    "act_hint": _move_act_type_for_step(step_id),
+                    "summary": summary or str(chunk.text or "").strip(),
+                    "confidence": step_logic.get("confidence"),
+                }
+            )
+
+    citation_rows: list[dict[str, Any]] = []
+    for index, row in enumerate((cite_rec or {}).get("cites_resolved") or [], start=1):
+        cited_paper_id = str(row.get("cited_paper_id") or "").strip()
+        if not cited_paper_id:
+            continue
+        citation_rows.append(
+            {
+                "citation_act_id": f"{paper_id}:citation:{index}",
+                "target_paper_id": cited_paper_id,
+                "anchor_ids": [
+                    f"{paper_id}:move:{str(step_id or '').lower()}:anchor:{chunk_id}"
+                    for step_id in step_order
+                    for chunk_id in (logic.get(step_id, {}) or {}).get("evidence_chunk_ids", [])
+                    if chunk_id in set(row.get("evidence_chunk_ids") or [])
+                ],
+            }
+        )
+
+    paper_metadata = {
+        "paper_id": paper_id,
+        "canonical_doi": doc.paper.doi,
+        "title": doc.paper.title or paper_id,
+        "year": doc.paper.year,
+        "authors": list(doc.paper.authors or []),
+        "paper_type": str(doc.paper.paper_type or "unknown"),
+        "source_refs": [chunk.chunk_id for chunk in doc.chunks if str(chunk.chunk_id or "").strip()],
+    }
+
+    return {
+        "paper_metadata": paper_metadata,
+        "evidence_rows": evidence_rows,
+        "figure_rows": [],
+        "table_rows": [],
+        "citation_rows": citation_rows,
+    }
+
+
+def run_phase1_paper_logic_trace(
+    *,
+    doc: DocumentIR,
+    paper_id: str,
+    cite_rec: dict[str, Any] | None,
+    schema: dict[str, Any],
+    artifacts_dir: Path | str,
+    logic_extractor: LogicExtractorFn | None = None,
+    claim_extractor: ClaimExtractorFn | None = None,
+    allow_weak: bool = False,
+) -> dict[str, Any]:
+    from app.paper_logic_trace.compiler import compile_paper_logic_trace
+
+    phase1_out = run_phase1_extraction(
+        doc=doc,
+        paper_id=paper_id,
+        cite_rec=cite_rec,
+        schema=schema,
+        artifacts_dir=artifacts_dir,
+        logic_extractor=logic_extractor,
+        claim_extractor=claim_extractor,
+        allow_weak=allow_weak,
+    )
+    compiler_inputs = _build_compiler_inputs_from_phase1(
+        doc=doc,
+        paper_id=paper_id,
+        cite_rec=cite_rec,
+        phase1_out=phase1_out,
+    )
+    trace = compile_paper_logic_trace(**compiler_inputs)
+    artifacts = Path(artifacts_dir)
+    artifacts.mkdir(parents=True, exist_ok=True)
+    _json_dump(artifacts / "paper_logic_trace.json", trace.model_dump(mode="json"))
+    return {
+        **phase1_out,
+        "paper_logic_trace": trace,
+    }
