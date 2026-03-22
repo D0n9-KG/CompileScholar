@@ -387,16 +387,16 @@ The hot path should try to populate:
 6. `limitation_types`
 7. `resource_mentions`
 
-### 9.3 Audit/enrichment fields
+### 9.3 Lightweight audit fields
 
-The following are allowed to be improved or completed later:
+The following are allowed to be improved or completed later, but they are not part of the first-batch hot-path implementation target:
 
 1. `observed_variables`
 2. `effects`
 3. deeper normalization of values
 4. extra provenance refinement
-5. citation-act enrichment
-6. advanced figure/table interpretation
+
+Heavy post-processing such as broad citation enrichment, advanced figure/table interpretation, or large extra normalization passes is not a first-batch requirement for this redesign.
 
 ### 9.4 Single-value vs multi-value
 
@@ -426,7 +426,7 @@ Multi-value:
 
 ## 10. End-to-End L2 Extraction Flow
 
-The new L2 flow is split into a synchronous hot path and a deferred audit/enrichment path.
+The new L2 flow is split into a synchronous hot path and a deferred lightweight-audit path.
 
 This is not merely a scheduling tweak. It is a structural rewrite of the second-layer extraction compiler.
 
@@ -454,16 +454,16 @@ This is not merely a scheduling tweak. It is a structural rewrite of the second-
 
 The hot path is expected to replace the old "logic first, claim second, then packaging and accumulated extras" shape with a much tighter `PaperLogicTrace` compiler path.
 
-### 10.2 Audit/enrichment path
+### 10.2 Lightweight-audit path
 
 Run later, outside the critical first-result path:
 
-1. semantic audit refinement
-2. multi-evidence aggregation
-3. deeper citation-act enrichment
-4. effect normalization
-5. figure/table deeper interpretation
-6. derived-view compilation refresh
+1. targeted semantic audit refinement
+2. selected provenance strengthening
+3. strict-subset eligibility checks
+4. minimal derived-view refresh when needed
+
+This path exists mainly for quality stratification, not for building a second heavy extraction pipeline behind the first one.
 
 ## 11. Recommended Extraction Strategy
 
@@ -516,17 +516,18 @@ It must produce:
 
 The hot path is not responsible for preserving old extraction stage boundaries if those boundaries hurt throughput.
 
-### 12.2 Audit responsibilities
+### 12.2 Lightweight-audit responsibilities
 
-Audit exists to improve confidence and downstream eligibility, not to define first availability.
+Lightweight audit exists to improve confidence and downstream eligibility, not to define first availability.
 
-Audit may:
+Lightweight audit may:
 
-1. increase completeness
-2. refine slot normalization
-3. strengthen provenance
-4. attach more citation semantics
-5. decide whether the trace is fit for stricter training subsets
+1. strengthen provenance on high-value fields
+2. verify borderline traces
+3. decide whether the trace is fit for stricter training subsets
+4. refresh a small set of derived views when required
+
+Lightweight audit is intentionally not a broad enrichment pass.
 
 ### 12.3 Performance constraint
 
@@ -542,7 +543,7 @@ Recommended initial budgets:
 2. per-paper hot-path target: `P95 <= 6 minutes`
 3. no extra audit-only LLM round may be required before first export
 4. the default extraction path should avoid unbounded sentence-level fanout
-5. slot refinement that materially increases latency belongs in audit unless it is required for canonical validity
+5. slot refinement that materially increases latency belongs in lightweight audit unless it is required for canonical validity
 6. schema migration must not be implemented as "old pipeline plus new export appended at the end"
 
 ## 13. Derived Views
@@ -671,7 +672,7 @@ A paper may still export a lower-confidence `PaperLogicTrace` when:
 1. some preferred L2.5 slots are sparse
 2. citation enrichment is incomplete
 3. figures or tables are only partially resolved
-4. audit has not yet run
+4. lightweight audit has not yet run
 
 In this case, the trace remains exportable but must carry:
 
@@ -687,7 +688,7 @@ Examples:
 
 1. community builders may accept hot-path-valid traces
 2. L3 builders may require stronger slot coverage
-3. high-trust training subsets may require audited traces only
+3. high-trust training subsets may require lightweight-audited traces only
 
 ## 16. Breaking Changes
 
