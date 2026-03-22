@@ -10,6 +10,8 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
 
 from app.api.routers.papers import (
     _canonical_dir_for_paper_id,
@@ -239,3 +241,50 @@ def test_export_bibtex_escapes_special_chars():
     bib = _export_bibtex(detail)
     assert "A \\{B\\} Title More" in bib
     assert "O'Brien" in bib
+
+
+def test_logic_trace_route_returns_canonical_payload(monkeypatch):
+    import app.api.routers.papers as papers_router
+
+    class _FakeNeo4jClient:
+        def __init__(self, uri: str, user: str, password: str) -> None:
+            self.uri = uri
+            self.user = user
+            self.password = password
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, tb):  # noqa: ANN001
+            return None
+
+    def _fake_export(_client, paper_id: str):
+        return {
+            'paper_metadata': {'paper_id': paper_id, 'title': 'Demo'},
+            'canonical_core': {
+                'moves': [{'move_id': 'm-1'}],
+                'move_relations': [],
+                'evidence_anchors': [],
+                'citation_acts': [],
+                'figure_refs': [],
+                'table_refs': [],
+            },
+            'derived_views': {'community_signatures': [{'move_id': 'm-1'}]},
+            'quality': {'audit_status': 'eligible'},
+        }
+
+    monkeypatch.setattr(papers_router, 'Neo4jClient', _FakeNeo4jClient)
+    monkeypatch.setattr(papers_router, 'export_paper_logic_trace', _fake_export)
+
+    app = FastAPI()
+    app.include_router(papers_router.router)
+    client = TestClient(app)
+
+    res = client.get('/papers/paper-1/logic-trace')
+
+    assert res.status_code == 200, res.text
+    payload = res.json()
+    assert payload['paper_metadata']['paper_id'] == 'paper-1'
+    assert payload['canonical_core']['moves'][0]['move_id'] == 'm-1'
+    assert payload['derived_views']['community_signatures'][0]['move_id'] == 'm-1'
+    assert payload['quality']['audit_status'] == 'eligible'

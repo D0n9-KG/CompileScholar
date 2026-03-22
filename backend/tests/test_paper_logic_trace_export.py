@@ -9,36 +9,41 @@ class _FakeClient:
             'paper_metadata': {
                 'paper_id': paper_id,
                 'title': 'Demo Paper',
-                'phase1_quality_tier': 'green',
+                'source_refs': ['chunk:1'],
             },
-            'logic_steps': [
+            'evidence_rows': [
                 {
-                    'logic_step_id': 'paper-1:Method',
-                    'step_type': 'Method',
-                    'summary': 'Uses graph encoding for retrieval.',
+                    'anchor_id': 'a-1',
+                    'paper_id': paper_id,
+                    'source_ref': 'chunk:1',
+                    'modality': 'text',
+                    'section_path': ['Method'],
+                    'locator': {'chunk_id': 'chunk:1'},
+                    'quote': 'We propose a graph encoder for retrieval.',
+                    'citation_ids': [],
+                    'support_type': 'direct',
+                    'weak': False,
+                    'move_id': 'm-1',
+                    'sequence_no': 1,
+                    'role_hint': 'method',
+                    'act_hint': 'propose_method',
+                    'summary': 'We propose a graph encoder for retrieval.',
+                    'methods': [{'surface': 'graph encoder', 'normalized': 'graph encoder', 'anchor_ids': ['a-1']}],
+                    'research_objects': [{'surface': 'retrieval', 'normalized': 'retrieval', 'anchor_ids': ['a-1']}],
                 }
             ],
-            'claims': [
-                {
-                    'claim_id': 'cl-1',
-                    'claim_key': 'claim-1',
-                    'text': 'Graph encoding improves retrieval performance.',
-                    'step_type': 'Method',
-                    'kinds': ['Result', 'Comparison'],
-                }
-            ],
-            'claim_evidence_links': [{'claim_key': 'claim-1', 'chunk_id': 'chunk-1'}],
-            'citation_acts': [],
-            'figures': [],
-            'limitations': [],
-            'future_work_signals': [],
+            'figure_rows': [],
+            'table_rows': [],
+            'citation_rows': [],
+            'move_relation_rows': [],
+            'built_at': '2026-03-22T12:00:00Z',
         }
 
 
-def test_export_paper_logic_trace_adds_l25_slots() -> None:
+def test_export_paper_logic_trace_returns_canonical_payload() -> None:
     trace = export_paper_logic_trace(_FakeClient(), 'paper-1')
 
-    assert trace.logic_steps[0].operation_or_method
-    assert 'graph' in ' '.join(trace.logic_steps[0].operation_or_method).lower()
-    assert trace.claims[0].comparison_target == []
-    assert trace.quality_tier == 'green'
+    assert trace.canonical_core.moves[0].move_id == 'm-1'
+    assert trace.canonical_core.move_relations == []
+    assert trace.derived_views['community_signatures'][0]['move_id'] == 'm-1'
+    assert trace.quality['audit_status'] == 'eligible'

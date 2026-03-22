@@ -1912,70 +1912,135 @@ RETURN p
         paper = dict(detail.get("paper") or {})
         canonical_paper_id = str(paper.get("paper_id") or paper_id).strip() or str(paper_id)
 
-        logic_steps: list[dict] = []
-        for row in detail.get("logic_steps") or []:
+        def _move_role_for_step(step_type: str) -> str:
+            normalized = str(step_type or "").strip().lower()
+            mapping = {
+                "problem": "problem",
+                "background": "background",
+                "hypothesis": "hypothesis",
+                "method": "method",
+                "experiment": "experiment",
+                "result": "result",
+                "conclusion": "interpretation",
+                "interpretation": "interpretation",
+                "limitation": "limitation",
+                "future_work": "future_work",
+                "future work": "future_work",
+            }
+            return mapping.get(normalized, "background")
+
+        def _move_act_type_for_step(step_type: str) -> str:
+            normalized = str(step_type or "").strip().lower()
+            mapping = {
+                "problem": "define_task",
+                "background": "identify_gap",
+                "hypothesis": "formulate_hypothesis",
+                "method": "propose_method",
+                "experiment": "run_experiment",
+                "result": "report_effect",
+                "conclusion": "explain_mechanism",
+                "interpretation": "explain_mechanism",
+                "limitation": "state_limitation",
+                "future_work": "suggest_extension",
+                "future work": "suggest_extension",
+            }
+            return mapping.get(normalized, "define_task")
+
+        evidence_rows: list[dict] = []
+        for step_index, row in enumerate(detail.get("logic_steps") or [], start=1):
             step_type = str(row.get("step_type") or "").strip()
+            summary = str(row.get("summary") or "").strip()
+            logic_step_id = str(row.get("logic_step_id") or f"{canonical_paper_id}:{step_type}").strip()
             evidence = list(row.get("evidence") or [])
-            logic_steps.append(
+            for evidence_index, item in enumerate(evidence, start=1):
+                chunk_id = str(item.get("chunk_id") or "").strip()
+                if not chunk_id:
+                    continue
+                evidence_rows.append(
+                    {
+                        "anchor_id": f"{logic_step_id}:anchor:{evidence_index}",
+                        "paper_id": canonical_paper_id,
+                        "source_ref": chunk_id,
+                        "modality": "text",
+                        "section_path": [str(item.get("section") or step_type).strip()] if str(item.get("section") or step_type).strip() else [],
+                        "locator": {
+                            "chunk_id": chunk_id,
+                            "start_line": item.get("start_line"),
+                            "end_line": item.get("end_line"),
+                        },
+                        "quote": str(item.get("quote") or item.get("text") or summary).strip(),
+                        "citation_ids": [],
+                        "support_type": "direct",
+                        "weak": bool(item.get("weak") or False),
+                        "move_id": logic_step_id,
+                        "sequence_no": step_index,
+                        "role_hint": _move_role_for_step(step_type),
+                        "act_hint": _move_act_type_for_step(step_type),
+                        "summary": summary,
+                        "confidence": row.get("confidence"),
+                        "methods": (
+                            [
+                                {
+                                    "surface": summary,
+                                    "normalized": summary.lower(),
+                                    "anchor_ids": [f"{logic_step_id}:anchor:{evidence_index}"],
+                                }
+                            ]
+                            if _move_role_for_step(step_type) == "method" and summary
+                            else []
+                        ),
+                    }
+                )
+
+        citation_rows: list[dict] = []
+        for index, row in enumerate(detail.get("outgoing_cites") or [], start=1):
+            cited_paper_id = str(row.get("cited_paper_id") or "").strip()
+            if not cited_paper_id:
+                continue
+            citation_rows.append(
                 {
-                    "logic_step_id": str(row.get("logic_step_id") or f"{canonical_paper_id}:{step_type}").strip(),
-                    "step_type": step_type,
-                    "summary": str(row.get("summary") or "").strip(),
-                    "confidence": row.get("confidence"),
-                    "evidence": evidence,
-                    "evidence_chunk_ids": [
-                        str(item.get("chunk_id") or "").strip()
-                        for item in evidence
-                        if str(item.get("chunk_id") or "").strip()
+                    "citation_act_id": f"{canonical_paper_id}:citation:{index}",
+                    "target_paper_id": cited_paper_id,
+                    "purpose": (list(row.get("purpose_labels") or []) or [None])[0],
+                    "anchor_ids": [
+                        str(item).strip()
+                        for item in (row.get("evidence_chunk_ids") or [])
+                        if str(item).strip()
                     ],
                 }
             )
 
-        claims: list[dict] = []
-        claim_evidence_links: list[dict] = []
-        for row in detail.get("claims") or []:
-            evidence = list(row.get("evidence") or [])
-            claim_key = str(row.get("claim_key") or row.get("claim_id") or "").strip()
-            claim = {
-                "claim_id": row.get("claim_id"),
-                "claim_key": claim_key,
-                "text": str(row.get("text") or "").strip(),
-                "step_type": row.get("step_type"),
-                "confidence": row.get("confidence"),
-                "kinds": list(row.get("kinds") or []),
-                "targets": list(row.get("targets") or []),
-                "evidence": evidence,
+        figure_rows = [
+            {
+                "figure_id": str(row.get("figure_id") or "").strip(),
+                "caption": str(row.get("caption_text") or "").strip() or None,
+                "anchor_ids": [],
             }
-            claims.append(claim)
-            for item in evidence:
-                chunk_id = str(item.get("chunk_id") or "").strip()
-                if not chunk_id:
-                    continue
-                claim_evidence_links.append(
-                    {
-                        "claim_id": row.get("claim_id"),
-                        "claim_key": claim_key,
-                        "chunk_id": chunk_id,
-                        "section": item.get("section"),
-                        "start_line": item.get("start_line"),
-                        "end_line": item.get("end_line"),
-                        "kind": item.get("kind"),
-                        "source": item.get("source"),
-                        "weak": bool(item.get("weak") or False),
-                    }
-                )
+            for row in (detail.get("figures") or [])
+            if str(row.get("figure_id") or "").strip()
+        ]
 
         return {
-            "schema_version": "v1",
-            "paper_metadata": paper,
-            "logic_steps": logic_steps,
-            "claims": claims,
-            "claim_evidence_links": claim_evidence_links,
-            "citation_acts": list(detail.get("outgoing_cites") or []),
-            "figures": list(detail.get("figures") or []),
-            "limitations": list(paper.get("limitations") or []),
-            "future_work_signals": list(paper.get("future_work_signals") or []),
-            "quality_tier": str(paper.get("phase1_quality_tier") or "").strip(),
+            "paper_metadata": {
+                "paper_id": canonical_paper_id,
+                "canonical_doi": str(paper.get("doi") or "").strip() or None,
+                "title": str(paper.get("title") or canonical_paper_id).strip(),
+                "year": paper.get("year"),
+                "authors": list(paper.get("authors") or []),
+                "venue": str(paper.get("venue") or "").strip() or None,
+                "paper_type": str(paper.get("paper_type") or "unknown").strip() or "unknown",
+                "source_refs": [
+                    str(item.get("chunk_id") or "").strip()
+                    for row in evidence_rows
+                    for item in [{"chunk_id": row.get("source_ref")}]
+                    if str(item.get("chunk_id") or "").strip()
+                ],
+            },
+            "evidence_rows": evidence_rows,
+            "figure_rows": figure_rows,
+            "table_rows": [],
+            "citation_rows": citation_rows,
+            "move_relation_rows": [],
         }
 
     def delete_paper_subgraph(self, paper_id: str) -> None:
