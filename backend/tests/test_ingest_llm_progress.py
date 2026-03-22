@@ -6,6 +6,7 @@ from pathlib import Path
 from app.graph.neo4j_client import paper_id_for_md_path
 from app.ingest import pipeline
 from app.ingest.models import DocumentIR, PaperDraft
+from app.paper_logic_trace.models import CanonicalCore, EvidenceAnchor, PaperLogicTrace, PaperMetadata, ResearchMove
 
 
 class _FakeNeo4jClient:
@@ -81,6 +82,78 @@ def _mock_document(index: int) -> DocumentIR:
     )
 
 
+def _mock_paper_logic_trace(paper_id: str, *, quality_tier: str = 'yellow', audit_status: str = 'eligible') -> PaperLogicTrace:
+    trace = PaperLogicTrace(
+        trace_id=f'{paper_id}:paper_logic_trace',
+        schema_version='v2',
+        built_at='2026-03-22T12:00:00Z',
+        paper_metadata=PaperMetadata(
+            paper_id=paper_id,
+            title='Demo',
+            source_refs=['chunk:1'],
+        ),
+        canonical_core=CanonicalCore(
+            evidence_anchors=[
+                EvidenceAnchor(
+                    anchor_id='a-1',
+                    paper_id=paper_id,
+                    source_ref='chunk:1',
+                    modality='text',
+                    section_path=['Method'],
+                    locator={'chunk_id': 'chunk:1'},
+                    quote='We propose a graph encoder.',
+                    citation_ids=[],
+                    support_type='direct',
+                    weak=False,
+                )
+            ],
+            moves=[
+                ResearchMove(
+                    move_id='m-1',
+                    sequence_no=1,
+                    role='method',
+                    act_type='propose_method',
+                    summary='We propose a graph encoder.',
+                    anchor_ids=['a-1'],
+                    confidence=0.9,
+                )
+            ],
+            move_relations=[],
+            citation_acts=[],
+            figure_refs=[],
+            table_refs=[],
+        ),
+        derived_views={'community_signatures': [{'move_id': 'm-1'}]},
+        quality={
+            'quality_tier': quality_tier,
+            'hot_path_gate_report': {'passed': True, 'move_count': 1, 'anchor_count': 1, 'sparse_trace': quality_tier != 'green'},
+            'audit_status': audit_status,
+        },
+    )
+    return trace
+
+
+def _fake_phase1_trace_output(paper_id: str, *, quality_tier: str = 'yellow', audit_status: str = 'eligible') -> dict:
+    return {
+        'logic': {'steps': []},
+        'validated_claims': [],
+        'quality_report': {
+            'gate_passed': True,
+            'quality_tier': 'green',
+            'quality_tier_score': 0.92,
+        },
+        'claim_candidates': [],
+        'claims_merged': [],
+        'rejected_claims': [],
+        'step_order': [],
+        'paper_logic_trace': _mock_paper_logic_trace(
+            paper_id,
+            quality_tier=quality_tier,
+            audit_status=audit_status,
+        ),
+    }
+
+
 def test_ingest_llm_progress_reports_active_and_queued_counts(monkeypatch):  # noqa: ANN001, ANN201
     docs = [_mock_document(index) for index in range(3)]
     docs_iter = iter(docs)
@@ -133,23 +206,12 @@ def test_ingest_llm_progress_reports_active_and_queued_counts(monkeypatch):  # n
     )
     monkeypatch.setattr(pipeline.settings, "ingest_llm_heartbeat_seconds", 5)
 
-    def fake_phase1(**kwargs):  # noqa: ANN003
+    def fake_phase1_trace(**kwargs):  # noqa: ANN003
         time.sleep(5.2)
-        return {
-            "logic": {"steps": []},
-            "validated_claims": [],
-            "quality_report": {
-                "gate_passed": True,
-                "quality_tier": "green",
-                "quality_tier_score": 0.92,
-            },
-            "claim_candidates": [],
-            "claims_merged": [],
-            "rejected_claims": [],
-            "step_order": [],
-        }
+        rec = kwargs['cite_rec']
+        return _fake_phase1_trace_output(rec['paper_id'])
 
-    monkeypatch.setattr(pipeline, "run_phase1_extraction", fake_phase1)
+    monkeypatch.setattr(pipeline, "run_phase1_paper_logic_trace", fake_phase1_trace)
     monkeypatch.setattr(
         pipeline,
         "classify_citation_purposes_batch",
@@ -219,23 +281,12 @@ def test_ingest_llm_requests_are_not_pinned_to_a_single_bound_worker(monkeypatch
         },
     )
 
-    def fake_phase1(**kwargs):  # noqa: ANN003
+    def fake_phase1_trace(**kwargs):  # noqa: ANN003
         seen_bound_ids.append(llm_client.get_bound_llm_worker_id())
-        return {
-            "logic": {"steps": []},
-            "validated_claims": [],
-            "quality_report": {
-                "gate_passed": True,
-                "quality_tier": "green",
-                "quality_tier_score": 0.92,
-            },
-            "claim_candidates": [],
-            "claims_merged": [],
-            "rejected_claims": [],
-            "step_order": [],
-        }
+        rec = kwargs['cite_rec']
+        return _fake_phase1_trace_output(rec['paper_id'])
 
-    monkeypatch.setattr(pipeline, "run_phase1_extraction", fake_phase1)
+    monkeypatch.setattr(pipeline, "run_phase1_paper_logic_trace", fake_phase1_trace)
     monkeypatch.setattr(
         pipeline,
         "classify_citation_purposes_batch",
@@ -300,23 +351,12 @@ def test_ingest_llm_propagates_active_paper_count_for_single_paper_bursting(monk
         },
     )
 
-    def fake_phase1(**kwargs):  # noqa: ANN003
+    def fake_phase1_trace(**kwargs):  # noqa: ANN003
         seen_active_papers.append(llm_client.get_active_llm_paper_count())
-        return {
-            "logic": {"steps": []},
-            "validated_claims": [],
-            "quality_report": {
-                "gate_passed": True,
-                "quality_tier": "green",
-                "quality_tier_score": 0.92,
-            },
-            "claim_candidates": [],
-            "claims_merged": [],
-            "rejected_claims": [],
-            "step_order": [],
-        }
+        rec = kwargs['cite_rec']
+        return _fake_phase1_trace_output(rec['paper_id'])
 
-    monkeypatch.setattr(pipeline, "run_phase1_extraction", fake_phase1)
+    monkeypatch.setattr(pipeline, "run_phase1_paper_logic_trace", fake_phase1_trace)
     monkeypatch.setattr(
         pipeline,
         "classify_citation_purposes_batch",
@@ -380,20 +420,8 @@ def test_ingest_llm_can_defer_citation_purpose_enrichment(monkeypatch):  # noqa:
     )
     monkeypatch.setattr(
         pipeline,
-        "run_phase1_extraction",
-        lambda **kwargs: {  # noqa: ARG005
-            "logic": {"steps": []},
-            "validated_claims": [],
-            "quality_report": {
-                "gate_passed": True,
-                "quality_tier": "green",
-                "quality_tier_score": 0.92,
-            },
-            "claim_candidates": [],
-            "claims_merged": [],
-            "rejected_claims": [],
-            "step_order": [],
-        },
+        "run_phase1_paper_logic_trace",
+        lambda **kwargs: _fake_phase1_trace_output(kwargs["cite_rec"]["paper_id"]),  # noqa: ARG005
     )
 
     def _should_not_run(**kwargs):  # noqa: ANN003
@@ -405,3 +433,75 @@ def test_ingest_llm_can_defer_citation_purpose_enrichment(monkeypatch):  # noqa:
 
     assert out["llm_built"] is True
     assert out["llm_error"] is None
+
+
+def test_ingest_completes_when_valid_paper_logic_trace_exists_without_audit(monkeypatch):  # noqa: ANN001, ANN201
+    docs = [_mock_document(index) for index in range(1)]
+    docs_iter = iter(docs)
+
+    monkeypatch.setattr(pipeline, "Neo4jClient", lambda *args, **kwargs: _FakeNeo4jClient())  # noqa: ARG005
+    monkeypatch.setattr(pipeline, "parse_mineru_markdown", lambda _md: next(docs_iter))
+    monkeypatch.setattr(
+        pipeline,
+        "recover_references_with_agent",
+        lambda doc, **kwargs: (doc, {"before_refs": 0, "after_refs": 0}),  # noqa: ARG005
+    )
+    monkeypatch.setattr(
+        pipeline,
+        "recover_citation_events_from_references",
+        lambda doc, **kwargs: (doc, {"before_events": 0, "after_events": 0}),  # noqa: ARG005
+    )
+    monkeypatch.setattr(pipeline, "CrossrefClient", lambda: object())
+    monkeypatch.setattr(
+        pipeline,
+        "build_reference_and_cite_records",
+        lambda doc, **kwargs: {  # noqa: ARG005
+            "paper_id": paper_id_for_md_path(doc.paper.md_path, doi=doc.paper.doi),
+            "refs": [],
+            "cited_papers": [],
+            "cites_resolved": [],
+            "cites_unresolved": [],
+        },
+    )
+    monkeypatch.setattr(pipeline, "load_canonical_meta", lambda _path: {"paper_type": "research"})
+    monkeypatch.setattr(
+        pipeline,
+        "load_active",
+        lambda _paper_type: {"version": 1, "paper_type": "research", "rules": {}, "prompts": {}},
+    )
+    monkeypatch.setattr(pipeline, "extract_figures_from_markdown", lambda **kwargs: [])  # noqa: ARG005
+    monkeypatch.setattr(pipeline, "build_faiss_for_chunks", lambda *args, **kwargs: None)  # noqa: ARG005
+    monkeypatch.setattr(pipeline, "build_faiss_for_rows", lambda *args, **kwargs: None)  # noqa: ARG005
+    monkeypatch.setattr(pipeline, "build_community_corpus_rows", lambda *args, **kwargs: [])  # noqa: ARG005
+    monkeypatch.setattr(pipeline, "_write_document_ir", lambda *args, **kwargs: None)  # noqa: ARG005
+    monkeypatch.setattr(Path, "write_text", lambda self, *args, **kwargs: 0)  # noqa: ARG005
+    monkeypatch.setattr(
+        pipeline,
+        "merge_runtime_config",
+        lambda _overrides: {
+            "ingest_pre_llm_max_workers": 1,
+            "ingest_llm_max_workers": 1,
+            "llm_global_max_concurrent": 12,
+            "ingest_defer_citation_purposes": True,
+        },
+    )
+    monkeypatch.setattr(
+        pipeline,
+        "run_phase1_paper_logic_trace",
+        lambda **kwargs: _fake_phase1_trace_output(  # noqa: ARG005
+            kwargs["cite_rec"]["paper_id"],
+            quality_tier="yellow",
+            audit_status="eligible",
+        ),
+    )
+    monkeypatch.setattr(
+        pipeline,
+        "classify_citation_purposes_batch",
+        lambda **kwargs: {"by_id": {}},  # noqa: ARG005
+    )
+
+    out = pipeline.ingest_markdowns(["dummy-1.md"])
+
+    assert out["llm_built"] is True
+    assert out["paper_logic_traces"][0]["quality_tier"] == "yellow"
+    assert out["paper_logic_traces"][0]["audit_status"] == "eligible"

@@ -12,7 +12,7 @@ from typing import Any, Callable
 from app.citations.aggregate import build_reference_and_cite_records
 from app.citations.citation_event_recovery import recover_citation_events_from_references
 from app.crossref.client import CrossrefClient
-from app.extraction.orchestrator import run_phase1_extraction
+from app.extraction.orchestrator import run_phase1_paper_logic_trace
 from app.graph.neo4j_client import Neo4jClient
 from app.graph.neo4j_client import paper_id_for_md_path
 from app.ingest.figures import extract_figures_from_markdown
@@ -397,7 +397,7 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
         paper_type = _paper_type_for_md(doc.paper.md_path, doc=doc)
         schema = load_active(paper_type)  # type: ignore[arg-type]
         phase1_artifacts_dir = run_dir / "raw_pool" / _safe_id(paper_id)
-        phase1 = run_phase1_extraction(
+        phase1 = run_phase1_paper_logic_trace(
             doc=doc,
             paper_id=paper_id,
             cite_rec=rec,
@@ -405,6 +405,8 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
             artifacts_dir=phase1_artifacts_dir,
             allow_weak=bool(getattr(settings, "phase1_gate_allow_weak", False)),
         )
+        trace = phase1.get("paper_logic_trace")
+        trace_payload = trace.model_dump(mode="json") if hasattr(trace, "model_dump") else dict(trace or {})
         step_order = list(phase1.get("step_order") or [])
         logic_claims = {
             "logic": phase1.get("logic") or {},
@@ -414,9 +416,16 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
             "raw_claims_merged": len(phase1.get("claims_merged") or []),
             "rejected_claims": len(phase1.get("rejected_claims") or []),
         }
-        llm_out = {"paper_id": paper_id, "schema": {"paper_type": paper_type, "version": schema.get("version")}, **logic_claims}
+        llm_out = {
+            "paper_id": paper_id,
+            "schema": {"paper_type": paper_type, "version": schema.get("version")},
+            "paper_logic_trace": trace_payload,
+            **logic_claims,
+        }
         out = run_dir / f"{doc.paper.paper_source}.llm_imrad.json"
         out.write_text(json.dumps(logic_claims, ensure_ascii=False, indent=2), encoding="utf-8")
+        trace_out = run_dir / f"{doc.paper.paper_source}.paper_logic_trace.json"
+        trace_out.write_text(json.dumps(trace_payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
         purposes = []
         if not defer_citation_purposes:
@@ -473,6 +482,7 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
             "citation_purposes": purposes,
             "citation_purposes_deferred": defer_citation_purposes,
             "llm_out": llm_out,
+            "paper_logic_trace": trace_payload,
         }
 
     def _write_llm_to_neo4j(item: dict[str, Any]) -> None:
@@ -483,7 +493,10 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
         purposes = list(item.get("citation_purposes") or [])
         purposes_deferred = bool(item.get("citation_purposes_deferred"))
         quality_report = logic_claims.get("quality_report") or {}
-        gate_passed = bool(quality_report.get("gate_passed"))
+        trace_payload = dict(item.get("paper_logic_trace") or {})
+        trace_quality = dict(trace_payload.get("quality") or {})
+        trace_gate_report = dict(trace_quality.get("hot_path_gate_report") or {})
+        gate_passed = bool(trace_gate_report.get("passed")) if trace_gate_report else bool(quality_report.get("gate_passed"))
         with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
             if not gate_passed:
                 try:
@@ -495,6 +508,8 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
                             "phase1_quality_json": json.dumps(quality_report, ensure_ascii=False),
                             "phase1_quality_tier": str(quality_report.get("quality_tier") or ""),
                             "phase1_quality_tier_score": float(quality_report.get("quality_tier_score") or 0.0),
+                            "paper_logic_trace_quality_tier": str(trace_quality.get("quality_tier") or ""),
+                            "paper_logic_trace_audit_status": str(trace_quality.get("audit_status") or ""),
                         },
                     )
                 except Exception:
@@ -515,6 +530,8 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
                         "phase1_gate_passed": bool(quality_report.get("gate_passed")),
                         "phase1_quality_tier": str(quality_report.get("quality_tier") or ""),
                         "phase1_quality_tier_score": float(quality_report.get("quality_tier_score") or 0.0),
+                        "paper_logic_trace_quality_tier": str(trace_quality.get("quality_tier") or ""),
+                        "paper_logic_trace_audit_status": str(trace_quality.get("audit_status") or ""),
                     },
                 )
             except Exception:
@@ -843,6 +860,15 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
                 "supported_claim_ratio": (o.get("quality_report") or {}).get("supported_claim_ratio"),
                 "step_coverage_ratio": (o.get("quality_report") or {}).get("step_coverage_ratio"),
                 "validated_claims": len(o.get("claims") or []),
+            }
+            for o in llm_outputs
+        ],
+        "paper_logic_traces": [
+            {
+                "paper_id": o.get("paper_id"),
+                "quality_tier": ((o.get("paper_logic_trace") or {}).get("quality") or {}).get("quality_tier"),
+                "audit_status": ((o.get("paper_logic_trace") or {}).get("quality") or {}).get("audit_status"),
+                "move_count": len((((o.get("paper_logic_trace") or {}).get("canonical_core") or {}).get("moves") or [])),
             }
             for o in llm_outputs
         ],
