@@ -12,15 +12,23 @@ The main problem is no longer "extract more claims." The main problem is that th
 4. audited against evidence
 5. reused without rerunning the most expensive paper extraction path
 
-This design hard-cuts the old second-layer abstraction and replaces it with a new canonical export centered on `PaperLogicTrace`.
+At the same time, the current extraction chain has accumulated too many stages around the old schema. If the schema is redesigned but the extraction chain is left structurally unchanged, the project will simply end up with a better schema on top of an increasingly expensive pipeline.
+
+This design therefore hard-cuts both:
+
+1. the old second-layer abstraction
+2. the old extraction-chain shape
+
+and replaces them with a new canonical export centered on `PaperLogicTrace` plus a rebuilt, throughput-conscious extraction compiler.
 
 ## 2. Goals
 
 1. Redefine L2 around a stable canonical export: `PaperLogicTrace`.
 2. Remove `LogicStep / Claim` as canonical second-layer schema.
 3. Preserve strong evidence traceability from every important L2 field back to paper evidence.
-4. Keep the extraction hot path fast enough for large-scale paper processing.
-5. Make L2 naturally consumable by:
+4. Rebuild the L2 extraction chain together with the schema, instead of adapting the old pipeline in place.
+5. Keep the extraction hot path fast enough for large-scale paper processing.
+6. Make L2 naturally consumable by:
    1. future L1 environment linking
    2. community construction
    3. L3 route-state reconstruction
@@ -33,6 +41,7 @@ This design hard-cuts the old second-layer abstraction and replaces it with a ne
 3. This spec does not preserve backward compatibility for `LogicStep / Claim`.
 4. This spec does not finalize the new community algorithm; it only defines what L2 exports to community builders.
 5. This spec does not require Neo4j to remain the canonical storage format for L2.
+6. This spec does not preserve the existing extraction orchestration shape just because it already exists.
 
 ## 4. Layer Alignment
 
@@ -117,6 +126,10 @@ Expensive enrichment and deep audits must not block the first usable `PaperLogic
 ### 6.5 Derived views may evolve faster than canonical core
 
 Community inputs, L1 bridge hints, and route feature candidates should be derived from canonical L2, not mixed into the truth layer itself.
+
+### 6.6 Extraction redesign is in scope
+
+Schema redesign and extraction-chain redesign are coupled in this project. The extraction flow should be simplified around `PaperLogicTrace`, not forced to preserve the stage boundaries created by the old `LogicStep / Claim` pipeline.
 
 ## 7. Canonical L2 Export
 
@@ -415,6 +428,8 @@ Multi-value:
 
 The new L2 flow is split into a synchronous hot path and a deferred audit/enrichment path.
 
+This is not merely a scheduling tweak. It is a structural rewrite of the second-layer extraction compiler.
+
 ### 10.1 Hot path
 
 1. `Evidence substrate preparation`
@@ -436,6 +451,8 @@ The new L2 flow is split into a synchronous hot path and a deferred audit/enrich
 6. `MoveRelation stitching`
 7. `Minimal hot-path gate`
 8. `Canonical PaperLogicTrace export`
+
+The hot path is expected to replace the old "logic first, claim second, then packaging and accumulated extras" shape with a much tighter `PaperLogicTrace` compiler path.
 
 ### 10.2 Audit/enrichment path
 
@@ -472,6 +489,16 @@ Use:
 
 This gives a middle ground between stability, evidence locality, and throughput.
 
+### 11.3 Pipeline simplification principle
+
+When an old pipeline step exists only to support the previous schema, it should be removed rather than adapted.
+
+Examples:
+
+1. old intermediate objects that only exist to materialize `LogicStep / Claim`
+2. packaging stages that mirror old database structures instead of canonical L2
+3. synchronous enrichments that do not affect first valid `PaperLogicTrace`
+
 ## 12. Hot-Path vs Audit Split
 
 ### 12.1 Hot-path responsibilities
@@ -486,6 +513,8 @@ It must produce:
 4. evidence anchors
 5. minimum slot inventory
 6. quality tier and hot-path gate report
+
+The hot path is not responsible for preserving old extraction stage boundaries if those boundaries hurt throughput.
 
 ### 12.2 Audit responsibilities
 
@@ -514,6 +543,7 @@ Recommended initial budgets:
 3. no extra audit-only LLM round may be required before first export
 4. the default extraction path should avoid unbounded sentence-level fanout
 5. slot refinement that materially increases latency belongs in audit unless it is required for canonical validity
+6. schema migration must not be implemented as "old pipeline plus new export appended at the end"
 
 ## 13. Derived Views
 
@@ -681,6 +711,8 @@ The following areas will require rewrite or major refactoring:
 5. paper-level read APIs
 6. frontend views that currently assume `LogicStep / Claim`
 
+In practice, this is an extraction-pipeline refactor as much as it is a schema refactor. Old staging, batching assumptions, and packaging boundaries should be treated as replaceable rather than preserved by default.
+
 The following areas remain useful and should be reused where possible:
 
 1. evidence extraction and quote grounding primitives
@@ -778,8 +810,9 @@ Proceed with a hard-cut L2 redesign centered on `PaperLogicTrace`.
 The implementation should:
 
 1. replace `LogicStep / Claim` with `ResearchMove`-based canonical exports
-2. split canonical truths from derived compiler views
-3. keep the hot path narrow
-4. expose explicit interfaces to future L1, community, L3, and L4 builders
+2. rebuild the extraction chain as a throughput-conscious `PaperLogicTrace` compiler
+3. split canonical truths from derived compiler views
+4. keep the hot path narrow
+5. expose explicit interfaces to future L1, community, L3, and L4 builders
 
 This gives LogicKG a real second-layer identity: not a graph workbench with paper extraction inside it, but a stable paper-logic compiler that can feed the rest of the scientific reasoning system.
