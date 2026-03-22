@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from .derived_views import build_derived_views
+from .gates import build_quality_payload, evaluate_hot_path_gate
 from .models import (
     CanonicalCore,
     CitationAct,
@@ -201,26 +202,25 @@ def compile_paper_logic_trace(
     built_at: str | None = None,
 ) -> PaperLogicTrace:
     metadata = PaperMetadata.model_validate(paper_metadata)
+    canonical_core = CanonicalCore(
+        evidence_anchors=_compile_anchors(evidence_rows),
+        moves=_compile_moves(metadata.paper_id, evidence_rows),
+        move_relations=_compile_move_relations(move_relation_rows),
+        citation_acts=_compile_citation_acts(citation_rows),
+        figure_refs=_compile_figure_refs(figure_rows),
+        table_refs=_compile_table_refs(table_rows),
+    )
+    gate_report = evaluate_hot_path_gate(
+        moves=canonical_core.moves,
+        anchors=canonical_core.evidence_anchors,
+    )
     trace = PaperLogicTrace(
         trace_id=f'{metadata.paper_id}:paper_logic_trace',
         schema_version='v2',
         built_at=built_at or _utc_now_iso(),
         paper_metadata=metadata,
-        canonical_core=CanonicalCore(
-            evidence_anchors=_compile_anchors(evidence_rows),
-            moves=_compile_moves(metadata.paper_id, evidence_rows),
-            move_relations=_compile_move_relations(move_relation_rows),
-            citation_acts=_compile_citation_acts(citation_rows),
-            figure_refs=_compile_figure_refs(figure_rows),
-            table_refs=_compile_table_refs(table_rows),
-        ),
-        quality={
-            'quality_tier': 'unknown',
-            'hot_path_gate_report': {
-                'move_count': len(evidence_rows),
-                'anchor_count': len(evidence_rows),
-            },
-        },
+        canonical_core=canonical_core,
+        quality=build_quality_payload(gate_report),
     )
     trace.derived_views = build_derived_views(trace)
     return trace
