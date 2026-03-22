@@ -111,6 +111,29 @@ def _patch_pipeline_dependencies(monkeypatch, fake_neo4j_client, docs: list[Docu
     docs = list(docs or [_mock_document()])
     doc_iter = iter(docs)
 
+    def _fake_phase1_trace_output(paper_id: str) -> dict:
+        return {
+            "logic": {},
+            "validated_claims": [],
+            "quality_report": {
+                "gate_passed": True,
+                "quality_tier": "green",
+                "quality_tier_score": 1.0,
+            },
+            "claim_candidates": [],
+            "claims_merged": [],
+            "rejected_claims": [],
+            "step_order": [],
+            "paper_logic_trace": {
+                "quality": {
+                    "quality_tier": "yellow",
+                    "audit_status": "eligible",
+                    "hot_path_gate_report": {"passed": True, "move_count": 1, "anchor_count": 1},
+                },
+                "canonical_core": {"moves": [{"move_id": "m-1"}]},
+            },
+        }
+
     # Neo4j
     monkeypatch.setattr(
         pipeline,
@@ -160,20 +183,8 @@ def _patch_pipeline_dependencies(monkeypatch, fake_neo4j_client, docs: list[Docu
     # LLM extraction
     monkeypatch.setattr(
         pipeline,
-        "run_phase1_extraction",
-        lambda **kwargs: {  # noqa: ARG005
-            "logic": {},
-            "validated_claims": [],
-            "quality_report": {
-                "gate_passed": True,
-                "quality_tier": "green",
-                "quality_tier_score": 1.0,
-            },
-            "claim_candidates": [],
-            "claims_merged": [],
-            "rejected_claims": [],
-            "step_order": [],
-        },
+        "run_phase1_paper_logic_trace",
+        lambda **kwargs: _fake_phase1_trace_output(kwargs["cite_rec"]["paper_id"]),  # noqa: ARG005
     )
     monkeypatch.setattr(
         pipeline,
@@ -356,7 +367,7 @@ def test_ingest_markdowns_builds_community_corpus_without_proposition_writes_or_
     )
     monkeypatch.setattr(
         pipeline,
-        "run_phase1_extraction",
+        "run_phase1_paper_logic_trace",
         lambda **kwargs: {  # noqa: ARG005
             "logic": {"steps": []},
             "validated_claims": [
@@ -376,6 +387,14 @@ def test_ingest_markdowns_builds_community_corpus_without_proposition_writes_or_
             "claims_merged": [],
             "rejected_claims": [],
             "step_order": [],
+            "paper_logic_trace": {
+                "quality": {
+                    "quality_tier": "yellow",
+                    "audit_status": "eligible",
+                    "hot_path_gate_report": {"passed": True, "move_count": 1, "anchor_count": 1},
+                },
+                "canonical_core": {"moves": [{"move_id": "m-1"}]},
+            },
         },
     )
     monkeypatch.setattr(
