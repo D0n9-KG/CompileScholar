@@ -9,9 +9,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from app.ingest.paper_identity import normalize_doi_strategy
 from app.settings import settings
-
-DOI_STRATEGIES = {"extract_only", "title_crossref"}
 
 
 def _backend_root() -> Path:
@@ -39,13 +38,6 @@ def upload_dir(upload_id: str) -> Path:
 
 def utc_now_iso() -> str:
     return datetime.now(tz=timezone.utc).isoformat()
-
-
-def normalize_doi_strategy(value: str | None) -> str:
-    s = str(value or "").strip().lower()
-    if s in DOI_STRATEGIES:
-        return s
-    return "title_crossref"
 
 
 @dataclass

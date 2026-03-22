@@ -2,14 +2,13 @@ from __future__ import annotations
 
 import json
 import os
-import re
-from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
 from app.crossref.client import CrossrefClient
 from app.graph.neo4j_client import Neo4jClient
+from app.ingest.paper_identity import resolve_document_identity
 from app.ingest.parse_md import parse_mineru_markdown
 from app.schema_store import normalize_paper_type
 from app.ingest.upload_store import (
@@ -24,21 +23,6 @@ from app.ingest.upload_store import (
     upload_dir,
 )
 from app.settings import settings
-
-
-_DOI_RE = re.compile(r"^10\.\d{4,9}/\S+$")
-_CROSSREF_CONFIDENCE_THRESHOLD = 0.25
-
-
-def _crossref_workers(crossref: CrossrefClient | None, item_count: int) -> int:
-    if crossref is None:
-        return 1
-    try:
-        workers = int(crossref.recommended_workers())
-    except Exception:  # noqa: BLE001
-        workers = 1
-    return max(1, min(workers, max(1, int(item_count))))
-
 
 @dataclass
 class PaperUnit:
@@ -68,8 +52,6 @@ def scan_upload(upload_id: str) -> dict[str, Any]:
 
     units: list[PaperUnit] = []
     errors: list[dict[str, Any]] = []
-    pending_crossref: list[tuple[int, str, str]] = []
-
     def _append_unit(md_path: Path, rel_dir: str) -> None:
         md_rel = md_path.relative_to(root).as_posix()
 
@@ -94,13 +76,13 @@ def scan_upload(upload_id: str) -> dict[str, Any]:
             )
             return
 
-        doi = (doi_override or doc.paper.doi or "").strip().lower() or None
-        if not doi and crossref:
-            query = (doc.paper.title or doc.paper.title_alt or "").strip()
-            if query:
-                pending_crossref.append((len(units), rel_dir, query))
-        if doi and not _DOI_RE.match(doi):
-            doi = None
+        identity = resolve_document_identity(
+            doc,
+            doi_override=doi_override,
+            doi_strategy=doi_strategy,
+            crossref=crossref,
+        )
+        doi = identity.doi
 
         units.append(
             PaperUnit(
@@ -148,35 +130,6 @@ def scan_upload(upload_id: str) -> dict[str, Any]:
         except Exception:
             rel_dir = "."
         _append_unit(md_path, rel_dir)
-
-    def _resolve_title_doi(index: int, rel_dir: str, query: str) -> tuple[int, str, str | None]:
-        try:
-            r = crossref.resolve_reference(query) if crossref else None
-            selected = r.selected if r else None
-            doi = None
-            if selected and selected.doi and float(r.confidence) >= _CROSSREF_CONFIDENCE_THRESHOLD:
-                doi = str(selected.doi).strip().lower()
-            return index, rel_dir, doi
-        except Exception as exc:  # noqa: BLE001
-            errors.append({"unit_dir": rel_dir, "error": f"Crossref title DOI resolve failed: {exc}"})
-            return index, rel_dir, None
-
-    workers = _crossref_workers(crossref, len(pending_crossref))
-    if pending_crossref and workers == 1:
-        resolved = [_resolve_title_doi(index, rel_dir, query) for index, rel_dir, query in pending_crossref]
-    elif pending_crossref:
-        with ThreadPoolExecutor(max_workers=workers) as executor:
-            futures = [executor.submit(_resolve_title_doi, index, rel_dir, query) for index, rel_dir, query in pending_crossref]
-            resolved = [future.result() for future in futures]
-    else:
-        resolved = []
-
-    for index, _rel_dir, doi in resolved:
-        if not doi or not _DOI_RE.match(doi):
-            continue
-        units[index].doi = doi
-        if units[index].status == "need_doi":
-            units[index].status = "ready"
 
     # Determine conflicts against Neo4j (best effort)
     if any(u.status == "ready" and u.doi for u in units):

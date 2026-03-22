@@ -17,6 +17,12 @@ from app.graph.neo4j_client import Neo4jClient
 from app.graph.neo4j_client import paper_id_for_md_path
 from app.ingest.figures import extract_figures_from_markdown
 from app.ingest.models import DocumentIR
+from app.ingest.paper_identity import (
+    apply_identity_to_document,
+    dedupe_documents_by_identity,
+    normalize_doi_strategy,
+    resolve_document_identity,
+)
 from app.ingest.paper_meta import load_canonical_meta
 from app.ingest.parse_md import find_mineru_markdowns, parse_mineru_markdown
 from app.llm.client import bind_active_llm_paper_count, submit_with_current_llm_context
@@ -44,6 +50,22 @@ _paper_type_cache: dict[str, str] = {}
 def _paper_type_cache_clear() -> None:
     """Clear the per-batch paper type cache (call at batch start)."""
     _paper_type_cache.clear()
+
+
+def _resolve_main_paper_identities(parsed: list[DocumentIR]) -> tuple[list[DocumentIR], list[dict[str, str]]]:
+    strategy = normalize_doi_strategy(getattr(settings, "ingest_main_doi_strategy", "title_crossref"))
+    crossref = CrossrefClient() if strategy == "title_crossref" else None
+    identities = [
+        resolve_document_identity(
+            doc,
+            doi_strategy=strategy,
+            crossref=crossref,
+        )
+        for doc in parsed
+    ]
+    resolved_docs = [apply_identity_to_document(doc, identity) for doc, identity in zip(parsed, identities)]
+    deduped_docs, _deduped_identities, duplicates = dedupe_documents_by_identity(resolved_docs, identities)
+    return deduped_docs, duplicates
 
 
 def _paper_type_for_md(md_path: str, doc: DocumentIR | None = None) -> str:
@@ -167,6 +189,9 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
     for md in md_files:
         doc = parse_mineru_markdown(md)
         parsed.append(doc)
+
+    parsed, duplicate_papers = _resolve_main_paper_identities(parsed)
+    for doc in parsed:
         out = run_dir / f"{doc.paper.paper_source}.document_ir.json"
         _write_document_ir(out, doc)
 
@@ -778,6 +803,7 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
     return {
         "run_id": run_id,
         "md_files": md_files,
+        "duplicate_papers_skipped": duplicate_papers,
         "papers": [
             {
                 "paper_source": d.paper.paper_source,

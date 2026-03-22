@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from app.crossref.client import CrossrefResolveResult, CrossrefWork
 from app.graph.neo4j_client import paper_id_for_md_path
 from app.ingest import pipeline
 from app.ingest.models import DocumentIR, PaperDraft
@@ -80,17 +81,24 @@ class _FakeNeo4jClient:
         return []
 
 
-def _mock_document() -> DocumentIR:
+def _mock_document(
+    *,
+    paper_source: str = "test_paper_1",
+    md_path: str = "C:/tmp/test_paper_1.md",
+    title: str = "Test Paper Title",
+    doi: str | None = "10.1000/TEST123",
+    year: int = 2024,
+) -> DocumentIR:
     """Create a minimal DocumentIR for testing."""
     return DocumentIR(
         paper=PaperDraft(
-            paper_source="test_paper_1",
-            md_path="C:/tmp/test_paper_1.md",
-            title="Test Paper Title",
+            paper_source=paper_source,
+            md_path=md_path,
+            title=title,
             title_alt=None,
             authors=[],
-            doi="10.1000/TEST123",
-            year=2024,
+            doi=doi,
+            year=year,
         ),
         chunks=[],
         references=[],
@@ -98,9 +106,10 @@ def _mock_document() -> DocumentIR:
     )
 
 
-def _patch_pipeline_dependencies(monkeypatch, fake_neo4j_client):  # noqa: ANN001, ANN201
+def _patch_pipeline_dependencies(monkeypatch, fake_neo4j_client, docs: list[DocumentIR] | None = None):  # noqa: ANN001, ANN201
     """Monkeypatch all external dependencies in pipeline.ingest_markdowns."""
-    doc = _mock_document()
+    docs = list(docs or [_mock_document()])
+    doc_iter = iter(docs)
 
     # Neo4j
     monkeypatch.setattr(
@@ -110,7 +119,7 @@ def _patch_pipeline_dependencies(monkeypatch, fake_neo4j_client):  # noqa: ANN00
     )
 
     # Parsing and document building
-    monkeypatch.setattr(pipeline, "parse_mineru_markdown", lambda _md: doc)
+    monkeypatch.setattr(pipeline, "parse_mineru_markdown", lambda _md: next(doc_iter))
     monkeypatch.setattr(
         pipeline,
         "recover_references_with_agent",
@@ -127,8 +136,8 @@ def _patch_pipeline_dependencies(monkeypatch, fake_neo4j_client):  # noqa: ANN00
     monkeypatch.setattr(
         pipeline,
         "build_reference_and_cite_records",
-        lambda *args, **kwargs: {  # noqa: ARG005
-            "paper_id": None,
+        lambda d, *args, **kwargs: {  # noqa: ARG005
+            "paper_id": paper_id_for_md_path(d.paper.md_path, doi=d.paper.doi),
             "refs": [],
             "cited_papers": [],
             "cites_resolved": [],
@@ -147,6 +156,30 @@ def _patch_pipeline_dependencies(monkeypatch, fake_neo4j_client):  # noqa: ANN00
     # Figures and FAISS
     monkeypatch.setattr(pipeline, "extract_figures_from_markdown", lambda **kwargs: [])  # noqa: ARG005
     monkeypatch.setattr(pipeline, "build_faiss_for_chunks", lambda *args, **kwargs: None)  # noqa: ARG005
+
+    # LLM extraction
+    monkeypatch.setattr(
+        pipeline,
+        "run_phase1_extraction",
+        lambda **kwargs: {  # noqa: ARG005
+            "logic": {},
+            "validated_claims": [],
+            "quality_report": {
+                "gate_passed": True,
+                "quality_tier": "green",
+                "quality_tier_score": 1.0,
+            },
+            "claim_candidates": [],
+            "claims_merged": [],
+            "rejected_claims": [],
+            "step_order": [],
+        },
+    )
+    monkeypatch.setattr(
+        pipeline,
+        "classify_citation_purposes_batch",
+        lambda **kwargs: {"by_id": {}},  # noqa: ARG005
+    )
 
     # File I/O
     monkeypatch.setattr(pipeline, "_write_document_ir", lambda *args, **kwargs: None)  # noqa: ARG005
@@ -196,6 +229,92 @@ def test_first_ingest_skips_delete_when_paper_missing(monkeypatch):  # noqa: ANN
     assert any(name == "upsert_paper_and_chunks" for name, _ in fake.calls), (
         "upsert_paper_and_chunks must be called even when paper doesn't pre-exist"
     )
+
+
+def test_ingest_markdowns_resolves_main_doi_before_reingest_check(monkeypatch):  # noqa: ANN001, ANN201
+    fake = _FakeNeo4jClient(paper_exists=True)
+    doc = _mock_document(
+        paper_source="paper_no_doi",
+        md_path="C:/tmp/paper_no_doi.md",
+        title="Learning Constitutive Laws",
+        doi=None,
+    )
+    _patch_pipeline_dependencies(monkeypatch, fake, docs=[doc])
+
+    selected = CrossrefWork(
+        doi="10.1234/example-doi",
+        title="Learning Constitutive Laws",
+        year=2025,
+        venue="Journal X",
+        authors=["Alice", "Bob"],
+        score=88.0,
+    )
+
+    class _FakeCrossref:
+        def resolve_reference(self, query: str):
+            assert query == "Learning Constitutive Laws"
+            return CrossrefResolveResult(
+                query=query,
+                topk=[selected],
+                selected=selected,
+                confidence=0.88,
+            )
+
+    monkeypatch.setattr(pipeline, "CrossrefClient", lambda: _FakeCrossref())
+
+    pipeline.ingest_markdowns(["dummy.md"])
+
+    expected_paper_id = "doi:10.1234/example-doi"
+    assert ("get_paper_basic", expected_paper_id) in fake.calls
+    assert ("delete_paper_subgraph", expected_paper_id) in fake.calls
+    assert ("upsert_paper_and_chunks", "10.1234/example-doi") in fake.calls
+
+
+def test_ingest_markdowns_dedupes_same_batch_duplicate_dois(monkeypatch):  # noqa: ANN001, ANN201
+    fake = _FakeNeo4jClient(paper_exists=False)
+    docs = [
+        _mock_document(
+            paper_source="paper_a",
+            md_path="C:/tmp/paper_a.md",
+            title="Learning Constitutive Laws",
+            doi=None,
+        ),
+        _mock_document(
+            paper_source="paper_b",
+            md_path="C:/tmp/paper_b.md",
+            title="Learning Constitutive Laws",
+            doi=None,
+        ),
+    ]
+    _patch_pipeline_dependencies(monkeypatch, fake, docs=docs)
+
+    selected = CrossrefWork(
+        doi="10.1234/example-doi",
+        title="Learning Constitutive Laws",
+        year=2025,
+        venue="Journal X",
+        authors=["Alice", "Bob"],
+        score=88.0,
+    )
+
+    class _FakeCrossref:
+        def resolve_reference(self, query: str):
+            assert query == "Learning Constitutive Laws"
+            return CrossrefResolveResult(
+                query=query,
+                topk=[selected],
+                selected=selected,
+                confidence=0.88,
+            )
+
+    monkeypatch.setattr(pipeline, "CrossrefClient", lambda: _FakeCrossref())
+
+    result = pipeline.ingest_markdowns(["a.md", "b.md"])
+
+    upserts = [call for call in fake.calls if call[0] == "upsert_paper_and_chunks"]
+    assert len(upserts) == 1
+    assert len(result["papers"]) == 1
+    assert result["papers"][0]["doi"] == "10.1234/example-doi"
 
 
 def test_ingest_markdowns_builds_community_corpus_without_proposition_writes_or_clustering(monkeypatch):  # noqa: ANN001, ANN201

@@ -80,6 +80,11 @@ class Settings(BaseSettings):
         validation_alias=AliasChoices("INGEST_DEFER_CITATION_PURPOSES"),
     )
 
+    ingest_main_doi_strategy: str = Field(
+        default="title_crossref",
+        validation_alias=AliasChoices("INGEST_MAIN_DOI_STRATEGY"),
+    )
+
     llm_timeout_seconds: int = Field(
         default=60,
         validation_alias=AliasChoices("LLM_TIMEOUT_SECONDS"),
