@@ -1,35 +1,57 @@
 from __future__ import annotations
 
-from app.paper_logic_trace.models import ClaimTrace, LogicStepTrace, PaperLogicTrace
+from app.paper_logic_trace.models import (
+    CanonicalCore,
+    EvidenceAnchor,
+    PaperLogicTrace,
+    PaperMetadata,
+    ResearchMove,
+)
 
 
-def test_paper_logic_trace_requires_canonical_sections() -> None:
+def test_paper_logic_trace_uses_canonical_core() -> None:
     trace = PaperLogicTrace(
-        schema_version='v1',
-        paper_metadata={'paper_id': 'paper-1'},
-        logic_steps=[
-            LogicStepTrace(
-                logic_step_id='ls-1',
-                step_type='Method',
-                summary='Uses graph encoding.',
-            )
-        ],
-        claims=[
-            ClaimTrace(
-                claim_id='cl-1',
-                claim_key='claim-1',
-                text='Graph encoding improves retrieval.',
-                step_type='Method',
-            )
-        ],
-        claim_evidence_links=[],
-        figures=[],
-        limitations=[],
-        future_work_signals=[],
-        citation_acts=[],
-        quality_tier='A',
+        trace_id='trace-1',
+        schema_version='v2',
+        built_at='2026-03-22T00:00:00Z',
+        paper_metadata=PaperMetadata(
+            paper_id='paper-1',
+            title='Demo',
+            source_refs=['chunk:1'],
+        ),
+        canonical_core=CanonicalCore(
+            evidence_anchors=[
+                EvidenceAnchor(
+                    anchor_id='a-1',
+                    paper_id='paper-1',
+                    source_ref='chunk:1',
+                    modality='text',
+                    section_path=[],
+                    locator={},
+                    quote='demo',
+                    citation_ids=[],
+                    support_type='direct',
+                    weak=False,
+                )
+            ],
+            moves=[
+                ResearchMove(
+                    move_id='m-1',
+                    sequence_no=1,
+                    role='method',
+                    act_type='propose_method',
+                    summary='Uses graph encoding',
+                    anchor_ids=['a-1'],
+                    confidence=0.8,
+                )
+            ],
+            move_relations=[],
+            citation_acts=[],
+            figure_refs=[],
+            table_refs=[],
+        ),
+        derived_views={},
+        quality={'quality_tier': 'green', 'hot_path_gate_report': {}},
     )
 
-    assert trace.schema_version == 'v1'
-    assert trace.logic_steps[0].step_type == 'Method'
-    assert trace.claims[0].comparison_target == []
+    assert trace.canonical_core.moves[0].role == 'method'
