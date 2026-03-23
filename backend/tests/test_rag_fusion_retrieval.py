@@ -9,7 +9,7 @@ def test_rank_fusion_basics_includes_textbook_fundamental_for_section_question()
     rows = [
         {
             "paper_source": "p1",
-            "step_type": "Method",
+            "role": "method",
             "entity_name": "Finite Element Method",
             "entity_type": "method",
             "description": "A numerical method for PDE discretization.",
@@ -18,7 +18,7 @@ def test_rank_fusion_basics_includes_textbook_fundamental_for_section_question()
         },
         {
             "paper_source": "p1",
-            "step_type": "Background",
+            "role": "background",
             "entity_name": "Industrial Revolution",
             "entity_type": "history",
             "description": "Historical period.",
@@ -36,7 +36,7 @@ def test_format_fusion_evidence_block_is_nonempty_for_ranked_rows() -> None:
     ranked = [
         {
             "paper_source": "p1",
-            "step_type": "Result",
+            "role": "result",
             "entity_name": "Natural Frequency",
             "entity_type": "theory",
             "score": 0.88,
@@ -54,8 +54,8 @@ def test_fusion_rows_to_structured_hits_preserves_textbook_metadata() -> None:
             {
                 "paper_source": "p1",
                 "paper_id": "doi:10.1000/example",
-                "logic_step_id": "ls-1",
-                "step_type": "Method",
+                "move_id": "mv-1",
+                "role": "method",
                 "entity_id": "ent-1",
                 "entity_name": "Finite Element Method",
                 "entity_type": "method",
@@ -88,8 +88,8 @@ def test_fusion_rows_to_structured_hits_preserves_fusion_provenance() -> None:
             {
                 "paper_source": "p1",
                 "paper_id": "doi:10.1000/example",
-                "logic_step_id": "ls-1",
-                "step_type": "Method",
+                "move_id": "mv-1",
+                "role": "method",
                 "entity_id": "ent-1",
                 "entity_name": "Finite Element Method",
                 "entity_type": "method",
@@ -107,7 +107,7 @@ def test_fusion_rows_to_structured_hits_preserves_fusion_provenance() -> None:
         ]
     )
 
-    assert hits[0]["logic_step_id"] == "ls-1"
+    assert hits[0]["move_id"] == "mv-1"
     assert hits[0]["source_chapter_id"] == "tb:1:ch001"
     assert hits[0]["reasons"] == ["coverage=1.0", "type=method"]
     assert hits[0]["evidence_chunk_ids"] == ["c1", "c2"]

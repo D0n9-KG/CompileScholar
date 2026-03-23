@@ -18,19 +18,17 @@ class _FakeClient:
     def ensure_schema(self):
         return None
 
-    def list_logic_steps_for_fusion(self, paper_id=None, limit=50000):
+    def list_research_moves(self, paper_id=None, limit=50000):
         return [
             {
-                'logic_step_id': 'paper-1:Method',
+                'move_id': 'paper-1:Method',
                 'paper_id': 'paper-1',
-                'step_type': 'Method',
+                'role': 'method',
+                'act_type': 'propose_method',
                 'summary': 'Uses density and modulus to build the method.',
-                'evidence_chunk_ids': ['chunk-1'],
+                'anchor_ids': ['anchor-1'],
             }
         ]
-
-    def list_claims_for_fusion(self, paper_id=None, limit=50000):
-        return []
 
     def list_textbook_entities_for_fusion(self, textbook_id=None, limit=50000):
         return [
@@ -65,7 +63,7 @@ def test_rebuild_fusion_maps_explains_edges_to_writer_payload(monkeypatch, tmp_p
         'build_fusion_projection',
         lambda **kwargs: {
             'nodes': [
-                {'id': 'paper-1:Method', 'label': 'LogicStep', 'summary': 'm1'},
+                {'id': 'paper-1:Method', 'label': 'ResearchMove', 'summary': 'm1'},
                 {'id': 'entity-1', 'label': 'KnowledgeEntity', 'name': 'Density'},
             ],
             'edges': [
@@ -76,6 +74,9 @@ def test_rebuild_fusion_maps_explains_edges_to_writer_payload(monkeypatch, tmp_p
                     'score': 0.76,
                     'reasons': ['coverage=1.0'],
                     'source_chapter_id': 'ch-1',
+                    'role': 'method',
+                    'act_type': 'propose_method',
+                    'summary': 'Uses density and modulus to build the method.',
                 }
             ],
         },
@@ -88,9 +89,11 @@ def test_rebuild_fusion_maps_explains_edges_to_writer_payload(monkeypatch, tmp_p
 
     assert result['ok'] is True
     assert result['explains_written'] == 1
+    assert result['research_moves'] == 1
     assert len(fake_client.explains_payload) == 1
 
     first = fake_client.explains_payload[0]
-    assert first['logic_step_id'] == 'paper-1:Method'
+    assert first['move_id'] == 'paper-1:Method'
+    assert first['paper_id'] == 'paper-1'
     assert first['entity_id'] == 'entity-1'
     assert float(first['score']) == 0.76

@@ -16,7 +16,7 @@ _MOJIBAKE_MARKERS = (
     "鈥",
 )
 
-# Common symbol confusables observed in claims/chunks.
+# Common symbol confusables observed in extracted text spans/chunks.
 # Keep 1:1 replacements so index-based matching remains stable.
 _SYMBOL_CONFUSABLES = str.maketrans(
     {
@@ -84,7 +84,7 @@ def normalize_formula_for_matching(text: str) -> str:
     - Spaces in formulas: "σ 1" vs "σ1"
     - Greek letter variants: θ/theta, α/alpha, β/beta, γ/gamma, μ/mu, σ/sigma
 
-    This is applied symmetrically to both claim and chunk during matching,
+    This is applied symmetrically to both text span and chunk during matching,
     but does NOT modify stored text.
     """
     s = text or ""

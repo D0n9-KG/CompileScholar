@@ -46,7 +46,7 @@ class RetrievalPlan(str, Enum):
     paper_first_then_textbook = "paper_first_then_textbook"
     textbook_first_then_paper = "textbook_first_then_paper"
     hybrid_parallel = "hybrid_parallel"
-    claim_first = "claim_first"
+    anchor_first = "anchor_first"
     community_first = "community_first"
 
 
@@ -81,8 +81,8 @@ class EvidenceItem(BaseModel):
 class FusionEvidenceItem(BaseModel):
     paper_source: str | None = None
     paper_id: str | None = None
-    logic_step_id: str | None = None
-    step_type: str | None = None
+    move_id: str | None = None
+    role: str | None = None
     entity_id: str | None = None
     entity_name: str | None = None
     entity_type: str | None = None

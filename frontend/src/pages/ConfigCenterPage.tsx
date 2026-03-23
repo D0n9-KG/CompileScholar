@@ -15,7 +15,7 @@ type SimilarityConfig = {
 
 type RuntimeConfig = {
   ingest_llm_max_workers: number
-  phase1_chunk_claim_max_workers: number
+  phase1_move_anchor_max_workers: number
   phase1_grounding_max_workers: number
   phase2_conflict_max_workers: number
   ingest_pre_llm_max_workers: number
@@ -197,10 +197,10 @@ const MODULE_LOCALIZATION: Record<string, LocalizedCopy> = {
     descEn: 'Similarity clustering behavior.',
   },
   schema: {
-    labelZh: '抽取策略',
-    labelEn: 'Extraction Policy',
-    descZh: '抽取规则与提示词控制。',
-    descEn: 'Schema rules and prompt controls.',
+    labelZh: '轨迹编译器',
+    labelEn: 'Trace Compiler',
+    descZh: '管理 PaperLogicTrace 编译版本与运行策略。',
+    descEn: 'Manage PaperLogicTrace compiler versions and runtime policy.',
   },
   runtime: {
     labelZh: '运行并发',
@@ -252,7 +252,7 @@ const FIELD_LOCALIZATION: Record<string, LocalizedCopy> = {
     descZh: '阈值越高，聚类越紧、越保守。',
   },
   'runtime.ingest_llm_max_workers': { labelZh: '论文级并发', labelEn: 'ingest_llm_max_workers' },
-  'runtime.phase1_chunk_claim_max_workers': { labelZh: '单篇要点并发', labelEn: 'phase1_chunk_claim_max_workers' },
+  'runtime.phase1_move_anchor_max_workers': { labelZh: '单篇 move/anchor 并发', labelEn: 'phase1_move_anchor_max_workers' },
   'runtime.phase1_grounding_max_workers': { labelZh: '证据复核并发', labelEn: 'phase1_grounding_max_workers' },
   'runtime.phase2_conflict_max_workers': { labelZh: '冲突裁决并发', labelEn: 'phase2_conflict_max_workers' },
   'runtime.ingest_pre_llm_max_workers': { labelZh: '预处理并发', labelEn: 'ingest_pre_llm_max_workers' },
@@ -329,8 +329,8 @@ const MODULE_ITEMS: ModuleItem[] = [
   },
   {
     id: 'schema',
-    label: { zh: '抽取策略', en: 'Extraction Policy' },
-    desc: { zh: '抽取规则与提示词控制。', en: 'Schema rules and prompt controls.' },
+    label: { zh: '轨迹编译器', en: 'Trace Compiler' },
+    desc: { zh: '管理 PaperLogicTrace 编译版本与运行策略。', en: 'Manage PaperLogicTrace compiler versions and runtime policy.' },
   },
   {
     id: 'runtime',
@@ -367,13 +367,13 @@ const RUNTIME_FIELDS: Array<{
   helpEn: string
 }> = [
   {
-    key: 'phase1_chunk_claim_max_workers',
+    key: 'phase1_move_anchor_max_workers',
     zh: '单篇要点并发',
-    en: 'phase1_chunk_claim_max_workers',
+    en: 'phase1_move_anchor_max_workers',
     min: 1,
     max: 8,
     helpZh: '单篇论文内部，要点抽取批次的参考并发数。当全局空闲连接充足时，系统可自动上调（最高 6）。',
-    helpEn: 'Reference concurrency for claim-batch workers inside one paper. The system may raise this automatically when global LLM slots are idle (hard cap 6).',
+    helpEn: 'Reference concurrency for move-and-anchor extraction batches inside one paper. The system may raise this automatically when global LLM slots are idle (hard cap 6).',
   },
   {
     key: 'phase1_grounding_max_workers',
@@ -381,8 +381,8 @@ const RUNTIME_FIELDS: Array<{
     en: 'phase1_grounding_max_workers',
     min: 1,
     max: 6,
-    helpZh: 'Claim 证据复核阶段的参考并发数，全局空闲时可自动上调。此值同时参与计算"有效论文并发"（分母 = 要点/复核/冲突三者最大值）。',
-    helpEn: 'Reference concurrency for claim grounding. Also used as the per-paper fan-out denominator (max of claim/grounding/conflict workers) when deriving effective paper concurrency.',
+    helpZh: 'EvidenceAnchor 证据复核阶段的参考并发数，全局空闲时可自动上调。此值同时参与计算"有效论文并发"（分母 = move/复核/冲突三者最大值）。',
+    helpEn: 'Reference concurrency for EvidenceAnchor grounding. Also used as the per-paper fan-out denominator (max of move/grounding/conflict workers) when deriving effective paper concurrency.',
   },
   {
     key: 'phase2_conflict_max_workers',
@@ -676,10 +676,10 @@ function loadStoredTurns(): AssistantTurn[] {
 
 function defaultAssistantGoal() {
   if (typeof window === 'undefined') {
-    return translate('zh-CN', '提高抽取精度，同时减少噪声要点并保持召回稳定。', 'Make extraction stricter and reduce noisy claims while keeping recall stable.')
+    return translate('zh-CN', '提高轨迹编译精度，同时减少噪声 move 和 anchor，并保持召回稳定。', 'Tighten trace compilation precision, reduce noisy moves and anchors, and keep recall stable.')
   }
   const locale = resolveInitialLocale(window.localStorage.getItem(LOCALE_STORAGE_KEY), window.navigator.language)
-  return translate(locale, '提高抽取精度，同时减少噪声要点并保持召回稳定。', 'Make extraction stricter and reduce noisy claims while keeping recall stable.')
+  return translate(locale, '提高轨迹编译精度，同时减少噪声 move 和 anchor，并保持召回稳定。', 'Tighten trace compilation precision, reduce noisy moves and anchors, and keep recall stable.')
 }
 
 function loadStoredGoal() {
@@ -713,7 +713,7 @@ function normalizeProfile(raw: Partial<ConfigProfile> | null | undefined): Confi
     },
     runtime: {
       ingest_llm_max_workers: Math.max(1, Math.min(32, asNumber(runtimeRaw?.ingest_llm_max_workers, 5))),
-      phase1_chunk_claim_max_workers: Math.max(1, Math.min(8, asNumber(runtimeRaw?.phase1_chunk_claim_max_workers, 4))),
+      phase1_move_anchor_max_workers: Math.max(1, Math.min(8, asNumber(runtimeRaw?.phase1_move_anchor_max_workers, 4))),
       phase1_grounding_max_workers: Math.max(1, Math.min(6, asNumber(runtimeRaw?.phase1_grounding_max_workers, 3))),
       phase2_conflict_max_workers: Math.max(1, Math.min(6, asNumber(runtimeRaw?.phase2_conflict_max_workers, 3))),
       ingest_pre_llm_max_workers: Math.max(1, Math.min(8, asNumber(runtimeRaw?.ingest_pre_llm_max_workers, 6))),
@@ -740,7 +740,7 @@ function fallbackCatalog(): ConfigCatalogResponse {
   return {
     modules: [
       { id: 'similarity', label: 'Similarity', fields: [] },
-      { id: 'schema', label: 'Extraction Policy', fields: [], rule_keys: [], prompt_keys: [] },
+      { id: 'schema', label: 'Trace Compiler', fields: [], rule_keys: [], prompt_keys: [] },
       { id: 'runtime', label: 'Runtime Concurrency', fields: [] },
       { id: 'llm_workers', label: 'LLM Workers', fields: [] },
       { id: 'providers', label: 'LLM & Embeddings', fields: [] },
@@ -765,7 +765,6 @@ export default function ConfigCenterPage() {
   const [goal, setGoal] = useState(() => loadStoredGoal())
   const [assistantBusy, setAssistantBusy] = useState(false)
   const [assistantTurns, setAssistantTurns] = useState<AssistantTurn[]>(() => loadStoredTurns())
-  const [showSchemaKeyList, setShowSchemaKeyList] = useState(false)
   const [schemaPaperType, setSchemaPaperType] = useState<PaperType>('research')
   const [schemaSummary, setSchemaSummary] = useState<SchemaSummary | null>(null)
   const [schemaVersions, setSchemaVersions] = useState<Array<{ version: number; name?: string }>>([])
@@ -855,7 +854,7 @@ export default function ConfigCenterPage() {
   )
   const estimatedPaperFanout = Math.max(
     1,
-    Math.max(1, Math.min(8, Number(profile.modules.runtime.phase1_chunk_claim_max_workers || 1))),
+    Math.max(1, Math.min(8, Number(profile.modules.runtime.phase1_move_anchor_max_workers || 1))),
     Math.max(1, Math.min(6, Number(profile.modules.runtime.phase1_grounding_max_workers || 1))),
     Math.max(1, Math.min(6, Number(profile.modules.runtime.phase2_conflict_max_workers || 1))),
   )
@@ -1125,7 +1124,7 @@ export default function ConfigCenterPage() {
               `已切换到 ${paperTypeLabel(schemaPaperType)} 的 ${schemaVersionLabel(nextSchema)}。`,
               `Activated ${schemaVersionLabel(nextSchema)} for ${paperTypeLabel(schemaPaperType)}.`,
             )
-          : t('已切换抽取规则版本。', 'Schema version activated.'),
+          : t('已切换轨迹编译器版本。', 'Trace compiler version activated.'),
       )
       await refreshSchemaOverview(schemaPaperType)
     } catch (cause: unknown) {
@@ -1239,10 +1238,6 @@ export default function ConfigCenterPage() {
     setInfo(t(`已应用建议到 ${anchor}。请保存配置以持久化。`, `Applied suggestion to ${anchor}. Save profile to persist.`))
   }
 
-  const schemaModule = useMemo(
-    () => (catalog.modules ?? []).find((module) => String(module?.id ?? '') === 'schema') ?? null,
-    [catalog.modules],
-  )
   const catalogModuleMap = useMemo(
     () =>
       new Map(
@@ -1256,10 +1251,6 @@ export default function ConfigCenterPage() {
     [catalog.modules],
   )
   const llmWorkersCatalog = useMemo(() => catalogModuleMap.get('llm_workers') ?? null, [catalogModuleMap])
-  const schemaRuleKeys = useMemo(() => schemaModule?.rule_keys ?? [], [schemaModule])
-  const schemaPromptKeys = useMemo(() => schemaModule?.prompt_keys ?? [], [schemaModule])
-  const schemaRulePreview = useMemo(() => schemaRuleKeys.slice(0, 18), [schemaRuleKeys])
-  const schemaPromptPreview = useMemo(() => schemaPromptKeys.slice(0, 18), [schemaPromptKeys])
   const moduleItems = useMemo(() => {
     const seen = new Set<string>(MODULE_ITEMS.map((item) => item.id))
     const extras: ModuleItem[] = []
@@ -1328,8 +1319,8 @@ export default function ConfigCenterPage() {
           <h2 className="pageTitle">{t('配置中心', 'Config Center')}</h2>
           <div className="pageSubtitle">
             {t(
-              '统一管理相似性聚类、抽取策略和运维调优建议。',
-              'Unified operations configuration for similarity clustering, extraction policy, and tuning guidance.',
+              '统一管理相似性聚类、PaperLogicTrace 编译器与运行调优建议。',
+              'Unified operations configuration for similarity clustering, the PaperLogicTrace compiler, and tuning guidance.',
             )}
           </div>
           <div className="metaLine">
@@ -1602,8 +1593,8 @@ export default function ConfigCenterPage() {
                     'llm_workers',
                     String(llmWorkersCatalog?.description ?? '').trim() ||
                       t(
-                        '每篇论文会固定分配给一个工作器，论文内部的 LogicStep、Claim、grounding 等后续请求都会沿用同一个来源。',
-                        'Each paper is pinned to one worker for its full extraction lifecycle, including nested logic, claim, and grounding calls.',
+                        '每篇论文会固定分配给一个工作器，整条 PaperLogicTrace 编译链中的 move、anchor 和 grounding 请求都会沿用同一个来源。',
+                        'Each paper is pinned to one worker for its full PaperLogicTrace compilation lifecycle, including move, anchor, and grounding calls.',
                       ),
                     t,
                   )}
@@ -1708,7 +1699,7 @@ export default function ConfigCenterPage() {
                                 updateLlmWorker(index, 'max_concurrent', Math.max(1, Math.min(128, Math.trunc(Number(event.target.value || worker.max_concurrent)))))
                               }
                             />
-                            <span className="cc-help">{t('此工作器允许同时在途的 LLM HTTP 请求数上限。每篇论文内部会并行发起多个请求（由要点/复核/冲突并发的最大值决定），实际论文并发 ≈ 该值 ÷ 内部并发分母。例如内部并发为 4，设 32 则约能同时处理 8 篇。', 'Maximum simultaneous in-flight LLM HTTP requests for this worker. Each paper generates multiple concurrent requests internally (fan-out = max of claim/grounding/conflict workers). Effective paper concurrency ≈ this value ÷ fan-out. Example: fan-out 4 × 32 connections ≈ 8 papers.')}</span>
+                            <span className="cc-help">{t('此工作器允许同时在途的 LLM HTTP 请求数上限。每篇论文内部会并行发起多个请求（由 move/复核/冲突并发的最大值决定），实际论文并发 ≈ 该值 ÷ 内部并发分母。例如内部并发为 4，设 32 则约能同时处理 8 篇。', 'Maximum simultaneous in-flight LLM HTTP requests for this worker. Each paper generates multiple concurrent requests internally (fan-out = max of move/grounding/conflict workers). Effective paper concurrency ≈ this value ÷ fan-out. Example: fan-out 4 × 32 connections ≈ 8 papers.')}</span>
                           </label>
 
                           <label className="cc-field">
@@ -1843,7 +1834,7 @@ export default function ConfigCenterPage() {
               <div className="panel">
                 <div className="panelHeader">
                   <div className="split">
-                    <div className="panelTitle">{t('抽取规则版本速切', 'Schema Version Switcher')}</div>
+                    <div className="panelTitle">{t('轨迹编译器版本速切', 'Trace Compiler Version Switcher')}</div>
                     <span className="pill">{schemaVersionLoading ? t('加载中', 'Loading') : t('后续任务生效', 'Applies to next tasks')}</span>
                   </div>
                 </div>
@@ -1857,7 +1848,7 @@ export default function ConfigCenterPage() {
                         </option>
                       ))}
                     </select>
-                    <span className="cc-help">{t('按论文类型管理当前启用的抽取规则版本。', 'Manage the active schema version per paper type.')}</span>
+                    <span className="cc-help">{t('按论文类型管理当前启用的 PaperLogicTrace 编译版本。', 'Manage the active PaperLogicTrace compiler version per paper type.')}</span>
                   </label>
 
                   <div className="cc-field">
@@ -1882,7 +1873,7 @@ export default function ConfigCenterPage() {
                         </option>
                       ))}
                     </select>
-                    <span className="cc-help">{t('这里做快速切换；完整的版本命名、预设套用和规则编辑仍在下方。', 'Use this for fast switching. Full naming, preset application, and rule editing remain below.')}</span>
+                    <span className="cc-help">{t('这里用于快速切换版本；详细的编译器策略与迁移说明在下方。', 'Use this for fast switching. Detailed compiler policy and migration notes remain below.')}</span>
                   </label>
 
                   <div className="cc-field">
@@ -1896,7 +1887,7 @@ export default function ConfigCenterPage() {
                       </button>
                     </div>
                     <span className="cc-help">
-                      {t('建议优先切到较新的均衡版（如 v8），再对目标论文执行重建。', 'For research papers, switching to a newer balanced schema such as v8 before rebuilding usually works better.')}
+                      {t('建议优先切到较新的均衡版（如 v8），再对目标论文执行重新编译。', 'For research papers, switching to a newer balanced compiler version such as v8 before recompiling usually works better.')}
                     </span>
                   </div>
                 </div>
@@ -1904,60 +1895,35 @@ export default function ConfigCenterPage() {
 
               <div className="panel">
                 <div className="panelHeader">
-                  <div className="panelTitle">{t('抽取策略助手索引', 'Extraction Policy Assistant Index')}</div>
+                  <div className="panelTitle">{t('轨迹编译器迁移说明', 'Trace Compiler Migration Notes')}</div>
                 </div>
                 <div className="panelBody cc-schema-index">
                   <div className="metaLine">
                     {t(
-                      '该索引用于把助手跳转链接映射到抽取规则对应编辑区。',
-                      'This index maps assistant jump links to schema edit areas.',
+                      '旧版第二层抽取策略编辑器已经退役，当前页面只保留 PaperLogicTrace 编译版本切换与迁移入口。',
+                      'The retired second-layer policy editor has been removed. This page now keeps only PaperLogicTrace compiler version switching and migration entry points.',
                     )}
-                    <code> schema.rules_json </code>
-                    {t('对应规则 JSON，', 'points to rule JSON and')}
-                    <code> schema.prompts_json </code>
-                    {t('对应提示词 JSON。', 'points to prompt JSON.')}
                   </div>
-                  <div className="cc-schema-index-stats">
-                    <span className="pill">{t('规则键', 'Rule Keys')}: {schemaRuleKeys.length}</span>
-                    <span className="pill">{t('提示词键', 'Prompt Keys')}: {schemaPromptKeys.length}</span>
-                    <button className="btn btnSmall" onClick={() => setShowSchemaKeyList((value) => !value)}>
-                      {showSchemaKeyList ? t('隐藏键列表', 'Hide Key List') : t('显示键列表', 'Show Key List')}
-                    </button>
-                  </div>
-                  {showSchemaKeyList ? (
-                    <div className="cc-schema-index-grid">
-                      <div className="cc-schema-index-block">
-                        <div className="kicker">{t('规则键预览', 'Rule Keys Preview')}</div>
-                        <div className="cc-key-list">
-                          {schemaRulePreview.map((key) => (
-                            <span key={`rk-${key}`} className="cc-key-pill">
-                              {key}
-                            </span>
-                          ))}
-                        </div>
-                        {schemaRuleKeys.length > schemaRulePreview.length ? (
-                          <div className="hint">
-                            {t(`其余 ${schemaRuleKeys.length - schemaRulePreview.length} 项...`, `and ${schemaRuleKeys.length - schemaRulePreview.length} more...`)}
-                          </div>
-                        ) : null}
-                      </div>
-                      <div className="cc-schema-index-block">
-                        <div className="kicker">{t('提示词键预览', 'Prompt Keys Preview')}</div>
-                        <div className="cc-key-list">
-                          {schemaPromptPreview.map((key) => (
-                            <span key={`pk-${key}`} className="cc-key-pill">
-                              {key}
-                            </span>
-                          ))}
-                        </div>
-                        {schemaPromptKeys.length > schemaPromptPreview.length ? (
-                          <div className="hint">
-                            {t(`其余 ${schemaPromptKeys.length - schemaPromptPreview.length} 项...`, `and ${schemaPromptKeys.length - schemaPromptPreview.length} more...`)}
-                          </div>
-                        ) : null}
+                  <div className="cc-schema-index-grid">
+                    <div className="cc-schema-index-block">
+                      <div className="kicker">{t('当前保留', 'What remains here')}</div>
+                      <div className="hint">
+                        {t(
+                          '按论文类型切换编译器版本，并进入下方的编译器策略页面查看迁移说明。',
+                          'Switch compiler versions per paper type and continue to the policy page below for migration guidance.',
+                        )}
                       </div>
                     </div>
-                  ) : null}
+                    <div className="cc-schema-index-block">
+                      <div className="kicker">{t('后续方向', 'What happens next')}</div>
+                      <div className="hint">
+                        {t(
+                          'ResearchMove、EvidenceAnchor 与 PaperLogicTrace 的细粒度控制会逐步取代旧版抽取规则编辑。',
+                          'Fine-grained controls for ResearchMove, EvidenceAnchor, and PaperLogicTrace will replace the retired legacy extraction editor.',
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
               <SchemaPage jumpTarget={schemaJumpTarget} jumpFocusKey={schemaJumpFocusKey} jumpNonce={jumpNonce} />
@@ -1986,8 +1952,8 @@ export default function ConfigCenterPage() {
                 {assistantTurns.length === 0 ? (
                   <div className="metaLine">
                     {t(
-                      '描述你的目标，例如精度、召回、速度或并发，助手会给出相似性、抽取策略和运行参数建议。',
-                      'Describe your target, such as precision, recall, speed, or concurrency. The assistant will propose similarity, schema, and runtime suggestions.',
+                      '描述你的目标，例如精度、召回、速度或并发；助手会给出相似性、轨迹编译器和运行参数建议。',
+                      'Describe your target, such as precision, recall, speed, or concurrency. The assistant will propose similarity, trace compiler, and runtime suggestions.',
                     )}
                   </div>
                 ) : (
@@ -2056,8 +2022,8 @@ export default function ConfigCenterPage() {
                   value={goal}
                   onChange={(event) => setGoal(event.target.value)}
                   placeholder={t(
-                      '例如：提高抽取精度并减少噪声要点',
-                      'Example: tighten extraction precision and reduce noisy claims',
+                      '例如：提高轨迹编译精度，并减少噪声 move 或 anchor',
+                      'Example: tighten trace compilation precision and reduce noisy moves or anchors',
                     )}
                 />
                 <div className="row">
@@ -2076,8 +2042,8 @@ export default function ConfigCenterPage() {
                 </div>
                 <div className="hint">
                   {t(
-                      '建议支持跳转定位；相似性和运行参数可直接应用，抽取策略建议可跳转到对应编辑区。',
-                      'Suggestions support jump links. Similarity and runtime parameters can be applied directly, while schema suggestions jump to the relevant editor.',
+                      '建议支持跳转定位；相似性和运行参数可直接应用，轨迹编译器建议会跳到对应页面。',
+                      'Suggestions support jump links. Similarity and runtime parameters can be applied directly, while trace compiler suggestions jump to the relevant page.',
                     )}
                 </div>
               </div>

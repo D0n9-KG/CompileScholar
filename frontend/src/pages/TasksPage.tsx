@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+﻿import { useEffect, useMemo, useState } from 'react'
 import { apiGet, apiPost } from '../api'
 import { useI18n, type UILocale } from '../i18n'
 
@@ -33,15 +33,13 @@ function statusLabel(status: string, locale: UILocale) {
 }
 
 function typeLabel(type: string, locale: UILocale) {
-  if (type === 'ingest_path') return locale === 'zh-CN' ? '导入（旧：本地路径）' : 'Ingest (Legacy Path)'
+  if (type === 'ingest_path') return locale === 'zh-CN' ? '导入（本地路径）' : 'Ingest (Path)'
   if (type === 'ingest_upload_ready') return locale === 'zh-CN' ? '导入（上传可导入项）' : 'Ingest (Uploaded Item)'
   if (type === 'upload_replace') return locale === 'zh-CN' ? '替换论文（按 DOI）' : 'Replace Paper (by DOI)'
   if (type === 'rebuild_paper') return locale === 'zh-CN' ? '重建论文' : 'Rebuild Paper'
   if (type === 'rebuild_global_communities') return locale === 'zh-CN' ? '重建全局聚类' : 'Rebuild Global Communities'
   if (type === 'rebuild_faiss') return locale === 'zh-CN' ? '重建全局 FAISS' : 'Rebuild Global FAISS'
   if (type === 'rebuild_all') return locale === 'zh-CN' ? '全链路重建（所有论文）' : 'Full Pipeline Rebuild'
-  if (type === 'rebuild_similarity') return locale === 'zh-CN' ? '重建相似度关系' : 'Rebuild Similarity Links'
-  if (type === 'update_similarity_paper') return locale === 'zh-CN' ? '更新单论文相似度' : 'Update Paper Similarity'
   return type
 }
 
@@ -252,7 +250,7 @@ export default function TasksPage() {
                   </div>
 
                   <div className="itemMeta">
-                    {t('阶段', 'Stage')}: <code title={row.stage ?? ''}>{stageLabel(row.stage, locale)}</code> · {t('进度', 'Progress')}: {pct}%
+                    {t('阶段', 'Stage')}: <code title={row.stage ?? ''}>{stageLabel(row.stage, locale)}</code> 路 {t('进度', 'Progress')}: {pct}%
                   </div>
 
                   <div className="progress" style={{ marginTop: 10 }}>
@@ -270,3 +268,4 @@ export default function TasksPage() {
     </div>
   )
 }
+

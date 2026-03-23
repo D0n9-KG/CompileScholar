@@ -62,6 +62,39 @@ function buildOverviewCommunityElements(): GraphElement[] {
 }
 
 describe('graph3dData', () => {
+  test('uses dedicated move and anchor colors in 3D data', () => {
+    const baseData = buildGraph3DBaseData([
+      {
+        group: 'nodes',
+        data: {
+          id: 'move:m-1',
+          label: 'Method move',
+          kind: 'move',
+        },
+      },
+      {
+        group: 'nodes',
+        data: {
+          id: 'anchor:a-1',
+          label: 'Anchor evidence',
+          kind: 'anchor',
+        },
+      },
+      {
+        group: 'nodes',
+        data: {
+          id: 'entity:e-1',
+          label: 'Shared concept',
+          kind: 'entity',
+        },
+      },
+    ])
+
+    expect(baseData.nodes.find((node) => node.id === 'move:m-1')?.color).toBe('#34d399')
+    expect(baseData.nodes.find((node) => node.id === 'anchor:a-1')?.color).toBe('#fb923c')
+    expect(baseData.nodes.find((node) => node.id === 'entity:e-1')?.color).toBe('#14b8a6')
+  })
+
   test('keeps seeded node positions stable when only the selection changes', () => {
     const baseData = buildGraph3DBaseData(buildOverviewCommunityElements())
     const initialPositions = baseData.nodes.map((node) => ({

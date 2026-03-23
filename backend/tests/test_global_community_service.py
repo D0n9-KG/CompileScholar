@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import importlib
+import json
 
 from app.graph.neo4j_client import Neo4jClient
 
@@ -19,6 +19,8 @@ class _Result:
 class _FakeSession:
     def __init__(self) -> None:
         self.calls: list[tuple[str, dict]] = []
+        self.community_members: dict[str, list[dict]] = {}
+        self.membership_edge_rows: list[dict] = []
 
     def run(self, query: str, **params):
         self.calls.append((str(query), dict(params)))
@@ -26,8 +28,18 @@ class _FakeSession:
             return _Result({"cnt": 1})
         if "RETURN count(hk) AS cnt" in str(query):
             return _Result({"cnt": 2})
-        if "RETURN count(im) AS cnt" in str(query):
-            return _Result({"cnt": 2})
+        if "SET gc.member_rows_json" in str(query):
+            rows = list(params.get("rows") or [])
+            self.community_members = {
+                str(row.get("community_id") or "").strip(): json.loads(str(row.get("member_rows_json") or "[]"))
+                for row in rows
+                if str(row.get("community_id") or "").strip()
+            }
+            return _Result({"cnt": sum(len(members) for members in self.community_members.values())})
+        if "IN_GLOBAL_COMMUNITY" in str(query) and "MERGE (member)-[ig:IN_GLOBAL_COMMUNITY]->(gc)" in str(query):
+            rows = list(params.get("rows") or [])
+            self.membership_edge_rows.extend(rows)
+            return _Result({"cnt": len(rows)})
         if "count(gc) AS deleted_communities" in str(query):
             return _Result(
                 {
@@ -42,16 +54,14 @@ class _FakeSession:
                 {
                     "community_id": "gc:demo",
                     "title": "Finite element stability",
-                    "summary": "Claims and textbook entities about FEM stability.",
+                    "summary": "Research moves and evidence anchors about FEM stability.",
                     "member_count": 2,
                     "keywords": ["finite element", "stability"],
                 }
             ]
-        if "RETURN member_id AS member_id" in str(query):
-            return [
-                {"member_id": "cl-1", "member_kind": "Claim", "text": "FEM improves stability."},
-                {"member_id": "ke-1", "member_kind": "KnowledgeEntity", "text": "Finite Element Method"},
-            ]
+        if "RETURN gc.member_rows_json AS member_rows_json" in str(query):
+            community_id = str(params.get("community_id") or "").strip()
+            return _Result({"member_rows_json": json.dumps(self.community_members.get(community_id, []))})
         return _Result({"cnt": 0})
 
     def __enter__(self):
@@ -93,7 +103,7 @@ def test_global_community_writer_helpers_use_global_labels_and_edges() -> None:
             {
                 "community_id": "gc:demo",
                 "title": "Finite element stability",
-                "summary": "Claims and textbook entities about FEM stability.",
+                "summary": "Research moves and evidence anchors about FEM stability.",
                 "confidence": 0.88,
                 "member_count": 2,
                 "version": "v1",
@@ -120,8 +130,28 @@ def test_global_community_writer_helpers_use_global_labels_and_edges() -> None:
     )
     membership_edges = client.replace_global_memberships(
         [
-            {"community_id": "gc:demo", "member_id": "cl-1", "member_kind": "Claim", "weight": 0.91},
-            {"community_id": "gc:demo", "member_id": "ke-1", "member_kind": "KnowledgeEntity", "weight": 0.73},
+            {
+                "community_id": "gc:demo",
+                "member_id": "move-1",
+                "member_kind": "ResearchMove",
+                "weight": 0.91,
+                "text": "FEM improves stability.",
+                "paper_id": "doi:10.1000/demo",
+                "paper_source": "paper-A",
+                "paper_title": "Finite element paper",
+                "role": "result",
+            },
+            {
+                "community_id": "gc:demo",
+                "member_id": "anchor-1",
+                "member_kind": "EvidenceAnchor",
+                "weight": 0.73,
+                "text": "Finite Element Method",
+                "paper_id": "doi:10.1000/demo",
+                "paper_source": "paper-A",
+                "paper_title": "Finite element paper",
+                "role": "result",
+            },
         ]
     )
 
@@ -133,12 +163,28 @@ def test_global_community_writer_helpers_use_global_labels_and_edges() -> None:
     queries = "\n".join(query for query, _ in fake_session.calls)
     assert "GlobalCommunity" in queries
     assert "GlobalKeyword" in queries
-    assert "IN_GLOBAL_COMMUNITY" in queries
     assert "HAS_GLOBAL_KEYWORD" in queries
+    assert "member_rows_json" in queries
+    assert "MERGE (member)-[ig:IN_GLOBAL_COMMUNITY]->(gc)" in queries
+    assert [row["member_id"] for row in fake_session.membership_edge_rows] == ["move-1", "anchor-1"]
 
 
 def test_global_community_read_helpers_return_keywords_and_members() -> None:
     fake_session = _FakeSession()
+    fake_session.community_members = {
+        "gc:demo": [
+            {
+                "member_id": "move-1",
+                "member_kind": "ResearchMove",
+                "text": "FEM improves stability.",
+            },
+            {
+                "member_id": "anchor-1",
+                "member_kind": "EvidenceAnchor",
+                "text": "Finite Element Method",
+            },
+        ]
+    }
     client = _client_with_fake_driver(fake_session)
 
     assert hasattr(client, "list_global_community_rows"), "Expected list_global_community_rows() to exist."
@@ -151,25 +197,25 @@ def test_global_community_read_helpers_return_keywords_and_members() -> None:
         {
             "community_id": "gc:demo",
             "title": "Finite element stability",
-            "summary": "Claims and textbook entities about FEM stability.",
+            "summary": "Research moves and evidence anchors about FEM stability.",
             "member_count": 2,
             "keywords": ["finite element", "stability"],
         }
     ]
     assert members == [
-        {"member_id": "cl-1", "member_kind": "Claim", "text": "FEM improves stability."},
-        {"member_id": "ke-1", "member_kind": "KnowledgeEntity", "text": "Finite Element Method"},
+        {"member_id": "move-1", "member_kind": "ResearchMove", "text": "FEM improves stability."},
+        {"member_id": "anchor-1", "member_kind": "EvidenceAnchor", "text": "Finite Element Method"},
     ]
 
 
-def test_global_community_members_query_falls_back_to_paper_node_source() -> None:
+def test_global_community_members_reader_uses_embedded_membership_rows_json() -> None:
     fake_session = _FakeSession()
     client = _client_with_fake_driver(fake_session)
 
     client.list_global_community_members("gc:demo", limit=10)
 
     queries = "\n".join(query for query, _ in fake_session.calls)
-    assert "coalesce(member.paper_source, p.paper_source)" in queries
+    assert "member_rows_json" in queries
 
 
 def test_legacy_proposition_cleanup_helper_deletes_groups_nodes_and_relation_edges() -> None:
@@ -229,101 +275,3 @@ def test_legacy_proposition_schema_cleanup_helper_drops_constraints_and_indexes(
     assert "DROP INDEX proposition_score IF EXISTS" in queries
 
 
-def test_rebuild_global_communities_passes_projection_limits_from_settings(monkeypatch) -> None:
-    service = importlib.import_module("app.community.service")
-
-    captured: dict[str, object] = {}
-
-    class _Graph:
-        def number_of_nodes(self) -> int:
-            return 2
-
-        def number_of_edges(self) -> int:
-            return 1
-
-    class _FakeClient:
-        def ensure_schema(self) -> None:
-            captured["ensure_schema"] = True
-
-        def clear_global_communities(self) -> dict[str, int]:
-            return {"deleted_communities": 0}
-
-        def upsert_global_communities(self, items: list[dict]) -> int:
-            captured["communities"] = list(items)
-            return len(items)
-
-        def upsert_global_keywords(self, items: list[dict]) -> int:
-            captured["keywords"] = list(items)
-            return len(items)
-
-        def replace_global_memberships(self, items: list[dict]) -> int:
-            captured["memberships"] = list(items)
-            return len(items)
-
-    class _FakeNeo4jClient:
-        def __init__(self, *args, **kwargs):  # noqa: ANN002, ANN003
-            self.client = _FakeClient()
-
-        def __enter__(self):
-            return self.client
-
-        def __exit__(self, exc_type, exc, tb):
-            return False
-
-    def _fake_projection(*, client, node_limit, edge_limit):  # noqa: ANN001
-        captured["projection_client"] = client
-        captured["node_limit"] = node_limit
-        captured["edge_limit"] = edge_limit
-        return _Graph()
-
-    def _fake_run_tree_comm(graph, *, top_keywords, version):  # noqa: ANN001
-        captured["run_tree_comm_graph"] = graph
-        captured["top_keywords"] = top_keywords
-        captured["version"] = version
-        return {
-            "communities": [
-                {
-                    "community_id": "gc:demo",
-                    "title": "Finite element stability",
-                    "summary": "TreeComm summary",
-                    "confidence": 1.0,
-                    "member_count": 2,
-                    "member_ids": ["ke-1", "cl-1"],
-                    "version": version,
-                    "built_at": "2026-03-11T00:00:00+00:00",
-                }
-            ],
-            "keywords": [
-                {
-                    "community_id": "gc:demo",
-                    "keyword_id": "gk:demo:1",
-                    "keyword": "finite element",
-                    "rank": 1,
-                    "weight": 1.0,
-                }
-            ],
-        }
-
-    monkeypatch.setattr(service, "Neo4jClient", _FakeNeo4jClient)
-    monkeypatch.setattr(service, "build_global_projection", _fake_projection)
-    monkeypatch.setattr(service, "run_tree_comm", _fake_run_tree_comm)
-    monkeypatch.setattr(service.settings, "global_community_use_v2", False)
-    monkeypatch.setattr(service.settings, "global_community_max_nodes", 12)
-    monkeypatch.setattr(service.settings, "global_community_max_edges", 34)
-    monkeypatch.setattr(service.settings, "global_community_top_keywords", 3)
-    monkeypatch.setattr(service.settings, "global_community_version", "vtest")
-
-    summary = service.rebuild_global_communities()
-
-    assert captured["node_limit"] == 12
-    assert captured["edge_limit"] == 34
-    assert captured["top_keywords"] == 3
-    assert captured["version"] == "vtest"
-    assert len(captured["communities"]) == 1
-    assert len(captured["keywords"]) == 1
-    assert len(captured["memberships"]) == 2
-    assert summary["projection_nodes"] == 2
-    assert summary["projection_edges"] == 1
-    assert summary["communities_written"] == 1
-    assert summary["keywords_written"] == 1
-    assert summary["memberships_written"] == 2

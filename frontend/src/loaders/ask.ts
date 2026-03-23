@@ -20,25 +20,29 @@ export type GraphContextRow = {
   purpose_labels?: string[]
 }
 
-export type StructuredLogicRow = {
+export type StructuredMoveRow = {
+  move_id?: string
   paper_source?: string
   paper_title?: string
-  step_type?: string
+  role?: string
+  act_type?: string
   summary?: string
+  anchor_ids?: string[]
 }
 
-export type StructuredClaimRow = {
-  claim_id?: string
+export type StructuredAnchorRow = {
+  anchor_id?: string
   paper_source?: string
   paper_title?: string
-  step_type?: string
+  role?: string
+  act_type?: string
   text?: string
   confidence?: number
 }
 
 export type StructuredKnowledge = {
-  logic_steps?: StructuredLogicRow[]
-  claims?: StructuredClaimRow[]
+  research_moves?: StructuredMoveRow[]
+  evidence_anchors?: StructuredAnchorRow[]
 }
 
 export type QueryPlanRow = {
@@ -89,8 +93,8 @@ export type GroundingRow = {
 export type FusionEvidenceRow = {
   paper_source?: string
   paper_id?: string
-  logic_step_id?: string
-  step_type?: string
+  move_id?: string
+  role?: string
   entity_id?: string
   entity_name?: string
   entity_type?: string
@@ -161,12 +165,12 @@ function communityNodeId(communityId: string): string {
   return `community:${communityId}`
 }
 
-function claimNodeId(claimId: string): string {
-  return `claim:${claimId}`
+function anchorNodeId(anchorId: string): string {
+  return `anchor:${anchorId}`
 }
 
-function logicNodeId(logicId: string): string {
-  return `logic:${logicId}`
+function moveNodeId(moveId: string): string {
+  return `move:${moveId}`
 }
 
 function evidenceSourceKey(row: Pick<EvidenceRow, 'paper_source' | 'paper_id' | 'md_path'>): string {
@@ -190,14 +194,15 @@ function evidenceNodeIdForGrounding(row: GroundingRow, evidenceNodeIdsBySource: 
 function normalizedMemberKind(kind: string): string {
   const value = norm(kind).toLowerCase()
   if (!value) return 'entity'
-  if (value === 'logic_step') return 'logic'
+  if (value === 'research_move' || value === 'researchmove' || value === 'move') return 'move'
+  if (value === 'evidence_anchor' || value === 'evidenceanchor' || value === 'anchor') return 'anchor'
   return value
 }
 
 function buildMemberNodeId(memberId: string, memberKind: string): string {
   const kind = normalizedMemberKind(memberKind)
-  if (kind === 'claim') return claimNodeId(memberId)
-  if (kind === 'logic') return logicNodeId(memberId)
+  if (kind === 'anchor') return anchorNodeId(memberId)
+  if (kind === 'move') return moveNodeId(memberId)
   if (kind === 'entity') return entityNodeId(memberId)
   if (kind === 'paper') return `paper:${memberId}`
   if (kind === 'textbook') return textbookNodeId(memberId)
@@ -254,9 +259,8 @@ export function buildAskGraph(res: AskApiResponse): GraphElement[] {
   const sourceToPaperTitle = new Map<string, string>()
   const paperNodePriority = new Map<string, number>()
   const evidenceNodeIdsBySource = new Map<string, string[]>()
-  const claimNodeById = new Map<string, string>()
-  const claimToLogicNodeId = new Map<string, string>()
   const communityNodeById = new Map<string, string>()
+  const moveNodeById = new Map<string, string>()
 
   const upsertPaperNode = (
     nodeId: string,
@@ -366,8 +370,9 @@ export function buildAskGraph(res: AskApiResponse): GraphElement[] {
     }
   }
 
-  const logicByPaperAndType = new Map<string, string>()
-  for (const step of res.structured_knowledge?.logic_steps ?? []) {
+  const moveByPaperAndType = new Map<string, string>()
+  const moveRows = res.structured_knowledge?.research_moves ?? []
+  for (const step of moveRows) {
     const source = norm(step.paper_source)
     const sourceNodeId = source ? sourceToPaperNodeId.get(source) ?? `paper_source:${source}` : ''
     if (!sourceNodeId) continue
@@ -379,14 +384,15 @@ export function buildAskGraph(res: AskApiResponse): GraphElement[] {
     })
     if (title && source) sourceToPaperTitle.set(source, title)
 
-    const key = `${source}:${step.step_type ?? 'logic'}:${step.summary ?? ''}`
-    const nodeId = `logic:${key}`
-    const logicSummary = norm(step.summary || step.step_type || 'logic')
+    const role = norm(step.role || 'move')
+    const key = norm(step.move_id || `${source}:${role}:${step.summary ?? ''}`)
+    const nodeId = moveNodeId(key)
+    const moveSummary = norm(step.summary || step.role || 'move')
     nodeMap.set(nodeId, {
       id: nodeId,
-      label: short(logicSummary, 38),
-      kind: 'logic',
-      description: logicSummary,
+      label: short(moveSummary, 38),
+      kind: 'move',
+      description: moveSummary,
     })
     edgeMap.set(`${sourceNodeId}->${nodeId}`, {
       id: `${sourceNodeId}->${nodeId}`,
@@ -395,14 +401,16 @@ export function buildAskGraph(res: AskApiResponse): GraphElement[] {
       kind: 'contains',
       weight: 0.5,
     })
-    logicByPaperAndType.set(`${source}:${step.step_type ?? ''}`, nodeId)
+    if (step.move_id) moveNodeById.set(norm(step.move_id), nodeId)
+    moveByPaperAndType.set(`${source}:${role}`, nodeId)
   }
 
-  for (const claim of res.structured_knowledge?.claims ?? []) {
-    const source = norm(claim.paper_source)
+  const anchorRows = res.structured_knowledge?.evidence_anchors ?? []
+  for (const anchor of anchorRows) {
+    const source = norm(anchor.paper_source)
     const sourceNodeId = source ? sourceToPaperNodeId.get(source) ?? `paper_source:${source}` : ''
     if (!sourceNodeId) continue
-    const title = norm(claim.paper_title) || sourceToPaperTitle.get(source) || ''
+    const title = norm(anchor.paper_title) || sourceToPaperTitle.get(source) || ''
     upsertPaperNode(sourceNodeId, {
       label: title || source,
       description: title || source,
@@ -410,32 +418,31 @@ export function buildAskGraph(res: AskApiResponse): GraphElement[] {
     })
     if (title && source) sourceToPaperTitle.set(source, title)
 
-    const key = norm(claim.claim_id || claim.text || `${source}:${claim.step_type ?? ''}`)
-    const claimNodeId = `claim:${key}`
-    const claimText = norm(claim.text || claim.claim_id || 'claim')
-    nodeMap.set(claimNodeId, {
-      id: claimNodeId,
-      label: short(claimText, 38),
-      kind: 'claim',
-      description: claimText,
-      confidence: claim.confidence,
+    const role = norm(anchor.role || 'anchor')
+    const key = norm(anchor.anchor_id || anchor.text || `${source}:${role}`)
+    const anchorId = anchorNodeId(key)
+    const anchorText = norm(anchor.text || anchor.anchor_id || 'anchor')
+    nodeMap.set(anchorId, {
+      id: anchorId,
+      label: short(anchorText, 38),
+      kind: 'anchor',
+      description: anchorText,
+      confidence: anchor.confidence,
     })
-    if (claim.claim_id) claimNodeById.set(norm(claim.claim_id), claimNodeId)
-    edgeMap.set(`${sourceNodeId}->${claimNodeId}`, {
-      id: `${sourceNodeId}->${claimNodeId}`,
+    edgeMap.set(`${sourceNodeId}->${anchorId}`, {
+      id: `${sourceNodeId}->${anchorId}`,
       source: sourceNodeId,
-      target: claimNodeId,
+      target: anchorId,
       kind: 'supports',
       weight: 0.5,
     })
 
-    const logicNodeId = logicByPaperAndType.get(`${source}:${claim.step_type ?? ''}`)
-    if (logicNodeId) {
-      if (claim.claim_id) claimToLogicNodeId.set(norm(claim.claim_id), logicNodeId)
-      edgeMap.set(`${logicNodeId}->${claimNodeId}`, {
-        id: `${logicNodeId}->${claimNodeId}`,
-        source: logicNodeId,
-        target: claimNodeId,
+    const moveId = moveByPaperAndType.get(`${source}:${role}`)
+    if (moveId) {
+      edgeMap.set(`${moveId}->${anchorId}`, {
+        id: `${moveId}->${anchorId}`,
+        source: moveId,
+        target: anchorId,
         kind: 'supports',
         weight: 0.5,
       })
@@ -601,11 +608,15 @@ export function buildAskGraph(res: AskApiResponse): GraphElement[] {
       }
     }
 
-    const logicNodeId = paperSource ? logicByPaperAndType.get(`${paperSource}:${fusion.step_type ?? ''}`) : undefined
-    if (entityId && logicNodeId) {
-      edgeMap.set(`${logicNodeId}->${entityNodeId(entityId)}`, {
-        id: `${logicNodeId}->${entityNodeId(entityId)}`,
-        source: logicNodeId,
+    const moveId = norm(fusion.move_id)
+    const role = norm(fusion.role || 'move').toLowerCase()
+    const moveNodeIdForFusion =
+      (moveId ? moveNodeById.get(moveId) : undefined)
+      || (paperSource ? moveByPaperAndType.get(`${paperSource}:${role}`) : undefined)
+    if (entityId && moveNodeIdForFusion) {
+      edgeMap.set(`${moveNodeIdForFusion}->${entityNodeId(entityId)}`, {
+        id: `${moveNodeIdForFusion}->${entityNodeId(entityId)}`,
+        source: moveNodeIdForFusion,
         target: entityNodeId(entityId),
         kind: 'maps_to',
         weight: Number.isFinite(Number(fusion.score)) ? Math.max(0.35, Math.min(1, Number(fusion.score))) : 0.56,

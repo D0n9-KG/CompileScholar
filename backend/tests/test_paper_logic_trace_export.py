@@ -4,39 +4,50 @@ from app.paper_logic_trace.exporter import export_paper_logic_trace
 
 
 class _FakeClient:
-    def get_paper_logic_trace_inputs(self, paper_id: str) -> dict:
+    def get_paper_logic_trace(self, paper_id: str) -> dict:
         return {
+            'trace_id': f'{paper_id}:paper_logic_trace',
+            'schema_version': 'v2',
+            'built_at': '2026-03-22T12:00:00Z',
             'paper_metadata': {
                 'paper_id': paper_id,
                 'title': 'Demo Paper',
                 'source_refs': ['chunk:1'],
             },
-            'evidence_rows': [
-                {
-                    'anchor_id': 'a-1',
-                    'paper_id': paper_id,
-                    'source_ref': 'chunk:1',
-                    'modality': 'text',
-                    'section_path': ['Method'],
-                    'locator': {'chunk_id': 'chunk:1'},
-                    'quote': 'We propose a graph encoder for retrieval.',
-                    'citation_ids': [],
-                    'support_type': 'direct',
-                    'weak': False,
-                    'move_id': 'm-1',
-                    'sequence_no': 1,
-                    'role_hint': 'method',
-                    'act_hint': 'propose_method',
-                    'summary': 'We propose a graph encoder for retrieval.',
-                    'methods': [{'surface': 'graph encoder', 'normalized': 'graph encoder', 'anchor_ids': ['a-1']}],
-                    'research_objects': [{'surface': 'retrieval', 'normalized': 'retrieval', 'anchor_ids': ['a-1']}],
-                }
-            ],
-            'figure_rows': [],
-            'table_rows': [],
-            'citation_rows': [],
-            'move_relation_rows': [],
-            'built_at': '2026-03-22T12:00:00Z',
+            'canonical_core': {
+                'evidence_anchors': [
+                    {
+                        'anchor_id': 'a-1',
+                        'paper_id': paper_id,
+                        'source_ref': 'chunk:1',
+                        'modality': 'text',
+                        'section_path': ['Method'],
+                        'locator': {'chunk_id': 'chunk:1'},
+                        'quote': 'We propose a graph encoder for retrieval.',
+                        'citation_ids': [],
+                        'support_type': 'direct',
+                        'weak': False,
+                    }
+                ],
+                'moves': [
+                    {
+                        'move_id': 'm-1',
+                        'sequence_no': 1,
+                        'role': 'method',
+                        'act_type': 'propose_method',
+                        'summary': 'We propose a graph encoder for retrieval.',
+                        'methods': [{'surface': 'graph encoder', 'normalized': 'graph encoder', 'anchor_ids': ['a-1']}],
+                        'research_objects': [{'surface': 'retrieval', 'normalized': 'retrieval', 'anchor_ids': ['a-1']}],
+                        'anchor_ids': ['a-1'],
+                    }
+                ],
+                'move_relations': [],
+                'citation_acts': [],
+                'figure_refs': [],
+                'table_refs': [],
+            },
+            'derived_views': {'community_signatures': [{'move_id': 'm-1'}]},
+            'quality': {'audit_status': 'eligible', 'quality_tier': 'yellow'},
         }
 
 

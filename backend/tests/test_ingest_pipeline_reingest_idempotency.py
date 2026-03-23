@@ -53,14 +53,8 @@ class _FakeNeo4jClient:
     def upsert_references_and_citations(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003, ARG002
         pass
 
-    def upsert_logic_steps_and_claims(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003, ARG002
-        self.calls.append(("upsert_logic_steps_and_claims", None))
-
-    def apply_human_claim_evidence_overrides(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003, ARG002
-        pass
-
-    def apply_human_logic_step_evidence_overrides(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003, ARG002
-        pass
+    def upsert_paper_logic_trace(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003, ARG002
+        self.calls.append(("upsert_paper_logic_trace", None))
 
     def update_cites_purposes(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003, ARG002
         pass
@@ -68,16 +62,16 @@ class _FakeNeo4jClient:
     def backfill_missing_citation_purposes(self, *args, **kwargs) -> int:  # noqa: ANN002, ANN003, ARG002
         return 0
 
-    def list_logic_step_structured_rows(self, *args, **kwargs) -> list[dict]:  # noqa: ANN002, ANN003, ARG002
-        return []
-
-    def list_claim_structured_rows(self, *args, **kwargs) -> list[dict]:  # noqa: ANN002, ANN003, ARG002
-        return []
-
     def list_global_community_rows(self, *args, **kwargs) -> list[dict]:  # noqa: ANN002, ANN003, ARG002
         return []
 
     def list_global_community_members(self, *args, **kwargs) -> list[dict]:  # noqa: ANN002, ANN003, ARG002
+        return []
+
+    def list_research_moves(self, *args, **kwargs) -> list[dict]:  # noqa: ANN002, ANN003, ARG002
+        return []
+
+    def list_evidence_anchors(self, *args, **kwargs) -> list[dict]:  # noqa: ANN002, ANN003, ARG002
         return []
 
 
@@ -113,17 +107,11 @@ def _patch_pipeline_dependencies(monkeypatch, fake_neo4j_client, docs: list[Docu
 
     def _fake_phase1_trace_output(paper_id: str) -> dict:
         return {
-            "logic": {},
-            "validated_claims": [],
             "quality_report": {
                 "gate_passed": True,
                 "quality_tier": "green",
                 "quality_tier_score": 1.0,
             },
-            "claim_candidates": [],
-            "claims_merged": [],
-            "rejected_claims": [],
-            "step_order": [],
             "paper_logic_trace": {
                 "quality": {
                     "quality_tier": "yellow",
@@ -330,22 +318,19 @@ def test_ingest_markdowns_dedupes_same_batch_duplicate_dois(monkeypatch):  # noq
 
 def test_ingest_markdowns_builds_community_corpus_without_proposition_writes_or_clustering(monkeypatch):  # noqa: ANN001, ANN201
     class _CommunityNeo4jClient(_FakeNeo4jClient):
-        def upsert_proposition_mentions_for_claims(self, *args, **kwargs):  # noqa: ANN002, ANN003
-            raise AssertionError("paper ingest should not write proposition mentions")
-
         def list_global_community_rows(self, *args, **kwargs) -> list[dict]:  # noqa: ANN002, ANN003, ARG002
             return [
                 {
                     "community_id": "gc:demo",
                     "title": "Finite element stability",
-                    "summary": "Claims and textbook entities about FEM stability.",
+                    "summary": "Research moves and textbook entities about FEM stability.",
                     "keywords": ["finite element", "stability"],
                 }
             ]
 
         def list_global_community_members(self, community_id: str, *args, **kwargs) -> list[dict]:  # noqa: ANN002, ANN003
             assert community_id == "gc:demo"
-            return [{"member_id": "cl-1", "member_kind": "Claim", "text": "FEM improves stability."}]
+            return [{"member_id": "m-1", "member_kind": "ResearchMove", "text": "FEM improves stability."}]
 
     fake = _CommunityNeo4jClient(paper_exists=False)
     _patch_pipeline_dependencies(monkeypatch, fake)
@@ -369,24 +354,11 @@ def test_ingest_markdowns_builds_community_corpus_without_proposition_writes_or_
         pipeline,
         "run_phase1_paper_logic_trace",
         lambda **kwargs: {  # noqa: ARG005
-            "logic": {"steps": []},
-            "validated_claims": [
-                {
-                    "claim_id": "cl-1",
-                    "text": "FEM improves stability.",
-                    "step_type": "Result",
-                    "confidence": 0.91,
-                }
-            ],
             "quality_report": {
                 "gate_passed": True,
                 "quality_tier": "green",
                 "quality_tier_score": 0.92,
             },
-            "claim_candidates": [],
-            "claims_merged": [],
-            "rejected_claims": [],
-            "step_order": [],
             "paper_logic_trace": {
                 "quality": {
                     "quality_tier": "yellow",
@@ -421,11 +393,11 @@ def test_ingest_markdowns_builds_community_corpus_without_proposition_writes_or_
     assert community_corpus[0]["kind"] == "community"
     assert community_corpus[0]["source_id"] == "gc:demo"
     assert community_corpus[0]["community_id"] == "gc:demo"
-    assert community_corpus[0]["member_ids"] == ["cl-1"]
-    assert community_corpus[0]["member_kinds"] == ["Claim"]
+    assert community_corpus[0]["member_ids"] == ["m-1"]
+    assert community_corpus[0]["member_kinds"] == ["ResearchMove"]
     assert community_corpus[0]["keyword_texts"] == ["finite element", "stability"]
     assert community_corpus[0]["text"] == (
         "Finite element stability\n"
-        "Claims and textbook entities about FEM stability.\n"
+        "Research moves and textbook entities about FEM stability.\n"
         "keywords: finite element, stability"
     )

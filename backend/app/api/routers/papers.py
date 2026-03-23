@@ -13,6 +13,7 @@ from fastapi.responses import FileResponse, PlainTextResponse, Response
 
 from app.graph.neo4j_client import Neo4jClient
 from app.paper_logic_trace import export_paper_logic_trace
+from app.paper_logic_trace.models import PaperLogicTrace
 from app.settings import settings
 
 
@@ -140,13 +141,13 @@ def _bib_escape(value: str) -> str:
     return value.replace("\\", "\\\\").replace("{", "\\{").replace("}", "\\}").replace("\n", " ")
 
 
-def _export_bibtex(detail: dict[str, Any]) -> str:
-    """Generate BibTeX entry from paper detail."""
-    paper = detail.get("paper") or {}
-    doi = str(paper.get("doi") or "").strip()
-    title = _bib_escape(str(paper.get("title") or "Untitled").strip())
-    year = paper.get("year")
-    authors = paper.get("authors")
+def _export_bibtex(trace: PaperLogicTrace) -> str:
+    """Generate BibTeX entry from canonical paper metadata."""
+    paper = trace.paper_metadata
+    doi = str(paper.canonical_doi or "").strip()
+    title = _bib_escape(str(paper.title or "Untitled").strip())
+    year = paper.year
+    authors = list(paper.authors or [])
     key = doi.replace("/", "_").replace(".", "_") if doi else "unknown"
     lines = [f"@article{{{key},"]
     lines.append(f"  title = {{{title}}},")
@@ -162,18 +163,20 @@ def _export_bibtex(detail: dict[str, Any]) -> str:
     return "\n".join(lines) + "\n"
 
 
-def _export_csv(detail: dict[str, Any]) -> str:
-    """Generate CSV with claims from paper detail."""
+def _export_csv(trace: PaperLogicTrace) -> str:
+    """Generate CSV with research moves from the canonical trace."""
     buf = io.StringIO()
     writer = csv.writer(buf)
-    writer.writerow(["claim_key", "text", "step_type", "confidence", "kinds"])
-    for claim in detail.get("claims") or []:
+    writer.writerow(["move_id", "sequence_no", "role", "act_type", "summary", "anchor_count", "confidence"])
+    for move in trace.canonical_core.moves:
         writer.writerow([
-            str(claim.get("claim_key") or ""),
-            str(claim.get("text") or ""),
-            str(claim.get("step_type") or ""),
-            str(claim.get("confidence") or ""),
-            ";".join(str(k) for k in (claim.get("kinds") or [])),
+            move.move_id,
+            move.sequence_no,
+            move.role,
+            move.act_type,
+            move.summary,
+            len(move.anchor_ids or []),
+            "" if move.confidence is None else move.confidence,
         ])
     return buf.getvalue()
 
@@ -188,31 +191,32 @@ def export_paper(
         with Neo4jClient(
             settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password,
         ) as client:
-            detail = client.get_paper_detail(paper_id)
+            payload = export_paper_logic_trace(client, paper_id)
+            trace = PaperLogicTrace.model_validate(payload)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
     if format == "bibtex":
-        text = _export_bibtex(detail)
+        text = _export_bibtex(trace)
         return Response(
             content=text,
             media_type="application/x-bibtex; charset=utf-8",
             headers={"Content-Disposition": "attachment; filename=paper.bib"},
         )
     if format == "csv":
-        text = _export_csv(detail)
+        text = _export_csv(trace)
         return Response(
             content=text,
             media_type="text/csv; charset=utf-8",
-            headers={"Content-Disposition": "attachment; filename=claims.csv"},
+            headers={"Content-Disposition": "attachment; filename=research_moves.csv"},
         )
     # json (default)
     return Response(
-        content=json.dumps(detail, ensure_ascii=False, default=str, indent=2),
+        content=json.dumps(trace.model_dump(mode='json'), ensure_ascii=False, default=str, indent=2),
         media_type="application/json; charset=utf-8",
-        headers={"Content-Disposition": "attachment; filename=paper.json"},
+        headers={"Content-Disposition": "attachment; filename=paper_logic_trace.json"},
     )
 
 

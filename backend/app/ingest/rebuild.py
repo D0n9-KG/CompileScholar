@@ -12,7 +12,7 @@ from app.citations.citation_event_recovery import recover_citation_events_from_r
 from app.citations.mention_projection import build_citation_mention_rows
 from app.citations.projection import build_citation_act_rows
 from app.crossref.client import CrossrefClient
-from app.extraction.orchestrator import run_phase1_extraction
+from app.extraction.orchestrator import run_phase1_paper_logic_trace
 from app.graph.neo4j_client import Neo4jClient
 from app.graph.neo4j_client import paper_id_for_md_path
 from app.ingest.figures import extract_figures_from_markdown
@@ -123,7 +123,7 @@ def _persist_rebuild_artifacts(
     paper_id: str,
     doc: Any,
     cite_rec: dict[str, Any] | None,
-    logic_claims: dict[str, Any],
+    trace_payload: dict[str, Any],
     purposes: list[dict[str, Any]] | None,
     citation_acts: list[dict[str, Any]],
     citation_mentions: list[dict[str, Any]],
@@ -144,7 +144,7 @@ def _persist_rebuild_artifacts(
         encoding="utf-8",
     )
     (out_dir / "citations.json").write_text(json.dumps(cite_rec or {}, ensure_ascii=False, indent=2), encoding="utf-8")
-    (out_dir / "llm_imrad.json").write_text(json.dumps(logic_claims, ensure_ascii=False, indent=2), encoding="utf-8")
+    (out_dir / "paper_logic_trace.json").write_text(json.dumps(trace_payload, ensure_ascii=False, indent=2), encoding="utf-8")
     (out_dir / "llm_citation_purposes.json").write_text(
         json.dumps(list(purposes or []), ensure_ascii=False, indent=2),
         encoding="utf-8",
@@ -462,10 +462,10 @@ def rebuild_paper(
                 cites_unresolved=cite_rec["cites_unresolved"],
             )
 
-    notify("rebuild:llm", 0.68, "Running LLM extraction (Logic/Claims/Citation Purposes)")
+    notify("rebuild:llm", 0.68, "Running PaperLogicTrace compilation")
     schema = _schema_for_md(doc.paper.md_path)
     phase1_artifacts_dir = _storage_dir() / "derived" / "papers" / _safe_id(paper_id) / "raw_pool"
-    phase1 = run_phase1_extraction(
+    phase1 = run_phase1_paper_logic_trace(
         doc=doc,
         paper_id=paper_id,
         cite_rec=cite_rec,
@@ -473,15 +473,9 @@ def rebuild_paper(
         artifacts_dir=phase1_artifacts_dir,
         allow_weak=bool(getattr(settings, "phase1_gate_allow_weak", False)),
     )
-    step_order = list(phase1.get("step_order") or [])
-    logic_claims = {
-        "logic": phase1.get("logic") or {},
-        "claims": phase1.get("validated_claims") or [],
-        "quality_report": phase1.get("quality_report") or {},
-        "raw_claim_candidates": len(phase1.get("claim_candidates") or []),
-        "raw_claims_merged": len(phase1.get("claims_merged") or []),
-        "rejected_claims": len(phase1.get("rejected_claims") or []),
-    }
+    quality_report = phase1.get("quality_report") or {}
+    trace = phase1.get("paper_logic_trace")
+    trace_payload = trace.model_dump(mode="json") if hasattr(trace, "model_dump") else dict(trace or {})
 
     purposes = []
     chunk_by_id = {c.chunk_id: c for c in doc.chunks}
@@ -532,10 +526,9 @@ def rebuild_paper(
 
     notify("rebuild:neo4j_llm", 0.78, "Writing LLM outputs to Neo4j")
 
-    # Phase1 gate: if quality gate failed, skip canonical Claim/LogicStep write
-    # to prevent low-quality data from polluting the knowledge graph.
-    quality_report = logic_claims.get("quality_report") or {}
-    gate_passed = bool(quality_report.get("gate_passed"))
+    trace_quality = dict(trace_payload.get("quality") or {})
+    trace_gate_report = dict(trace_quality.get("hot_path_gate_report") or {})
+    gate_passed = bool(trace_gate_report.get("passed")) if trace_gate_report else bool(quality_report.get("gate_passed"))
     if not gate_passed:
         with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
             try:
@@ -547,6 +540,8 @@ def rebuild_paper(
                         "phase1_quality_tier": str(quality_report.get("quality_tier") or ""),
                         "phase1_quality_tier_score": float(quality_report.get("quality_tier_score") or 0.0),
                         "phase1_quality_json": json.dumps(quality_report, ensure_ascii=False),
+                        "paper_logic_trace_quality_tier": str(trace_quality.get("quality_tier") or ""),
+                        "paper_logic_trace_audit_status": str(trace_quality.get("audit_status") or ""),
                     },
                 )
             except Exception:
@@ -561,7 +556,7 @@ def rebuild_paper(
             paper_id=paper_id,
             doc=doc,
             cite_rec=cite_rec,
-            logic_claims=logic_claims,
+            trace_payload=trace_payload,
             purposes=purposes,
             citation_acts=citation_acts,
             citation_mentions=citation_mentions,
@@ -582,7 +577,7 @@ def rebuild_paper(
             },
             "llm": {
                 "purposes": len(purposes),
-                "claims": len(logic_claims.get("claims") or []),
+                "moves": len(((trace_payload.get("canonical_core") or {}).get("moves") or [])),
                 "gate_passed": False,
                 "quality_tier": str(quality_report.get("quality_tier") or ""),
                 "quality_report": quality_report,
@@ -591,9 +586,8 @@ def rebuild_paper(
         }
 
     with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
-        client.upsert_logic_steps_and_claims(paper_id=paper_id, logic=logic_claims["logic"], claims=logic_claims["claims"], step_order=step_order)
+        client.upsert_paper_logic_trace(paper_id=paper_id, trace_payload=trace_payload)
         try:
-            quality_report = logic_claims.get("quality_report") or {}
             client.update_paper_props(
                 paper_id,
                 {
@@ -601,17 +595,10 @@ def rebuild_paper(
                     "phase1_gate_passed": bool(quality_report.get("gate_passed")),
                     "phase1_quality_tier": str(quality_report.get("quality_tier") or ""),
                     "phase1_quality_tier_score": float(quality_report.get("quality_tier_score") or 0.0),
+                    "paper_logic_trace_quality_tier": str(trace_quality.get("quality_tier") or ""),
+                    "paper_logic_trace_audit_status": str(trace_quality.get("audit_status") or ""),
                 },
             )
-        except Exception:
-            pass
-        # Re-apply human evidence overrides (if any) on top of the rebuilt machine graph.
-        try:
-            client.apply_human_claim_evidence_overrides(paper_id)
-        except Exception:
-            pass
-        try:
-            client.apply_human_logic_step_evidence_overrides(paper_id)
         except Exception:
             pass
         for p in purposes:
@@ -640,7 +627,7 @@ def rebuild_paper(
         paper_id=paper_id,
         doc=doc,
         cite_rec=cite_rec,
-        logic_claims=logic_claims,
+        trace_payload=trace_payload,
         purposes=purposes,
         citation_acts=citation_acts,
         citation_mentions=citation_mentions,
@@ -654,6 +641,10 @@ def rebuild_paper(
         "reference_recovery": reference_recovery,
         "citation_event_recovery": citation_event_recovery,
         "artifacts_dir": artifact_payload["artifacts_dir"],
+        "moves": len(((trace_payload.get("canonical_core") or {}).get("moves") or [])),
+        "gate_passed": gate_passed,
+        "quality_tier": str(quality_report.get("quality_tier") or ""),
+        "quality_report": quality_report,
         "citations": {
             "refs": len(cite_rec.get("refs") or []),
             "cites_resolved": len(cite_rec.get("cites_resolved") or []),
@@ -661,10 +652,10 @@ def rebuild_paper(
         },
         "llm": {
             "purposes": len(purposes),
-            "claims": len(logic_claims.get("claims") or []),
-            "gate_passed": bool((logic_claims.get("quality_report") or {}).get("gate_passed")),
-            "quality_tier": str((logic_claims.get("quality_report") or {}).get("quality_tier") or ""),
-            "quality_report": logic_claims.get("quality_report") or {},
+            "moves": len(((trace_payload.get("canonical_core") or {}).get("moves") or [])),
+            "gate_passed": gate_passed,
+            "quality_tier": str(quality_report.get("quality_tier") or ""),
+            "quality_report": quality_report,
         },
         "citation_semantic": artifact_payload["citation_semantic"],
     }
@@ -783,10 +774,10 @@ def replace_paper_from_md_path(
                 cites_unresolved=cite_rec["cites_unresolved"],
             )
 
-    notify("replace:llm", 0.70, "Running LLM extraction (Logic/Claims/Citation Purposes)")
+    notify("replace:llm", 0.70, "Running PaperLogicTrace compilation")
     schema = _schema_for_md(doc.paper.md_path)
     phase1_artifacts_dir = _storage_dir() / "derived" / "papers" / _safe_id(paper_id) / "raw_pool"
-    phase1 = run_phase1_extraction(
+    phase1 = run_phase1_paper_logic_trace(
         doc=doc,
         paper_id=paper_id,
         cite_rec=cite_rec,
@@ -794,15 +785,9 @@ def replace_paper_from_md_path(
         artifacts_dir=phase1_artifacts_dir,
         allow_weak=bool(getattr(settings, "phase1_gate_allow_weak", False)),
     )
-    step_order = list(phase1.get("step_order") or [])
-    logic_claims = {
-        "logic": phase1.get("logic") or {},
-        "claims": phase1.get("validated_claims") or [],
-        "quality_report": phase1.get("quality_report") or {},
-        "raw_claim_candidates": len(phase1.get("claim_candidates") or []),
-        "raw_claims_merged": len(phase1.get("claims_merged") or []),
-        "rejected_claims": len(phase1.get("rejected_claims") or []),
-    }
+    quality_report = phase1.get("quality_report") or {}
+    trace = phase1.get("paper_logic_trace")
+    trace_payload = trace.model_dump(mode="json") if hasattr(trace, "model_dump") else dict(trace or {})
 
     purposes = []
     chunk_by_id = {c.chunk_id: c for c in doc.chunks}
@@ -853,9 +838,9 @@ def replace_paper_from_md_path(
 
     notify("replace:neo4j_llm", 0.82, "Writing LLM outputs to Neo4j")
 
-    # Phase1 gate: if quality gate failed, skip canonical Claim/LogicStep write.
-    quality_report = logic_claims.get("quality_report") or {}
-    gate_passed = bool(quality_report.get("gate_passed"))
+    trace_quality = dict(trace_payload.get("quality") or {})
+    trace_gate_report = dict(trace_quality.get("hot_path_gate_report") or {})
+    gate_passed = bool(trace_gate_report.get("passed")) if trace_gate_report else bool(quality_report.get("gate_passed"))
     if not gate_passed:
         with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
             try:
@@ -867,6 +852,8 @@ def replace_paper_from_md_path(
                         "phase1_quality_tier": str(quality_report.get("quality_tier") or ""),
                         "phase1_quality_tier_score": float(quality_report.get("quality_tier_score") or 0.0),
                         "phase1_quality_json": json.dumps(quality_report, ensure_ascii=False),
+                        "paper_logic_trace_quality_tier": str(trace_quality.get("quality_tier") or ""),
+                        "paper_logic_trace_audit_status": str(trace_quality.get("audit_status") or ""),
                     },
                 )
             except Exception:
@@ -881,7 +868,7 @@ def replace_paper_from_md_path(
             paper_id=paper_id,
             doc=doc,
             cite_rec=cite_rec,
-            logic_claims=logic_claims,
+            trace_payload=trace_payload,
             purposes=purposes,
             citation_acts=citation_acts,
             citation_mentions=citation_mentions,
@@ -899,9 +886,8 @@ def replace_paper_from_md_path(
         }
 
     with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
-        client.upsert_logic_steps_and_claims(paper_id=paper_id, logic=logic_claims["logic"], claims=logic_claims["claims"], step_order=step_order)
+        client.upsert_paper_logic_trace(paper_id=paper_id, trace_payload=trace_payload)
         try:
-            quality_report = logic_claims.get("quality_report") or {}
             client.update_paper_props(
                 paper_id,
                 {
@@ -909,16 +895,10 @@ def replace_paper_from_md_path(
                     "phase1_gate_passed": bool(quality_report.get("gate_passed")),
                     "phase1_quality_tier": str(quality_report.get("quality_tier") or ""),
                     "phase1_quality_tier_score": float(quality_report.get("quality_tier_score") or 0.0),
+                    "paper_logic_trace_quality_tier": str(trace_quality.get("quality_tier") or ""),
+                    "paper_logic_trace_audit_status": str(trace_quality.get("audit_status") or ""),
                 },
             )
-        except Exception:
-            pass
-        try:
-            client.apply_human_claim_evidence_overrides(paper_id)
-        except Exception:
-            pass
-        try:
-            client.apply_human_logic_step_evidence_overrides(paper_id)
         except Exception:
             pass
         for p in purposes:
@@ -947,7 +927,7 @@ def replace_paper_from_md_path(
         paper_id=paper_id,
         doc=doc,
         cite_rec=cite_rec,
-        logic_claims=logic_claims,
+        trace_payload=trace_payload,
         purposes=purposes,
         citation_acts=citation_acts,
         citation_mentions=citation_mentions,
@@ -961,10 +941,10 @@ def replace_paper_from_md_path(
         "reference_recovery": reference_recovery,
         "citation_event_recovery": citation_event_recovery,
         "artifacts_dir": artifact_payload["artifacts_dir"],
-        "claims": len(logic_claims.get("claims") or []),
-        "gate_passed": bool((logic_claims.get("quality_report") or {}).get("gate_passed")),
-        "quality_tier": str((logic_claims.get("quality_report") or {}).get("quality_tier") or ""),
-        "quality_report": logic_claims.get("quality_report") or {},
+        "moves": len(((trace_payload.get("canonical_core") or {}).get("moves") or [])),
+        "gate_passed": gate_passed,
+        "quality_tier": str(quality_report.get("quality_tier") or ""),
+        "quality_report": quality_report,
         "citation_semantic": artifact_payload["citation_semantic"],
     }
 
@@ -982,29 +962,35 @@ def rebuild_global_faiss(progress: ProgressFn | None = None, log: LogFn | None =
     with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
         rows = client.list_chunks_for_faiss(limit=200000)
         structured_corpora = {
-            "logic_steps": (
-                client.list_logic_step_structured_rows(limit=50000),
+            "research_moves": (
+                client.list_research_moves(limit=50000),
                 [
                     "kind",
                     "source_id",
                     "paper_id",
                     "paper_source",
-                    "step_type",
-                    "evidence_chunk_ids",
-                    "evidence_quote",
+                    "paper_title",
+                    "role",
+                    "act_type",
+                    "anchor_ids",
                 ],
             ),
-            "claims": (
-                client.list_claim_structured_rows(limit=50000),
+            "evidence_anchors": (
+                client.list_evidence_anchors(limit=50000),
                 [
                     "kind",
                     "source_id",
                     "paper_id",
                     "paper_source",
-                    "step_type",
+                    "paper_title",
+                    "move_id",
+                    "role",
                     "confidence",
-                    "evidence_chunk_ids",
-                    "evidence_quote",
+                    "quote",
+                    "source_ref",
+                    "chunk_id",
+                    "start_line",
+                    "end_line",
                 ],
             ),
             "communities": (

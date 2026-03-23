@@ -8,14 +8,14 @@ def materialize_community_rows(
     communities: list[dict[str, Any]],
     memberships: dict[str, list[dict[str, Any]]],
     labels: dict[str, dict[str, Any]],
-    logic_steps: list[dict[str, Any]],
+    moves: list[dict[str, Any]],
     version: str,
     built_at: str,
 ) -> dict[str, list[dict[str, Any]]]:
-    logic_steps_by_id = {
-        str(row.get('logic_step_id') or '').strip(): row
-        for row in logic_steps
-        if str(row.get('logic_step_id') or '').strip()
+    moves_by_id = {
+        str(row.get('move_id') or '').strip(): row
+        for row in moves
+        if str(row.get('move_id') or '').strip()
     }
 
     community_rows: list[dict[str, Any]] = []
@@ -34,9 +34,9 @@ def materialize_community_rows(
         ]
         label = labels.get(community_id) or {}
         paper_ids = {
-            str((logic_steps_by_id.get(member_id) or {}).get('paper_id') or '').strip()
+            str((moves_by_id.get(member_id) or {}).get('paper_id') or '').strip()
             for member_id in member_ids
-            if str((logic_steps_by_id.get(member_id) or {}).get('paper_id') or '').strip()
+            if str((moves_by_id.get(member_id) or {}).get('paper_id') or '').strip()
         }
         community_rows.append(
             {
@@ -67,15 +67,21 @@ def materialize_community_rows(
             )
 
     for member_id, member_rows in memberships.items():
+        move = moves_by_id.get(str(member_id or '').strip()) or {}
         for row in member_rows:
             membership_rows.append(
                 {
                     'community_id': str(row.get('community_id') or '').strip(),
                     'member_id': str(member_id or '').strip(),
-                    'member_kind': 'LogicStep',
+                    'member_kind': 'ResearchMove',
                     'weight': float(row.get('score') or 0.0),
                     'rank': int(row.get('rank') or 0),
                     'is_core': bool(row.get('is_core') or False),
+                    'text': str(move.get('summary') or '').strip(),
+                    'paper_id': str(move.get('paper_id') or '').strip() or None,
+                    'paper_source': str(move.get('paper_source') or '').strip() or None,
+                    'paper_title': str(move.get('paper_title') or '').strip() or None,
+                    'role': str(move.get('role') or '').strip() or None,
                 }
             )
 

@@ -38,8 +38,8 @@ SIMILARITY_FIELD_HELP: dict[str, str] = {
 
 RUNTIME_FIELD_HELP: dict[str, str] = {
     "ingest_llm_max_workers": "Effective paper-level ingest concurrency derived from enabled LLM workers, per-paper fan-out, and the global LLM limit.",
-    "phase1_chunk_claim_max_workers": "Parallel claim-batch workers inside one paper extraction task.",
-    "phase1_grounding_max_workers": "Parallel grounding judge workers for claim evidence verification.",
+    "phase1_move_anchor_max_workers": "Parallel move-and-anchor extraction workers inside one paper compilation task.",
+    "phase1_grounding_max_workers": "Parallel grounding judge workers for evidence-anchor verification.",
     "phase2_conflict_max_workers": "Parallel conflict-judge workers for semantic contradiction checks.",
     "ingest_pre_llm_max_workers": "Parallel preprocessing workers for reference and citation-event recovery.",
     "faiss_embed_max_workers": "Parallel embedding workers when rebuilding global FAISS indexes.",
@@ -395,8 +395,8 @@ def _heuristic_suggestions(
             suggested_value="0.60",
             rationale=_text_by_locale(
                 normalized_locale,
-                "提高 grounded claim 通过下限，增强抽取精度。",
-                "Raise the grounded-claim gate to improve extraction precision.",
+                "提高 trace-support 通过下限，增强抽取精度。",
+                "Raise the trace-support gate to improve PaperLogicTrace precision.",
             ),
             focus_key="phase1_gate_supported_ratio_min",
         )
@@ -408,14 +408,13 @@ def _heuristic_suggestions(
             suggested_value=_text_by_locale(
                 normalized_locale,
                 "强化只基于证据生成主张的约束。",
-                "Strengthen evidence-only claim generation constraints.",
+                "Strengthen evidence-bound ResearchMove and EvidenceAnchor compilation constraints.",
             ),
             rationale=_text_by_locale(
                 normalized_locale,
                 "收紧抽取提示词，减少无证据支撑的输出。",
-                "Tighten extraction prompts to reduce unsupported output.",
+                "Tighten compiler prompts to reduce unsupported output.",
             ),
-            focus_key="phase1_chunk_claim_extract_system",
         )
 
     if wants_recall:
@@ -440,7 +439,7 @@ def _heuristic_suggestions(
             rationale=_text_by_locale(
                 normalized_locale,
                 "适度降低 supported ratio 下限，为后续过滤保留更多候选主张。",
-                "Lower the supported-ratio gate slightly to preserve more candidate claims for later filtering.",
+                "Lower the support-ratio gate slightly to preserve more candidate moves and anchors for later filtering.",
             ),
             focus_key="phase1_gate_supported_ratio_min",
             caution=_text_by_locale(
@@ -495,7 +494,6 @@ def _heuristic_suggestions(
                 "提示词更紧凑时，通常能降低抽取延迟。",
                 "More compact prompts often lower extraction latency.",
             ),
-            focus_key="logic_claims_system",
         )
 
     if not out:
@@ -535,7 +533,6 @@ def _heuristic_suggestions(
                 "当偏差主要来自语义表达时，优先复核提示词约束。",
                 "When behavior drift is mostly semantic, review prompt constraints first.",
             ),
-            focus_key="logic_claims_system",
         )
 
     cleaned = [{key: value for key, value in row.items() if key != "_sig"} for row in out]

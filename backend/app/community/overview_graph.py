@@ -8,19 +8,23 @@ from typing import Any
 
 _TOKEN_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_\-+/]*")
 _MEMBER_KIND_PRIORITY = {
-    "claim": 0,
-    "logicstep": 1,
-    "logic_step": 1,
-    "logic": 1,
+    "researchmove": 0,
+    "research_move": 0,
+    "move": 0,
+    "evidenceanchor": 1,
+    "evidence_anchor": 1,
+    "anchor": 1,
     "knowledgeentity": 2,
     "knowledge_entity": 2,
     "entity": 2,
 }
 _MEMBER_NODE_KIND = {
-    "claim": "claim",
-    "logicstep": "logic",
-    "logic_step": "logic",
-    "logic": "logic",
+    "researchmove": "move",
+    "research_move": "move",
+    "move": "move",
+    "evidenceanchor": "anchor",
+    "evidence_anchor": "anchor",
+    "anchor": "anchor",
     "knowledgeentity": "entity",
     "knowledge_entity": "entity",
     "entity": "entity",
@@ -97,7 +101,7 @@ def _member_description(row: dict[str, Any]) -> str | None:
     paper_source = _clean_text(row.get("paper_source"))
     paper_id = _clean_text(row.get("paper_id"))
     paper_title = _clean_text(row.get("paper_title"))
-    step_type = _clean_text(row.get("step_type"))
+    role = _clean_text(row.get("role"))
     source_chapter_id = _clean_text(row.get("source_chapter_id"))
     text = _clean_text(row.get("text"))
     if paper_source:
@@ -106,8 +110,8 @@ def _member_description(row: dict[str, Any]) -> str | None:
         parts.append(paper_id)
     if paper_title:
         parts.append(paper_title)
-    if step_type:
-        parts.append(step_type)
+    if role:
+        parts.append(role)
     if source_chapter_id:
         parts.append(source_chapter_id)
     if text:
@@ -255,7 +259,7 @@ def build_overview_community_graph(
                         "paper_id": _clean_text(member.get("paper_id")) or None,
                         "paper_source": _clean_text(member.get("paper_source")) or None,
                         "paper_title": _clean_text(member.get("paper_title")) or None,
-                        "step_type": _clean_text(member.get("step_type")) or None,
+                        "role": _clean_text(member.get("role")) or None,
                         "chapter_id": _clean_text(member.get("source_chapter_id")) or None,
                     }
                 )

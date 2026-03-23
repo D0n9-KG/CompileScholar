@@ -122,14 +122,14 @@ class Settings(BaseSettings):
 
     # ── Parallel processing controls ──
 
-    phase1_chunk_claim_max_workers: int = Field(
+    phase1_move_anchor_max_workers: int = Field(
         default=4, ge=1, le=8,
-        validation_alias=AliasChoices("PHASE1_CHUNK_CLAIM_MAX_WORKERS"),
+        validation_alias=AliasChoices("PHASE1_MOVE_ANCHOR_MAX_WORKERS"),
     )
 
-    phase1_claim_chunks_runtime_cap: int = Field(
+    phase1_source_units_runtime_cap: int = Field(
         default=48, ge=1, le=512,
-        validation_alias=AliasChoices("PHASE1_CLAIM_CHUNKS_RUNTIME_CAP"),
+        validation_alias=AliasChoices("PHASE1_SOURCE_UNITS_RUNTIME_CAP"),
     )
 
     phase1_grounding_max_workers: int = Field(

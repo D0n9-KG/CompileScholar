@@ -14,7 +14,7 @@ describe('rightPanelModel fusion evidence helpers', () => {
       entity_id: 'ent-1',
       entity_name: 'Finite Element Method',
       score: 0.84,
-      step_type: 'Method',
+      role: 'method',
       evidence_quote: 'Finite element method discretizes the domain.',
     },
     {
@@ -27,7 +27,7 @@ describe('rightPanelModel fusion evidence helpers', () => {
       entity_id: 'ent-2',
       entity_name: 'Galerkin Form',
       score: 0.78,
-      step_type: 'Method',
+      role: 'method',
       evidence_quote: 'Galerkin weighted residual form.',
     },
     {
@@ -40,7 +40,7 @@ describe('rightPanelModel fusion evidence helpers', () => {
       entity_id: 'ent-9',
       entity_name: 'Bubble Collapse',
       score: 0.67,
-      step_type: 'Mechanism',
+      role: 'interpretation',
       evidence_quote: 'Bubble collapse drives local pressure rise.',
     },
   ]

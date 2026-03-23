@@ -15,8 +15,8 @@ export type SignalGraphNode = {
     | 'hotspot'
     | 'paper'
     | 'entity'
-    | 'logic'
-    | 'claim'
+    | 'move'
+    | 'anchor'
     | 'citation'
     | 'summary'
     | 'query'
@@ -55,8 +55,8 @@ function spreadLine(count: number, start: number, end: number): number[] {
 }
 
 const PAPER_FLOW_ROOT_RADIUS = 42
-const PAPER_FLOW_LOGIC_RADIUS = 19
-const PAPER_FLOW_CLAIM_RADIUS = 15
+const PAPER_FLOW_MOVE_RADIUS = 19
+const PAPER_FLOW_ANCHOR_RADIUS = 15
 const PAPER_FLOW_FIRST_RING_RADIUS = 58
 const PAPER_FLOW_RING_STEP = 46
 const PAPER_FLOW_CLUSTER_PADDING = 26
@@ -66,21 +66,21 @@ const PAPER_FLOW_SIDE_PADDING = 92
 const PAPER_FLOW_TOP_PADDING = 126
 const PAPER_FLOW_BOTTOM_PADDING = 94
 
-function claimRingCapacity(radius: number): number {
-  return Math.max(5, Math.floor((2 * Math.PI * radius) / (PAPER_FLOW_CLAIM_RADIUS * 2 + 12)))
+function anchorRingCapacity(radius: number): number {
+  return Math.max(5, Math.floor((2 * Math.PI * radius) / (PAPER_FLOW_ANCHOR_RADIUS * 2 + 12)))
 }
 
-function computeClusterRadius(claimCount: number): number {
-  if (claimCount <= 0) return PAPER_FLOW_LOGIC_RADIUS + PAPER_FLOW_CLUSTER_PADDING + 14
-  let remaining = claimCount
+function computeClusterRadius(anchorCount: number): number {
+  if (anchorCount <= 0) return PAPER_FLOW_MOVE_RADIUS + PAPER_FLOW_CLUSTER_PADDING + 14
+  let remaining = anchorCount
   let ringRadius = PAPER_FLOW_FIRST_RING_RADIUS
   while (remaining > 0) {
-    const capacity = claimRingCapacity(ringRadius)
+    const capacity = anchorRingCapacity(ringRadius)
     remaining -= capacity
-    if (remaining <= 0) return ringRadius + PAPER_FLOW_CLAIM_RADIUS + PAPER_FLOW_CLUSTER_PADDING
+    if (remaining <= 0) return ringRadius + PAPER_FLOW_ANCHOR_RADIUS + PAPER_FLOW_CLUSTER_PADDING
     ringRadius += PAPER_FLOW_RING_STEP
   }
-  return ringRadius + PAPER_FLOW_CLAIM_RADIUS + PAPER_FLOW_CLUSTER_PADDING
+  return ringRadius + PAPER_FLOW_ANCHOR_RADIUS + PAPER_FLOW_CLUSTER_PADDING
 }
 
 function buildClusterSlots(
@@ -147,8 +147,16 @@ function buildClusterSlots(
   return { width, height, rootY, contentBottomY, slots }
 }
 
-function claimRingStartAngle(clusterIndex: number, ringIndex: number): number {
+function anchorRingStartAngle(clusterIndex: number, ringIndex: number): number {
   return (-Math.PI / 2) + (Math.PI / 9) * ((clusterIndex + ringIndex) % 6)
+}
+
+function isMoveKind(kind: string | undefined): boolean {
+  return kind === 'move'
+}
+
+function isAnchorKind(kind: string | undefined): boolean {
+  return kind === 'anchor'
 }
 
 export function buildPaperFlowPositions(
@@ -161,52 +169,57 @@ export function buildPaperFlowPositions(
 
   const root = nodes.find((node) => node.kind === 'root') ?? nodes[0]
   const rootId = String(root?.id ?? '')
+  const nodeById = new Map(nodes.map((node) => [node.id, node]))
 
   const clusterNodes = nodes.filter((node) => node.kind === 'cluster')
-  const logicNodes = nodes
-    .filter((node) => node.kind === 'logic')
+  const moveNodes = nodes
+    .filter((node) => isMoveKind(node.kind))
     .slice()
     .sort((a, b) => parseTrailingIndex(a.id) - parseTrailingIndex(b.id))
-  const claimNodes = nodes.filter((node) => node.kind === 'claim')
+  const anchorNodes = nodes.filter((node) => isAnchorKind(node.kind))
   const otherNodes = nodes.filter(
     (node) =>
       node.id !== rootId &&
       node.kind !== 'cluster' &&
-      node.kind !== 'logic' &&
-      node.kind !== 'claim' &&
+      !isMoveKind(node.kind) &&
+      !isAnchorKind(node.kind) &&
       node.kind !== 'citation' &&
       node.kind !== 'summary',
   )
 
-  const parentLogicByClaim = new Map<string, string>()
+  const parentMoveByAnchor = new Map<string, string>()
   for (const edge of edges) {
     const targetId = String(edge.target ?? '')
     const sourceId = String(edge.source ?? '')
-    if (!targetId || !sourceId || !targetId.startsWith('claim:')) continue
-    if (sourceId.startsWith('logic:')) {
-      parentLogicByClaim.set(targetId, sourceId)
+    const targetNode = nodeById.get(targetId)
+    const sourceNode = nodeById.get(sourceId)
+    if (!targetNode || !sourceNode || !isAnchorKind(targetNode.kind) || !isMoveKind(sourceNode.kind)) continue
+    if (isMoveKind(sourceNode.kind)) {
+      parentMoveByAnchor.set(targetId, sourceId)
     }
   }
 
-  const claimsByLogic = new Map<string, SignalGraphNode[]>()
-  const danglingClaims: SignalGraphNode[] = []
+  const anchorsByMove = new Map<string, SignalGraphNode[]>()
+  const danglingAnchors: SignalGraphNode[] = []
 
-  for (const claim of claimNodes) {
-    const parentLogic = parentLogicByClaim.get(claim.id)
-    if (!parentLogic) {
-      danglingClaims.push(claim)
+  for (const anchor of anchorNodes) {
+    const parentMove = parentMoveByAnchor.get(anchor.id)
+    if (!parentMove) {
+      danglingAnchors.push(anchor)
       continue
     }
-    const group = claimsByLogic.get(parentLogic) ?? []
-    group.push(claim)
-    claimsByLogic.set(parentLogic, group)
+    const group = anchorsByMove.get(parentMove) ?? []
+    group.push(anchor)
+    anchorsByMove.set(parentMove, group)
   }
 
-  const clusters = logicNodes.map((logicNode) => ({
-    logicNode,
-    clusterNode: clusterNodes.find((node) => node.id === logicNode.id.replace(/^logic:/, 'cluster:')),
-    claims: (claimsByLogic.get(logicNode.id) ?? []).slice().sort((a, b) => a.id.localeCompare(b.id)),
-    radius: computeClusterRadius((claimsByLogic.get(logicNode.id) ?? []).length),
+  const clusters = moveNodes.map((moveNode) => ({
+    moveNode,
+    clusterNode: clusterNodes.find((node) =>
+      node.id === moveNode.id.replace(/^move:/, 'cluster:'),
+    ),
+    anchors: (anchorsByMove.get(moveNode.id) ?? []).slice().sort((a, b) => a.id.localeCompare(b.id)),
+    radius: computeClusterRadius((anchorsByMove.get(moveNode.id) ?? []).length),
   }))
   const layoutFrame = buildClusterSlots(
     clusters.map((cluster) => cluster.radius),
@@ -226,23 +239,23 @@ export function buildPaperFlowPositions(
     const cluster = clusters[i]
     const slot = layoutFrame.slots[i] ?? { x: centerX, y: Math.round(height * 0.45) }
 
-    map.set(cluster.logicNode.id, { x: slot.x, y: slot.y })
+    map.set(cluster.moveNode.id, { x: slot.x, y: slot.y })
     if (cluster.clusterNode) {
       map.set(cluster.clusterNode.id, { x: slot.x, y: slot.y })
     }
 
     let placed = 0
     let ringIndex = 0
-    while (placed < cluster.claims.length) {
+    while (placed < cluster.anchors.length) {
       const ringRadius = PAPER_FLOW_FIRST_RING_RADIUS + ringIndex * PAPER_FLOW_RING_STEP
-      const capacity = claimRingCapacity(ringRadius)
-      const countThisRing = Math.min(capacity, cluster.claims.length - placed)
+      const capacity = anchorRingCapacity(ringRadius)
+      const countThisRing = Math.min(capacity, cluster.anchors.length - placed)
       for (let offset = 0; offset < countThisRing; offset += 1) {
         const angle =
-          claimRingStartAngle(i, ringIndex) +
+          anchorRingStartAngle(i, ringIndex) +
           (Math.PI * 2 * offset) / Math.max(1, countThisRing)
-        const claimNode = cluster.claims[placed + offset]
-        map.set(claimNode.id, {
+        const anchorNode = cluster.anchors[placed + offset]
+        map.set(anchorNode.id, {
           x: Math.round(slot.x + ringRadius * Math.cos(angle)),
           y: Math.round(slot.y + ringRadius * Math.sin(angle)),
         })
@@ -252,26 +265,26 @@ export function buildPaperFlowPositions(
     }
   }
 
-  if (danglingClaims.length > 0) {
+  if (danglingAnchors.length > 0) {
     const danglingSpan =
-      danglingClaims.length * (PAPER_FLOW_CLAIM_RADIUS * 2) +
-      Math.max(0, danglingClaims.length - 1) * (PAPER_FLOW_CLAIM_RADIUS * 2 + 18)
+      danglingAnchors.length * (PAPER_FLOW_ANCHOR_RADIUS * 2) +
+      Math.max(0, danglingAnchors.length - 1) * (PAPER_FLOW_ANCHOR_RADIUS * 2 + 18)
     width = Math.max(width, Math.ceil(danglingSpan + PAPER_FLOW_SIDE_PADDING * 2))
   }
   const danglingXs = spreadLine(
-    danglingClaims.length,
-    PAPER_FLOW_SIDE_PADDING + PAPER_FLOW_CLAIM_RADIUS,
-    width - PAPER_FLOW_SIDE_PADDING - PAPER_FLOW_CLAIM_RADIUS,
+    danglingAnchors.length,
+    PAPER_FLOW_SIDE_PADDING + PAPER_FLOW_ANCHOR_RADIUS,
+    width - PAPER_FLOW_SIDE_PADDING - PAPER_FLOW_ANCHOR_RADIUS,
   )
   const danglingY = Math.round(layoutFrame.contentBottomY + PAPER_FLOW_ROW_GAP * 0.68)
-  for (let i = 0; i < danglingClaims.length; i += 1) {
-    map.set(danglingClaims[i].id, {
+  for (let i = 0; i < danglingAnchors.length; i += 1) {
+    map.set(danglingAnchors[i].id, {
       x: Math.round(danglingXs[i]),
       y: danglingY,
     })
   }
-  if (danglingClaims.length > 0) {
-    height = Math.max(height, danglingY + PAPER_FLOW_CLAIM_RADIUS + PAPER_FLOW_BOTTOM_PADDING)
+  if (danglingAnchors.length > 0) {
+    height = Math.max(height, danglingY + PAPER_FLOW_ANCHOR_RADIUS + PAPER_FLOW_BOTTOM_PADDING)
   }
 
   const ringRadius = Math.min(width, height) * 0.16
@@ -338,7 +351,9 @@ export default function SignalGraph({
 
   const elements = graphData.elements
   const hasPaperFlow = useMemo(
-    () => nodes.some((node) => node.kind === 'root') && nodes.some((node) => node.kind === 'logic' || node.kind === 'claim'),
+    () =>
+      nodes.some((node) => node.kind === 'root') &&
+      nodes.some((node) => isMoveKind(node.kind) || isAnchorKind(node.kind)),
     [nodes],
   )
 
@@ -497,7 +512,7 @@ export default function SignalGraph({
           },
         },
         {
-          selector: 'node[kind = "logic"]',
+          selector: 'node[kind = "move"]',
           style: {
             shape: 'ellipse',
             width: hasPaperFlow ? 'mapData(weight, 0, 1, 34, 40)' : 'mapData(weight, 0, 1, 98, 118)',
@@ -514,7 +529,7 @@ export default function SignalGraph({
           },
         },
         {
-          selector: 'node[kind = "claim"]',
+          selector: 'node[kind = "anchor"]',
           style: {
             shape: 'ellipse',
             width: hasPaperFlow ? 'mapData(weight, 0, 1, 30, 34)' : 'mapData(weight, 0, 1, 136, 208)',

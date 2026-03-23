@@ -4,17 +4,15 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { I18nProvider, LOCALE_STORAGE_KEY } from '../src/i18n'
 
-const { apiGetMock, apiPatchMock, apiPostMock } = vi.hoisted(() => ({
+const { apiGetMock } = vi.hoisted(() => ({
   apiGetMock: vi.fn(),
-  apiPatchMock: vi.fn(),
-  apiPostMock: vi.fn(),
 }))
 
 vi.mock('../src/api', () => ({
   apiBaseUrl: () => 'http://127.0.0.1:8080',
   apiGet: apiGetMock,
-  apiPatch: apiPatchMock,
-  apiPost: apiPostMock,
+  apiPatch: vi.fn(),
+  apiPost: vi.fn(),
 }))
 
 vi.mock('../src/components/MarkdownView', () => ({
@@ -41,125 +39,179 @@ vi.mock('../src/components/SignalGraph', () => ({
 
 import PaperDetailPage from '../src/pages/PaperDetailPage'
 
-const scrollIntoViewMock = vi.fn()
-
-function buildPaperDetail(citationCount = 12) {
-  return {
-    paper: {
-      paper_id: 'doi:10.1000/example',
-      doi: '10.1000/example',
-      year: 2024,
-      title: '颗粒混合研究',
-      paper_source: 'paper-source',
-      phase1_gate_passed: true,
-      phase1_quality_tier: 'green',
-      phase1_quality_tier_score: 1,
-    },
-    schema: {
-      paper_type: 'research',
-      version: 1,
-      steps: [
-        { id: 'Background', label_zh: '背景', label_en: 'Background', enabled: true, order: 0 },
-        { id: 'Method', label_zh: '方法', label_en: 'Method', enabled: true, order: 1 },
-        { id: 'Result', label_zh: '结果', label_en: 'Result', enabled: true, order: 2 },
-      ],
-      claim_kinds: [{ id: 'finding', label_zh: '发现', label_en: 'Finding', enabled: true }],
-      rules: {},
-    },
-    stats: { chunk_count: 20, ref_count: citationCount },
-    logic_steps: [
-      { step_type: 'Background', summary: '背景摘要', confidence: 0.76, order: 0 },
-      { step_type: 'Method', summary: '方法摘要', confidence: 0.8, order: 1 },
-      { step_type: 'Result', summary: '结果摘要', confidence: 0.9, order: 2 },
-    ],
-    claims: [
+const trace = {
+  trace_id: 'trace:doi:10.1000/example',
+  schema_version: 'v2',
+  built_at: '2026-03-22T12:00:00Z',
+  paper_metadata: {
+    paper_id: 'doi:10.1000/example',
+    canonical_doi: '10.1000/example',
+    title: 'A Unified Study of Granular Stability',
+    year: 2024,
+    authors: ['Ada Researcher', 'Bo Analyst'],
+    venue: 'Journal of Test Cases',
+    paper_type: 'empirical',
+    source_refs: ['chunk-1', 'chunk-2'],
+  },
+  canonical_core: {
+    evidence_anchors: [
       {
-        claim_key: 'claim-bg-1',
-        text: '背景观点一',
-        confidence: 0.65,
-        step_type: 'Background',
-        kinds: ['finding'],
+        anchor_id: 'anchor-1',
+        paper_id: 'doi:10.1000/example',
+        source_ref: 'chunk-1',
+        modality: 'text',
+        section_path: ['Method'],
+        locator: { start_line: 11, end_line: 20 },
+        quote: 'We propose a finite-element solver for granular stability analysis.',
+        citation_ids: [],
+        support_type: 'direct',
+        weak: false,
       },
       {
-        claim_key: 'claim-method-1',
-        text: '方法要点一',
+        anchor_id: 'anchor-2',
+        paper_id: 'doi:10.1000/example',
+        source_ref: 'chunk-2',
+        modality: 'text',
+        section_path: ['Result'],
+        locator: { start_line: 42, end_line: 50 },
+        quote: 'The method improves stability prediction over the baseline.',
+        citation_ids: ['cite-1'],
+        support_type: 'direct',
+        weak: false,
+      },
+    ],
+    moves: [
+      {
+        move_id: 'move-1',
+        sequence_no: 1,
+        role: 'method',
+        act_type: 'propose_method',
+        summary: 'Propose a finite-element solver.',
+        research_objects: [
+          {
+            surface: 'granular stability',
+            normalized: 'granular stability',
+            anchor_ids: ['anchor-1'],
+            confidence: 0.88,
+            inferred: false,
+          },
+        ],
+        methods: [
+          {
+            surface: 'finite-element solver',
+            normalized: 'finite element solver',
+            anchor_ids: ['anchor-1'],
+            confidence: 0.9,
+            inferred: false,
+          },
+        ],
+        observed_variables: [],
+        metrics: [],
+        comparators: [],
+        conditions: [],
+        effects: [],
+        limitation_types: [],
+        resource_mentions: [],
+        anchor_ids: ['anchor-1'],
+        slot_provenance: [],
         confidence: 0.83,
-        step_type: 'Method',
-        kinds: ['finding'],
+        audit_state: 'hot_path',
       },
       {
-        claim_key: 'claim-method-2',
-        text: '方法要点二',
-        confidence: 0.74,
-        step_type: 'Method',
-        kinds: ['finding'],
-      },
-      {
-        claim_key: 'claim-result-1',
-        text: '结论一',
-        confidence: 0.92,
-        step_type: 'Result',
-        kinds: ['finding'],
-      },
-      {
-        claim_key: 'claim-result-2',
-        text: '结果观点二',
-        confidence: 0.79,
-        step_type: 'Result',
-        kinds: ['finding'],
+        move_id: 'move-2',
+        sequence_no: 2,
+        role: 'result',
+        act_type: 'report_effect',
+        summary: 'Improve stability prediction over the baseline.',
+        research_objects: [],
+        methods: [],
+        observed_variables: [],
+        metrics: [
+          {
+            surface: 'stability prediction',
+            normalized: 'stability prediction',
+            anchor_ids: ['anchor-2'],
+            confidence: 0.84,
+            inferred: false,
+          },
+        ],
+        comparators: [
+          {
+            surface: 'baseline',
+            normalized: 'baseline',
+            anchor_ids: ['anchor-2'],
+            confidence: 0.8,
+            inferred: false,
+          },
+        ],
+        conditions: [],
+        effects: [
+          {
+            direction: 'improve',
+            comparator_surface: 'baseline',
+            anchor_ids: ['anchor-2'],
+            confidence: 0.86,
+          },
+        ],
+        limitation_types: [],
+        resource_mentions: [],
+        anchor_ids: ['anchor-2'],
+        slot_provenance: [],
+        confidence: 0.89,
+        audit_state: 'hot_path',
       },
     ],
-    figures: [],
-    outgoing_cites: Array.from({ length: citationCount }, (_, index) => ({
-      cited_paper_id: `cite-${index + 1}`,
-      cited_doi: `10.1000/cite-${index + 1}`,
-      cited_title: `引用论文 ${index + 1}`,
-      total_mentions: citationCount - index,
-      ref_nums: [index + 1],
-      purpose_labels: ['Background'],
-      purpose_scores: [0.8],
-      semantic: {
-        polarity: index === 0 ? 'positive' : 'neutral',
-        semantic_signals: index === 0 ? ['method_transfer_hint'] : [],
-        target_scopes: index === 0 ? ['paper', 'method'] : ['paper'],
-        evidence_chunk_ids: index === 0 ? ['chunk-2', 'chunk-4'] : [],
-        evidence_spans: index === 0 ? ['20-22'] : [],
+    move_relations: [
+      {
+        relation_id: 'rel-1',
+        source_move_id: 'move-1',
+        target_move_id: 'move-2',
+        relation_type: 'yields',
+        anchor_ids: ['anchor-2'],
+        confidence: 0.8,
       },
-      mentions: index === 0
-        ? [
-            {
-              mention_id: 'mention-1',
-              ref_num: 1,
-              source_chunk_id: 'chunk-2',
-              span_start: 20,
-              span_end: 22,
-              section: 'method',
-              context_text: 'This method is adapted from the cited paper.',
-            },
-          ]
-        : [],
-    })),
-    unresolved: [],
-  }
+    ],
+    citation_acts: [
+      {
+        citation_act_id: 'cite-1',
+        source_move_id: 'move-1',
+        target_paper_id: 'doi:10.1000/cited',
+        purpose: 'background',
+        polarity: 'positive',
+        semantic_signal: 'method_transfer_hint',
+        target_scope: 'method',
+        anchor_ids: ['anchor-1'],
+        confidence: 0.71,
+      },
+    ],
+    figure_refs: [],
+    table_refs: [],
+  },
+  derived_views: {
+    l2_5_slot_inventory: {},
+    l1_bridge_hints: {},
+    community_signatures: [],
+    route_feature_candidates: [],
+    paper_summaries: {
+      one_paragraph_summary: 'This paper proposes a finite-element solver and reports stronger stability prediction.',
+      move_role_distribution: {
+        method: 1,
+        result: 1,
+      },
+      key_method_summary: 'Propose a finite-element solver.',
+    },
+  },
+  quality: {
+    gate_passed: true,
+    quality_tier: 'green',
+    score: 0.94,
+  },
 }
 
-function buildPaperDetailWithoutCitationEnrichment() {
-  const detail = buildPaperDetail(3)
-  return {
-    ...detail,
-    outgoing_cites: detail.outgoing_cites.map((cite, index) => {
-      if (index !== 0) return cite
-      const rest = { ...cite }
-      delete rest.semantic
-      delete rest.mentions
-      return rest
-    }),
-  }
-}
-
-function renderPaperDetail(citationCount = 12) {
+function renderPaperDetail() {
   apiGetMock.mockImplementation(async (path: string) => {
-    if (path === '/graph/paper/doi%3A10.1000%2Fexample') return buildPaperDetail(citationCount)
+    if (path === '/papers/doi%3A10.1000%2Fexample/logic-trace') return trace
+    if (path === '/papers/doi%3A10.1000%2Fexample/content') return '# Source Content\n\nOriginal markdown body.'
     throw new Error(`unexpected apiGet path: ${path}`)
   })
 
@@ -174,126 +226,57 @@ function renderPaperDetail(citationCount = 12) {
   )
 }
 
-describe('PaperDetailPage graph workbench', () => {
+describe('PaperDetailPage paper logic trace workbench', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    scrollIntoViewMock.mockReset()
-    Element.prototype.scrollIntoView = scrollIntoViewMock
     window.localStorage.clear()
     window.localStorage.setItem(LOCALE_STORAGE_KEY, 'zh-CN')
   })
 
-  test('shows a detail card when a graph node is selected', async () => {
+  test('renders research move graph and shows a move detail card when a node is selected', async () => {
     const { container } = renderPaperDetail()
 
     await waitFor(() => expect(screen.getByTestId('signal-graph-mock')).toBeInTheDocument())
-    expect(container.querySelector('.paperGraphWorkbench')).not.toBeNull()
+    expect(container.querySelector('.paperTraceWorkbench')).not.toBeNull()
 
-    fireEvent.click(screen.getByRole('button', { name: '方法(Method)' }))
+    fireEvent.click(screen.getByRole('button', { name: '1. Method' }))
 
-    const detailCard = container.querySelector('.paperGraphDetailCard')
+    const detailCard = container.querySelector('.paperTraceDetailCard')
     expect(detailCard).not.toBeNull()
     const detail = within(detailCard as HTMLElement)
 
-    expect(detail.getByText('节点详情')).toBeInTheDocument()
-    expect(detail.getByText('方法(Method)')).toBeInTheDocument()
-    expect(detail.getByText('逻辑步骤')).toBeInTheDocument()
-    expect(detail.getByText('方法摘要')).toBeInTheDocument()
+    expect(detail.getByText('Node Detail')).toBeInTheDocument()
+    expect(detail.getByText('Research Move')).toBeInTheDocument()
+    expect(detail.getByText('Propose a finite-element solver.')).toBeInTheDocument()
+    expect(detail.getByText('Role')).toBeInTheDocument()
+    expect(detail.getByText('Act Type')).toBeInTheDocument()
   })
 
-  test('renders all logic steps and claims without citation nodes', async () => {
-    renderPaperDetail(12)
+  test('renders move, relation, evidence, and citation views without legacy logic-step or claim tabs', async () => {
+    renderPaperDetail()
 
-    await waitFor(() => expect(screen.getByTestId('signal-graph-mock')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getAllByText('Research Moves').length).toBeGreaterThan(0))
+    expect(screen.getByText('Move Relations')).toBeInTheDocument()
+    expect(screen.getByText('Evidence Anchors')).toBeInTheDocument()
+    expect(screen.getByText('Citation Acts')).toBeInTheDocument()
+    expect(screen.queryByText('Logic Steps')).not.toBeInTheDocument()
+    expect(screen.queryByText('Claims')).not.toBeInTheDocument()
 
-    expect(screen.getByRole('button', { name: '背景(Background)' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: '方法(Method)' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: '结果(Result)' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: '发现(Finding) | 背景观点一' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: '发现(Finding) | 方法要点一' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: '发现(Finding) | 方法要点二' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: '发现(Finding) | 结论一' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: '发现(Finding) | 结果观点二' })).toBeInTheDocument()
-    expect(screen.queryByText(/更多引用 \+\d+/)).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /引用论文/ })).not.toBeInTheDocument()
-  })
-  test('opens the matching claim card from the detail action without auto-switching on select', async () => {
-    renderPaperDetail(12)
+    expect(screen.getAllByText('1. Method').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('2. Result').length).toBeGreaterThan(0)
+    expect(screen.getByText('Propose a finite-element solver.')).toBeInTheDocument()
 
-    await waitFor(() => expect(screen.getByTestId('signal-graph-mock')).toBeInTheDocument())
+    fireEvent.click(screen.getByRole('button', { name: 'Move Relations' }))
+    expect(await screen.findByText('yields')).toBeInTheDocument()
+    expect(screen.getByText('move-1')).toBeInTheDocument()
+    expect(screen.getByText('move-2')).toBeInTheDocument()
 
-    const claimButtons = screen.getAllByRole('button').filter((button) => button.textContent?.includes('Finding'))
-    fireEvent.click(claimButtons[1])
+    fireEvent.click(screen.getByRole('button', { name: 'Evidence Anchors' }))
+    await waitFor(() => expect(screen.getAllByText('anchor-1').length).toBeGreaterThan(0))
+    expect(screen.getByText(/finite-element solver for granular stability analysis/i)).toBeInTheDocument()
 
-    expect(screen.queryByText('claim-method-1')).not.toBeInTheDocument()
-
-    fireEvent.click(screen.getByRole('button', { name: /完整论断/ }))
-
-    await waitFor(() => expect(screen.getByText('claim-method-1')).toBeInTheDocument())
-    await waitFor(() => expect(scrollIntoViewMock).toHaveBeenCalled())
-  })
-
-  test('renders citation semantic enrichment and keeps manual purpose controls collapsed by default', async () => {
-    apiGetMock.mockImplementation(async (path: string) => {
-      if (path === '/graph/paper/doi%3A10.1000%2Fexample') return buildPaperDetail(12)
-      throw new Error(`unexpected apiGet path: ${path}`)
-    })
-
-    render(
-      <I18nProvider>
-        <MemoryRouter initialEntries={['/papers/doi%3A10.1000%2Fexample?tab=cites']}>
-          <Routes>
-            <Route path="/papers/:paperId" element={<PaperDetailPage />} />
-          </Routes>
-        </MemoryRouter>
-      </I18nProvider>,
-    )
-
-    await waitFor(() => expect(screen.getByText('引用论文 1')).toBeInTheDocument())
-
-    const firstCitationCard = screen.getByText('引用论文 1').closest('.itemCard') as HTMLElement
-    const citationCard = within(firstCitationCard)
-
-    expect(citationCard.getByText('语义画像')).toBeInTheDocument()
-    expect(citationCard.getByText('方法迁移提示')).toBeInTheDocument()
-    expect(citationCard.getByText('方法')).toBeInTheDocument()
-    expect(citationCard.getByText('引用依据')).toBeInTheDocument()
-    expect(citationCard.getByText('背景')).toBeInTheDocument()
-    expect(citationCard.getByText('置信度 0.80')).toBeInTheDocument()
-    expect(citationCard.getByText('chunk-2')).toBeInTheDocument()
-    expect(citationCard.getByRole('button', { name: /提及证据 1/ })).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: '综述' })).not.toBeInTheDocument()
-
-    fireEvent.click(citationCard.getByRole('button', { name: /提及证据 1/ }))
-    expect(screen.getByText('This method is adapted from the cited paper.')).toBeInTheDocument()
-
-    fireEvent.click(screen.getByRole('button', { name: /人工校正引用目的/ }))
-    expect(screen.getAllByRole('button', { name: '综述' }).length).toBeGreaterThan(0)
-  })
-
-  test('renders missing citation enrichment state clearly when semantic and mentions are absent', async () => {
-    apiGetMock.mockImplementation(async (path: string) => {
-      if (path === '/graph/paper/doi%3A10.1000%2Fexample') return buildPaperDetailWithoutCitationEnrichment()
-      throw new Error(`unexpected apiGet path: ${path}`)
-    })
-
-    render(
-      <I18nProvider>
-        <MemoryRouter initialEntries={['/papers/doi%3A10.1000%2Fexample?tab=cites']}>
-          <Routes>
-            <Route path="/papers/:paperId" element={<PaperDetailPage />} />
-          </Routes>
-        </MemoryRouter>
-      </I18nProvider>,
-    )
-
-    await waitFor(() => expect(screen.getByText('引用论文 1')).toBeInTheDocument())
-
-    const firstCitationCard = screen.getByText('引用论文 1').closest('.itemCard') as HTMLElement
-    const citationCard = within(firstCitationCard)
-
-    expect(citationCard.getByText('未生成增强语义。')).toBeInTheDocument()
-    expect(citationCard.queryByText('中性')).not.toBeInTheDocument()
-    expect(citationCard.getByRole('button', { name: '提及证据未生成' })).toBeDisabled()
+    fireEvent.click(screen.getByRole('button', { name: 'Citation Acts' }))
+    await waitFor(() => expect(screen.getAllByText('cite-1').length).toBeGreaterThan(0))
+    expect(screen.getByText(/method_transfer_hint/)).toBeInTheDocument()
   })
 })

@@ -112,7 +112,7 @@ def plan_ask_query(question: str, scope: dict | None = None, locale: str | None 
                         "intent, retrieval_plan, main_query, paper_query, textbook_query, community_query, confidence, reason. "
                         "main_query is mandatory. "
                         "Valid intents: paper_detail, foundational, hybrid_explanation, comparison. "
-                        "Valid retrieval plans: paper_first_then_textbook, textbook_first_then_paper, hybrid_parallel, claim_first, community_first."
+                        "Valid retrieval plans: paper_first_then_textbook, textbook_first_then_paper, hybrid_parallel, anchor_first, community_first."
                     ),
                 ),
                 (

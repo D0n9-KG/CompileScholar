@@ -59,51 +59,92 @@ def test_resolve_llm_request_config_falls_back_to_default_provider(monkeypatch):
 def test_extract_json_ignores_trailing_extra_data():
     from app.llm import client
 
-    raw = '{"chunks":[{"chunk_id":"c1","claims":[]}]} trailing text that should be ignored'
+    raw = '{"moves":[{"role":"method","act_type":"propose_method","summary":"Uses FEM","anchor_chunk_ids":["c1"],"methods":[{"surface":"finite element method","normalized":"finite element method"}]}]} trailing text that should be ignored'
 
     parsed = client._extract_json(raw)
 
-    assert parsed["chunks"][0]["chunk_id"] == "c1"
+    assert parsed["moves"][0]["anchor_chunk_ids"] == ["c1"]
 
 
 def test_extract_json_repairs_invalid_escape_sequences():
     from app.llm import client
 
-    raw = '{"chunks":[{"chunk_id":"c1","claims":[{"text":"Value uses \\\\mu and \\m","evidence_quote":"Value uses \\\\mu and \\m","step_type":"Method","claim_kinds":["Observation"],"confidence":0.8}]}]}'
+    raw = '{"moves":[{"role":"method","act_type":"propose_method","summary":"Value uses \\\\mu and \\m","anchor_chunk_ids":["c1"],"methods":[{"surface":"Value uses \\\\mu and \\m","normalized":"Value uses \\\\mu and \\m"}],"confidence":0.8}]}'
 
     parsed = client._extract_json(raw)
 
-    claim = parsed["chunks"][0]["claims"][0]
-    assert claim["text"] == "Value uses \\mu and \\m"
-    assert claim["evidence_quote"] == "Value uses \\mu and \\m"
+    move = parsed["moves"][0]
+    assert move["summary"] == "Value uses \\mu and \\m"
+    assert move["methods"][0]["surface"] == "Value uses \\mu and \\m"
 
 
 def test_call_validated_json_wraps_top_level_list_for_batch_models(monkeypatch):
     from app.llm import client
-    from app.llm.schemas import ChunkClaimsBatchResponse
+    from app.llm.schemas import BatchCitationPurposeResponse
 
-    raw = '[{"chunk_id":"c1","claims":[]}]'
+    raw = '[{"ref_id":"r1","purposes":[{"label":"support","score":0.82}]}]'
 
     monkeypatch.setattr(client, "call_text", lambda *args, **kwargs: raw)
 
-    validated = client.call_validated_json("system", "user", ChunkClaimsBatchResponse, max_retries=0, use_retry=False)
+    validated = client.call_validated_json("system", "user", BatchCitationPurposeResponse, max_retries=0, use_retry=False)
 
-    assert len(validated.chunks) == 1
-    assert validated.chunks[0].chunk_id == "c1"
+    assert len(validated.citations) == 1
+    assert validated.citations[0].ref_id == "r1"
 
 
 def test_call_validated_json_wraps_top_level_list_for_single_list_response(monkeypatch):
     from app.llm import client
-    from app.llm.schemas import ChunkClaimsResponse
+    from app.llm.schemas import ResearchMoveWindowResponse
 
-    raw = '[{"text":"Claim","evidence_quote":"Claim evidence quote","step_type":"Method","claim_kinds":["Observation"],"confidence":0.8}]'
+    raw = '[{"role":"method","act_type":"propose_method","summary":"Finding","anchor_chunk_ids":["c1"],"methods":[{"surface":"finite element method","normalized":"finite element method"}],"confidence":0.8}]'
 
     monkeypatch.setattr(client, "call_text", lambda *args, **kwargs: raw)
 
-    validated = client.call_validated_json("system", "user", ChunkClaimsResponse, max_retries=0, use_retry=False)
+    validated = client.call_validated_json("system", "user", ResearchMoveWindowResponse, max_retries=0, use_retry=False)
 
-    assert len(validated.claims) == 1
-    assert validated.claims[0].text == "Claim"
+    assert len(validated.moves) == 1
+    assert validated.moves[0].summary == "Finding"
+
+
+def test_call_validated_json_coerces_string_mentions_for_research_move_windows(monkeypatch):
+    from app.llm import client
+    from app.llm.schemas import ResearchMoveWindowResponse
+
+    raw = """
+    {
+      "moves": [
+        {
+          "role": "result",
+          "act_type": "report_effect",
+          "summary": "Results show improved packing behavior under low stress.",
+          "anchor_chunk_ids": ["c1"],
+          "research_objects": ["granular packing"],
+          "methods": ["discrete element method"],
+          "observed_variables": ["particle size"],
+          "metrics": ["packing fraction"],
+          "comparators": ["baseline model"],
+          "conditions": ["under low stress"],
+          "limitation_types": ["computational cost"],
+          "resource_mentions": ["x-ray microtomography"],
+          "confidence": 0.8
+        }
+      ]
+    }
+    """
+
+    monkeypatch.setattr(client, "call_text", lambda *args, **kwargs: raw)
+
+    validated = client.call_validated_json("system", "user", ResearchMoveWindowResponse, max_retries=0, use_retry=False)
+
+    move = validated.moves[0]
+    assert move.research_objects[0].surface == "granular packing"
+    assert move.methods[0].surface == "discrete element method"
+    assert move.observed_variables[0].surface == "particle size"
+    assert move.metrics[0].surface == "packing fraction"
+    assert move.comparators[0].surface == "baseline model"
+    assert move.conditions[0].surface == "under low stress"
+    assert move.limitation_types[0].surface == "computational cost"
+    assert move.resource_mentions[0].surface == "x-ray microtomography"
 
 
 def test_recommend_llm_subtask_workers_bursts_when_fewer_papers_are_active(monkeypatch):

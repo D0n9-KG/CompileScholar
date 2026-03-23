@@ -64,7 +64,7 @@ describe('graph3dLinkBudget', () => {
   test('always preserves non-similar edges', () => {
     const links = [
       makeLink('ab', 'community:a', 'community:b', 0.95),
-      makeLink('contain-a', 'community:a', 'claim:1', 0.92, 'contains'),
+      makeLink('contain-a', 'community:a', 'anchor:1', 0.92, 'contains'),
     ]
 
     const visible = buildOverview3DVisibleLinks(links)

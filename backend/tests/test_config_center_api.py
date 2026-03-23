@@ -7,7 +7,7 @@ from app.settings import settings
 
 _SETTINGS_FIELDS_TO_RESTORE = (
     "ingest_llm_max_workers",
-    "phase1_chunk_claim_max_workers",
+    "phase1_move_anchor_max_workers",
     "phase1_grounding_max_workers",
     "phase2_conflict_max_workers",
     "ingest_pre_llm_max_workers",
@@ -77,7 +77,7 @@ def test_config_center_profile_roundtrip(monkeypatch, tmp_path):
     assert "integrations" in profile0["modules"]
     assert "community" in profile0["modules"]
     assert profile0["modules"]["runtime"]["ingest_llm_max_workers"] == 5
-    assert profile0["modules"]["runtime"]["phase1_chunk_claim_max_workers"] == 4
+    assert profile0["modules"]["runtime"]["phase1_move_anchor_max_workers"] == 4
     assert profile0["modules"]["runtime"]["llm_global_max_concurrent"] == 32
     assert profile0["modules"]["providers"]["llm_provider"] == "deepseek"
     assert profile0["modules"]["llm_workers"]["items"] == []
@@ -97,7 +97,7 @@ def test_config_center_profile_roundtrip(monkeypatch, tmp_path):
             },
             "runtime": {
                 "ingest_llm_max_workers": 2,
-                "phase1_chunk_claim_max_workers": 2,
+                "phase1_move_anchor_max_workers": 2,
                 "phase1_grounding_max_workers": 2,
                 "phase2_conflict_max_workers": 2,
                 "ingest_pre_llm_max_workers": 4,
@@ -162,7 +162,7 @@ def test_config_center_profile_roundtrip(monkeypatch, tmp_path):
     assert profile1["modules"]["similarity"]["group_clustering_method"] == "louvain"
     assert abs(float(profile1["modules"]["similarity"]["group_clustering_threshold"]) - 0.91) < 1e-9
     assert profile1["modules"]["runtime"]["ingest_llm_max_workers"] == 4
-    assert profile1["modules"]["runtime"]["phase1_chunk_claim_max_workers"] == 2
+    assert profile1["modules"]["runtime"]["phase1_move_anchor_max_workers"] == 2
     assert profile1["modules"]["runtime"]["llm_global_max_concurrent"] == 10
     assert profile1["modules"]["providers"]["llm_provider"] == "openai"
     assert profile1["modules"]["providers"]["llm_api_key"] == "test-llm-key"
@@ -218,7 +218,7 @@ def test_config_center_catalog_and_assistant(monkeypatch, tmp_path):
     assert "community" in modules
     assert _is_field(modules["similarity"].get("fields") or [], "group_clustering_method", "similarity.group_clustering_method")
     assert _is_field(modules["runtime"].get("fields") or [], "ingest_llm_max_workers", "runtime.ingest_llm_max_workers")
-    assert _is_field(modules["runtime"].get("fields") or [], "phase1_chunk_claim_max_workers", "runtime.phase1_chunk_claim_max_workers")
+    assert _is_field(modules["runtime"].get("fields") or [], "phase1_move_anchor_max_workers", "runtime.phase1_move_anchor_max_workers")
     assert _is_field(modules["runtime"].get("fields") or [], "llm_global_max_concurrent", "runtime.llm_global_max_concurrent")
     assert not _is_field(modules["providers"].get("fields") or [], "llm_api_key", "providers.llm_api_key")
     assert _is_field(modules["providers"].get("fields") or [], "embedding_api_key", "providers.embedding_api_key")
@@ -242,8 +242,11 @@ def test_config_center_catalog_and_assistant(monkeypatch, tmp_path):
     assert suggestions, payload
     assert any(_has_cjk(str(item.get("rationale") or "")) for item in suggestions if isinstance(item, dict))
     anchors = {str(item.get("anchor")) for item in suggestions if isinstance(item, dict)}
+    focus_keys = {str(item.get("focus_key")) for item in suggestions if isinstance(item, dict) and item.get("focus_key") is not None}
     assert "discovery.max_gaps" not in anchors
     assert "similarity.group_clustering_threshold" in anchors
+    assert "logic_claims_system" not in focus_keys
+    assert "phase1_chunk_claim_extract_system" not in focus_keys
     assert not any("鍛介" in str(item.get("rationale") or "") for item in suggestions if isinstance(item, dict))
 
     speed_resp = client.post(
@@ -253,7 +256,10 @@ def test_config_center_catalog_and_assistant(monkeypatch, tmp_path):
     assert speed_resp.status_code == 200, speed_resp.text
     speed_suggestions = speed_resp.json().get("suggestions") or []
     speed_anchors = {str(item.get("anchor")) for item in speed_suggestions if isinstance(item, dict)}
+    speed_focus_keys = {str(item.get("focus_key")) for item in speed_suggestions if isinstance(item, dict) and item.get("focus_key") is not None}
     assert "runtime.ingest_llm_max_workers" not in speed_anchors
+    assert "logic_claims_system" not in speed_focus_keys
+    assert "phase1_chunk_claim_extract_system" not in speed_focus_keys
 
 
 def test_config_center_assistant_keeps_extraction_accuracy_goals_off_discovery(monkeypatch, tmp_path):

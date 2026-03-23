@@ -26,31 +26,29 @@ class _FakeNeo4jClient:
             }
         ]
 
-    def list_logic_step_structured_rows(self, limit=50000):  # noqa: ARG002
+    def list_research_moves(self, limit=50000):  # noqa: ARG002
         return [
             {
-                "kind": "logic_step",
+                "kind": "research_move",
                 "source_id": "ls-1",
                 "paper_id": "doi:10.1000/example",
                 "paper_source": "paper-A",
-                "step_type": "Method",
-                "evidence_chunk_ids": ["chunk-1"],
-                "evidence_quote": "Finite element methods improve numerical stability.",
+                "role": "method",
+                "act_type": "propose_method",
                 "text": "Method step about FEM stability.",
             }
         ]
 
-    def list_claim_structured_rows(self, limit=50000):  # noqa: ARG002
+    def list_evidence_anchors(self, limit=50000):  # noqa: ARG002
         return [
             {
-                "kind": "claim",
-                "source_id": "cl-1",
+                "kind": "evidence_anchor",
+                "source_id": "ea-1",
                 "paper_id": "doi:10.1000/example",
                 "paper_source": "paper-A",
-                "step_type": "Result",
+                "move_id": "ls-1",
                 "confidence": 0.91,
-                "evidence_chunk_ids": ["chunk-1"],
-                "evidence_quote": "Finite element methods improve numerical stability.",
+                "quote": "Finite element methods improve numerical stability.",
                 "text": "Finite element methods improve numerical stability.",
             }
         ]
@@ -60,7 +58,7 @@ class _FakeNeo4jClient:
             {
                 "community_id": "gc:demo",
                 "title": "Finite element stability",
-                "summary": "Claims and textbook entities about FEM stability.",
+                "summary": "Research moves and textbook entities about FEM stability.",
                 "keywords": ["finite element", "stability"],
             }
         ]
@@ -68,7 +66,7 @@ class _FakeNeo4jClient:
     def list_global_community_members(self, community_id: str, limit=200):  # noqa: ARG002
         assert community_id == "gc:demo"
         return [
-            {"member_id": "cl-1", "member_kind": "Claim", "text": "FEM improves stability."},
+            {"member_id": "ls-1", "member_kind": "ResearchMove", "text": "FEM improves stability."},
             {"member_id": "ke-1", "member_kind": "KnowledgeEntity", "text": "Finite Element Method"},
         ]
 
@@ -116,24 +114,24 @@ def test_rebuild_global_faiss_keeps_only_community_corpora_and_removes_stale_pro
 
     assert "propositions" not in result["faiss"]["corpora"]
     assert not any("propositions" in out_dir for out_dir, _, _ in built_row_corpora)
-    claim_corpus_kwargs = next(kwargs for out_dir, _, kwargs in built_row_corpora if out_dir.endswith("claims"))
-    assert "proposition_id" not in list(claim_corpus_kwargs.get("metadata_keys") or [])
+    anchor_corpus_kwargs = next(kwargs for out_dir, _, kwargs in built_row_corpora if out_dir.endswith("evidence_anchors"))
+    assert "proposition_id" not in list(anchor_corpus_kwargs.get("metadata_keys") or [])
     community_corpus = next(rows for out_dir, rows, _ in built_row_corpora if out_dir.endswith("communities"))
     assert community_corpus == [
         {
             "community_id": "gc:demo",
             "title": "Finite element stability",
-            "summary": "Claims and textbook entities about FEM stability.",
+            "summary": "Research moves and textbook entities about FEM stability.",
             "keywords": ["finite element", "stability"],
             "kind": "community",
             "source_id": "gc:demo",
             "id": "gc:demo",
-            "member_ids": ["cl-1", "ke-1"],
-            "member_kinds": ["Claim", "KnowledgeEntity"],
+            "member_ids": ["ls-1", "ke-1"],
+            "member_kinds": ["ResearchMove", "KnowledgeEntity"],
             "keyword_texts": ["finite element", "stability"],
             "text": (
                 "Finite element stability\n"
-                "Claims and textbook entities about FEM stability.\n"
+                "Research moves and textbook entities about FEM stability.\n"
                 "keywords: finite element, stability"
             ),
         }

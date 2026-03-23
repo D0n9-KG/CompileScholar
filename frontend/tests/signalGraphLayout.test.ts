@@ -5,55 +5,55 @@ import { buildPaperFlowPositions, type SignalGraphEdge, type SignalGraphNode } f
 function radiusForKind(kind: SignalGraphNode['kind']): number {
   if (kind === 'root') return 46
   if (kind === 'cluster') return 134
-  if (kind === 'logic') return 20
-  if (kind === 'claim') return 17
+  if (kind === 'move') return 20
+  if (kind === 'anchor') return 17
   return 28
 }
 
 describe('buildPaperFlowPositions', () => {
-  test('keeps dense logic clusters separated without node overlap', () => {
+  test('keeps dense move clusters separated without node overlap', () => {
     const nodes: SignalGraphNode[] = [
-      { id: 'paper:1', label: '中心论文', kind: 'root', weight: 1 },
+      { id: 'paper:1', label: 'Center Paper', kind: 'root', weight: 1 },
     ]
     const edges: SignalGraphEdge[] = []
-    const claimCounts = [8, 7, 6, 5, 4, 4]
+    const anchorCounts = [8, 7, 6, 5, 4, 4]
 
-    claimCounts.forEach((claimCount, logicIndex) => {
-      const clusterId = `cluster:${logicIndex + 1}`
-      const logicId = `logic:${logicIndex + 1}`
+    anchorCounts.forEach((anchorCount, moveIndex) => {
+      const clusterId = `cluster:${moveIndex + 1}`
+      const moveId = `move:${moveIndex + 1}`
       nodes.push({
         id: clusterId,
-        label: `簇 ${logicIndex + 1}`,
+        label: `Cluster ${moveIndex + 1}`,
         kind: 'cluster',
         weight: 0.8,
       })
       nodes.push({
-        id: logicId,
-        label: `逻辑 ${logicIndex + 1}`,
-        kind: 'logic',
+        id: moveId,
+        label: `Move ${moveIndex + 1}`,
+        kind: 'move',
         weight: 0.7,
       })
       edges.push({
-        id: `paper:1->${logicId}`,
+        id: `paper:1->${moveId}`,
         source: 'paper:1',
-        target: logicId,
+        target: moveId,
         kind: 'supports',
         weight: 0.7,
       })
 
-      for (let claimIndex = 0; claimIndex < claimCount; claimIndex += 1) {
-        const claimId = `claim:${logicIndex + 1}-${claimIndex + 1}`
+      for (let anchorIndex = 0; anchorIndex < anchorCount; anchorIndex += 1) {
+        const anchorId = `anchor:${moveIndex + 1}-${anchorIndex + 1}`
         nodes.push({
-          id: claimId,
-          label: `论断 ${logicIndex + 1}-${claimIndex + 1}`,
-          kind: 'claim',
+          id: anchorId,
+          label: `Anchor ${moveIndex + 1}-${anchorIndex + 1}`,
+          kind: 'anchor',
           weight: 0.55,
         })
         edges.push({
-          id: `${logicId}->${claimId}`,
-          source: logicId,
-          target: claimId,
-          kind: 'supports',
+          id: `${moveId}->${anchorId}`,
+          source: moveId,
+          target: anchorId,
+          kind: 'evidenced_by',
           weight: 0.55,
         })
       }
@@ -76,19 +76,19 @@ describe('buildPaperFlowPositions', () => {
       }
     }
 
-    const clusterCenters = claimCounts.map((_, logicIndex) => {
-      const clusterId = `cluster:${logicIndex + 1}`
-      const logicId = `logic:${logicIndex + 1}`
+    const clusterCenters = anchorCounts.map((_, moveIndex) => {
+      const clusterId = `cluster:${moveIndex + 1}`
+      const moveId = `move:${moveIndex + 1}`
       const clusterPoint = positions.get(clusterId)
-      const logicPoint = positions.get(logicId)
+      const movePoint = positions.get(moveId)
       expect(clusterPoint, `${clusterId} should have a position`).toBeTruthy()
-      expect(logicPoint, `${logicId} should have a position`).toBeTruthy()
+      expect(movePoint, `${moveId} should have a position`).toBeTruthy()
       expect(
-        Math.hypot((clusterPoint?.x ?? 0) - (logicPoint?.x ?? 0), (clusterPoint?.y ?? 0) - (logicPoint?.y ?? 0)),
-        `${clusterId} should anchor ${logicId}`,
+        Math.hypot((clusterPoint?.x ?? 0) - (movePoint?.x ?? 0), (clusterPoint?.y ?? 0) - (movePoint?.y ?? 0)),
+        `${clusterId} should anchor ${moveId}`,
       ).toBeLessThan(28)
       const members = nodes.filter(
-        (node) => node.id === logicId || (node.kind === 'claim' && node.id.startsWith(`claim:${logicIndex + 1}-`)),
+        (node) => node.id === moveId || (node.kind === 'anchor' && node.id.startsWith(`anchor:${moveIndex + 1}-`)),
       )
       const coords = members.map((node) => positions.get(node.id)).filter(Boolean) as Array<{ x: number; y: number }>
       const center = coords.reduce(

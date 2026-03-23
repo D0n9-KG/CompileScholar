@@ -34,8 +34,8 @@ def _jaccard(a: set[str], b: set[str]) -> float:
     return inter / max(1, len(a | b))
 
 
-def _step_affinity(question_tokens: set[str], step_type: str) -> float:
-    step_norm = _normalize_text(step_type).lower()
+def _role_affinity(question_tokens: set[str], role: str) -> float:
+    step_norm = _normalize_text(role).lower()
     hints = _STEP_HINTS.get(step_norm)
     if not hints:
         return 0.0
@@ -60,11 +60,11 @@ def rank_fusion_basics(
                 str(row.get("description") or ""),
                 str(row.get("evidence_quote") or ""),
                 str(row.get("entity_type") or ""),
-                str(row.get("step_type") or ""),
+                str(row.get("role") or ""),
             ]
         )
         lexical = _jaccard(q_tokens, _tokens(text_blob))
-        step_bonus = _step_affinity(q_tokens, str(row.get("step_type") or ""))
+        step_bonus = _role_affinity(q_tokens, str(row.get("role") or ""))
         base_score = float(row.get("score") or 0.0)
         rank_score = 0.45 * base_score + 0.35 * lexical + 0.20 * step_bonus
         out = dict(row)
@@ -111,8 +111,8 @@ def fusion_rows_to_structured_hits(rows: list[dict[str, Any]] | None) -> list[di
                 "source_ref_id": entity_id,
                 "textbook_id": str(row.get("textbook_id") or "").strip() or None,
                 "chapter_id": str(row.get("chapter_id") or row.get("source_chapter_id") or "").strip() or None,
-                "logic_step_id": str(row.get("logic_step_id") or "").strip() or None,
-                "step_type": str(row.get("step_type") or "").strip() or None,
+                "move_id": str(row.get("move_id") or "").strip() or None,
+                "role": str(row.get("role") or "").strip() or None,
                 "entity_type": str(row.get("entity_type") or "").strip() or None,
                 "source_chapter_id": str(row.get("source_chapter_id") or row.get("chapter_id") or "").strip() or None,
                 "reasons": list(row.get("reasons") or []),
@@ -131,7 +131,7 @@ def format_fusion_evidence_block(rows: list[dict[str, Any]]) -> str:
     lines = ["Textbook Fundamentals:"]
     for idx, row in enumerate(rows[:12], start=1):
         paper_source = str(row.get("paper_source") or "").strip()
-        step_type = str(row.get("step_type") or "").strip()
+        role = str(row.get("role") or "").strip()
         entity_name = str(row.get("entity_name") or "").strip()
         entity_type = str(row.get("entity_type") or "").strip()
         score = float(row.get("score") or 0.0)
@@ -142,8 +142,8 @@ def format_fusion_evidence_block(rows: list[dict[str, Any]]) -> str:
         parts = [f"[T{idx}]"]
         if paper_source:
             parts.append(paper_source)
-        if step_type:
-            parts.append(step_type)
+        if role:
+            parts.append(role)
         if entity_name:
             parts.append(entity_name)
         if entity_type:

@@ -88,7 +88,7 @@ def test_merge_outgoing_citation_enrichment_applies_semantic_overlay_and_mention
     assert cite["pending_machine_purpose_labels"] == ["MethodUse"]
     assert cite["semantic"]["polarity"] == "negative"
     assert cite["semantic"]["semantic_signals"] == ["gap_hint", "future_opportunity_hint"]
-    assert cite["semantic"]["target_scopes"] == ["paper", "claim", "gap"]
+    assert cite["semantic"]["target_scopes"] == ["paper", "finding", "gap"]
     assert cite["semantic"]["evidence_chunk_ids"] == ["chunk-9", "chunk-3"]
     assert cite["semantic"]["evidence_spans"] == ["88-90", "54-55"]
     assert [item["mention_id"] for item in cite["mentions"]] == ["m1", "m2"]

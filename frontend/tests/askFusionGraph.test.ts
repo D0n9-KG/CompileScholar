@@ -3,7 +3,7 @@ import { describe, expect, test } from 'vitest'
 import { buildAskGraph } from '../src/loaders/ask'
 
 describe('ask fusion graph builder', () => {
-  test('maps fusion evidence into textbook, chapter, and entity nodes linked back to paper logic', () => {
+  test('maps fusion evidence into textbook, chapter, and entity nodes linked back to research moves', () => {
     const graph = buildAskGraph({
       answer: 'ok',
       evidence: [
@@ -21,8 +21,8 @@ describe('ask fusion graph builder', () => {
         {
           paper_id: 'doi:10.1000/example',
           paper_source: 'paper-A',
-          logic_step_id: 'ls-1',
-          step_type: 'Method',
+          move_id: 'mv-1',
+          role: 'method',
           entity_id: 'ent-1',
           entity_name: 'Finite Element Method',
           entity_type: 'method',
@@ -38,8 +38,8 @@ describe('ask fusion graph builder', () => {
       ],
       graph_context: [],
       structured_knowledge: {
-        logic_steps: [{ paper_source: 'paper-A', step_type: 'Method', summary: 'Uses FEM for discretization.' }],
-        claims: [],
+        research_moves: [{ paper_source: 'paper-A', move_id: 'mv-1', role: 'method', summary: 'Uses FEM for discretization.' }],
+        evidence_anchors: [],
       },
       dual_evidence_coverage: true,
     })
@@ -52,6 +52,7 @@ describe('ask fusion graph builder', () => {
     expect(nodes.some((node) => node.id === 'entity:ent-1' && node.kind === 'entity')).toBe(true)
     expect(edges.some((edge) => edge.source === 'textbook:tb:1' && edge.target === 'chapter:tb:1:ch001' && edge.kind === 'contains')).toBe(true)
     expect(edges.some((edge) => edge.source === 'chapter:tb:1:ch001' && edge.target === 'entity:ent-1' && edge.kind === 'contains')).toBe(true)
-    expect(edges.some((edge) => edge.source.startsWith('logic:') && edge.target === 'entity:ent-1' && edge.kind === 'maps_to')).toBe(true)
+    expect(edges.some((edge) => edge.source.startsWith('move:') && edge.target === 'entity:ent-1' && edge.kind === 'maps_to')).toBe(true)
+    expect(nodes.some((node) => node.kind === 'logic')).toBe(false)
   })
 })

@@ -8,7 +8,8 @@ import threading
 import time
 from concurrent.futures import Executor, Future
 from contextlib import contextmanager
-from typing import Any, TypeVar
+from types import UnionType
+from typing import Any, TypeVar, Union, get_args, get_origin
 
 from pydantic import BaseModel, ValidationError
 from tenacity import retry, stop_after_attempt, wait_exponential
@@ -344,15 +345,78 @@ def _extract_json(text: str) -> dict:
 
 
 def _coerce_json_payload_for_model(payload: Any, model_class: type[_T]) -> Any:
-    if isinstance(payload, dict):
-        return payload
-    if not isinstance(payload, list):
-        return payload
+    wrapped = payload
+    if not isinstance(wrapped, dict):
+        if not isinstance(wrapped, list):
+            return wrapped
+        model_fields = getattr(model_class, "model_fields", {}) or {}
+        if len(model_fields) != 1:
+            return wrapped
+        only_field = next(iter(model_fields.keys()))
+        wrapped = {only_field: wrapped}
+    return _coerce_mapping_for_model(wrapped, model_class)
+
+
+def _coerce_mapping_for_model(payload: dict[str, Any], model_class: type[BaseModel]) -> dict[str, Any]:
+    coerced = dict(payload)
     model_fields = getattr(model_class, "model_fields", {}) or {}
-    if len(model_fields) != 1:
-        return payload
-    only_field = next(iter(model_fields.keys()))
-    return {only_field: payload}
+    for field_name, field in model_fields.items():
+        if field_name not in coerced:
+            continue
+        coerced[field_name] = _coerce_value_for_annotation(coerced[field_name], field.annotation)
+    return coerced
+
+
+def _coerce_value_for_annotation(value: Any, annotation: Any) -> Any:
+    target = _unwrap_optional_annotation(annotation)
+    origin = get_origin(target)
+    if origin is list:
+        item_args = get_args(target)
+        item_annotation = item_args[0] if item_args else Any
+        if not isinstance(value, list):
+            return value
+        return [_coerce_sequence_item(item, item_annotation) for item in value]
+    if isinstance(target, type) and issubclass(target, BaseModel) and isinstance(value, dict):
+        return _coerce_mapping_for_model(value, target)
+    return value
+
+
+def _coerce_sequence_item(item: Any, annotation: Any) -> Any:
+    target = _unwrap_optional_annotation(annotation)
+    if isinstance(target, type) and issubclass(target, BaseModel):
+        if isinstance(item, dict):
+            return _coerce_mapping_for_model(item, target)
+        mention_item = _coerce_scalar_to_mention_item(item, target)
+        if mention_item is not None:
+            return mention_item
+    return item
+
+
+def _coerce_scalar_to_mention_item(item: Any, model_class: type[BaseModel]) -> dict[str, Any] | None:
+    text = str(item or "").strip()
+    if not text:
+        return None
+    field_names = set((getattr(model_class, "model_fields", {}) or {}).keys())
+    if "surface" not in field_names:
+        return None
+    payload: dict[str, Any] = {"surface": text}
+    if "normalized" in field_names:
+        payload["normalized"] = text
+    if "confidence" in field_names:
+        payload["confidence"] = 0.5
+    return payload
+
+
+def _unwrap_optional_annotation(annotation: Any) -> Any:
+    current = annotation
+    while True:
+        origin = get_origin(current)
+        if origin not in (Union, UnionType):
+            return current
+        args = [arg for arg in get_args(current) if arg is not type(None)]
+        if len(args) != 1:
+            return current
+        current = args[0]
 
 
 def _build_llm_client(resolved: dict[str, Any]) -> Any:

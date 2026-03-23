@@ -1,4 +1,5 @@
 import type { GraphEdgeData, GraphElement } from '../state/types'
+import { normalizeGraphKind } from '../graphKinds'
 
 type LimitOptions = {
   activeModule: string
@@ -23,14 +24,15 @@ function isEdge(element: GraphElement): element is Extract<GraphElement, { group
 }
 
 function nodeKindBoost(kind: string): number {
-  if (kind === 'paper') return 0.8
-  if (kind === 'community') return 0.72
-  if (kind === 'logic') return 0.54
-  if (kind === 'claim') return 0.5
-  if (kind === 'textbook') return 0.46
-  if (kind === 'chapter') return 0.42
-  if (kind === 'entity') return 0.32
-  if (kind === 'citation') return 0.18
+  const normalizedKind = normalizeGraphKind(kind)
+  if (normalizedKind === 'paper') return 0.8
+  if (normalizedKind === 'community') return 0.72
+  if (normalizedKind === 'move') return 0.54
+  if (normalizedKind === 'anchor') return 0.5
+  if (normalizedKind === 'textbook') return 0.46
+  if (normalizedKind === 'chapter') return 0.42
+  if (normalizedKind === 'entity') return 0.32
+  if (normalizedKind === 'citation') return 0.18
   return 0.14
 }
 

@@ -26,8 +26,8 @@ export type EvidenceRow = {
 export type FusionEvidenceRow = {
   paper_source?: string
   paper_id?: string
-  logic_step_id?: string
-  step_type?: string
+  move_id?: string
+  role?: string
   entity_id?: string
   entity_name?: string
   entity_type?: string
@@ -240,7 +240,7 @@ export function filterFusionEvidenceRows(rows: FusionEvidenceRow[], query: strin
         [
           row.paper_source,
           row.paper_id,
-          row.step_type,
+          row.role,
           row.entity_name,
           row.entity_type,
           row.description,

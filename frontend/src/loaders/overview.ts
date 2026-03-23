@@ -33,7 +33,7 @@ type OverviewCommunityNode = {
   paper_id?: string
   paper_source?: string
   paper_title?: string
-  step_type?: string
+  role?: string
   chapter_id?: string
 }
 
@@ -57,7 +57,7 @@ type OverviewCommunityDetailMember = {
   paper_id?: string
   paper_source?: string
   paper_title?: string
-  step_type?: string
+  role?: string
   source_chapter_id?: string
 }
 
@@ -108,8 +108,8 @@ function communityClusterKey(communityId: string) {
 
 function communityMemberKind(memberKind: unknown): GraphNodeData['kind'] {
   const normalized = normalizeText(memberKind).toLowerCase()
-  if (normalized === 'logicstep' || normalized === 'logic_step' || normalized === 'logic') return 'logic'
-  if (normalized === 'claim') return 'claim'
+  if (normalized === 'researchmove' || normalized === 'research_move' || normalized === 'move') return 'move'
+  if (normalized === 'evidenceanchor' || normalized === 'evidence_anchor' || normalized === 'anchor') return 'anchor'
   if (normalized === 'knowledgeentity' || normalized === 'knowledge_entity' || normalized === 'entity') return 'entity'
   if (normalized === 'paper') return 'paper'
   return 'group'
@@ -131,9 +131,9 @@ function communityMemberDescription(member: OverviewCommunityDetailMember) {
   const text = normalizeText(member.text)
   const paperSource = normalizeText(member.paper_source)
   const paperTitle = normalizeText(member.paper_title)
-  const stepType = normalizeText(member.step_type)
+  const role = normalizeText(member.role)
   const sourceChapterId = normalizeText(member.source_chapter_id)
-  const parts = [paperSource, paperTitle, stepType, text || sourceChapterId].filter(Boolean)
+  const parts = [paperSource, paperTitle, role, text || sourceChapterId].filter(Boolean)
   return parts.join(' | ')
 }
 
@@ -317,7 +317,7 @@ export async function loadOverviewCommunity3DGraph(options: {
             paperId: String(node.paper_id ?? '').trim() || undefined,
             paperSource: String(node.paper_source ?? '').trim() || undefined,
             paperTitle: String(node.paper_title ?? '').trim() || undefined,
-            stepType: String(node.step_type ?? '').trim() || undefined,
+            role: String(node.role ?? '').trim() || undefined,
             chapterId: String(node.chapter_id ?? '').trim() || undefined,
           } satisfies GraphNodeData,
         })
@@ -461,7 +461,7 @@ export async function loadOverviewCommunitySubgraph(
             paperId: normalizeText(member.paper_id) || undefined,
             paperSource: normalizeText(member.paper_source) || undefined,
             paperTitle: normalizeText(member.paper_title) || undefined,
-            stepType: normalizeText(member.step_type) || undefined,
+            role: normalizeText(member.role) || undefined,
             chapterId: normalizeText(member.source_chapter_id) || undefined,
           } satisfies GraphNodeData,
         })

@@ -14,7 +14,7 @@ vi.mock('../src/api', () => ({
 }))
 
 vi.mock('../src/pages/SchemaPage', () => ({
-  default: () => <div>Schema Page</div>,
+  default: () => <div>Trace Compiler Page</div>,
 }))
 
 import { I18nProvider } from '../src/i18n'
@@ -68,7 +68,7 @@ describe('ConfigCenterPage discovery retirement', () => {
               },
               runtime: {
                 ingest_llm_max_workers: 3,
-                phase1_chunk_claim_max_workers: 3,
+                phase1_move_anchor_max_workers: 3,
                 phase1_grounding_max_workers: 2,
                 phase2_conflict_max_workers: 2,
                 ingest_pre_llm_max_workers: 4,
@@ -325,7 +325,7 @@ describe('ConfigCenterPage discovery retirement', () => {
           },
           runtime: {
             ingest_llm_max_workers: 3,
-            phase1_chunk_claim_max_workers: 3,
+            phase1_move_anchor_max_workers: 3,
             phase1_grounding_max_workers: 2,
             phase2_conflict_max_workers: 2,
             ingest_pre_llm_max_workers: 4,
@@ -392,7 +392,7 @@ describe('ConfigCenterPage discovery retirement', () => {
     expect(screen.getByText((text) => /Profile Format\s+v3/i.test(text))).toBeInTheDocument()
   })
 
-  test('shows runtime controls and schema quick version switcher', async () => {
+  test('shows runtime controls and trace compiler quick version switcher', async () => {
     render(
       <I18nProvider>
         <ConfigCenterPage />
@@ -402,12 +402,12 @@ describe('ConfigCenterPage discovery retirement', () => {
     await waitFor(() => expect(screen.getByText('Config Center')).toBeInTheDocument())
 
     fireEvent.click(screen.getByRole('button', { name: /Runtime Concurrency/i }))
-    await waitFor(() => expect(screen.getByText('phase1_chunk_claim_max_workers')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByText('phase1_move_anchor_max_workers')).toBeInTheDocument())
     expect(screen.getByText('ingest_llm_max_workers')).toBeInTheDocument()
     expect(screen.getByText('llm_global_max_concurrent')).toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('button', { name: /Extraction Policy/i }))
-    await waitFor(() => expect(screen.getByText('Schema Version Switcher')).toBeInTheDocument())
+    fireEvent.click(screen.getByRole('button', { name: /Trace Compiler/i }))
+    await waitFor(() => expect(screen.getByText('Trace Compiler Version Switcher')).toBeInTheDocument())
     expect(screen.getAllByText('balanced (v8)').length).toBeGreaterThan(0)
 
     const schemaSelects = screen.getAllByRole('combobox')
@@ -454,7 +454,7 @@ describe('ConfigCenterPage discovery retirement', () => {
               },
               runtime: {
                 ingest_llm_max_workers: 3,
-                phase1_chunk_claim_max_workers: 3,
+                phase1_move_anchor_max_workers: 3,
                 phase1_grounding_max_workers: 2,
                 phase2_conflict_max_workers: 2,
                 ingest_pre_llm_max_workers: 4,
@@ -676,6 +676,6 @@ describe('ConfigCenterPage discovery retirement', () => {
     expect(screen.queryByText('默认 LLM')).not.toBeInTheDocument()
     expect(screen.queryByText('旧版专用密钥')).not.toBeInTheDocument()
     expect(screen.queryByText('默认提供方')).not.toBeInTheDocument()
-    expect(screen.getByDisplayValue('提高抽取精度，同时减少噪声要点并保持召回稳定。')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('提高轨迹编译精度，同时减少噪声 move 和 anchor，并保持召回稳定。')).toBeInTheDocument()
   })
 })

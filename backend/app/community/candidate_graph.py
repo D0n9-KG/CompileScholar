@@ -4,19 +4,19 @@ from collections import defaultdict
 from typing import Any
 
 
-def build_logicstep_candidate_graph(
+def build_move_candidate_graph(
     *,
-    logic_steps: list[dict[str, Any]],
-    similar_logic_edges: list[dict[str, Any]],
-    shared_entity_edges: list[dict[str, Any]],
+    moves: list[dict[str, Any]],
+    similar_move_edges: list[dict[str, Any]],
+    shared_signal_edges: list[dict[str, Any]],
     citation_boosts: list[dict[str, Any]],
     neighbor_cap: int = 32,
 ) -> dict[str, list[dict[str, Any]] | list[str]]:
-    node_ids = [str(row.get('logic_step_id') or '').strip() for row in logic_steps if str(row.get('logic_step_id') or '').strip()]
+    node_ids = [str(row.get('move_id') or '').strip() for row in moves if str(row.get('move_id') or '').strip()]
     paper_by_node = {
-        str(row.get('logic_step_id') or '').strip(): str(row.get('paper_id') or '').strip()
-        for row in logic_steps
-        if str(row.get('logic_step_id') or '').strip()
+        str(row.get('move_id') or '').strip(): str(row.get('paper_id') or '').strip()
+        for row in moves
+        if str(row.get('move_id') or '').strip()
     }
 
     edge_scores: dict[tuple[str, str], float] = defaultdict(float)
@@ -39,9 +39,9 @@ def build_logicstep_candidate_graph(
         key = tuple(sorted((src, dst)))
         edge_scores[key] += score
 
-    for row in similar_logic_edges:
+    for row in similar_move_edges:
         add_edge(row.get('source'), row.get('target'), row.get('score'))
-    for row in shared_entity_edges:
+    for row in shared_signal_edges:
         add_edge(row.get('source'), row.get('target'), row.get('score') or row.get('weight') or 0.15)
     for row in citation_boosts:
         add_edge(row.get('source'), row.get('target'), row.get('score') or row.get('weight') or 0.05)

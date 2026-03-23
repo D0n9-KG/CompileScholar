@@ -94,7 +94,7 @@ describe('ask loader graph builder', () => {
             community_id: 'gc:demo',
             text: 'Finite element stability community.',
             member_ids: ['cl-1', 'ke-1'],
-            member_kinds: ['claim', 'entity'],
+            member_kinds: ['anchor', 'entity'],
             keyword_texts: ['finite element', 'stability'],
             score: 0.82,
           },
@@ -107,15 +107,15 @@ describe('ask loader graph builder', () => {
     expect(graph.some((item) => item.group === 'nodes' && item.data.kind === 'community')).toBe(true)
   })
 
-  test('buildAskGraph keeps full description text for claim/logic/citation/entity node details', () => {
-    const longClaim =
+  test('buildAskGraph keeps full description text for move/anchor/citation/entity node details', () => {
+    const longAnchorText =
       'Mixing performance strongly correlates with impeller speed and fill level, and the effect remains stable across repeated trials without significant drift.'
-    const longLogic =
+    const longMoveText =
       'We first establish the baseline flow regime, then compare perturbation cases under controlled boundary conditions to isolate the dominant mixing factors.'
     const longCitation =
       'A comprehensive review on granular mixing mechanisms in rotating drum and ribbon systems'
     const longEvidence =
-      'This evidence snippet includes detailed context about measurement setup, sampling interval, and confidence calibration to support the claim.'
+      'This evidence snippet includes detailed context about measurement setup, sampling interval, and confidence calibration to support the finding.'
 
     const graph = buildAskGraph({
       answer: 'ok',
@@ -135,21 +135,22 @@ describe('ask loader graph builder', () => {
         },
       ],
       structured_knowledge: {
-        logic_steps: [{ paper_source: 'paper-A', step_type: 'Method', summary: longLogic }],
-        claims: [{ paper_source: 'paper-A', step_type: 'Result', text: longClaim, confidence: 0.9 }],
+        research_moves: [{ paper_source: 'paper-A', move_id: 'mv-1', role: 'method', summary: longMoveText }],
+        evidence_anchors: [{ paper_source: 'paper-A', anchor_id: 'ea-1', role: 'result', text: longAnchorText, confidence: 0.9 }],
       },
     })
 
     const nodes = graph.filter((item) => item.group === 'nodes').map((item) => item.data)
-    const claimNode = nodes.find((node) => node.kind === 'claim')
-    const logicNode = nodes.find((node) => node.kind === 'logic')
+    const anchorNode = nodes.find((node) => node.kind === 'anchor')
+    const moveNode = nodes.find((node) => node.kind === 'move')
     const citationNode = nodes.find((node) => node.kind === 'citation')
     const evidenceNode = nodes.find((node) => node.kind === 'entity' && String(node.id).startsWith('evidence:'))
 
-    expect(claimNode?.description).toContain('Mixing performance strongly correlates')
-    expect(logicNode?.description).toContain('baseline flow regime')
+    expect(anchorNode?.description).toContain('Mixing performance strongly correlates')
+    expect(moveNode?.description).toContain('baseline flow regime')
     expect(citationNode?.description).toContain('granular mixing mechanisms')
     expect(evidenceNode?.description).toContain('measurement setup')
+    expect(nodes.some((node) => node.kind === 'logic' || node.kind === 'claim')).toBe(false)
   })
 
   test('buildAskGraph prefers paper_title for paper node labels and descriptions', () => {
@@ -173,8 +174,8 @@ describe('ask loader graph builder', () => {
         },
       ],
       structured_knowledge: {
-        logic_steps: [{ paper_source: 'paper-A', step_type: 'Method', summary: 'Method summary' }],
-        claims: [{ paper_source: 'paper-A', step_type: 'Result', text: 'Result claim', confidence: 0.9 }],
+        research_moves: [{ paper_source: 'paper-A', move_id: 'mv-1', role: 'method', summary: 'Method summary' }],
+        evidence_anchors: [{ paper_source: 'paper-A', anchor_id: 'ea-1', role: 'result', text: 'Result finding', confidence: 0.9 }],
       },
     })
 

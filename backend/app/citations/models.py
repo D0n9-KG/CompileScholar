@@ -85,7 +85,7 @@ def derive_target_scopes(labels: Iterable[object] | None) -> list[str]:
     if any(label in {'DataTool'} for label in cleaned):
         scopes.append('dataset')
     if any(label in {'SupportEvidence', 'CritiqueLimit', 'Theory'} for label in cleaned):
-        scopes.append('claim')
+        scopes.append('finding')
     if any(label in {'FutureDirection', 'ProblemSetup'} for label in cleaned):
         scopes.append('gap')
     return scopes

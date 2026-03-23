@@ -4,8 +4,8 @@ from __future__ import annotations
 
 def test_gate_check_logic_fail():
     """Verify gate check logic: when gate_passed=False, should return early."""
-    logic_claims = {
-        "claims": [{"text": "Test claim"}],
+    trace_payload = {
+        "research_moves": [{"summary": "Test move"}],
         "quality_report": {
             "gate_passed": False,
             "quality_tier": "red",
@@ -13,7 +13,7 @@ def test_gate_check_logic_fail():
         },
     }
 
-    quality_report = logic_claims.get("quality_report") or {}
+    quality_report = trace_payload.get("quality_report") or {}
     gate_passed = bool(quality_report.get("gate_passed"))
 
     # Verify gate check logic
@@ -23,8 +23,8 @@ def test_gate_check_logic_fail():
 
 def test_gate_check_logic_pass():
     """Verify gate check logic: when gate_passed=True, should proceed."""
-    logic_claims = {
-        "claims": [{"text": "Test claim"}],
+    trace_payload = {
+        "research_moves": [{"summary": "Test move"}],
         "quality_report": {
             "gate_passed": True,
             "quality_tier": "green",
@@ -32,7 +32,7 @@ def test_gate_check_logic_pass():
         },
     }
 
-    quality_report = logic_claims.get("quality_report") or {}
+    quality_report = trace_payload.get("quality_report") or {}
     gate_passed = bool(quality_report.get("gate_passed"))
 
     # Verify gate check logic
@@ -42,12 +42,12 @@ def test_gate_check_logic_pass():
 
 def test_gate_check_missing_quality_report():
     """Verify gate check handles missing quality_report gracefully."""
-    logic_claims = {
-        "claims": [{"text": "Test claim"}],
+    trace_payload = {
+        "research_moves": [{"summary": "Test move"}],
         # No quality_report
     }
 
-    quality_report = logic_claims.get("quality_report") or {}
+    quality_report = trace_payload.get("quality_report") or {}
     gate_passed = bool(quality_report.get("gate_passed"))
 
     # Missing quality_report should fail gate check (safe default)

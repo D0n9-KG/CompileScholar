@@ -19,12 +19,12 @@ import { ASK_STORE_EVENT, ASK_STORE_KEY, getCurrentAskSession, readAskModuleStat
 import { useGlobalState } from '../state/store'
 import type { AskModuleState } from '../state/types'
 import { assistantTurnText, buildEvidenceStats, toConversationTurns } from '../panels/askPanelModel'
+import type { PaperLogicTrace } from '../types/paperLogicTrace'
+import { tracePreviewMoves, tracePreviewRelations } from '../types/paperLogicTrace'
 
-type PaperPreviewApi = {
+type PaperPreviewApi = PaperLogicTrace & {
   title?: string
   paper_source?: string
-  logic_steps?: Array<{ step_type?: string; summary?: string }>
-  claims?: Array<{ step_type?: string; text?: string }>
 }
 
 type LocalizedText = {
@@ -41,8 +41,8 @@ const KIND_LABELS: Record<string, LocalizedText> = {
   chapter: { zh: '章节', en: 'Chapter' },
   community: { zh: '社区', en: 'Community' },
   paper: { zh: '论文', en: 'Paper' },
-  logic: { zh: '逻辑步骤', en: 'Logic Step' },
-  claim: { zh: '论断', en: 'Claim' },
+  move: { zh: '研究动作', en: 'Research Move' },
+  anchor: { zh: '证据锚点', en: 'Evidence Anchor' },
   group: { zh: '分组', en: 'Group' },
   entity: { zh: '实体', en: 'Entity' },
   citation: { zh: '被引文献', en: 'Citation' },
@@ -68,6 +68,8 @@ function normalizeText(value: unknown): string {
 
 function kindLabel(kind: string, locale: UILocale) {
   const key = String(kind ?? '')
+  if (key === 'move') return pickText(locale, { zh: '鐮旂┒鍔ㄤ綔', en: 'Research Move' })
+  if (key === 'anchor') return pickText(locale, { zh: '璇佹嵁閿氱偣', en: 'Evidence Anchor' })
   const label = KIND_LABELS[key]
   return label ? pickText(locale, label) : key || 'unknown'
 }
@@ -115,7 +117,8 @@ function asStringList(value: unknown): string[] {
 
 function communityMemberNodeId(memberId: string, memberKind: string): string {
   const kind = normalizeText(memberKind)
-  if (kind === 'claim') return `claim:${memberId}`
+  if (kind === 'anchor' || kind === 'evidence_anchor') return `anchor:${memberId}`
+  if (kind === 'move' || kind === 'research_move') return `move:${memberId}`
   if (kind === 'entity' || kind === 'knowledge_entity') return `entity:${memberId}`
   if (kind === 'paper') return `paper:${memberId}`
   if (kind === 'chapter') return `chapter:${memberId}`
@@ -177,7 +180,13 @@ export default function RightPanel({ collapsed, floating = false, onToggle }: Pr
   const [showRaw, setShowRaw] = useState(false)
   const [evidenceQuery, setEvidenceQuery] = useState('')
   const [snapshot, setSnapshot] = useState<AskModuleState | null>(() => loadAskSnapshot())
-  const [paperPreview, setPaperPreview] = useState<{ title: string; paperSource: string; logic: string[]; claims: string[] } | null>(null)
+  const [paperPreview, setPaperPreview] = useState<{
+    title: string
+    paperSource: string
+    moves: string[]
+    relations: string[]
+    anchors: string[]
+  } | null>(null)
   const [paperPreviewLoading, setPaperPreviewLoading] = useState(false)
   const [paperPreviewError, setPaperPreviewError] = useState('')
   const [communityActionLoading, setCommunityActionLoading] = useState(false)
@@ -261,8 +270,8 @@ export default function RightPanel({ collapsed, floating = false, onToggle }: Pr
       textbook: 0,
       chapter: 0,
       community: 0,
-      logic: 0,
-      claim: 0,
+      move: 0,
+      anchor: 0,
       entity: 0,
       citation: 0,
     }
@@ -271,8 +280,8 @@ export default function RightPanel({ collapsed, floating = false, onToggle }: Pr
       else if (node.kind === 'textbook') counts.textbook += 1
       else if (node.kind === 'chapter') counts.chapter += 1
       else if (node.kind === 'community') counts.community += 1
-      else if (node.kind === 'logic') counts.logic += 1
-      else if (node.kind === 'claim') counts.claim += 1
+      else if (node.kind === 'move') counts.move += 1
+      else if (node.kind === 'anchor') counts.anchor += 1
       else if (node.kind === 'entity') counts.entity += 1
       else if (node.kind === 'citation') counts.citation += 1
     }
@@ -424,16 +433,25 @@ export default function RightPanel({ collapsed, floating = false, onToggle }: Pr
       setPaperPreviewLoading(true)
       setPaperPreviewError('')
     }, 0)
-    apiGet<PaperPreviewApi>(`/graph/paper/${encodeURIComponent(genericPaperId)}`)
+    apiGet<PaperPreviewApi>(`/papers/${encodeURIComponent(genericPaperId)}/logic-trace`)
       .then((res) => {
         if (cancelled) return
-        const logic = (res.logic_steps ?? [])
-          .map((row) => shortText(`${normalizeText(row.step_type)} ${normalizeText(row.summary)}`, 110))
+        const title = normalizeText(res.paper_metadata?.title || res.title)
+        const paperSource = normalizeText(
+          res.paper_source || (Array.isArray(res.paper_metadata?.source_refs) ? res.paper_metadata.source_refs[0] : ''),
+        )
+        const moves = tracePreviewMoves(res).map((line) => shortText(line, 110)).filter(Boolean)
+        const relations = tracePreviewRelations(res).map((line) => shortText(line, 110)).filter(Boolean)
+        const anchors = (res.canonical_core?.evidence_anchors ?? [])
+          .map((anchor) => shortText(normalizeText(anchor.quote || anchor.anchor_id), 110))
           .filter(Boolean)
-        const claims = (res.claims ?? [])
-          .map((row) => shortText(`${normalizeText(row.step_type)} ${normalizeText(row.text)}`, 110))
-          .filter(Boolean)
-        setPaperPreview({ title: normalizeText(res.title), paperSource: normalizeText(res.paper_source), logic: logic.slice(0, 3), claims: claims.slice(0, 3) })
+        setPaperPreview({
+          title,
+          paperSource,
+          moves: moves.slice(0, 3),
+          relations: relations.slice(0, 3),
+          anchors: anchors.slice(0, 3),
+        })
       })
       .catch((error: unknown) => {
         if (cancelled) return
@@ -509,7 +527,7 @@ export default function RightPanel({ collapsed, floating = false, onToggle }: Pr
       paperId: node.paperId,
       paperSource: node.paperSource,
       paperTitle: node.paperTitle,
-      stepType: node.stepType,
+      role: node.role,
       textbookId: node.textbookId,
       chapterId: node.chapterId,
       communityId: node.communityId,
@@ -650,8 +668,8 @@ export default function RightPanel({ collapsed, floating = false, onToggle }: Pr
       textbook: 0,
       chapter: 0,
       community: 0,
-      logic: 0,
-      claim: 0,
+      move: 0,
+      anchor: 0,
       entity: 0,
       citation: 0,
     }
@@ -804,12 +822,12 @@ export default function RightPanel({ collapsed, floating = false, onToggle }: Pr
                         <div className="kgInfoMetricValue">{counts.paper}</div>
                       </div>
                       <div className="kgInfoMetricCard">
-                        <div className="kgInfoMetricLabel">{t('逻辑节点', 'Logic Nodes')}</div>
-                        <div className="kgInfoMetricValue">{counts.logic}</div>
+                        <div className="kgInfoMetricLabel">{t('研究动作节点', 'Research Move Nodes')}</div>
+                        <div className="kgInfoMetricValue">{counts.move}</div>
                       </div>
                       <div className="kgInfoMetricCard">
-                        <div className="kgInfoMetricLabel">{t('论断节点', 'Claim Nodes')}</div>
-                        <div className="kgInfoMetricValue">{counts.claim}</div>
+                        <div className="kgInfoMetricLabel">{t('证据锚点节点', 'Evidence Anchor Nodes')}</div>
+                        <div className="kgInfoMetricValue">{counts.anchor}</div>
                       </div>
                       <div className="kgInfoMetricCard">
                         <div className="kgInfoMetricLabel">{t('社区节点', 'Community Nodes')}</div>
@@ -933,14 +951,17 @@ export default function RightPanel({ collapsed, floating = false, onToggle }: Pr
                               .map((memberId, memberIndex) => {
                                 const memberKind = asStringList(rowRecord.member_kinds)[memberIndex] || ''
                                 const graphNode = askContext?.nodeMap.get(communityMemberNodeId(memberId, memberKind))
-                                const claimRow = (current.structuredKnowledge?.claims ?? []).find((claim) => normalizeText(claim.claim_id) === memberId)
+                                const anchorRow = (
+                                  current.structuredKnowledge?.evidence_anchors
+                                  ?? []
+                                ).find((anchor) => normalizeText(anchor.anchor_id) === memberId)
                                 const fusionRow = (current.fusionEvidence ?? []).find((fusionRow) => normalizeText(fusionRow.entity_id) === memberId)
                                 return {
                                   memberId,
                                   memberKind: memberKind || normalizeText(graphNode?.kind),
                                   memberLabel:
                                     normalizeText(graphNode?.label)
-                                    || normalizeText(claimRow?.text)
+                                    || normalizeText(anchorRow?.text)
                                     || normalizeText(fusionRow?.entity_name)
                                     || memberId,
                                   groundingRows: groundingBySourceId.get(memberId) ?? [],
@@ -1338,18 +1359,18 @@ export default function RightPanel({ collapsed, floating = false, onToggle }: Pr
                   <button
                     className="kgBtn kgBtn--sm"
                     type="button"
-                    onClick={() => navigate(`/paper/${encodeURIComponent(genericPaperId)}?tab=logic`)}
+                    onClick={() => navigate(`/paper/${encodeURIComponent(genericPaperId)}?tab=moves`)}
                   >
-                    {t('查看逻辑步骤', 'View Logic Steps')}
+                    {t('查看研究动作', 'View Research Moves')}
                   </button>
                 )}
                 {genericPaperId && (
                   <button
                     className="kgBtn kgBtn--sm"
                     type="button"
-                    onClick={() => navigate(`/paper/${encodeURIComponent(genericPaperId)}?tab=claims`)}
+                    onClick={() => navigate(`/paper/${encodeURIComponent(genericPaperId)}?tab=anchors`)}
                   >
-                    {t('查看论断', 'View Claims')}
+                    {t('查看证据锚点', 'View Evidence Anchors')}
                   </button>
                 )}
                 {genericPaperId && !currentInAskScope && (
@@ -1519,8 +1540,8 @@ export default function RightPanel({ collapsed, floating = false, onToggle }: Pr
                   <b>{prettyValue(resolvedPaperTitle)}</b>
                 </div>
                 <div className="kgInfoLine">
-                  <span>stepType</span>
-                  <b>{prettyValue(genericContext.center?.stepType ?? genericContext.raw.selectedNode.stepType)}</b>
+                  <span>role</span>
+                  <b>{prettyValue(genericContext.center?.role ?? genericContext.raw.selectedNode.role)}</b>
                 </div>
                 <div className="kgInfoLine">
                   <span>textbookId</span>
@@ -1542,7 +1563,7 @@ export default function RightPanel({ collapsed, floating = false, onToggle }: Pr
 
               {genericPaperId && (
                 <>
-                  <div className="kgSectionTitle">{t('逻辑 / 论断入口', 'Logic / Claim Entry')}</div>
+                  <div className="kgSectionTitle">{t('论文 Trace 入口', 'Paper Trace Entry')}</div>
                   <div className="kgInfoSection">
                     <div className="kgInfoLine">
                       <span>{t('论文', 'Paper')}</span>
@@ -1552,7 +1573,7 @@ export default function RightPanel({ collapsed, floating = false, onToggle }: Pr
                       <span>{t('来源', 'Source')}</span>
                       <b>{prettyValue(resolvedPaperSource)}</b>
                     </div>
-                    {paperPreviewLoading && <div className="kgInfoNeighborMeta">{t('正在加载逻辑步骤与论断...', 'Loading logic steps and claims...')}</div>}
+                    {paperPreviewLoading && <div className="kgInfoNeighborMeta">{t('正在加载论文 Trace...', 'Loading paper trace...')}</div>}
                     {!paperPreviewLoading && paperPreviewError && (
                       <div className="kgInfoNeighborMeta" style={{ color: 'var(--danger)' }}>
                         {t('加载失败', 'Load failed')}: {paperPreviewError}
@@ -1560,18 +1581,26 @@ export default function RightPanel({ collapsed, floating = false, onToggle }: Pr
                     )}
                     {!paperPreviewLoading && !paperPreviewError && paperPreview && (
                       <>
-                        <div className="kgInfoNeighborMeta">{t('逻辑步骤', 'Logic steps')}: {paperPreview.logic.length}</div>
-                        {paperPreview.logic.map((line, idx) => (
-                          <div key={`logic-preview-${idx}`} className="kgInfoNeighborMeta">
-                            L{idx + 1}. {line}
+                        <div className="kgInfoNeighborMeta">{t('研究动作', 'Research Moves')}: {paperPreview.moves.length}</div>
+                        {paperPreview.moves.map((line, idx) => (
+                          <div key={`move-preview-${idx}`} className="kgInfoNeighborMeta">
+                            M{idx + 1}. {line}
                           </div>
                         ))}
                         <div className="kgInfoNeighborMeta" style={{ marginTop: 4 }}>
-                          {t('论断', 'Claims')}: {paperPreview.claims.length}
+                          {t('动作关系', 'Move Relations')}: {paperPreview.relations.length}
                         </div>
-                        {paperPreview.claims.map((line, idx) => (
-                          <div key={`claim-preview-${idx}`} className="kgInfoNeighborMeta">
-                            C{idx + 1}. {line}
+                        {paperPreview.relations.map((line, idx) => (
+                          <div key={`relation-preview-${idx}`} className="kgInfoNeighborMeta">
+                            R{idx + 1}. {line}
+                          </div>
+                        ))}
+                        <div className="kgInfoNeighborMeta" style={{ marginTop: 4 }}>
+                          {t('证据锚点', 'Evidence Anchors')}: {paperPreview.anchors.length}
+                        </div>
+                        {paperPreview.anchors.map((line, idx) => (
+                          <div key={`anchor-preview-${idx}`} className="kgInfoNeighborMeta">
+                            A{idx + 1}. {line}
                           </div>
                         ))}
                       </>

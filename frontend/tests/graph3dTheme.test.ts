@@ -51,9 +51,9 @@ describe('graph3dTheme', () => {
           color: '#fb7185',
         },
         {
-          id: 'claim:1',
-          kind: 'claim',
-          label: 'Claim 1',
+          id: 'anchor:1',
+          kind: 'anchor',
+          label: 'Anchor 1',
           color: '#fb923c',
         },
       ],
@@ -70,7 +70,7 @@ describe('graph3dTheme', () => {
     )
 
     expect(styled.nodes.find((node) => node.id === 'community:a')?.color).not.toBe('#fb7185')
-    expect(styled.nodes.find((node) => node.id === 'claim:1')?.color).toBe('#fb923c')
+    expect(styled.nodes.find((node) => node.id === 'anchor:1')?.color).toBe('#fb923c')
   })
 
   test('uses a brighter role palette for isolated communities', () => {

@@ -117,22 +117,22 @@ describe('overviewCommunity3dLoader', () => {
       member_count: 3,
       members: [
         {
-          member_id: 'claim-1',
-          member_kind: 'Claim',
-          text: 'Alpha claim with the strongest signal.',
+          member_id: 'anchor-1',
+          member_kind: 'EvidenceAnchor',
+          text: 'Alpha anchor with the strongest signal.',
           paper_id: 'paper-1',
           paper_source: 'P-001',
           paper_title: 'Alpha Study',
-          step_type: 'Method',
+          role: 'method',
         },
         {
-          member_id: 'logic-1',
-          member_kind: 'LogicStep',
+          member_id: 'move-1',
+          member_kind: 'ResearchMove',
           text: 'Logic chain that explains the alpha workflow.',
           paper_id: 'paper-1',
           paper_source: 'P-001',
           paper_title: 'Alpha Study',
-          step_type: 'Method',
+          role: 'method',
         },
         {
           member_id: 'entity-1',
@@ -158,17 +158,17 @@ describe('overviewCommunity3dLoader', () => {
           clusterKey: 'community:gc:alpha',
         }),
         expect.objectContaining({
-          id: 'claim:claim-1',
-          kind: 'claim',
+          id: 'anchor:anchor-1',
+          kind: 'anchor',
           communityId: 'gc:alpha',
           paperId: 'paper-1',
           paperSource: 'P-001',
           paperTitle: 'Alpha Study',
-          stepType: 'Method',
+          role: 'method',
         }),
         expect.objectContaining({
-          id: 'logic:logic-1',
-          kind: 'logic',
+          id: 'move:move-1',
+          kind: 'move',
           communityId: 'gc:alpha',
           paperId: 'paper-1',
         }),
@@ -183,15 +183,15 @@ describe('overviewCommunity3dLoader', () => {
     expect(edges).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          id: 'contains:community:gc:alpha->claim:claim-1',
+          id: 'contains:community:gc:alpha->anchor:anchor-1',
           source: 'community:gc:alpha',
-          target: 'claim:claim-1',
+          target: 'anchor:anchor-1',
           kind: 'contains',
         }),
         expect.objectContaining({
-          id: 'contains:community:gc:alpha->logic:logic-1',
+          id: 'contains:community:gc:alpha->move:move-1',
           source: 'community:gc:alpha',
-          target: 'logic:logic-1',
+          target: 'move:move-1',
           kind: 'contains',
         }),
         expect.objectContaining({
@@ -219,9 +219,9 @@ describe('overviewCommunity3dLoader', () => {
       {
         group: 'nodes',
         data: {
-          id: 'claim:claim-1',
-          label: 'Alpha claim',
-          kind: 'claim',
+          id: 'anchor:anchor-1',
+          label: 'Alpha anchor',
+          kind: 'anchor',
           communityId: 'gc:alpha',
           clusterKey: 'community:gc:alpha',
         },
@@ -229,9 +229,9 @@ describe('overviewCommunity3dLoader', () => {
       {
         group: 'edges',
         data: {
-          id: 'contains:community:gc:alpha->claim:claim-1',
+          id: 'contains:community:gc:alpha->anchor:anchor-1',
           source: 'community:gc:alpha',
-          target: 'claim:claim-1',
+          target: 'anchor:anchor-1',
           kind: 'contains',
           weight: 1,
         },

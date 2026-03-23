@@ -13,11 +13,11 @@ log = logging.getLogger(__name__)
 
 _TOKEN_RE = re.compile(r"[A-Za-z0-9_:+./-]+|[\u4e00-\u9fff]+")
 _CORPUS_KIND = {
-    "logic_steps": "logic_step",
-    "claims": "claim",
+    "research_moves": "research_move",
+    "evidence_anchors": "evidence_anchor",
     "communities": "community",
 }
-_SUPPORTED_STRUCTURED_KINDS = {"community", "claim", "logic_step", "textbook", "chunk", "structured"}
+_SUPPORTED_STRUCTURED_KINDS = {"community", "research_move", "evidence_anchor", "textbook", "chunk", "structured"}
 _SUPPORTED_STRUCTURED_ROW_KEYS = {
     "kind",
     "source_id",
@@ -38,14 +38,19 @@ _SUPPORTED_STRUCTURED_ROW_KEYS = {
     "paper_id",
     "paper_title",
     "chunk_id",
+    "source_ref",
+    "source_md_path",
     "source_chunk_id",
     "chapter_id",
     "source_chapter_id",
     "chapter_title",
     "textbook_id",
     "textbook_title",
-    "logic_step_id",
-    "step_type",
+    "move_id",
+    "anchor_id",
+    "role",
+    "act_type",
+    "modality",
     "entity_type",
     "evidence_event_id",
     "evidence_event_type",
@@ -225,10 +230,10 @@ def normalize_structured_rows(rows: list[dict[str, Any]] | None) -> list[dict[st
 def _load_corpus_rows(corpus: str) -> list[dict[str, Any]]:
     try:
         with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
-            if corpus == "logic_steps":
-                return client.list_logic_step_structured_rows()
-            if corpus == "claims":
-                return client.list_claim_structured_rows()
+            if corpus == "research_moves":
+                return client.list_research_moves()
+            if corpus == "evidence_anchors":
+                return client.list_evidence_anchors()
             if corpus == "communities":
                 return build_community_corpus_rows(client)
     except Exception:
@@ -323,12 +328,12 @@ def _search_corpus(corpus: str, query: str, k: int, allowed_sources=None) -> lis
     return _dedupe_hits(_sort_rows(ranked))[: max(1, int(k))]
 
 
-def retrieve_logic_steps(query: str, k: int, allowed_sources: set[str] | None = None) -> list[dict[str, Any]]:
-    return normalize_structured_rows(_search_corpus("logic_steps", query, k, allowed_sources=allowed_sources))
+def retrieve_research_moves(query: str, k: int, allowed_sources: set[str] | None = None) -> list[dict[str, Any]]:
+    return normalize_structured_rows(_search_corpus("research_moves", query, k, allowed_sources=allowed_sources))
 
 
-def retrieve_claims(query: str, k: int, allowed_sources: set[str] | None = None) -> list[dict[str, Any]]:
-    return normalize_structured_rows(_search_corpus("claims", query, k, allowed_sources=allowed_sources))
+def retrieve_evidence_anchors(query: str, k: int, allowed_sources: set[str] | None = None) -> list[dict[str, Any]]:
+    return normalize_structured_rows(_search_corpus("evidence_anchors", query, k, allowed_sources=allowed_sources))
 
 
 def retrieve_communities(query: str, k: int, allowed_sources: set[str] | None = None) -> list[dict[str, Any]]:
@@ -366,8 +371,8 @@ def fuse_retrieval_channels(
     retrieval_plan: str,
     question: str,
     chunk_hits: list[dict[str, Any]] | None = None,
-    logic_hits: list[dict[str, Any]] | None = None,
-    claim_hits: list[dict[str, Any]] | None = None,
+    move_hits: list[dict[str, Any]] | None = None,
+    anchor_hits: list[dict[str, Any]] | None = None,
     community_hits: list[dict[str, Any]] | None = None,
     textbook_hits: list[dict[str, Any]] | None = None,
     k: int = 8,
@@ -376,16 +381,16 @@ def fuse_retrieval_channels(
     ordered: dict[str, list[dict[str, Any]]] = {
         "textbook": _sorted_hits(textbook_hits),
         "community": _sorted_hits(community_hits),
-        "claim": _sorted_hits(claim_hits),
-        "logic_step": _sorted_hits(logic_hits),
+        "evidence_anchor": _sorted_hits(anchor_hits),
+        "research_move": _sorted_hits(move_hits),
         "chunk": _sorted_hits(chunk_hits),
     }
     plan_order = {
-        "textbook_first_then_paper": ["textbook", "community", "claim", "logic_step", "chunk"],
-        "claim_first": ["claim", "logic_step", "chunk", "community", "textbook"],
-        "community_first": ["community", "textbook", "claim", "logic_step", "chunk"],
-        "hybrid_parallel": ["claim", "community", "logic_step", "textbook", "chunk"],
-        "paper_first_then_textbook": ["chunk", "claim", "logic_step", "community", "textbook"],
+        "textbook_first_then_paper": ["textbook", "community", "evidence_anchor", "research_move", "chunk"],
+        "anchor_first": ["evidence_anchor", "research_move", "chunk", "community", "textbook"],
+        "community_first": ["community", "textbook", "evidence_anchor", "research_move", "chunk"],
+        "hybrid_parallel": ["evidence_anchor", "community", "research_move", "textbook", "chunk"],
+        "paper_first_then_textbook": ["chunk", "evidence_anchor", "research_move", "community", "textbook"],
     }
     order = plan_order.get(str(retrieval_plan or "").strip(), plan_order["paper_first_then_textbook"])
 

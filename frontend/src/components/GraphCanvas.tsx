@@ -12,6 +12,7 @@ import { syncGraphElements } from './graphCanvasSync'
 import { resolveGraphCanvasViewState } from './graphCanvasViewState'
 import { resolveGraphRenderPlan } from './graphRenderPlan'
 import { orientComponentPositions, placeOverviewComponents } from './paperOverviewLayout'
+import { graphKindLabel, normalizeGraphKind } from '../graphKinds'
 
 const Graph3D = lazy(() => import('./Graph3D'))
 
@@ -94,25 +95,13 @@ function pickText(locale: UILocale, text: LocalizedText): string {
   return locale === 'zh-CN' ? text.zh : text.en
 }
 
-const KIND_LABELS: Record<string, LocalizedText> = {
-  textbook: { zh: '\u6559\u6750', en: 'Textbook' },
-  chapter: { zh: '\u7ae0\u8282', en: 'Chapter' },
-  community: { zh: '\u793e\u533a', en: 'Community' },
-  paper: { zh: '论文', en: 'Paper' },
-  logic: { zh: '逻辑', en: 'Logic' },
-  claim: { zh: '论断', en: 'Claim' },
-  group: { zh: '分组', en: 'Group' },
-  entity: { zh: '实体', en: 'Entity' },
-  citation: { zh: '引文', en: 'Citation' },
-}
-
 const KIND_PRIORITY: Record<string, number> = {
   textbook: 1,
   chapter: 2,
   community: 3,
   paper: 4,
-  logic: 5,
-  claim: 6,
+  move: 5,
+  anchor: 6,
   group: 8,
   entity: 9,
   citation: 10,
@@ -169,18 +158,17 @@ function validYear(value: unknown): number | null {
 }
 
 function kindLabel(kind: string, locale: UILocale) {
-  const key = String(kind ?? '')
-  const text = KIND_LABELS[key]
-  return text ? pickText(locale, text) : key || 'other'
+  return graphKindLabel(kind, locale)
 }
 
 function kindOrder(kind: string) {
-  return KIND_PRIORITY[String(kind ?? '')] ?? 99
+  return KIND_PRIORITY[normalizeGraphKind(kind)] ?? 99
 }
 
 function nodeVisual(data: GraphNodeData, degree: number): NodeVisual {
+  const kind = normalizeGraphKind(data.kind)
   const weightedDegree = clamp(Math.round(degree), 0, 24)
-  if (data.kind === 'textbook') {
+  if (kind === 'textbook') {
     return {
       color: 'rgba(34, 211, 238, 0.94)',
       borderColor: 'rgba(207, 250, 254, 0.96)',
@@ -188,7 +176,7 @@ function nodeVisual(data: GraphNodeData, degree: number): NodeVisual {
       size: 24 + Math.min(30, weightedDegree * 1.15),
     }
   }
-  if (data.kind === 'chapter') {
+  if (kind === 'chapter') {
     return {
       color: 'rgba(251, 191, 36, 0.92)',
       borderColor: 'rgba(254, 243, 199, 0.94)',
@@ -196,7 +184,7 @@ function nodeVisual(data: GraphNodeData, degree: number): NodeVisual {
       size: 20 + Math.min(22, weightedDegree * 0.9),
     }
   }
-  if (data.kind === 'community') {
+  if (kind === 'community') {
     return {
       color: 'rgba(45, 212, 191, 0.92)',
       borderColor: 'rgba(204, 251, 241, 0.92)',
@@ -204,7 +192,7 @@ function nodeVisual(data: GraphNodeData, degree: number): NodeVisual {
       size: 18 + Math.min(22, weightedDegree * 0.9),
     }
   }
-  if (data.kind === 'paper') {
+  if (kind === 'paper') {
     const imported = data.ingested !== false
     if (!imported) {
       return {
@@ -234,7 +222,7 @@ function nodeVisual(data: GraphNodeData, degree: number): NodeVisual {
       size: 20 + Math.min(26, weightedDegree * 1.18),
     }
   }
-  if (data.kind === 'logic') {
+  if (kind === 'move') {
     return {
       color: 'rgba(52, 211, 153, 0.94)',
       borderColor: 'rgba(209, 250, 229, 0.92)',
@@ -242,7 +230,7 @@ function nodeVisual(data: GraphNodeData, degree: number): NodeVisual {
       size: 16 + Math.min(20, weightedDegree * 0.8),
     }
   }
-  if (data.kind === 'claim') {
+  if (kind === 'anchor') {
     return {
       color: 'rgba(251, 146, 60, 0.92)',
       borderColor: 'rgba(255, 237, 213, 0.92)',
@@ -250,7 +238,7 @@ function nodeVisual(data: GraphNodeData, degree: number): NodeVisual {
       size: 14 + Math.min(18, weightedDegree * 0.7),
     }
   }
-  if (data.kind === 'group') {
+  if (kind === 'group') {
     return {
       color: 'rgba(45, 212, 191, 0.90)',
       borderColor: 'rgba(204, 251, 241, 0.9)',
@@ -258,7 +246,7 @@ function nodeVisual(data: GraphNodeData, degree: number): NodeVisual {
       size: 20 + Math.min(24, weightedDegree),
     }
   }
-  if (data.kind === 'entity') {
+  if (kind === 'entity') {
     return {
       color: 'rgba(20, 184, 166, 0.90)',
       borderColor: 'rgba(153, 246, 228, 0.88)',
@@ -266,7 +254,7 @@ function nodeVisual(data: GraphNodeData, degree: number): NodeVisual {
       size: 13 + Math.min(16, weightedDegree * 0.65),
     }
   }
-  if (data.kind === 'citation') {
+  if (kind === 'citation') {
     return {
       color: 'rgba(148, 163, 184, 0.7)',
       borderColor: 'rgba(203, 213, 225, 0.75)',
@@ -1983,7 +1971,7 @@ export default function GraphCanvas({
         paperId: data.paperId,
         paperSource: data.paperSource,
         paperTitle: data.paperTitle,
-        stepType: data.stepType,
+        role: data.role,
         textbookId: data.textbookId,
         chapterId: data.chapterId,
       })

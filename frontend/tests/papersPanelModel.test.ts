@@ -28,7 +28,7 @@ function edge(id: string, source: string, target: string, kind: string): GraphEl
 
 describe('papersPanelModel', () => {
   test('keeps the current graph when a paper neighborhood is already selected', () => {
-    expect(shouldHydratePapersOverviewGraph([node('paper:1', 'paper'), node('logic:1', 'logic')], 'paper:1')).toBe(false)
+    expect(shouldHydratePapersOverviewGraph([node('paper:1', 'paper'), node('move:1', 'move')], 'paper:1')).toBe(false)
   })
 
   test('reuses overview-like graphs when entering papers', () => {
@@ -47,7 +47,7 @@ describe('papersPanelModel', () => {
   })
 
   test('requests a background refresh when the current graph comes from another workflow', () => {
-    expect(shouldHydratePapersOverviewGraph([node('logic:1', 'logic'), node('paper:1', 'paper')], null)).toBe(true)
+    expect(shouldHydratePapersOverviewGraph([node('move:1', 'move'), node('paper:1', 'paper')], null)).toBe(true)
   })
 
   test('requests a graph when no prior nodes are available', () => {

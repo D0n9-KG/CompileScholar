@@ -165,8 +165,9 @@ def test_allowed_paper_sources_normalizes_scope_refs(monkeypatch):
             "paper_ids": [
                 "paper:doi:10.1000/test",
                 "paper_source:07_1605",
-                "logic:bc082d21ddcde94212aab4ab474d9e32097a34ab90995a8bd181b29b1ed29026:0",
-                "claim:bc082d21ddcde94212aab4ab474d9e32097a34ab90995a8bd181b29b1ed29026:1",
+                "move:mv-1",
+                "evidence_anchor:ea-1",
+                "community:gc-demo",
             ],
         }
     )
@@ -175,7 +176,6 @@ def test_allowed_paper_sources_normalizes_scope_refs(monkeypatch):
     assert captured["paper_ids"] == [
         "doi:10.1000/test",
         "07_1605",
-        "bc082d21ddcde94212aab4ab474d9e32097a34ab90995a8bd181b29b1ed29026",
     ]
 
 
@@ -193,12 +193,12 @@ def test_format_graph_context_empty_list():
 def test_format_graph_context_basic():
     ctx = [
         {"source_paper": "Paper A", "target_paper": "Paper B", "relationship": "cites"},
-        {"step_type": "Method", "summary": "Uses DEM for simulation"},
+        {"role": "method", "act_type": "propose_method", "summary": "Uses DEM for simulation"},
     ]
     result = _format_graph_context(ctx)
     assert "Graph Context:" in result
     assert "Paper A" in result
-    assert "Method" in result
+    assert "method" in result
     assert "DEM" in result
 
 
@@ -275,54 +275,54 @@ def test_format_structured_knowledge_none():
 
 
 def test_format_structured_knowledge_empty():
-    assert _format_structured_knowledge({"claims": [], "logic_steps": []}) == ""
+    assert _format_structured_knowledge({"research_moves": [], "evidence_anchors": []}) == ""
 
 
-def test_format_structured_knowledge_logic_steps():
+def test_format_structured_knowledge_research_moves():
     knowledge = {
-        "claims": [],
-        "logic_steps": [
-            {"step_type": "Method", "summary": "Uses DEM simulation", "paper_source": "paper-A"},
-            {"step_type": "Result", "summary": "Accuracy improved", "paper_source": "paper-A"},
+        "evidence_anchors": [],
+        "research_moves": [
+            {"move_id": "mv-1", "role": "method", "summary": "Uses DEM simulation", "paper_source": "paper-A"},
+            {"move_id": "mv-2", "role": "result", "summary": "Accuracy improved", "paper_source": "paper-A"},
         ],
     }
     result = _format_structured_knowledge(knowledge)
-    assert "Logic Steps:" in result
-    assert "Method" in result
+    assert "Research Moves:" in result
+    assert "[MV:mv-1]" in result
     assert "DEM simulation" in result
 
 
-def test_format_structured_knowledge_claims_with_ids():
+def test_format_structured_knowledge_evidence_anchors_with_ids():
     knowledge = {
-        "claims": [
+        "evidence_anchors": [
             {
-                "claim_id": "abc123",
+                "anchor_id": "ea-1",
                 "text": "DEM outperforms FEM in granular flow",
-                "step_type": "Result",
+                "role": "result",
                 "confidence": 0.92,
                 "paper_source": "paper-A",
             },
         ],
-        "logic_steps": [],
+        "research_moves": [],
     }
     result = _format_structured_knowledge(knowledge)
-    assert "Validated Claims:" in result
-    assert "[CL:abc123]" in result
+    assert "Evidence Anchors:" in result
+    assert "[EA:ea-1]" in result
     assert "DEM outperforms FEM" in result
     assert "0.92" in result
 
 
-def test_format_structured_knowledge_skips_claims_without_id():
+def test_format_structured_knowledge_skips_anchors_without_id():
     knowledge = {
-        "claims": [
+        "evidence_anchors": [
             {
-                "claim_id": "",
-                "text": "Untraceable claim",
-                "step_type": "Result",
+                "anchor_id": "",
+                "text": "Untraceable evidence",
+                "role": "result",
                 "paper_source": "paper-A",
             },
         ],
-        "logic_steps": [],
+        "research_moves": [],
     }
     assert _format_structured_knowledge(knowledge) == ""
 
@@ -330,11 +330,11 @@ def test_format_structured_knowledge_skips_claims_without_id():
 def test_format_structured_knowledge_truncates_long_text():
     long_text = "x" * 500
     knowledge = {
-        "claims": [
-            {"claim_id": "abc123", "text": long_text, "step_type": "Result", "paper_source": "p1"},
+        "evidence_anchors": [
+            {"anchor_id": "ea-1", "text": long_text, "role": "result", "paper_source": "p1"},
         ],
-        "logic_steps": [
-            {"step_type": "Method", "summary": long_text, "paper_source": "p1"},
+        "research_moves": [
+            {"move_id": "mv-1", "role": "method", "summary": long_text, "paper_source": "p1"},
         ],
     }
     result = _format_structured_knowledge(knowledge)
@@ -344,23 +344,24 @@ def test_format_structured_knowledge_truncates_long_text():
 
 def test_format_structured_knowledge_combined():
     knowledge = {
-        "claims": [
-            {"claim_id": "c1", "text": "Claim text", "step_type": "Method",
+        "evidence_anchors": [
+            {"anchor_id": "ea-1", "text": "Anchor text", "role": "method",
              "confidence": 0.8, "paper_source": "p1"},
         ],
-        "logic_steps": [
-            {"step_type": "Background", "summary": "Context info", "paper_source": "p1"},
+        "research_moves": [
+            {"move_id": "mv-1", "role": "background", "summary": "Context info", "paper_source": "p1"},
         ],
     }
     result = _format_structured_knowledge(knowledge)
-    assert "Logic Steps:" in result
-    assert "Validated Claims:" in result
+    assert "Research Moves:" in result
+    assert "Evidence Anchors:" in result
 
 
-def test_build_system_prompt_mentions_claims():
-    """System prompt should instruct LLM to reference claim IDs."""
+def test_build_system_prompt_mentions_move_and_anchor_ids():
+    """System prompt should instruct LLM to reference move and anchor IDs."""
     prompt = _build_system_prompt()
-    assert "[CL:" in prompt
+    assert "[MV:" in prompt
+    assert "[EA:" in prompt
 
 
 def test_prepare_ask_v2_context_adds_fusion_evidence(monkeypatch):
@@ -397,8 +398,8 @@ def test_prepare_ask_v2_context_adds_fusion_evidence(monkeypatch):
 
         def get_structured_knowledge_for_papers(self, paper_sources):
             return {
-                "logic_steps": [{"paper_source": paper_sources[0], "step_type": "Method", "summary": "Uses FEM"}],
-                "claims": [],
+                "research_moves": [{"paper_source": paper_sources[0], "move_id": "mv-1", "role": "method", "summary": "Uses FEM"}],
+                "evidence_anchors": [],
             }
 
         def list_fusion_basics_by_paper_sources(self, paper_sources, limit=200):
@@ -406,8 +407,8 @@ def test_prepare_ask_v2_context_adds_fusion_evidence(monkeypatch):
                 {
                     "paper_source": paper_sources[0],
                     "paper_id": "doi:10.1000/test",
-                    "logic_step_id": "ls-1",
-                    "step_type": "Method",
+                    "move_id": "mv-1",
+                    "role": "method",
                     "entity_id": "ent-1",
                     "entity_name": "Finite Element Method",
                     "entity_type": "method",
@@ -484,13 +485,13 @@ def test_prepare_ask_v2_context_augments_single_paper_scope_query(monkeypatch):
         def list_paper_sources_for_paper_ids(self, paper_ids):
             return ["05_340"] if "05_340" in paper_ids else []
 
-        def get_paper_detail(self, paper_id):
+        def get_paper_logic_trace(self, paper_id):
             assert paper_id == "05_340"
             return {
-                "paper": {
+                "paper_metadata": {
                     "paper_id": "24fefb2c62ea3a1d453d51b306b4c141e09df44fc14f14160c3420b24f35f79c",
-                    "paper_source": "05_340",
                     "title": "Grain-scale experimental investigation of localised deformation in sand: a discrete particle tracking approach",
+                    "source_refs": ["05_340"],
                 }
             }
 
@@ -498,7 +499,7 @@ def test_prepare_ask_v2_context_augments_single_paper_scope_query(monkeypatch):
             return []
 
         def get_structured_knowledge_for_papers(self, paper_sources):
-            return {"logic_steps": [], "claims": []}
+            return {"research_moves": [], "evidence_anchors": []}
 
         def list_fusion_basics_by_paper_sources(self, paper_sources, limit=200):
             return []
@@ -594,7 +595,7 @@ def test_prepare_ask_v2_context_uses_bilingual_rewrite_for_global_chinese_questi
             return []
 
         def get_structured_knowledge_for_papers(self, paper_sources):
-            return {"logic_steps": [], "claims": []}
+            return {"research_moves": [], "evidence_anchors": []}
 
         def list_fusion_basics_by_paper_sources(self, paper_sources, limit=200):
             return []
@@ -673,8 +674,8 @@ def test_prepare_ask_v2_context_includes_query_plan_structured_evidence_and_grou
 
         def get_structured_knowledge_for_papers(self, paper_sources):
             return {
-                "logic_steps": [{"paper_source": paper_sources[0], "step_type": "Method", "summary": "Uses FEM"}],
-                "claims": [{"claim_id": "cl-1", "paper_source": paper_sources[0], "step_type": "Result", "text": "FEM improves stability."}],
+                "research_moves": [{"paper_source": paper_sources[0], "move_id": "mv-1", "role": "method", "summary": "Uses FEM"}],
+                "evidence_anchors": [{"anchor_id": "ea-1", "paper_source": paper_sources[0], "role": "result", "text": "FEM improves stability."}],
             }
 
         def list_fusion_basics_by_paper_sources(self, paper_sources, limit=200):
@@ -682,8 +683,8 @@ def test_prepare_ask_v2_context_includes_query_plan_structured_evidence_and_grou
                 {
                     "paper_source": paper_sources[0],
                     "paper_id": "doi:10.1000/test",
-                    "logic_step_id": "ls-1",
-                    "step_type": "Method",
+                    "move_id": "mv-1",
+                    "role": "method",
                     "entity_id": "ent-1",
                     "entity_name": "Finite Element Method",
                     "entity_type": "method",
@@ -714,8 +715,8 @@ def test_prepare_ask_v2_context_includes_query_plan_structured_evidence_and_grou
                 "source_id": "gc:demo",
                 "community_id": "gc:demo",
                 "text": "Finite element stability community.",
-                "member_ids": ["cl-1", "ke-1"],
-                "member_kinds": ["Claim", "KnowledgeEntity"],
+                "member_ids": ["ea-1", "ke-1"],
+                "member_kinds": ["EvidenceAnchor", "KnowledgeEntity"],
                 "keyword_texts": ["finite element", "stability"],
             }
         ],
@@ -725,8 +726,8 @@ def test_prepare_ask_v2_context_includes_query_plan_structured_evidence_and_grou
         "app.rag.service.ground_structured_evidence",
         lambda *args, **kwargs: [
             {
-                "source_kind": "claim",
-                "source_id": "cl-1",
+                "source_kind": "evidence_anchor",
+                "source_id": "ea-1",
                 "quote": (
                     "Finite element method discretizes the domain. "
                     "Additional implementation details should stay out of the prompt-level grounding block."
@@ -766,7 +767,7 @@ def test_prepare_ask_v2_context_includes_query_plan_structured_evidence_and_grou
     assert bundle_dump["query_plan"]["intent"] == "foundational"
     assert bundle_dump["structured_evidence"][0]["kind"] == "community"
     assert bundle_dump["structured_evidence"][0]["community_id"] == "gc:demo"
-    assert bundle_dump["grounding"][0]["source_id"] == "cl-1"
+    assert bundle_dump["grounding"][0]["source_id"] == "ea-1"
     assert "Structured Evidence" in ctx["user"]
     assert "Grounding" in ctx["user"]
     assert "Finite element method discretizes the domain." in ctx["user"]
@@ -813,15 +814,15 @@ def test_prepare_ask_v2_context_textbook_first_uses_textbook_seed_and_prompt_ord
             return []
 
         def get_structured_knowledge_for_papers(self, paper_sources):
-            return {"logic_steps": [], "claims": []}
+            return {"research_moves": [], "evidence_anchors": []}
 
         def list_fusion_basics_by_paper_sources(self, paper_sources, limit=200):
             return [
                 {
                     "paper_source": paper_sources[0],
                     "paper_id": "doi:10.1000/test",
-                    "logic_step_id": "ls-1",
-                    "step_type": "Method",
+                    "move_id": "mv-1",
+                    "role": "method",
                     "entity_id": "ent-1",
                     "entity_name": "Finite Element Method",
                     "entity_type": "method",
@@ -921,7 +922,7 @@ def test_prepare_ask_v2_context_falls_back_when_planner_returns_invalid_dict(mon
             return []
 
         def get_structured_knowledge_for_papers(self, paper_sources):
-            return {"logic_steps": [], "claims": []}
+            return {"research_moves": [], "evidence_anchors": []}
 
         def list_fusion_basics_by_paper_sources(self, paper_sources, limit=200):
             return []
@@ -963,18 +964,18 @@ def test_prepare_ask_v2_context_falls_back_when_planner_returns_invalid_dict(mon
     assert bundle_dump["query_plan"]["main_query"] == "What assumptions does FEM make?"
 
 
-def test_retrieve_structured_evidence_claim_first_prefers_claims_and_logic(monkeypatch):
+def test_retrieve_structured_evidence_anchor_first_prefers_anchors_and_moves(monkeypatch):
     monkeypatch.setattr(
-        "app.rag.service.retrieve_logic_steps",
+        "app.rag.service.retrieve_research_moves",
         lambda query, k, allowed_sources=None: [
-            {"kind": "logic_step", "source_id": "ls-1", "text": "Method: uses FEM.", "score": 0.81, "paper_source": "paper-A"}
+            {"kind": "research_move", "source_id": "mv-1", "move_id": "mv-1", "text": "Method: uses FEM.", "score": 0.81, "paper_source": "paper-A"}
         ],
         raising=False,
     )
     monkeypatch.setattr(
-        "app.rag.service.retrieve_claims",
+        "app.rag.service.retrieve_evidence_anchors",
         lambda query, k, allowed_sources=None: [
-            {"kind": "claim", "source_id": "cl-1", "text": "Result: FEM improves stability.", "score": 0.9, "paper_source": "paper-A"}
+            {"kind": "evidence_anchor", "source_id": "ea-1", "anchor_id": "ea-1", "text": "Result: FEM improves stability.", "score": 0.9, "paper_source": "paper-A"}
         ],
         raising=False,
     )
@@ -986,8 +987,8 @@ def test_retrieve_structured_evidence_claim_first_prefers_claims_and_logic(monke
                 "source_id": "gc:demo",
                 "community_id": "gc:demo",
                 "text": "Canonical FEM stability community.",
-                "member_ids": ["cl-1"],
-                "member_kinds": ["Claim"],
+                "member_ids": ["ea-1"],
+                "member_kinds": ["EvidenceAnchor"],
                 "keyword_texts": ["finite element", "stability"],
                 "score": 0.7,
             }
@@ -999,7 +1000,7 @@ def test_retrieve_structured_evidence_claim_first_prefers_claims_and_logic(monke
         question="What method and results does this paper report?",
         query_plan={
             "intent": "paper_detail",
-            "retrieval_plan": "claim_first",
+            "retrieval_plan": "anchor_first",
             "main_query": "fem method results",
             "paper_query": "fem method results in this paper",
             "community_query": "fem method result community",
@@ -1010,12 +1011,12 @@ def test_retrieve_structured_evidence_claim_first_prefers_claims_and_logic(monke
         fusion_rows=[],
     )
 
-    assert [row["kind"] for row in rows[:2]] == ["claim", "logic_step"]
+    assert [row["kind"] for row in rows[:2]] == ["evidence_anchor", "research_move"]
 
 
 def test_retrieve_structured_evidence_textbook_first_prefers_textbook_support_and_communities(monkeypatch):
-    monkeypatch.setattr("app.rag.service.retrieve_logic_steps", lambda *args, **kwargs: [], raising=False)
-    monkeypatch.setattr("app.rag.service.retrieve_claims", lambda *args, **kwargs: [], raising=False)
+    monkeypatch.setattr("app.rag.service.retrieve_research_moves", lambda *args, **kwargs: [], raising=False)
+    monkeypatch.setattr("app.rag.service.retrieve_evidence_anchors", lambda *args, **kwargs: [], raising=False)
     monkeypatch.setattr(
         "app.rag.service.retrieve_communities",
         lambda query, k, allowed_sources=None: [
@@ -1025,8 +1026,8 @@ def test_retrieve_structured_evidence_textbook_first_prefers_textbook_support_an
                 "community_id": "gc:demo",
                 "text": "Finite element discretization stability community.",
                 "score": 0.79,
-                "member_ids": ["cl-1", "ent-1"],
-                "member_kinds": ["Claim", "KnowledgeEntity"],
+                "member_ids": ["ea-1", "ent-1"],
+                "member_kinds": ["EvidenceAnchor", "KnowledgeEntity"],
                 "keyword_texts": ["finite element", "stability"],
                 "textbook_id": "tb:1",
                 "chapter_id": "tb:1:ch001",
@@ -1052,7 +1053,7 @@ def test_retrieve_structured_evidence_textbook_first_prefers_textbook_support_an
             {
                 "paper_source": "paper-A",
                 "paper_id": "doi:10.1000/example",
-                "step_type": "Method",
+                "role": "method",
                 "entity_id": "ent-1",
                 "entity_name": "Finite Element Method",
                 "entity_type": "method",
@@ -1080,11 +1081,11 @@ def test_ground_structured_evidence_expands_community_members_and_textbook_fallb
             return False
 
         def get_grounding_rows_for_structured_ids(self, ids, limit=200):
-            assert ids == [{"kind": "claim", "source_id": "cl-1"}]
+            assert ids == [{"kind": "evidence_anchor", "source_id": "ea-1"}]
             return [
                 {
-                    "source_kind": "claim",
-                    "source_id": "cl-1",
+                    "source_kind": "evidence_anchor",
+                    "source_id": "ea-1",
                     "quote": (
                         "Finite element method discretizes the domain. "
                         "This chunk also includes a long implementation discussion that should not be echoed wholesale."
@@ -1117,8 +1118,8 @@ def test_ground_structured_evidence_expands_community_members_and_textbook_fallb
                 "source_id": "gc:demo",
                 "community_id": "gc:demo",
                 "text": "Finite element stability community.",
-                "member_ids": ["cl-1", "ent-1"],
-                "member_kinds": ["Claim", "KnowledgeEntity"],
+                "member_ids": ["ea-1", "ent-1"],
+                "member_kinds": ["EvidenceAnchor", "KnowledgeEntity"],
                 "keyword_texts": ["finite element", "stability"],
                 "paper_source": "paper-A",
                 "paper_id": "doi:10.1000/in",
@@ -1138,7 +1139,7 @@ def test_ground_structured_evidence_expands_community_members_and_textbook_fallb
     )
 
     assert len(rows) == 2
-    assert rows[0]["source_id"] == "cl-1"
+    assert rows[0]["source_id"] == "ea-1"
     assert rows[0]["quote"] == "Finite element method discretizes the domain."
     assert rows[0]["chunk_id"] == "c1"
     assert rows[0]["paper_source"] == "paper-A"
@@ -1167,8 +1168,8 @@ def test_ground_structured_evidence_ignores_legacy_proposition_rows(monkeypatch)
             captured["ids"] = list(ids)
             return [
                 {
-                    "source_kind": "claim",
-                    "source_id": "cl-1",
+                    "source_kind": "evidence_anchor",
+                    "source_id": "ea-1",
                     "quote": "Finite element method discretizes the domain.",
                     "chunk_id": "c1",
                     "md_path": "runs/paper-A/content.md",
@@ -1194,9 +1195,9 @@ def test_ground_structured_evidence_ignores_legacy_proposition_rows(monkeypatch)
     rows = ground_structured_evidence(
         structured_evidence=[
             {
-                "kind": "claim",
-                "source_id": "cl-1",
-                "text": "Finite element stability claim.",
+                "kind": "evidence_anchor",
+                "source_id": "ea-1",
+                "text": "Finite element stability evidence anchor.",
             },
             {
                 "kind": "proposition",
@@ -1209,13 +1210,13 @@ def test_ground_structured_evidence_ignores_legacy_proposition_rows(monkeypatch)
         k=4,
     )
 
-    assert captured["ids"] == [{"kind": "claim", "source_id": "cl-1"}]
-    assert [row["source_id"] for row in rows] == ["cl-1"]
+    assert captured["ids"] == [{"kind": "evidence_anchor", "source_id": "ea-1"}]
+    assert [row["source_id"] for row in rows] == ["ea-1"]
 
 
 def test_retrieve_structured_evidence_scoped_community_first_keeps_textbook_origin(monkeypatch):
-    monkeypatch.setattr("app.rag.service.retrieve_logic_steps", lambda *args, **kwargs: [], raising=False)
-    monkeypatch.setattr("app.rag.service.retrieve_claims", lambda *args, **kwargs: [], raising=False)
+    monkeypatch.setattr("app.rag.service.retrieve_research_moves", lambda *args, **kwargs: [], raising=False)
+    monkeypatch.setattr("app.rag.service.retrieve_evidence_anchors", lambda *args, **kwargs: [], raising=False)
     monkeypatch.setattr(
         "app.rag.service.retrieve_communities",
         lambda query, k, allowed_sources=None: [
@@ -1237,8 +1238,8 @@ def test_retrieve_structured_evidence_scoped_community_first_keeps_textbook_orig
                 "community_id": "gc:paper-out",
                 "text": "Out-of-scope paper community.",
                 "score": 0.91,
-                "member_ids": ["cl-out"],
-                "member_kinds": ["Claim"],
+                "member_ids": ["ea-out"],
+                "member_kinds": ["EvidenceAnchor"],
                 "keyword_texts": ["finite element", "paper-B"],
                 "paper_source": "paper-B",
                 "paper_id": "doi:10.1000/out",
@@ -1249,8 +1250,8 @@ def test_retrieve_structured_evidence_scoped_community_first_keeps_textbook_orig
                 "community_id": "gc:paper-in",
                 "text": "In-scope paper community.",
                 "score": 0.89,
-                "member_ids": ["cl-in"],
-                "member_kinds": ["Claim"],
+                "member_ids": ["ea-in"],
+                "member_kinds": ["EvidenceAnchor"],
                 "keyword_texts": ["finite element", "paper-A"],
                 "paper_source": "paper-A",
                 "paper_id": "doi:10.1000/in",
@@ -1304,7 +1305,7 @@ def test_prepare_ask_v2_context_scope_uses_structured_hits_before_early_return(m
         "app.rag.service.plan_ask_query",
         lambda question, scope=None, locale=None: {
             "intent": "paper_detail",
-            "retrieval_plan": "claim_first",
+            "retrieval_plan": "anchor_first",
             "main_query": "finite element method assumptions",
             "paper_query": "finite element method assumptions in this paper",
         },
@@ -1316,9 +1317,9 @@ def test_prepare_ask_v2_context_scope_uses_structured_hits_before_early_return(m
         "app.rag.service.retrieve_structured_evidence",
         lambda *args, **kwargs: [
             {
-                "kind": "claim",
-                "source_id": "cl-1",
-                "text": "Scoped paper claim evidence.",
+                "kind": "evidence_anchor",
+                "source_id": "ea-1",
+                "text": "Scoped paper evidence.",
                 "paper_source": "paper-A",
                 "paper_id": "doi:10.1000/in",
             }
@@ -1346,13 +1347,13 @@ def test_prepare_ask_v2_context_scope_uses_structured_hits_before_early_return(m
     )
 
     ctx = _prepare_ask_v2_context(
-        "What does the scoped paper claim?",
+        "What does the scoped paper show?",
         k=4,
         scope={"mode": "papers", "paper_ids": ["paper-A"]},
     )
 
     assert "early_response" not in ctx
-    assert ctx["bundle"].structured_evidence[0].source_id == "cl-1"
+    assert ctx["bundle"].structured_evidence[0].source_id == "ea-1"
     assert ctx["bundle"].insufficient_scope_evidence is False
 
 
@@ -1389,7 +1390,7 @@ def test_prepare_ask_v2_context_includes_recent_conversation_history(monkeypatch
             return []
 
         def get_structured_knowledge_for_papers(self, paper_sources):
-            return {"logic_steps": [], "claims": []}
+            return {"research_moves": [], "evidence_anchors": []}
 
         def list_fusion_basics_by_paper_sources(self, paper_sources, limit=200):
             return []
@@ -1465,7 +1466,7 @@ def test_prepare_ask_v2_context_uses_conversation_when_planning_follow_up_querie
             return []
 
         def get_structured_knowledge_for_papers(self, paper_sources):
-            return {"logic_steps": [], "claims": []}
+            return {"research_moves": [], "evidence_anchors": []}
 
         def list_fusion_basics_by_paper_sources(self, paper_sources, limit=200):
             return []

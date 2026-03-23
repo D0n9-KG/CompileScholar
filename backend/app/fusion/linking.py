@@ -7,13 +7,15 @@ from typing import Any
 _TOKEN_RE = re.compile(r"[A-Za-z0-9\u4e00-\u9fff]+")
 _SPACE_RE = re.compile(r"\s+")
 
-_TYPE_COMPATIBILITY: dict[str, set[str]] = {
+_ROLE_COMPATIBILITY: dict[str, set[str]] = {
     "background": {"concept", "theory", "definition", "principle"},
     "problem": {"concept", "theory", "condition", "definition"},
     "method": {"method", "algorithm", "model", "equation", "concept"},
     "experiment": {"method", "model", "equation", "concept"},
     "result": {"theory", "equation", "model", "principle", "concept"},
-    "conclusion": {"theory", "principle", "concept", "model"},
+    "interpretation": {"theory", "principle", "concept", "model"},
+    "limitation": {"concept", "condition", "principle"},
+    "future_work": {"concept", "method", "model", "condition"},
 }
 
 _GENERIC_ENTITY_TYPES = {
@@ -44,35 +46,35 @@ def _jaccard(a: set[str], b: set[str]) -> float:
     return inter / max(1, union)
 
 
-def _is_type_compatible(step_type: str, entity_type: str) -> bool:
-    s = _normalize_text(step_type)
+def _is_type_compatible(role: str, entity_type: str) -> bool:
+    s = _normalize_text(role)
     e = _normalize_text(entity_type)
     if e in _GENERIC_ENTITY_TYPES:
         return True
-    allowed = _TYPE_COMPATIBILITY.get(s)
+    allowed = _ROLE_COMPATIBILITY.get(s)
     if not allowed:
         return True
     return e in allowed
 
 
 def _compute_link_score(
-    step: dict[str, Any],
+    move: dict[str, Any],
     entity: dict[str, Any],
     semantic_score: float | None = None,
 ) -> tuple[float, list[str]]:
-    step_summary = str(step.get("summary") or "")
+    move_summary = str(move.get("summary") or "")
     entity_name = str(entity.get("name") or "")
     entity_desc = str(entity.get("description") or "")
     entity_type = str(entity.get("entity_type") or "concept")
-    step_type = str(step.get("step_type") or "")
+    role = str(move.get("role") or "")
 
-    step_tokens = _tokenize(step_summary)
+    move_tokens = _tokenize(move_summary)
     entity_tokens = _tokenize(f"{entity_name} {entity_desc}")
-    lexical = _jaccard(step_tokens, entity_tokens)
-    overlap = len(step_tokens & entity_tokens)
+    lexical = _jaccard(move_tokens, entity_tokens)
+    overlap = len(move_tokens & entity_tokens)
     entity_coverage = overlap / max(1, len(entity_tokens))
     name_norm = _normalize_text(entity_name)
-    summary_norm = _normalize_text(step_summary)
+    summary_norm = _normalize_text(move_summary)
     name_in_summary = bool(name_norm and len(name_norm) >= 4 and name_norm in summary_norm)
 
     if semantic_score is None:
@@ -80,11 +82,11 @@ def _compute_link_score(
     else:
         semantic = float(max(0.0, min(1.0, semantic_score)))
 
-    compatible = _is_type_compatible(step_type, entity_type)
+    compatible = _is_type_compatible(role, entity_type)
 
     # Hard suppression for obvious type mismatch with no textual evidence.
     if not compatible and overlap <= 0 and not name_in_summary:
-        return 0.0, [f"type_mismatch:{step_type}->{entity_type}"]
+        return 0.0, [f"type_mismatch:{role}->{entity_type}"]
 
     type_score = 1.0 if compatible else 0.35
     name_hit = 1.0 if name_in_summary else 0.0
@@ -100,45 +102,48 @@ def _compute_link_score(
 
 
 def generate_explains_links(
-    logic_steps: list[dict[str, Any]],
+    research_moves: list[dict[str, Any]],
     entities: list[dict[str, Any]],
     *,
     min_score: float = 0.45,
-    top_k_per_step: int = 3,
+    top_k_per_move: int = 3,
     semantic_overrides: dict[tuple[str, str], float] | None = None,
 ) -> list[dict[str, Any]]:
     semantic_overrides = semantic_overrides or {}
     out: list[dict[str, Any]] = []
 
-    for step in logic_steps:
-        step_id = str(step.get("logic_step_id") or "").strip()
-        if not step_id:
+    for move in research_moves:
+        move_id = str(move.get("move_id") or "").strip()
+        if not move_id:
             continue
-        step_links: list[dict[str, Any]] = []
+        move_links: list[dict[str, Any]] = []
         for entity in entities:
             entity_id = str(entity.get("entity_id") or "").strip()
             if not entity_id:
                 continue
-            override = semantic_overrides.get((step_id, entity_id))
-            score, reasons = _compute_link_score(step, entity, semantic_score=override)
+            override = semantic_overrides.get((move_id, entity_id))
+            score, reasons = _compute_link_score(move, entity, semantic_score=override)
             if score < float(min_score):
                 continue
-            step_links.append(
+            move_links.append(
                 {
-                    "logic_step_id": step_id,
-                    "paper_id": str(step.get("paper_id") or ""),
+                    "move_id": move_id,
+                    "paper_id": str(move.get("paper_id") or ""),
+                    "paper_source": str(move.get("paper_source") or ""),
+                    "role": str(move.get("role") or ""),
+                    "act_type": str(move.get("act_type") or ""),
+                    "summary": str(move.get("summary") or ""),
                     "entity_id": entity_id,
                     "source_chapter_id": str(entity.get("source_chapter_id") or ""),
                     "score": score,
                     "reasons": reasons,
-                    "evidence_chunk_ids": list(step.get("evidence_chunk_ids") or []),
-                    "source_chunk_id": str((step.get("evidence_chunk_ids") or [""])[0] or ""),
-                    "evidence_quote": f"{str(step.get('summary') or '')[:120]} | {str(entity.get('name') or '')}",
+                    "anchor_ids": [str(item).strip() for item in (move.get("anchor_ids") or []) if str(item).strip()],
+                    "evidence_quote": f"{str(move.get('summary') or '')[:120]} | {str(entity.get('name') or '')}",
                 }
             )
 
-        step_links.sort(key=lambda x: (-float(x.get("score") or 0.0), str(x.get("entity_id") or "")))
-        out.extend(step_links[: max(1, int(top_k_per_step))])
+        move_links.sort(key=lambda x: (-float(x.get("score") or 0.0), str(x.get("entity_id") or "")))
+        out.extend(move_links[: max(1, int(top_k_per_move))])
 
-    out.sort(key=lambda x: (str(x.get("logic_step_id") or ""), -float(x.get("score") or 0.0), str(x.get("entity_id") or "")))
+    out.sort(key=lambda x: (str(x.get("move_id") or ""), -float(x.get("score") or 0.0), str(x.get("entity_id") or "")))
     return out

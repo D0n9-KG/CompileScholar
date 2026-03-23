@@ -16,7 +16,7 @@ const TABS: Array<{ id: Tab; zh: { label: string; desc: string }; en: { label: s
   {
     id: 'config',
     zh: { label: '配置中心', desc: '集中管理参数、抽取策略与调优助手。' },
-    en: { label: 'Config Center', desc: 'Centralized parameters, extraction policy, and tuning assistant.' },
+    en: { label: 'Config Center', desc: 'Centralized parameters, trace compiler controls, and tuning assistant.' },
   },
   {
     id: 'unresolved',

@@ -20,8 +20,8 @@ _LLM_WORKER_INT_LIMITS: dict[str, tuple[int, int, int]] = {
 
 _RUNTIME_LIMITS: dict[str, tuple[int, int, int]] = {
     "ingest_llm_max_workers": (5, 1, 32),
-    "phase1_claim_chunks_runtime_cap": (48, 1, 512),
-    "phase1_chunk_claim_max_workers": (4, 1, 8),
+    "phase1_source_units_runtime_cap": (48, 1, 512),
+    "phase1_move_anchor_max_workers": (4, 1, 8),
     "phase1_grounding_max_workers": (3, 1, 6),
     "phase2_conflict_max_workers": (3, 1, 6),
     "ingest_pre_llm_max_workers": (6, 1, 8),
@@ -121,7 +121,7 @@ _FIELD_ENV_KEYS: dict[str, tuple[str, ...]] = {
     "group_clustering_method": ("GROUP_CLUSTERING_METHOD",),
     "ingest_llm_max_workers": ("INGEST_LLM_MAX_WORKERS",),
     "ingest_llm_heartbeat_seconds": ("INGEST_LLM_HEARTBEAT_SECONDS",),
-    "phase1_claim_chunks_runtime_cap": ("PHASE1_CLAIM_CHUNKS_RUNTIME_CAP",),
+    "phase1_source_units_runtime_cap": ("PHASE1_SOURCE_UNITS_RUNTIME_CAP",),
     "llm_timeout_seconds": ("LLM_TIMEOUT_SECONDS",),
     "llm_client_max_retries": ("LLM_CLIENT_MAX_RETRIES",),
     "rag_llm_timeout_seconds": ("RAG_LLM_TIMEOUT_SECONDS",),
@@ -129,7 +129,7 @@ _FIELD_ENV_KEYS: dict[str, tuple[str, ...]] = {
     "pageindex_enabled": ("PAGEINDEX_ENABLED",),
     "pageindex_index_dir": ("PAGEINDEX_INDEX_DIR",),
     "neo4j_connection_timeout_seconds": ("NEO4J_CONNECTION_TIMEOUT_SECONDS",),
-    "phase1_chunk_claim_max_workers": ("PHASE1_CHUNK_CLAIM_MAX_WORKERS",),
+    "phase1_move_anchor_max_workers": ("PHASE1_MOVE_ANCHOR_MAX_WORKERS",),
     "phase1_grounding_max_workers": ("PHASE1_GROUNDING_MAX_WORKERS",),
     "phase2_conflict_max_workers": ("PHASE2_CONFLICT_MAX_WORKERS",),
     "ingest_pre_llm_max_workers": ("INGEST_PRE_LLM_MAX_WORKERS",),
@@ -231,11 +231,11 @@ def _default_similarity() -> dict[str, Any]:
 def _default_runtime() -> dict[str, Any]:
     return {
         "ingest_llm_max_workers": int(getattr(settings, "ingest_llm_max_workers", _RUNTIME_LIMITS["ingest_llm_max_workers"][0])),
-        "phase1_claim_chunks_runtime_cap": int(
-            getattr(settings, "phase1_claim_chunks_runtime_cap", _RUNTIME_LIMITS["phase1_claim_chunks_runtime_cap"][0])
+        "phase1_source_units_runtime_cap": int(
+            getattr(settings, "phase1_source_units_runtime_cap", _RUNTIME_LIMITS["phase1_source_units_runtime_cap"][0])
         ),
-        "phase1_chunk_claim_max_workers": int(
-            getattr(settings, "phase1_chunk_claim_max_workers", _RUNTIME_LIMITS["phase1_chunk_claim_max_workers"][0])
+        "phase1_move_anchor_max_workers": int(
+            getattr(settings, "phase1_move_anchor_max_workers", _RUNTIME_LIMITS["phase1_move_anchor_max_workers"][0])
         ),
         "phase1_grounding_max_workers": int(
             getattr(settings, "phase1_grounding_max_workers", _RUNTIME_LIMITS["phase1_grounding_max_workers"][0])
@@ -460,14 +460,14 @@ def _is_routable_llm_worker(row: dict[str, Any]) -> bool:
 
 
 def _estimate_llm_requests_per_paper(runtime: dict[str, Any]) -> int:
-    chunk_claim_default, chunk_claim_lo, chunk_claim_hi = _RUNTIME_LIMITS["phase1_chunk_claim_max_workers"]
+    move_anchor_default, move_anchor_lo, move_anchor_hi = _RUNTIME_LIMITS["phase1_move_anchor_max_workers"]
     grounding_default, grounding_lo, grounding_hi = _RUNTIME_LIMITS["phase1_grounding_max_workers"]
     conflict_default, conflict_lo, conflict_hi = _RUNTIME_LIMITS["phase2_conflict_max_workers"]
-    chunk_claim = _clamp_int(
-        runtime.get("phase1_chunk_claim_max_workers", chunk_claim_default),
-        default=chunk_claim_default,
-        lo=chunk_claim_lo,
-        hi=chunk_claim_hi,
+    move_anchor = _clamp_int(
+        runtime.get("phase1_move_anchor_max_workers", move_anchor_default),
+        default=move_anchor_default,
+        lo=move_anchor_lo,
+        hi=move_anchor_hi,
     )
     grounding = _clamp_int(
         runtime.get("phase1_grounding_max_workers", grounding_default),
@@ -481,7 +481,7 @@ def _estimate_llm_requests_per_paper(runtime: dict[str, Any]) -> int:
         lo=conflict_lo,
         hi=conflict_hi,
     )
-    return max(1, chunk_claim, grounding, conflict)
+    return max(1, move_anchor, grounding, conflict)
 
 
 def _derive_ingest_llm_max_workers(runtime: dict[str, Any], llm_workers: dict[str, Any] | None) -> int:

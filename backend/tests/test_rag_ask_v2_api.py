@@ -34,8 +34,8 @@ def test_ask_v2_response_accepts_community_structured_evidence_payload():
                 "source_id": "gc:demo",
                 "community_id": "gc:demo",
                 "text": "Finite element stability community.",
-                "member_ids": ["cl-1", "ke-1"],
-                "member_kinds": ["Claim", "KnowledgeEntity"],
+                "member_ids": ["mv-1", "ke-1"],
+                "member_kinds": ["move", "entity"],
                 "keyword_texts": ["finite element", "stability"],
             }
         ],
@@ -43,4 +43,4 @@ def test_ask_v2_response_accepts_community_structured_evidence_payload():
 
     assert response.structured_evidence[0].kind == "community"
     assert response.structured_evidence[0].community_id == "gc:demo"
-    assert response.structured_evidence[0].member_ids == ["cl-1", "ke-1"]
+    assert response.structured_evidence[0].member_ids == ["mv-1", "ke-1"]

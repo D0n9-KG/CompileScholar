@@ -137,7 +137,7 @@ def _llm_progress_message(
     ]
     if oldest_active and oldest_active[0]:
         parts.append(f"oldest_active={oldest_active[0]}:{oldest_active[1]}s")
-    return "Running LLM extraction (Logic/Claims; citation enrichment optional) (" + ", ".join(parts) + ")"
+    return "Running PaperLogicTrace compilation (citation enrichment optional) (" + ", ".join(parts) + ")"
 
 
 def _write_document_ir(path: Path, doc: DocumentIR) -> None:
@@ -331,7 +331,7 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
                     # Paper doesn't exist yet - first ingest, no stale data to clean
                     pass
                 else:
-                    # Paper exists - delete stale chunks/claims/logic/refs/cites before upserting
+                # Paper exists - delete stale paper subgraph before writing the fresh trace-backed graph
                     client.delete_paper_subgraph(paper_id)
 
                 client.upsert_paper_and_chunks(doc)
@@ -384,7 +384,7 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
     except Exception as exc:  # noqa: BLE001
         neo4j_error = str(exc)
 
-    notify("ingest:llm", 0.70, "Running LLM extraction (Logic/Claims)")
+    notify("ingest:llm", 0.70, "Running PaperLogicTrace compilation")
     llm_built = False
     llm_error = None
     llm_outputs: list[dict[str, Any]] = []
@@ -407,23 +407,13 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
         )
         trace = phase1.get("paper_logic_trace")
         trace_payload = trace.model_dump(mode="json") if hasattr(trace, "model_dump") else dict(trace or {})
-        step_order = list(phase1.get("step_order") or [])
-        logic_claims = {
-            "logic": phase1.get("logic") or {},
-            "claims": phase1.get("validated_claims") or [],
-            "quality_report": phase1.get("quality_report") or {},
-            "raw_claim_candidates": len(phase1.get("claim_candidates") or []),
-            "raw_claims_merged": len(phase1.get("claims_merged") or []),
-            "rejected_claims": len(phase1.get("rejected_claims") or []),
-        }
+        quality_report = phase1.get("quality_report") or {}
         llm_out = {
             "paper_id": paper_id,
             "schema": {"paper_type": paper_type, "version": schema.get("version")},
             "paper_logic_trace": trace_payload,
-            **logic_claims,
+            "quality_report": quality_report,
         }
-        out = run_dir / f"{doc.paper.paper_source}.llm_imrad.json"
-        out.write_text(json.dumps(logic_claims, ensure_ascii=False, indent=2), encoding="utf-8")
         trace_out = run_dir / f"{doc.paper.paper_source}.paper_logic_trace.json"
         trace_out.write_text(json.dumps(trace_payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
@@ -477,8 +467,7 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
             "idx": idx,
             "paper_id": paper_id,
             "paper_year": doc.paper.year,
-            "step_order": step_order,
-            "logic_claims": logic_claims,
+            "quality_report": quality_report,
             "citation_purposes": purposes,
             "citation_purposes_deferred": defer_citation_purposes,
             "llm_out": llm_out,
@@ -487,12 +476,9 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
 
     def _write_llm_to_neo4j(item: dict[str, Any]) -> None:
         paper_id = str(item["paper_id"])
-        logic_claims = dict(item.get("logic_claims") or {})
-        claims = list(logic_claims.get("claims") or [])
-        step_order = list(item.get("step_order") or [])
+        quality_report = dict(item.get("quality_report") or {})
         purposes = list(item.get("citation_purposes") or [])
         purposes_deferred = bool(item.get("citation_purposes_deferred"))
-        quality_report = logic_claims.get("quality_report") or {}
         trace_payload = dict(item.get("paper_logic_trace") or {})
         trace_quality = dict(trace_payload.get("quality") or {})
         trace_gate_report = dict(trace_quality.get("hot_path_gate_report") or {})
@@ -515,14 +501,8 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
                 except Exception:
                     pass
                 return
-            client.upsert_logic_steps_and_claims(
-                paper_id=paper_id,
-                logic=logic_claims.get("logic") or {},
-                claims=claims,
-                step_order=step_order,
-            )
+            client.upsert_paper_logic_trace(paper_id=paper_id, trace_payload=trace_payload)
             try:
-                quality_report = logic_claims.get("quality_report") or {}
                 client.update_paper_props(
                     paper_id,
                     {
@@ -534,14 +514,6 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
                         "paper_logic_trace_audit_status": str(trace_quality.get("audit_status") or ""),
                     },
                 )
-            except Exception:
-                pass
-            try:
-                client.apply_human_claim_evidence_overrides(paper_id)
-            except Exception:
-                pass
-            try:
-                client.apply_human_logic_step_evidence_overrides(paper_id)
             except Exception:
                 pass
             if not purposes_deferred:
@@ -753,30 +725,35 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
         if neo4j_written:
             with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
                 structured_corpora = {
-                    "logic_steps": (
-                        client.list_logic_step_structured_rows(limit=50000),
+                    "research_moves": (
+                        client.list_research_moves(limit=50000),
                         [
                             "kind",
                             "source_id",
                             "paper_id",
                             "paper_source",
-                            "step_type",
-                            "evidence_chunk_ids",
-                            "evidence_quote",
+                            "paper_title",
+                            "role",
+                            "act_type",
+                            "anchor_ids",
                         ],
                     ),
-                    "claims": (
-                        client.list_claim_structured_rows(limit=50000),
+                    "evidence_anchors": (
+                        client.list_evidence_anchors(limit=50000),
                         [
                             "kind",
                             "source_id",
                             "paper_id",
                             "paper_source",
-                            "step_type",
+                            "paper_title",
+                            "move_id",
+                            "role",
                             "confidence",
-                            "community_id",
-                            "evidence_chunk_ids",
-                            "evidence_quote",
+                            "quote",
+                            "source_ref",
+                            "chunk_id",
+                            "start_line",
+                            "end_line",
                         ],
                     ),
                     "communities": (
@@ -854,12 +831,12 @@ def ingest_markdowns(md_files: list[str], progress: ProgressFn | None = None) ->
         "phase1_quality": [
             {
                 "paper_id": o.get("paper_id"),
-                "gate_passed": bool((o.get("quality_report") or {}).get("gate_passed")),
-                "quality_tier": str((o.get("quality_report") or {}).get("quality_tier") or ""),
+                "hot_path_gate_passed": bool((((o.get("paper_logic_trace") or {}).get("quality") or {}).get("hot_path_gate_report") or {}).get("passed")),
+                "quality_tier": str((((o.get("paper_logic_trace") or {}).get("quality") or {}).get("quality_tier") or "")),
                 "quality_tier_score": (o.get("quality_report") or {}).get("quality_tier_score"),
-                "supported_claim_ratio": (o.get("quality_report") or {}).get("supported_claim_ratio"),
-                "step_coverage_ratio": (o.get("quality_report") or {}).get("step_coverage_ratio"),
-                "validated_claims": len(o.get("claims") or []),
+                "move_count": len((((o.get("paper_logic_trace") or {}).get("canonical_core") or {}).get("moves") or [])),
+                "anchor_count": len((((o.get("paper_logic_trace") or {}).get("canonical_core") or {}).get("evidence_anchors") or [])),
+                "sparse_trace": bool((((o.get("paper_logic_trace") or {}).get("quality") or {}).get("hot_path_gate_report") or {}).get("sparse_trace")),
             }
             for o in llm_outputs
         ],

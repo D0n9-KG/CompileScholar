@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 
 from app.crossref.client import CrossrefClient
 from app.graph.neo4j_client import Neo4jClient
+from app.paper_logic_trace import export_paper_logic_trace
 from app.settings import settings
 
 
@@ -27,7 +28,7 @@ def list_papers(limit: int = 50, collection_id: str | None = None):
 def get_paper(paper_id: str):
     try:
         with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
-            return client.get_paper_detail(paper_id)
+            return export_paper_logic_trace(client, paper_id)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except Exception as exc:
@@ -103,42 +104,6 @@ def neighborhood(
                 limit_edges=limit_edges,
                 collection_id=collection_id,
             )
-    except HTTPException:
-        raise
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc)) from exc
-
-
-@router.get("/similarity/claims")
-def similar_claims(paper_ids: str, min_score: float = 0.0, limit_per_source: int = 2, limit_total: int = 4000):
-    try:
-        ids = [s.strip() for s in str(paper_ids or "").split(",") if s.strip()]
-        if not ids:
-            raise HTTPException(status_code=400, detail="paper_ids is required (comma-separated)")
-        with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
-            return {
-                "edges": client.list_similar_claim_edges_in_papers(
-                    paper_ids=ids, min_score=float(min_score), limit_per_source=limit_per_source, limit_total=limit_total
-                )
-            }
-    except HTTPException:
-        raise
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc)) from exc
-
-
-@router.get("/similarity/logic")
-def similar_logic(paper_ids: str, min_score: float = 0.0, limit_per_source: int = 2, limit_total: int = 3000):
-    try:
-        ids = [s.strip() for s in str(paper_ids or "").split(",") if s.strip()]
-        if not ids:
-            raise HTTPException(status_code=400, detail="paper_ids is required (comma-separated)")
-        with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
-            return {
-                "edges": client.list_similar_logic_edges_in_papers(
-                    paper_ids=ids, min_score=float(min_score), limit_per_source=limit_per_source, limit_total=limit_total
-                )
-            }
     except HTTPException:
         raise
     except Exception as exc:

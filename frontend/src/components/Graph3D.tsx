@@ -352,7 +352,7 @@ export default function Graph3D({ elements, selectedNodeId, onSelectNode, transi
           paperId: node.paperId,
           paperSource: node.paperSource,
           paperTitle: node.paperTitle,
-          stepType: node.stepType,
+          role: node.role,
           textbookId: node.textbookId,
           chapterId: node.chapterId,
         })

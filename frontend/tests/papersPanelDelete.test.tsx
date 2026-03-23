@@ -48,6 +48,8 @@ vi.mock('../src/loaders/panelData', () => ({
 }))
 
 vi.mock('../src/loaders/overview', () => ({
+  OVERVIEW_GRAPH_DEFAULT_LIMIT_PAPERS: 200,
+  OVERVIEW_GRAPH_DEFAULT_LIMIT_EDGES: 600,
   loadOverviewGraph: mockLoadOverviewGraph,
   invalidateOverviewGraphCache: mockInvalidateOverviewGraphCache,
 }))

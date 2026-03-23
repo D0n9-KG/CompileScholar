@@ -1,8 +1,43 @@
 from __future__ import annotations
 
+import re
 from typing import Any, Iterable
 
 from .models import MentionValue, PaperLogicTrace, ResearchMove
+
+
+_WORD_RE = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)?", re.IGNORECASE)
+_GENERIC_TOKENS = {
+    'a',
+    'an',
+    'and',
+    'are',
+    'as',
+    'at',
+    'be',
+    'behavior',
+    'for',
+    'in',
+    'is',
+    'method',
+    'methods',
+    'model',
+    'of',
+    'on',
+    'paper',
+    'results',
+    'study',
+    'studied',
+    'system',
+    'that',
+    'the',
+    'this',
+    'to',
+    'under',
+    'using',
+    'we',
+    'with',
+}
 
 
 def _unique(values: Iterable[str]) -> list[str]:
@@ -23,6 +58,48 @@ def _mention_token(mention: MentionValue) -> str:
 
 def _mention_tokens(mentions: list[MentionValue]) -> list[str]:
     return _unique(_mention_token(mention) for mention in mentions)
+
+
+def _summary_terms(summary: str) -> list[str]:
+    return [
+        token.lower()
+        for token in _WORD_RE.findall(str(summary or '').lower())
+        if token and token.lower() not in _GENERIC_TOKENS and len(token) >= 3
+    ]
+
+
+def _summary_fallback_tokens(move: ResearchMove) -> dict[str, list[str]]:
+    terms = _summary_terms(move.summary)
+    if not terms:
+        return {'method_tokens': [], 'object_tokens': [], 'condition_tokens': []}
+
+    object_tokens = _unique(
+        [' '.join(terms[i : i + 2]) for i in range(max(0, min(len(terms) - 1, 2)))]
+        or terms[:2]
+    )
+
+    condition_tokens: list[str] = []
+    lowered = str(move.summary or '').lower()
+    for cue in ('under', 'with', 'at', 'during'):
+        marker = f'{cue} '
+        if marker not in lowered:
+            continue
+        tail = lowered.split(marker, 1)[1]
+        words = [token for token in _WORD_RE.findall(tail) if token and token.lower() not in _GENERIC_TOKENS]
+        if words:
+            condition_tokens.append(' '.join(words[:3]).lower())
+
+    if move.role in {'method', 'experiment'}:
+        return {
+            'method_tokens': object_tokens[:3],
+            'object_tokens': [],
+            'condition_tokens': _unique(condition_tokens)[:2],
+        }
+    return {
+        'method_tokens': [],
+        'object_tokens': object_tokens[:3],
+        'condition_tokens': _unique(condition_tokens)[:2],
+    }
 
 
 def _slot_provenance_for(move: ResearchMove, field: str) -> list[dict[str, Any]]:
@@ -100,16 +177,20 @@ def build_l1_bridge_hints(moves: list[ResearchMove]) -> dict[str, list[dict[str,
 def build_community_signatures(paper_id: str, moves: list[ResearchMove]) -> list[dict[str, Any]]:
     signatures: list[dict[str, Any]] = []
     for move in moves:
+        fallback = _summary_fallback_tokens(move)
+        method_tokens = _mention_tokens(move.methods) or list(fallback['method_tokens'])
+        object_tokens = _mention_tokens(move.research_objects) or list(fallback['object_tokens'])
+        condition_tokens = _mention_tokens(move.conditions) or list(fallback['condition_tokens'])
         signatures.append(
             {
                 'move_id': move.move_id,
                 'paper_id': paper_id,
                 'role': move.role,
                 'act_type': move.act_type,
-                'method_tokens': _mention_tokens(move.methods),
-                'object_tokens': _mention_tokens(move.research_objects),
+                'method_tokens': method_tokens,
+                'object_tokens': object_tokens,
                 'metric_tokens': _mention_tokens(move.metrics),
-                'condition_tokens': _mention_tokens(move.conditions),
+                'condition_tokens': condition_tokens,
                 'comparator_tokens': _mention_tokens(move.comparators),
                 'effect_directions': _unique(effect.direction for effect in move.effects),
                 'limitation_tokens': _mention_tokens(move.limitation_types),

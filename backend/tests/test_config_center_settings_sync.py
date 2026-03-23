@@ -184,13 +184,13 @@ def test_merge_runtime_config_includes_claim_chunk_cap(monkeypatch, tmp_path):
     import app.ops_config_store as config_store
 
     monkeypatch.setattr(config_store, "_CONFIG_PATH_OVERRIDE", tmp_path / "config_center.json")
-    monkeypatch.delenv("PHASE1_CLAIM_CHUNKS_RUNTIME_CAP", raising=False)
+    monkeypatch.delenv("PHASE1_SOURCE_UNITS_RUNTIME_CAP", raising=False)
 
     config_store.save_profile(
         {
             "modules": {
                 "runtime": {
-                    "phase1_claim_chunks_runtime_cap": 48,
+                    "phase1_source_units_runtime_cap": 48,
                 },
             }
         }
@@ -198,4 +198,4 @@ def test_merge_runtime_config_includes_claim_chunk_cap(monkeypatch, tmp_path):
 
     runtime = config_store.merge_runtime_config({})
 
-    assert runtime["phase1_claim_chunks_runtime_cap"] == 48
+    assert runtime["phase1_source_units_runtime_cap"] == 48

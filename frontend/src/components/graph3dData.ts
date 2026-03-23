@@ -2,6 +2,7 @@ import { buildOverview3DVisibleLinks } from './graph3dLinkBudget'
 import { seedClusteredPositions } from './graph3dModel'
 import { applyCommunityThemeLinks, applyCommunityThemeNodes, buildCommunityRoleAssignments, type CommunityRoleAssignment } from './graph3dTheme'
 import type { GraphElement } from '../state/types'
+import { normalizeGraphKind } from '../graphKinds'
 
 export type Graph3DNode = {
   id: string
@@ -15,7 +16,7 @@ export type Graph3DNode = {
   paperId?: string
   paperSource?: string
   paperTitle?: string
-  stepType?: string
+  role?: string
   textbookId?: string
   chapterId?: string
   keywords?: string[]
@@ -54,7 +55,8 @@ function clamp(value: number, min: number, max: number) {
 }
 
 function nodeColor(kind: string, tier?: string, ingested?: boolean): string {
-  if (kind === 'paper') {
+  const normalizedKind = normalizeGraphKind(kind)
+  if (normalizedKind === 'paper') {
     if (ingested === false) return '#4f6d89'
     if (tier === 'A1') return '#7dd3fc'
     if (tier === 'A2') return '#38bdf8'
@@ -63,25 +65,26 @@ function nodeColor(kind: string, tier?: string, ingested?: boolean): string {
     if (tier === 'C') return '#0369a1'
     return '#0ea5e9'
   }
-  if (kind === 'textbook') return '#f59e0b'
-  if (kind === 'chapter') return '#22c55e'
-  if (kind === 'community') return '#fb7185'
-  if (kind === 'logic') return '#34d399'
-  if (kind === 'claim') return '#fb923c'
-  if (kind === 'group') return '#2dd4bf'
-  if (kind === 'entity') return '#14b8a6'
+  if (normalizedKind === 'textbook') return '#f59e0b'
+  if (normalizedKind === 'chapter') return '#22c55e'
+  if (normalizedKind === 'community') return '#fb7185'
+  if (normalizedKind === 'move') return '#34d399'
+  if (normalizedKind === 'anchor') return '#fb923c'
+  if (normalizedKind === 'group') return '#2dd4bf'
+  if (normalizedKind === 'entity') return '#14b8a6'
   return '#94a3b8'
 }
 
 function nodeSize(kind: string, degree?: number, ingested?: boolean): number {
+  const normalizedKind = normalizeGraphKind(kind)
   const d = clamp(Number(degree ?? 0), 0, 20)
-  if (kind === 'textbook') return 10.5 + d * 0.32
-  if (kind === 'chapter') return 7.2 + d * 0.24
-  if (kind === 'community') return 6.4 + d * 0.24
-  if (kind === 'paper') return ingested === false ? 3.8 + d * 0.2 : 5.8 + d * 0.34
-  if (kind === 'group') return 6.2 + d * 0.28
-  if (kind === 'logic' || kind === 'claim') return 4.8 + d * 0.24
-  if (kind === 'citation') return 3.2 + d * 0.14
+  if (normalizedKind === 'textbook') return 10.5 + d * 0.32
+  if (normalizedKind === 'chapter') return 7.2 + d * 0.24
+  if (normalizedKind === 'community') return 6.4 + d * 0.24
+  if (normalizedKind === 'paper') return ingested === false ? 3.8 + d * 0.2 : 5.8 + d * 0.34
+  if (normalizedKind === 'group') return 6.2 + d * 0.28
+  if (normalizedKind === 'move' || normalizedKind === 'anchor') return 4.8 + d * 0.24
+  if (normalizedKind === 'citation') return 3.2 + d * 0.14
   return 4 + d * 0.2
 }
 
@@ -109,7 +112,7 @@ export function buildGraph3DBaseData(elements: GraphElement[]): Graph3DBaseData 
       paperId: element.data.paperId,
       paperSource: element.data.paperSource,
       paperTitle: element.data.paperTitle,
-      stepType: element.data.stepType,
+      role: element.data.role,
       textbookId: element.data.textbookId,
       chapterId: element.data.chapterId,
       keywords: element.data.keywords,

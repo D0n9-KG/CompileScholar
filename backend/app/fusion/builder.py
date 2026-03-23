@@ -6,54 +6,36 @@ from app.fusion.linking import generate_explains_links
 
 
 def build_fusion_projection(
-    logic_steps: list[dict[str, Any]],
-    claims: list[dict[str, Any]],
+    research_moves: list[dict[str, Any]],
     entities: list[dict[str, Any]],
     textbook_relations: list[dict[str, Any]],
     *,
     min_link_score: float = 0.45,
-    top_k_per_step: int = 3,
+    top_k_per_move: int = 3,
 ) -> dict[str, list[dict[str, Any]]]:
     links = generate_explains_links(
-        logic_steps,
+        research_moves,
         entities,
         min_score=min_link_score,
-        top_k_per_step=top_k_per_step,
+        top_k_per_move=top_k_per_move,
     )
 
     nodes_by_id: dict[str, dict[str, Any]] = {}
     edges: list[dict[str, Any]] = []
 
-    for step in logic_steps:
-        sid = str(step.get("logic_step_id") or "").strip()
-        if not sid:
+    for move in research_moves:
+        move_id = str(move.get("move_id") or "").strip()
+        if not move_id:
             continue
-        nodes_by_id[sid] = {
-            "id": sid,
-            "label": "LogicStep",
-            "step_type": step.get("step_type"),
-            "summary": step.get("summary"),
+        nodes_by_id[move_id] = {
+            "id": move_id,
+            "label": "ResearchMove",
+            "paper_id": move.get("paper_id"),
+            "paper_source": move.get("paper_source"),
+            "role": move.get("role"),
+            "act_type": move.get("act_type"),
+            "summary": move.get("summary"),
         }
-
-    for claim in claims:
-        cid = str(claim.get("claim_id") or "").strip()
-        if not cid:
-            continue
-        nodes_by_id[cid] = {
-            "id": cid,
-            "label": "Claim",
-            "text": claim.get("text"),
-            "step_type": claim.get("step_type"),
-        }
-        c_step_type = str(claim.get("step_type") or "")
-        for step in logic_steps:
-            if str(step.get("step_type") or "") != c_step_type:
-                continue
-            sid = str(step.get("logic_step_id") or "").strip()
-            if not sid:
-                continue
-            edges.append({"type": "HAS_CLAIM", "source": sid, "target": cid})
-            break
 
     for ent in entities:
         eid = str(ent.get("entity_id") or "").strip()
@@ -84,11 +66,14 @@ def build_fusion_projection(
         edges.append(
             {
                 "type": "EXPLAINS",
-                "source": link["logic_step_id"],
+                "source": link["move_id"],
                 "target": link["entity_id"],
                 "score": link.get("score"),
                 "reasons": link.get("reasons"),
-                "evidence_chunk_ids": link.get("evidence_chunk_ids"),
+                "anchor_ids": link.get("anchor_ids"),
+                "evidence_quote": link.get("evidence_quote"),
+                "role": link.get("role"),
+                "act_type": link.get("act_type"),
             }
         )
 

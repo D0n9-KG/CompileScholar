@@ -213,6 +213,7 @@ def compile_paper_logic_trace(
     gate_report = evaluate_hot_path_gate(
         moves=canonical_core.moves,
         anchors=canonical_core.evidence_anchors,
+        move_relations=canonical_core.move_relations,
     )
     trace = PaperLogicTrace(
         trace_id=f'{metadata.paper_id}:paper_logic_trace',

@@ -32,14 +32,23 @@ def test_embedding_retry_policy_is_explicit(
         def __exit__(self, exc_type, exc, tb):
             return False
 
-        def list_claim_similarity_rows(self, paper_id: str | None = None):
+        def list_research_moves(self, paper_id: str | None = None, limit: int = 50000):
             return [
-                {"node_id": "c1", "paper_id": "p1", "text": "Granular flow increases with vibration."},
-                {"node_id": "c2", "paper_id": "p2", "text": "Vibration increases granular flow rate."},
+                {
+                    "move_id": "m1",
+                    "paper_id": "p1",
+                    "summary": "Granular flow increases with vibration.",
+                    "role": "result",
+                    "act_type": "report_effect",
+                },
+                {
+                    "move_id": "m2",
+                    "paper_id": "p2",
+                    "summary": "Vibration increases granular flow rate.",
+                    "role": "result",
+                    "act_type": "report_effect",
+                },
             ]
-
-        def list_logic_step_similarity_rows(self, paper_id: str | None = None):
-            return []
 
     class _FailingEmbeddingClient:
         def embed_documents(self, texts):  # noqa: ANN001
@@ -55,6 +64,7 @@ def test_embedding_retry_policy_is_explicit(
     monkeypatch.setattr(similarity_service, "_embedding_client", lambda: _FailingEmbeddingClient())
     monkeypatch.setattr(similarity_service, "_write_items", lambda kind, items: None)
     monkeypatch.setattr(similarity_service, "_save_embeddings", lambda kind, x: None)
+    monkeypatch.setattr(similarity_service, "_write_neighbors", lambda kind, rows: None)
     monkeypatch.setattr(
         similarity_service,
         "_meta_path",
@@ -80,8 +90,7 @@ def test_embedding_retry_policy_is_explicit(
     assert sleep_calls == expected_sleeps
 
     # No meta files written: exception occurred before any successful embedding.
-    assert not (tmp_path / "claim_meta.json").exists()
-    assert not (tmp_path / "logic_meta.json").exists()
+    assert not (tmp_path / "move_meta.json").exists()
 
     # Retry progress logs should include attempt counters.
     assert any(f"attempt 1/{expected_attempts}" in line.lower() for line in logs)

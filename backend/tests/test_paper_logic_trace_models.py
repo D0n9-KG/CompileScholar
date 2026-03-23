@@ -55,3 +55,20 @@ def test_paper_logic_trace_uses_canonical_core() -> None:
     )
 
     assert trace.canonical_core.moves[0].role == 'method'
+
+
+def test_derived_views_can_fallback_summary_tokens_for_sparse_move() -> None:
+    from app.paper_logic_trace.derived_views import build_community_signatures
+
+    move = ResearchMove(
+        move_id='m-1',
+        sequence_no=1,
+        role='background',
+        act_type='define_task',
+        summary='Particle packing behavior under high stress conditions is studied.',
+        anchor_ids=['a-1'],
+    )
+
+    signatures = build_community_signatures('paper-1', [move])
+
+    assert signatures[0]['object_tokens'] or signatures[0]['condition_tokens']

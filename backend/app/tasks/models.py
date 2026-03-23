@@ -24,11 +24,8 @@ class TaskType(str, Enum):
     rebuild_paper = "rebuild_paper"
     rebuild_faiss = "rebuild_faiss"
     rebuild_all = "rebuild_all"
-    rebuild_similarity = "rebuild_similarity"
-    rebuild_fusion = "rebuild_fusion"
     rebuild_global_communities = "rebuild_global_communities"
     cleanup_legacy_propositions = "cleanup_legacy_propositions"
-    update_similarity_paper = "update_similarity_paper"
     ingest_textbook = "ingest_textbook"
 
 

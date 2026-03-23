@@ -47,14 +47,16 @@ describe('RightPanel ask summary fusion coverage', () => {
       activeModule: 'ask',
       graphElements: [
         { group: 'nodes', data: { id: 'paper:doi:1', label: 'Paper A', kind: 'paper', paperId: 'doi:1' } },
-        { group: 'nodes', data: { id: 'logic:paper-A:Method:Uses FEM', label: 'Uses FEM', kind: 'logic' } },
+        { group: 'nodes', data: { id: 'move:paper-A:Method:Uses FEM', label: 'Uses FEM', kind: 'move' } },
+        { group: 'nodes', data: { id: 'anchor:cl-1', label: 'FEM improves stability.', kind: 'anchor' } },
         { group: 'nodes', data: { id: 'textbook:tb:1', label: 'Continuum Mechanics', kind: 'textbook', textbookId: 'tb:1', clusterKey: 'textbook:tb:1' } },
         { group: 'nodes', data: { id: 'chapter:tb:1:ch001', label: 'Ch.1 Finite Element Foundations', kind: 'chapter', textbookId: 'tb:1', chapterId: 'tb:1:ch001', clusterKey: 'textbook:tb:1' } },
         { group: 'nodes', data: { id: 'entity:ent-1', label: 'Finite Element Method', kind: 'entity', textbookId: 'tb:1', chapterId: 'tb:1:ch001', clusterKey: 'chapter:tb:1:ch001' } },
-        { group: 'edges', data: { id: 'paper:doi:1->logic:paper-A:Method:Uses FEM', source: 'paper:doi:1', target: 'logic:paper-A:Method:Uses FEM', kind: 'contains' } },
+        { group: 'edges', data: { id: 'paper:doi:1->move:paper-A:Method:Uses FEM', source: 'paper:doi:1', target: 'move:paper-A:Method:Uses FEM', kind: 'contains' } },
+        { group: 'edges', data: { id: 'paper:doi:1->anchor:cl-1', source: 'paper:doi:1', target: 'anchor:cl-1', kind: 'supports' } },
         { group: 'edges', data: { id: 'textbook:tb:1->chapter:tb:1:ch001', source: 'textbook:tb:1', target: 'chapter:tb:1:ch001', kind: 'contains' } },
         { group: 'edges', data: { id: 'chapter:tb:1:ch001->entity:ent-1', source: 'chapter:tb:1:ch001', target: 'entity:ent-1', kind: 'contains' } },
-        { group: 'edges', data: { id: 'logic:paper-A:Method:Uses FEM->entity:ent-1', source: 'logic:paper-A:Method:Uses FEM', target: 'entity:ent-1', kind: 'maps_to' } },
+        { group: 'edges', data: { id: 'move:paper-A:Method:Uses FEM->entity:ent-1', source: 'move:paper-A:Method:Uses FEM', target: 'entity:ent-1', kind: 'maps_to' } },
       ],
       ask: {
         sessions: [
@@ -86,8 +88,8 @@ describe('RightPanel ask summary fusion coverage', () => {
                   {
                     paper_id: 'doi:1',
                     paper_source: 'paper-A',
-                    logic_step_id: 'ls-1',
-                    step_type: 'Method',
+                    move_id: 'mv-1',
+                    role: 'method',
                     entity_id: 'ent-1',
                     entity_name: 'Finite Element Method',
                     entity_type: 'method',
@@ -104,8 +106,8 @@ describe('RightPanel ask summary fusion coverage', () => {
                 dualEvidenceCoverage: true,
                 graphContext: [],
                 structuredKnowledge: {
-                  logic_steps: [{ paper_source: 'paper-A', step_type: 'Method', summary: 'Uses FEM.' }],
-                  claims: [{ claim_id: 'cl-1', paper_source: 'paper-A', step_type: 'Result', text: 'FEM improves stability.' }],
+                  research_moves: [{ paper_source: 'paper-A', move_id: 'mv-1', role: 'method', summary: 'Uses FEM.' }],
+                  evidence_anchors: [{ paper_source: 'paper-A', anchor_id: 'ea-1', role: 'result', text: 'FEM improves stability.' }],
                 },
                 structuredEvidence: [
                   {
@@ -113,17 +115,17 @@ describe('RightPanel ask summary fusion coverage', () => {
                     source_id: 'gc:finite-element',
                     community_id: 'gc:finite-element',
                     text: 'Finite element stability community.',
-                    source_kind: 'claim',
-                    source_ref_id: 'cl-1',
-                    member_ids: ['cl-1', 'ent-1'],
-                    member_kinds: ['claim', 'entity'],
+                    source_kind: 'evidence_anchor',
+                    source_ref_id: 'ea-1',
+                    member_ids: ['ea-1', 'ent-1'],
+                    member_kinds: ['anchor', 'entity'],
                     keyword_texts: ['finite element', 'stability'],
                   },
                 ],
                 grounding: [
                   {
-                    source_kind: 'claim',
-                    source_id: 'cl-1',
+                    source_kind: 'evidence_anchor',
+                    source_id: 'ea-1',
                     quote: 'Finite element method discretizes the domain.',
                     chunk_id: 'c1',
                     chapter_id: 'tb:1:ch001',
@@ -171,8 +173,8 @@ describe('RightPanel ask summary fusion coverage', () => {
               {
                 paper_id: 'doi:1',
                 paper_source: 'paper-A',
-                logic_step_id: 'ls-1',
-                step_type: 'Method',
+                move_id: 'mv-1',
+                role: 'method',
                 entity_id: 'ent-1',
                 entity_name: 'Finite Element Method',
                 entity_type: 'method',
@@ -189,8 +191,8 @@ describe('RightPanel ask summary fusion coverage', () => {
             dualEvidenceCoverage: true,
             graphContext: [],
             structuredKnowledge: {
-              logic_steps: [{ paper_source: 'paper-A', step_type: 'Method', summary: 'Uses FEM.' }],
-              claims: [{ claim_id: 'cl-1', paper_source: 'paper-A', step_type: 'Result', text: 'FEM improves stability.' }],
+              research_moves: [{ paper_source: 'paper-A', move_id: 'mv-1', role: 'method', summary: 'Uses FEM.' }],
+              evidence_anchors: [{ paper_source: 'paper-A', anchor_id: 'ea-1', role: 'result', text: 'FEM improves stability.' }],
             },
             structuredEvidence: [
               {
@@ -198,17 +200,17 @@ describe('RightPanel ask summary fusion coverage', () => {
                 source_id: 'gc:finite-element',
                 community_id: 'gc:finite-element',
                 text: 'Finite element stability community.',
-                source_kind: 'claim',
-                source_ref_id: 'cl-1',
-                member_ids: ['cl-1', 'ent-1'],
-                member_kinds: ['claim', 'entity'],
+                source_kind: 'evidence_anchor',
+                source_ref_id: 'ea-1',
+                member_ids: ['ea-1', 'ent-1'],
+                member_kinds: ['anchor', 'entity'],
                 keyword_texts: ['finite element', 'stability'],
               },
             ],
             grounding: [
               {
-                source_kind: 'claim',
-                source_id: 'cl-1',
+                source_kind: 'evidence_anchor',
+                source_id: 'ea-1',
                 quote: 'Finite element method discretizes the domain.',
                 chunk_id: 'c1',
                 chapter_id: 'tb:1:ch001',
@@ -251,5 +253,9 @@ describe('RightPanel ask summary fusion coverage', () => {
     expect(html).toContain('Finite element method discretizes the domain.')
     expect(html).toContain('c1')
     expect(html).toContain('Lines 11-13')
+    expect(html).toContain('Research Move Nodes')
+    expect(html).toContain('Evidence Anchor Nodes')
+    expect(html).not.toContain('Logic Nodes')
+    expect(html).not.toContain('Claim Nodes')
   })
 })

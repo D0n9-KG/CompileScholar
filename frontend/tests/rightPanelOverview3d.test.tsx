@@ -76,10 +76,49 @@ describe('RightPanel overview 3D node details', () => {
     loadOverviewCommunitySubgraphMock.mockReset()
     loadOverviewGraphMock.mockReset()
     apiGetMock.mockResolvedValue({
-      title: 'Alpha Study',
+      trace_id: 'trace:paper-1',
+      schema_version: 'v2',
+      built_at: '2026-03-22T00:00:00Z',
       paper_source: 'P-001',
-      logic_steps: [{ step_type: 'Method', summary: 'Method summary' }],
-      claims: [{ step_type: 'Method', text: 'Claim summary' }],
+      paper_metadata: {
+        paper_id: 'paper-1',
+        title: 'Alpha Study',
+        paper_type: 'empirical',
+        source_refs: ['chunk:1'],
+      },
+      canonical_core: {
+        evidence_anchors: [
+          {
+            anchor_id: 'anchor-1',
+            paper_id: 'paper-1',
+            source_ref: 'chunk:1',
+            modality: 'text',
+            section_path: ['Method'],
+            locator: { start_line: 10, end_line: 16 },
+            quote: 'Anchor summary',
+            citation_ids: [],
+            support_type: 'direct',
+            weak: false,
+          },
+        ],
+        moves: [
+          {
+            move_id: 'move-1',
+            sequence_no: 1,
+            role: 'method',
+            act_type: 'propose_method',
+            summary: 'Method summary',
+            anchor_ids: ['anchor-1'],
+            confidence: 0.8,
+          },
+        ],
+        move_relations: [],
+        citation_acts: [],
+        figure_refs: [],
+        table_refs: [],
+      },
+      derived_views: {},
+      quality: { quality_tier: 'green' },
     })
     mockedState = {
       ...INITIAL_STATE,
@@ -97,9 +136,9 @@ describe('RightPanel overview 3D node details', () => {
         },
       ],
       selectedNode: {
-        id: 'claim:claim-1',
-        kind: 'claim',
-        label: 'Alpha claim with the strongest signal.',
+        id: 'anchor:anchor-1',
+        kind: 'anchor',
+        label: 'Alpha anchor with the strongest signal.',
       },
     }
   })
@@ -120,24 +159,24 @@ describe('RightPanel overview 3D node details', () => {
       {
         group: 'nodes',
         data: {
-          id: 'claim:claim-1',
-          label: 'Alpha claim with the strongest signal.',
-          kind: 'claim',
-          description: 'Alpha claim with the strongest signal.',
+          id: 'anchor:anchor-1',
+          label: 'Alpha anchor with the strongest signal.',
+          kind: 'anchor',
+          description: 'Alpha anchor with the strongest signal.',
           communityId: 'gc:alpha',
           clusterKey: 'community:gc:alpha',
           paperId: 'paper-1',
           paperSource: 'P-001',
           paperTitle: 'Alpha Study',
-          stepType: 'Method',
+          role: 'Method',
         },
       },
       {
         group: 'edges',
         data: {
-          id: 'contains:community:gc:alpha->claim:claim-1',
+          id: 'contains:community:gc:alpha->anchor:anchor-1',
           source: 'community:gc:alpha',
-          target: 'claim:claim-1',
+          target: 'anchor:anchor-1',
           kind: 'contains',
           weight: 0.92,
         },
@@ -150,10 +189,13 @@ describe('RightPanel overview 3D node details', () => {
     expect(loadOverviewCommunity3DGraphMock).toHaveBeenCalledWith()
     await waitFor(() => expect(screen.getAllByText('P-001').length).toBeGreaterThan(0))
     expect(screen.getAllByText('Alpha Study').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('Method').length).toBeGreaterThan(0)
+    expect(screen.getByRole('button', { name: 'View Research Moves' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'View Evidence Anchors' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'View Logic Steps' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'View Claims' })).not.toBeInTheDocument()
   })
 
-  test('falls back to paper preview metadata when a 3D claim node is missing paper source', async () => {
+  test('falls back to paper trace preview metadata when a 3D anchor node is missing paper source', async () => {
     loadOverviewCommunity3DGraphMock.mockResolvedValue([
       {
         group: 'nodes',
@@ -169,23 +211,23 @@ describe('RightPanel overview 3D node details', () => {
       {
         group: 'nodes',
         data: {
-          id: 'claim:claim-1',
-          label: 'Alpha claim with the strongest signal.',
-          kind: 'claim',
-          description: 'Alpha Study | Method | Alpha claim with the strongest signal.',
+          id: 'anchor:anchor-1',
+          label: 'Alpha anchor with the strongest signal.',
+          kind: 'anchor',
+          description: 'Alpha Study | Method | Alpha anchor with the strongest signal.',
           communityId: 'gc:alpha',
           clusterKey: 'community:gc:alpha',
           paperId: 'paper-1',
           paperTitle: 'Alpha Study',
-          stepType: 'Method',
+          role: 'Method',
         },
       },
       {
         group: 'edges',
         data: {
-          id: 'contains:community:gc:alpha->claim:claim-1',
+          id: 'contains:community:gc:alpha->anchor:anchor-1',
           source: 'community:gc:alpha',
-          target: 'claim:claim-1',
+          target: 'anchor:anchor-1',
           kind: 'contains',
           weight: 0.92,
         },
@@ -215,24 +257,24 @@ describe('RightPanel overview 3D node details', () => {
       {
         group: 'nodes',
         data: {
-          id: 'claim:claim-1',
-          label: 'Alpha claim with the strongest signal.',
-          kind: 'claim',
-          description: 'Alpha Study | Method | Alpha claim with the strongest signal.',
+          id: 'anchor:anchor-1',
+          label: 'Alpha anchor with the strongest signal.',
+          kind: 'anchor',
+          description: 'Alpha Study | Method | Alpha anchor with the strongest signal.',
           communityId: 'gc:alpha',
           clusterKey: 'community:gc:alpha',
           paperId: 'paper-1',
           paperSource: 'P-001',
           paperTitle: 'Alpha Study',
-          stepType: 'Method',
+          role: 'Method',
         },
       },
       {
         group: 'edges',
         data: {
-          id: 'contains:community:gc:alpha->claim:claim-1',
+          id: 'contains:community:gc:alpha->anchor:anchor-1',
           source: 'community:gc:alpha',
-          target: 'claim:claim-1',
+          target: 'anchor:anchor-1',
           kind: 'contains',
           weight: 0.92,
         },
@@ -253,39 +295,39 @@ describe('RightPanel overview 3D node details', () => {
       {
         group: 'nodes',
         data: {
-          id: 'claim:claim-1',
-          label: 'Alpha claim with the strongest signal.',
-          kind: 'claim',
-          description: 'Alpha Study | Method | Alpha claim with the strongest signal.',
+          id: 'anchor:anchor-1',
+          label: 'Alpha anchor with the strongest signal.',
+          kind: 'anchor',
+          description: 'Alpha Study | Method | Alpha anchor with the strongest signal.',
           communityId: 'gc:alpha',
           clusterKey: 'community:gc:alpha',
           paperId: 'paper-1',
           paperSource: 'P-001',
           paperTitle: 'Alpha Study',
-          stepType: 'Method',
+          role: 'Method',
         },
       },
       {
         group: 'nodes',
         data: {
-          id: 'logic:logic-1',
-          label: 'Logic chain that explains the alpha workflow.',
-          kind: 'logic',
-          description: 'Alpha Study | Logic chain that explains the alpha workflow.',
+          id: 'move:move-1',
+          label: 'Method pathway that explains the alpha workflow.',
+          kind: 'move',
+          description: 'Alpha Study | Method pathway that explains the alpha workflow.',
           communityId: 'gc:alpha',
           clusterKey: 'community:gc:alpha',
           paperId: 'paper-1',
           paperSource: 'P-001',
           paperTitle: 'Alpha Study',
-          stepType: 'Method',
+          role: 'Method',
         },
       },
       {
         group: 'edges',
         data: {
-          id: 'contains:community:gc:alpha->claim:claim-1',
+          id: 'contains:community:gc:alpha->anchor:anchor-1',
           source: 'community:gc:alpha',
-          target: 'claim:claim-1',
+          target: 'anchor:anchor-1',
           kind: 'contains',
           weight: 0.92,
         },
@@ -293,9 +335,9 @@ describe('RightPanel overview 3D node details', () => {
       {
         group: 'edges',
         data: {
-          id: 'contains:community:gc:alpha->logic:logic-1',
+          id: 'contains:community:gc:alpha->move:move-1',
           source: 'community:gc:alpha',
-          target: 'logic:logic-1',
+          target: 'move:move-1',
           kind: 'contains',
           weight: 0.81,
         },
@@ -345,24 +387,24 @@ describe('RightPanel overview 3D node details', () => {
         {
           group: 'nodes',
           data: {
-            id: 'claim:claim-1',
-            label: 'Alpha claim with the strongest signal.',
-            kind: 'claim',
-            description: 'Alpha Study | Method | Alpha claim with the strongest signal.',
+            id: 'anchor:anchor-1',
+            label: 'Alpha anchor with the strongest signal.',
+            kind: 'anchor',
+            description: 'Alpha Study | Method | Alpha anchor with the strongest signal.',
             communityId: 'gc:alpha',
             clusterKey: 'community:gc:alpha',
             paperId: 'paper-1',
             paperSource: 'P-001',
             paperTitle: 'Alpha Study',
-            stepType: 'Method',
+            role: 'Method',
           },
         },
         {
           group: 'edges',
           data: {
-            id: 'contains:community:gc:alpha->claim:claim-1',
+            id: 'contains:community:gc:alpha->anchor:anchor-1',
             source: 'community:gc:alpha',
-            target: 'claim:claim-1',
+            target: 'anchor:anchor-1',
             kind: 'contains',
             weight: 0.92,
           },

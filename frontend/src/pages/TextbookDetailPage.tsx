@@ -2,6 +2,8 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { apiGet } from '../api'
 import SignalGraph, { type SignalGraphEdge, type SignalGraphNode } from '../components/SignalGraph'
+import type { PaperLogicTrace } from '../types/paperLogicTrace'
+import { formatMoveLabel, moveActLabel } from '../types/paperLogicTrace'
 
 type ChapterRow = {
   chapter_id: string
@@ -45,11 +47,6 @@ type PaperRow = {
   title?: string
   paper_source?: string
   year?: number
-}
-
-type PaperDetailSummary = {
-  logic_steps?: Array<{ step_type?: string; summary?: string }>
-  claims?: Array<{ text?: string; step_type?: string; confidence?: number | null }>
 }
 
 type ChapterPaperLink = {
@@ -123,7 +120,7 @@ export default function TextbookDetailPage() {
   const [chapterData, setChapterData] = useState<ChapterData | null>(null)
   const [papers, setPapers] = useState<PaperRow[]>([])
   const [selectedPaperId, setSelectedPaperId] = useState('')
-  const [paperDetail, setPaperDetail] = useState<PaperDetailSummary | null>(null)
+  const [paperTrace, setPaperTrace] = useState<PaperLogicTrace | null>(null)
   const [selectedGraphNodeId, setSelectedGraphNodeId] = useState('')
   const [loadingChapter, setLoadingChapter] = useState(false)
   const [loadingPaper, setLoadingPaper] = useState(false)
@@ -159,7 +156,7 @@ export default function TextbookDetailPage() {
       setLoadingChapter(true)
       setChapterData(null)
       setSelectedPaperId('')
-      setPaperDetail(null)
+      setPaperTrace(null)
       setSelectedGraphNodeId(`ch:${chapterId}`)
 
       try {
@@ -185,8 +182,8 @@ export default function TextbookDetailPage() {
     if (!selectedPaperId) return
     setLoadingPaper(true)
 
-    apiGet<PaperDetailSummary>(`/graph/paper/${encodeURIComponent(selectedPaperId)}`)
-      .then((value) => setPaperDetail(value))
+    apiGet<PaperLogicTrace>(`/papers/${encodeURIComponent(selectedPaperId)}/logic-trace`)
+      .then((value) => setPaperTrace(value))
       .catch((e: unknown) => setError(String((e as { message?: unknown })?.message ?? e)))
       .finally(() => setLoadingPaper(false))
   }, [selectedPaperId])
@@ -211,10 +208,17 @@ export default function TextbookDetailPage() {
       ? Number((chapterLinks.reduce((sum, item) => sum + item.score, 0) / chapterLinks.length).toFixed(1))
       : 0
     const relationDensity = entityCount ? Number((relationCount / entityCount).toFixed(2)) : 0
-    const claimCount = paperDetail?.claims?.length ?? 0
+    const moveCount = paperTrace?.canonical_core.moves?.length ?? 0
+    const anchorCount = paperTrace?.canonical_core.evidence_anchors?.length ?? 0
 
-    return { entityCount, relationCount, avgLinkScore, relationDensity, claimCount }
-  }, [chapterData?.entities?.length, chapterData?.relations?.length, chapterLinks, paperDetail?.claims?.length])
+    return { entityCount, relationCount, avgLinkScore, relationDensity, moveCount, anchorCount }
+  }, [
+    chapterData?.entities?.length,
+    chapterData?.relations?.length,
+    chapterLinks,
+    paperTrace?.canonical_core.evidence_anchors?.length,
+    paperTrace?.canonical_core.moves?.length,
+  ])
 
   const textbookGraph = useMemo(() => {
     const nodes = new Map<string, SignalGraphNode>()
@@ -330,55 +334,66 @@ export default function TextbookDetailPage() {
       }
     }
 
-    if (selectedPaperId) {
-      for (const [idx, step] of (paperDetail?.logic_steps ?? []).slice(0, 6).entries()) {
-        const logicNodeId = `logic:${selectedPaperId}:${idx}`
+    if (selectedPaperId && paperTrace) {
+      const anchorMap = new Map(
+        (paperTrace.canonical_core.evidence_anchors ?? []).map((anchor) => [anchor.anchor_id, anchor] as const),
+      )
+
+      for (const move of (paperTrace.canonical_core.moves ?? []).slice(0, 6)) {
+        const moveNodeId = `move:${move.move_id}`
         putNode(
           {
-            id: logicNodeId,
-            label: shortText(step.summary || step.step_type || 'logic', 34),
-            kind: 'logic',
-            weight: 0.24,
+            id: moveNodeId,
+            label: shortText(formatMoveLabel(move), 34),
+            kind: 'move',
+            weight: 0.28,
           },
-          { title: step.step_type || 'logic', detail: step.summary || '' },
+          {
+            title: `${formatMoveLabel(move)} | ${moveActLabel(move.act_type)}`,
+            detail: move.summary || '',
+            paperId: selectedPaperId,
+          },
         )
 
         putEdge({
-          id: `paper:${selectedPaperId}->${logicNodeId}`,
+          id: `paper:${selectedPaperId}->${moveNodeId}`,
           source: `paper:${selectedPaperId}`,
-          target: logicNodeId,
+          target: moveNodeId,
           kind: 'contains',
-          weight: 0.55,
+          weight: 0.58,
         })
-      }
 
-      for (const [idx, claim] of (paperDetail?.claims ?? []).slice(0, 8).entries()) {
-        const claimNodeId = `claim:${selectedPaperId}:${idx}`
-        putNode(
-          {
-            id: claimNodeId,
-            label: shortText(claim.text || claim.step_type || 'claim', 34),
-            kind: 'claim',
-            weight: 0.22,
-          },
-          {
-            title: claim.step_type || 'claim',
-            detail: `${shortText(claim.text || '', 160)}${Number.isFinite(Number(claim.confidence)) ? ` | ${(Number(claim.confidence) * 100).toFixed(0)}%` : ''}`,
-          },
-        )
+        for (const anchorId of (move.anchor_ids ?? []).slice(0, 4)) {
+          const anchor = anchorMap.get(anchorId)
+          if (!anchor) continue
+          const anchorNodeId = `anchor:${anchor.anchor_id}`
+          putNode(
+            {
+              id: anchorNodeId,
+              label: shortText(anchor.quote || anchor.anchor_id, 34),
+              kind: 'anchor',
+              weight: anchor.weak ? 0.18 : 0.22,
+            },
+            {
+              title: anchor.anchor_id,
+              detail: `${shortText(anchor.quote || '', 160)}${anchor.weak ? ' | weak' : ''}`,
+              paperId: selectedPaperId,
+            },
+          )
 
-        putEdge({
-          id: `paper:${selectedPaperId}->${claimNodeId}`,
-          source: `paper:${selectedPaperId}`,
-          target: claimNodeId,
-          kind: 'supports',
-          weight: 0.6,
-        })
+          putEdge({
+            id: `${moveNodeId}->${anchorNodeId}`,
+            source: moveNodeId,
+            target: anchorNodeId,
+            kind: 'evidenced_by',
+            weight: anchor.weak ? 0.42 : 0.62,
+          })
+        }
       }
     }
 
     return { nodes: Array.from(nodes.values()), edges: Array.from(edges.values()), metaMap }
-  }, [chapterData?.entities, chapterLinks, detail, paperDetail?.claims, paperDetail?.logic_steps, selectedChapter, selectedPaperId])
+  }, [chapterData?.entities, chapterLinks, detail, paperTrace, selectedChapter, selectedPaperId])
 
   const selectedGraphMeta = useMemo(
     () => textbookGraph.metaMap.get(selectedGraphNodeId),
@@ -434,7 +449,7 @@ export default function TextbookDetailPage() {
         <div className="moduleHeroMain">
           <span className="moduleHeroEyebrow">教科书章节作战层</span>
           <h1 className="moduleHeroTitle">章节到论文的智能桥接</h1>
-          <p className="moduleHeroSubtitle">查看章节实体与关系，并在统一工作区跟踪匹配论文及其 logic / claim 证据。</p>
+          <p className="moduleHeroSubtitle">查看章节实体与关系，并在统一工作区跟踪匹配论文的 research move 与 evidence anchor 证据。</p>
           <div className="moduleHeroMeta">
             <span className="pill">
               <span className="kicker">章节</span> {detail.total_chapters}
@@ -458,8 +473,12 @@ export default function TextbookDetailPage() {
             <div className="moduleHeroStatValue">{chapterSignals.relationCount}</div>
           </div>
           <div className="moduleHeroStatCard">
-            <span className="kicker">论断</span>
-            <div className="moduleHeroStatValue">{chapterSignals.claimCount}</div>
+            <span className="kicker">Moves</span>
+            <div className="moduleHeroStatValue">{chapterSignals.moveCount}</div>
+          </div>
+          <div className="moduleHeroStatCard">
+            <span className="kicker">Anchors</span>
+            <div className="moduleHeroStatValue">{chapterSignals.anchorCount}</div>
           </div>
         </div>
       </section>
@@ -521,8 +540,12 @@ export default function TextbookDetailPage() {
                   <div className="textbookSignalValue">{chapterSignals.avgLinkScore.toFixed(1)}</div>
                 </div>
                 <div className="textbookSignalCard" role="listitem">
-                  <div className="kicker">选中论断</div>
-                  <div className="textbookSignalValue">{chapterSignals.claimCount}</div>
+                  <div className="kicker">选中 Moves</div>
+                  <div className="textbookSignalValue">{chapterSignals.moveCount}</div>
+                </div>
+                <div className="textbookSignalCard" role="listitem">
+                  <div className="kicker">选中 Anchors</div>
+                  <div className="textbookSignalValue">{chapterSignals.anchorCount}</div>
                 </div>
               </div>
 
@@ -656,7 +679,7 @@ export default function TextbookDetailPage() {
 
                   <div className="textbookPaperBridgeDetail itemCard">
                     <div className="split">
-                      <div className="itemTitle">论文细节联动</div>
+                      <div className="itemTitle">Paper Trace Preview</div>
                       {selectedPaperId && (
                         <button className="btn btnSmall" onClick={() => nav(`/paper/${encodeURIComponent(selectedPaperId)}`)}>
                           打开论文详情
@@ -664,24 +687,26 @@ export default function TextbookDetailPage() {
                       )}
                     </div>
 
-                    {!selectedPaperId && <div className="metaLine">在左侧选择一篇匹配论文，查看它的 logic 与 claim。</div>}
-                    {loadingPaper && <div className="metaLine">正在加载论文图谱详情...</div>}
+                    {!selectedPaperId && <div className="metaLine">在左侧选择一篇匹配论文，查看它的 research move 与 evidence anchor。</div>}
+                    {loadingPaper && <div className="metaLine">正在加载论文 trace 详情...</div>}
 
                     {!loadingPaper && selectedPaperId && (
                       <div className="stack" style={{ marginTop: 8 }}>
                         <div className="list">
-                          {(paperDetail?.logic_steps ?? []).slice(0, 4).map((step, idx) => (
-                            <div key={`${step.step_type ?? 'logic'}:${idx}`} className="fusionDetailItem">
-                              <span className="badge">{step.step_type ?? '逻辑'}</span>
-                              <div className="itemBody">{shortText(step.summary || '', 180) || '暂无逻辑摘要'}</div>
+                          <div className="itemTitle">Research Moves</div>
+                          {(paperTrace?.canonical_core.moves ?? []).slice(0, 4).map((move) => (
+                            <div key={move.move_id} className="fusionDetailItem">
+                              <span className="badge">{moveActLabel(move.act_type)}</span>
+                              <div className="itemBody">{shortText(`${formatMoveLabel(move)} ${move.summary || ''}`, 180) || '暂无研究动作摘要'}</div>
                             </div>
                           ))}
                         </div>
                         <div className="list">
-                          {(paperDetail?.claims ?? []).slice(0, 4).map((claim, idx) => (
-                            <div key={`${claim.step_type ?? 'claim'}:${idx}`} className="fusionDetailItem">
-                              <span className="badge">{claim.step_type ?? '论断'}</span>
-                              <div className="itemBody">{shortText(claim.text || '', 180) || '暂无论断文本'}</div>
+                          <div className="itemTitle">Evidence Anchors</div>
+                          {(paperTrace?.canonical_core.evidence_anchors ?? []).slice(0, 4).map((anchor) => (
+                            <div key={anchor.anchor_id} className="fusionDetailItem">
+                              <span className="badge">{anchor.anchor_id}</span>
+                              <div className="itemBody">{shortText(anchor.quote || '', 180) || '暂无证据锚点文本'}</div>
                             </div>
                           ))}
                         </div>

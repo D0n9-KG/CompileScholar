@@ -192,40 +192,6 @@ def iso_time_for_paper_year(year: int | None) -> str:
     return datetime(y, 1, 1, tzinfo=timezone.utc).isoformat()
 
 
-def _split_prefixed_evidence_ids(ids: list[str]) -> dict[str, list[str]]:
-    out = {
-        "claim_ids": [],
-        "community_ids": [],
-        "chunk_ids": [],
-        "event_ids": [],
-        "other_ids": [],
-    }
-    seen = {k: set() for k in out}
-    for raw in ids or []:
-        value = str(raw or "").strip()
-        if not value:
-            continue
-        if ":" in value:
-            prefix, payload = value.split(":", 1)
-            key = prefix.strip().upper()
-            payload = payload.strip()
-        else:
-            key, payload = "", value
-        bucket = "other_ids"
-        if key == "CL":
-            bucket = "claim_ids"
-        elif key == "GC":
-            bucket = "community_ids"
-        elif key == "CH":
-            bucket = "chunk_ids"
-        elif key == "EV":
-            bucket = "event_ids"
-        if payload and payload not in seen[bucket]:
-            seen[bucket].add(payload)
-            out[bucket].append(payload)
-    return out
-
-
 def _year_sort_value(node: dict) -> int:
     try:
         return int(node.get("year") or 0)
@@ -376,8 +342,8 @@ class Neo4jClient:
             "CREATE CONSTRAINT paper_id_unique IF NOT EXISTS FOR (p:Paper) REQUIRE p.paper_id IS UNIQUE",
             "CREATE CONSTRAINT chunk_id_unique IF NOT EXISTS FOR (c:Chunk) REQUIRE c.chunk_id IS UNIQUE",
             "CREATE CONSTRAINT ref_id_unique IF NOT EXISTS FOR (r:ReferenceEntry) REQUIRE r.ref_id IS UNIQUE",
-            "CREATE CONSTRAINT logic_step_id_unique IF NOT EXISTS FOR (s:LogicStep) REQUIRE s.logic_step_id IS UNIQUE",
-            "CREATE CONSTRAINT claim_id_unique IF NOT EXISTS FOR (cl:Claim) REQUIRE cl.claim_id IS UNIQUE",
+            "CREATE CONSTRAINT research_move_id_unique IF NOT EXISTS FOR (m:ResearchMove) REQUIRE m.move_id IS UNIQUE",
+            "CREATE CONSTRAINT evidence_anchor_id_unique IF NOT EXISTS FOR (ea:EvidenceAnchor) REQUIRE ea.anchor_id IS UNIQUE",
             "CREATE CONSTRAINT evidence_event_id_unique IF NOT EXISTS FOR (ev:EvidenceEvent) REQUIRE ev.event_id IS UNIQUE",
             "CREATE CONSTRAINT figure_id_unique IF NOT EXISTS FOR (f:Figure) REQUIRE f.figure_id IS UNIQUE",
             "CREATE CONSTRAINT collection_id_unique IF NOT EXISTS FOR (co:Collection) REQUIRE co.collection_id IS UNIQUE",
@@ -542,178 +508,6 @@ SET r2.weight = coalesce(r2.weight, 0) + 1,
                     now=now,
                 )
 
-    def upsert_logic_steps_and_claims(self, paper_id: str, logic: dict, claims: list[dict], step_order: list[str] | None = None) -> None:
-        """
-        Upsert logic steps and claims (schema-driven).
-
-        Required for each claim:
-        - claim_id, claim_key, text, confidence, step_type
-
-        Optional:
-        - kinds: list[str]
-        - evidence_chunk_ids: list[str]
-        - evidence_weak: bool
-        - targets_paper_ids: list[str]
-        """
-        if step_order is None:
-            # Prefer stable order from caller; otherwise use keys order with deterministic fallback.
-            step_order = list((logic or {}).keys())
-        steps = []
-        for idx, step_type in enumerate(step_order):
-            v = (logic or {}).get(step_type) or {}
-
-            # P0 Fix: Defensive filter - skip empty logic steps
-            summary = v.get("summary") or ""
-            evidence_ids = list(v.get("evidence_chunk_ids") or [])
-
-            # Skip if both summary and evidence are empty
-            if not summary.strip() and not evidence_ids:
-                continue
-
-            steps.append(
-                {
-                    "logic_step_id": f"{paper_id}:{step_type}",
-                    "paper_id": paper_id,
-                    "step_type": step_type,
-                    "order": int(v.get("order") if v.get("order") is not None else idx),
-                    "summary": summary,
-                    "confidence": v.get("confidence"),
-                    "evidence_chunk_ids": evidence_ids,
-                    "evidence_weak": bool(v.get("evidence_weak") or False),
-                }
-            )
-        cypher = """
-MATCH (p:Paper {paper_id:$paper_id})
-WITH p, $steps AS steps
-CALL {
-    WITH p, steps
-    UNWIND steps AS s
-    MERGE (ls:LogicStep {logic_step_id: s.logic_step_id})
-    SET ls.paper_id = s.paper_id,
-        ls.step_type = s.step_type,
-        ls.order = s.order,
-        ls.summary = s.summary,
-        ls.confidence = s.confidence
-    MERGE (p)-[:HAS_LOGIC_STEP]->(ls)
-    RETURN count(*) AS logic_steps_written
-}
-CALL {
-    WITH steps
-    UNWIND range(0, size(steps)-2) AS i
-    MATCH (a:LogicStep {logic_step_id: steps[i].logic_step_id})
-    MATCH (b:LogicStep {logic_step_id: steps[i+1].logic_step_id})
-    MERGE (a)-[:NEXT]->(b)
-    RETURN count(*) AS next_edges_written
-}
-CALL {
-    WITH steps
-    UNWIND steps AS s
-    MATCH (ls:LogicStep {logic_step_id: s.logic_step_id})
-    WITH ls, s
-    UNWIND coalesce(s.evidence_chunk_ids, []) AS cid
-    MATCH (ch:Chunk {chunk_id: cid})
-    MERGE (ls)-[e:EVIDENCED_BY {source:'machine'}]->(ch)
-    SET e.weak = coalesce(s.evidence_weak, false)
-    RETURN count(*) AS logic_step_evidence_written
-}
-WITH p
-UNWIND $claims AS c
-MERGE (cl:Claim {claim_id: c.claim_id})
-SET cl.paper_id = $paper_id,
-    cl.claim_key = coalesce(c.claim_key, c.claim_id),
-    cl.text = c.text,
-    cl.confidence = c.confidence,
-    cl.step_type = c.step_type,
-    cl.kinds = coalesce(c.kinds, []),
-    cl.evidence_weak = coalesce(c.evidence_weak, false),
-    cl.targets_paper_ids = coalesce(c.targets_paper_ids, []),
-    cl.evidence_span_start = coalesce(c.span_start, -1),
-    cl.evidence_span_end = coalesce(c.span_end, -1),
-    cl.evidence_quote = coalesce(c.evidence_quote, ''),
-    cl.match_mode = coalesce(c.match_mode, 'none'),
-    cl.match_confidence = coalesce(c.match_confidence, 0.0)
-MERGE (p)-[:HAS_CLAIM]->(cl)
-WITH cl, c, $paper_id AS paper_id
-OPTIONAL MATCH (ls:LogicStep {logic_step_id: paper_id + ':' + c.step_type})
-FOREACH (_ IN CASE WHEN ls IS NULL THEN [] ELSE [1] END |
-    MERGE (ls)-[:HAS_CLAIM]->(cl)
-)
-WITH cl, c
-CALL {
-    WITH cl, c
-    UNWIND coalesce(c.evidence_chunk_ids, []) AS cid
-    MATCH (ch:Chunk {chunk_id: cid})
-    MERGE (cl)-[e:EVIDENCED_BY {source:'machine'}]->(ch)
-    SET e.weak = coalesce(c.evidence_weak, false)
-    RETURN count(*) AS claim_evidence_written
-}
-CALL {
-    WITH cl, c
-    UNWIND coalesce(c.targets_paper_ids, []) AS tid
-    MATCH (tp:Paper {paper_id: tid})
-    MERGE (cl)-[:TARGETS_PAPER]->(tp)
-    RETURN count(*) AS claim_targets_written
-}
-RETURN count(*) AS claims_written
-"""
-        with self._driver.session() as session:
-            session.run(cypher, paper_id=paper_id, steps=steps, claims=claims)
-
-    def set_logic_step_evidence(self, paper_id: str, step_type: str, chunk_ids: list[str], source: str = "human") -> None:
-        src = (source or "human").strip().lower()
-        if src not in {"human", "machine"}:
-            src = "human"
-        st = str(step_type or "").strip()
-        if not st:
-            return
-        cypher = """
-MATCH (p:Paper {paper_id:$paper_id})-[:HAS_LOGIC_STEP]->(ls:LogicStep)
-WHERE ls.step_type = $step_type
-OPTIONAL MATCH (ls)-[e:EVIDENCED_BY]->(:Chunk)
-WHERE coalesce(e.source,'machine') = $source
-DELETE e
-WITH ls
-UNWIND $chunk_ids AS cid
-MATCH (ch:Chunk {chunk_id: cid})
-MERGE (ls)-[e:EVIDENCED_BY {source:$source}]->(ch)
-SET e.weak = false
-"""
-        with self._driver.session() as session:
-            session.run(cypher, paper_id=paper_id, step_type=st, chunk_ids=list(chunk_ids or []), source=src)
-
-    def apply_human_logic_step_evidence_overrides(self, paper_id: str) -> None:
-        """
-        Re-apply Paper-level human evidence overrides for logic steps after rebuild/replace.
-        """
-        paper = self.get_paper_basic(paper_id)
-
-        def _safe_json(obj: object, default):  # type: ignore[no-untyped-def]
-            if obj is None:
-                return default
-            if isinstance(obj, (dict, list)):
-                return obj
-            try:
-                s = str(obj)
-                if not s.strip():
-                    return default
-                return json.loads(s)
-            except Exception:
-                return default
-
-        evidence = _safe_json(paper.get("human_logic_evidence_json"), {})
-        cleared = set(_safe_json(paper.get("human_logic_evidence_cleared_json"), []))
-        if not isinstance(evidence, dict):
-            evidence = {}
-
-        for step, ids in evidence.items():
-            st = str(step)
-            if not st:
-                continue
-            chunk_ids = [str(x).strip() for x in (ids or []) if str(x).strip()]
-            self.set_logic_step_evidence(paper_id, st, chunk_ids, source="human")
-        for st in cleared:
-            self.set_logic_step_evidence(paper_id, str(st), [], source="human")
-
     def upsert_references_and_citations(
         self,
         paper_id: str,
@@ -812,49 +606,40 @@ LIMIT $limit
             return [dict(r) for r in rows]
 
     def get_structured_knowledge_for_papers(
-        self, paper_sources: list[str], *, max_claims: int = 30, max_steps: int = 20,
+        self, paper_sources: list[str], *, max_anchors: int = 30, max_moves: int = 20,
     ) -> dict[str, list[dict]]:
-        """Fetch validated claims and logic steps for papers (used by RAG).
-
-        Returns:
-            {"claims": [...], "logic_steps": [...]}
-        """
         if not paper_sources:
-            return {"claims": [], "logic_steps": []}
+            return {"research_moves": [], "evidence_anchors": []}
 
-        claims_cypher = """
-MATCH (p:Paper)-[:HAS_CLAIM]->(cl:Claim)
-WHERE p.paper_source IN $paper_sources
-  AND coalesce(trim(toString(cl.claim_id)), '') <> ''
-RETURN cl.claim_id AS claim_id,
-       cl.text AS text,
-       cl.step_type AS step_type,
-       cl.kinds AS kinds,
-       cl.confidence AS confidence,
-       cl.evidence_quote AS evidence_quote,
-       p.paper_source AS paper_source
-ORDER BY coalesce(cl.confidence, -1.0) DESC,
-         p.paper_source ASC,
-         cl.claim_id ASC
-LIMIT $limit
-"""
-        steps_cypher = """
-MATCH (p:Paper)-[:HAS_LOGIC_STEP]->(s:LogicStep)
-WHERE p.paper_source IN $paper_sources
-RETURN s.step_type AS step_type,
-       s.summary AS summary,
-       s.confidence AS confidence,
-       s.order AS step_order,
-       p.paper_source AS paper_source
-ORDER BY coalesce(s.order, 999) ASC,
-         p.paper_source ASC,
-         s.step_type ASC
-LIMIT $limit
-"""
-        with self._driver.session() as session:
-            claims = [dict(r) for r in session.run(claims_cypher, paper_sources=paper_sources, limit=max_claims)]
-            steps = [dict(r) for r in session.run(steps_cypher, paper_sources=paper_sources, limit=max_steps)]
-        return {"claims": claims, "logic_steps": steps}
+        allowed = {str(item or "").strip() for item in paper_sources if str(item or "").strip()}
+        moves: list[dict] = []
+        anchors: list[dict] = []
+        for row in self.list_paper_logic_trace_rows(limit=max(1, max(max_anchors, max_moves) * 20)):
+            paper_source = str(row.get("paper_source") or "").strip()
+            if paper_source not in allowed:
+                continue
+            for move in row.get("research_moves") or []:
+                moves.append(dict(move))
+            for anchor in row.get("evidence_anchors") or []:
+                anchors.append(dict(anchor))
+
+        moves.sort(
+            key=lambda item: (
+                str(item.get("paper_source") or ""),
+                int(item.get("sequence_no") or 0),
+                str(item.get("move_id") or ""),
+            )
+        )
+        anchors.sort(
+            key=lambda item: (
+                str(item.get("paper_source") or ""),
+                str(item.get("anchor_id") or ""),
+            )
+        )
+        return {
+            "research_moves": moves[: max(1, int(max_moves))],
+            "evidence_anchors": anchors[: max(1, int(max_anchors))],
+        }
 
     def list_papers(self, limit: int = 50, collection_id: str | None = None) -> list[dict]:
         cid = (collection_id or "").strip()
@@ -1049,21 +834,6 @@ LIMIT $limit
 """
         with self._driver.session() as session:
             return [dict(r) for r in session.run(cypher, paper_ids=ids, limit=limit)]
-
-    def list_paper_ids_for_claims(self, claim_ids: list[str], limit: int = 200) -> list[str]:
-        ids = [str(x).strip() for x in (claim_ids or []) if str(x).strip()]
-        if not ids:
-            return []
-        limit = max(1, min(5000, int(limit)))
-        cypher = """
-MATCH (p:Paper)-[:HAS_CLAIM]->(cl:Claim)
-WHERE cl.claim_id IN $claim_ids
-RETURN DISTINCT p.paper_id AS paper_id
-LIMIT $limit
-"""
-        with self._driver.session() as session:
-            rows = session.run(cypher, claim_ids=ids, limit=limit)
-            return [str(r.get("paper_id") or "").strip() for r in rows if str(r.get("paper_id") or "").strip()]
 
     def _sample_author_hop_papers(
         self,
@@ -1357,495 +1127,6 @@ DELETE r
         with self._driver.session() as session:
             session.run(cypher, paper_id=paper_id)
 
-    def get_paper_detail(self, paper_id: str) -> dict:
-        with self._driver.session() as session:
-            p_row = session.run(
-                """
-MATCH (p:Paper {paper_id:$paper_id})
-RETURN p
-""",
-                paper_id=paper_id,
-            ).single()
-            if not p_row:
-                # Fallback: try matching by paper_source (e.g. "13_2334")
-                p_row = session.run(
-                    """
-MATCH (p:Paper {paper_source:$paper_source})
-RETURN p
-""",
-                    paper_source=paper_id,
-                ).single()
-            if not p_row:
-                raise KeyError(f"Paper not found: {paper_id}")
-            paper = dict(p_row["p"])
-
-            def _safe_json(obj: object, default):  # type: ignore[no-untyped-def]
-                if obj is None:
-                    return default
-                if isinstance(obj, (dict, list)):
-                    return obj
-                try:
-                    s = str(obj)
-                    if not s.strip():
-                        return default
-                    return json.loads(s)
-                except Exception:
-                    return default
-
-            human_meta = _safe_json(paper.get("human_meta_json"), {})
-            meta_cleared = set(_safe_json(paper.get("human_meta_cleared_json"), []))
-            human_logic = _safe_json(paper.get("human_logic_json"), {})
-            logic_cleared = set(_safe_json(paper.get("human_logic_cleared_json"), []))
-            human_claims = _safe_json(paper.get("human_claims_json"), {})
-            claims_cleared = set(_safe_json(paper.get("human_claims_cleared_json"), []))
-            human_cites = _safe_json(paper.get("human_cites_purpose_json"), {})
-            cites_cleared = set(_safe_json(paper.get("human_cites_purpose_cleared_json"), []))
-            paper["phase1_quality"] = _safe_json(paper.get("phase1_quality_json"), {})
-            paper["phase1_gate_passed"] = bool(paper.get("phase1_gate_passed"))
-            paper["phase1_quality_tier"] = str(paper.get("phase1_quality_tier") or "")
-            try:
-                paper["phase1_quality_tier_score"] = float(paper.get("phase1_quality_tier_score") or 0.0)
-            except Exception:
-                paper["phase1_quality_tier_score"] = 0.0
-
-            pending_task_id = paper.get("review_pending_task_id")
-            resolved_task_id = paper.get("review_resolved_task_id")
-            has_human_edits = bool(
-                human_meta
-                or meta_cleared
-                or human_logic
-                or logic_cleared
-                or human_claims
-                or claims_cleared
-                or human_cites
-                or cites_cleared
-            )
-            needs_review = bool(pending_task_id and pending_task_id != resolved_task_id and has_human_edits)
-
-            # Apply editable metadata overlays (effective values exposed via paper.title/year, but keep machine copy).
-            paper["title_machine"] = paper.get("title")
-            paper["year_machine"] = paper.get("year")
-            if "title" in meta_cleared:
-                paper["title"] = ""
-                paper["title_source"] = "cleared"
-            elif isinstance(human_meta, dict) and human_meta.get("title") is not None:
-                paper["title"] = str(human_meta.get("title") or "")
-                paper["title_source"] = "human"
-            else:
-                paper["title_source"] = "machine"
-
-            if "year" in meta_cleared:
-                paper["year"] = None
-                paper["year_source"] = "cleared"
-            elif isinstance(human_meta, dict) and human_meta.get("year") is not None:
-                try:
-                    paper["year"] = int(human_meta.get("year"))
-                except Exception:
-                    paper["year"] = None
-                paper["year_source"] = "human"
-            else:
-                paper["year_source"] = "machine"
-
-            stats = session.run(
-                """
-MATCH (p:Paper {paper_id:$paper_id})
-OPTIONAL MATCH (p)-[:HAS_CHUNK]->(c:Chunk)
-OPTIONAL MATCH (p)-[:HAS_REFERENCE]->(r:ReferenceEntry)
-RETURN count(DISTINCT c) AS chunk_count, count(DISTINCT r) AS ref_count
-""",
-                paper_id=paper_id,
-            ).single()
-
-            logic_steps_raw = [
-                dict(r)
-                for r in session.run(
-                    """
-MATCH (p:Paper {paper_id:$paper_id})-[:HAS_LOGIC_STEP]->(s:LogicStep)
-RETURN s.step_type AS step_type, s.summary AS summary, s.confidence AS confidence, s.order AS order
-ORDER BY coalesce(s.order, 999) ASC, s.step_type ASC
-""",
-                    paper_id=paper_id,
-                )
-            ]
-
-            # Overlay logic step edits
-            logic_steps: list[dict] = []
-            for s in logic_steps_raw:
-                st = str(s.get("step_type") or "")
-                machine_summary = s.get("summary")
-                machine_conf = s.get("confidence")
-                human_summary = human_logic.get(st) if isinstance(human_logic, dict) else None
-                cleared = st in logic_cleared
-                if cleared:
-                    effective = ""
-                    source = "cleared"
-                elif human_summary is not None:
-                    effective = str(human_summary)
-                    source = "human"
-                else:
-                    effective = machine_summary
-                    source = "machine"
-                out = dict(s)
-                out["summary_machine"] = machine_summary
-                out["confidence_machine"] = machine_conf
-                out["summary_human"] = None if human_summary is None else str(human_summary)
-                out["source"] = source
-                out["summary"] = effective
-                if needs_review and source in {"human", "cleared"}:
-                    out["pending_machine_summary"] = machine_summary
-                    out["pending_machine_confidence"] = machine_conf
-                logic_steps.append(out)
-
-            claims_raw = [
-                dict(r)
-                for r in session.run(
-                    """
-MATCH (p:Paper {paper_id:$paper_id})-[:HAS_CLAIM]->(cl:Claim)
-RETURN cl.claim_id AS claim_id,
-       cl.claim_key AS claim_key,
-       cl.text AS text,
-       cl.confidence AS confidence,
-       cl.step_type AS step_type,
-       cl.kinds AS kinds,
-       cl.evidence_weak AS evidence_weak,
-       cl.targets_paper_ids AS targets_paper_ids
-ORDER BY cl.confidence DESC, cl.claim_key ASC
-LIMIT 400
-""",
-                    paper_id=paper_id,
-                )
-            ]
-
-            def _norm_claim_text(t: str) -> str:
-                s = " ".join((t or "").split()).strip()
-                while s and s[-1] in ".;銆傦紱":
-                    s = s[:-1].rstrip()
-                return s
-
-            def _claim_key_for(text: str) -> str:
-                doi = str(paper.get("doi") or "")
-                base = (doi.strip().lower() + "\0" + _norm_claim_text(text)).encode("utf-8", errors="ignore")
-                return hashlib.sha256(base).hexdigest()[:24]
-
-            # Overlay claim edits (and include human-only claims)
-            machine_keys: set[str] = set()
-            claims: list[dict] = []
-            for c in claims_raw:
-                key = str(c.get("claim_key") or "") or _claim_key_for(str(c.get("text") or ""))
-                machine_keys.add(key)
-                machine_text = c.get("text")
-                human_text = human_claims.get(key) if isinstance(human_claims, dict) else None
-                cleared = key in claims_cleared
-                if cleared:
-                    effective = ""
-                    source = "cleared"
-                elif human_text is not None:
-                    effective = str(human_text)
-                    source = "human"
-                else:
-                    effective = machine_text
-                    source = "machine"
-                out = dict(c)
-                out["claim_key"] = key
-                out["text_machine"] = machine_text
-                out["confidence_machine"] = out.get("confidence")
-                out["text_human"] = None if human_text is None else str(human_text)
-                out["source"] = source
-                out["text"] = effective
-                if needs_review and source in {"human", "cleared"}:
-                    out["pending_machine_text"] = machine_text
-                    out["pending_machine_confidence"] = out.get("confidence")
-                claims.append(out)
-
-            # Attach evidence for logic steps (LogicStep -> Chunk).
-            try:
-                step_evidence_rows = [
-                    dict(r)
-                    for r in session.run(
-                        """
-MATCH (p:Paper {paper_id:$paper_id})-[:HAS_LOGIC_STEP]->(ls:LogicStep)-[e:EVIDENCED_BY]->(ch:Chunk)
-RETURN ls.step_type AS step_type,
-       ch.chunk_id AS chunk_id,
-       ch.section AS section,
-       ch.start_line AS start_line,
-       ch.end_line AS end_line,
-       ch.kind AS kind,
-       ch.text AS text,
-       e.source AS source,
-       e.weak AS weak
-""",
-                        paper_id=paper_id,
-                    )
-                ]
-                step_by_machine: dict[str, list[dict]] = {}
-                step_by_human: dict[str, list[dict]] = {}
-                for r in step_evidence_rows:
-                    st = str(r.get("step_type") or "")
-                    if not st:
-                        continue
-                    src = str(r.get("source") or "machine").strip().lower()
-                    txt = str(r.get("text") or "").strip().replace("\n", " ")
-                    txt = " ".join(txt.split())[:600]
-                    out = {
-                        "chunk_id": r.get("chunk_id"),
-                        "section": r.get("section"),
-                        "start_line": r.get("start_line"),
-                        "end_line": r.get("end_line"),
-                        "kind": r.get("kind"),
-                        "snippet": txt,
-                        "weak": bool(r.get("weak") or False),
-                        "source": src,
-                    }
-                    if src == "human":
-                        step_by_human.setdefault(st, []).append(out)
-                    else:
-                        step_by_machine.setdefault(st, []).append(out)
-                for m in (step_by_machine, step_by_human):
-                    for st in list(m.keys()):
-                        m[st].sort(key=lambda x: (int(x.get("start_line") or 0), str(x.get("chunk_id") or "")))
-
-                for s in logic_steps:
-                    st = str(s.get("step_type") or "")
-                    if not st:
-                        continue
-                    s["evidence_machine"] = step_by_machine.get(st, [])
-                    s["evidence_human"] = step_by_human.get(st, [])
-                    s["evidence"] = s["evidence_human"] or s["evidence_machine"]
-            except Exception:
-                pass
-
-            # add human-only claims (including cleared placeholders)
-            if isinstance(human_claims, dict):
-                for key, txt in human_claims.items():
-                    k = str(key)
-                    if k in machine_keys:
-                        continue
-                    cleared = k in claims_cleared
-                    out = {
-                        "claim_id": None,
-                        "claim_key": k,
-                        "confidence": None,
-                        "confidence_machine": None,
-                        "text_machine": None,
-                        "text_human": None if txt is None else str(txt),
-                        "source": "cleared" if cleared else "human",
-                        "text": "" if cleared else (None if txt is None else str(txt)),
-                    }
-                    if needs_review and out["source"] in {"human", "cleared"}:
-                        out["pending_machine_text"] = None
-                        out["pending_machine_confidence"] = None
-                    claims.append(out)
-            for k in sorted(claims_cleared):
-                if k in machine_keys:
-                    continue
-                if isinstance(human_claims, dict) and k in human_claims:
-                    continue
-                out = {
-                    "claim_id": None,
-                    "claim_key": k,
-                    "confidence": None,
-                    "confidence_machine": None,
-                    "text_machine": None,
-                    "text_human": None,
-                    "source": "cleared",
-                    "text": "",
-                }
-                if needs_review:
-                    out["pending_machine_text"] = None
-                    out["pending_machine_confidence"] = None
-                claims.append(out)
-
-            # Attach evidence (Claim -> Chunk) and targets (Claim -> Paper) for machine claims.
-            try:
-                evidence_rows = [
-                    dict(r)
-                    for r in session.run(
-                        """
-MATCH (p:Paper {paper_id:$paper_id})-[:HAS_CLAIM]->(cl:Claim)-[e:EVIDENCED_BY]->(ch:Chunk)
-RETURN cl.claim_key AS claim_key,
-       ch.chunk_id AS chunk_id,
-       ch.section AS section,
-       ch.start_line AS start_line,
-       ch.end_line AS end_line,
-       ch.kind AS kind,
-       ch.text AS text,
-       e.source AS source,
-       e.weak AS weak
-""",
-                        paper_id=paper_id,
-                    )
-                ]
-                by_key_machine: dict[str, list[dict]] = {}
-                by_key_human: dict[str, list[dict]] = {}
-                for r in evidence_rows:
-                    k = str(r.get("claim_key") or "")
-                    if not k:
-                        continue
-                    src = str(r.get("source") or "machine").strip().lower()
-                    txt = str(r.get("text") or "").strip().replace("\n", " ")
-                    txt = " ".join(txt.split())[:600]
-                    out = {
-                        "chunk_id": r.get("chunk_id"),
-                        "section": r.get("section"),
-                        "start_line": r.get("start_line"),
-                        "end_line": r.get("end_line"),
-                        "kind": r.get("kind"),
-                        "snippet": txt,
-                        "weak": bool(r.get("weak") or False),
-                        "source": src,
-                    }
-                    if src == "human":
-                        by_key_human.setdefault(k, []).append(out)
-                    else:
-                        by_key_machine.setdefault(k, []).append(out)
-
-                # stable ordering: human first by line, machine by line
-                for m in (by_key_machine, by_key_human):
-                    for kk in list(m.keys()):
-                        m[kk].sort(key=lambda x: (int(x.get("start_line") or 0), str(x.get("chunk_id") or "")))
-
-                target_rows = [
-                    dict(r)
-                    for r in session.run(
-                        """
-MATCH (p:Paper {paper_id:$paper_id})-[:HAS_CLAIM]->(cl:Claim)-[:TARGETS_PAPER]->(tp:Paper)
-RETURN cl.claim_key AS claim_key,
-       tp.paper_id AS paper_id,
-       tp.doi AS doi,
-       tp.title AS title,
-       tp.year AS year
-""",
-                        paper_id=paper_id,
-                    )
-                ]
-                targets_by_key: dict[str, list[dict]] = {}
-                for r in target_rows:
-                    k = str(r.get("claim_key") or "")
-                    if not k:
-                        continue
-                    targets_by_key.setdefault(k, []).append(
-                        {
-                            "paper_id": r.get("paper_id"),
-                            "doi": r.get("doi"),
-                            "title": r.get("title"),
-                            "year": r.get("year"),
-                        }
-                    )
-
-                for c in claims:
-                    k = str(c.get("claim_key") or "")
-                    if not k:
-                        continue
-                    c["evidence_machine"] = by_key_machine.get(k, [])
-                    c["evidence_human"] = by_key_human.get(k, [])
-                    c["evidence"] = c["evidence_human"] if c["evidence_human"] else c["evidence_machine"]
-                    c["targets"] = targets_by_key.get(k, [])
-            except Exception:
-                pass
-
-            outgoing_raw = [
-                dict(r)
-                for r in session.run(
-                    """
-MATCH (p:Paper {paper_id:$paper_id})-[c:CITES]->(q:Paper)
-RETURN q.paper_id AS cited_paper_id,
-       q.doi AS cited_doi,
-       q.title AS cited_title,
-       c.total_mentions AS total_mentions,
-       c.ref_nums AS ref_nums,
-       c.evidence_chunk_ids AS evidence_chunk_ids,
-       c.evidence_spans AS evidence_spans,
-       c.purpose_labels AS purpose_labels,
-       c.purpose_scores AS purpose_scores
-ORDER BY c.total_mentions DESC
-LIMIT 200
-""",
-                    paper_id=paper_id,
-                )
-            ]
-
-            citation_acts, citation_mentions = _load_citation_enrichment_artifacts(paper_id)
-            outgoing = _merge_outgoing_citation_enrichment(
-                outgoing_raw=outgoing_raw,
-                human_cites=human_cites,
-                cites_cleared=cites_cleared,
-                needs_review=needs_review,
-                citation_acts=citation_acts,
-                citation_mentions=citation_mentions,
-            )
-
-            unresolved = [
-                dict(r)
-                for r in session.run(
-                    """
-MATCH (p:Paper {paper_id:$paper_id})-[u:CITES_UNRESOLVED]->(re:ReferenceEntry)
-RETURN re.ref_id AS ref_id,
-       re.raw AS raw,
-       re.crossref_json AS crossref_json,
-       u.total_mentions AS total_mentions,
-       u.ref_nums AS ref_nums
-ORDER BY u.total_mentions DESC
-LIMIT 200
-""",
-                    paper_id=paper_id,
-                )
-            ]
-
-            figures = [
-                dict(r)
-                for r in session.run(
-                    """
-MATCH (p:Paper {paper_id:$paper_id})-[:HAS_FIGURE]->(f:Figure)
-RETURN f.figure_id AS figure_id,
-       f.rel_path AS rel_path,
-       f.filename AS filename,
-       f.img_line AS img_line,
-       f.caption_text AS caption_text,
-       f.caption_start_line AS caption_start_line,
-       f.caption_end_line AS caption_end_line
-ORDER BY f.img_line ASC
-LIMIT 500
-""",
-                    paper_id=paper_id,
-                )
-            ]
-
-            # Review summary (count only human/cleared items).
-            pending_count = 0
-            if needs_review:
-                if isinstance(human_meta, dict):
-                    pending_count += len([k for k, v in human_meta.items() if v is not None])
-                pending_count += len(meta_cleared)
-                pending_count += len([x for x in logic_steps if x.get("source") in {"human", "cleared"}])
-                pending_count += len([x for x in claims if x.get("source") in {"human", "cleared"}])
-                pending_count += len([x for x in outgoing if x.get("purpose_source") in {"human", "cleared"}])
-
-            paper["review_pending_task_id"] = pending_task_id
-            paper["review_resolved_task_id"] = resolved_task_id
-            paper["review_needs_review"] = needs_review
-            paper["review_pending_count"] = pending_count
-
-            schema = None
-            try:
-                from app.schema_store import load_version, normalize_paper_type
-
-                pt = normalize_paper_type(paper.get("schema_paper_type") or paper.get("paper_type"))
-                v = int(paper.get("schema_version") or 1)
-                schema = load_version(pt, v)  # type: ignore[arg-type]
-            except Exception:
-                schema = None
-
-            return {
-                "paper": paper,
-                "schema": schema,
-                "stats": dict(stats) if stats else {},
-                "logic_steps": logic_steps,
-                "claims": claims,
-                "outgoing_cites": outgoing,
-                "unresolved": unresolved,
-                "figures": figures,
-            }
-
     def update_paper_props(self, paper_id: str, props: dict) -> None:
         cypher = """
 MATCH (p:Paper {paper_id:$paper_id})
@@ -1854,45 +1135,456 @@ SET p += $props
         with self._driver.session() as session:
             session.run(cypher, paper_id=paper_id, props=props)
 
-    @staticmethod
-    def _claim_id_for(paper_id: str, claim_key: str) -> str:
-        base = (str(paper_id) + "\0" + str(claim_key)).encode("utf-8", errors="ignore")
-        return hashlib.sha256(base).hexdigest()[:24]
-
-    def upsert_human_only_claim_node(self, paper_id: str, claim_key: str, text: str) -> str:
-        """
-        Ensure a Claim node exists for a human-only claim (created via UI).
-
-        Safety:
-        - If a machine Claim with the same claim_id already exists, we do NOT overwrite its text.
-        - We only update cl.text when cl.source == 'human'.
-        """
-        pid = str(paper_id or "").strip()
-        ck = str(claim_key or "").strip()
-        txt = str(text or "").strip()
-        if not pid or not ck:
-            raise ValueError("paper_id/claim_key required")
-        claim_id = self._claim_id_for(pid, ck)
-        cypher = """
+    def upsert_paper_logic_trace(self, paper_id: str, trace_payload: dict) -> None:
+        paper_trace_cypher = """
 MATCH (p:Paper {paper_id:$paper_id})
-MERGE (cl:Claim {claim_id:$claim_id})
-ON CREATE SET cl.paper_id = $paper_id,
-              cl.claim_key = $claim_key,
-              cl.text = $text,
-              cl.confidence = null,
-              cl.step_type = null,
-              cl.kinds = [],
-              cl.evidence_weak = false,
-              cl.targets_paper_ids = [],
-              cl.source = 'human'
-MERGE (p)-[:HAS_CLAIM]->(cl)
-SET cl.claim_key = coalesce(cl.claim_key, $claim_key)
-WITH cl
-SET cl.text = CASE WHEN coalesce(cl.source,'') = 'human' THEN $text ELSE cl.text END
+SET p.paper_logic_trace_json = $trace_json,
+    p.paper_logic_trace_schema_version = $schema_version,
+    p.paper_logic_trace_built_at = $built_at,
+    p.paper_logic_trace_quality_tier = $quality_tier,
+    p.paper_logic_trace_audit_status = $audit_status
+"""
+        payload = dict(trace_payload or {})
+        paper_metadata = dict(payload.get("paper_metadata") or {})
+        canonical_core = dict(payload.get("canonical_core") or {})
+        derived_views = dict(payload.get("derived_views") or {})
+        signature_by_move_id = {
+            str(item.get("move_id") or "").strip(): dict(item)
+            for item in (derived_views.get("community_signatures") or [])
+            if str(item.get("move_id") or "").strip()
+        }
+
+        move_rows: list[dict] = []
+        for move in (canonical_core.get("moves") or []):
+            move_id = str(move.get("move_id") or "").strip()
+            if not move_id:
+                continue
+            signature = signature_by_move_id.get(move_id) or {}
+            move_rows.append(
+                {
+                    "move_id": move_id,
+                    "paper_source": str(paper_metadata.get("paper_source") or "").strip() or None,
+                    "paper_title": str(paper_metadata.get("title") or "").strip() or None,
+                    "role": str(move.get("role") or "").strip() or None,
+                    "act_type": str(move.get("act_type") or "").strip() or None,
+                    "summary": str(move.get("summary") or "").strip() or None,
+                    "text": str(move.get("summary") or "").strip() or None,
+                    "sequence_no": int(move.get("sequence_no") or 0),
+                    "confidence": float(move["confidence"]) if move.get("confidence") is not None else None,
+                    "anchor_ids": [str(item).strip() for item in (move.get("anchor_ids") or []) if str(item).strip()],
+                    "method_tokens": [str(item).strip() for item in (signature.get("method_tokens") or []) if str(item).strip()],
+                    "object_tokens": [str(item).strip() for item in (signature.get("object_tokens") or []) if str(item).strip()],
+                    "metric_tokens": [str(item).strip() for item in (signature.get("metric_tokens") or []) if str(item).strip()],
+                    "condition_tokens": [str(item).strip() for item in (signature.get("condition_tokens") or []) if str(item).strip()],
+                    "comparator_tokens": [str(item).strip() for item in (signature.get("comparator_tokens") or []) if str(item).strip()],
+                    "effect_directions": [str(item).strip() for item in (signature.get("effect_directions") or []) if str(item).strip()],
+                    "limitation_tokens": [str(item).strip() for item in (signature.get("limitation_tokens") or []) if str(item).strip()],
+                    "resource_tokens": [str(item).strip() for item in (signature.get("resource_tokens") or []) if str(item).strip()],
+                }
+            )
+
+        anchor_rows: list[dict] = []
+        for anchor in (canonical_core.get("evidence_anchors") or []):
+            anchor_id = str(anchor.get("anchor_id") or "").strip()
+            if not anchor_id:
+                continue
+            locator = dict(anchor.get("locator") or {})
+            anchor_rows.append(
+                {
+                    "anchor_id": anchor_id,
+                    "paper_source": str(paper_metadata.get("paper_source") or "").strip() or None,
+                    "paper_title": str(paper_metadata.get("title") or "").strip() or None,
+                    "source_ref": str(anchor.get("source_ref") or "").strip() or None,
+                    "modality": str(anchor.get("modality") or "").strip() or None,
+                    "quote": str(anchor.get("quote") or "").strip() or None,
+                    "text": str(anchor.get("quote") or "").strip() or None,
+                    "weak": bool(anchor.get("weak") or False),
+                    "support_type": str(anchor.get("support_type") or "").strip() or None,
+                    "section_path": [str(item).strip() for item in (anchor.get("section_path") or []) if str(item).strip()],
+                    "chunk_id": str(locator.get("chunk_id") or "").strip() or None,
+                    "start_line": int(locator["start_line"]) if locator.get("start_line") is not None else None,
+                    "end_line": int(locator["end_line"]) if locator.get("end_line") is not None else None,
+                    "page": int(locator["page"]) if locator.get("page") is not None else None,
+                    "citation_ids": [str(item).strip() for item in (anchor.get("citation_ids") or []) if str(item).strip()],
+                }
+            )
+
+        evidence_rows: list[dict] = []
+        for move in (canonical_core.get("moves") or []):
+            move_id = str(move.get("move_id") or "").strip()
+            if not move_id:
+                continue
+            for rank, anchor_id in enumerate(move.get("anchor_ids") or [], start=1):
+                normalized_anchor_id = str(anchor_id or "").strip()
+                if not normalized_anchor_id:
+                    continue
+                evidence_rows.append(
+                    {
+                        "move_id": move_id,
+                        "anchor_id": normalized_anchor_id,
+                        "rank": rank,
+                    }
+                )
+
+        relation_rows: list[dict] = []
+        for relation in (canonical_core.get("move_relations") or []):
+            relation_id = str(relation.get("relation_id") or "").strip()
+            source_move_id = str(relation.get("source_move_id") or "").strip()
+            target_move_id = str(relation.get("target_move_id") or "").strip()
+            if not relation_id or not source_move_id or not target_move_id:
+                continue
+            relation_rows.append(
+                {
+                    "relation_id": relation_id,
+                    "source_move_id": source_move_id,
+                    "target_move_id": target_move_id,
+                    "relation_type": str(relation.get("relation_type") or "").strip() or "motivates",
+                    "anchor_ids": [str(item).strip() for item in (relation.get("anchor_ids") or []) if str(item).strip()],
+                    "confidence": float(relation["confidence"]) if relation.get("confidence") is not None else None,
+                }
+            )
+
+        cleanup_cypher = """
+MATCH (p:Paper {paper_id:$paper_id})
+OPTIONAL MATCH (p)-[:HAS_RESEARCH_MOVE]->(old_rm:ResearchMove)
+WITH collect(DISTINCT old_rm) AS old_moves, $paper_id AS paper_id
+FOREACH (node IN [item IN old_moves WHERE item IS NOT NULL] | DETACH DELETE node)
+WITH size([item IN old_moves WHERE item IS NOT NULL]) AS deleted_moves, paper_id
+OPTIONAL MATCH (ea:EvidenceAnchor {paper_id: paper_id})
+WITH deleted_moves, collect(DISTINCT ea) AS old_anchors
+FOREACH (node IN [item IN old_anchors WHERE item IS NOT NULL] | DETACH DELETE node)
+RETURN deleted_moves, size([item IN old_anchors WHERE item IS NOT NULL]) AS deleted_anchors
+"""
+        write_moves_cypher = """
+UNWIND $rows AS r
+MATCH (p:Paper {paper_id:$paper_id})
+MERGE (rm:ResearchMove {move_id: r.move_id})
+SET rm.paper_id = $paper_id,
+    rm.paper_source = coalesce(r.paper_source, p.paper_source, rm.paper_source),
+    rm.paper_title = coalesce(r.paper_title, p.title, rm.paper_title),
+    rm.role = r.role,
+    rm.act_type = r.act_type,
+    rm.summary = r.summary,
+    rm.text = r.text,
+    rm.sequence_no = r.sequence_no,
+    rm.confidence = r.confidence,
+    rm.anchor_ids = r.anchor_ids,
+    rm.method_tokens = r.method_tokens,
+    rm.object_tokens = r.object_tokens,
+    rm.metric_tokens = r.metric_tokens,
+    rm.condition_tokens = r.condition_tokens,
+    rm.comparator_tokens = r.comparator_tokens,
+    rm.effect_directions = r.effect_directions,
+    rm.limitation_tokens = r.limitation_tokens,
+    rm.resource_tokens = r.resource_tokens,
+    rm.updated_at = datetime()
+MERGE (p)-[:HAS_RESEARCH_MOVE]->(rm)
+RETURN count(DISTINCT rm) AS cnt
+"""
+        write_anchors_cypher = """
+UNWIND $rows AS r
+MATCH (p:Paper {paper_id:$paper_id})
+MERGE (ea:EvidenceAnchor {anchor_id: r.anchor_id})
+SET ea.paper_id = $paper_id,
+    ea.paper_source = coalesce(r.paper_source, p.paper_source, ea.paper_source),
+    ea.paper_title = coalesce(r.paper_title, p.title, ea.paper_title),
+    ea.source_ref = r.source_ref,
+    ea.modality = r.modality,
+    ea.quote = r.quote,
+    ea.text = r.text,
+    ea.weak = r.weak,
+    ea.support_type = r.support_type,
+    ea.section_path = r.section_path,
+    ea.chunk_id = r.chunk_id,
+    ea.start_line = r.start_line,
+    ea.end_line = r.end_line,
+    ea.page = r.page,
+    ea.citation_ids = r.citation_ids,
+    ea.updated_at = datetime()
+MERGE (p)-[:HAS_EVIDENCE_ANCHOR]->(ea)
+RETURN count(DISTINCT ea) AS cnt
+"""
+        write_evidence_edges_cypher = """
+UNWIND $rows AS r
+MATCH (rm:ResearchMove {move_id: r.move_id})
+MATCH (ea:EvidenceAnchor {anchor_id: r.anchor_id})
+MERGE (rm)-[er:EVIDENCED_BY]->(ea)
+SET er.paper_id = $paper_id,
+    er.rank = r.rank,
+    er.updated_at = datetime()
+RETURN count(er) AS cnt
+"""
+        write_relation_edges_cypher = """
+UNWIND $rows AS r
+MATCH (src:ResearchMove {move_id: r.source_move_id})
+MATCH (dst:ResearchMove {move_id: r.target_move_id})
+MERGE (src)-[rel:MOVE_RELATION {relation_id: r.relation_id}]->(dst)
+SET rel.paper_id = $paper_id,
+    rel.relation_type = r.relation_type,
+    rel.anchor_ids = r.anchor_ids,
+    rel.confidence = r.confidence,
+    rel.updated_at = datetime()
+RETURN count(DISTINCT rel) AS cnt
 """
         with self._driver.session() as session:
-            session.run(cypher, paper_id=pid, claim_id=claim_id, claim_key=ck, text=txt)
-        return claim_id
+            session.run(
+                paper_trace_cypher,
+                paper_id=paper_id,
+                trace_json=json.dumps(payload, ensure_ascii=False),
+                schema_version=str(payload.get("schema_version") or ""),
+                built_at=str(payload.get("built_at") or ""),
+                quality_tier=str((payload.get("quality") or {}).get("quality_tier") or ""),
+                audit_status=str((payload.get("quality") or {}).get("audit_status") or ""),
+            )
+            session.run(cleanup_cypher, paper_id=paper_id).single()
+            if move_rows:
+                session.run(write_moves_cypher, paper_id=paper_id, rows=move_rows).single()
+            if anchor_rows:
+                session.run(write_anchors_cypher, paper_id=paper_id, rows=anchor_rows).single()
+            if evidence_rows:
+                session.run(write_evidence_edges_cypher, paper_id=paper_id, rows=evidence_rows).single()
+            if relation_rows:
+                session.run(write_relation_edges_cypher, paper_id=paper_id, rows=relation_rows).single()
+
+    def get_paper_logic_trace(self, paper_id: str) -> dict:
+        cypher = """
+MATCH (p:Paper {paper_id:$paper_id})
+RETURN p.paper_logic_trace_json AS trace_json
+"""
+        with self._driver.session() as session:
+            row = session.run(cypher, paper_id=paper_id).single()
+        if not row:
+            raise KeyError(f"Paper not found: {paper_id}")
+        raw = row.get("trace_json")
+        if raw is None or not str(raw).strip():
+            raise KeyError(f"PaperLogicTrace not found: {paper_id}")
+        if isinstance(raw, dict):
+            return dict(raw)
+        return dict(json.loads(str(raw)))
+
+    def list_paper_logic_trace_rows(self, paper_id: str | None = None, limit: int = 50000) -> list[dict]:
+        cypher = """
+MATCH (p:Paper)
+WHERE coalesce(p.ingested, false) = true
+  AND coalesce(trim(toString(p.paper_logic_trace_json)), '') <> ''
+  AND ($paper_id = '' OR p.paper_id = $paper_id)
+RETURN p.paper_id AS paper_id,
+       p.paper_source AS paper_source,
+       p.title AS title,
+       p.source_md_path AS source_md_path,
+       p.paper_logic_trace_json AS trace_json
+ORDER BY p.paper_id ASC
+LIMIT $limit
+"""
+        pid = str(paper_id or "").strip()
+        with self._driver.session() as session:
+            raw_rows = [dict(r) for r in session.run(cypher, paper_id=pid, limit=int(limit))]
+
+        rows: list[dict] = []
+        for raw in raw_rows:
+            trace_raw = raw.get("trace_json")
+            if trace_raw is None or not str(trace_raw).strip():
+                continue
+            try:
+                trace = dict(trace_raw) if isinstance(trace_raw, dict) else dict(json.loads(str(trace_raw)))
+            except Exception:
+                continue
+
+            paper_meta = dict(trace.get("paper_metadata") or {})
+            canonical_core = dict(trace.get("canonical_core") or {})
+            derived_views = dict(trace.get("derived_views") or {})
+            move_list = list(canonical_core.get("moves") or [])
+            anchor_list = list(canonical_core.get("evidence_anchors") or [])
+            signature_list = list(derived_views.get("community_signatures") or [])
+            signature_by_move_id = {
+                str(item.get("move_id") or "").strip(): dict(item)
+                for item in signature_list
+                if str(item.get("move_id") or "").strip()
+            }
+            anchors_by_id = {
+                str(item.get("anchor_id") or "").strip(): dict(item)
+                for item in anchor_list
+                if str(item.get("anchor_id") or "").strip()
+            }
+            anchor_owner: dict[str, dict] = {}
+            for move in move_list:
+                move_id = str(move.get("move_id") or "").strip()
+                role = str(move.get("role") or "").strip()
+                act_type = str(move.get("act_type") or "").strip()
+                sequence_no = int(move.get("sequence_no") or 0)
+                summary = str(move.get("summary") or "").strip()
+                confidence = move.get("confidence")
+                for anchor_id in move.get("anchor_ids") or []:
+                    key = str(anchor_id or "").strip()
+                    if key and key not in anchor_owner:
+                        anchor_owner[key] = {
+                            "move_id": move_id,
+                            "role": role,
+                            "act_type": act_type,
+                            "sequence_no": sequence_no,
+                            "summary": summary,
+                            "confidence": confidence,
+                        }
+
+            research_moves: list[dict] = []
+            for move in move_list:
+                move_id = str(move.get("move_id") or "").strip()
+                if not move_id:
+                    continue
+                signature = signature_by_move_id.get(move_id) or {}
+                research_moves.append(
+                    {
+                        "kind": "research_move",
+                        "source_id": move_id,
+                        "id": move_id,
+                        "move_id": move_id,
+                        "paper_id": str(paper_meta.get("paper_id") or raw.get("paper_id") or "").strip(),
+                        "paper_source": str(raw.get("paper_source") or "").strip(),
+                        "paper_title": str(paper_meta.get("title") or raw.get("title") or "").strip(),
+                        "role": str(move.get("role") or "").strip(),
+                        "act_type": str(move.get("act_type") or "").strip(),
+                        "text": str(move.get("summary") or "").strip(),
+                        "summary": str(move.get("summary") or "").strip(),
+                        "sequence_no": int(move.get("sequence_no") or 0),
+                        "confidence": move.get("confidence"),
+                        "anchor_ids": [str(item).strip() for item in (move.get("anchor_ids") or []) if str(item).strip()],
+                        "method_tokens": [str(item).strip() for item in (signature.get("method_tokens") or []) if str(item).strip()],
+                        "object_tokens": [str(item).strip() for item in (signature.get("object_tokens") or []) if str(item).strip()],
+                        "metric_tokens": [str(item).strip() for item in (signature.get("metric_tokens") or []) if str(item).strip()],
+                        "condition_tokens": [str(item).strip() for item in (signature.get("condition_tokens") or []) if str(item).strip()],
+                        "comparator_tokens": [str(item).strip() for item in (signature.get("comparator_tokens") or []) if str(item).strip()],
+                        "effect_directions": [str(item).strip() for item in (signature.get("effect_directions") or []) if str(item).strip()],
+                        "limitation_tokens": [str(item).strip() for item in (signature.get("limitation_tokens") or []) if str(item).strip()],
+                        "resource_tokens": [str(item).strip() for item in (signature.get("resource_tokens") or []) if str(item).strip()],
+                    }
+                )
+
+            evidence_anchors: list[dict] = []
+            for anchor in anchor_list:
+                anchor_id = str(anchor.get("anchor_id") or "").strip()
+                if not anchor_id:
+                    continue
+                owner = anchor_owner.get(anchor_id) or {}
+                locator = dict(anchor.get("locator") or {})
+                evidence_anchors.append(
+                    {
+                        "kind": "evidence_anchor",
+                        "source_id": anchor_id,
+                        "id": anchor_id,
+                        "anchor_id": anchor_id,
+                        "paper_id": str(paper_meta.get("paper_id") or raw.get("paper_id") or "").strip(),
+                        "paper_source": str(raw.get("paper_source") or "").strip(),
+                        "paper_title": str(paper_meta.get("title") or raw.get("title") or "").strip(),
+                        "move_id": str(owner.get("move_id") or "").strip() or None,
+                        "role": str(owner.get("role") or "").strip() or None,
+                        "act_type": str(owner.get("act_type") or "").strip() or None,
+                        "text": str(anchor.get("quote") or "").strip(),
+                        "quote": str(anchor.get("quote") or "").strip(),
+                        "confidence": owner.get("confidence"),
+                        "source_ref": str(anchor.get("source_ref") or "").strip() or None,
+                        "source_md_path": str(raw.get("source_md_path") or "").strip() or None,
+                        "chunk_id": str(locator.get("chunk_id") or anchor.get("source_ref") or "").strip() or None,
+                        "start_line": locator.get("start_line"),
+                        "end_line": locator.get("end_line"),
+                    }
+                )
+
+            rows.append(
+                {
+                    "paper_id": str(raw.get("paper_id") or "").strip(),
+                    "paper_source": str(raw.get("paper_source") or "").strip(),
+                    "paper_title": str(paper_meta.get("title") or raw.get("title") or "").strip(),
+                    "source_md_path": str(raw.get("source_md_path") or "").strip(),
+                    "trace": trace,
+                    "research_moves": research_moves,
+                    "evidence_anchors": evidence_anchors,
+                }
+            )
+        return rows
+
+    def list_research_moves(self, paper_id: str | None = None, limit: int = 50000) -> list[dict]:
+        cypher = """
+MATCH (p:Paper)-[:HAS_RESEARCH_MOVE]->(rm:ResearchMove)
+WHERE ($paper_id = '' OR p.paper_id = $paper_id)
+OPTIONAL MATCH (rm)-[:EVIDENCED_BY]->(ea:EvidenceAnchor)
+RETURN rm.move_id AS move_id,
+       p.paper_id AS paper_id,
+       coalesce(rm.paper_source, p.paper_source, '') AS paper_source,
+       coalesce(rm.paper_title, p.title, '') AS paper_title,
+       rm.role AS role,
+       rm.act_type AS act_type,
+       coalesce(rm.text, rm.summary, '') AS text,
+       rm.summary AS summary,
+       rm.sequence_no AS sequence_no,
+       rm.confidence AS confidence,
+       collect(DISTINCT ea.anchor_id) AS anchor_ids,
+       coalesce(rm.method_tokens, []) AS method_tokens,
+       coalesce(rm.object_tokens, []) AS object_tokens,
+       coalesce(rm.metric_tokens, []) AS metric_tokens,
+       coalesce(rm.condition_tokens, []) AS condition_tokens,
+       coalesce(rm.comparator_tokens, []) AS comparator_tokens,
+       coalesce(rm.effect_directions, []) AS effect_directions,
+       coalesce(rm.limitation_tokens, []) AS limitation_tokens,
+       coalesce(rm.resource_tokens, []) AS resource_tokens
+ORDER BY p.paper_id ASC, coalesce(rm.sequence_no, 0) ASC, rm.move_id ASC
+LIMIT $limit
+"""
+        pid = str(paper_id or "").strip()
+        safe_limit = max(1, min(50000, int(limit)))
+        with self._driver.session() as session:
+            rows = [dict(r) for r in session.run(cypher, paper_id=pid, limit=safe_limit)]
+        if rows:
+            return rows
+
+        fallback_rows: list[dict] = []
+        for trace_row in self.list_paper_logic_trace_rows(paper_id=paper_id, limit=limit):
+            for move in trace_row.get("research_moves") or []:
+                fallback_rows.append(dict(move))
+                if len(fallback_rows) >= int(limit):
+                    return fallback_rows
+        return fallback_rows
+
+    def list_evidence_anchors(self, paper_id: str | None = None, limit: int = 50000) -> list[dict]:
+        cypher = """
+MATCH (ea:EvidenceAnchor)
+WHERE ($paper_id = '' OR ea.paper_id = $paper_id)
+OPTIONAL MATCH (p:Paper {paper_id: ea.paper_id})
+OPTIONAL MATCH (p)-[:HAS_RESEARCH_MOVE]->(rm:ResearchMove)-[:EVIDENCED_BY]->(ea)
+WITH p, ea, rm
+ORDER BY coalesce(rm.sequence_no, 0) ASC, rm.move_id ASC
+WITH p, ea, collect(rm)[0] AS owner
+RETURN ea.anchor_id AS anchor_id,
+       coalesce(ea.paper_id, p.paper_id, '') AS paper_id,
+       coalesce(ea.paper_source, p.paper_source, '') AS paper_source,
+       coalesce(ea.paper_title, p.title, '') AS paper_title,
+       coalesce(owner.move_id, '') AS move_id,
+       coalesce(owner.role, '') AS role,
+       coalesce(owner.act_type, '') AS act_type,
+       coalesce(ea.text, ea.quote, '') AS text,
+       ea.quote AS quote,
+       coalesce(owner.confidence, ea.confidence) AS confidence,
+       ea.source_ref AS source_ref,
+       p.source_md_path AS source_md_path,
+       ea.chunk_id AS chunk_id,
+       ea.start_line AS start_line,
+       ea.end_line AS end_line
+ORDER BY p.paper_id ASC, coalesce(ea.start_line, 0) ASC, ea.anchor_id ASC
+LIMIT $limit
+"""
+        pid = str(paper_id or "").strip()
+        safe_limit = max(1, min(50000, int(limit)))
+        with self._driver.session() as session:
+            rows = [dict(r) for r in session.run(cypher, paper_id=pid, limit=safe_limit)]
+        if rows:
+            return rows
+
+        fallback_rows: list[dict] = []
+        for trace_row in self.list_paper_logic_trace_rows(paper_id=paper_id, limit=limit):
+            for anchor in trace_row.get("evidence_anchors") or []:
+                fallback_rows.append(dict(anchor))
+                if len(fallback_rows) >= int(limit):
+                    return fallback_rows
+        return fallback_rows
 
     def get_paper_basic(self, paper_id: str) -> dict:
         with self._driver.session() as session:
@@ -1906,142 +1598,6 @@ RETURN p
             if not row:
                 raise KeyError(f"Paper not found: {paper_id}")
             return dict(row["p"])
-
-    def get_paper_logic_trace_inputs(self, paper_id: str) -> dict:
-        detail = self.get_paper_detail(paper_id)
-        paper = dict(detail.get("paper") or {})
-        canonical_paper_id = str(paper.get("paper_id") or paper_id).strip() or str(paper_id)
-
-        def _move_role_for_step(step_type: str) -> str:
-            normalized = str(step_type or "").strip().lower()
-            mapping = {
-                "problem": "problem",
-                "background": "background",
-                "hypothesis": "hypothesis",
-                "method": "method",
-                "experiment": "experiment",
-                "result": "result",
-                "conclusion": "interpretation",
-                "interpretation": "interpretation",
-                "limitation": "limitation",
-                "future_work": "future_work",
-                "future work": "future_work",
-            }
-            return mapping.get(normalized, "background")
-
-        def _move_act_type_for_step(step_type: str) -> str:
-            normalized = str(step_type or "").strip().lower()
-            mapping = {
-                "problem": "define_task",
-                "background": "identify_gap",
-                "hypothesis": "formulate_hypothesis",
-                "method": "propose_method",
-                "experiment": "run_experiment",
-                "result": "report_effect",
-                "conclusion": "explain_mechanism",
-                "interpretation": "explain_mechanism",
-                "limitation": "state_limitation",
-                "future_work": "suggest_extension",
-                "future work": "suggest_extension",
-            }
-            return mapping.get(normalized, "define_task")
-
-        evidence_rows: list[dict] = []
-        for step_index, row in enumerate(detail.get("logic_steps") or [], start=1):
-            step_type = str(row.get("step_type") or "").strip()
-            summary = str(row.get("summary") or "").strip()
-            logic_step_id = str(row.get("logic_step_id") or f"{canonical_paper_id}:{step_type}").strip()
-            evidence = list(row.get("evidence") or [])
-            for evidence_index, item in enumerate(evidence, start=1):
-                chunk_id = str(item.get("chunk_id") or "").strip()
-                if not chunk_id:
-                    continue
-                evidence_rows.append(
-                    {
-                        "anchor_id": f"{logic_step_id}:anchor:{evidence_index}",
-                        "paper_id": canonical_paper_id,
-                        "source_ref": chunk_id,
-                        "modality": "text",
-                        "section_path": [str(item.get("section") or step_type).strip()] if str(item.get("section") or step_type).strip() else [],
-                        "locator": {
-                            "chunk_id": chunk_id,
-                            "start_line": item.get("start_line"),
-                            "end_line": item.get("end_line"),
-                        },
-                        "quote": str(item.get("quote") or item.get("text") or summary).strip(),
-                        "citation_ids": [],
-                        "support_type": "direct",
-                        "weak": bool(item.get("weak") or False),
-                        "move_id": logic_step_id,
-                        "sequence_no": step_index,
-                        "role_hint": _move_role_for_step(step_type),
-                        "act_hint": _move_act_type_for_step(step_type),
-                        "summary": summary,
-                        "confidence": row.get("confidence"),
-                        "methods": (
-                            [
-                                {
-                                    "surface": summary,
-                                    "normalized": summary.lower(),
-                                    "anchor_ids": [f"{logic_step_id}:anchor:{evidence_index}"],
-                                }
-                            ]
-                            if _move_role_for_step(step_type) == "method" and summary
-                            else []
-                        ),
-                    }
-                )
-
-        citation_rows: list[dict] = []
-        for index, row in enumerate(detail.get("outgoing_cites") or [], start=1):
-            cited_paper_id = str(row.get("cited_paper_id") or "").strip()
-            if not cited_paper_id:
-                continue
-            citation_rows.append(
-                {
-                    "citation_act_id": f"{canonical_paper_id}:citation:{index}",
-                    "target_paper_id": cited_paper_id,
-                    "purpose": (list(row.get("purpose_labels") or []) or [None])[0],
-                    "anchor_ids": [
-                        str(item).strip()
-                        for item in (row.get("evidence_chunk_ids") or [])
-                        if str(item).strip()
-                    ],
-                }
-            )
-
-        figure_rows = [
-            {
-                "figure_id": str(row.get("figure_id") or "").strip(),
-                "caption": str(row.get("caption_text") or "").strip() or None,
-                "anchor_ids": [],
-            }
-            for row in (detail.get("figures") or [])
-            if str(row.get("figure_id") or "").strip()
-        ]
-
-        return {
-            "paper_metadata": {
-                "paper_id": canonical_paper_id,
-                "canonical_doi": str(paper.get("doi") or "").strip() or None,
-                "title": str(paper.get("title") or canonical_paper_id).strip(),
-                "year": paper.get("year"),
-                "authors": list(paper.get("authors") or []),
-                "venue": str(paper.get("venue") or "").strip() or None,
-                "paper_type": str(paper.get("paper_type") or "unknown").strip() or "unknown",
-                "source_refs": [
-                    str(item.get("chunk_id") or "").strip()
-                    for row in evidence_rows
-                    for item in [{"chunk_id": row.get("source_ref")}]
-                    if str(item.get("chunk_id") or "").strip()
-                ],
-            },
-            "evidence_rows": evidence_rows,
-            "figure_rows": figure_rows,
-            "table_rows": [],
-            "citation_rows": citation_rows,
-            "move_relation_rows": [],
-        }
 
     def delete_paper_subgraph(self, paper_id: str) -> None:
         """
@@ -2058,23 +1614,18 @@ DELETE c
 MATCH (p:Paper {paper_id:$paper_id})-[u:CITES_UNRESOLVED]->()
 DELETE u
 """,
-            # Delete EvidenceEvents belonging to this paper's claims (before deleting claims)
-            """
-MATCH (p:Paper {paper_id:$paper_id})-[:HAS_CLAIM]->(cl:Claim)-[:TRIGGERS_EVENT]->(ev:EvidenceEvent)
-DETACH DELETE ev
-""",
             # Owned sub-nodes
             """
 MATCH (p:Paper {paper_id:$paper_id})-[:HAS_CHUNK]->(c:Chunk)
 DETACH DELETE c
 """,
             """
-MATCH (p:Paper {paper_id:$paper_id})-[:HAS_LOGIC_STEP]->(s:LogicStep)
-DETACH DELETE s
+MATCH (p:Paper {paper_id:$paper_id})-[:HAS_RESEARCH_MOVE]->(rm:ResearchMove)
+DETACH DELETE rm
 """,
             """
-MATCH (p:Paper {paper_id:$paper_id})-[:HAS_CLAIM]->(cl:Claim)
-DETACH DELETE cl
+MATCH (ea:EvidenceAnchor {paper_id:$paper_id})
+DETACH DELETE ea
 """,
             """
 MATCH (p:Paper {paper_id:$paper_id})-[:HAS_REFERENCE]->(re:ReferenceEntry)
@@ -2084,6 +1635,14 @@ DETACH DELETE re
             """
 MATCH (p:Paper {paper_id:$paper_id})-[:HAS_FIGURE]->(f:Figure)
 DETACH DELETE f
+""",
+            """
+MATCH (p:Paper {paper_id:$paper_id})
+REMOVE p.paper_logic_trace_json,
+       p.paper_logic_trace_schema_version,
+       p.paper_logic_trace_built_at,
+       p.paper_logic_trace_quality_tier,
+       p.paper_logic_trace_audit_status
 """,
         ]
         with self._driver.session() as session:
@@ -2136,59 +1695,6 @@ LIMIT $limit
 """
         with self._driver.session() as session:
             return [dict(r) for r in session.run(cypher, paper_id=paper_id, limit=limit)]
-
-    def set_claim_evidence(self, paper_id: str, claim_key: str, chunk_ids: list[str], source: str = "human") -> None:
-        src = (source or "human").strip().lower()
-        if src not in {"human", "machine"}:
-            src = "human"
-        cypher = """
-MATCH (p:Paper {paper_id:$paper_id})-[:HAS_CLAIM]->(cl:Claim)
-WHERE cl.claim_key = $claim_key
-OPTIONAL MATCH (cl)-[e:EVIDENCED_BY]->(:Chunk)
-WHERE coalesce(e.source,'machine') = $source
-DELETE e
-WITH cl
-UNWIND $chunk_ids AS cid
-MATCH (ch:Chunk {chunk_id: cid})
-MERGE (cl)-[e:EVIDENCED_BY {source:$source}]->(ch)
-SET e.weak = false
-"""
-        with self._driver.session() as session:
-            session.run(cypher, paper_id=paper_id, claim_key=claim_key, chunk_ids=list(chunk_ids or []), source=src)
-
-    def apply_human_claim_evidence_overrides(self, paper_id: str) -> None:
-        """
-        Re-apply Paper-level human evidence overrides after a rebuild/replace.
-        Stores are on the Paper node so they survive; Claim/Chunk nodes are recreated.
-        """
-        paper = self.get_paper_basic(paper_id)
-
-        def _safe_json(obj: object, default):  # type: ignore[no-untyped-def]
-            if obj is None:
-                return default
-            if isinstance(obj, (dict, list)):
-                return obj
-            try:
-                s = str(obj)
-                if not s.strip():
-                    return default
-                return json.loads(s)
-            except Exception:
-                return default
-
-        evidence = _safe_json(paper.get("human_claim_evidence_json"), {})
-        cleared = set(_safe_json(paper.get("human_claim_evidence_cleared_json"), []))
-        if not isinstance(evidence, dict):
-            evidence = {}
-
-        for key, ids in evidence.items():
-            ck = str(key)
-            if not ck:
-                continue
-            chunk_ids = [str(x).strip() for x in (ids or []) if str(x).strip()]
-            self.set_claim_evidence(paper_id, ck, chunk_ids, source="human")
-        for ck in cleared:
-            self.set_claim_evidence(paper_id, str(ck), [], source="human")
 
     def list_unresolved(self, limit: int = 100) -> list[dict]:
         cypher = """
@@ -2506,250 +2012,87 @@ RETURN p.paper_id AS id,
 
             return {"nodes": nodes, "edges": edges, "center_id": pid, "depth": depth, "collection_id": cid or None}
 
-    def list_claim_similarity_rows(self, paper_id: str | None = None, limit: int = 200000) -> list[dict]:
-        """
-        Return effective claim texts for similarity indexing.
-
-        Notes:
-        - Applies Paper-level human overrides/clears (human_claims_json / human_claims_cleared_json).
-        - Only returns Claim nodes that exist in the graph (claim_id must be present).
-        - Cleared/empty claims are omitted.
-        """
-        pid = (paper_id or "").strip()
-        limit = max(1, min(500000, int(limit)))
-
-        cypher = """
-MATCH (p:Paper)
-WHERE ($paper_id = '' OR p.paper_id = $paper_id)
-MATCH (p)-[:HAS_CLAIM]->(cl:Claim)
-RETURN p.paper_id AS paper_id,
-       p.human_claims_json AS human_claims_json,
-       p.human_claims_cleared_json AS human_claims_cleared_json,
-       cl.claim_id AS claim_id,
-       cl.claim_key AS claim_key,
-       cl.text AS text
-LIMIT $limit
-"""
-        with self._driver.session() as session:
-            rows = [dict(r) for r in session.run(cypher, paper_id=pid, limit=limit)]
-
-        def _safe_json(obj: object, default):  # type: ignore[no-untyped-def]
-            if obj is None:
-                return default
-            if isinstance(obj, (dict, list)):
-                return obj
-            try:
-                s = str(obj)
-                if not s.strip():
-                    return default
-                return json.loads(s)
-            except Exception:
-                return default
-
-        by_paper: dict[str, tuple[dict, set[str]]] = {}
-        out: list[dict] = []
-        for r in rows:
-            p_id = str(r.get("paper_id") or "").strip()
-            if not p_id:
-                continue
-            if p_id not in by_paper:
-                human = _safe_json(r.get("human_claims_json"), {})
-                cleared = set(_safe_json(r.get("human_claims_cleared_json"), []))
-                if not isinstance(human, dict):
-                    human = {}
-                by_paper[p_id] = (human, cleared)
-            human, cleared = by_paper[p_id]
-
-            claim_id = str(r.get("claim_id") or "").strip()
-            if not claim_id:
-                continue
-            claim_key = str(r.get("claim_key") or "").strip()
-            if not claim_key:
-                continue
-            if claim_key in cleared:
-                continue
-            txt = human.get(claim_key)
-            effective = (str(txt) if txt is not None else str(r.get("text") or "")).strip()
-            if not effective:
-                continue
-            out.append({"node_id": claim_id, "paper_id": p_id, "text": effective})
-        return out
-
-    def list_logic_step_similarity_rows(self, paper_id: str | None = None, limit: int = 50000) -> list[dict]:
-        """
-        Return effective logic-step summaries for similarity indexing.
-
-        Notes:
-        - Applies Paper-level human overrides/clears (human_logic_json / human_logic_cleared_json).
-        - Cleared/empty steps are omitted.
-        """
-        pid = (paper_id or "").strip()
-        limit = max(1, min(200000, int(limit)))
-        cypher = """
-MATCH (p:Paper)
-WHERE ($paper_id = '' OR p.paper_id = $paper_id)
-MATCH (p)-[:HAS_LOGIC_STEP]->(ls:LogicStep)
-RETURN p.paper_id AS paper_id,
-       p.human_logic_json AS human_logic_json,
-       p.human_logic_cleared_json AS human_logic_cleared_json,
-       ls.logic_step_id AS logic_step_id,
-       ls.step_type AS step_type,
-       ls.summary AS summary
-LIMIT $limit
-"""
-        with self._driver.session() as session:
-            rows = [dict(r) for r in session.run(cypher, paper_id=pid, limit=limit)]
-
-        def _safe_json(obj: object, default):  # type: ignore[no-untyped-def]
-            if obj is None:
-                return default
-            if isinstance(obj, (dict, list)):
-                return obj
-            try:
-                s = str(obj)
-                if not s.strip():
-                    return default
-                return json.loads(s)
-            except Exception:
-                return default
-
-        by_paper: dict[str, tuple[dict, set[str]]] = {}
-        out: list[dict] = []
-        for r in rows:
-            p_id = str(r.get("paper_id") or "").strip()
-            if not p_id:
-                continue
-            if p_id not in by_paper:
-                human = _safe_json(r.get("human_logic_json"), {})
-                cleared = set(_safe_json(r.get("human_logic_cleared_json"), []))
-                if not isinstance(human, dict):
-                    human = {}
-                by_paper[p_id] = (human, cleared)
-            human, cleared = by_paper[p_id]
-
-            step_id = str(r.get("logic_step_id") or "").strip()
-            if not step_id:
-                continue
-            step_type = str(r.get("step_type") or "").strip()
-            if not step_type:
-                continue
-            if step_type in cleared:
-                continue
-            txt = human.get(step_type)
-            effective = (str(txt) if txt is not None else str(r.get("summary") or "")).strip()
-            if not effective:
-                continue
-            out.append({"node_id": step_id, "paper_id": p_id, "text": effective})
-        return out
-
-    def list_logic_step_structured_rows(self, paper_id: str | None = None, limit: int = 50000) -> list[dict]:
-        pid = (paper_id or "").strip()
-        limit = max(1, min(200000, int(limit)))
-        cypher = """
-MATCH (p:Paper)-[:HAS_LOGIC_STEP]->(ls:LogicStep)
-WHERE ($paper_id = '' OR p.paper_id = $paper_id)
-OPTIONAL MATCH (ls)-[:EVIDENCED_BY]->(ch:Chunk)
-WITH p, ls, collect(DISTINCT ch)[0..12] AS chunks
-RETURN 'logic_step' AS kind,
-       ls.logic_step_id AS source_id,
-       p.paper_id AS paper_id,
-       p.paper_source AS paper_source,
-       ls.step_type AS step_type,
-       ls.summary AS text,
-       [ch IN chunks WHERE ch.chunk_id IS NOT NULL | ch.chunk_id] AS evidence_chunk_ids,
-       coalesce(head([ch IN chunks WHERE trim(coalesce(ch.text, '')) <> '' | ch.text]), '') AS evidence_quote
-ORDER BY p.paper_id ASC, coalesce(ls.order, 999) ASC, ls.logic_step_id ASC
-LIMIT $limit
-"""
-        with self._driver.session() as session:
-            return [dict(r) for r in session.run(cypher, paper_id=pid, limit=limit)]
-
-    def list_claim_structured_rows(self, paper_id: str | None = None, limit: int = 50000) -> list[dict]:
-        pid = (paper_id or "").strip()
-        limit = max(1, min(200000, int(limit)))
-        cypher = """
-MATCH (p:Paper)-[:HAS_CLAIM]->(cl:Claim)
-WHERE ($paper_id = '' OR p.paper_id = $paper_id)
-OPTIONAL MATCH (cl)-[:EVIDENCED_BY]->(ch:Chunk)
-WITH p, cl, collect(DISTINCT ch)[0..12] AS chunks
-RETURN 'claim' AS kind,
-       cl.claim_id AS source_id,
-       p.paper_id AS paper_id,
-       p.paper_source AS paper_source,
-       cl.step_type AS step_type,
-       cl.text AS text,
-       cl.confidence AS confidence,
-       [ch IN chunks WHERE ch.chunk_id IS NOT NULL | ch.chunk_id] AS evidence_chunk_ids,
-       coalesce(cl.evidence_quote, head([ch IN chunks WHERE trim(coalesce(ch.text, '')) <> '' | ch.text]), '') AS evidence_quote
-ORDER BY p.paper_id ASC, cl.claim_id ASC
-LIMIT $limit
-"""
-        with self._driver.session() as session:
-            return [dict(r) for r in session.run(cypher, paper_id=pid, limit=limit)]
-
     def get_grounding_rows_for_structured_ids(self, ids: list[dict], limit: int = 200) -> list[dict]:
         limit = max(1, min(500, int(limit)))
-        claim_ids: list[str] = []
-        logic_ids: list[str] = []
+        anchor_ids: list[str] = []
+        move_ids: list[str] = []
         for item in ids or []:
             kind = str(item.get("kind") or item.get("source_kind") or "").strip().lower()
             ident = str(item.get("id") or item.get("source_id") or "").strip()
             if not ident:
                 continue
-            if kind == "claim":
-                claim_ids.append(ident)
-            elif kind in {"logic_step", "logic"}:
-                logic_ids.append(ident)
+            if kind == "evidence_anchor":
+                anchor_ids.append(ident)
+            elif kind == "research_move":
+                move_ids.append(ident)
+
+        trace_rows = self.list_paper_logic_trace_rows(limit=50000)
+        anchor_map: dict[str, dict] = {}
+        move_anchor_map: dict[str, list[dict]] = defaultdict(list)
+        move_summary_map: dict[str, dict] = {}
+        for row in trace_rows:
+            for move in row.get("research_moves") or []:
+                move_id = str(move.get("move_id") or "").strip()
+                if move_id:
+                    move_summary_map[move_id] = {
+                        "source_kind": "research_move",
+                        "source_id": move_id,
+                        "quote": str(move.get("summary") or "").strip(),
+                        "chunk_id": None,
+                        "md_path": str(row.get("source_md_path") or "").strip() or None,
+                        "start_line": None,
+                        "end_line": None,
+                        "textbook_id": None,
+                        "chapter_id": None,
+                        "evidence_event_id": None,
+                        "evidence_event_type": None,
+                    }
+            for anchor in row.get("evidence_anchors") or []:
+                anchor_id = str(anchor.get("anchor_id") or "").strip()
+                if not anchor_id:
+                    continue
+                normalized = {
+                    "source_kind": "evidence_anchor",
+                    "source_id": anchor_id,
+                    "quote": str(anchor.get("quote") or anchor.get("text") or "").strip(),
+                    "chunk_id": str(anchor.get("chunk_id") or "").strip() or None,
+                    "md_path": str(anchor.get("source_md_path") or "").strip() or None,
+                    "start_line": anchor.get("start_line"),
+                    "end_line": anchor.get("end_line"),
+                    "textbook_id": None,
+                    "chapter_id": None,
+                    "evidence_event_id": None,
+                    "evidence_event_type": None,
+                }
+                anchor_map[anchor_id] = normalized
+                move_id = str(anchor.get("move_id") or "").strip()
+                if move_id:
+                    move_anchor_map[move_id].append(normalized)
 
         rows: list[dict] = []
-        with self._driver.session() as session:
-            if claim_ids:
-                claim_cypher = """
-UNWIND $claim_ids AS claim_id
-MATCH (cl:Claim {claim_id: claim_id})
-OPTIONAL MATCH (cl)-[:EVIDENCED_BY]->(ch:Chunk)
-OPTIONAL MATCH (cl)-[:TRIGGERS_EVENT]->(ev:EvidenceEvent)
-RETURN 'claim' AS source_kind,
-       cl.claim_id AS source_id,
-       coalesce(cl.evidence_quote, ch.text, cl.text) AS quote,
-       ch.chunk_id AS chunk_id,
-       ch.md_path AS md_path,
-       ch.start_line AS start_line,
-       ch.end_line AS end_line,
-       NULL AS textbook_id,
-       NULL AS chapter_id,
-       ev.event_id AS evidence_event_id,
-       ev.event_type AS evidence_event_type
-LIMIT $limit
-"""
-                rows.extend(dict(r) for r in session.run(claim_cypher, claim_ids=claim_ids[:limit], limit=limit))
-
-            if logic_ids and len(rows) < limit:
-                logic_cypher = """
-UNWIND $logic_ids AS logic_step_id
-MATCH (ls:LogicStep {logic_step_id: logic_step_id})
-OPTIONAL MATCH (ls)-[:EVIDENCED_BY]->(ch:Chunk)
-RETURN 'logic_step' AS source_kind,
-       ls.logic_step_id AS source_id,
-       coalesce(ch.text, ls.summary) AS quote,
-       ch.chunk_id AS chunk_id,
-       ch.md_path AS md_path,
-       ch.start_line AS start_line,
-       ch.end_line AS end_line,
-       NULL AS textbook_id,
-       NULL AS chapter_id,
-       NULL AS evidence_event_id,
-       NULL AS evidence_event_type
-LIMIT $limit
-"""
-                rows.extend(
-                    dict(r)
-                    for r in session.run(
-                        logic_cypher,
-                        logic_ids=logic_ids[: max(1, limit - len(rows))],
-                        limit=max(1, limit - len(rows)),
-                    )
-                )
+        for anchor_id in anchor_ids:
+            if anchor_id in anchor_map:
+                rows.append(dict(anchor_map[anchor_id]))
+            if len(rows) >= limit:
+                break
+        if len(rows) < limit:
+            for move_id in move_ids:
+                anchor_rows = move_anchor_map.get(move_id) or []
+                if anchor_rows:
+                    for item in anchor_rows:
+                        rows.append(
+                            {
+                                **dict(item),
+                                "source_kind": "research_move",
+                                "source_id": move_id,
+                            }
+                        )
+                        if len(rows) >= limit:
+                            break
+                elif move_id in move_summary_map:
+                    rows.append(dict(move_summary_map[move_id]))
+                if len(rows) >= limit:
+                    break
 
         deduped: list[dict] = []
         seen: set[tuple[str, str, str, str]] = set()
@@ -2783,164 +2126,6 @@ LIMIT $limit
             if len(deduped) >= limit:
                 break
         return deduped
-
-    def list_gap_like_claims(self, limit: int = 200, kinds: list[str] | None = None) -> list[dict]:
-        limit = max(1, min(5000, int(limit)))
-        use_kinds = [str(k).strip() for k in (kinds or ["Gap", "FutureWork", "Limitation", "Critique"]) if str(k).strip()]
-        if not use_kinds:
-            return []
-
-        cypher = """
-MATCH (p:Paper)-[:HAS_CLAIM]->(cl:Claim)
-WHERE any(k IN coalesce(cl.kinds, []) WHERE k IN $kinds)
-OPTIONAL MATCH (cl)-[:IN_GLOBAL_COMMUNITY]->(gc:GlobalCommunity)
-OPTIONAL MATCH (cl)-[ev:EVIDENCED_BY]->(:Chunk)
-RETURN cl.claim_id AS claim_id,
-       cl.claim_key AS claim_key,
-       cl.text AS text,
-       cl.kinds AS kinds,
-       cl.step_type AS step_type,
-       coalesce(cl.confidence, 0.0) AS confidence,
-       p.paper_id AS paper_id,
-       p.paper_source AS paper_source,
-       p.title AS paper_title,
-       p.year AS paper_year,
-       collect(DISTINCT gc.community_id) AS source_community_ids,
-       count(DISTINCT ev) AS evidence_count
-ORDER BY confidence DESC, evidence_count DESC, cl.claim_id ASC
-LIMIT $limit
-"""
-        with self._driver.session() as session:
-            return [dict(r) for r in session.run(cypher, kinds=use_kinds, limit=limit)]
-
-    def replace_similar_claim_edges_batch(self, items: list[dict], model: str, built_at: str, mode: str = "embedding") -> None:
-        """
-        Replace outgoing SIMILAR_CLAIM edges for each source claim.
-        Input: [{"source": "<claim_id>", "targets": [{"target":"<claim_id>","score":0.9}, ...]}, ...]
-        """
-        cypher = """
-UNWIND $items AS it
-MATCH (a:Claim {claim_id: it.source})
-OPTIONAL MATCH (a)-[r:SIMILAR_CLAIM]->(:Claim)
-DELETE r
-WITH it, a
-UNWIND coalesce(it.targets, []) AS t
-MATCH (b:Claim {claim_id: t.target})
-MERGE (a)-[s:SIMILAR_CLAIM]->(b)
-SET s.score = t.score,
-    s.model = $model,
-    s.mode = $mode,
-    s.built_at = $built_at
-"""
-        mode_norm = str(mode or "embedding").strip().lower()
-        if mode_norm not in {"embedding", "lexical"}:
-            mode_norm = "embedding"
-        with self._driver.session() as session:
-            # chunk to avoid huge transactions
-            batch = list(items or [])
-            for i in range(0, len(batch), 200):
-                session.run(cypher, items=batch[i : i + 200], model=str(model), mode=mode_norm, built_at=str(built_at))
-
-    def replace_similar_logic_edges_batch(self, items: list[dict], model: str, built_at: str) -> None:
-        """
-        Replace outgoing SIMILAR_LOGIC edges for each source logic step.
-        Input: [{"source": "<logic_step_id>", "targets": [{"target":"<logic_step_id>","score":0.9}, ...]}, ...]
-        """
-        cypher = """
-UNWIND $items AS it
-MATCH (a:LogicStep {logic_step_id: it.source})
-OPTIONAL MATCH (a)-[r:SIMILAR_LOGIC]->(:LogicStep)
-DELETE r
-WITH it, a
-UNWIND coalesce(it.targets, []) AS t
-MATCH (b:LogicStep {logic_step_id: t.target})
-MERGE (a)-[s:SIMILAR_LOGIC]->(b)
-SET s.score = t.score,
-    s.model = $model,
-    s.built_at = $built_at
-"""
-        with self._driver.session() as session:
-            batch = list(items or [])
-            for i in range(0, len(batch), 200):
-                session.run(cypher, items=batch[i : i + 200], model=str(model), built_at=str(built_at))
-
-    def list_similar_claim_edges_in_papers(
-        self,
-        paper_ids: list[str],
-        min_score: float = 0.0,
-        limit_per_source: int = 2,
-        limit_total: int = 4000,
-    ) -> list[dict]:
-        ids = [str(x).strip() for x in (paper_ids or []) if str(x).strip()]
-        if not ids:
-            return []
-        limit_per_source = max(1, min(50, int(limit_per_source)))
-        limit_total = max(1, min(20000, int(limit_total)))
-        cypher = """
-MATCH (p1:Paper)-[:HAS_CLAIM]->(a:Claim)-[s:SIMILAR_CLAIM]->(b:Claim)<-[:HAS_CLAIM]-(p2:Paper)
-WHERE p1.paper_id IN $paper_ids
-  AND p2.paper_id IN $paper_ids
-  AND p1.paper_id <> p2.paper_id
-  AND coalesce(s.score, 0.0) >= $min_score
-WITH a, b, s
-ORDER BY s.score DESC
-WITH a, collect({target: b.claim_id, score: s.score})[0..$limit_per_source] AS tgts
-UNWIND tgts AS t
-RETURN a.claim_id AS source, t.target AS target, t.score AS score
-LIMIT $limit_total
-"""
-        with self._driver.session() as session:
-            return [dict(r) for r in session.run(cypher, paper_ids=ids, min_score=float(min_score), limit_per_source=limit_per_source, limit_total=limit_total)]
-
-    def list_similar_logic_edges_in_papers(
-        self,
-        paper_ids: list[str],
-        min_score: float = 0.0,
-        limit_per_source: int = 2,
-        limit_total: int = 3000,
-    ) -> list[dict]:
-        ids = [str(x).strip() for x in (paper_ids or []) if str(x).strip()]
-        if not ids:
-            return []
-        limit_per_source = max(1, min(50, int(limit_per_source)))
-        limit_total = max(1, min(20000, int(limit_total)))
-        cypher = """
-MATCH (p1:Paper)-[:HAS_LOGIC_STEP]->(a:LogicStep)-[s:SIMILAR_LOGIC]->(b:LogicStep)<-[:HAS_LOGIC_STEP]-(p2:Paper)
-WHERE p1.paper_id IN $paper_ids
-  AND p2.paper_id IN $paper_ids
-  AND p1.paper_id <> p2.paper_id
-  AND coalesce(s.score, 0.0) >= $min_score
-WITH a, b, s
-ORDER BY s.score DESC
-WITH a, collect({target: b.logic_step_id, score: s.score})[0..$limit_per_source] AS tgts
-UNWIND tgts AS t
-RETURN a.logic_step_id AS source, t.target AS target, t.score AS score
-LIMIT $limit_total
-        """
-        with self._driver.session() as session:
-            return [dict(r) for r in session.run(cypher, paper_ids=ids, min_score=float(min_score), limit_per_source=limit_per_source, limit_total=limit_total)]
-
-    def list_shared_entity_logicstep_edges(self, paper_ids: list[str], limit: int = 50000) -> list[dict]:
-        ids = [str(x).strip() for x in (paper_ids or []) if str(x).strip()]
-        if not ids:
-            return []
-        safe_limit = max(1, min(200000, int(limit)))
-        cypher = """
-MATCH (p1:Paper)-[:HAS_LOGIC_STEP]->(a:LogicStep)-[ra:EXPLAINS]->(ke:KnowledgeEntity)<-[rb:EXPLAINS]-(b:LogicStep)<-[:HAS_LOGIC_STEP]-(p2:Paper)
-WHERE p1.paper_id IN $paper_ids
-  AND p2.paper_id IN $paper_ids
-  AND p1.paper_id <> p2.paper_id
-  AND a.logic_step_id < b.logic_step_id
-WITH a, b, count(DISTINCT ke) AS shared_entities, avg(coalesce(ra.score, 0.0) + coalesce(rb.score, 0.0)) / 2.0 AS raw_score
-RETURN a.logic_step_id AS source,
-       b.logic_step_id AS target,
-       raw_score + shared_entities * 0.05 AS score,
-       shared_entities AS shared_entities
-ORDER BY score DESC, source ASC, target ASC
-LIMIT $limit
-"""
-        with self._driver.session() as session:
-            return [dict(r) for r in session.run(cypher, paper_ids=ids, limit=safe_limit)]
 
     def list_paper_citation_pairs(self, paper_ids: list[str], limit: int = 50000) -> list[dict]:
         ids = [str(x).strip() for x in (paper_ids or []) if str(x).strip()]
@@ -3341,21 +2526,26 @@ RETURN count(*) AS cnt
         return int(row["cnt"]) if row else 0
 
     def create_fusion_explains_edges(self, links: list[dict]) -> int:
-        """Create or update EXPLAINS edges between LogicStep and KnowledgeEntity."""
+        """Create or update EXPLAINS edges between ResearchMove and KnowledgeEntity."""
         if not links:
             return 0
         cypher = """
 UNWIND $rows AS r
-MATCH (ls:LogicStep {logic_step_id: r.logic_step_id})
+MATCH (p:Paper {paper_id: r.paper_id})
+MERGE (rm:ResearchMove {move_id: r.move_id})
+SET rm.paper_id = r.paper_id,
+    rm.paper_source = coalesce(r.paper_source, rm.paper_source),
+    rm.role = coalesce(r.role, rm.role),
+    rm.act_type = coalesce(r.act_type, rm.act_type),
+    rm.summary = coalesce(r.summary, rm.summary),
+    rm.anchor_ids = coalesce(r.anchor_ids, rm.anchor_ids),
+    rm.updated_at = datetime()
+MERGE (p)-[:HAS_RESEARCH_MOVE]->(rm)
 MATCH (e:KnowledgeEntity {entity_id: r.entity_id})
-MERGE (ls)-[rel:EXPLAINS]->(e)
+MERGE (rm)-[rel:EXPLAINS]->(e)
 SET rel.score = coalesce(r.score, rel.score),
     rel.reasons = coalesce(r.reasons, rel.reasons),
-    rel.evidence_chunk_ids = coalesce(r.evidence_chunk_ids, rel.evidence_chunk_ids),
-    rel.source_chunk_id = CASE
-        WHEN r.source_chunk_id IS NULL OR trim(toString(r.source_chunk_id)) = '' THEN rel.source_chunk_id
-        ELSE r.source_chunk_id
-    END,
+    rel.anchor_ids = coalesce(r.anchor_ids, rel.anchor_ids),
     rel.evidence_quote = CASE
         WHEN r.evidence_quote IS NULL OR trim(toString(r.evidence_quote)) = '' THEN rel.evidence_quote
         ELSE r.evidence_quote
@@ -3369,20 +2559,23 @@ RETURN count(rel) AS cnt
 """
         rows = []
         for link in links:
-            sid = str(link.get("logic_step_id") or "").strip()
+            sid = str(link.get("move_id") or "").strip()
+            paper_id = str(link.get("paper_id") or "").strip()
             eid = str(link.get("entity_id") or "").strip()
-            if not sid or not eid:
+            if not sid or not paper_id or not eid:
                 continue
             rows.append(
                 {
-                    "logic_step_id": sid,
+                    "move_id": sid,
+                    "paper_id": paper_id,
+                    "paper_source": str(link.get("paper_source") or "").strip() or None,
+                    "role": str(link.get("role") or "").strip() or None,
+                    "act_type": str(link.get("act_type") or "").strip() or None,
+                    "summary": str(link.get("summary") or "").strip() or None,
                     "entity_id": eid,
                     "score": float(link["score"]) if link.get("score") is not None else None,
                     "reasons": [str(x) for x in (link.get("reasons") or []) if str(x).strip()],
-                    "evidence_chunk_ids": [
-                        str(x) for x in (link.get("evidence_chunk_ids") or []) if str(x).strip()
-                    ],
-                    "source_chunk_id": str(link.get("source_chunk_id") or "").strip() or None,
+                    "anchor_ids": [str(x) for x in (link.get("anchor_ids") or []) if str(x).strip()],
                     "evidence_quote": str(link.get("evidence_quote") or "").strip() or None,
                     "source_chapter_id": str(link.get("source_chapter_id") or "").strip() or None,
                 }
@@ -3395,7 +2588,7 @@ RETURN count(rel) AS cnt
         return int(row["cnt"]) if row else 0
 
     def upsert_fusion_communities(self, communities: list[dict]) -> int:
-        """Write FusionCommunity nodes and IN_COMMUNITY memberships."""
+        """Write FusionCommunity nodes and embedded membership rows."""
         if not communities:
             return 0
 
@@ -3405,16 +2598,8 @@ MERGE (fc:FusionCommunity {community_id: r.community_id})
 SET fc.title = r.title,
     fc.confidence = r.confidence,
     fc.representative_evidence = r.representative_evidence,
+    fc.member_rows_json = r.member_rows_json,
     fc.updated_at = datetime()
-WITH fc, r
-UNWIND r.member_ids AS member_id
-OPTIONAL MATCH (ls:LogicStep {logic_step_id: member_id})
-OPTIONAL MATCH (cl:Claim {claim_id: member_id})
-OPTIONAL MATCH (ke:KnowledgeEntity {entity_id: member_id})
-WITH fc, r, coalesce(ls, cl, ke) AS m
-WHERE m IS NOT NULL
-MERGE (m)-[ic:IN_COMMUNITY]->(fc)
-SET ic.weight = r.weight
 RETURN count(DISTINCT fc) AS cnt
 """
         rows = []
@@ -3425,14 +2610,23 @@ RETURN count(DISTINCT fc) AS cnt
             members = [str(x).strip() for x in (item.get("member_ids") or []) if str(x).strip()]
             if not members:
                 continue
+            member_rows = []
+            for rank, member_id in enumerate(members, start=1):
+                member_rows.append(
+                    {
+                        "member_id": member_id,
+                        "member_kind": "ResearchMove" if ":move:" in member_id else "KnowledgeEntity",
+                        "rank": rank,
+                        "weight": float(item.get("weight") or 1.0),
+                    }
+                )
             rows.append(
                 {
                     "community_id": cid,
                     "title": str(item.get("title") or cid),
                     "confidence": float(item.get("confidence") or 0.0),
                     "representative_evidence": str(item.get("representative_evidence") or ""),
-                    "member_ids": members,
-                    "weight": float(item.get("weight") or 1.0),
+                    "member_rows_json": json.dumps(member_rows, ensure_ascii=False),
                 }
             )
         if not rows:
@@ -3614,7 +2808,10 @@ RETURN count(hk) AS cnt
         if not items:
             return 0
 
-        rows = []
+        grouped_rows: dict[str, list[dict]] = {}
+        move_rows: list[dict] = []
+        anchor_rows: list[dict] = []
+        entity_rows: list[dict] = []
         community_ids: list[str] = []
         seen_community_ids: set[str] = set()
         for item in items:
@@ -3624,25 +2821,40 @@ RETURN count(hk) AS cnt
             if not community_id or not member_id:
                 continue
             normalized_kind = member_kind.casefold()
-            if normalized_kind in {"claim"}:
-                member_kind = "Claim"
-            elif normalized_kind in {"logicstep", "logic_step", "logic"}:
-                member_kind = "LogicStep"
+            if normalized_kind in {"researchmove", "research_move", "move"}:
+                member_kind = "ResearchMove"
+            elif normalized_kind in {"evidenceanchor", "evidence_anchor", "anchor"}:
+                member_kind = "EvidenceAnchor"
             elif normalized_kind in {"knowledgeentity", "knowledge_entity", "entity"}:
                 member_kind = "KnowledgeEntity"
-            rows.append(
-                {
-                    "community_id": community_id,
-                    "member_id": member_id,
-                    "member_kind": member_kind,
-                    "weight": float(item.get("weight") or 0.0),
-                }
+            normalized_row = {
+                "community_id": community_id,
+                "member_id": member_id,
+                "member_kind": member_kind,
+                "weight": float(item.get("weight") or 0.0),
+                "rank": int(item.get("rank") or 0),
+                "is_core": bool(item.get("is_core") or False),
+                "text": str(item.get("text") or "").strip(),
+                "paper_id": str(item.get("paper_id") or "").strip() or None,
+                "paper_source": str(item.get("paper_source") or "").strip() or None,
+                "paper_title": str(item.get("paper_title") or "").strip() or None,
+                "role": str(item.get("role") or "").strip() or None,
+                "source_chapter_id": str(item.get("source_chapter_id") or "").strip() or None,
+            }
+            grouped_rows.setdefault(community_id, []).append(
+                {key: value for key, value in normalized_row.items() if key != "community_id"}
             )
+            if member_kind == "ResearchMove":
+                move_rows.append(normalized_row)
+            elif member_kind == "EvidenceAnchor":
+                anchor_rows.append(normalized_row)
+            elif member_kind == "KnowledgeEntity":
+                entity_rows.append(normalized_row)
             if community_id not in seen_community_ids:
                 seen_community_ids.add(community_id)
                 community_ids.append(community_id)
 
-        if not rows:
+        if not grouped_rows:
             return 0
 
         delete_cypher = """
@@ -3655,27 +2867,81 @@ FOREACH (rel IN [edge IN stale_edges WHERE edge IS NOT NULL] | DELETE rel)
         write_cypher = """
 UNWIND $rows AS r
 MATCH (gc:GlobalCommunity {community_id: r.community_id})
-OPTIONAL MATCH (ls:LogicStep {logic_step_id: r.member_id})
-OPTIONAL MATCH (cl:Claim {claim_id: r.member_id})
-OPTIONAL MATCH (ke:KnowledgeEntity {entity_id: r.member_id})
-WITH gc, r, coalesce(
-    CASE WHEN r.member_kind = 'LogicStep' THEN ls END,
-    CASE WHEN r.member_kind = 'Claim' THEN cl END,
-    CASE WHEN r.member_kind = 'KnowledgeEntity' THEN ke END,
-    ls,
-    cl,
-    ke
-) AS member
-WHERE member IS NOT NULL
-MERGE (member)-[im:IN_GLOBAL_COMMUNITY]->(gc)
-SET im.weight = r.weight,
-    im.member_kind = r.member_kind
-RETURN count(im) AS cnt
+SET gc.member_rows_json = r.member_rows_json,
+    gc.updated_at = datetime()
+RETURN count(gc) AS cnt
 """
+        write_move_edges_cypher = """
+UNWIND $rows AS r
+MATCH (gc:GlobalCommunity {community_id: r.community_id})
+MATCH (member:ResearchMove {move_id: r.member_id})
+MERGE (member)-[ig:IN_GLOBAL_COMMUNITY]->(gc)
+SET ig.member_kind = r.member_kind,
+    ig.weight = r.weight,
+    ig.rank = r.rank,
+    ig.is_core = r.is_core,
+    ig.text = r.text,
+    ig.paper_id = r.paper_id,
+    ig.paper_source = r.paper_source,
+    ig.paper_title = r.paper_title,
+    ig.role = r.role,
+    ig.source_chapter_id = r.source_chapter_id,
+    ig.updated_at = datetime()
+RETURN count(ig) AS cnt
+"""
+        write_anchor_edges_cypher = """
+UNWIND $rows AS r
+MATCH (gc:GlobalCommunity {community_id: r.community_id})
+MATCH (member:EvidenceAnchor {anchor_id: r.member_id})
+MERGE (member)-[ig:IN_GLOBAL_COMMUNITY]->(gc)
+SET ig.member_kind = r.member_kind,
+    ig.weight = r.weight,
+    ig.rank = r.rank,
+    ig.is_core = r.is_core,
+    ig.text = r.text,
+    ig.paper_id = r.paper_id,
+    ig.paper_source = r.paper_source,
+    ig.paper_title = r.paper_title,
+    ig.role = r.role,
+    ig.source_chapter_id = r.source_chapter_id,
+    ig.updated_at = datetime()
+RETURN count(ig) AS cnt
+"""
+        write_entity_edges_cypher = """
+UNWIND $rows AS r
+MATCH (gc:GlobalCommunity {community_id: r.community_id})
+MATCH (member:KnowledgeEntity {entity_id: r.member_id})
+MERGE (member)-[ig:IN_GLOBAL_COMMUNITY]->(gc)
+SET ig.member_kind = r.member_kind,
+    ig.weight = r.weight,
+    ig.rank = r.rank,
+    ig.is_core = r.is_core,
+    ig.text = r.text,
+    ig.paper_id = r.paper_id,
+    ig.paper_source = r.paper_source,
+    ig.paper_title = r.paper_title,
+    ig.role = r.role,
+    ig.source_chapter_id = r.source_chapter_id,
+    ig.updated_at = datetime()
+RETURN count(ig) AS cnt
+"""
+        rows = [
+            {
+                "community_id": community_id,
+                "member_rows_json": json.dumps(members, ensure_ascii=False),
+            }
+            for community_id, members in grouped_rows.items()
+        ]
         with self._driver.session() as session:
             session.run(delete_cypher, community_ids=community_ids)
-            row = session.run(write_cypher, rows=rows).single()
-        return int((row or {}).get("cnt") or 0)
+            session.run(write_cypher, rows=rows).single()
+            if move_rows:
+                session.run(write_move_edges_cypher, rows=move_rows).single()
+            if anchor_rows:
+                session.run(write_anchor_edges_cypher, rows=anchor_rows).single()
+            if entity_rows:
+                session.run(write_entity_edges_cypher, rows=entity_rows).single()
+        return sum(len(members) for members in grouped_rows.values())
     def list_global_community_rows(self, limit: int = 50000) -> list[dict]:
         cypher = """
 MATCH (gc:GlobalCommunity)
@@ -3698,56 +2964,86 @@ LIMIT $limit
             return [dict(r) for r in session.run(cypher, limit=safe_limit)]
 
     def list_global_community_members(self, community_id: str, limit: int = 200) -> list[dict]:
-        cypher = """
-MATCH (gc:GlobalCommunity {community_id: $community_id})<-[:IN_GLOBAL_COMMUNITY]-(member)
-OPTIONAL MATCH (p:Paper {paper_id: member.paper_id})
-WITH member,
-     p,
-     CASE
-       WHEN member:LogicStep THEN member.logic_step_id
-       WHEN member:Claim THEN member.claim_id
-       WHEN member:KnowledgeEntity THEN member.entity_id
-       ELSE toString(id(member))
-     END AS member_id,
-     CASE
-       WHEN member:LogicStep THEN 'LogicStep'
-       WHEN member:Claim THEN 'Claim'
-       WHEN member:KnowledgeEntity THEN 'KnowledgeEntity'
-       ELSE 'Node'
-     END AS member_kind,
-     coalesce(member.summary, member.text, member.name, member.title, '') AS text
-RETURN member_id AS member_id,
-       member_kind AS member_kind,
-       text AS text,
-       CASE
-         WHEN member:LogicStep OR member:Claim THEN member.paper_id
-         ELSE NULL
-       END AS paper_id,
-       CASE
-         WHEN member:LogicStep OR member:Claim THEN coalesce(member.paper_source, p.paper_source)
-         ELSE NULL
-       END AS paper_source,
-       CASE
-         WHEN member:LogicStep OR member:Claim THEN coalesce(member.paper_title, p.title)
-         ELSE NULL
-       END AS paper_title,
-       CASE
-         WHEN member:LogicStep OR member:Claim THEN member.step_type
-         ELSE NULL
-       END AS step_type,
-       CASE
-         WHEN member:KnowledgeEntity THEN member.source_chapter_id
-         ELSE NULL
-       END AS source_chapter_id
-ORDER BY member_kind ASC, member_id ASC
+        graph_cypher = """
+MATCH (gc:GlobalCommunity {community_id: $community_id})
+MATCH (member)-[ig:IN_GLOBAL_COMMUNITY]->(gc)
+RETURN CASE
+           WHEN member:ResearchMove THEN member.move_id
+           WHEN member:EvidenceAnchor THEN member.anchor_id
+           WHEN member:KnowledgeEntity THEN member.entity_id
+           ELSE toString(id(member))
+       END AS member_id,
+       coalesce(
+           ig.member_kind,
+           CASE
+               WHEN member:ResearchMove THEN 'ResearchMove'
+               WHEN member:EvidenceAnchor THEN 'EvidenceAnchor'
+               WHEN member:KnowledgeEntity THEN 'KnowledgeEntity'
+               ELSE ''
+           END
+       ) AS member_kind,
+       coalesce(ig.text, member.text, member.summary, member.quote, member.name, '') AS text,
+       coalesce(ig.paper_id, member.paper_id, '') AS paper_id,
+       coalesce(ig.paper_source, member.paper_source, '') AS paper_source,
+       coalesce(ig.paper_title, member.paper_title, '') AS paper_title,
+       coalesce(ig.role, member.role, '') AS role,
+       coalesce(ig.source_chapter_id, member.source_chapter_id, '') AS source_chapter_id
+ORDER BY coalesce(ig.rank, 0) ASC,
+         coalesce(ig.weight, 0.0) DESC,
+         member_id ASC
 LIMIT $limit
+"""
+        fallback_cypher = """
+MATCH (gc:GlobalCommunity {community_id: $community_id})
+RETURN gc.member_rows_json AS member_rows_json
 """
         cid = str(community_id or "").strip()
         if not cid:
             return []
         safe_limit = max(1, min(2000, int(limit)))
         with self._driver.session() as session:
-            return [dict(r) for r in session.run(cypher, community_id=cid, limit=safe_limit)]
+            graph_rows = [dict(r) for r in session.run(graph_cypher, community_id=cid, limit=safe_limit)]
+            if graph_rows:
+                out: list[dict] = []
+                for member in graph_rows:
+                    row = {
+                        "member_id": str(member.get("member_id") or "").strip(),
+                        "member_kind": str(member.get("member_kind") or "").strip(),
+                        "text": str(member.get("text") or "").strip(),
+                    }
+                    for key in ("paper_id", "paper_source", "paper_title", "role", "source_chapter_id"):
+                        value = str(member.get(key) or "").strip()
+                        if value:
+                            row[key] = value
+                    if row["member_id"]:
+                        out.append(row)
+                if out:
+                    return out
+            row = session.run(fallback_cypher, community_id=cid).single()
+        raw = (row or {}).get("member_rows_json")
+        if raw is None or not str(raw).strip():
+            return []
+        try:
+            members = raw if isinstance(raw, list) else json.loads(str(raw))
+        except Exception:
+            return []
+        out: list[dict] = []
+        for member in members if isinstance(members, list) else []:
+            if not isinstance(member, dict):
+                continue
+            row = {
+                "member_id": str(member.get("member_id") or "").strip(),
+                "member_kind": str(member.get("member_kind") or "").strip(),
+                "text": str(member.get("text") or "").strip(),
+            }
+            for key in ("paper_id", "paper_source", "paper_title", "role", "source_chapter_id"):
+                value = str(member.get(key) or "").strip()
+                if value:
+                    row[key] = value
+            out.append(row)
+            if len(out) >= safe_limit:
+                break
+        return out
 
     def upsert_fusion_keywords(self, keyword_rows: list[dict]) -> int:
         """Write FusionKeyword nodes and HAS_KEYWORD edges from FusionCommunity."""
@@ -3788,43 +3084,6 @@ RETURN count(hk) AS cnt
             row = result.single()
         return int(row["cnt"]) if row else 0
 
-    def list_logic_steps_for_fusion(self, paper_id: str | None = None, limit: int = 50000) -> list[dict]:
-        cypher = """
-MATCH (p:Paper)-[:HAS_LOGIC_STEP]->(ls:LogicStep)
-WHERE $paper_id = '' OR p.paper_id = $paper_id
-OPTIONAL MATCH (ls)-[:EVIDENCED_BY]->(ch:Chunk)
-WITH p, ls, collect(DISTINCT ch.chunk_id) AS evidence_chunk_ids
-RETURN ls.logic_step_id AS logic_step_id,
-       p.paper_id AS paper_id,
-       p.paper_source AS paper_source,
-       ls.step_type AS step_type,
-       ls.summary AS summary,
-       ls.order AS step_order,
-       evidence_chunk_ids AS evidence_chunk_ids
-ORDER BY p.paper_id ASC, coalesce(ls.order, 999) ASC, ls.logic_step_id ASC
-LIMIT $limit
-"""
-        pid = str(paper_id or "").strip()
-        with self._driver.session() as session:
-            return [dict(r) for r in session.run(cypher, paper_id=pid, limit=int(limit))]
-
-    def list_claims_for_fusion(self, paper_id: str | None = None, limit: int = 50000) -> list[dict]:
-        cypher = """
-MATCH (p:Paper)-[:HAS_CLAIM]->(cl:Claim)
-WHERE $paper_id = '' OR p.paper_id = $paper_id
-RETURN cl.claim_id AS claim_id,
-       p.paper_id AS paper_id,
-       p.paper_source AS paper_source,
-       cl.step_type AS step_type,
-       cl.text AS text,
-       cl.confidence AS confidence
-ORDER BY p.paper_id ASC, cl.step_type ASC, cl.claim_id ASC
-LIMIT $limit
-"""
-        pid = str(paper_id or "").strip()
-        with self._driver.session() as session:
-            return [dict(r) for r in session.run(cypher, paper_id=pid, limit=int(limit))]
-
     def list_textbook_entities_for_fusion(self, textbook_id: str | None = None, limit: int = 50000) -> list[dict]:
         cypher = """
 MATCH (t:Textbook)-[:HAS_CHAPTER]->(c:TextbookChapter)-[:HAS_ENTITY]->(e:KnowledgeEntity)
@@ -3861,19 +3120,17 @@ LIMIT $limit
     def list_fusion_graph(self, limit_nodes: int = 1000, limit_edges: int = 3000) -> dict[str, list[dict]]:
         cypher_nodes = """
 MATCH (n)
-WHERE n:LogicStep OR n:Claim OR n:KnowledgeEntity OR n:FusionCommunity OR n:FusionKeyword
+WHERE n:ResearchMove OR n:KnowledgeEntity OR n:FusionCommunity OR n:FusionKeyword
 RETURN
   CASE
-    WHEN n:LogicStep THEN n.logic_step_id
-    WHEN n:Claim THEN n.claim_id
+    WHEN n:ResearchMove THEN n.move_id
     WHEN n:KnowledgeEntity THEN n.entity_id
     WHEN n:FusionCommunity THEN n.community_id
     WHEN n:FusionKeyword THEN n.keyword_id
     ELSE toString(id(n))
   END AS id,
   CASE
-    WHEN n:LogicStep THEN 'LogicStep'
-    WHEN n:Claim THEN 'Claim'
+    WHEN n:ResearchMove THEN 'ResearchMove'
     WHEN n:KnowledgeEntity THEN 'KnowledgeEntity'
     WHEN n:FusionCommunity THEN 'FusionCommunity'
     WHEN n:FusionKeyword THEN 'FusionKeyword'
@@ -3884,19 +3141,17 @@ LIMIT $limit_nodes
 """
         cypher_edges = """
 MATCH (a)-[r]->(b)
-WHERE type(r) IN ['EXPLAINS', 'RELATES_TO', 'IN_COMMUNITY', 'HAS_KEYWORD', 'HAS_CLAIM']
+WHERE type(r) IN ['EXPLAINS', 'RELATES_TO', 'HAS_KEYWORD']
 RETURN
   CASE
-    WHEN a:LogicStep THEN a.logic_step_id
-    WHEN a:Claim THEN a.claim_id
+    WHEN a:ResearchMove THEN a.move_id
     WHEN a:KnowledgeEntity THEN a.entity_id
     WHEN a:FusionCommunity THEN a.community_id
     WHEN a:FusionKeyword THEN a.keyword_id
     ELSE toString(id(a))
   END AS source,
   CASE
-    WHEN b:LogicStep THEN b.logic_step_id
-    WHEN b:Claim THEN b.claim_id
+    WHEN b:ResearchMove THEN b.move_id
     WHEN b:KnowledgeEntity THEN b.entity_id
     WHEN b:FusionCommunity THEN b.community_id
     WHEN b:FusionKeyword THEN b.keyword_id
@@ -3914,39 +3169,41 @@ LIMIT $limit_edges
 
     def list_fusion_sections_for_paper(self, paper_id: str) -> list[dict]:
         cypher = """
-MATCH (p:Paper {paper_id: $paper_id})-[:HAS_LOGIC_STEP]->(ls:LogicStep)
-OPTIONAL MATCH (ls)-[ex:EXPLAINS]->(:KnowledgeEntity)
-RETURN ls.logic_step_id AS logic_step_id,
-       ls.step_type AS step_type,
-       ls.summary AS summary,
-       ls.order AS step_order,
+MATCH (p:Paper {paper_id: $paper_id})-[:HAS_RESEARCH_MOVE]->(rm:ResearchMove)
+OPTIONAL MATCH (rm)-[ex:EXPLAINS]->(:KnowledgeEntity)
+RETURN rm.move_id AS move_id,
+       rm.role AS role,
+       rm.act_type AS act_type,
+       rm.summary AS summary,
+       rm.sequence_no AS sequence_no,
        count(ex) AS basics_count,
        max(ex.score) AS top_score
-ORDER BY coalesce(ls.order, 999) ASC, ls.step_type ASC
+ORDER BY coalesce(rm.sequence_no, 999) ASC, rm.role ASC, rm.move_id ASC
 """
         with self._driver.session() as session:
             return [dict(r) for r in session.run(cypher, paper_id=str(paper_id))]
 
-    def list_fusion_basics_for_section(self, paper_id: str, step_type: str, limit: int = 50) -> list[dict]:
+    def list_fusion_basics_for_role(self, paper_id: str, role: str, limit: int = 50) -> list[dict]:
         cypher = """
-MATCH (p:Paper {paper_id: $paper_id})-[:HAS_LOGIC_STEP]->(ls:LogicStep)
-WHERE ls.step_type = $step_type
-MATCH (ls)-[ex:EXPLAINS]->(ke:KnowledgeEntity)
+MATCH (p:Paper {paper_id: $paper_id})-[:HAS_RESEARCH_MOVE]->(rm:ResearchMove)
+WHERE rm.role = $role
+MATCH (rm)-[ex:EXPLAINS]->(ke:KnowledgeEntity)
 OPTIONAL MATCH (tc:TextbookChapter {chapter_id: coalesce(ex.source_chapter_id, ke.source_chapter_id)})
 OPTIONAL MATCH (tb:Textbook)-[:HAS_CHAPTER]->(tc)
-RETURN ls.logic_step_id AS logic_step_id,
-       ls.step_type AS step_type,
+RETURN rm.move_id AS move_id,
+       rm.role AS role,
+       rm.act_type AS act_type,
+       rm.summary AS summary,
        ke.entity_id AS entity_id,
        ke.name AS entity_name,
        ke.entity_type AS entity_type,
        ke.description AS description,
        ex.score AS score,
        ex.reasons AS reasons,
-       ex.evidence_chunk_ids AS evidence_chunk_ids,
-       ex.source_chunk_id AS source_chunk_id,
-       ex.evidence_quote AS evidence_quote,
-       tb.textbook_id AS textbook_id,
-       tb.title AS textbook_title,
+       ex.anchor_ids AS anchor_ids,
+        ex.evidence_quote AS evidence_quote,
+        tb.textbook_id AS textbook_id,
+        tb.title AS textbook_title,
        tc.chapter_id AS chapter_id,
        tc.title AS chapter_title
 ORDER BY coalesce(ex.score, 0.0) DESC, ke.name ASC
@@ -3958,7 +3215,7 @@ LIMIT $limit
                 for r in session.run(
                     cypher,
                     paper_id=str(paper_id),
-                    step_type=str(step_type),
+                    role=str(role),
                     limit=int(limit),
                 )
             ]
@@ -3967,22 +3224,23 @@ LIMIT $limit
         if not paper_sources:
             return []
         cypher = """
-MATCH (p:Paper)-[:HAS_LOGIC_STEP]->(ls:LogicStep)-[ex:EXPLAINS]->(ke:KnowledgeEntity)
+MATCH (p:Paper)-[:HAS_RESEARCH_MOVE]->(rm:ResearchMove)-[ex:EXPLAINS]->(ke:KnowledgeEntity)
 WHERE p.paper_source IN $paper_sources
 OPTIONAL MATCH (tc:TextbookChapter {chapter_id: coalesce(ex.source_chapter_id, ke.source_chapter_id)})
 OPTIONAL MATCH (tb:Textbook)-[:HAS_CHAPTER]->(tc)
 RETURN p.paper_source AS paper_source,
        p.paper_id AS paper_id,
-       ls.logic_step_id AS logic_step_id,
-       ls.step_type AS step_type,
+       rm.move_id AS move_id,
+       rm.role AS role,
+       rm.act_type AS act_type,
+       rm.summary AS summary,
        ke.entity_id AS entity_id,
        ke.name AS entity_name,
        ke.entity_type AS entity_type,
        ke.description AS description,
        ex.score AS score,
        ex.reasons AS reasons,
-       ex.evidence_chunk_ids AS evidence_chunk_ids,
-       ex.source_chunk_id AS source_chunk_id,
+       ex.anchor_ids AS anchor_ids,
        ex.evidence_quote AS evidence_quote,
        ex.source_chapter_id AS source_chapter_id,
        tb.textbook_id AS textbook_id,

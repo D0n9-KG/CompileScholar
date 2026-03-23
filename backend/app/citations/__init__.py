@@ -8,7 +8,6 @@ from app.citations.models import (
     derive_target_scopes,
 )
 from app.citations.projection import build_citation_act_rows
-from app.citations.writeback import persist_citation_graph_enrichment
 
 __all__ = [
     'CitationActRecord',
@@ -20,5 +19,4 @@ __all__ = [
     'derive_semantic_signals',
     'derive_polarity',
     'derive_target_scopes',
-    'persist_citation_graph_enrichment',
 ]

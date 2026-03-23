@@ -17,7 +17,7 @@ class _FakeNeo4jClient:
     def list_fusion_graph(self, limit_nodes: int = 1000, limit_edges: int = 3000):
         return {
             "nodes": [
-                {"id": "n1", "label": "LogicStep", "text": "step one"},
+                {"id": "n1", "label": "ResearchMove", "text": "step one"},
                 {"id": "n2", "label": "KnowledgeEntity", "text": "entity"},
             ],
             "edges": [
@@ -48,7 +48,7 @@ def test_get_fusion_graph_filters_edges_outside_node_set_on_snapshot(monkeypatch
             {
                 "generated_at": "2026-02-25T00:00:00Z",
                 "nodes": [
-                    {"id": "s1", "label": "LogicStep", "text": "step one"},
+                    {"id": "s1", "label": "ResearchMove", "text": "step one"},
                     {"id": "k1", "label": "KnowledgeEntity", "text": "entity"},
                 ],
                 "edges": [
@@ -79,7 +79,7 @@ def test_get_fusion_graph_keeps_connected_backbone_when_node_limit_is_small(monk
                 "nodes": [
                     {"id": "isolated-a", "label": "KnowledgeEntity", "text": "alpha"},
                     {"id": "isolated-b", "label": "KnowledgeEntity", "text": "beta"},
-                    {"id": "logic-1", "label": "LogicStep", "text": "method"},
+                    {"id": "logic-1", "label": "ResearchMove", "text": "method"},
                     {"id": "entity-1", "label": "KnowledgeEntity", "text": "drag coefficient"},
                 ],
                 "edges": [

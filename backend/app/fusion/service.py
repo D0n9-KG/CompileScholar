@@ -35,17 +35,29 @@ def _snapshot_file() -> Path:
     return _snapshot_dir() / "latest_graph.json"
 
 
-def _normalize_explains_links(edges: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def _normalize_explains_links(
+    edges: list[dict[str, Any]],
+    *,
+    move_lookup: dict[str, dict[str, Any]] | None = None,
+) -> list[dict[str, Any]]:
     """Normalize EXPLAINS edges into Neo4j writer payload keys."""
     rows: list[dict[str, Any]] = []
+    lookup = move_lookup or {}
     for edge in edges:
-        sid = str(edge.get("logic_step_id") or edge.get("source") or "").strip()
+        sid = str(edge.get("move_id") or edge.get("source") or "").strip()
         eid = str(edge.get("entity_id") or edge.get("target") or "").strip()
         if not sid or not eid:
             continue
+        move = lookup.get(sid) or {}
         row = dict(edge)
-        row["logic_step_id"] = sid
+        row["move_id"] = sid
         row["entity_id"] = eid
+        row["paper_id"] = str(edge.get("paper_id") or move.get("paper_id") or "").strip() or None
+        row["paper_source"] = str(edge.get("paper_source") or move.get("paper_source") or "").strip() or None
+        row["role"] = str(edge.get("role") or move.get("role") or "").strip() or None
+        row["act_type"] = str(edge.get("act_type") or move.get("act_type") or "").strip() or None
+        row["summary"] = str(edge.get("summary") or move.get("summary") or "").strip() or None
+        row["anchor_ids"] = [str(x) for x in (edge.get("anchor_ids") or move.get("anchor_ids") or []) if str(x).strip()]
         if row.get("score") is None and row.get("weight") is not None:
             row["score"] = row.get("weight")
         rows.append(row)
@@ -105,7 +117,6 @@ def _sanitize_graph_payload(
         type_bonus = {
             "EXPLAINS": 5,
             "RELATES_TO": 4,
-            "HAS_CLAIM": 3,
             "IN_COMMUNITY": 2,
             "HAS_KEYWORD": 1,
         }.get(edge_type, 0)
@@ -166,22 +177,25 @@ def rebuild_fusion_graph(
     progress("fusion:init", 0.02, "Loading paper and textbook graph inputs")
     with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
         client.ensure_schema()
-        logic_steps = client.list_logic_steps_for_fusion(paper_id=paper_id, limit=50000)
-        claims = client.list_claims_for_fusion(paper_id=paper_id, limit=50000)
+        research_moves = client.list_research_moves(paper_id=paper_id, limit=50000)
+        move_lookup = {
+            str(move.get("move_id") or "").strip(): dict(move)
+            for move in research_moves
+            if str(move.get("move_id") or "").strip()
+        }
         entities = client.list_textbook_entities_for_fusion(limit=50000)
         relations = client.list_textbook_relations_for_fusion(limit=100000)
 
         progress("fusion:linking", 0.35, "Building cross-source EXPLAINS links")
         projection = build_fusion_projection(
-            logic_steps=logic_steps,
-            claims=claims,
+            research_moves=research_moves,
             entities=entities,
             textbook_relations=relations,
             min_link_score=0.45,
-            top_k_per_step=3,
+            top_k_per_move=3,
         )
         explains_edges = [e for e in projection["edges"] if str(e.get("type")) == "EXPLAINS"]
-        explains_links = _normalize_explains_links(explains_edges)
+        explains_links = _normalize_explains_links(explains_edges, move_lookup=move_lookup)
         explains_written = client.create_fusion_explains_edges(explains_links)
         log(f"fusion explains written: {explains_written}")
 
@@ -199,7 +213,7 @@ def rebuild_fusion_graph(
         community_edges = []
         for edge in projection["edges"]:
             edge_type = str(edge.get("type") or "")
-            if edge_type not in {"EXPLAINS", "RELATES_TO", "HAS_CLAIM"}:
+            if edge_type not in {"EXPLAINS", "RELATES_TO"}:
                 continue
             community_edges.append(
                 {
@@ -231,8 +245,7 @@ def rebuild_fusion_graph(
     return {
         "ok": True,
         "paper_id_scope": str(paper_id or ""),
-        "logic_steps": len(logic_steps),
-        "claims": len(claims),
+        "research_moves": len(research_moves),
         "entities": len(entities),
         "relations": len(relations),
         "explains_written": int(explains_written),
@@ -281,34 +294,34 @@ def list_fusion_sections_for_paper(paper_id: str) -> dict[str, Any]:
     return {"paper_id": paper_id, "sections": sections}
 
 
-def list_fusion_basics_for_section(paper_id: str, step_type: str, limit: int = 50) -> dict[str, Any]:
+def list_fusion_basics_for_role(paper_id: str, role: str, limit: int = 50) -> dict[str, Any]:
     with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
-        basics = client.list_fusion_basics_for_section(paper_id, step_type, limit=limit)
-    return {"paper_id": paper_id, "step_type": step_type, "basics": basics}
+        basics = client.list_fusion_basics_for_role(paper_id, role, limit=limit)
+    return {"paper_id": paper_id, "role": role, "basics": basics}
 
 
 def retrieve_fusion_basics(
     *,
     question: str,
     paper_id: str,
-    step_type: str | None = None,
+    role: str | None = None,
     k: int = 8,
 ) -> dict[str, Any]:
     with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
-        if step_type:
-            rows = client.list_fusion_basics_for_section(paper_id, step_type, limit=max(30, k * 5))
+        if role:
+            rows = client.list_fusion_basics_for_role(paper_id, role, limit=max(30, k * 5))
         else:
             rows = []
             sections = client.list_fusion_sections_for_paper(paper_id)
             for sec in sections[:10]:
-                st = str(sec.get("step_type") or "").strip()
-                if not st:
+                item_role = str(sec.get("role") or "").strip()
+                if not item_role:
                     continue
-                rows.extend(client.list_fusion_basics_for_section(paper_id, st, limit=20))
+                rows.extend(client.list_fusion_basics_for_role(paper_id, item_role, limit=20))
 
     ranked = rank_fusion_basics(question, rows, k=k)
     return {
         "paper_id": paper_id,
-        "step_type": step_type,
+        "role": role,
         "items": ranked,
     }

@@ -652,6 +652,14 @@ export default function IngestPage() {
   const [info, setInfo] = useState<string>('')
   const [result, setResult] = useState<string>('')
   const [showRawResult, setShowRawResult] = useState(false)
+  const replaceResult = useCallback((nextResult: string) => {
+    setShowRawResult(false)
+    setResult(nextResult)
+  }, [])
+  const clearResult = useCallback(() => {
+    setShowRawResult(false)
+    setResult('')
+  }, [])
 
   // Upload ingest
   const [chunkMB, setChunkMB] = useState<number>(8)
@@ -799,10 +807,6 @@ export default function IngestPage() {
   const taskProgressPct = Math.round(Math.max(0, Math.min(1, Number(task?.progress ?? 0))) * 100)
   const taskIsActive = ['queued', 'running'].includes(String(task?.status ?? ''))
 
-  useEffect(() => {
-    setShowRawResult(false)
-  }, [result])
-
   const pollTask = useCallback(async (id: string): Promise<{ isFinal: boolean }> => {
     let t: TaskInfo
     try {
@@ -843,7 +847,7 @@ export default function IngestPage() {
       setLoadUploadId(payloadUploadId)
     }
     if (status && !['queued', 'running'].includes(status)) {
-      setResult(JSON.stringify(t, null, 2))
+      replaceResult(JSON.stringify(t, null, 2))
       if (status === 'succeeded') setInfo(`任务已完成：${id}`)
       if (status === 'failed') setInfo(`任务失败：${id}\n${String(t?.error ?? t?.message ?? '')}`.trim())
       if (status === 'canceled') setInfo(`任务已取消：${id}`)
@@ -857,7 +861,7 @@ export default function IngestPage() {
       }
     }
     return { isFinal: Boolean(isFinal) }
-  }, [refreshScan, refreshedForTaskId, searchParams, setSearchParams, uploadId])
+  }, [refreshScan, refreshedForTaskId, replaceResult, searchParams, setSearchParams, uploadId])
 
   useEffect(() => {
     if (!taskId) return
@@ -885,7 +889,7 @@ export default function IngestPage() {
 
   async function rebuildFaiss() {
     setError('')
-    setResult('')
+    clearResult()
     setTask(null)
     try {
       const res = await apiPost<{ task_id: string }>('/tasks/rebuild/faiss', {})
@@ -898,7 +902,7 @@ export default function IngestPage() {
 
   async function rebuildCommunities() {
     setError('')
-    setResult('')
+    clearResult()
     setTask(null)
     try {
       const res = await apiPost<{ task_id: string }>('/tasks/rebuild/community', {})
@@ -912,7 +916,7 @@ export default function IngestPage() {
   async function rebuildAll() {
     if (!window.confirm('确定要“全链路重建（所有论文）”吗？\n这会重新解析/抽取并写回 Neo4j，并在最后重建全局 FAISS。')) return
     setError('')
-    setResult('')
+    clearResult()
     setTask(null)
     try {
       const res = await apiPost<{ task_id: string }>('/tasks/rebuild/all', {})
@@ -970,7 +974,7 @@ export default function IngestPage() {
   async function startUpload(mode: 'zip' | 'folder') {
     setUploadBusy(true)
     setError('')
-    setResult('')
+    clearResult()
     setInfo('')
     setTask(null)
     setTaskId('')
@@ -1046,7 +1050,7 @@ export default function IngestPage() {
   async function keepExisting(unitId: string) {
     if (!uploadId) return
     setError('')
-    setResult('')
+    clearResult()
     try {
       const s = await apiPost<UploadScan>('/ingest/upload/keep_existing', { upload_id: uploadId, unit_id: unitId })
       setScan(s)
@@ -1060,7 +1064,7 @@ export default function IngestPage() {
   async function replaceWithNew(unitId: string) {
     if (!uploadId) return
     setError('')
-    setResult('')
+    clearResult()
     try {
       const res = await apiPost<{ task_id: string }>('/ingest/upload/replace_with_new', { upload_id: uploadId, unit_id: unitId })
       setActionUnitId(unitId)
@@ -1074,7 +1078,7 @@ export default function IngestPage() {
   async function commitReady() {
     if (!uploadId) return
     setError('')
-    setResult('')
+    clearResult()
     try {
       const res = await apiPost<{ task_id: string }>('/ingest/upload/commit_ready', { upload_id: uploadId, unit_id: '_' })
       setTaskId(res.task_id ?? '')

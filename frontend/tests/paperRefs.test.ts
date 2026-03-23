@@ -7,13 +7,19 @@ describe('paperRefForAskScope', () => {
     expect(paperRefForAskScope({ id: '569', kind: 'paper', paperId: 'doi:10.1000/test' })).toBe('doi:10.1000/test')
   })
 
-  test('normalizes prefixed node ids', () => {
+  test('normalizes paper, move, and anchor prefixes', () => {
     expect(paperRefForAskScope({ id: 'paper:doi:10.1000/test', kind: 'paper' })).toBe('doi:10.1000/test')
     expect(paperRefForAskScope({ id: 'paper_source:07_1605', kind: 'paper' })).toBe('07_1605')
     expect(
       paperRefForAskScope({
-        id: 'logic:bc082d21ddcde94212aab4ab474d9e32097a34ab90995a8bd181b29b1ed29026:0',
-        kind: 'logic',
+        id: 'move:bc082d21ddcde94212aab4ab474d9e32097a34ab90995a8bd181b29b1ed29026:0',
+        kind: 'move',
+      }),
+    ).toBe('bc082d21ddcde94212aab4ab474d9e32097a34ab90995a8bd181b29b1ed29026')
+    expect(
+      paperRefForAskScope({
+        id: 'anchor:bc082d21ddcde94212aab4ab474d9e32097a34ab90995a8bd181b29b1ed29026:1',
+        kind: 'anchor',
       }),
     ).toBe('bc082d21ddcde94212aab4ab474d9e32097a34ab90995a8bd181b29b1ed29026')
   })

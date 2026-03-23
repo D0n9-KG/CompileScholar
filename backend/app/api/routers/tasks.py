@@ -77,15 +77,6 @@ def submit_rebuild_all():
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 
-@router.post("/rebuild/similarity", response_model=SubmitTaskResponse)
-def submit_rebuild_similarity():
-    try:
-        task_id = task_manager.submit(TaskType.rebuild_similarity, {})
-        return SubmitTaskResponse(task_id=task_id)
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc)) from exc
-
-
 @router.post("/delete/papers", response_model=SubmitTaskResponse)
 def submit_delete_papers(req: DeletePapersTaskRequest):
     try:
@@ -116,15 +107,6 @@ def submit_delete_textbooks(req: DeleteTextbooksTaskRequest):
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 
-@router.post("/rebuild/fusion", response_model=SubmitTaskResponse)
-def submit_rebuild_fusion():
-    try:
-        task_id = task_manager.submit(TaskType.rebuild_fusion, {})
-        return SubmitTaskResponse(task_id=task_id)
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc)) from exc
-
-
 @router.post("/rebuild/community", response_model=SubmitTaskResponse)
 def submit_rebuild_community(req: RebuildCommunityTaskRequest):
     try:
@@ -145,20 +127,6 @@ def submit_cleanup_legacy_propositions():
         return SubmitTaskResponse(task_id=task_id)
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
-
-
-class UpdateSimilarityPaperRequest(BaseModel):
-    paper_id: str = Field(min_length=3)
-
-
-@router.post("/similarity/paper", response_model=SubmitTaskResponse)
-def submit_update_similarity_paper(req: UpdateSimilarityPaperRequest):
-    try:
-        task_id = task_manager.submit(TaskType.update_similarity_paper, {"paper_id": req.paper_id})
-        return SubmitTaskResponse(task_id=task_id)
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc)) from exc
-
 
 @router.get("")
 def tasks_list(limit: int = 80, keep_finished: int = 10, prune_finished: bool = True):

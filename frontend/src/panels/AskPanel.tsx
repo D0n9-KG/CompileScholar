@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { apiBaseUrl, apiGet, apiPost } from '../api'
 import MarkdownView from '../components/MarkdownView'
 import { useI18n } from '../i18n'
@@ -24,7 +25,11 @@ const OVERVIEW_GRAPH_PAPER_LIMIT = 400
 const OVERVIEW_GRAPH_EDGE_LIMIT = 1200
 const SCOPE_LIST_PAGE_SIZE = 120
 
-const EXAMPLES_ZH = ['这篇论文的主要方法是什么？', '核心结论是什么？', '用一句话概括贡献。']
+const EXAMPLES_ZH = [
+  '这篇论文的主要方法是什么？',
+  '核心结论是什么？',
+  '用一句话概括贡献。',
+]
 const EXAMPLES_EN = [
   'What is the main method of this paper?',
   'What is the core conclusion?',
@@ -191,6 +196,7 @@ export default function AskPanel() {
   const [paperCatalog, setPaperCatalog] = useState<ScopePaperApiRow[]>([])
   const [paperCatalogLoading, setPaperCatalogLoading] = useState(false)
   const [paperCatalogError, setPaperCatalogError] = useState('')
+  const [chatWindowOpen, setChatWindowOpen] = useState(false)
 
   const currentSession = useMemo(() => getCurrentAskSession(ask), [ask])
   const current = useMemo(() => {
@@ -221,6 +227,15 @@ export default function AskPanel() {
     if (!el) return
     el.scrollTop = el.scrollHeight
   }, [chatMessages.length, current?.status, latestChatMessageText])
+
+  useEffect(() => {
+    if (!chatWindowOpen || typeof window === 'undefined') return
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setChatWindowOpen(false)
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [chatWindowOpen])
 
   useEffect(() => {
     if (hydratedRef.current) return
@@ -594,8 +609,21 @@ export default function AskPanel() {
     [dispatch],
   )
 
-  return (
-    <div className="kgPanelBody kgStack kgAskChatShell">
+  const openChatWindow = useCallback(() => setChatWindowOpen(true), [])
+  const closeChatWindow = useCallback(() => setChatWindowOpen(false), [])
+
+  const shell = (
+    <div className={`kgPanelBody kgStack kgAskChatShell${chatWindowOpen ? ' kgAskChatShell--modal' : ''}`}>
+      {!chatWindowOpen && (
+        <div className="kgAskToolbar">
+          <div className="kgAskToolbarHint">
+            {t('\u5728\u5927\u7a97\u4e2d\u67e5\u770b\u5b8c\u6574\u95ee\u7b54\u4e0e\u8bc1\u636e\u3002', 'Open the chat in a larger window for longer answers and evidence.')}
+          </div>
+          <button type="button" className="kgBtn kgBtn--sm kgBtn--primary" onClick={openChatWindow}>
+            {t('\u5f39\u51fa\u5927\u7a97', 'Open Chat Window')}
+          </button>
+        </div>
+      )}
       <div className="kgAskPanelSection">
         <div className="kgSectionTitle" style={{ marginTop: 0 }}>
           {t('历史会话', 'Sessions')}
@@ -892,5 +920,51 @@ export default function AskPanel() {
         )}
       </details>
     </div>
+  )
+
+  return (
+    <>
+      {chatWindowOpen ? (
+        <div className="kgPanelBody kgStack kgAskChatShell">
+          <div className="kgAskPanelSection kgAskDetachedNotice">
+            <div className="kgSectionTitle" style={{ marginTop: 0 }}>
+              {t('\u653e\u5927\u95ee\u7b54', 'Expanded Chat')}
+            </div>
+            <div className="kgCard" style={{ marginBottom: 0 }}>
+              <div className="kgCardBody kgStack">
+                <div>{t('\u804a\u5929\u5de5\u4f5c\u533a\u5df2\u5728\u5927\u7a97\u53e3\u4e2d\u6253\u5f00\u3002', 'Chat workspace is open in a larger window.')}</div>
+                <div className="kgRow" style={{ flexWrap: 'wrap' }}>
+                  <button type="button" className="kgBtn kgBtn--sm" onClick={closeChatWindow}>
+                    {t('\u8fd4\u56de\u4fa7\u680f', 'Return to Side Panel')}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : shell}
+      {chatWindowOpen && typeof document !== 'undefined' && createPortal(
+        <div className="modalOverlay" onClick={closeChatWindow}>
+          <div
+            className="modal kgAskModal"
+            role="dialog"
+            aria-modal="true"
+            aria-label={t('\u653e\u5927\u95ee\u7b54\u5de5\u4f5c\u533a', 'Expanded Chat Workspace')}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="modalHeader">
+              <div className="modalTitle">{t('\u653e\u5927\u95ee\u7b54\u5de5\u4f5c\u533a', 'Expanded Chat Workspace')}</div>
+              <button type="button" className="btn btnSmall" onClick={closeChatWindow}>
+                {t('\u5173\u95ed', 'Close')}
+              </button>
+            </div>
+            <div className="modalBody kgAskModalBody">
+              {shell}
+            </div>
+          </div>
+        </div>,
+        document.body,
+      )}
+    </>
   )
 }

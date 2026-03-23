@@ -14,11 +14,9 @@ from app.ingest.rebuild import cleanup_legacy_proposition_artifacts, rebuild_glo
 from app.ingest.textbook_upload_actions import ingest_textbook_upload_ready
 from app.ingest.upload_actions import commit_ready, replace_with_new
 from app.ingest.textbook_pipeline import ingest_textbook
-from app.fusion.service import rebuild_fusion_graph
 from app.graph.neo4j_client import Neo4jClient
 from app.ops_config_store import merge_runtime_config
 from app.settings import settings
-from app.similarity.service import rebuild_similarity_global, update_similarity_for_paper
 from app.tasks.manager import PartialTaskFailure
 
 
@@ -452,34 +450,6 @@ def handle_rebuild_all(
     return {"ok": True, "papers": total, "failed": failed_count, "faiss": res}
 
 
-def handle_rebuild_similarity(
-    task_id: str,
-    update: Callable[[str, float, str | None], None],
-    log: Callable[[str], None],
-) -> dict[str, Any]:
-    update("similarity:rebuild", 0.02, "Rebuilding similarity indexes/edges")
-
-    def progress(stage: str, p: float, msg: str | None = None) -> None:
-        update(stage, p, msg)
-
-    return rebuild_similarity_global(progress=progress, log=log)
-
-
-def handle_rebuild_fusion(
-    task_id: str,
-    update: Callable[[str, float, str | None], None],
-    log: Callable[[str], None],
-) -> dict[str, Any]:
-    payload = _load_payload(task_id)
-    paper_id = str(payload.get("paper_id") or "").strip() or None
-    update("fusion:rebuild", 0.02, "Rebuilding fusion graph and communities")
-
-    def progress(stage: str, p: float, msg: str | None = None) -> None:
-        update(stage, p, msg)
-
-    return rebuild_fusion_graph(paper_id=paper_id, progress=progress, log=log)
-
-
 def handle_rebuild_global_communities(
     task_id: str,
     update: Callable[[str, float, str | None], None],
@@ -502,23 +472,6 @@ def handle_cleanup_legacy_propositions(
         update(stage, p, msg)
 
     return cleanup_legacy_proposition_artifacts(progress=progress, log=log)
-
-
-def handle_update_similarity_paper(
-    task_id: str,
-    update: Callable[[str, float, str | None], None],
-    log: Callable[[str], None],
-) -> dict[str, Any]:
-    payload = _load_payload(task_id)
-    paper_id = str(payload.get("paper_id") or "").strip()
-    if not paper_id:
-        raise ValueError("Missing paper_id")
-    update("similarity:update", 0.02, f"Updating similarity for {paper_id}")
-
-    def progress(stage: str, p: float, msg: str | None = None) -> None:
-        update(stage, p, msg)
-
-    return update_similarity_for_paper(paper_id, progress=progress, log=log)
 
 
 def handle_ingest_textbook(

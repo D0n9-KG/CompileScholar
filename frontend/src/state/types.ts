@@ -13,17 +13,17 @@ export type GraphNodeData = {
   label: string
   shortLabel?: string
   description?: string
-  kind: string        // 'textbook' | 'chapter' | 'community' | 'paper' | 'logic' | 'claim' | 'entity' | 'citation' | 'group'
+  kind: string        // 'textbook' | 'chapter' | 'community' | 'paper' | 'move' | 'anchor' | 'entity' | 'citation' | 'group'
   // Type-specific optional fields
   qualityTier?: string   // 'A1' | 'A2' | 'B1' | 'B2' | 'C'
   ingested?: boolean
   inScope?: boolean
   year?: number
-  confidence?: number    // 0–1, drives opacity for claims
+  confidence?: number    // 0–1, drives opacity for evidence anchors
   paperId?: string
   paperSource?: string
   paperTitle?: string
-  stepType?: string
+  role?: string
   textbookId?: string
   chapterId?: string
   communityId?: string
@@ -66,7 +66,7 @@ export type SelectedNode = {
   paperId?: string
   paperSource?: string
   paperTitle?: string
-  stepType?: string
+  role?: string
   textbookId?: string
   chapterId?: string
   communityId?: string
@@ -100,8 +100,8 @@ export type AskItem = {
   fusionEvidence?: Array<{
     paper_source?: string
     paper_id?: string
-    logic_step_id?: string
-    step_type?: string
+    move_id?: string
+    role?: string
     entity_id?: string
     entity_name?: string
     entity_type?: string
@@ -128,15 +128,17 @@ export type AskItem = {
     purpose_labels?: string[]
   }>
   structuredKnowledge?: {
-    logic_steps?: Array<{
+    research_moves?: Array<{
       paper_source?: string
-      step_type?: string
+      role?: string
+      act_type?: string
       summary?: string
     }>
-    claims?: Array<{
-      claim_id?: string
+    evidence_anchors?: Array<{
+      anchor_id?: string
       paper_source?: string
-      step_type?: string
+      role?: string
+      act_type?: string
       text?: string
       confidence?: number
     }>

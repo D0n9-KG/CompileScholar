@@ -22,9 +22,9 @@ from app.rag.planner import plan_ask_query, resolve_query_plan
 from app.rag.retrieval import latest_run_dir, load_chunks_from_run, lexical_retrieve
 from app.rag.structured_retrieval import (
     normalize_structured_rows,
-    retrieve_claims,
     retrieve_communities,
-    retrieve_logic_steps,
+    retrieve_evidence_anchors,
+    retrieve_research_moves,
 )
 from app.rag.tree_router import route_query
 from app.retrieval.pageindex_adapter import PageIndexAdapter
@@ -35,7 +35,7 @@ log = logging.getLogger(__name__)
 _CJK_RE = re.compile(r"[\u4e00-\u9fff]")
 _ASCII_TOKEN_RE = re.compile(r"[A-Za-z][A-Za-z0-9_:+./-]*|\d[\d_./-]*")
 _GROUNDING_SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?。！？;；])\s+|\n+")
-_SUPPORTED_GROUNDING_KINDS = {"claim", "logic_step", "community", "textbook", "structured"}
+_SUPPORTED_GROUNDING_KINDS = {"evidence_anchor", "research_move", "community", "textbook", "structured"}
 _ALLOWED_STRUCTURED_EXTRA_KEYS = {
     "paper_source",
     "paper_id",
@@ -56,8 +56,12 @@ _ALLOWED_STRUCTURED_EXTRA_KEYS = {
     "chapter_title",
     "textbook_id",
     "textbook_title",
-    "logic_step_id",
-    "step_type",
+    "move_id",
+    "anchor_id",
+    "role",
+    "act_type",
+    "source_ref",
+    "source_md_path",
     "entity_type",
     "evidence_event_id",
     "evidence_event_type",
@@ -181,6 +185,13 @@ def _allowed_paper_sources(scope: dict | None) -> set[str] | None:
 def _normalize_scope_paper_refs(values: list[Any] | tuple[Any, ...] | set[Any] | None) -> list[str]:
     seen: set[str] = set()
     out: list[str] = []
+    unsupported_prefixes = (
+        "move:",
+        "research_move:",
+        "anchor:",
+        "evidence_anchor:",
+        "community:",
+    )
     for raw in values or []:
         text = str(raw or "").strip()
         if not text:
@@ -189,10 +200,8 @@ def _normalize_scope_paper_refs(values: list[Any] | tuple[Any, ...] | set[Any] |
             text = text[len("paper:"):].strip()
         elif text.startswith("paper_source:"):
             text = text[len("paper_source:"):].strip()
-        else:
-            match = re.match(r"^(logic|claim):([^:]+):\d+$", text)
-            if match:
-                text = str(match.group(2) or "").strip()
+        elif text.startswith(unsupported_prefixes):
+            continue
         if not text or text in seen:
             continue
         seen.add(text)
@@ -212,14 +221,15 @@ def _single_scope_paper_context(scope: dict | None) -> dict[str, str] | None:
     paper_ref = refs[0]
     try:
         with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
-            detail = client.get_paper_detail(paper_ref)
+            trace = client.get_paper_logic_trace(paper_ref)
     except Exception:
         return None
-    paper = detail.get("paper") if isinstance(detail, dict) else None
-    if not isinstance(paper, dict):
+    if not isinstance(trace, dict):
         return None
-    paper_id = str(paper.get("paper_id") or "").strip()
-    paper_source = str(paper.get("paper_source") or "").strip()
+    paper = trace.get("paper_metadata") if isinstance(trace.get("paper_metadata"), dict) else {}
+    paper_id = str(paper.get("paper_id") or paper_ref).strip()
+    source_refs = paper.get("source_refs") if isinstance(paper.get("source_refs"), list) else []
+    paper_source = str(source_refs[0] or "").strip() if source_refs else ""
     paper_title = str(paper.get("title") or "").strip()
     if not (paper_id or paper_source or paper_title):
         return None
@@ -404,11 +414,11 @@ def _build_system_prompt(domain_prompt: str | None = None, *, locale: str | None
             domain = "你是科研知识图谱问答助手。"
         return (
             f"{domain}\n"
-            "请严格只依据提供的证据片段、已验证主张和图谱上下文回答。\n"
+            "请严格只依据提供的证据片段、研究动作和图谱上下文回答。\n"
             "如果证据不足，请明确指出缺少什么信息。\n"
             "引用证据时使用 [E1]、[E2] 这类证据编号。\n"
-            "引用已验证主张时使用 [CL:abc123] 这类主张编号。\n"
-            "有图谱上下文时，请结合引用关系、逻辑步骤和主张关系进行解释。\n"
+            "引用研究动作时使用 [MV:abc123] 这类动作编号，引用证据锚点时使用 [EA:abc123]。\n"
+            "有图谱上下文时，请结合引用关系、研究动作和证据锚点关系进行解释。\n"
             "如提供了历史对话，仅将其用于消解追问中的指代，并以当前问题为准。\n"
             "除用户明确要求外，回答请使用简体中文。"
         )
@@ -416,13 +426,13 @@ def _build_system_prompt(domain_prompt: str | None = None, *, locale: str | None
         domain = "You are a scientific research assistant."
     return (
         f"{domain}\n"
-        "Answer ONLY using the provided evidence snippets, validated claims, and graph context.\n"
+        "Answer ONLY using the provided evidence snippets, research moves, evidence anchors, and graph context.\n"
         "If evidence is insufficient, say what is missing.\n"
         "Cite evidence by referencing the evidence ids like [E1], [E2].\n"
-        "When referencing validated claims, use their claim id like [CL:abc123].\n"
+        "When referencing research moves, use their move id like [MV:abc123]. When referencing evidence anchors, use [EA:abc123].\n"
         "When conversation history is provided, use it only to resolve follow-up references and prioritize the current question.\n"
         "When graph context is provided, use it to enrich your answer with "
-        "structural relationships (citations, logic steps, claims)."
+        "structural relationships (citations, research moves, evidence anchors)."
     )
 
 
@@ -501,7 +511,7 @@ def _format_graph_context(graph_context: list[dict[str, Any]] | None) -> str:
     field_order = (
         "paper_source", "doi", "cited_doi", "cited_title", "purpose_labels",
         "total_mentions", "ref_nums", "source_paper", "target_paper",
-        "relationship", "purpose", "step_type", "summary",
+        "relationship", "purpose", "role", "summary",
     )
     max_entries = 30
     max_total_chars = 6000
@@ -534,53 +544,53 @@ def _format_graph_context(graph_context: list[dict[str, Any]] | None) -> str:
 
 
 def _format_structured_knowledge(knowledge: dict[str, list[dict[str, Any]]] | None) -> str:
-    """Format claims and logic steps into a text block for the LLM prompt.
-
-    Each claim includes its claim_id so the LLM can reference it in the answer,
-    enabling frontend traceability (e.g. [CL:abc123]).
-    """
+    """Format research moves and evidence anchors into a text block for the LLM prompt."""
     if not knowledge:
         return ""
     parts: list[str] = []
 
-    # Logic steps
-    steps = knowledge.get("logic_steps") or []
-    if steps:
-        step_lines = []
-        for s in steps[:20]:
-            st = str(s.get("step_type") or "").strip()
-            summary = str(s.get("summary") or "").strip()
-            ps = str(s.get("paper_source") or "").strip()
-            if st and summary:
-                if len(summary) > 300:
-                    summary = summary[:297] + "..."
-                step_lines.append(f"  [{ps}] {st}: {summary}")
-        if step_lines:
-            parts.append("Logic Steps:\n" + "\n".join(step_lines))
+    moves = knowledge.get("research_moves") or []
+    if moves:
+        move_lines = []
+        for move in moves[:20]:
+            move_id = str(move.get("move_id") or move.get("source_id") or "").strip()
+            role = str(move.get("role") or "").strip()
+            act_type = str(move.get("act_type") or "").strip()
+            summary = str(move.get("summary") or move.get("text") or "").strip()
+            paper_source = str(move.get("paper_source") or "").strip()
+            if not (move_id and summary):
+                continue
+            if len(summary) > 300:
+                summary = summary[:297] + "..."
+            scope = "/".join(part for part in (paper_source, role, act_type) if part)
+            scope_str = f" [{scope}]" if scope else ""
+            move_lines.append(f"  [MV:{move_id}]{scope_str} {summary}")
+        if move_lines:
+            parts.append("Research Moves:\n" + "\n".join(move_lines))
 
-    # Claims
-    claims = knowledge.get("claims") or []
-    if claims:
-        claim_lines = []
-        for c in claims[:30]:
-            cid = str(c.get("claim_id") or "").strip()
-            text = str(c.get("text") or "").strip()
-            st = str(c.get("step_type") or "").strip()
-            conf = c.get("confidence")
-            ps = str(c.get("paper_source") or "").strip()
-            if cid and text:
-                if len(text) > 300:
-                    text = text[:297] + "..."
-                conf_str = (
-                    f" (conf={conf:.2f})"
-                    if isinstance(conf, (int, float)) and not isinstance(conf, bool)
-                    else ""
-                )
-                scope = "/".join(part for part in (ps, st) if part)
-                scope_str = f" [{scope}]" if scope else ""
-                claim_lines.append(f"  [CL:{cid}]{scope_str}{conf_str} {text}")
-        if claim_lines:
-            parts.append("Validated Claims:\n" + "\n".join(claim_lines))
+    anchors = knowledge.get("evidence_anchors") or []
+    if anchors:
+        anchor_lines = []
+        for anchor in anchors[:30]:
+            anchor_id = str(anchor.get("anchor_id") or anchor.get("source_id") or "").strip()
+            text = str(anchor.get("text") or anchor.get("quote") or "").strip()
+            role = str(anchor.get("role") or "").strip()
+            conf = anchor.get("confidence")
+            paper_source = str(anchor.get("paper_source") or "").strip()
+            if not (anchor_id and text):
+                continue
+            if len(text) > 300:
+                text = text[:297] + "..."
+            conf_str = (
+                f" (conf={conf:.2f})"
+                if isinstance(conf, (int, float)) and not isinstance(conf, bool)
+                else ""
+            )
+            scope = "/".join(part for part in (paper_source, role) if part)
+            scope_str = f" [{scope}]" if scope else ""
+            anchor_lines.append(f"  [EA:{anchor_id}]{scope_str}{conf_str} {text}")
+        if anchor_lines:
+            parts.append("Evidence Anchors:\n" + "\n".join(anchor_lines))
 
     if not parts:
         return ""
@@ -729,20 +739,20 @@ def _structured_channel_limits(plan_name: str, want: int) -> dict[str, int]:
     base = max(2, want + 1)
     boosted = max(base + 1, want * 2)
     limits = {
-        "logic_step": base,
-        "claim": base,
+        "research_move": base,
+        "evidence_anchor": base,
         "community": base,
         "textbook": base,
     }
     if plan_name == "paper_first_then_textbook":
-        limits["logic_step"] = boosted
-        limits["claim"] = boosted
+        limits["research_move"] = boosted
+        limits["evidence_anchor"] = boosted
     elif plan_name == "textbook_first_then_paper":
         limits["community"] = boosted
         limits["textbook"] = boosted
-    elif plan_name == "claim_first":
-        limits["claim"] = boosted
-        limits["logic_step"] = max(base, want + 2)
+    elif plan_name == "anchor_first":
+        limits["evidence_anchor"] = boosted
+        limits["research_move"] = max(base, want + 2)
     elif plan_name == "community_first":
         limits["community"] = boosted
         limits["textbook"] = max(base, want + 2)
@@ -813,10 +823,10 @@ def _filter_scoped_community_hits(
 
 def _member_kind_to_structured_kind(member_kind: str | None) -> str | None:
     kind = str(member_kind or "").strip().lower()
-    if kind == "claim":
-        return "claim"
-    if kind in {"logicstep", "logic_step", "logic"}:
-        return "logic_step"
+    if kind in {"anchor", "evidence_anchor", "evidenceanchor"}:
+        return "evidence_anchor"
+    if kind in {"researchmove", "research_move", "move"}:
+        return "research_move"
     if kind in {"knowledgeentity", "entity", "textbook_entity"}:
         return "textbook"
     return None
@@ -1038,12 +1048,12 @@ def retrieve_structured_evidence(
         fallback=textbook_query or plan.main_query,
     )
 
-    logic_hits = _attach_paper_metadata(
-        retrieve_logic_steps(paper_query, limits["logic_step"], allowed_sources=allowed_sources),
+    move_hits = _attach_paper_metadata(
+        retrieve_research_moves(paper_query, limits["research_move"], allowed_sources=allowed_sources),
         evidence,
     )
-    claim_hits = _attach_paper_metadata(
-        retrieve_claims(paper_query, limits["claim"], allowed_sources=allowed_sources),
+    anchor_hits = _attach_paper_metadata(
+        retrieve_evidence_anchors(paper_query, limits["evidence_anchor"], allowed_sources=allowed_sources),
         evidence,
     )
 
@@ -1059,16 +1069,16 @@ def retrieve_structured_evidence(
     textbook_hits = _attach_paper_metadata(fusion_rows_to_structured_hits(ranked_textbook_rows), evidence)
 
     channel_order = {
-        "textbook_first_then_paper": ["textbook", "community", "claim", "logic_step"],
-        "claim_first": ["claim", "logic_step", "community", "textbook"],
-        "community_first": ["community", "textbook", "claim", "logic_step"],
-        "hybrid_parallel": ["claim", "community", "logic_step", "textbook"],
-        "paper_first_then_textbook": ["claim", "logic_step", "textbook", "community"],
-    }.get(plan_name, ["claim", "logic_step", "textbook", "community"])
+        "textbook_first_then_paper": ["textbook", "community", "evidence_anchor", "research_move"],
+        "anchor_first": ["evidence_anchor", "research_move", "community", "textbook"],
+        "community_first": ["community", "textbook", "evidence_anchor", "research_move"],
+        "hybrid_parallel": ["evidence_anchor", "community", "research_move", "textbook"],
+        "paper_first_then_textbook": ["evidence_anchor", "research_move", "textbook", "community"],
+    }.get(plan_name, ["evidence_anchor", "research_move", "textbook", "community"])
 
     channel_map = {
-        "logic_step": logic_hits,
-        "claim": claim_hits,
+        "research_move": move_hits,
+        "evidence_anchor": anchor_hits,
         "community": community_hits,
         "textbook": textbook_hits,
     }
@@ -1094,7 +1104,7 @@ def ground_structured_evidence(*args, **kwargs) -> list[dict[str, Any]]:  # noqa
     graph_targets = [
         {"kind": str(row.get("kind") or "").strip(), "source_id": str(row.get("source_id") or "").strip()}
         for row in grounding_seed_rows
-        if str(row.get("kind") or "").strip() in {"claim", "logic_step"}
+        if str(row.get("kind") or "").strip() in {"evidence_anchor", "research_move"}
         and str(row.get("source_id") or "").strip()
     ]
     if graph_targets:
@@ -1145,7 +1155,7 @@ def _prepare_ask_v2_context(
     retrieval_query = _build_retrieval_query(seed_query, scope_paper, locale=normalized_locale)
     want = max(1, int(k))
     oversample = min(100, max(want, want * 5))
-    if plan_name == "claim_first":
+    if plan_name == "anchor_first":
         oversample = min(100, max(oversample, want * 6))
     elif plan_name == "community_first":
         oversample = min(100, max(oversample, want * 4))

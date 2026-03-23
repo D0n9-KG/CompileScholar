@@ -9,7 +9,6 @@ from app.api.routers.rag import router as rag_router
 from app.api.routers.graph import router as graph_router
 from app.api.routers.tasks import router as tasks_router
 from app.api.routers.papers import router as papers_router
-from app.api.routers.paper_edits import router as paper_edits_router
 from app.api.routers.schema import router as schema_router
 from app.api.routers.collections import router as collections_router
 from app.api.routers.config_center import router as config_center_router
@@ -27,12 +26,9 @@ from app.tasks.handlers import (
     handle_ingest_textbook_upload_ready,
     handle_ingest_upload_ready,
     handle_rebuild_all,
-    handle_rebuild_fusion,
     handle_rebuild_global_communities,
     handle_rebuild_faiss,
     handle_rebuild_paper,
-    handle_rebuild_similarity,
-    handle_update_similarity_paper,
     handle_upload_replace,
 )
 from app.tasks.manager import TaskManager, task_manager
@@ -49,11 +45,8 @@ def register_task_handlers(manager: TaskManager) -> None:
     manager.register(TaskType.rebuild_paper, handle_rebuild_paper)
     manager.register(TaskType.rebuild_faiss, handle_rebuild_faiss)
     manager.register(TaskType.rebuild_all, handle_rebuild_all)
-    manager.register(TaskType.rebuild_fusion, handle_rebuild_fusion)
     manager.register(TaskType.rebuild_global_communities, handle_rebuild_global_communities)
     manager.register(TaskType.cleanup_legacy_propositions, handle_cleanup_legacy_propositions)
-    manager.register(TaskType.rebuild_similarity, handle_rebuild_similarity)
-    manager.register(TaskType.update_similarity_paper, handle_update_similarity_paper)
     manager.register(TaskType.ingest_textbook, handle_ingest_textbook)
 
 
@@ -82,7 +75,6 @@ app.include_router(rag_router)
 app.include_router(graph_router)
 app.include_router(tasks_router)
 app.include_router(papers_router)
-app.include_router(paper_edits_router)
 app.include_router(schema_router)
 app.include_router(collections_router)
 app.include_router(config_center_router)

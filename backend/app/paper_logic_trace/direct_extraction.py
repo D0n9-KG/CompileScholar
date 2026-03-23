@@ -1,0 +1,1014 @@
+from __future__ import annotations
+
+import json
+import logging
+import re
+from collections import defaultdict
+from typing import Any, Callable
+
+from app.ingest.models import Chunk, DocumentIR
+
+
+logger = logging.getLogger(__name__)
+
+
+MoveExtractorFn = Callable[..., dict[str, Any]]
+
+_SPACE_RE = re.compile(r"\s+")
+_WORD_RE = re.compile(r"[A-Za-z][A-Za-z\\-]+|\\d+|[\\u4e00-\\u9fff]+")
+_STOP_TOKENS = {
+    'a',
+    'an',
+    'and',
+    'are',
+    'as',
+    'at',
+    'be',
+    'by',
+    'for',
+    'from',
+    'in',
+    'into',
+    'is',
+    'of',
+    'on',
+    'or',
+    'our',
+    'paper',
+    'that',
+    'the',
+    'their',
+    'this',
+    'to',
+    'using',
+    'we',
+    'with',
+}
+_REFERENCE_TOKENS = {'reference', 'references', 'bibliography', 'acknowledgment', 'acknowledgement', 'appendix'}
+_NOISE_SECTION_TOKENS = {
+    'title',
+    'authors',
+    'author information',
+    'highlights',
+    'article info',
+    'articleinfo',
+    'article history',
+}
+_IMAGE_ONLY_RE = re.compile(r'^\s*!\[[^\]]*\]\([^)]+\)\s*$')
+_MARKDOWN_HEADING_RE = re.compile(r'^\s*#{1,6}\s*(.+?)\s*$')
+_FRONT_MATTER_INSTITUTION_CUES = (
+    'university',
+    'department',
+    'school of',
+    'institute',
+    'laboratory',
+    'centre for',
+    'center for',
+    'college of',
+)
+_FRONT_MATTER_METADATA_CUES = (
+    'available online',
+    'article history',
+    'received ',
+    'accepted ',
+    'in revised form',
+    'keywords:',
+    'keyword:',
+    'corresponding author',
+)
+_PROBLEM_TEXT_PATTERNS = (
+    'this paper investigates',
+    'this paper studies',
+    'this paper addresses',
+    'we investigate',
+    'we study',
+    'we address',
+    'the aim of this paper',
+    'the objective of this paper',
+    'the goal of this paper',
+    'challenge',
+    'research gap',
+)
+_RESULT_TEXT_PATTERNS = (
+    'results show',
+    'results indicate',
+    'we show that',
+    'we find that',
+    'we found that',
+    'our results show',
+    'demonstrate that',
+    'demonstrates that',
+    'reveals that',
+    'revealed that',
+    'led to',
+    'improved',
+    'decreased',
+    'increased',
+)
+_CONDITION_CUE_WORDS = ('under', 'with', 'at', 'during')
+_SECTION_ROLE_HINTS: list[tuple[tuple[str, ...], str]] = [
+    (('future work', 'future directions', 'future'), 'future_work'),
+    (('limitation', 'limitations', 'threats to validity'), 'limitation'),
+    (('result', 'results', 'finding', 'findings'), 'result'),
+    (('discussion', 'interpretation', 'analysis'), 'interpretation'),
+    (('experiment', 'evaluation', 'experimental', 'benchmark', 'ablation'), 'experiment'),
+    (('method', 'approach', 'framework', 'model', 'algorithm', 'implementation'), 'method'),
+    (('problem', 'motivation', 'task', 'challenge', 'gap'), 'problem'),
+    (('background', 'introduction', 'preliminar', 'related work'), 'background'),
+]
+_ROLE_TO_ACT: dict[str, str] = {
+    'problem': 'define_task',
+    'background': 'identify_gap',
+    'hypothesis': 'formulate_hypothesis',
+    'method': 'propose_method',
+    'experiment': 'run_experiment',
+    'result': 'report_effect',
+    'interpretation': 'explain_mechanism',
+    'limitation': 'state_limitation',
+    'future_work': 'suggest_extension',
+}
+_ACT_TO_ROLE: dict[str, str] = {
+    'identify_gap': 'problem',
+    'define_task': 'problem',
+    'formulate_hypothesis': 'hypothesis',
+    'propose_method': 'method',
+    'adapt_method': 'method',
+    'run_experiment': 'experiment',
+    'measure_outcome': 'experiment',
+    'compare_baseline': 'experiment',
+    'report_effect': 'result',
+    'explain_mechanism': 'interpretation',
+    'diagnose_failure': 'limitation',
+    'state_limitation': 'limitation',
+    'suggest_extension': 'future_work',
+}
+_ALLOWED_ROLES = tuple(_ROLE_TO_ACT.keys())
+_ALLOWED_ACTS = (
+    'identify_gap',
+    'define_task',
+    'formulate_hypothesis',
+    'propose_method',
+    'adapt_method',
+    'build_resource',
+    'set_condition',
+    'run_experiment',
+    'measure_outcome',
+    'compare_baseline',
+    'report_effect',
+    'explain_mechanism',
+    'diagnose_failure',
+    'state_limitation',
+    'suggest_extension',
+)
+
+
+def _normalize_space(value: object) -> str:
+    return _SPACE_RE.sub(' ', str(value or '').strip())
+
+
+def _normalize_role(value: object) -> str:
+    token = _normalize_space(value).lower().replace(' ', '_')
+    return token if token in _ALLOWED_ROLES else 'background'
+
+
+def _normalize_act_type(value: object, *, role: str) -> str:
+    token = _normalize_space(value).lower().replace(' ', '_')
+    return token if token in _ALLOWED_ACTS else _ROLE_TO_ACT.get(role, 'define_task')
+
+
+def _is_reference_section(section: object) -> bool:
+    label = _normalize_space(section).lower()
+    return any(token in label for token in _REFERENCE_TOKENS)
+
+
+def _looks_like_author_line(text: str) -> bool:
+    clean = _normalize_space(text)
+    if not clean or len(clean) > 120:
+        return False
+    lowered = clean.lower()
+    if any(marker in lowered for marker in ('paper', 'method', 'result', 'experiment', 'introduction')):
+        return False
+    letters = [ch for ch in clean if ch.isalpha()]
+    if len(letters) < 6:
+        return False
+    upper_ratio = sum(1 for ch in letters if ch.isupper()) / max(1, len(letters))
+    if upper_ratio >= 0.6:
+        return True
+
+    parts = [part.strip() for part in re.split(r',| and ', clean) if part.strip()]
+    if len(parts) < 2:
+        return False
+
+    name_like_parts = 0
+    for part in parts:
+        normalized = re.sub(r'[\*\d]+$', '', part).strip()
+        normalized = re.sub(r'\b[a-z]\b', '', normalized).strip()
+        tokens = [token for token in normalized.split() if token]
+        if not 1 <= len(tokens) <= 4:
+            continue
+        if all(token[0].isupper() for token in tokens if token[0].isalpha()):
+            name_like_parts += 1
+    return name_like_parts >= 2
+
+
+def _looks_like_front_matter_noise(text: str, *, section: str, paper_title: str) -> bool:
+    lowered = text.lower()
+    in_title_block = bool(section) and bool(paper_title) and section == paper_title
+    if in_title_block and any(cue in lowered for cue in _FRONT_MATTER_METADATA_CUES):
+        return True
+    if in_title_block and any(cue in lowered for cue in _FRONT_MATTER_INSTITUTION_CUES):
+        return True
+    if in_title_block and _looks_like_author_line(text):
+        return True
+    return False
+
+
+def _looks_like_heading_only(text: str, *, section: str) -> bool:
+    match = _MARKDOWN_HEADING_RE.match(str(text or ''))
+    if not match:
+        return False
+    heading = _normalize_space(match.group(1))
+    if not heading:
+        return True
+    normalized_heading = re.sub(r'^(?:\d+(?:\.\d+)*)\s*', '', heading).strip(' .:-').lower()
+    normalized_section = re.sub(r'^(?:\d+(?:\.\d+)*)\s*', '', _normalize_space(section)).strip(' .:-').lower()
+    if normalized_section and (
+        normalized_heading == normalized_section
+        or normalized_heading in normalized_section
+        or normalized_section in normalized_heading
+    ):
+        return True
+    heading_words = normalized_heading.split()
+    verb_markers = {
+        'is',
+        'are',
+        'was',
+        'were',
+        'investigates',
+        'investigate',
+        'proposes',
+        'propose',
+        'shows',
+        'show',
+        'demonstrates',
+        'demonstrate',
+        'improves',
+        'improve',
+        'decreases',
+        'decrease',
+        'increases',
+        'increase',
+    }
+    if len(heading_words) <= 8 and not any(word in verb_markers for word in heading_words):
+        return True
+    return False
+
+
+def _is_noise_chunk(chunk: Chunk, *, paper_title: object) -> bool:
+    section = _normalize_space(chunk.section).lower()
+    text = _normalize_space(chunk.text)
+    lowered = text.lower()
+    if section in _NOISE_SECTION_TOKENS:
+        return True
+    if _IMAGE_ONLY_RE.match(str(chunk.text or '')):
+        return True
+    if _looks_like_heading_only(str(chunk.text or ''), section=section):
+        return True
+    title = _normalize_space(paper_title).lower()
+    if text.startswith('#') and title and title in lowered:
+        return True
+    if lowered.startswith('copyright ') or lowered.startswith('preprint '):
+        return True
+    if _looks_like_front_matter_noise(text, section=section, paper_title=title):
+        return True
+    return False
+
+
+def _role_for_section(section: object) -> str:
+    label = _normalize_space(section).lower()
+    for hints, role in _SECTION_ROLE_HINTS:
+        if any(hint in label for hint in hints):
+            return role
+    return 'background'
+
+
+def _role_for_chunk(chunk: Chunk, *, paper_title: object) -> str:
+    role = _role_for_section(chunk.section)
+    text = _normalize_space(chunk.text).lower()
+    section = _normalize_space(chunk.section).lower()
+    title = _normalize_space(paper_title).lower()
+    intro_like = section.startswith('1') or 'introduction' in section or 'background' in section
+    pre_section_like = not section or (title and section == title)
+    if role == 'background' and (intro_like or pre_section_like):
+        if any(pattern in text for pattern in _PROBLEM_TEXT_PATTERNS):
+            return 'problem'
+    if role in {'background', 'interpretation', 'experiment'}:
+        if any(pattern in text for pattern in _RESULT_TEXT_PATTERNS):
+            return 'result'
+    return role
+
+
+def _promote_role_from_act_type(*, role: str, act_type: str) -> str:
+    promoted = _ACT_TO_ROLE.get(act_type)
+    if not promoted:
+        return role
+    if role == promoted:
+        return role
+    if role in {'background', 'interpretation'}:
+        return promoted
+    if role == 'problem' and promoted in {'method', 'experiment', 'result'}:
+        return promoted
+    return role
+
+
+def _window_max_chars(schema: dict[str, Any]) -> int:
+    rules = dict(schema.get('rules') or {})
+    try:
+        value = int(rules.get('paper_logic_trace_window_chars_max') or 5000)
+    except Exception:
+        value = 5000
+    return max(1200, min(9000, value))
+
+
+def _max_moves_per_window(schema: dict[str, Any]) -> int:
+    rules = dict(schema.get('rules') or {})
+    try:
+        value = int(rules.get('paper_logic_trace_moves_per_window_max') or 2)
+    except Exception:
+        value = 2
+    return max(1, min(4, value))
+
+
+def _keyword_mentions(text: str, *, limit: int = 3) -> list[dict[str, Any]]:
+    tokens = [token.lower() for token in _WORD_RE.findall(text) if token]
+    phrases: list[str] = []
+    for idx in range(len(tokens)):
+        unigram = tokens[idx]
+        if unigram in _STOP_TOKENS or len(unigram) < 3:
+            continue
+        phrases.append(unigram)
+        if idx + 1 < len(tokens):
+            bigram = f'{unigram} {tokens[idx + 1]}'
+            if tokens[idx + 1] not in _STOP_TOKENS and len(tokens[idx + 1]) >= 3:
+                phrases.append(bigram)
+    seen: set[str] = set()
+    rows: list[dict[str, Any]] = []
+    for phrase in phrases:
+        if phrase in seen:
+            continue
+        seen.add(phrase)
+        rows.append({'surface': phrase, 'normalized': phrase})
+        if len(rows) >= limit:
+            break
+    return rows
+
+
+def _condition_mentions(text: str, *, limit: int = 2) -> list[dict[str, Any]]:
+    lowered = _normalize_space(text).lower()
+    rows: list[dict[str, Any]] = []
+    for cue in _CONDITION_CUE_WORDS:
+        for match in re.finditer(rf'\b{cue}\s+([a-z0-9][a-z0-9\-\s]{{4,40}})', lowered):
+            phrase = _normalize_space(match.group(1)).strip(' .,;:')
+            if not phrase:
+                continue
+            candidate = f'{cue} {phrase}'
+            rows.append({'surface': candidate, 'normalized': candidate})
+            if len(rows) >= limit:
+                return rows
+    return rows
+
+
+def _summary_from_text(text: str, *, max_chars: int = 220) -> str:
+    clean = _normalize_space(text)
+    if not clean:
+        return ''
+    sentences = re.split(r'(?<=[.!?。！？])\s+', clean)
+    summary = ' '.join(sentence.strip() for sentence in sentences[:2] if sentence.strip()).strip()
+    if not summary:
+        summary = clean
+    if len(summary) <= max_chars:
+        return summary
+    return summary[: max_chars - 3].rstrip() + '...'
+
+
+def _window_text(chunks: list[Chunk], max_chars: int) -> str:
+    parts: list[str] = []
+    total = 0
+    for chunk in chunks:
+        text = _normalize_space(chunk.text)
+        if not text:
+            continue
+        remaining = max_chars - total
+        if remaining <= 0:
+            break
+        if len(text) > remaining:
+            text = text[:remaining].rstrip()
+        parts.append(f'[{chunk.chunk_id}] {text}')
+        total += len(text)
+    return '\n\n'.join(parts)
+
+
+def _semantic_windows(doc: DocumentIR, schema: dict[str, Any]) -> list[dict[str, Any]]:
+    max_chars = _window_max_chars(schema)
+    windows: list[dict[str, Any]] = []
+    current: dict[str, Any] | None = None
+    for chunk in doc.chunks:
+        text = _normalize_space(chunk.text)
+        if not text or _is_reference_section(chunk.section) or _is_noise_chunk(chunk, paper_title=doc.paper.title):
+            continue
+        role_hint = _role_for_chunk(chunk, paper_title=doc.paper.title)
+        if (
+            current is None
+            or current['role_hint'] != role_hint
+            or current['char_count'] + len(text) > max_chars
+        ):
+            current = {
+                'window_id': f'{doc.paper.paper_source}:window:{len(windows) + 1}',
+                'role_hint': role_hint,
+                'act_hint': _ROLE_TO_ACT.get(role_hint, 'define_task'),
+                'section_path': [str(chunk.section).strip()] if str(chunk.section or '').strip() else [],
+                'chunks': [],
+                'char_count': 0,
+            }
+            windows.append(current)
+        current['chunks'].append(chunk)
+        current['char_count'] += len(text)
+    return [window for window in windows if window.get('chunks')]
+
+
+def _normalize_mention_rows(rows: list[dict[str, Any]] | None, *, anchor_ids: list[str]) -> list[dict[str, Any]]:
+    out: list[dict[str, Any]] = []
+    for row in rows or []:
+        surface = _normalize_space(row.get('surface') or row.get('normalized') or '')
+        if not surface:
+            continue
+        out.append(
+            {
+                'surface': surface,
+                'normalized': _normalize_space(row.get('normalized') or surface).lower() or None,
+                'type': _normalize_space(row.get('type') or '') or None,
+                'anchor_ids': list(anchor_ids),
+                'confidence': row.get('confidence'),
+                'inferred': False,
+            }
+        )
+    return out
+
+
+def _normalize_effect_rows(rows: list[dict[str, Any]] | None, *, anchor_ids: list[str]) -> list[dict[str, Any]]:
+    out: list[dict[str, Any]] = []
+    for row in rows or []:
+        direction = _normalize_space(row.get('direction') or 'unknown').lower()
+        if direction not in {'increase', 'decrease', 'improve', 'worsen', 'mixed', 'none', 'unknown'}:
+            direction = 'unknown'
+        out.append(
+            {
+                'direction': direction,
+                'magnitude_text': _normalize_space(row.get('magnitude_text') or '') or None,
+                'comparator_surface': _normalize_space(row.get('comparator_surface') or '') or None,
+                'anchor_ids': list(anchor_ids),
+                'confidence': row.get('confidence'),
+            }
+        )
+    return out
+
+
+def _slot_provenance_rows(field: str, values: list[dict[str, Any]], *, anchor_ids: list[str]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for index, value in enumerate(values):
+        rows.append(
+            {
+                'field': field,
+                'value_index': index,
+                'anchor_ids': list(anchor_ids),
+                'extraction_mode': 'direct',
+                'support_strength': 'strong',
+                'confidence': value.get('confidence'),
+            }
+        )
+    return rows
+
+
+def _fallback_move_payload(window: dict[str, Any]) -> list[dict[str, Any]]:
+    chunks: list[Chunk] = list(window.get('chunks') or [])
+    if not chunks:
+        return []
+    anchor_chunk_ids = [str(chunk.chunk_id).strip() for chunk in chunks[:2] if str(chunk.chunk_id).strip()]
+    summary = _summary_from_text(' '.join(chunk.text for chunk in chunks))
+    role = _normalize_role(window.get('role_hint'))
+    methods = _keyword_mentions(summary, limit=2) if role in {'method', 'experiment'} else []
+    research_objects = _keyword_mentions(summary, limit=2) if role not in {'method', 'experiment'} else []
+    conditions = _condition_mentions(summary, limit=2)
+    return [
+        {
+            'role': role,
+            'act_type': _ROLE_TO_ACT.get(role, 'define_task'),
+            'summary': summary,
+            'anchor_chunk_ids': anchor_chunk_ids,
+            'research_objects': research_objects,
+            'methods': methods,
+            'observed_variables': [],
+            'metrics': [],
+            'comparators': [],
+            'conditions': conditions,
+            'limitation_types': _keyword_mentions(summary, limit=2) if role == 'limitation' else [],
+            'resource_mentions': [],
+            'effects': [],
+            'confidence': 0.0,
+        }
+    ]
+
+
+def _derive_move_confidence(
+    *,
+    summary: str,
+    anchor_chunk_ids: list[str],
+    research_objects: list[dict[str, Any]],
+    methods: list[dict[str, Any]],
+    observed_variables: list[dict[str, Any]],
+    metrics: list[dict[str, Any]],
+    comparators: list[dict[str, Any]],
+    conditions: list[dict[str, Any]],
+    effects: list[dict[str, Any]],
+    limitation_types: list[dict[str, Any]],
+    resource_mentions: list[dict[str, Any]],
+    raw_confidence: Any,
+) -> float:
+    try:
+        raw_value = float(raw_confidence)
+    except (TypeError, ValueError):
+        raw_value = 0.0
+    slot_count = sum(
+        len(items)
+        for items in (
+            research_objects,
+            methods,
+            observed_variables,
+            metrics,
+            comparators,
+            conditions,
+            effects,
+            limitation_types,
+            resource_mentions,
+        )
+    )
+    heuristic = 0.22
+    heuristic += min(0.18, 0.07 * len(anchor_chunk_ids))
+    heuristic += min(0.38, 0.06 * slot_count)
+    if len(_normalize_space(summary)) >= 32:
+        heuristic += 0.08
+    if methods or research_objects:
+        heuristic += 0.08
+    if metrics or comparators or effects:
+        heuristic += 0.06
+    if raw_value > 0.0:
+        heuristic = max(heuristic, raw_value)
+    return round(min(0.98, heuristic), 4)
+
+
+def _extract_window_moves_llm(
+    *,
+    doc: DocumentIR,
+    schema: dict[str, Any],
+    window: dict[str, Any],
+) -> list[dict[str, Any]]:
+    from app.llm.client import call_validated_json
+    from app.llm.schemas import ResearchMoveWindowResponse
+
+    chunks: list[Chunk] = list(window.get('chunks') or [])
+    if not chunks:
+        return []
+    system, user = _build_research_move_prompt(doc=doc, schema=schema, window=window)
+    try:
+        validated = call_validated_json(system, user, ResearchMoveWindowResponse)
+    except Exception:
+        logger.debug('ResearchMove window extraction failed; using heuristic fallback', exc_info=True)
+        return []
+    payload = validated.model_dump(mode='json') if hasattr(validated, 'model_dump') else dict(validated or {})
+    return list(payload.get('moves') or [])
+
+
+def _build_research_move_prompt(
+    *,
+    doc: DocumentIR,
+    schema: dict[str, Any],
+    window: dict[str, Any],
+) -> tuple[str, str]:
+    chunks: list[Chunk] = list(window.get('chunks') or [])
+    max_moves = _max_moves_per_window(schema)
+    chunk_ids = [str(chunk.chunk_id).strip() for chunk in chunks if str(chunk.chunk_id).strip()]
+    chunk_text = _window_text(chunks, _window_max_chars(schema))
+    system = (
+        'You extract canonical ResearchMove records for a PaperLogicTrace.\n'
+        'Return strict JSON only.\n'
+        'Do not mention any field that is not directly supported by the provided chunks.\n'
+        'Use only the provided chunk ids in anchor_chunk_ids.\n'
+        f'Allowed roles: {", ".join(_ALLOWED_ROLES)}.\n'
+        f'Allowed act_type values: {", ".join(_ALLOWED_ACTS)}.\n'
+        'Keep summary concise and factual.\n'
+        'Normalize short phrases when obvious, but do not invent domain ontology.\n'
+        'Positive example: "This paper investigates ..." or "In this paper, we investigate ..." in an abstract/introduction window usually signals a problem or define_task move.\n'
+        'Positive example: "Results show that ..." or "we find that ..." usually signals a result/report_effect move.\n'
+        'Negative example: an author line, affiliation line, or received date is front matter and should produce no move.\n'
+        'Negative example: image-only markdown or captionless asset references should produce no move.\n'
+    )
+    user = (
+        f'Paper title: {doc.paper.title or doc.paper.paper_source}\n'
+        f'Role hint: {window.get("role_hint")}\n'
+        f'Section path: {" > ".join(window.get("section_path") or []) or "(unknown)"}\n'
+        f'Max moves: {max_moves}\n'
+        f'Available chunk ids: {", ".join(chunk_ids)}\n\n'
+        'Return JSON like:\n'
+        '{\n'
+        '  "moves": [\n'
+        '    {\n'
+        '      "role": "method",\n'
+        '      "act_type": "propose_method",\n'
+        '      "summary": "...",\n'
+        '      "anchor_chunk_ids": ["c1"],\n'
+        '      "research_objects": [{"surface": "...", "normalized": "...", "type": ""}],\n'
+        '      "methods": [{"surface": "...", "normalized": "...", "type": ""}],\n'
+        '      "observed_variables": [],\n'
+        '      "metrics": [],\n'
+        '      "comparators": [],\n'
+        '      "conditions": [],\n'
+        '      "limitation_types": [],\n'
+        '      "resource_mentions": [],\n'
+        '      "effects": [{"direction": "unknown", "magnitude_text": "", "comparator_surface": ""}],\n'
+        '      "confidence": 0.0\n'
+        '    }\n'
+        '  ]\n'
+        '}\n\n'
+        f'Chunks:\n{chunk_text}'
+    )
+    return system, user
+
+
+def _move_rows_from_windows(
+    *,
+    doc: DocumentIR,
+    paper_id: str,
+    schema: dict[str, Any],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, Any]]:
+    chunk_by_id = {chunk.chunk_id: chunk for chunk in doc.chunks}
+    windows = _semantic_windows(doc, schema)
+    evidence_rows: list[dict[str, Any]] = []
+    move_defs: list[dict[str, Any]] = []
+    extracted_moves = 0
+
+    for window_index, window in enumerate(windows, start=1):
+        raw_moves = _extract_window_moves_llm(doc=doc, schema=schema, window=window)
+        if not raw_moves:
+            raw_moves = _fallback_move_payload(window)
+        for move_offset, raw_move in enumerate(raw_moves, start=1):
+            role = _normalize_role(raw_move.get('role') or window.get('role_hint'))
+            act_type = _normalize_act_type(raw_move.get('act_type'), role=role)
+            role = _promote_role_from_act_type(role=role, act_type=act_type)
+            summary = _summary_from_text(raw_move.get('summary') or _window_text(window.get('chunks') or [], 1200))
+            anchor_chunk_ids = [
+                str(item).strip()
+                for item in (raw_move.get('anchor_chunk_ids') or [])
+                if str(item).strip() in chunk_by_id
+            ]
+            if not anchor_chunk_ids:
+                anchor_chunk_ids = [str(chunk.chunk_id).strip() for chunk in (window.get('chunks') or [])[:1] if str(chunk.chunk_id).strip()]
+            if not anchor_chunk_ids:
+                continue
+
+            move_id = f'{paper_id}:move:{window_index}:{move_offset}'
+            research_objects = _normalize_mention_rows(raw_move.get('research_objects'), anchor_ids=anchor_chunk_ids)
+            methods = _normalize_mention_rows(raw_move.get('methods'), anchor_ids=anchor_chunk_ids)
+            observed_variables = _normalize_mention_rows(raw_move.get('observed_variables'), anchor_ids=anchor_chunk_ids)
+            metrics = _normalize_mention_rows(raw_move.get('metrics'), anchor_ids=anchor_chunk_ids)
+            comparators = _normalize_mention_rows(raw_move.get('comparators'), anchor_ids=anchor_chunk_ids)
+            conditions = _normalize_mention_rows(raw_move.get('conditions'), anchor_ids=anchor_chunk_ids)
+            limitation_types = _normalize_mention_rows(raw_move.get('limitation_types'), anchor_ids=anchor_chunk_ids)
+            resource_mentions = _normalize_mention_rows(raw_move.get('resource_mentions'), anchor_ids=anchor_chunk_ids)
+            effects = _normalize_effect_rows(raw_move.get('effects'), anchor_ids=anchor_chunk_ids)
+
+            slot_provenance = [
+                *_slot_provenance_rows('research_objects', research_objects, anchor_ids=anchor_chunk_ids),
+                *_slot_provenance_rows('methods', methods, anchor_ids=anchor_chunk_ids),
+                *_slot_provenance_rows('observed_variables', observed_variables, anchor_ids=anchor_chunk_ids),
+                *_slot_provenance_rows('metrics', metrics, anchor_ids=anchor_chunk_ids),
+                *_slot_provenance_rows('comparators', comparators, anchor_ids=anchor_chunk_ids),
+                *_slot_provenance_rows('conditions', conditions, anchor_ids=anchor_chunk_ids),
+                *_slot_provenance_rows('limitation_types', limitation_types, anchor_ids=anchor_chunk_ids),
+                *_slot_provenance_rows('resource_mentions', resource_mentions, anchor_ids=anchor_chunk_ids),
+            ]
+            confidence = _derive_move_confidence(
+                summary=summary,
+                anchor_chunk_ids=anchor_chunk_ids,
+                research_objects=research_objects,
+                methods=methods,
+                observed_variables=observed_variables,
+                metrics=metrics,
+                comparators=comparators,
+                conditions=conditions,
+                effects=effects,
+                limitation_types=limitation_types,
+                resource_mentions=resource_mentions,
+                raw_confidence=raw_move.get('confidence'),
+            )
+
+            for anchor_index, chunk_id in enumerate(anchor_chunk_ids, start=1):
+                chunk = chunk_by_id.get(chunk_id)
+                if chunk is None:
+                    continue
+                evidence_rows.append(
+                    {
+                        'anchor_id': f'{move_id}:anchor:{anchor_index}',
+                        'paper_id': paper_id,
+                        'source_ref': chunk_id,
+                        'modality': 'text',
+                        'section_path': [str(chunk.section).strip()] if str(chunk.section or '').strip() else [],
+                        'locator': {
+                            'chunk_id': chunk.chunk_id,
+                            'start_line': chunk.span.start_line,
+                            'end_line': chunk.span.end_line,
+                        },
+                        'quote': _normalize_space(chunk.text),
+                        'citation_ids': [],
+                        'support_type': 'direct',
+                        'weak': False,
+                        'move_id': move_id,
+                        'sequence_no': len(move_defs) + 1,
+                        'role_hint': role,
+                        'act_hint': act_type,
+                        'summary': summary,
+                        'confidence': confidence,
+                        'research_objects': research_objects,
+                        'methods': methods,
+                        'observed_variables': observed_variables,
+                        'metrics': metrics,
+                        'comparators': comparators,
+                        'conditions': conditions,
+                        'effects': effects,
+                        'limitation_types': limitation_types,
+                        'resource_mentions': resource_mentions,
+                        'slot_provenance': slot_provenance,
+                    }
+                )
+
+            move_defs.append(
+                {
+                    'move_id': move_id,
+                    'sequence_no': len(move_defs) + 1,
+                    'role': role,
+                    'act_type': act_type,
+                    'anchor_chunk_ids': anchor_chunk_ids,
+                }
+            )
+            extracted_moves += 1
+
+    report = {
+        'window_count': len(windows),
+        'move_count': extracted_moves,
+    }
+    return evidence_rows, move_defs, report
+
+
+def _infer_relation_type(source_role: str, target_role: str, source_act: str = '', target_act: str = '') -> str:
+    source_method_like = source_role == 'method' or source_act in {'propose_method', 'adapt_method'}
+    target_method_like = target_role == 'method' or target_act in {'propose_method', 'adapt_method'}
+    source_experiment_like = source_role == 'experiment' or source_act in {'run_experiment', 'measure_outcome', 'compare_baseline', 'set_condition'}
+    target_experiment_like = target_role == 'experiment' or target_act in {'run_experiment', 'measure_outcome', 'compare_baseline', 'set_condition'}
+    source_result_like = source_role == 'result' or source_act == 'report_effect'
+    target_result_like = target_role == 'result' or target_act == 'report_effect'
+
+    if source_method_like and target_method_like:
+        return 'implements'
+    if source_method_like and target_experiment_like:
+        return 'evaluates'
+    if source_experiment_like and target_result_like:
+        return 'yields'
+    if source_method_like and target_result_like:
+        return 'yields'
+
+    pair = (source_role, target_role)
+    mapping = {
+        ('background', 'problem'): 'motivates',
+        ('problem', 'method'): 'addresses',
+        ('problem', 'experiment'): 'addresses',
+        ('method', 'experiment'): 'evaluates',
+        ('experiment', 'result'): 'yields',
+        ('experiment', 'interpretation'): 'explains',
+        ('result', 'interpretation'): 'explains',
+        ('result', 'limitation'): 'limits',
+        ('method', 'interpretation'): 'explains',
+        ('interpretation', 'limitation'): 'limits',
+        ('method', 'result'): 'yields',
+        ('result', 'future_work'): 'extends',
+        ('limitation', 'future_work'): 'extends',
+    }
+    return mapping.get(pair, 'motivates')
+
+
+def _relation_row(source: dict[str, Any], target: dict[str, Any]) -> dict[str, Any]:
+    source_move_id = str(source.get('move_id') or '')
+    target_move_id = str(target.get('move_id') or '')
+    relation_type = _infer_relation_type(
+        str(source.get('role') or ''),
+        str(target.get('role') or ''),
+        str(source.get('act_type') or ''),
+        str(target.get('act_type') or ''),
+    )
+    return {
+        'relation_id': f'{source_move_id}:rel:{target_move_id}',
+        'source_move_id': source_move_id,
+        'target_move_id': target_move_id,
+        'relation_type': relation_type,
+        'anchor_ids': [],
+        'confidence': 0.65,
+    }
+
+
+def _build_move_relation_rows(move_defs: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    ordered = sorted(move_defs, key=lambda row: int(row.get('sequence_no') or 0))
+    seen_pairs: set[tuple[str, str]] = set()
+    for index in range(len(ordered) - 1):
+        source = ordered[index]
+        target = ordered[index + 1]
+        pair = (str(source.get('move_id') or ''), str(target.get('move_id') or ''))
+        if pair in seen_pairs:
+            continue
+        rows.append(_relation_row(source, target))
+        seen_pairs.add(pair)
+
+    max_lookahead = 3
+    for index, source in enumerate(ordered):
+        source_move_id = str(source.get('move_id') or '')
+        if not source_move_id:
+            continue
+        for lookahead in range(index + 2, min(len(ordered), index + 1 + max_lookahead)):
+            target = ordered[lookahead]
+            pair = (source_move_id, str(target.get('move_id') or ''))
+            if pair in seen_pairs:
+                continue
+            relation_type = _infer_relation_type(
+                str(source.get('role') or ''),
+                str(target.get('role') or ''),
+                str(source.get('act_type') or ''),
+                str(target.get('act_type') or ''),
+            )
+            if relation_type == 'motivates':
+                continue
+            rows.append(_relation_row(source, target))
+            seen_pairs.add(pair)
+            break
+    return rows
+
+
+def _build_citation_rows(cite_rec: dict[str, Any] | None, move_defs: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    if not cite_rec:
+        return []
+    move_ids_by_chunk: dict[str, list[str]] = defaultdict(list)
+    for move in move_defs:
+        for chunk_id in move.get('anchor_chunk_ids') or []:
+            move_ids_by_chunk[str(chunk_id)].append(str(move.get('move_id') or ''))
+    rows: list[dict[str, Any]] = []
+    for index, row in enumerate((cite_rec.get('cites_resolved') or []), start=1):
+        cited_paper_id = str(row.get('cited_paper_id') or '').strip()
+        if not cited_paper_id:
+            continue
+        evidence_chunk_ids = [str(item).strip() for item in (row.get('evidence_chunk_ids') or []) if str(item).strip()]
+        source_move_id = next(
+            (
+                move_id
+                for chunk_id in evidence_chunk_ids
+                for move_id in move_ids_by_chunk.get(chunk_id, [])
+                if move_id
+            ),
+            None,
+        )
+        rows.append(
+            {
+                'citation_act_id': f'{cite_rec.get("paper_id") or "paper"}:citation:{index}',
+                'source_move_id': source_move_id,
+                'target_paper_id': cited_paper_id,
+                'purpose': None,
+                'polarity': None,
+                'semantic_signal': None,
+                'target_scope': None,
+                'anchor_ids': [],
+                'confidence': 0.4,
+            }
+        )
+    return rows
+
+
+def build_trace_quality_report(trace: Any, extraction_report: dict[str, Any] | None = None) -> dict[str, Any]:
+    moves = list((trace.canonical_core.moves if trace else []) or [])
+    anchors = list((trace.canonical_core.evidence_anchors if trace else []) or [])
+    relations = list((trace.canonical_core.move_relations if trace else []) or [])
+    gate = dict((trace.quality or {}).get('hot_path_gate_report') or {})
+    quality = dict((trace.quality or {}) or {})
+    slot_signal_counts = {
+        'research_objects': sum(len(move.research_objects) for move in moves),
+        'methods': sum(len(move.methods) for move in moves),
+        'metrics': sum(len(move.metrics) for move in moves),
+        'conditions': sum(len(move.conditions) for move in moves),
+        'comparators': sum(len(move.comparators) for move in moves),
+        'limitation_types': sum(len(move.limitation_types) for move in moves),
+        'resource_mentions': sum(len(move.resource_mentions) for move in moves),
+    }
+    roles_present = sorted({str(move.role) for move in moves if str(move.role).strip()})
+    critical_roles = {'problem', 'method', 'result'}
+    critical_present = critical_roles & set(roles_present)
+    slot_ready_moves = [
+        move.move_id
+        for move in moves
+        if any(
+            (
+                move.research_objects,
+                move.methods,
+                move.metrics,
+                move.conditions,
+                move.comparators,
+                move.limitation_types,
+                move.resource_mentions,
+            )
+        )
+    ]
+    report = {
+        'gate_passed': bool(gate.get('passed')),
+        'quality_tier': str(quality.get('quality_tier') or 'red'),
+        'quality_tier_score': float(quality.get('quality_tier_score') or 0.0),
+        'quality_flags': list(quality.get('quality_flags') or []),
+        'audit_status': str(quality.get('audit_status') or 'blocked'),
+        'move_count': len(moves),
+        'anchor_count': len(anchors),
+        'relation_count': len(relations),
+        'roles_present': roles_present,
+        'role_coverage_ratio': len(critical_present) / max(1, len(critical_roles)),
+        'supported_signal_ratio': len(slot_ready_moves) / max(1, len(moves)),
+        'slot_signal_counts': slot_signal_counts,
+        'paper_logic_trace_mode': 'direct_move_extraction',
+    }
+    if extraction_report:
+        report.update(
+            {
+                'window_count': int(extraction_report.get('window_count') or 0),
+                'move_window_count': int(extraction_report.get('move_count') or 0),
+            }
+        )
+    return report
+
+
+def build_paper_logic_trace_inputs(
+    *,
+    doc: DocumentIR,
+    paper_id: str,
+    cite_rec: dict[str, Any] | None,
+    schema: dict[str, Any],
+    move_extractor: MoveExtractorFn | None = None,
+) -> dict[str, Any]:
+    extractor = move_extractor or _default_move_extractor
+    try:
+        extracted = extractor(
+            doc=doc,
+            paper_id=paper_id,
+            cite_rec=cite_rec,
+            schema=schema,
+        )
+    except TypeError:
+        extracted = extractor(
+            doc=doc,
+            paper_id=paper_id,
+            schema=schema,
+        )
+    payload = dict(extracted or {})
+    if payload.get('paper_metadata') and payload.get('evidence_rows') is not None:
+        return payload
+
+    evidence_rows, move_defs, report = _move_rows_from_windows(doc=doc, paper_id=paper_id, schema=schema)
+    paper_metadata = {
+        'paper_id': paper_id,
+        'canonical_doi': doc.paper.doi,
+        'title': doc.paper.title or paper_id,
+        'year': doc.paper.year,
+        'authors': list(doc.paper.authors or []),
+        'paper_type': str(doc.paper.paper_type or 'unknown'),
+        'source_refs': [chunk.chunk_id for chunk in doc.chunks if str(chunk.chunk_id or '').strip()],
+    }
+    return {
+        'paper_metadata': paper_metadata,
+        'evidence_rows': evidence_rows,
+        'figure_rows': [],
+        'table_rows': [],
+        'citation_rows': _build_citation_rows(cite_rec, move_defs),
+        'move_relation_rows': _build_move_relation_rows(move_defs),
+        'extraction_report': report,
+    }
+
+
+def _default_move_extractor(
+    *,
+    doc: DocumentIR,
+    paper_id: str,
+    cite_rec: dict[str, Any] | None,
+    schema: dict[str, Any],
+) -> dict[str, Any]:
+    del cite_rec
+    return {}
