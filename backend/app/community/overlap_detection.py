@@ -14,6 +14,15 @@ def _community_score(member_ids: list[str], edge_weight: dict[frozenset[str], fl
     return sum(scores) / len(scores)
 
 
+def _minimum_expansion_score(member_count: int) -> float:
+    safe_size = max(1, int(member_count))
+    if safe_size <= 2:
+        return 0.38
+    if safe_size == 3:
+        return 0.42
+    return 0.48
+
+
 def _expand_seed_members(
     *,
     seed_members: list[str],
@@ -38,7 +47,7 @@ def _expand_seed_members(
             if candidate_score > best_score:
                 best_score = candidate_score
                 best_node = node
-        if not best_node or best_score < 0.55:
+        if not best_node or best_score < _minimum_expansion_score(len(members)):
             break
         members.append(best_node)
         candidates = sorted(

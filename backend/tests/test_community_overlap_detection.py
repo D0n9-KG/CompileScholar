@@ -37,6 +37,39 @@ def test_detector_can_expand_dense_triangle_into_single_three_node_community() -
     assert 3 in community_sizes
 
 
+def test_detector_can_expand_sparse_but_consistent_three_node_community() -> None:
+    result = detect_overlapping_communities(
+        nodes=['a', 'b', 'c'],
+        edges=[
+            {'source': 'a', 'target': 'b', 'weight': 0.40},
+            {'source': 'a', 'target': 'c', 'weight': 0.39},
+            {'source': 'b', 'target': 'c', 'weight': 0.38},
+        ],
+        max_memberships_per_node=2,
+        min_community_size=2,
+    )
+
+    community_sizes = sorted(len(row['member_ids']) for row in result['communities'])
+
+    assert 3 in community_sizes
+
+
+def test_detector_does_not_expand_pair_with_single_sided_attachment() -> None:
+    result = detect_overlapping_communities(
+        nodes=['a', 'b', 'c'],
+        edges=[
+            {'source': 'a', 'target': 'b', 'weight': 0.92},
+            {'source': 'a', 'target': 'c', 'weight': 0.78},
+        ],
+        max_memberships_per_node=2,
+        min_community_size=2,
+    )
+
+    community_sizes = sorted(len(row['member_ids']) for row in result['communities'])
+
+    assert 3 not in community_sizes
+
+
 def test_merge_high_overlap_communities_collapses_near_duplicate_clusters() -> None:
     edge_weight = {}
     dense_group = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
