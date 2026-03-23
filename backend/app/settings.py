@@ -252,6 +252,12 @@ class Settings(BaseSettings):
         le=64,
         validation_alias=AliasChoices("GLOBAL_COMMUNITY_V2_MIN_SIZE"),
     )
+    global_community_v2_publish_min_size: int = Field(
+        default=3,
+        ge=2,
+        le=64,
+        validation_alias=AliasChoices("GLOBAL_COMMUNITY_V2_PUBLISH_MIN_SIZE"),
+    )
     global_community_v2_max_memberships_per_node: int = Field(
         default=2,
         ge=1,

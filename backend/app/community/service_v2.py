@@ -57,6 +57,34 @@ def _utc_now_iso() -> str:
     return datetime.now(tz=timezone.utc).isoformat()
 
 
+def _filter_materialized_communities(
+    *,
+    communities: list[dict[str, Any]],
+    memberships: dict[str, list[dict[str, Any]]],
+    min_member_count: int,
+) -> dict[str, Any]:
+    safe_min = max(2, int(min_member_count))
+    kept = [
+        dict(row)
+        for row in communities
+        if len(row.get('member_ids') or []) >= safe_min
+    ]
+    allowed_ids = {str(row.get('community_id') or '').strip() for row in kept}
+    filtered_memberships: dict[str, list[dict[str, Any]]] = {}
+    for member_id, rows in memberships.items():
+        kept_rows = [
+            dict(row)
+            for row in rows
+            if str(row.get('community_id') or '').strip() in allowed_ids
+        ]
+        if kept_rows:
+            filtered_memberships[member_id] = kept_rows
+    return {
+        'communities': kept,
+        'memberships': filtered_memberships,
+    }
+
+
 def _tokenize(text: object) -> set[str]:
     return {
         token.lower()
@@ -313,9 +341,14 @@ def rebuild_global_communities_v2(
             max_memberships_per_node=settings.global_community_v2_max_memberships_per_node,
             min_community_size=settings.global_community_v2_min_size,
         )
+        publishable = _filter_materialized_communities(
+            communities=refined['communities'],
+            memberships=refined['memberships'],
+            min_member_count=settings.global_community_v2_publish_min_size,
+        )
 
         labels = {}
-        for community in refined['communities']:
+        for community in publishable['communities']:
             community_id = str(community.get('community_id') or '').strip()
             core_members = [
                 moves_by_id[member_id]
@@ -324,15 +357,15 @@ def rebuild_global_communities_v2(
             ]
             labels[community_id] = label_community(core_members=core_members, evidence_rows=[])
         labels = disambiguate_community_labels(
-            communities=refined['communities'],
+            communities=publishable['communities'],
             labels=labels,
             moves_by_id=moves_by_id,
         )
 
         progress('community:write', 0.85, 'Writing global communities to Neo4j')
         materialized = materialize_community_rows(
-            communities=refined['communities'],
-            memberships=refined['memberships'],
+            communities=publishable['communities'],
+            memberships=publishable['memberships'],
             labels=labels,
             moves=moves,
             version=settings.global_community_version,
