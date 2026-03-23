@@ -125,6 +125,56 @@ def test_rebuild_global_communities_v2_does_not_materialize_pair_only_clusters()
     assert client.memberships == []
 
 
+class _WeakSignalClient(_FakeClient):
+    def list_research_moves(self, paper_id: str | None = None, limit: int = 50000) -> list[dict]:
+        del paper_id, limit
+        return [
+            {
+                'move_id': 'p1:experiment',
+                'paper_id': 'p1',
+                'paper_source': 'paper-1',
+                'role': 'experiment',
+                'act_type': 'run_experiment',
+                'summary': 'The authors conducted experiments.',
+                'sequence_no': 1,
+                'method_tokens': [],
+                'object_tokens': [],
+            },
+            {
+                'move_id': 'p2:experiment',
+                'paper_id': 'p2',
+                'paper_source': 'paper-2',
+                'role': 'experiment',
+                'act_type': 'run_experiment',
+                'summary': 'The authors conducted experiments.',
+                'sequence_no': 1,
+                'method_tokens': [],
+                'object_tokens': [],
+            },
+            {
+                'move_id': 'p3:experiment',
+                'paper_id': 'p3',
+                'paper_source': 'paper-3',
+                'role': 'experiment',
+                'act_type': 'run_experiment',
+                'summary': 'The authors conducted experiments.',
+                'sequence_no': 1,
+                'method_tokens': [],
+                'object_tokens': [],
+            },
+        ]
+
+
+def test_rebuild_global_communities_v2_filters_generic_three_member_clusters() -> None:
+    client = _WeakSignalClient()
+
+    result = rebuild_global_communities_v2(client=client)
+
+    assert result['communities'] == 0
+    assert client.communities == []
+    assert client.memberships == []
+
+
 def test_rebuild_global_communities_always_uses_v2_pipeline(monkeypatch) -> None:
     monkeypatch.setattr(
         community_service,

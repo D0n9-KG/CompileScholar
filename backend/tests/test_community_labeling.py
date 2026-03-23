@@ -57,3 +57,24 @@ def test_labeler_merges_overlapping_signal_phrases_without_repeating_middle_toke
     )
 
     assert label['title'] == 'good agreement found'
+
+
+def test_labeler_avoids_generic_author_subject_phrases() -> None:
+    label = label_community(
+        core_members=[
+            {
+                'summary': 'The authors conducted experiments on 3D particle packings.',
+                'paper_title': 'A',
+                'method_tokens': ['authors conducted', 'conducted experiments', '3d particle packings'],
+            },
+            {
+                'summary': 'The authors conduct mixing process experiments using a pitched-blade impeller mixer.',
+                'paper_title': 'B',
+                'method_tokens': ['mixing process experiment', 'pitched-blade impeller mixer'],
+            },
+        ],
+        evidence_rows=[],
+    )
+
+    assert label['title'] != 'authors conducted experiments'
+    assert 'authors' not in label['title']

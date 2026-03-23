@@ -76,6 +76,19 @@ _FRONT_MATTER_METADATA_CUES = (
     'keyword:',
     'corresponding author',
 )
+_NOISE_SUMMARY_PREFIXES = (
+    '# abstract',
+    '# article info',
+    '# articleinfo',
+    '# credit author statement',
+    'abstract',
+    'article info',
+    'articleinfo',
+    'available online',
+    'credit author statement',
+    'keywords:',
+    'keyword:',
+)
 _PROBLEM_TEXT_PATTERNS = (
     'this paper investigates',
     'this paper studies',
@@ -260,6 +273,24 @@ def _looks_like_heading_only(text: str, *, section: str) -> bool:
         'increase',
     }
     if len(heading_words) <= 8 and not any(word in verb_markers for word in heading_words):
+        return True
+    return False
+
+
+def _looks_like_noise_summary(text: object) -> bool:
+    clean = _normalize_space(text)
+    if not clean:
+        return True
+    lowered = clean.lower()
+    if _looks_like_heading_only(clean, section=''):
+        return True
+    if _looks_like_author_line(clean):
+        return True
+    if any(lowered.startswith(prefix) for prefix in _NOISE_SUMMARY_PREFIXES):
+        return True
+    if lowered.startswith('received ') or lowered.startswith('accepted ') or lowered.startswith('copyright '):
+        return True
+    if 'article history' in lowered and ('received ' in lowered or 'accepted ' in lowered):
         return True
     return False
 
@@ -665,6 +696,8 @@ def _move_rows_from_windows(
             act_type = _normalize_act_type(raw_move.get('act_type'), role=role)
             role = _promote_role_from_act_type(role=role, act_type=act_type)
             summary = _summary_from_text(raw_move.get('summary') or _window_text(window.get('chunks') or [], 1200))
+            if _looks_like_noise_summary(summary):
+                continue
             anchor_chunk_ids = [
                 str(item).strip()
                 for item in (raw_move.get('anchor_chunk_ids') or [])

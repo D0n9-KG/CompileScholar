@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from typing import Any, Callable
 
 from app.community.candidate_graph import build_move_candidate_graph
-from app.community.labeling import label_community
+from app.community.labeling import _is_distinctive_phrase, _normalize_phrase, label_community
 from app.community.materializer import materialize_community_rows
 from app.community.overlap_detection import detect_overlapping_communities
 from app.community.refinement import disambiguate_community_labels, merge_labeled_communities
@@ -43,6 +43,13 @@ _GENERIC_TOKENS = {
     'using',
     'with',
 }
+_WEAK_COMMUNITY_TITLES = {
+    'cross paper logic pattern',
+    'cross-paper logic pattern',
+    'discussion',
+    'experimental setup',
+    'future work',
+}
 
 
 def _noop_progress(stage: str, p: float, msg: str | None = None) -> None:
@@ -61,13 +68,23 @@ def _filter_materialized_communities(
     *,
     communities: list[dict[str, Any]],
     memberships: dict[str, list[dict[str, Any]]],
+    labels: dict[str, dict[str, Any]],
+    moves_by_id: dict[str, dict[str, Any]],
     min_member_count: int,
+    min_paper_count: int,
 ) -> dict[str, Any]:
     safe_min = max(2, int(min_member_count))
+    safe_paper_min = max(1, int(min_paper_count))
     kept = [
         dict(row)
         for row in communities
-        if len(row.get('member_ids') or []) >= safe_min
+        if _is_publishable_community(
+            community=row,
+            labels=labels,
+            moves_by_id=moves_by_id,
+            min_member_count=safe_min,
+            min_paper_count=safe_paper_min,
+        )
     ]
     allowed_ids = {str(row.get('community_id') or '').strip() for row in kept}
     filtered_memberships: dict[str, list[dict[str, Any]]] = {}
@@ -83,6 +100,44 @@ def _filter_materialized_communities(
         'communities': kept,
         'memberships': filtered_memberships,
     }
+
+
+def _is_publishable_title(title: object) -> bool:
+    normalized = _normalize_phrase(title)
+    if not normalized:
+        return False
+    if normalized in _WEAK_COMMUNITY_TITLES:
+        return False
+    if not _is_distinctive_phrase(normalized):
+        return False
+    return True
+
+
+def _is_publishable_community(
+    *,
+    community: dict[str, Any],
+    labels: dict[str, dict[str, Any]],
+    moves_by_id: dict[str, dict[str, Any]],
+    min_member_count: int,
+    min_paper_count: int,
+) -> bool:
+    member_ids = [
+        str(member_id).strip()
+        for member_id in (community.get('member_ids') or [])
+        if str(member_id).strip()
+    ]
+    if len(member_ids) < int(min_member_count):
+        return False
+    paper_ids = {
+        str((moves_by_id.get(member_id) or {}).get('paper_id') or '').strip()
+        for member_id in member_ids
+        if str((moves_by_id.get(member_id) or {}).get('paper_id') or '').strip()
+    }
+    if len(paper_ids) < int(min_paper_count):
+        return False
+    community_id = str(community.get('community_id') or '').strip()
+    title = str((labels.get(community_id) or {}).get('title') or '').strip()
+    return _is_publishable_title(title)
 
 
 def _tokenize(text: object) -> set[str]:
@@ -341,14 +396,8 @@ def rebuild_global_communities_v2(
             max_memberships_per_node=settings.global_community_v2_max_memberships_per_node,
             min_community_size=settings.global_community_v2_min_size,
         )
-        publishable = _filter_materialized_communities(
-            communities=refined['communities'],
-            memberships=refined['memberships'],
-            min_member_count=settings.global_community_v2_publish_min_size,
-        )
-
         labels = {}
-        for community in publishable['communities']:
+        for community in refined['communities']:
             community_id = str(community.get('community_id') or '').strip()
             core_members = [
                 moves_by_id[member_id]
@@ -357,9 +406,17 @@ def rebuild_global_communities_v2(
             ]
             labels[community_id] = label_community(core_members=core_members, evidence_rows=[])
         labels = disambiguate_community_labels(
-            communities=publishable['communities'],
+            communities=refined['communities'],
             labels=labels,
             moves_by_id=moves_by_id,
+        )
+        publishable = _filter_materialized_communities(
+            communities=refined['communities'],
+            memberships=refined['memberships'],
+            labels=labels,
+            moves_by_id=moves_by_id,
+            min_member_count=settings.global_community_v2_publish_min_size,
+            min_paper_count=settings.global_community_v2_publish_min_papers,
         )
 
         progress('community:write', 0.85, 'Writing global communities to Neo4j')

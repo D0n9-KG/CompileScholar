@@ -11,10 +11,18 @@ _GENERIC_TOKENS = {
     'an',
     'and',
     'approach',
+    'author',
+    'authors',
     'based',
+    'conduct',
+    'conducted',
     'describes',
     'effect',
     'existing',
+    'example',
+    'examples',
+    'experiment',
+    'experiments',
     'for',
     'method',
     'methods',
@@ -31,15 +39,32 @@ _GENERIC_TOKENS = {
     'results',
     'same',
     'study',
+    'single',
     'system',
     'the',
     'this',
     'to',
     'investigate',
     'investigates',
+    'performed',
+    'presented',
+    'presents',
     'uses',
     'using',
     'work',
+}
+_GENERIC_LEAD_TOKENS = {
+    'author',
+    'authors',
+    'paper',
+    'research',
+    'results',
+    'study',
+    'this',
+    'work',
+}
+_GENERIC_TAIL_TOKENS = {
+    'single',
 }
 
 
@@ -60,6 +85,10 @@ def _is_distinctive_phrase(text: object) -> bool:
         return False
     non_generic = [token for token in tokens if token not in _GENERIC_TOKENS]
     if not non_generic:
+        return False
+    if tokens[0] in _GENERIC_LEAD_TOKENS and len(non_generic) < 2:
+        return False
+    if tokens[-1] in _GENERIC_TAIL_TOKENS:
         return False
     if len(tokens) >= 2 and tokens[0] in _GENERIC_TOKENS and len(non_generic) == 1:
         return False

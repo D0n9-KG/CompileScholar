@@ -303,6 +303,43 @@ def test_article_metadata_chunks_are_filtered_before_move_construction(monkeypat
     assert 'keywords:' not in joined
 
 
+def test_noise_like_llm_summary_is_dropped_after_window_extraction(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk('c-1', 'ABSTRACT', 'This paper investigates granular crushing in DEM simulations.', line=1),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'problem',
+                'act_type': 'define_task',
+                'summary': '# Abstract',
+                'anchor_chunk_ids': ['c-1'],
+                'confidence': 0.5,
+            },
+            {
+                'role': 'problem',
+                'act_type': 'define_task',
+                'summary': 'This paper investigates granular crushing in DEM simulations.',
+                'anchor_chunk_ids': ['c-1'],
+                'confidence': 0.6,
+            },
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    summaries = [str(row['summary']) for row in payload['evidence_rows']]
+
+    assert summaries == ['This paper investigates granular crushing in DEM simulations.']
+
+
 def test_research_move_prompt_includes_positive_and_negative_examples() -> None:
     doc = _doc_with_chunks(
         _chunk('c-1', '1. Introduction', 'In this paper, we investigate particle recirculation in granular avalanches.', line=1),
