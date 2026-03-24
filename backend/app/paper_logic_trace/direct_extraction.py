@@ -98,14 +98,42 @@ _PROBLEM_TEXT_PATTERNS = (
     'this paper investigates',
     'this paper studies',
     'this paper addresses',
+    'this paper outlines',
     'we investigate',
     'we study',
     'we address',
     'the aim of this paper',
     'the objective of this paper',
     'the goal of this paper',
+    'the work presented here',
+    'in this study',
+    'in this work',
+    'in this paper, we present investigations',
+    'in this paper we present investigations',
     'challenge',
     'research gap',
+)
+_PROBLEM_SUBJECT_HINTS = (
+    'this paper',
+    'this study',
+    'this work',
+    'in this paper',
+    'in this study',
+    'in this work',
+    'the work presented here',
+    'we present',
+)
+_PROBLEM_PURPOSE_HINTS = (
+    'aims to',
+    'aimed to',
+    'goal is to',
+    'objective is to',
+    'in order to investigate',
+    'in order to study',
+    'to investigate',
+    'to study',
+    'to examine',
+    'to quantify',
 )
 _RESULT_TEXT_PATTERNS = (
     'results show',
@@ -500,12 +528,20 @@ def _role_for_chunk(chunk: Chunk, *, paper_title: object) -> str:
     intro_like = section.startswith('1') or 'introduction' in section or 'background' in section
     pre_section_like = not section or (title and section == title)
     if role == 'background' and (intro_like or pre_section_like):
-        if any(pattern in text for pattern in _PROBLEM_TEXT_PATTERNS):
+        if _looks_like_problem_statement(text):
             return 'problem'
     if role in {'background', 'interpretation', 'experiment'}:
         if any(pattern in text for pattern in _RESULT_TEXT_PATTERNS):
             return 'result'
     return role
+
+
+def _looks_like_problem_statement(text: str) -> bool:
+    if any(pattern in text for pattern in _PROBLEM_TEXT_PATTERNS):
+        return True
+    return any(subject in text for subject in _PROBLEM_SUBJECT_HINTS) and any(
+        hint in text for hint in _PROBLEM_PURPOSE_HINTS
+    )
 
 
 def _promote_role_from_act_type(*, role: str, act_type: str) -> str:
@@ -1023,6 +1059,7 @@ def _build_research_move_prompt(
         'Keep summary concise and factual.\n'
         'Normalize short phrases when obvious, but do not invent domain ontology.\n'
         'Positive example: "This paper investigates ..." or "In this paper, we investigate ..." in an abstract/introduction window usually signals a problem or define_task move.\n'
+        'Positive example: "This paper outlines ... to investigate ..." or "The work presented here ... aims to ..." in an abstract/introduction window usually signals a problem or define_task move.\n'
         'Positive example: "Results show that ..." or "we find that ..." usually signals a result/report_effect move.\n'
         'Positive example: "the mixing degree is higher than the dry mixture baseline" should yield a metric like "mixing degree" and a comparator like "dry mixture baseline".\n'
         'Positive example: "using X-ray microtomography and high-speed camera observations" should populate resource_mentions.\n'

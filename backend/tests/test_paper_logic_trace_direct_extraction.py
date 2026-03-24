@@ -5,6 +5,7 @@ from app.paper_logic_trace.compiler import compile_paper_logic_trace
 from app.paper_logic_trace.direct_extraction import (
     _build_move_relation_rows,
     _build_research_move_prompt,
+    _role_for_chunk,
     build_paper_logic_trace_inputs,
 )
 
@@ -83,6 +84,136 @@ def test_pre_section_task_chunk_under_title_is_promoted_to_problem_role(monkeypa
     roles = {row['role_hint'] for row in payload['evidence_rows']}
 
     assert 'problem' in roles
+
+
+def test_intro_in_this_study_chunk_is_promoted_to_problem_role(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk('c-1', '1. Introduction', 'In this study, we combine X-ray microtomography and DEM to investigate particle packing under compression.', line=1),
+        _chunk('c-2', '2. Method', 'A coupled microtomography-DEM workflow is constructed for the compression stages.', line=2),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    roles = {row['role_hint'] for row in payload['evidence_rows']}
+
+    assert 'problem' in roles
+
+
+def test_intro_work_presented_aims_to_chunk_is_promoted_to_problem_role(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk('c-1', 'ABSTRACT', 'The work presented here aims to quantify how irregular particle shape affects yielding and normal compression.', line=1),
+        _chunk('c-2', '2. Method', 'Irregular particles are introduced into the DEM packing workflow.', line=2),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    roles = {row['role_hint'] for row in payload['evidence_rows']}
+
+    assert 'problem' in roles
+
+
+def test_intro_outlines_technique_to_investigate_chunk_is_promoted_to_problem_role(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '1. Introduction',
+            'This paper outlines a novel technique, based on X-ray microtomography and DEM, to investigate randomly packed particles during powder compaction.',
+            line=1,
+        ),
+        _chunk('c-2', '2. Method', 'The coupled workflow reconstructs packed particle systems from XMT data.', line=2),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    roles = {row['role_hint'] for row in payload['evidence_rows']}
+
+    assert 'problem' in roles
+
+
+def test_intro_work_presented_utilises_model_and_aims_to_chunk_is_promoted_to_problem_role(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '1. Introduction',
+            'The work presented here utilises the same crushing model, but aims to make the next step by introducing irregular particle shape.',
+            line=1,
+        ),
+        _chunk('c-2', '2. Method', 'Irregular particles are represented as clumps in the DEM model.', line=2),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    roles = {row['role_hint'] for row in payload['evidence_rows']}
+
+    assert 'problem' in roles
+
+
+def test_role_for_chunk_promotes_outlines_technique_to_investigate_intro_to_problem() -> None:
+    role = _role_for_chunk(
+        _chunk(
+            'c-1',
+            '1. Introduction',
+            'This paper outlines a novel technique, based on X-ray microtomography and DEM, to investigate randomly packed particles during powder compaction.',
+            line=1,
+        ),
+        paper_title='Demo Paper',
+    )
+
+    assert role == 'problem'
+
+
+def test_role_for_chunk_promotes_work_presented_aims_to_intro_to_problem() -> None:
+    role = _role_for_chunk(
+        _chunk(
+            'c-1',
+            '1. Introduction',
+            'The work presented here utilises the same crushing model, but aims to make the next step by introducing irregular particle shape.',
+            line=1,
+        ),
+        paper_title='Demo Paper',
+    )
+
+    assert role == 'problem'
 
 
 def test_discussion_result_chunk_is_promoted_to_result_role(monkeypatch) -> None:
@@ -359,6 +490,8 @@ def test_research_move_prompt_includes_positive_and_negative_examples() -> None:
     assert 'author line' in lowered
     assert 'received date' in lowered
     assert 'this paper investigates' in lowered
+    assert 'this paper outlines' in lowered
+    assert 'the work presented here' in lowered
 
 
 def test_research_move_prompt_includes_slot_extraction_examples() -> None:
