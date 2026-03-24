@@ -10,12 +10,19 @@ class _FakeClient:
         self.keywords: list[dict] = []
         self.memberships: list[dict] = []
         self.cleared = False
+        self.ready_only_calls: list[bool] = []
 
     def ensure_schema(self) -> None:
         return None
 
-    def list_research_moves(self, paper_id: str | None = None, limit: int = 50000) -> list[dict]:
+    def list_research_moves(
+        self,
+        paper_id: str | None = None,
+        limit: int = 50000,
+        ready_for_community_only: bool = False,
+    ) -> list[dict]:
         del paper_id, limit
+        self.ready_only_calls.append(bool(ready_for_community_only))
         return [
             {
                 'move_id': 'p1:method',
@@ -79,6 +86,7 @@ def test_rebuild_global_communities_v2_materializes_cross_paper_move_clusters() 
     result = rebuild_global_communities_v2(client=client)
 
     assert result['communities'] == 1
+    assert client.ready_only_calls == [True]
     assert client.cleared is True
     assert client.communities[0]['paper_count'] == 3
     assert 'relation-aware graph' in client.communities[0]['title'].lower()
@@ -87,8 +95,14 @@ def test_rebuild_global_communities_v2_materializes_cross_paper_move_clusters() 
 
 
 class _PairOnlyClient(_FakeClient):
-    def list_research_moves(self, paper_id: str | None = None, limit: int = 50000) -> list[dict]:
+    def list_research_moves(
+        self,
+        paper_id: str | None = None,
+        limit: int = 50000,
+        ready_for_community_only: bool = False,
+    ) -> list[dict]:
         del paper_id, limit
+        self.ready_only_calls.append(bool(ready_for_community_only))
         return [
             {
                 'move_id': 'p1:method',
@@ -126,8 +140,14 @@ def test_rebuild_global_communities_v2_does_not_materialize_pair_only_clusters()
 
 
 class _WeakSignalClient(_FakeClient):
-    def list_research_moves(self, paper_id: str | None = None, limit: int = 50000) -> list[dict]:
+    def list_research_moves(
+        self,
+        paper_id: str | None = None,
+        limit: int = 50000,
+        ready_for_community_only: bool = False,
+    ) -> list[dict]:
         del paper_id, limit
+        self.ready_only_calls.append(bool(ready_for_community_only))
         return [
             {
                 'move_id': 'p1:experiment',

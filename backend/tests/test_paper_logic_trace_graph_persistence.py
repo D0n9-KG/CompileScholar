@@ -20,6 +20,7 @@ class _FakeSession:
         self.calls: list[tuple[str, dict]] = []
         self.graph_move_rows: list[dict] = []
         self.graph_anchor_rows: list[dict] = []
+        self.empty_ready_filtered_move_rows = False
 
     def run(self, query: str, **params):
         text = str(query)
@@ -33,6 +34,8 @@ class _FakeSession:
         if "RETURN count(DISTINCT rel) AS cnt" in text:
             return _Result({"cnt": len(list(params.get("rows") or []))})
         if "MATCH (p:Paper)-[:HAS_RESEARCH_MOVE]->(rm:ResearchMove)" in text and "RETURN rm.move_id AS move_id" in text:
+            if self.empty_ready_filtered_move_rows and params.get("ready_for_community_only"):
+                return _Result(rows=[])
             return _Result(rows=list(self.graph_move_rows))
         if "MATCH (ea:EvidenceAnchor)" in text and "RETURN ea.anchor_id AS anchor_id" in text:
             return _Result(rows=list(self.graph_anchor_rows))
@@ -130,6 +133,12 @@ def _sample_trace_payload() -> dict:
         "quality": {
             "quality_tier": "green",
             "audit_status": "not_needed",
+            "l2_completeness_audit": {
+                "ready_for_community": True,
+                "ready_for_l3": True,
+                "ready_for_l4": False,
+                "completeness_score": 0.88,
+            },
         },
     }
 
@@ -145,6 +154,21 @@ def test_upsert_paper_logic_trace_materializes_research_moves_and_evidence_ancho
     assert "MERGE (ea:EvidenceAnchor {anchor_id: r.anchor_id})" in queries
     assert "MERGE (rm)-[er:EVIDENCED_BY]->(ea)" in queries
     assert "MERGE (src)-[rel:MOVE_RELATION {relation_id: r.relation_id}]->(dst)" in queries
+
+
+def test_upsert_paper_logic_trace_writes_readiness_flags_to_paper() -> None:
+    fake_session = _FakeSession()
+    client = _client_with_fake_driver(fake_session)
+
+    client.upsert_paper_logic_trace("paper-1", _sample_trace_payload())
+
+    paper_write = next((params for query, params in fake_session.calls if "SET p.paper_logic_trace_json =" in query), None)
+
+    assert paper_write is not None
+    assert paper_write["ready_for_community"] is True
+    assert paper_write["ready_for_l3"] is True
+    assert paper_write["ready_for_l4"] is False
+    assert paper_write["completeness_score"] == 0.88
 
 
 def test_list_research_moves_prefers_materialized_graph_rows_over_trace_json_fallback() -> None:
@@ -179,6 +203,78 @@ def test_list_research_moves_prefers_materialized_graph_rows_over_trace_json_fal
 
     assert rows[0]["move_id"] == "m-1"
     assert rows[0]["method_tokens"] == ["graph encoder"]
+
+
+def test_list_research_moves_can_filter_ready_for_community_rows() -> None:
+    fake_session = _FakeSession()
+    fake_session.graph_move_rows = [
+        {
+            "move_id": "m-1",
+            "paper_id": "paper-1",
+            "paper_source": "paper-A",
+            "paper_title": "Demo Paper",
+            "role": "method",
+            "act_type": "propose_method",
+            "text": "We propose a graph encoder.",
+            "summary": "We propose a graph encoder.",
+            "sequence_no": 1,
+            "confidence": 0.82,
+            "anchor_ids": ["a-1"],
+            "method_tokens": ["graph encoder"],
+            "object_tokens": ["retrieval graph"],
+            "metric_tokens": ["accuracy"],
+            "condition_tokens": [],
+            "comparator_tokens": [],
+            "effect_directions": ["improve"],
+            "limitation_tokens": [],
+            "resource_tokens": [],
+        }
+    ]
+    client = _client_with_fake_driver(fake_session)
+
+    rows = client.list_research_moves(limit=10, ready_for_community_only=True)
+
+    assert rows[0]["move_id"] == "m-1"
+    query, params = fake_session.calls[-1]
+    assert "coalesce(p.paper_logic_trace_ready_for_community, false) = true" in query
+    assert params["ready_for_community_only"] is True
+
+
+def test_list_research_moves_ready_filter_falls_back_to_legacy_graph_rows_when_flags_absent() -> None:
+    fake_session = _FakeSession()
+    fake_session.graph_move_rows = [
+        {
+            "move_id": "m-1",
+            "paper_id": "paper-1",
+            "paper_source": "paper-A",
+            "paper_title": "Demo Paper",
+            "role": "method",
+            "act_type": "propose_method",
+            "text": "We propose a graph encoder.",
+            "summary": "We propose a graph encoder.",
+            "sequence_no": 1,
+            "confidence": 0.82,
+            "anchor_ids": ["a-1"],
+            "method_tokens": ["graph encoder"],
+            "object_tokens": ["retrieval graph"],
+            "metric_tokens": ["accuracy"],
+            "condition_tokens": [],
+            "comparator_tokens": [],
+            "effect_directions": ["improve"],
+            "limitation_tokens": [],
+            "resource_tokens": [],
+        }
+    ]
+    fake_session.empty_ready_filtered_move_rows = True
+    client = _client_with_fake_driver(fake_session)
+    client.list_paper_logic_trace_rows = lambda *args, **kwargs: []
+
+    rows = client.list_research_moves(limit=10, ready_for_community_only=True)
+
+    assert rows[0]["move_id"] == "m-1"
+    assert len(fake_session.calls) >= 2
+    assert fake_session.calls[0][1]["ready_for_community_only"] is True
+    assert fake_session.calls[1][1]["ready_for_community_only"] is False
 
 
 def test_list_evidence_anchors_prefers_materialized_graph_rows_over_trace_json_fallback() -> None:

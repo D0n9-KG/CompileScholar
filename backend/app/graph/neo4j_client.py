@@ -1142,12 +1142,18 @@ SET p.paper_logic_trace_json = $trace_json,
     p.paper_logic_trace_schema_version = $schema_version,
     p.paper_logic_trace_built_at = $built_at,
     p.paper_logic_trace_quality_tier = $quality_tier,
-    p.paper_logic_trace_audit_status = $audit_status
+    p.paper_logic_trace_audit_status = $audit_status,
+    p.paper_logic_trace_ready_for_community = $ready_for_community,
+    p.paper_logic_trace_ready_for_l3 = $ready_for_l3,
+    p.paper_logic_trace_ready_for_l4 = $ready_for_l4,
+    p.paper_logic_trace_completeness_score = $completeness_score
 """
         payload = dict(trace_payload or {})
         paper_metadata = dict(payload.get("paper_metadata") or {})
         canonical_core = dict(payload.get("canonical_core") or {})
         derived_views = dict(payload.get("derived_views") or {})
+        quality = dict(payload.get("quality") or {})
+        completeness_audit = dict(quality.get("l2_completeness_audit") or {})
         signature_by_move_id = {
             str(item.get("move_id") or "").strip(): dict(item)
             for item in (derived_views.get("community_signatures") or [])
@@ -1333,8 +1339,12 @@ RETURN count(DISTINCT rel) AS cnt
                 trace_json=json.dumps(payload, ensure_ascii=False),
                 schema_version=str(payload.get("schema_version") or ""),
                 built_at=str(payload.get("built_at") or ""),
-                quality_tier=str((payload.get("quality") or {}).get("quality_tier") or ""),
-                audit_status=str((payload.get("quality") or {}).get("audit_status") or ""),
+                quality_tier=str(quality.get("quality_tier") or ""),
+                audit_status=str(quality.get("audit_status") or ""),
+                ready_for_community=bool(completeness_audit.get("ready_for_community") or False),
+                ready_for_l3=bool(completeness_audit.get("ready_for_l3") or False),
+                ready_for_l4=bool(completeness_audit.get("ready_for_l4") or False),
+                completeness_score=float(completeness_audit.get("completeness_score") or 0.0),
             )
             session.run(cleanup_cypher, paper_id=paper_id).single()
             if move_rows:
@@ -1502,10 +1512,16 @@ LIMIT $limit
             )
         return rows
 
-    def list_research_moves(self, paper_id: str | None = None, limit: int = 50000) -> list[dict]:
+    def list_research_moves(
+        self,
+        paper_id: str | None = None,
+        limit: int = 50000,
+        ready_for_community_only: bool = False,
+    ) -> list[dict]:
         cypher = """
 MATCH (p:Paper)-[:HAS_RESEARCH_MOVE]->(rm:ResearchMove)
 WHERE ($paper_id = '' OR p.paper_id = $paper_id)
+  AND (NOT $ready_for_community_only OR coalesce(p.paper_logic_trace_ready_for_community, false) = true)
 OPTIONAL MATCH (rm)-[:EVIDENCED_BY]->(ea:EvidenceAnchor)
 RETURN rm.move_id AS move_id,
        p.paper_id AS paper_id,
@@ -1531,13 +1547,31 @@ LIMIT $limit
 """
         pid = str(paper_id or "").strip()
         safe_limit = max(1, min(50000, int(limit)))
-        with self._driver.session() as session:
-            rows = [dict(r) for r in session.run(cypher, paper_id=pid, limit=safe_limit)]
+
+        def _run_graph_query(*, ready_only: bool) -> list[dict]:
+            with self._driver.session() as session:
+                return [
+                    dict(r)
+                    for r in session.run(
+                        cypher,
+                        paper_id=pid,
+                        limit=safe_limit,
+                        ready_for_community_only=bool(ready_only),
+                    )
+                ]
+
+        rows = _run_graph_query(ready_only=bool(ready_for_community_only))
+        if not rows and ready_for_community_only:
+            rows = _run_graph_query(ready_only=False)
         if rows:
             return rows
 
         fallback_rows: list[dict] = []
         for trace_row in self.list_paper_logic_trace_rows(paper_id=paper_id, limit=limit):
+            if ready_for_community_only:
+                audit = dict(((trace_row.get("trace") or {}).get("quality") or {}).get("l2_completeness_audit") or {})
+                if not bool(audit.get("ready_for_community") or False):
+                    continue
             for move in trace_row.get("research_moves") or []:
                 fallback_rows.append(dict(move))
                 if len(fallback_rows) >= int(limit):

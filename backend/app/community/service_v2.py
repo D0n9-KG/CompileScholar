@@ -322,7 +322,10 @@ def rebuild_global_communities_v2(
         client.ensure_schema()
         progress('community:init', 0.05, 'Preparing global community rebuild v2')
 
-        moves = client.list_research_moves(limit=settings.global_community_max_nodes)
+        moves = client.list_research_moves(
+            limit=settings.global_community_max_nodes,
+            ready_for_community_only=True,
+        )
         for move in moves:
             move['_summary_tokens'] = _tokenize(move.get('summary'))
             move['_signature_tokens'] = _signature_tokens(move) or set(move.get('_summary_tokens') or set())
