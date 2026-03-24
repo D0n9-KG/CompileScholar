@@ -395,3 +395,89 @@ def test_rich_empirical_trace_is_marked_ready_for_l3_and_l4() -> None:
     assert audit['ready_for_community'] is True
     assert audit['ready_for_l3'] is True
     assert audit['ready_for_l4'] is True
+
+
+def test_unknown_trace_without_result_signal_is_not_ready_for_upper_layers() -> None:
+    gate_report = evaluate_hot_path_gate(
+        moves=[
+            ResearchMove(
+                move_id='m-1',
+                sequence_no=1,
+                role='problem',
+                act_type='define_task',
+                summary='We investigate erosion in a mixed pump.',
+                research_objects=[{'surface': 'erosion in a mixed pump'}],
+                anchor_ids=['a-1'],
+                slot_provenance=[{'field': 'research_objects', 'anchor_ids': ['a-1'], 'extraction_mode': 'direct', 'support_strength': 'strong'}],
+            ),
+            ResearchMove(
+                move_id='m-2',
+                sequence_no=2,
+                role='method',
+                act_type='propose_method',
+                summary='We couple CFD and DEM for the pump simulation.',
+                methods=[{'surface': 'CFD-DEM coupled method'}],
+                anchor_ids=['a-2'],
+                slot_provenance=[{'field': 'methods', 'anchor_ids': ['a-2'], 'extraction_mode': 'direct', 'support_strength': 'strong'}],
+            ),
+            ResearchMove(
+                move_id='m-3',
+                sequence_no=3,
+                role='experiment',
+                act_type='run_experiment',
+                summary='The simulation is carried out under several operating conditions.',
+                conditions=[{'surface': 'several operating conditions'}],
+                metrics=[{'surface': 'wear rate'}],
+                comparators=[{'surface': 'different blade regions'}],
+                effects=[{'direction': 'increase'}],
+                anchor_ids=['a-3'],
+                slot_provenance=[
+                    {'field': 'conditions', 'anchor_ids': ['a-3'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                    {'field': 'metrics', 'anchor_ids': ['a-3'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                    {'field': 'comparators', 'anchor_ids': ['a-3'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                    {'field': 'effects', 'anchor_ids': ['a-3'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                ],
+            ),
+        ],
+        anchors=[
+            EvidenceAnchor(
+                anchor_id=anchor_id,
+                paper_id='paper-1',
+                source_ref=f'chunk:{idx}',
+                modality='text',
+                section_path=[],
+                locator={},
+                quote='demo',
+                citation_ids=[],
+                support_type='direct',
+                weak=False,
+            )
+            for idx, anchor_id in enumerate(['a-1', 'a-2', 'a-3'], start=1)
+        ],
+        move_relations=[
+            {
+                'relation_id': 'r-1',
+                'source_move_id': 'm-1',
+                'target_move_id': 'm-2',
+                'relation_type': 'addresses',
+                'anchor_ids': ['a-1'],
+            },
+            {
+                'relation_id': 'r-2',
+                'source_move_id': 'm-2',
+                'target_move_id': 'm-3',
+                'relation_type': 'evaluates',
+                'anchor_ids': ['a-2'],
+            },
+        ],
+        paper_type='unknown',
+    )
+
+    quality = build_quality_payload(gate_report)
+    audit = quality['l2_completeness_audit']
+
+    assert 'limited_role_coverage' in quality['quality_flags']
+    assert audit['ready_for_community'] is True
+    assert audit['ready_for_l3'] is False
+    assert audit['ready_for_l4'] is False
+    assert audit['completeness_score'] < 1.0

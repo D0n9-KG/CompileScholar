@@ -172,6 +172,7 @@ def _l2_completeness_audit(
     expected_roles = list(_EXPECTED_ROLES_BY_PAPER_TYPE.get(str(paper_type or 'unknown'), _EXPECTED_ROLES_BY_PAPER_TYPE['unknown']))
     expected_slots = list(_EXPECTED_SLOTS_BY_PAPER_TYPE.get(str(paper_type or 'unknown'), _EXPECTED_SLOTS_BY_PAPER_TYPE['unknown']))
     missing_expected_roles = sorted(role for role in expected_roles if role not in observed_roles)
+    critical_role_ratio = _safe_ratio(len(set(observed_roles) & _CRITICAL_ROLES), len(_CRITICAL_ROLES))
     missing_l2_slot_fields = [field for field in _CORE_SLOT_FIELDS if slot_counts.get(field, 0) == 0]
     missing_expected_slot_fields = [field for field in expected_slots if slot_counts.get(field, 0) == 0]
     sparse_expected_slot_fields = [
@@ -189,8 +190,15 @@ def _l2_completeness_audit(
         )
     )
     relation_ratio = _relation_coverage(moves, move_relations)
+    has_outcome_signal = any(role in observed_roles for role in ('result', 'interpretation'))
     ready_for_community = signature_ready_move_count >= 3 and (slot_counts.get('methods', 0) > 0 or slot_counts.get('research_objects', 0) > 0)
-    ready_for_l3 = not missing_expected_roles and relation_ratio >= 0.4 and (slot_counts.get('methods', 0) > 0 or slot_counts.get('research_objects', 0) > 0)
+    ready_for_l3 = (
+        not missing_expected_roles
+        and relation_ratio >= 0.4
+        and critical_role_ratio >= 0.67
+        and has_outcome_signal
+        and (slot_counts.get('methods', 0) > 0 or slot_counts.get('research_objects', 0) > 0)
+    )
     evidence_signal_count = sum(1 for field in ('metrics', 'comparators', 'effects') if slot_counts.get(field, 0) > 0)
     context_signal_count = sum(1 for field in ('conditions', 'resource_mentions', 'limitation_types') if slot_counts.get(field, 0) > 0)
     ready_for_l4 = ready_for_l3 and evidence_signal_count >= 2 and context_signal_count >= 1
@@ -199,7 +207,18 @@ def _l2_completeness_audit(
     expected_slot_score = _safe_ratio(len(expected_slots) - len(missing_expected_slot_fields), len(expected_slots))
     sparse_penalty = _safe_ratio(len(sparse_expected_slot_fields), len(expected_slots))
     noise_penalty = _safe_ratio(len(noise_move_ids), move_count)
-    completeness_score = max(0.0, min(1.0, role_score * 0.45 + expected_slot_score * 0.45 + (1.0 - sparse_penalty) * 0.05 + (1.0 - noise_penalty) * 0.05))
+    completeness_score = max(
+        0.0,
+        min(
+            1.0,
+            role_score * 0.30
+            + critical_role_ratio * 0.20
+            + expected_slot_score * 0.35
+            + (1.0 - sparse_penalty) * 0.05
+            + (1.0 - noise_penalty) * 0.05
+            + relation_ratio * 0.05,
+        ),
+    )
 
     return {
         'paper_type': str(paper_type or 'unknown'),
@@ -208,6 +227,7 @@ def _l2_completeness_audit(
         'observed_roles': observed_roles,
         'expected_roles': expected_roles,
         'missing_expected_roles': missing_expected_roles,
+        'critical_role_coverage_ratio': round(critical_role_ratio, 4),
         'slot_counts': slot_counts,
         'slot_move_ratios': slot_move_ratios,
         'missing_l2_slot_fields': missing_l2_slot_fields,
