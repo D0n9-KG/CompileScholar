@@ -220,6 +220,15 @@ _RESOURCE_KEEP_TYPES = {
     'software',
     'tool',
 }
+_GENERIC_LIMITATION_PHRASES = {
+    'assumption',
+    'methodological',
+    'methodological_assumption',
+    'model_assumption',
+    'technique_limitation',
+    'data_processing_error',
+    'validity_boundary',
+}
 _LIMITATION_CUE_WORDS = (
     'cost',
     'costly',
@@ -836,6 +845,59 @@ def _limitation_mentions(text: str, *, limit: int = 2) -> list[dict[str, Any]]:
     return rows
 
 
+def _trim_limitation_phrase(phrase: str) -> str:
+    clean = _normalize_space(phrase).strip(' ,.;:')
+    clean = re.split(r'\b(?:which|that|while|when|because|but|and)\b', clean, maxsplit=1)[0]
+    return _clean_phrase(clean)
+
+
+def _refine_limitation_rows(rows: list[dict[str, Any]], *, text: str) -> list[dict[str, Any]]:
+    lowered_text = _normalize_space(text).lower()
+    prepared: list[tuple[dict[str, Any], str]] = []
+    for row in rows or []:
+        phrase = _normalize_space(row.get('normalized') or row.get('surface') or '').lower()
+        if not phrase:
+            continue
+        if phrase in _GENERIC_LIMITATION_PHRASES:
+            candidate = None
+            assumption_match = re.search(r'assum(?:e|es|ed|ing)\s+(?:that\s+)?([a-z0-9][a-z0-9\-\s]{4,50})', lowered_text)
+            if assumption_match:
+                base = _trim_limitation_phrase(assumption_match.group(1))
+                if base:
+                    candidate = f'{base} assumption'
+            if not candidate:
+                validity_match = re.search(r'valid only\s+(below|above|under)\s+([a-z0-9][a-z0-9\-\s.]{2,25})', lowered_text)
+                if validity_match:
+                    scope = _trim_limitation_phrase(validity_match.group(2))
+                    if scope:
+                        candidate = f'valid only {validity_match.group(1)} {scope}'
+            if not candidate:
+                due_match = re.search(r'due to\s+([a-z0-9][a-z0-9\-\s]{4,40})', lowered_text)
+                if due_match:
+                    base = _trim_limitation_phrase(due_match.group(1))
+                    if base:
+                        candidate = f'due to {base}'
+            if not candidate:
+                req_match = re.search(r'requiring\s+([a-z0-9][a-z0-9\-\s]{4,40})', lowered_text)
+                if req_match:
+                    base = _trim_limitation_phrase(req_match.group(1))
+                    if base:
+                        candidate = f'requiring {base}'
+            if candidate:
+                row = {**row, 'surface': candidate, 'normalized': candidate}
+                phrase = candidate
+        prepared.append((row, phrase))
+
+    seen: set[str] = set()
+    refined: list[dict[str, Any]] = []
+    for row, phrase in prepared:
+        if phrase in seen:
+            continue
+        seen.add(phrase)
+        refined.append(row)
+    return refined
+
+
 def _augment_sparse_slots(
     *,
     text: str,
@@ -1211,6 +1273,10 @@ def _move_rows_from_windows(
             comparators = _normalize_mention_rows(augmented['comparators'], anchor_ids=anchor_chunk_ids)
             comparators = _refine_comparator_rows(comparators)
             limitation_types = _normalize_mention_rows(augmented['limitation_types'], anchor_ids=anchor_chunk_ids)
+            limitation_types = _refine_limitation_rows(
+                limitation_types,
+                text=' '.join([summary, _window_text(window.get('chunks') or [], 1600)]),
+            )
             resource_mentions = _normalize_mention_rows(augmented['resource_mentions'], anchor_ids=anchor_chunk_ids)
             resource_mentions = _refine_resource_rows(resource_mentions)
 

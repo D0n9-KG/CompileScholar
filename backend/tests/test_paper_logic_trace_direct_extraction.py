@@ -639,6 +639,44 @@ def test_result_summary_does_not_turn_generic_challenging_problem_into_limitatio
     assert any('packing fraction' in (item.normalized or item.surface).lower() for item in move.metrics)
 
 
+def test_limitation_summary_refines_generic_assumption_to_specific_phrase(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '5. Limitations',
+            'Analytical micromechanical models assume a homogeneous strain field, which becomes invalid at high relative density.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'limitation',
+                'act_type': 'state_limitation',
+                'summary': 'Analytical micromechanical models assume a homogeneous strain field, which becomes invalid at high relative density.',
+                'anchor_chunk_ids': ['c-1'],
+                'limitation_types': [{'surface': 'assumption'}],
+                'confidence': 0.6,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+    trace = compile_paper_logic_trace(**{k: payload[k] for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']})
+    move = trace.canonical_core.moves[0]
+    limitations = {(item.normalized or item.surface).lower() for item in move.limitation_types}
+
+    assert 'assumption' not in limitations
+    assert any('homogeneous strain field' in item for item in limitations)
+
+
 def test_result_summary_extracts_clean_resource_mentions_without_metric_prefix(monkeypatch) -> None:
     doc = _doc_with_chunks(
         _chunk(
