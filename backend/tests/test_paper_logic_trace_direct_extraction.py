@@ -492,6 +492,7 @@ def test_research_move_prompt_includes_positive_and_negative_examples() -> None:
     assert 'this paper investigates' in lowered
     assert 'this paper outlines' in lowered
     assert 'the work presented here' in lowered
+    assert 'named citations' in lowered
 
 
 def test_research_move_prompt_includes_slot_extraction_examples() -> None:
@@ -678,6 +679,51 @@ def test_result_summary_extracts_clean_resource_mentions_without_metric_prefix(m
     assert any('microtomography' in item for item in resources)
     assert 'optical microscopy' in resources
     assert not any('density' in item for item in resources)
+
+
+def test_result_summary_filters_citation_theory_and_application_resource_noise(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '4. Results',
+            'X-ray microtomography reproduces the packing structure, while prior cone penetrometer testing and Weibull statistics are only discussed as background context.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'result',
+                'act_type': 'report_effect',
+                'summary': 'X-ray microtomography reproduces the packing structure, while prior cone penetrometer testing and Weibull statistics are only discussed as background context.',
+                'anchor_chunk_ids': ['c-1'],
+                'resource_mentions': [
+                    {'surface': 'X-ray microtomography', 'type': 'instrument'},
+                    {'surface': 'McDowell and Bolton [7]', 'type': 'citation'},
+                    {'surface': "Weibull's statistical distribution", 'type': 'theory'},
+                    {'surface': 'cone penetrometer testing', 'type': 'application'},
+                ],
+                'confidence': 0.6,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+    trace = compile_paper_logic_trace(**{k: payload[k] for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']})
+    move = trace.canonical_core.moves[0]
+    resources = {(item.normalized or item.surface).lower() for item in move.resource_mentions}
+
+    assert 'x-ray microtomography' in resources
+    assert not any('mcdowell' in item for item in resources)
+    assert not any('weibull' in item for item in resources)
+    assert not any('cone penetrometer' in item for item in resources)
 
 
 def test_affiliation_summary_with_email_is_filtered_after_llm_extraction(monkeypatch) -> None:

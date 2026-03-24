@@ -206,6 +206,12 @@ _RESOURCE_CUE_WORDS = (
     'tester',
     'tomography',
 )
+_RESOURCE_BAD_TYPES = {
+    'application',
+    'citation',
+    'reference',
+    'theory',
+}
 _LIMITATION_CUE_WORDS = (
     'cost',
     'costly',
@@ -674,6 +680,34 @@ def _resource_mentions_from_text(text: str, *, limit: int = 3) -> list[dict[str,
     return rows
 
 
+def _refine_resource_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    prepared: list[tuple[dict[str, Any], str]] = []
+    for row in rows or []:
+        phrase = _normalize_space(row.get('normalized') or row.get('surface') or '').lower()
+        type_name = _normalize_space(row.get('type') or '').lower()
+        if not phrase:
+            continue
+        if type_name in _RESOURCE_BAD_TYPES:
+            continue
+        if '[' in phrase or ']' in phrase or ' et al' in phrase or ' doi' in phrase:
+            continue
+        prepared.append((row, phrase))
+
+    keep_indices: list[int] = []
+    phrases = [phrase for _, phrase in prepared]
+    for index, phrase in enumerate(phrases):
+        is_subsumed = False
+        for other_index, other in enumerate(phrases):
+            if index == other_index or len(other) <= len(phrase):
+                continue
+            if re.search(rf'(^|\b){re.escape(phrase)}($|\b)', other):
+                is_subsumed = True
+                break
+        if not is_subsumed:
+            keep_indices.append(index)
+    return [prepared[index][0] for index in keep_indices]
+
+
 def _comparator_mentions(text: str, *, limit: int = 2) -> list[dict[str, Any]]:
     lowered = _normalize_space(text).lower()
     rows: list[dict[str, Any]] = []
@@ -1066,6 +1100,7 @@ def _build_research_move_prompt(
         'Positive example: "advanced tracking techniques are expensive because of computational cost" should populate limitation_types such as "computational cost" or "expensive tracking techniques".\n'
         'Negative example: an author line, affiliation line, or received date is front matter and should produce no move.\n'
         'Negative example: image-only markdown or captionless asset references should produce no move.\n'
+        'Negative example: named citations, statistical laws, and application areas are not resource_mentions unless the text explicitly presents them as a tool, platform, dataset, software package, protocol, or instrument.\n'
         'Negative example: do not treat every noun phrase as a metric or resource; only extract them when the text explicitly uses them as an evaluation target, comparator, limitation, tool, platform, or instrument.\n'
     )
     user = (
@@ -1159,6 +1194,7 @@ def _move_rows_from_windows(
             comparators = _refine_comparator_rows(comparators)
             limitation_types = _normalize_mention_rows(augmented['limitation_types'], anchor_ids=anchor_chunk_ids)
             resource_mentions = _normalize_mention_rows(augmented['resource_mentions'], anchor_ids=anchor_chunk_ids)
+            resource_mentions = _refine_resource_rows(resource_mentions)
 
             slot_provenance = [
                 *_slot_provenance_rows('research_objects', research_objects, anchor_ids=anchor_chunk_ids),
