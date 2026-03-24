@@ -1512,6 +1512,40 @@ LIMIT $limit
             )
         return rows
 
+    def backfill_paper_logic_trace_readiness(self, paper_id: str | None = None, limit: int = 50000) -> dict[str, int]:
+        rows: list[dict] = []
+        for trace_row in self.list_paper_logic_trace_rows(paper_id=paper_id, limit=limit):
+            paper_id_value = str(trace_row.get("paper_id") or "").strip()
+            if not paper_id_value:
+                continue
+            trace = dict(trace_row.get("trace") or {})
+            quality = dict(trace.get("quality") or {})
+            audit = dict(quality.get("l2_completeness_audit") or {})
+            rows.append(
+                {
+                    "paper_id": paper_id_value,
+                    "ready_for_community": bool(audit.get("ready_for_community") or False),
+                    "ready_for_l3": bool(audit.get("ready_for_l3") or False),
+                    "ready_for_l4": bool(audit.get("ready_for_l4") or False),
+                    "completeness_score": float(audit.get("completeness_score") or 0.0),
+                }
+            )
+
+        if not rows:
+            return {"updated_papers": 0}
+
+        cypher = """
+UNWIND $rows AS row
+MATCH (p:Paper {paper_id: row.paper_id})
+SET p.paper_logic_trace_ready_for_community = row.ready_for_community,
+    p.paper_logic_trace_ready_for_l3 = row.ready_for_l3,
+    p.paper_logic_trace_ready_for_l4 = row.ready_for_l4,
+    p.paper_logic_trace_completeness_score = row.completeness_score
+"""
+        with self._driver.session() as session:
+            session.run(cypher, rows=rows)
+        return {"updated_papers": len(rows)}
+
     def list_research_moves(
         self,
         paper_id: str | None = None,

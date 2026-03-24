@@ -277,6 +277,28 @@ def test_list_research_moves_ready_filter_falls_back_to_legacy_graph_rows_when_f
     assert fake_session.calls[1][1]["ready_for_community_only"] is False
 
 
+def test_backfill_paper_logic_trace_readiness_writes_flags_from_trace_json() -> None:
+    fake_session = _FakeSession()
+    client = _client_with_fake_driver(fake_session)
+    client.list_paper_logic_trace_rows = lambda *args, **kwargs: [
+        {
+            "paper_id": "paper-1",
+            "trace": _sample_trace_payload(),
+        }
+    ]
+
+    result = client.backfill_paper_logic_trace_readiness(limit=10)
+
+    assert result["updated_papers"] == 1
+    query, params = fake_session.calls[-1]
+    assert "SET p.paper_logic_trace_ready_for_community = row.ready_for_community" in query
+    assert params["rows"][0]["paper_id"] == "paper-1"
+    assert params["rows"][0]["ready_for_community"] is True
+    assert params["rows"][0]["ready_for_l3"] is True
+    assert params["rows"][0]["ready_for_l4"] is False
+    assert params["rows"][0]["completeness_score"] == 0.88
+
+
 def test_list_evidence_anchors_prefers_materialized_graph_rows_over_trace_json_fallback() -> None:
     fake_session = _FakeSession()
     fake_session.graph_anchor_rows = [

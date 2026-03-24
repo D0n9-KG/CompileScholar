@@ -11,9 +11,15 @@ class _FakeClient:
         self.memberships: list[dict] = []
         self.cleared = False
         self.ready_only_calls: list[bool] = []
+        self.backfill_calls = 0
 
     def ensure_schema(self) -> None:
         return None
+
+    def backfill_paper_logic_trace_readiness(self, paper_id: str | None = None, limit: int = 50000) -> dict:
+        del paper_id, limit
+        self.backfill_calls += 1
+        return {'updated_papers': 3}
 
     def list_research_moves(
         self,
@@ -86,6 +92,7 @@ def test_rebuild_global_communities_v2_materializes_cross_paper_move_clusters() 
     result = rebuild_global_communities_v2(client=client)
 
     assert result['communities'] == 1
+    assert client.backfill_calls == 1
     assert client.ready_only_calls == [True]
     assert client.cleared is True
     assert client.communities[0]['paper_count'] == 3

@@ -321,6 +321,7 @@ def rebuild_global_communities_v2(
     try:
         client.ensure_schema()
         progress('community:init', 0.05, 'Preparing global community rebuild v2')
+        client.backfill_paper_logic_trace_readiness()
 
         moves = client.list_research_moves(
             limit=settings.global_community_max_nodes,
