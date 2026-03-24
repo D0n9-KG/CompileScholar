@@ -119,6 +119,70 @@ _RESULT_TEXT_PATTERNS = (
     'increased',
 )
 _CONDITION_CUE_WORDS = ('under', 'with', 'at', 'during')
+_METRIC_CUE_WORDS = (
+    'accuracy',
+    'degree',
+    'density',
+    'dissolution',
+    'error',
+    'force',
+    'fraction',
+    'hardness',
+    'index',
+    'performance',
+    'pressure',
+    'quality',
+    'rate',
+    'ratio',
+    'speed',
+    'strain',
+    'strength',
+    'stress',
+    'uniformity',
+    'velocity',
+    'wear',
+)
+_RESOURCE_BACKTRACK_STOP_TOKENS = {
+    *_STOP_TOKENS,
+    *_METRIC_CUE_WORDS,
+    'measurement',
+    'measurements',
+    'measured',
+    'observed',
+    'observation',
+    'observations',
+    'quantification',
+    'quantified',
+    'quantify',
+}
+_RESOURCE_CUE_WORDS = (
+    'camera',
+    'cell',
+    'drum',
+    'framework',
+    'imaging',
+    'machine',
+    'microscope',
+    'microscopy',
+    'microtomography',
+    'mixer',
+    'platform',
+    'pump',
+    'scanner',
+    'software',
+    'tester',
+    'tomography',
+)
+_LIMITATION_CUE_WORDS = (
+    'cost',
+    'costly',
+    'difficult',
+    'difficulty',
+    'expensive',
+    'limitation',
+    'limitations',
+    'memory',
+)
 _SECTION_ROLE_HINTS: list[tuple[tuple[str, ...], str]] = [
     (('future work', 'future directions', 'future'), 'future_work'),
     (('limitation', 'limitations', 'threats to validity'), 'limitation'),
@@ -394,6 +458,150 @@ def _keyword_mentions(text: str, *, limit: int = 3) -> list[dict[str, Any]]:
     return rows
 
 
+def _clean_phrase(phrase: str) -> str:
+    tokens = [token for token in _WORD_RE.findall(_normalize_space(phrase).lower()) if token]
+    while tokens and tokens[0] in _STOP_TOKENS:
+        tokens.pop(0)
+    while tokens and tokens[-1] in _STOP_TOKENS:
+        tokens.pop()
+    return ' '.join(tokens)
+
+
+def _phrase_suffix_mentions(text: str, *, cue_words: tuple[str, ...], limit: int = 3) -> list[dict[str, Any]]:
+    if not text:
+        return []
+    rows: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for cue in cue_words:
+        pattern = re.compile(
+            rf'\b((?:[a-z0-9-]+\s+){{0,3}}{re.escape(cue)})\b',
+            re.IGNORECASE,
+        )
+        for match in pattern.finditer(text):
+            phrase = _clean_phrase(match.group(1))
+            if not phrase or phrase in seen:
+                continue
+            seen.add(phrase)
+            rows.append({'surface': phrase, 'normalized': phrase})
+            if len(rows) >= limit:
+                return rows
+    return rows
+
+
+def _metric_mentions(text: str, *, limit: int = 3) -> list[dict[str, Any]]:
+    return _phrase_suffix_mentions(text, cue_words=_METRIC_CUE_WORDS, limit=limit)
+
+
+def _resource_mentions_from_text(text: str, *, limit: int = 3) -> list[dict[str, Any]]:
+    tokens = [token.lower() for token in _WORD_RE.findall(_normalize_space(text)) if token]
+    rows: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for index, token in enumerate(tokens):
+        if token not in _RESOURCE_CUE_WORDS:
+            continue
+        start = index
+        while start > 0 and index - start < 3:
+            candidate = tokens[start - 1]
+            if candidate in {'and', 'or'}:
+                break
+            if candidate in _RESOURCE_BACKTRACK_STOP_TOKENS:
+                break
+            start -= 1
+        phrase = _clean_phrase(' '.join(tokens[start : index + 1]))
+        if not phrase or phrase in seen:
+            continue
+        seen.add(phrase)
+        rows.append({'surface': phrase, 'normalized': phrase})
+        if len(rows) >= limit:
+            break
+    return rows
+
+
+def _comparator_mentions(text: str, *, limit: int = 2) -> list[dict[str, Any]]:
+    lowered = _normalize_space(text).lower()
+    rows: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    patterns = (
+        r'\bcompared with\s+([a-z0-9][a-z0-9\-\s]{2,50})',
+        r'\bcompared to\s+([a-z0-9][a-z0-9\-\s]{2,50})',
+        r'\bthan\s+([a-z0-9][a-z0-9\-\s]{2,50})',
+        r'\bunlike\s+([a-z0-9][a-z0-9\-\s]{2,50})',
+        r'\bversus\s+([a-z0-9][a-z0-9\-\s]{2,50})',
+        r'\bvs\.?\s+([a-z0-9][a-z0-9\-\s]{2,50})',
+    )
+    for pattern in patterns:
+        for match in re.finditer(pattern, lowered):
+            phrase = re.split(r'[.,;:()]', match.group(1), maxsplit=1)[0]
+            phrase = _clean_phrase(' '.join(phrase.split()[:5]))
+            if not phrase or phrase in seen:
+                continue
+            seen.add(phrase)
+            rows.append({'surface': phrase, 'normalized': phrase})
+            if len(rows) >= limit:
+                return rows
+    return rows
+
+
+def _limitation_mentions(text: str, *, limit: int = 2) -> list[dict[str, Any]]:
+    lowered = _normalize_space(text).lower()
+    rows: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    patterns = (
+        r'\b([a-z0-9-]+\s+cost)\b',
+        r'\b(memory limitations?)\b',
+        r'\b(difficult to [a-z0-9-]+(?:\s+[a-z0-9-]+){0,2})\b',
+        r'\b(expensive [a-z0-9-]+(?:\s+[a-z0-9-]+){0,2})\b',
+        r'\b(limited [a-z0-9-]+(?:\s+[a-z0-9-]+){0,2})\b',
+    )
+    for pattern in patterns:
+        for match in re.finditer(pattern, lowered):
+            phrase = _clean_phrase(match.group(1))
+            if not phrase or phrase in seen:
+                continue
+            seen.add(phrase)
+            rows.append({'surface': phrase, 'normalized': phrase})
+            if len(rows) >= limit:
+                return rows
+    for cue in _LIMITATION_CUE_WORDS:
+        if cue not in lowered:
+            continue
+        words = [token for token in _WORD_RE.findall(lowered) if token]
+        for index, token in enumerate(words):
+            if token != cue:
+                continue
+            start = max(0, index - 1)
+            end = min(len(words), index + 3)
+            phrase = _clean_phrase(' '.join(words[start:end]))
+            if not phrase or phrase in seen:
+                continue
+            seen.add(phrase)
+            rows.append({'surface': phrase, 'normalized': phrase})
+            if len(rows) >= limit:
+                return rows
+    return rows
+
+
+def _augment_sparse_slots(
+    *,
+    text: str,
+    role: str,
+    metrics: list[dict[str, Any]],
+    comparators: list[dict[str, Any]],
+    limitation_types: list[dict[str, Any]],
+    resource_mentions: list[dict[str, Any]],
+) -> dict[str, list[dict[str, Any]]]:
+    role_token = _normalize_role(role)
+    metric_roles = {'result', 'experiment', 'interpretation'}
+    limitation_roles = {'limitation', 'interpretation', 'result', 'future_work'}
+    resource_roles = {'method', 'experiment', 'result'}
+    return {
+        'metrics': metrics or (_metric_mentions(text, limit=3) if role_token in metric_roles else []),
+        'comparators': comparators or (_comparator_mentions(text, limit=2) if role_token in metric_roles else []),
+        'limitation_types': limitation_types or (_limitation_mentions(text, limit=2) if role_token in limitation_roles else []),
+        'resource_mentions': resource_mentions or (_resource_mentions_from_text(text, limit=3) if role_token in resource_roles else []),
+    }
+
+
 def _condition_mentions(text: str, *, limit: int = 2) -> list[dict[str, Any]]:
     lowered = _normalize_space(text).lower()
     rows: list[dict[str, Any]] = []
@@ -530,6 +738,14 @@ def _fallback_move_payload(window: dict[str, Any]) -> list[dict[str, Any]]:
     methods = _keyword_mentions(summary, limit=2) if role in {'method', 'experiment'} else []
     research_objects = _keyword_mentions(summary, limit=2) if role not in {'method', 'experiment'} else []
     conditions = _condition_mentions(summary, limit=2)
+    augmented = _augment_sparse_slots(
+        text=summary,
+        role=role,
+        metrics=[],
+        comparators=[],
+        limitation_types=_keyword_mentions(summary, limit=2) if role == 'limitation' else [],
+        resource_mentions=[],
+    )
     return [
         {
             'role': role,
@@ -539,11 +755,11 @@ def _fallback_move_payload(window: dict[str, Any]) -> list[dict[str, Any]]:
             'research_objects': research_objects,
             'methods': methods,
             'observed_variables': [],
-            'metrics': [],
-            'comparators': [],
+            'metrics': augmented['metrics'],
+            'comparators': augmented['comparators'],
             'conditions': conditions,
-            'limitation_types': _keyword_mentions(summary, limit=2) if role == 'limitation' else [],
-            'resource_mentions': [],
+            'limitation_types': augmented['limitation_types'],
+            'resource_mentions': augmented['resource_mentions'],
             'effects': [],
             'confidence': 0.0,
         }
@@ -640,8 +856,12 @@ def _build_research_move_prompt(
         'Normalize short phrases when obvious, but do not invent domain ontology.\n'
         'Positive example: "This paper investigates ..." or "In this paper, we investigate ..." in an abstract/introduction window usually signals a problem or define_task move.\n'
         'Positive example: "Results show that ..." or "we find that ..." usually signals a result/report_effect move.\n'
+        'Positive example: "the mixing degree is higher than the dry mixture baseline" should yield a metric like "mixing degree" and a comparator like "dry mixture baseline".\n'
+        'Positive example: "using X-ray microtomography and high-speed camera observations" should populate resource_mentions.\n'
+        'Positive example: "advanced tracking techniques are expensive because of computational cost" should populate limitation_types such as "computational cost" or "expensive tracking techniques".\n'
         'Negative example: an author line, affiliation line, or received date is front matter and should produce no move.\n'
         'Negative example: image-only markdown or captionless asset references should produce no move.\n'
+        'Negative example: do not treat every noun phrase as a metric or resource; only extract them when the text explicitly uses them as an evaluation target, comparator, limitation, tool, platform, or instrument.\n'
     )
     user = (
         f'Paper title: {doc.paper.title or doc.paper.paper_source}\n'
@@ -718,6 +938,21 @@ def _move_rows_from_windows(
             limitation_types = _normalize_mention_rows(raw_move.get('limitation_types'), anchor_ids=anchor_chunk_ids)
             resource_mentions = _normalize_mention_rows(raw_move.get('resource_mentions'), anchor_ids=anchor_chunk_ids)
             effects = _normalize_effect_rows(raw_move.get('effects'), anchor_ids=anchor_chunk_ids)
+            augmented = _augment_sparse_slots(
+                text=' '.join([
+                    summary,
+                    _window_text(window.get('chunks') or [], 1600),
+                ]),
+                role=role,
+                metrics=metrics,
+                comparators=comparators,
+                limitation_types=limitation_types,
+                resource_mentions=resource_mentions,
+            )
+            metrics = _normalize_mention_rows(augmented['metrics'], anchor_ids=anchor_chunk_ids)
+            comparators = _normalize_mention_rows(augmented['comparators'], anchor_ids=anchor_chunk_ids)
+            limitation_types = _normalize_mention_rows(augmented['limitation_types'], anchor_ids=anchor_chunk_ids)
+            resource_mentions = _normalize_mention_rows(augmented['resource_mentions'], anchor_ids=anchor_chunk_ids)
 
             slot_provenance = [
                 *_slot_provenance_rows('research_objects', research_objects, anchor_ids=anchor_chunk_ids),

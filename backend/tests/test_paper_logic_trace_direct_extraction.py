@@ -361,6 +361,192 @@ def test_research_move_prompt_includes_positive_and_negative_examples() -> None:
     assert 'this paper investigates' in lowered
 
 
+def test_research_move_prompt_includes_slot_extraction_examples() -> None:
+    doc = _doc_with_chunks(
+        _chunk('c-1', 'ABSTRACT', 'Results show that the mixing degree is higher than the dry mixture baseline using X-ray microtomography.', line=1),
+    )
+    window = {
+        'role_hint': 'result',
+        'section_path': ['ABSTRACT'],
+        'chunks': [doc.chunks[0]],
+    }
+
+    system, user = _build_research_move_prompt(doc=doc, schema={'rules': {}}, window=window)
+
+    lowered = f'{system}\n{user}'.lower()
+
+    assert 'metric' in lowered
+    assert 'comparator' in lowered
+    assert 'resource_mentions' in lowered
+    assert 'limitation_types' in lowered
+    assert 'mixing degree' in lowered
+    assert 'x-ray microtomography' in lowered
+
+
+def test_sparse_llm_move_is_augmented_with_metric_comparator_limitation_and_resource_slots(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            'ABSTRACT',
+            'Results show that the mixing degree is higher than the dry mixture baseline using X-ray microtomography and high-speed camera observations, but advanced tracking techniques remain expensive because of computational cost.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'result',
+                'act_type': 'report_effect',
+                'summary': 'The mixing degree is higher than the dry mixture baseline using X-ray microtomography and high-speed camera observations, but advanced tracking techniques remain expensive because of computational cost.',
+                'anchor_chunk_ids': ['c-1'],
+                'metrics': [],
+                'comparators': [],
+                'limitation_types': [],
+                'resource_mentions': [],
+                'confidence': 0.6,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+    trace = compile_paper_logic_trace(**{k: payload[k] for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']})
+    move = trace.canonical_core.moves[0]
+
+    assert any('mixing degree' in (item.normalized or item.surface).lower() for item in move.metrics)
+    assert any('dry mixture' in (item.normalized or item.surface).lower() for item in move.comparators)
+    assert any('x-ray microtomography' in (item.normalized or item.surface).lower() for item in move.resource_mentions)
+    assert any('computational cost' in (item.normalized or item.surface).lower() or 'expensive' in (item.normalized or item.surface).lower() for item in move.limitation_types)
+
+
+def test_problem_summary_does_not_gain_noisy_metric_or_limitation_slots(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '1. Introduction',
+            'The packing behavior of particles is of great interest in many practical applications, but a deeper understanding is still needed for this challenging problem.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'problem',
+                'act_type': 'identify_gap',
+                'summary': 'The packing behavior of particles is of great interest in many practical applications, but a deeper understanding is still needed for this challenging problem.',
+                'anchor_chunk_ids': ['c-1'],
+                'metrics': [],
+                'comparators': [],
+                'limitation_types': [],
+                'resource_mentions': [],
+                'confidence': 0.6,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+    trace = compile_paper_logic_trace(**{k: payload[k] for k in payload if k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']})
+    move = trace.canonical_core.moves[0]
+
+    assert move.metrics == []
+    assert move.limitation_types == []
+
+
+def test_result_summary_does_not_turn_generic_challenging_problem_into_limitation(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '4. Results',
+            'Results show that packing fraction remains a challenging problem in powder compaction, while bulk density increases under stronger confinement.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'result',
+                'act_type': 'report_effect',
+                'summary': 'Packing fraction remains a challenging problem in powder compaction, while bulk density increases under stronger confinement.',
+                'anchor_chunk_ids': ['c-1'],
+                'metrics': [],
+                'comparators': [],
+                'limitation_types': [],
+                'resource_mentions': [],
+                'confidence': 0.6,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+    trace = compile_paper_logic_trace(**{k: payload[k] for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']})
+    move = trace.canonical_core.moves[0]
+
+    assert move.limitation_types == []
+    assert any('packing fraction' in (item.normalized or item.surface).lower() for item in move.metrics)
+
+
+def test_result_summary_extracts_clean_resource_mentions_without_metric_prefix(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '4. Results',
+            'Bulk density X-ray microtomography measurements agree with the optical microscopy observations during the compaction test.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'result',
+                'act_type': 'report_effect',
+                'summary': 'Bulk density X-ray microtomography measurements agree with the optical microscopy observations during the compaction test.',
+                'anchor_chunk_ids': ['c-1'],
+                'metrics': [],
+                'comparators': [],
+                'limitation_types': [],
+                'resource_mentions': [],
+                'confidence': 0.6,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+    trace = compile_paper_logic_trace(**{k: payload[k] for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']})
+    move = trace.canonical_core.moves[0]
+    resources = {(item.normalized or item.surface).lower() for item in move.resource_mentions}
+
+    assert any('microtomography' in item for item in resources)
+    assert 'optical microscopy' in resources
+    assert not any('density' in item for item in resources)
+
+
 def test_rich_move_without_model_confidence_gets_non_zero_confidence(monkeypatch) -> None:
     doc = _doc_with_chunks(
         _chunk('c-1', '2. Method', 'We propose a discrete element simulation workflow for crushable sands.', line=1),
