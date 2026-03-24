@@ -19,6 +19,7 @@ from .models import (
     ResearchMove,
     SlotProvenance,
     TableRef,
+    normalize_trace_paper_type,
 )
 
 
@@ -201,7 +202,11 @@ def compile_paper_logic_trace(
     move_relation_rows: list[dict[str, Any]] | None = None,
     built_at: str | None = None,
 ) -> PaperLogicTrace:
-    metadata = PaperMetadata.model_validate(paper_metadata)
+    normalized_metadata = dict(paper_metadata)
+    normalized_metadata['paper_type'] = normalize_trace_paper_type(
+        normalized_metadata.get('paper_type'),
+    )
+    metadata = PaperMetadata.model_validate(normalized_metadata)
     canonical_core = CanonicalCore(
         evidence_anchors=_compile_anchors(evidence_rows),
         moves=_compile_moves(metadata.paper_id, evidence_rows),

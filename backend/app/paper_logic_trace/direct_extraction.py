@@ -7,6 +7,7 @@ from collections import defaultdict
 from typing import Any, Callable
 
 from app.ingest.models import Chunk, DocumentIR
+from app.paper_logic_trace.models import normalize_trace_paper_type
 
 
 logger = logging.getLogger(__name__)
@@ -155,29 +156,103 @@ _CONDITION_CUE_WORDS = ('under', 'with', 'at', 'during')
 _METRIC_CUE_WORDS = (
     'accuracy',
     'degree',
-    'density',
+    'deviation',
+    'deviations',
     'dissolution',
     'error',
-    'force',
     'fraction',
     'hardness',
     'index',
-    'performance',
-    'pressure',
-    'quality',
     'rate',
     'ratio',
-    'speed',
-    'strain',
-    'strength',
-    'stress',
     'uniformity',
-    'velocity',
     'wear',
 )
+_OBSERVED_VARIABLE_CUE_WORDS = (
+    'density',
+    'densities',
+    'displacement',
+    'displacements',
+    'force',
+    'forces',
+    'pressure',
+    'pressures',
+    'rotation',
+    'rotations',
+    'strain',
+    'stresses',
+    'stress',
+    'strength',
+    'strengths',
+    'velocity',
+    'velocities',
+)
+_OBSERVED_VARIABLE_BAD_PREFIXES = (
+    'accuracy of',
+    'how far the',
+    'indicated by',
+    'insight into',
+    'precision of',
+    'results show',
+    'simulation of',
+    'terms of',
+    'they exhibit',
+)
+_OBSERVED_VARIABLE_BAD_TOKENS = {
+    'decrease',
+    'decreased',
+    'exhibit',
+    'exhibiting',
+    'increase',
+    'increased',
+    'indicated',
+    'show',
+    'shows',
+}
+_STRONG_METRIC_TOKENS = {
+    'accuracy',
+    'degree',
+    'deviation',
+    'deviations',
+    'dissolution',
+    'error',
+    'fraction',
+    'hardness',
+    'index',
+    'rate',
+    'ratio',
+    'uniformity',
+    'wear',
+}
+_METRIC_BAD_PREFIXES = (
+    'details on',
+    'detail on',
+    'insight into',
+    'insights into',
+    'measurement of',
+    'until the',
+)
+_METRIC_BAD_TOKENS = {
+    'investigate',
+    'investigation',
+    'occurring',
+    'occur',
+    'exhibit',
+    'exhibits',
+    'exhibiting',
+    'reveals',
+    'reveal',
+}
 _RESOURCE_BACKTRACK_STOP_TOKENS = {
     *_STOP_TOKENS,
     *_METRIC_CUE_WORDS,
+    'density',
+    'densities',
+    'pressure',
+    'pressures',
+    'strain',
+    'stresses',
+    'stress',
     'measurement',
     'measurements',
     'measured',
@@ -674,6 +749,98 @@ def _metric_mentions(text: str, *, limit: int = 3) -> list[dict[str, Any]]:
     return _phrase_suffix_mentions(text, cue_words=_METRIC_CUE_WORDS, limit=limit)
 
 
+def _observed_variable_mentions(text: str, *, limit: int = 3) -> list[dict[str, Any]]:
+    return _phrase_suffix_mentions(text, cue_words=_OBSERVED_VARIABLE_CUE_WORDS, limit=limit)
+
+
+def _refine_observed_variable_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    prepared: list[tuple[dict[str, Any], str]] = []
+    for row in rows or []:
+        phrase = _normalize_space(row.get('normalized') or row.get('surface') or '').lower()
+        if not phrase:
+            continue
+        if any(phrase.startswith(prefix) for prefix in _OBSERVED_VARIABLE_BAD_PREFIXES):
+            continue
+        tokens = phrase.split()
+        if not tokens:
+            continue
+        if any(token in _OBSERVED_VARIABLE_BAD_TOKENS for token in tokens):
+            continue
+        prepared.append((row, phrase))
+
+    keep_indices: list[int] = []
+    phrases = [phrase for _, phrase in prepared]
+    for index, phrase in enumerate(phrases):
+        is_subsumed = False
+        for other_index, other in enumerate(phrases):
+            if index == other_index or len(other) <= len(phrase):
+                continue
+            if re.search(rf'(^|\\b){re.escape(phrase)}($|\\b)', other):
+                is_subsumed = True
+                break
+        if not is_subsumed:
+            keep_indices.append(index)
+    return [prepared[index][0] for index in keep_indices]
+
+
+def _refine_metric_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    prepared: list[tuple[dict[str, Any], str]] = []
+    for row in rows or []:
+        phrase = _normalize_space(row.get('normalized') or row.get('surface') or '').lower()
+        if not phrase:
+            continue
+        if any(phrase.startswith(prefix) for prefix in _METRIC_BAD_PREFIXES):
+            continue
+        tokens = phrase.split()
+        if not tokens:
+            continue
+        if any(token in _METRIC_BAD_TOKENS for token in tokens):
+            continue
+        prepared.append((row, phrase))
+
+    keep_indices: list[int] = []
+    phrases = [phrase for _, phrase in prepared]
+    for index, phrase in enumerate(phrases):
+        is_subsumed = False
+        for other_index, other in enumerate(phrases):
+            if index == other_index or len(other) <= len(phrase):
+                continue
+            if re.search(rf'(^|\\b){re.escape(phrase)}($|\\b)', other):
+                is_subsumed = True
+                break
+        if not is_subsumed:
+            keep_indices.append(index)
+    return [prepared[index][0] for index in keep_indices]
+
+
+def _reclassify_physical_metric_rows(
+    *,
+    metrics: list[dict[str, Any]],
+    observed_variables: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    observed_rows = list(observed_variables or [])
+    kept_metrics: list[dict[str, Any]] = []
+    observed_seen = {
+        _normalize_space(row.get('normalized') or row.get('surface') or '').lower()
+        for row in observed_rows
+        if _normalize_space(row.get('normalized') or row.get('surface') or '')
+    }
+    for row in metrics or []:
+        phrase = _normalize_space(row.get('normalized') or row.get('surface') or '').lower()
+        tokens = phrase.split()
+        if (
+            tokens
+            and any(token in _OBSERVED_VARIABLE_CUE_WORDS for token in tokens)
+            and not any(token in _STRONG_METRIC_TOKENS for token in tokens)
+        ):
+            if phrase and phrase not in observed_seen:
+                observed_rows.append(dict(row))
+                observed_seen.add(phrase)
+            continue
+        kept_metrics.append(row)
+    return observed_rows, kept_metrics
+
+
 def _resource_mentions_from_text(text: str, *, limit: int = 3) -> list[dict[str, Any]]:
     tokens = [token.lower() for token in _WORD_RE.findall(_normalize_space(text)) if token]
     rows: list[dict[str, Any]] = []
@@ -912,6 +1079,7 @@ def _augment_sparse_slots(
     *,
     text: str,
     role: str,
+    observed_variables: list[dict[str, Any]],
     metrics: list[dict[str, Any]],
     comparators: list[dict[str, Any]],
     limitation_types: list[dict[str, Any]],
@@ -919,10 +1087,12 @@ def _augment_sparse_slots(
 ) -> dict[str, list[dict[str, Any]]]:
     role_token = _normalize_role(role)
     metric_roles = {'result', 'experiment', 'interpretation'}
+    observed_variable_roles = {'experiment', 'result', 'interpretation', 'method'}
     limitation_roles = {'limitation', 'interpretation', 'result', 'future_work'}
     resource_roles = {'method', 'experiment', 'result'}
     heuristic_comparators = _comparator_mentions(text, limit=3) if role_token in metric_roles else []
     return {
+        'observed_variables': observed_variables or (_observed_variable_mentions(text, limit=3) if role_token in observed_variable_roles else []),
         'metrics': metrics or (_metric_mentions(text, limit=3) if role_token in metric_roles else []),
         'comparators': _merge_raw_mention_rows(comparators, heuristic_comparators),
         'limitation_types': limitation_types or (_limitation_mentions(text, limit=2) if role_token in limitation_roles else []),
@@ -1069,6 +1239,7 @@ def _fallback_move_payload(window: dict[str, Any]) -> list[dict[str, Any]]:
     augmented = _augment_sparse_slots(
         text=summary,
         role=role,
+        observed_variables=[],
         metrics=[],
         comparators=[],
         limitation_types=_keyword_mentions(summary, limit=2) if role == 'limitation' else [],
@@ -1082,7 +1253,7 @@ def _fallback_move_payload(window: dict[str, Any]) -> list[dict[str, Any]]:
             'anchor_chunk_ids': anchor_chunk_ids,
             'research_objects': research_objects,
             'methods': methods,
-            'observed_variables': [],
+            'observed_variables': augmented['observed_variables'],
             'metrics': augmented['metrics'],
             'comparators': augmented['comparators'],
             'conditions': conditions,
@@ -1274,12 +1445,21 @@ def _move_rows_from_windows(
                     _window_text(window.get('chunks') or [], 1600),
                 ]),
                 role=role,
+                observed_variables=observed_variables,
                 metrics=metrics,
                 comparators=comparators,
                 limitation_types=limitation_types,
                 resource_mentions=resource_mentions,
             )
+            observed_variables = _normalize_mention_rows(augmented['observed_variables'], anchor_ids=anchor_chunk_ids)
+            observed_variables = _refine_observed_variable_rows(observed_variables)
             metrics = _normalize_mention_rows(augmented['metrics'], anchor_ids=anchor_chunk_ids)
+            metrics = _refine_metric_rows(metrics)
+            observed_variables, metrics = _reclassify_physical_metric_rows(
+                metrics=metrics,
+                observed_variables=observed_variables,
+            )
+            observed_variables = _refine_observed_variable_rows(observed_variables)
             comparators = _normalize_mention_rows(augmented['comparators'], anchor_ids=anchor_chunk_ids)
             comparators = _refine_comparator_rows(comparators)
             limitation_types = _normalize_mention_rows(augmented['limitation_types'], anchor_ids=anchor_chunk_ids)
@@ -1593,7 +1773,10 @@ def build_paper_logic_trace_inputs(
         'title': doc.paper.title or paper_id,
         'year': doc.paper.year,
         'authors': list(doc.paper.authors or []),
-        'paper_type': str(doc.paper.paper_type or 'unknown'),
+        'paper_type': normalize_trace_paper_type(
+            doc.paper.paper_type,
+            schema.get('paper_type'),
+        ),
         'source_refs': [chunk.chunk_id for chunk in doc.chunks if str(chunk.chunk_id or '').strip()],
     }
     return {

@@ -188,6 +188,42 @@ def test_intro_work_presented_utilises_model_and_aims_to_chunk_is_promoted_to_pr
     assert 'problem' in roles
 
 
+def test_build_inputs_uses_schema_paper_type_when_doc_type_missing(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk('c-1', '1. Introduction', 'We investigate particle crushing prediction under high stress conditions.', line=1),
+        _chunk('c-2', '2. Method', 'We propose a discrete element simulation workflow.', line=2),
+    )
+    doc = DocumentIR(
+        paper=PaperDraft(
+            paper_source=doc.paper.paper_source,
+            md_path=doc.paper.md_path,
+            title=doc.paper.title,
+            title_alt=doc.paper.title_alt,
+            authors=doc.paper.authors,
+            doi=doc.paper.doi,
+            year=doc.paper.year,
+            paper_type=None,
+        ),
+        chunks=doc.chunks,
+        references=doc.references,
+        citations=doc.citations,
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'paper_type': 'research', 'rules': {}},
+    )
+
+    assert payload['paper_metadata']['paper_type'] == 'empirical'
+
+
 def test_role_for_chunk_promotes_outlines_technique_to_investigate_intro_to_problem() -> None:
     role = _role_for_chunk(
         _chunk(
@@ -717,6 +753,296 @@ def test_result_summary_extracts_clean_resource_mentions_without_metric_prefix(m
     assert any('microtomography' in item for item in resources)
     assert 'optical microscopy' in resources
     assert not any('density' in item for item in resources)
+
+
+def test_experiment_summary_does_not_turn_generic_performance_phrase_into_metric(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '4. Experiments',
+            'This reveals details on the performance of the technique for different grain shapes and insight into the differences in the grain-scale mechanisms occurring in these two sands as they exhibit strain localisation under triaxial loading.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'experiment',
+                'act_type': 'run_experiment',
+                'summary': 'This reveals details on the performance of the technique for different grain shapes and insight into the differences in the grain-scale mechanisms occurring in these two sands as they exhibit strain localisation under triaxial loading.',
+                'anchor_chunk_ids': ['c-1'],
+                'metrics': [],
+                'comparators': [],
+                'limitation_types': [],
+                'resource_mentions': [],
+                'confidence': 0.6,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+    trace = compile_paper_logic_trace(**{k: payload[k] for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']})
+    move = trace.canonical_core.moves[0]
+    metrics = {(item.normalized or item.surface).lower() for item in move.metrics}
+
+    assert metrics == set()
+
+
+def test_result_summary_preserves_standard_deviation_metric(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '4. Results',
+            'The measurement of rotations is relatively accurate, with distributions centered on the imposed 4.7 degrees, but not precise, as shown by large standard deviations.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'result',
+                'act_type': 'report_effect',
+                'summary': 'The measurement of rotations is relatively accurate, with distributions centered on the imposed 4.7 degrees, but not precise, as shown by large standard deviations.',
+                'anchor_chunk_ids': ['c-1'],
+                'metrics': [],
+                'comparators': [],
+                'limitation_types': [],
+                'resource_mentions': [],
+                'confidence': 0.6,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+    trace = compile_paper_logic_trace(**{k: payload[k] for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']})
+    move = trace.canonical_core.moves[0]
+    metrics = {(item.normalized or item.surface).lower() for item in move.metrics}
+
+    assert any('standard deviation' in item for item in metrics)
+
+
+def test_limitation_summary_does_not_treat_measurement_of_quantities_as_metrics(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '5. Limitations',
+            'The technique measures rotations less precisely and reliably than Discrete DIC over a smaller range, and the measurement of displacements and rotations should be interpreted carefully.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'limitation',
+                'act_type': 'state_limitation',
+                'summary': 'The technique measures rotations less precisely and reliably than Discrete DIC over a smaller range, and the measurement of displacements and rotations should be interpreted carefully.',
+                'anchor_chunk_ids': ['c-1'],
+                'metrics': [{'surface': 'measurement of displacements'}, {'surface': 'measurement of rotations'}],
+                'comparators': [],
+                'limitation_types': [],
+                'resource_mentions': [],
+                'confidence': 0.6,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+    trace = compile_paper_logic_trace(**{k: payload[k] for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']})
+    move = trace.canonical_core.moves[0]
+    metrics = {(item.normalized or item.surface).lower() for item in move.metrics}
+
+    assert 'measurement of displacements' not in metrics
+    assert 'measurement of rotations' not in metrics
+
+
+def test_experiment_summary_prefers_observed_variables_for_physical_quantities(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '4. Experiments',
+            'The experiment tracks grain displacements and rotations during strain localisation under triaxial loading.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'experiment',
+                'act_type': 'run_experiment',
+                'summary': 'The experiment tracks grain displacements and rotations during strain localisation under triaxial loading.',
+                'anchor_chunk_ids': ['c-1'],
+                'observed_variables': [],
+                'metrics': [],
+                'comparators': [],
+                'limitation_types': [],
+                'resource_mentions': [],
+                'confidence': 0.6,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+    trace = compile_paper_logic_trace(**{k: payload[k] for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']})
+    move = trace.canonical_core.moves[0]
+    observed = {(item.normalized or item.surface).lower() for item in move.observed_variables}
+    metrics = {(item.normalized or item.surface).lower() for item in move.metrics}
+
+    assert any('displacements' in item or 'rotations' in item or 'strain localisation' in item for item in observed)
+    assert metrics == set()
+
+
+def test_experiment_summary_filters_pronoun_clause_observed_variable_noise(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '4. Experiments',
+            'This reveals insight into the differences in the two sands as they exhibit strain localisation under triaxial loading.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'experiment',
+                'act_type': 'run_experiment',
+                'summary': 'This reveals insight into the differences in the two sands as they exhibit strain localisation under triaxial loading.',
+                'anchor_chunk_ids': ['c-1'],
+                'observed_variables': [],
+                'metrics': [],
+                'comparators': [],
+                'limitation_types': [],
+                'resource_mentions': [],
+                'confidence': 0.6,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+    trace = compile_paper_logic_trace(**{k: payload[k] for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']})
+    move = trace.canonical_core.moves[0]
+    observed = {(item.normalized or item.surface).lower() for item in move.observed_variables}
+
+    assert 'they exhibit strain' not in observed
+
+
+def test_method_summary_filters_observed_variable_clause_noise(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '3. Method',
+            'The method weights candidate matches by how far the displacement is from the neighborhood median.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'method',
+                'act_type': 'propose_method',
+                'summary': 'The method weights candidate matches by how far the displacement is from the neighborhood median.',
+                'anchor_chunk_ids': ['c-1'],
+                'observed_variables': [{'surface': 'how far the displacement'}],
+                'metrics': [],
+                'comparators': [],
+                'limitation_types': [],
+                'resource_mentions': [],
+                'confidence': 0.6,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+    trace = compile_paper_logic_trace(**{k: payload[k] for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']})
+    move = trace.canonical_core.moves[0]
+    observed = {(item.normalized or item.surface).lower() for item in move.observed_variables}
+
+    assert 'how far the displacement' not in observed
+
+
+def test_result_summary_moves_physical_quantity_from_metric_to_observed_variable(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '4. Results',
+            'The results show increased rotation variability together with a large standard deviation.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'result',
+                'act_type': 'report_effect',
+                'summary': 'The results show increased rotation variability together with a large standard deviation.',
+                'anchor_chunk_ids': ['c-1'],
+                'observed_variables': [],
+                'metrics': [{'surface': 'rotation'}, {'surface': 'standard deviation'}],
+                'comparators': [],
+                'limitation_types': [],
+                'resource_mentions': [],
+                'confidence': 0.6,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+    trace = compile_paper_logic_trace(**{k: payload[k] for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']})
+    move = trace.canonical_core.moves[0]
+    observed = {(item.normalized or item.surface).lower() for item in move.observed_variables}
+    metrics = {(item.normalized or item.surface).lower() for item in move.metrics}
+
+    assert 'rotation' in observed
+    assert 'rotation' not in metrics
+    assert any('standard deviation' in item for item in metrics)
 
 
 def test_result_summary_filters_citation_theory_and_application_resource_noise(monkeypatch) -> None:

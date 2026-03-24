@@ -208,7 +208,7 @@ def build_route_feature_candidates(moves: list[ResearchMove]) -> list[dict[str, 
             candidates.append(
                 {
                     'move_id': move.move_id,
-                    'feature_type': 'method_candidate',
+                    'candidate_type': 'method_candidate',
                     'tokens': _mention_tokens(move.methods),
                     'anchor_ids': list(move.anchor_ids),
                 }
@@ -217,8 +217,17 @@ def build_route_feature_candidates(moves: list[ResearchMove]) -> list[dict[str, 
             candidates.append(
                 {
                     'move_id': move.move_id,
-                    'feature_type': 'metric_candidate',
+                    'candidate_type': 'metric_candidate',
                     'tokens': _mention_tokens(move.metrics),
+                    'anchor_ids': list(move.anchor_ids),
+                }
+            )
+        if move.comparators:
+            candidates.append(
+                {
+                    'move_id': move.move_id,
+                    'candidate_type': 'comparison_candidate',
+                    'tokens': _mention_tokens(move.comparators),
                     'anchor_ids': list(move.anchor_ids),
                 }
             )
@@ -226,8 +235,31 @@ def build_route_feature_candidates(moves: list[ResearchMove]) -> list[dict[str, 
             candidates.append(
                 {
                     'move_id': move.move_id,
-                    'feature_type': 'condition_candidate',
+                    'candidate_type': 'condition_candidate',
                     'tokens': _mention_tokens(move.conditions),
+                    'anchor_ids': list(move.anchor_ids),
+                }
+            )
+        benchmark_tokens = [
+            _mention_token(mention)
+            for mention in move.resource_mentions
+            if str(mention.type or '').strip().lower() == 'benchmark' and _mention_token(mention)
+        ]
+        if benchmark_tokens:
+            candidates.append(
+                {
+                    'move_id': move.move_id,
+                    'candidate_type': 'benchmark_candidate',
+                    'tokens': _unique(benchmark_tokens),
+                    'anchor_ids': list(move.anchor_ids),
+                }
+            )
+        if move.limitation_types:
+            candidates.append(
+                {
+                    'move_id': move.move_id,
+                    'candidate_type': 'limitation_candidate',
+                    'tokens': _mention_tokens(move.limitation_types),
                     'anchor_ids': list(move.anchor_ids),
                 }
             )

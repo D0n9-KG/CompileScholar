@@ -50,6 +50,13 @@ def _build_move() -> ResearchMove:
                 anchor_ids=['a-4'],
             )
         ],
+        limitation_types=[
+            MentionValue(
+                surface='computational cost',
+                normalized='computational cost',
+                anchor_ids=['a-6'],
+            )
+        ],
         resource_mentions=[
             MentionValue(
                 surface='WN18RR',
@@ -83,10 +90,19 @@ def test_build_community_signatures_uses_move_slots_not_raw_summary() -> None:
 
 def test_build_route_feature_candidates_points_back_to_canonical_moves() -> None:
     candidates = build_route_feature_candidates([_build_move()])
+    candidate_types = {candidate['candidate_type'] for candidate in candidates}
 
     assert candidates[0]['move_id'] == 'm-1'
-    assert candidates[0]['feature_type'] == 'method_candidate'
-    assert 'graph neural network' in candidates[0]['tokens']
+    assert 'method_candidate' in candidate_types
+    assert 'metric_candidate' in candidate_types
+    assert 'condition_candidate' in candidate_types
+    assert 'comparison_candidate' in candidate_types
+    assert 'benchmark_candidate' in candidate_types
+    assert 'limitation_candidate' in candidate_types
+    assert any(
+        candidate['candidate_type'] == 'benchmark_candidate' and 'wn18rr' in candidate['tokens']
+        for candidate in candidates
+    )
 
 
 def test_build_l1_bridge_hints_preserves_provenance_refs() -> None:

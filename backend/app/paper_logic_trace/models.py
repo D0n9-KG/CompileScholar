@@ -32,6 +32,26 @@ EffectDirection = Literal['increase', 'decrease', 'improve', 'worsen', 'mixed', 
 AuditState = Literal['hot_path', 'audited']
 MoveRelationType = Literal['motivates', 'addresses', 'implements', 'evaluates', 'yields', 'explains', 'limits', 'extends']
 
+_TRACE_PAPER_TYPE_MAP: dict[str, PaperType] = {
+    'benchmark': 'benchmark',
+    'case_study': 'case_study',
+    'empirical': 'empirical',
+    'research': 'empirical',
+    'review': 'review',
+    'software': 'software',
+    'theoretical': 'theoretical',
+    'unknown': 'unknown',
+}
+
+
+def normalize_trace_paper_type(*values: object) -> PaperType:
+    for value in values:
+        token = str(value or '').strip().lower().replace(' ', '_')
+        normalized = _TRACE_PAPER_TYPE_MAP.get(token)
+        if normalized:
+            return normalized
+    return 'unknown'
+
 
 class PaperMetadata(BaseModel):
     paper_id: str
