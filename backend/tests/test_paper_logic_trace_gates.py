@@ -476,9 +476,71 @@ def test_unknown_trace_without_result_signal_is_not_ready_for_upper_layers() -> 
     quality = build_quality_payload(gate_report)
     audit = quality['l2_completeness_audit']
 
-    assert 'limited_role_coverage' in quality['quality_flags']
-    assert quality['quality_tier'] == 'yellow'
+    assert quality['quality_tier'] == 'green'
     assert audit['ready_for_community'] is True
     assert audit['ready_for_l3'] is False
     assert audit['ready_for_l4'] is False
-    assert audit['completeness_score'] < 1.0
+    assert audit['completeness_score'] == 1.0
+
+
+def test_software_trace_does_not_require_result_role_for_green_quality() -> None:
+    gate_report = evaluate_hot_path_gate(
+        moves=[
+            ResearchMove(
+                move_id='m-1',
+                sequence_no=1,
+                role='problem',
+                act_type='define_task',
+                summary='We introduce an open-source DEM platform for granular simulation workflows.',
+                research_objects=[{'surface': 'granular simulation workflows'}],
+                anchor_ids=['a-1'],
+                slot_provenance=[{'field': 'research_objects', 'anchor_ids': ['a-1'], 'extraction_mode': 'direct', 'support_strength': 'strong'}],
+            ),
+            ResearchMove(
+                move_id='m-2',
+                sequence_no=2,
+                role='method',
+                act_type='build_resource',
+                summary='The software provides a discrete element engine and reusable scripting interfaces.',
+                methods=[{'surface': 'discrete element engine'}],
+                resource_mentions=[{'surface': 'open-source software'}],
+                anchor_ids=['a-2'],
+                slot_provenance=[
+                    {'field': 'methods', 'anchor_ids': ['a-2'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                    {'field': 'resource_mentions', 'anchor_ids': ['a-2'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                ],
+            ),
+        ],
+        anchors=[
+            EvidenceAnchor(
+                anchor_id=anchor_id,
+                paper_id='paper-1',
+                source_ref=f'chunk:{idx}',
+                modality='text',
+                section_path=[],
+                locator={},
+                quote='demo',
+                citation_ids=[],
+                support_type='direct',
+                weak=False,
+            )
+            for idx, anchor_id in enumerate(['a-1', 'a-2'], start=1)
+        ],
+        move_relations=[
+            {
+                'relation_id': 'r-1',
+                'source_move_id': 'm-1',
+                'target_move_id': 'm-2',
+                'relation_type': 'addresses',
+                'anchor_ids': ['a-1'],
+            },
+        ],
+        paper_type='software',
+    )
+
+    quality = build_quality_payload(gate_report)
+    audit = quality['l2_completeness_audit']
+
+    assert quality['quality_tier'] == 'green'
+    assert audit['missing_expected_roles'] == []
+    assert audit['ready_for_l3'] is True

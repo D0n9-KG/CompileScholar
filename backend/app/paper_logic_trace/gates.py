@@ -16,7 +16,6 @@ _CORE_SLOT_FIELDS = (
     'limitation_types',
     'resource_mentions',
 )
-_CRITICAL_ROLES = {'problem', 'method', 'result'}
 _GREEN_THRESHOLD = 0.78
 _YELLOW_THRESHOLD = 0.38
 _QUALITY_NOISE_PREFIXES = (
@@ -91,6 +90,7 @@ def _quality_score(
     anchors: list[EvidenceAnchor],
     move_relations: list[MoveRelation],
     invalid_move_ids: list[str],
+    paper_type: str,
 ) -> tuple[float, dict[str, float]]:
     valid_move_count = max(0, len(moves) - len(invalid_move_ids))
     valid_move_ratio = _safe_ratio(valid_move_count, len(moves))
@@ -98,7 +98,8 @@ def _quality_score(
     anchor_ratio = _anchor_density(moves, anchors)
     summary_ratio = _safe_ratio(sum(1 for move in moves if _summary_ready(move)), len(moves))
     slot_ready_ratio = _safe_ratio(sum(1 for move in moves if _has_core_slot_signal(move)), len(moves))
-    role_ratio = _safe_ratio(len({str(move.role) for move in moves} & _CRITICAL_ROLES), len(_CRITICAL_ROLES))
+    expected_roles = set(_EXPECTED_ROLES_BY_PAPER_TYPE.get(str(paper_type or 'unknown'), _EXPECTED_ROLES_BY_PAPER_TYPE['unknown']))
+    role_ratio = _safe_ratio(len({str(move.role) for move in moves} & expected_roles), len(expected_roles))
     relation_ratio = _relation_coverage(moves, move_relations)
     provenance_ratio = _safe_ratio(sum(1 for move in moves if move.slot_provenance), len(moves))
 
@@ -151,6 +152,10 @@ def _looks_like_noise_summary(summary: str) -> bool:
     return normalized.startswith('#') and len(normalized.split()) <= 6
 
 
+def is_noise_summary(summary: str) -> bool:
+    return _looks_like_noise_summary(summary)
+
+
 def _l2_completeness_audit(
     *,
     moves: list[ResearchMove],
@@ -172,7 +177,8 @@ def _l2_completeness_audit(
     expected_roles = list(_EXPECTED_ROLES_BY_PAPER_TYPE.get(str(paper_type or 'unknown'), _EXPECTED_ROLES_BY_PAPER_TYPE['unknown']))
     expected_slots = list(_EXPECTED_SLOTS_BY_PAPER_TYPE.get(str(paper_type or 'unknown'), _EXPECTED_SLOTS_BY_PAPER_TYPE['unknown']))
     missing_expected_roles = sorted(role for role in expected_roles if role not in observed_roles)
-    critical_role_ratio = _safe_ratio(len(set(observed_roles) & _CRITICAL_ROLES), len(_CRITICAL_ROLES))
+    expected_role_set = set(expected_roles)
+    critical_role_ratio = _safe_ratio(len(set(observed_roles) & expected_role_set), len(expected_role_set))
     missing_l2_slot_fields = [field for field in _CORE_SLOT_FIELDS if slot_counts.get(field, 0) == 0]
     missing_expected_slot_fields = [field for field in expected_slots if slot_counts.get(field, 0) == 0]
     sparse_expected_slot_fields = [
@@ -191,12 +197,13 @@ def _l2_completeness_audit(
     )
     relation_ratio = _relation_coverage(moves, move_relations)
     has_outcome_signal = any(role in observed_roles for role in ('result', 'interpretation'))
+    requires_outcome_signal = str(paper_type or 'unknown') not in {'software'}
     ready_for_community = signature_ready_move_count >= 3 and (slot_counts.get('methods', 0) > 0 or slot_counts.get('research_objects', 0) > 0)
     ready_for_l3 = (
         not missing_expected_roles
         and relation_ratio >= 0.4
         and critical_role_ratio >= 0.67
-        and has_outcome_signal
+        and (has_outcome_signal or not requires_outcome_signal)
         and (slot_counts.get('methods', 0) > 0 or slot_counts.get('research_objects', 0) > 0)
     )
     evidence_signal_count = sum(1 for field in ('metrics', 'comparators', 'effects') if slot_counts.get(field, 0) > 0)
@@ -277,6 +284,7 @@ def evaluate_hot_path_gate(
         anchors=anchors,
         move_relations=move_relations,
         invalid_move_ids=invalid_move_ids,
+        paper_type=paper_type,
     )
     completeness_audit = _l2_completeness_audit(
         moves=moves,

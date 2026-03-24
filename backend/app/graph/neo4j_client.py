@@ -13,6 +13,9 @@ from neo4j import GraphDatabase
 from app.citations.models import derive_polarity, derive_semantic_signals, derive_target_scopes
 from app.graph.textbook_graph import build_community_rows, sample_connected_graph_rows
 from app.ingest.models import DocumentIR
+from app.paper_logic_trace.derived_views import build_derived_views
+from app.paper_logic_trace.gates import build_quality_payload, evaluate_hot_path_gate, is_noise_summary
+from app.paper_logic_trace.models import EvidenceAnchor, MoveRelation, PaperLogicTrace, ResearchMove
 from app.settings import settings
 
 
@@ -1519,11 +1522,64 @@ LIMIT $limit
             if not paper_id_value:
                 continue
             trace = dict(trace_row.get("trace") or {})
-            quality = dict(trace.get("quality") or {})
+            canonical_core = dict(trace.get("canonical_core") or {})
+            moves = [ResearchMove.model_validate(item) for item in list(canonical_core.get("moves") or [])]
+            anchors = [EvidenceAnchor.model_validate(item) for item in list(canonical_core.get("evidence_anchors") or [])]
+            move_relations = [MoveRelation.model_validate(item) for item in list(canonical_core.get("move_relations") or [])]
+            paper_metadata = dict(trace.get("paper_metadata") or {})
+            initial_gate_report = evaluate_hot_path_gate(
+                moves=moves,
+                anchors=anchors,
+                move_relations=move_relations,
+                paper_type=str(paper_metadata.get("paper_type") or "unknown"),
+            )
+            noise_move_ids = set((initial_gate_report.get("l2_completeness_audit") or {}).get("noise_move_ids") or [])
+            if noise_move_ids:
+                moves = [move for move in moves if move.move_id not in noise_move_ids]
+                kept_move_ids = {move.move_id for move in moves}
+                move_relations = [
+                    relation
+                    for relation in move_relations
+                    if relation.source_move_id in kept_move_ids and relation.target_move_id in kept_move_ids
+                ]
+                referenced_anchor_ids = {
+                    anchor_id
+                    for move in moves
+                    for anchor_id in list(move.anchor_ids or [])
+                    if str(anchor_id or "").strip()
+                }
+                referenced_anchor_ids.update(
+                    str(anchor_id or "").strip()
+                    for relation in move_relations
+                    for anchor_id in list(relation.anchor_ids or [])
+                    if str(anchor_id or "").strip()
+                )
+                anchors = [anchor for anchor in anchors if anchor.anchor_id in referenced_anchor_ids]
+                canonical_core["moves"] = [move.model_dump(mode="json") for move in moves]
+                canonical_core["move_relations"] = [relation.model_dump(mode="json") for relation in move_relations]
+                canonical_core["evidence_anchors"] = [anchor.model_dump(mode="json") for anchor in anchors]
+                trace["canonical_core"] = canonical_core
+            gate_report = evaluate_hot_path_gate(
+                moves=moves,
+                anchors=anchors,
+                move_relations=move_relations,
+                paper_type=str(paper_metadata.get("paper_type") or "unknown"),
+            )
+            quality = build_quality_payload(gate_report)
+            try:
+                trace_model = PaperLogicTrace.model_validate(trace)
+                trace["derived_views"] = build_derived_views(trace_model)
+            except Exception:
+                pass
+            trace["quality"] = quality
             audit = dict(quality.get("l2_completeness_audit") or {})
             rows.append(
                 {
                     "paper_id": paper_id_value,
+                    "trace_json": json.dumps(trace, ensure_ascii=False),
+                    "quality_tier": str(quality.get("quality_tier") or ""),
+                    "quality_tier_score": float(quality.get("quality_tier_score") or 0.0),
+                    "audit_status": str(quality.get("audit_status") or ""),
                     "ready_for_community": bool(audit.get("ready_for_community") or False),
                     "ready_for_l3": bool(audit.get("ready_for_l3") or False),
                     "ready_for_l4": bool(audit.get("ready_for_l4") or False),
@@ -1537,7 +1593,11 @@ LIMIT $limit
         cypher = """
 UNWIND $rows AS row
 MATCH (p:Paper {paper_id: row.paper_id})
-SET p.paper_logic_trace_ready_for_community = row.ready_for_community,
+SET p.paper_logic_trace_json = row.trace_json,
+    p.paper_logic_trace_quality_tier = row.quality_tier,
+    p.paper_logic_trace_quality_tier_score = row.quality_tier_score,
+    p.paper_logic_trace_audit_status = row.audit_status,
+    p.paper_logic_trace_ready_for_community = row.ready_for_community,
     p.paper_logic_trace_ready_for_l3 = row.ready_for_l3,
     p.paper_logic_trace_ready_for_l4 = row.ready_for_l4,
     p.paper_logic_trace_completeness_score = row.completeness_score
@@ -1597,6 +1657,11 @@ LIMIT $limit
         rows = _run_graph_query(ready_only=bool(ready_for_community_only))
         if not rows and ready_for_community_only:
             rows = _run_graph_query(ready_only=False)
+        rows = [
+            dict(row)
+            for row in rows
+            if not is_noise_summary(str(row.get("summary") or row.get("text") or ""))
+        ]
         if rows:
             return rows
 
@@ -1607,6 +1672,8 @@ LIMIT $limit
                 if not bool(audit.get("ready_for_community") or False):
                     continue
             for move in trace_row.get("research_moves") or []:
+                if is_noise_summary(str(move.get("summary") or move.get("text") or "")):
+                    continue
                 fallback_rows.append(dict(move))
                 if len(fallback_rows) >= int(limit):
                     return fallback_rows

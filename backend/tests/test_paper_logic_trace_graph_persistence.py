@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 from app.graph.neo4j_client import Neo4jClient
 
 
@@ -141,6 +143,59 @@ def _sample_trace_payload() -> dict:
             },
         },
     }
+
+
+def _sample_trace_payload_with_noise_move() -> dict:
+    payload = _sample_trace_payload()
+    payload["canonical_core"]["moves"].append(
+        {
+            "move_id": "m-noise",
+            "sequence_no": 2,
+            "role": "result",
+            "act_type": "report_effect",
+            "summary": "# 3. Results",
+            "anchor_ids": ["a-noise"],
+            "confidence": 0.25,
+        }
+    )
+    payload["canonical_core"]["evidence_anchors"].append(
+        {
+            "anchor_id": "a-noise",
+            "paper_id": "paper-1",
+            "source_ref": "chunk:2",
+            "modality": "text",
+            "section_path": ["Results"],
+            "locator": {"chunk_id": "chunk:2", "start_line": 4, "end_line": 4},
+            "quote": "# 3. Results",
+            "citation_ids": [],
+            "support_type": "direct",
+            "weak": False,
+        }
+    )
+    payload["canonical_core"]["move_relations"].append(
+        {
+            "relation_id": "r-noise",
+            "source_move_id": "m-1",
+            "target_move_id": "m-noise",
+            "relation_type": "yields",
+            "anchor_ids": ["a-noise"],
+            "confidence": 0.4,
+        }
+    )
+    payload["derived_views"]["community_signatures"].append(
+        {
+            "move_id": "m-noise",
+            "method_tokens": [],
+            "object_tokens": [],
+            "metric_tokens": [],
+            "condition_tokens": [],
+            "comparator_tokens": [],
+            "effect_directions": [],
+            "limitation_tokens": [],
+            "resource_tokens": [],
+        }
+    )
+    return payload
 
 
 def test_upsert_paper_logic_trace_materializes_research_moves_and_evidence_anchors() -> None:
@@ -291,12 +346,39 @@ def test_backfill_paper_logic_trace_readiness_writes_flags_from_trace_json() -> 
 
     assert result["updated_papers"] == 1
     query, params = fake_session.calls[-1]
-    assert "SET p.paper_logic_trace_ready_for_community = row.ready_for_community" in query
+    assert "p.paper_logic_trace_json = row.trace_json" in query
+    assert "p.paper_logic_trace_ready_for_community = row.ready_for_community" in query
     assert params["rows"][0]["paper_id"] == "paper-1"
-    assert params["rows"][0]["ready_for_community"] is True
-    assert params["rows"][0]["ready_for_l3"] is True
-    assert params["rows"][0]["ready_for_l4"] is False
-    assert params["rows"][0]["completeness_score"] == 0.88
+    refreshed_trace = json.loads(params["rows"][0]["trace_json"])
+    refreshed_audit = refreshed_trace["quality"]["l2_completeness_audit"]
+    assert params["rows"][0]["ready_for_community"] is refreshed_audit["ready_for_community"]
+    assert params["rows"][0]["ready_for_l3"] is refreshed_audit["ready_for_l3"]
+    assert params["rows"][0]["ready_for_l4"] is refreshed_audit["ready_for_l4"]
+    assert params["rows"][0]["completeness_score"] == refreshed_audit["completeness_score"]
+    assert refreshed_trace["quality"]["quality_tier"] in {"green", "yellow", "red"}
+
+
+def test_backfill_paper_logic_trace_readiness_strips_noise_moves_from_trace_json() -> None:
+    fake_session = _FakeSession()
+    client = _client_with_fake_driver(fake_session)
+    client.list_paper_logic_trace_rows = lambda *args, **kwargs: [
+        {
+            "paper_id": "paper-1",
+            "trace": _sample_trace_payload_with_noise_move(),
+        }
+    ]
+
+    client.backfill_paper_logic_trace_readiness(limit=10)
+
+    _, params = fake_session.calls[-1]
+    refreshed_trace = json.loads(params["rows"][0]["trace_json"])
+    move_ids = {item["move_id"] for item in refreshed_trace["canonical_core"]["moves"]}
+    anchor_ids = {item["anchor_id"] for item in refreshed_trace["canonical_core"]["evidence_anchors"]}
+    relation_ids = {item["relation_id"] for item in refreshed_trace["canonical_core"]["move_relations"]}
+
+    assert "m-noise" not in move_ids
+    assert "a-noise" not in anchor_ids
+    assert "r-noise" not in relation_ids
 
 
 def test_list_evidence_anchors_prefers_materialized_graph_rows_over_trace_json_fallback() -> None:
@@ -327,3 +409,56 @@ def test_list_evidence_anchors_prefers_materialized_graph_rows_over_trace_json_f
 
     assert rows[0]["anchor_id"] == "a-1"
     assert rows[0]["move_id"] == "m-1"
+
+
+def test_list_research_moves_filters_noise_like_graph_rows() -> None:
+    fake_session = _FakeSession()
+    fake_session.graph_move_rows = [
+        {
+            "move_id": "m-noise",
+            "paper_id": "paper-1",
+            "paper_source": "paper-A",
+            "paper_title": "Demo Paper",
+            "role": "result",
+            "act_type": "report_effect",
+            "text": "# 3. Results",
+            "summary": "# 3. Results",
+            "sequence_no": 1,
+            "confidence": 0.25,
+            "anchor_ids": ["a-noise"],
+            "method_tokens": [],
+            "object_tokens": [],
+            "metric_tokens": [],
+            "condition_tokens": [],
+            "comparator_tokens": [],
+            "effect_directions": [],
+            "limitation_tokens": [],
+            "resource_tokens": [],
+        },
+        {
+            "move_id": "m-1",
+            "paper_id": "paper-1",
+            "paper_source": "paper-A",
+            "paper_title": "Demo Paper",
+            "role": "method",
+            "act_type": "propose_method",
+            "text": "We propose a graph encoder.",
+            "summary": "We propose a graph encoder.",
+            "sequence_no": 2,
+            "confidence": 0.82,
+            "anchor_ids": ["a-1"],
+            "method_tokens": ["graph encoder"],
+            "object_tokens": ["retrieval graph"],
+            "metric_tokens": ["accuracy"],
+            "condition_tokens": [],
+            "comparator_tokens": [],
+            "effect_directions": ["improve"],
+            "limitation_tokens": [],
+            "resource_tokens": [],
+        },
+    ]
+    client = _client_with_fake_driver(fake_session)
+
+    rows = client.list_research_moves(limit=10)
+
+    assert [row["move_id"] for row in rows] == ["m-1"]
