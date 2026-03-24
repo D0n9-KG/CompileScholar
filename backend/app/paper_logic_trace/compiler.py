@@ -214,6 +214,7 @@ def compile_paper_logic_trace(
         moves=canonical_core.moves,
         anchors=canonical_core.evidence_anchors,
         move_relations=canonical_core.move_relations,
+        paper_type=metadata.paper_type,
     )
     trace = PaperLogicTrace(
         trace_id=f'{metadata.paper_id}:paper_logic_trace',

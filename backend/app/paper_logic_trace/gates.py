@@ -19,6 +19,39 @@ _CORE_SLOT_FIELDS = (
 _CRITICAL_ROLES = {'problem', 'method', 'result'}
 _GREEN_THRESHOLD = 0.78
 _YELLOW_THRESHOLD = 0.38
+_QUALITY_NOISE_PREFIXES = (
+    '# abstract',
+    '# article info',
+    '# articleinfo',
+    '# credit author statement',
+    'abstract',
+    'article info',
+    'articleinfo',
+    'available online',
+    'credit author statement',
+    'keywords:',
+    'keyword:',
+    'article history',
+)
+_EXPECTED_ROLES_BY_PAPER_TYPE: dict[str, tuple[str, ...]] = {
+    'empirical': ('problem', 'method', 'result'),
+    'benchmark': ('problem', 'method', 'result'),
+    'case_study': ('problem', 'method', 'result'),
+    'theoretical': ('problem', 'method', 'interpretation'),
+    'review': ('background', 'interpretation'),
+    'software': ('problem', 'method'),
+    'unknown': ('problem', 'method'),
+}
+_EXPECTED_SLOTS_BY_PAPER_TYPE: dict[str, tuple[str, ...]] = {
+    'empirical': ('research_objects', 'methods', 'metrics', 'comparators', 'effects'),
+    'benchmark': ('research_objects', 'methods', 'metrics', 'comparators', 'effects'),
+    'case_study': ('research_objects', 'methods', 'conditions', 'metrics'),
+    'theoretical': ('research_objects', 'methods', 'conditions'),
+    'review': ('research_objects', 'methods'),
+    'software': ('research_objects', 'methods', 'resource_mentions'),
+    'unknown': ('research_objects', 'methods'),
+}
+_SPARSE_SLOT_RATIO = 0.08
 
 
 def _safe_ratio(numerator: int | float, denominator: int | float) -> float:
@@ -109,11 +142,94 @@ def _soft_flags(*, sparse_trace: bool, invalid_move_ids: list[str], signals: dic
     return flags
 
 
+def _looks_like_noise_summary(summary: str) -> bool:
+    normalized = str(summary or '').strip().lower()
+    if not normalized:
+        return False
+    if any(normalized.startswith(prefix) for prefix in _QUALITY_NOISE_PREFIXES):
+        return True
+    return normalized.startswith('#') and len(normalized.split()) <= 6
+
+
+def _l2_completeness_audit(
+    *,
+    moves: list[ResearchMove],
+    move_relations: list[MoveRelation],
+    paper_type: str,
+) -> dict[str, Any]:
+    move_count = len(moves)
+    role_counts: dict[str, int] = {}
+    slot_counts: dict[str, int] = {}
+    slot_move_ratios: dict[str, float] = {}
+    observed_roles = sorted({str(move.role) for move in moves if str(move.role or '').strip()})
+    for role in observed_roles:
+        role_counts[role] = sum(1 for move in moves if str(move.role) == role)
+    for field in _CORE_SLOT_FIELDS:
+        count = sum(1 for move in moves if bool(getattr(move, field, None)))
+        slot_counts[field] = count
+        slot_move_ratios[field] = round(_safe_ratio(count, move_count), 4)
+
+    expected_roles = list(_EXPECTED_ROLES_BY_PAPER_TYPE.get(str(paper_type or 'unknown'), _EXPECTED_ROLES_BY_PAPER_TYPE['unknown']))
+    expected_slots = list(_EXPECTED_SLOTS_BY_PAPER_TYPE.get(str(paper_type or 'unknown'), _EXPECTED_SLOTS_BY_PAPER_TYPE['unknown']))
+    missing_expected_roles = sorted(role for role in expected_roles if role not in observed_roles)
+    missing_l2_slot_fields = [field for field in _CORE_SLOT_FIELDS if slot_counts.get(field, 0) == 0]
+    missing_expected_slot_fields = [field for field in expected_slots if slot_counts.get(field, 0) == 0]
+    sparse_expected_slot_fields = [
+        field
+        for field in expected_slots
+        if 0 < slot_counts.get(field, 0) and slot_move_ratios.get(field, 0.0) < _SPARSE_SLOT_RATIO
+    ]
+    noise_move_ids = [move.move_id for move in moves if _looks_like_noise_summary(move.summary)]
+    signature_ready_move_count = sum(
+        1
+        for move in moves
+        if any(
+            bool(getattr(move, field, None))
+            for field in ('research_objects', 'methods', 'metrics', 'comparators', 'conditions', 'effects', 'resource_mentions')
+        )
+    )
+    relation_ratio = _relation_coverage(moves, move_relations)
+    ready_for_community = signature_ready_move_count >= 3 and (slot_counts.get('methods', 0) > 0 or slot_counts.get('research_objects', 0) > 0)
+    ready_for_l3 = not missing_expected_roles and relation_ratio >= 0.4 and (slot_counts.get('methods', 0) > 0 or slot_counts.get('research_objects', 0) > 0)
+    evidence_signal_count = sum(1 for field in ('metrics', 'comparators', 'effects') if slot_counts.get(field, 0) > 0)
+    context_signal_count = sum(1 for field in ('conditions', 'resource_mentions', 'limitation_types') if slot_counts.get(field, 0) > 0)
+    ready_for_l4 = ready_for_l3 and evidence_signal_count >= 2 and context_signal_count >= 1
+
+    role_score = _safe_ratio(len(expected_roles) - len(missing_expected_roles), len(expected_roles))
+    expected_slot_score = _safe_ratio(len(expected_slots) - len(missing_expected_slot_fields), len(expected_slots))
+    sparse_penalty = _safe_ratio(len(sparse_expected_slot_fields), len(expected_slots))
+    noise_penalty = _safe_ratio(len(noise_move_ids), move_count)
+    completeness_score = max(0.0, min(1.0, role_score * 0.45 + expected_slot_score * 0.45 + (1.0 - sparse_penalty) * 0.05 + (1.0 - noise_penalty) * 0.05))
+
+    return {
+        'paper_type': str(paper_type or 'unknown'),
+        'move_count': move_count,
+        'role_counts': role_counts,
+        'observed_roles': observed_roles,
+        'expected_roles': expected_roles,
+        'missing_expected_roles': missing_expected_roles,
+        'slot_counts': slot_counts,
+        'slot_move_ratios': slot_move_ratios,
+        'missing_l2_slot_fields': missing_l2_slot_fields,
+        'expected_slot_fields': expected_slots,
+        'missing_expected_slot_fields': missing_expected_slot_fields,
+        'sparse_expected_slot_fields': sparse_expected_slot_fields,
+        'noise_move_ids': noise_move_ids,
+        'signature_ready_move_count': signature_ready_move_count,
+        'relation_coverage_ratio': round(relation_ratio, 4),
+        'ready_for_community': ready_for_community,
+        'ready_for_l3': ready_for_l3,
+        'ready_for_l4': ready_for_l4,
+        'completeness_score': round(completeness_score, 4),
+    }
+
+
 def evaluate_hot_path_gate(
     *,
     moves: list[ResearchMove],
     anchors: list[EvidenceAnchor],
     move_relations: list[MoveRelation] | None = None,
+    paper_type: str = 'unknown',
 ) -> dict[str, Any]:
     move_relations = list(move_relations or [])
     invalid_move_ids = [
@@ -142,11 +258,28 @@ def evaluate_hot_path_gate(
         move_relations=move_relations,
         invalid_move_ids=invalid_move_ids,
     )
+    completeness_audit = _l2_completeness_audit(
+        moves=moves,
+        move_relations=move_relations,
+        paper_type=paper_type,
+    )
+    quality_tier_score = round(
+        quality_tier_score * 0.7 + float(completeness_audit.get('completeness_score') or 0.0) * 0.3,
+        4,
+    )
     soft_flags = _soft_flags(
         sparse_trace=sparse_trace,
         invalid_move_ids=invalid_move_ids,
         signals=score_signals,
     )
+    if completeness_audit.get('missing_expected_roles'):
+        soft_flags.append('missing_expected_roles')
+    if completeness_audit.get('missing_expected_slot_fields'):
+        soft_flags.append('missing_expected_slots')
+    if completeness_audit.get('sparse_expected_slot_fields'):
+        soft_flags.append('sparse_expected_slots')
+    if completeness_audit.get('noise_move_ids'):
+        soft_flags.append('residual_noise_moves')
     return {
         'passed': passed,
         'invalid_move_ids': invalid_move_ids,
@@ -157,6 +290,7 @@ def evaluate_hot_path_gate(
         'hard_fail_reasons': hard_fail_reasons,
         'soft_flags': soft_flags,
         'quality_tier_score': quality_tier_score,
+        'l2_completeness_audit': completeness_audit,
         **score_signals,
     }
 
@@ -174,9 +308,19 @@ def needs_lightweight_audit(gate_report: dict[str, Any]) -> bool:
 def build_quality_payload(gate_report: dict[str, Any]) -> dict[str, Any]:
     passed = bool(gate_report.get('passed'))
     score = float(gate_report.get('quality_tier_score') or 0.0)
+    completeness_audit = dict(gate_report.get('l2_completeness_audit') or {})
+    missing_expected_roles = list(completeness_audit.get('missing_expected_roles') or [])
+    missing_expected_slots = list(completeness_audit.get('missing_expected_slot_fields') or [])
+    noise_move_ids = list(completeness_audit.get('noise_move_ids') or [])
     if not passed or score < _YELLOW_THRESHOLD:
         quality_tier = 'red'
-    elif bool(gate_report.get('sparse_trace')) or score < _GREEN_THRESHOLD:
+    elif (
+        bool(gate_report.get('sparse_trace'))
+        or score < _GREEN_THRESHOLD
+        or bool(missing_expected_roles)
+        or len(missing_expected_slots) >= 2
+        or bool(noise_move_ids)
+    ):
         quality_tier = 'yellow'
     else:
         quality_tier = 'green'
@@ -186,5 +330,6 @@ def build_quality_payload(gate_report: dict[str, Any]) -> dict[str, Any]:
         'quality_tier_score': round(score, 4),
         'quality_flags': list(gate_report.get('soft_flags') or []),
         'hot_path_gate_report': gate_report,
+        'l2_completeness_audit': completeness_audit,
         'audit_status': audit_status,
     }
