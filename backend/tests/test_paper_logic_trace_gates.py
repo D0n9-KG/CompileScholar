@@ -477,6 +477,7 @@ def test_unknown_trace_without_result_signal_is_not_ready_for_upper_layers() -> 
     audit = quality['l2_completeness_audit']
 
     assert 'limited_role_coverage' in quality['quality_flags']
+    assert quality['quality_tier'] == 'yellow'
     assert audit['ready_for_community'] is True
     assert audit['ready_for_l3'] is False
     assert audit['ready_for_l4'] is False

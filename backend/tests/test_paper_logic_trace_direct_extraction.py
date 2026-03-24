@@ -547,6 +547,211 @@ def test_result_summary_extracts_clean_resource_mentions_without_metric_prefix(m
     assert not any('density' in item for item in resources)
 
 
+def test_affiliation_summary_with_email_is_filtered_after_llm_extraction(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            'Preface',
+            'LMGC UMR CNRS 5508, Universite Montpellier 2, Place Eugene Bataillon 34095 Montpellier Cedex 5, France richefeu@example.edu',
+            line=1,
+        ),
+        _chunk(
+            'c-2',
+            '1. Introduction',
+            'This paper investigates the micromechanics of wet granular materials.',
+            line=2,
+        ),
+    )
+
+    def _fake_extract(**kwargs):
+        first_chunk_id = kwargs['window']['chunks'][0].chunk_id
+        if first_chunk_id == 'c-1':
+            return [
+                {
+                    'role': 'interpretation',
+                    'act_type': 'explain_mechanism',
+                    'summary': 'LMGC UMR CNRS 5508, Universite Montpellier 2, Place Eugene Bataillon 34095 Montpellier Cedex 5, France richefeu@example.edu',
+                    'anchor_chunk_ids': ['c-1'],
+                    'confidence': 0.6,
+                }
+            ]
+        return [
+            {
+                'role': 'problem',
+                'act_type': 'define_task',
+                'summary': 'This paper investigates the micromechanics of wet granular materials.',
+                'anchor_chunk_ids': ['c-2'],
+                'research_objects': [{'surface': 'wet granular materials'}],
+                'confidence': 0.7,
+            }
+        ]
+
+    monkeypatch.setattr('app.paper_logic_trace.direct_extraction._extract_window_moves_llm', _fake_extract)
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+    trace = compile_paper_logic_trace(**{k: payload[k] for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']})
+    summaries = [move.summary for move in trace.canonical_core.moves]
+
+    assert len(summaries) == 1
+    assert 'Montpellier' not in summaries[0]
+
+
+def test_result_summary_extracts_comparators_from_agreement_between_sources(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '4. Results',
+            'Experiments and numerical simulations are in good agreement for the unsaturated soil response.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'result',
+                'act_type': 'report_effect',
+                'summary': 'Experiments and numerical simulations are in good agreement for the unsaturated soil response.',
+                'anchor_chunk_ids': ['c-1'],
+                'comparators': [],
+                'confidence': 0.6,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+    trace = compile_paper_logic_trace(**{k: payload[k] for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']})
+    move = trace.canonical_core.moves[0]
+    comparators = {(item.normalized or item.surface).lower() for item in move.comparators}
+
+    assert 'experiments' in comparators
+    assert 'numerical simulations' in comparators
+
+
+def test_result_summary_extracts_comparator_from_similar_to_phrase(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '4. Results',
+            'The medium and dense samples have average particle stresses similar to the loose sample during loading.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'result',
+                'act_type': 'report_effect',
+                'summary': 'The medium and dense samples have average particle stresses similar to the loose sample during loading.',
+                'anchor_chunk_ids': ['c-1'],
+                'comparators': [],
+                'confidence': 0.6,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+    trace = compile_paper_logic_trace(**{k: payload[k] for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']})
+    move = trace.canonical_core.moves[0]
+    comparators = {(item.normalized or item.surface).lower() for item in move.comparators}
+
+    assert 'the loose sample' in comparators or 'loose sample' in comparators
+
+
+def test_result_summary_prefers_specific_comparator_phrase_over_single_word_noise(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '4. Results',
+            'Good agreement is found between experiments and numerical simulations.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'result',
+                'act_type': 'report_effect',
+                'summary': 'Good agreement is found between experiments and numerical simulations.',
+                'anchor_chunk_ids': ['c-1'],
+                'comparators': [{'surface': 'numerical'}],
+                'confidence': 0.6,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+    trace = compile_paper_logic_trace(**{k: payload[k] for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']})
+    move = trace.canonical_core.moves[0]
+    comparators = {(item.normalized or item.surface).lower() for item in move.comparators}
+
+    assert 'numerical simulations' in comparators
+    assert 'numerical' not in comparators
+
+
+def test_result_summary_filters_noisy_model_comparator_when_heuristic_target_exists(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '4. Results',
+            'Particles with fewer contacts experience much higher maximum stresses and stress variability compared to those with more contacts.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'result',
+                'act_type': 'report_effect',
+                'summary': 'Particles with fewer contacts experience much higher maximum stresses and stress variability compared to those with more contacts.',
+                'anchor_chunk_ids': ['c-1'],
+                'comparators': [{'surface': 'experienced by particles'}],
+                'confidence': 0.6,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+    trace = compile_paper_logic_trace(**{k: payload[k] for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']})
+    move = trace.canonical_core.moves[0]
+    comparators = {(item.normalized or item.surface).lower() for item in move.comparators}
+
+    assert 'those with more contacts' in comparators
+    assert 'experienced by particles' not in comparators
+
+
 def test_rich_move_without_model_confidence_gets_non_zero_confidence(monkeypatch) -> None:
     doc = _doc_with_chunks(
         _chunk('c-1', '2. Method', 'We propose a discrete element simulation workflow for crushable sands.', line=1),

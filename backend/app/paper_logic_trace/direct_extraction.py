@@ -58,13 +58,18 @@ _IMAGE_ONLY_RE = re.compile(r'^\s*!\[[^\]]*\]\([^)]+\)\s*$')
 _MARKDOWN_HEADING_RE = re.compile(r'^\s*#{1,6}\s*(.+?)\s*$')
 _FRONT_MATTER_INSTITUTION_CUES = (
     'university',
+    'universite',
+    'université',
     'department',
     'school of',
     'institute',
     'laboratory',
+    'faculty of',
     'centre for',
     'center for',
     'college of',
+    'cnrs',
+    'cedex',
 )
 _FRONT_MATTER_METADATA_CUES = (
     'available online',
@@ -183,6 +188,85 @@ _LIMITATION_CUE_WORDS = (
     'limitations',
     'memory',
 )
+_COMPARATOR_ENTITY_HINTS = {
+    'baseline',
+    'sample',
+    'samples',
+    'experiment',
+    'experiments',
+    'simulation',
+    'simulations',
+    'measurement',
+    'measurements',
+    'method',
+    'methods',
+    'region',
+    'regions',
+    'condition',
+    'conditions',
+    'case',
+    'cases',
+    'result',
+    'results',
+    'estimate',
+    'estimates',
+    'contact',
+    'contacts',
+    'group',
+    'groups',
+    'mixture',
+    'mixtures',
+    'model',
+    'models',
+}
+_COMPARATOR_BAD_TOKENS = {
+    'experienced',
+    'appears',
+    'appeared',
+    'showing',
+    'showed',
+    'show',
+    'shows',
+    'predicted',
+    'observed',
+}
+_COMPARATOR_BAD_LEADS = {
+    'applied',
+    'different',
+    'higher',
+    'lower',
+    'greater',
+    'smaller',
+    'larger',
+}
+_REPORTING_VERB_CUES = (
+    'investigate',
+    'investigates',
+    'study',
+    'studies',
+    'propose',
+    'proposes',
+    'show',
+    'shows',
+    'find',
+    'finds',
+    'indicate',
+    'indicates',
+    'demonstrate',
+    'demonstrates',
+    'compare',
+    'compares',
+    'analyze',
+    'analyzes',
+    'analyse',
+    'analyses',
+    'develop',
+    'develops',
+    'evaluate',
+    'evaluates',
+    'measure',
+    'measures',
+)
 _SECTION_ROLE_HINTS: list[tuple[tuple[str, ...], str]] = [
     (('future work', 'future directions', 'future'), 'future_work'),
     (('limitation', 'limitations', 'threats to validity'), 'limitation'),
@@ -288,6 +372,25 @@ def _looks_like_author_line(text: str) -> bool:
     return name_like_parts >= 2
 
 
+def _looks_like_affiliation_summary(text: str) -> bool:
+    clean = _normalize_space(text)
+    if not clean:
+        return False
+    lowered = clean.lower()
+    has_affiliation_cue = any(cue in lowered for cue in _FRONT_MATTER_INSTITUTION_CUES)
+    has_email = '@' in lowered or ' e-mail ' in f' {lowered} ' or ' email ' in f' {lowered} '
+    if not has_affiliation_cue and not has_email:
+        return False
+    has_reporting_verb = any(verb in lowered for verb in _REPORTING_VERB_CUES)
+    comma_count = clean.count(',')
+    digit_count = sum(1 for ch in clean if ch.isdigit())
+    if has_email and not has_reporting_verb:
+        return True
+    if has_affiliation_cue and comma_count >= 2 and digit_count >= 2 and not has_reporting_verb:
+        return True
+    return False
+
+
 def _looks_like_front_matter_noise(text: str, *, section: str, paper_title: str) -> bool:
     lowered = text.lower()
     in_title_block = bool(section) and bool(paper_title) and section == paper_title
@@ -349,6 +452,8 @@ def _looks_like_noise_summary(text: object) -> bool:
     if _looks_like_heading_only(clean, section=''):
         return True
     if _looks_like_author_line(clean):
+        return True
+    if _looks_like_affiliation_summary(clean):
         return True
     if any(lowered.startswith(prefix) for prefix in _NOISE_SUMMARY_PREFIXES):
         return True
@@ -467,6 +572,22 @@ def _clean_phrase(phrase: str) -> str:
     return ' '.join(tokens)
 
 
+def _merge_raw_mention_rows(*groups: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for group in groups:
+        for row in group or []:
+            surface = _normalize_space((row or {}).get('surface') or (row or {}).get('normalized') or '')
+            if not surface:
+                continue
+            key = surface.lower()
+            if key in seen:
+                continue
+            seen.add(key)
+            rows.append(dict(row))
+    return rows
+
+
 def _phrase_suffix_mentions(text: str, *, cue_words: tuple[str, ...], limit: int = 3) -> list[dict[str, Any]]:
     if not text:
         return []
@@ -521,25 +642,71 @@ def _comparator_mentions(text: str, *, limit: int = 2) -> list[dict[str, Any]]:
     lowered = _normalize_space(text).lower()
     rows: list[dict[str, Any]] = []
     seen: set[str] = set()
-    patterns = (
+    pair_patterns = (
+        r'\bagreement between\s+([a-z0-9][a-z0-9\-\s]{2,30})\s+and\s+([a-z0-9][a-z0-9\-\s]{2,30})\b',
+        r'\bagreement is found between\s+([a-z0-9][a-z0-9\-\s]{2,30})\s+and\s+([a-z0-9][a-z0-9\-\s]{2,30})\b',
+        r'\b([a-z0-9][a-z0-9\-\s]{2,30})\s+and\s+([a-z0-9][a-z0-9\-\s]{2,30})\s+are\s+in\s+(?:(?:good|close|quantitative)\s+)?agreement\b',
+    )
+    single_patterns = (
         r'\bcompared with\s+([a-z0-9][a-z0-9\-\s]{2,50})',
         r'\bcompared to\s+([a-z0-9][a-z0-9\-\s]{2,50})',
         r'\bthan\s+([a-z0-9][a-z0-9\-\s]{2,50})',
         r'\bunlike\s+([a-z0-9][a-z0-9\-\s]{2,50})',
         r'\bversus\s+([a-z0-9][a-z0-9\-\s]{2,50})',
         r'\bvs\.?\s+([a-z0-9][a-z0-9\-\s]{2,50})',
+        r'\bsimilar to\s+([a-z0-9][a-z0-9\-\s]{2,50})',
+        r'\bagreement with\s+([a-z0-9][a-z0-9\-\s]{2,50})',
     )
-    for pattern in patterns:
+
+    def _push_phrase(raw_phrase: str) -> bool:
+        phrase = re.split(r'[.,;:()]', raw_phrase, maxsplit=1)[0]
+        phrase = re.split(r'\b(?:during|under|while|when|for|in|at|on)\b', phrase, maxsplit=1)[0]
+        phrase = _clean_phrase(' '.join(phrase.split()[:6]))
+        if not phrase or phrase in seen:
+            return False
+        seen.add(phrase)
+        rows.append({'surface': phrase, 'normalized': phrase})
+        return len(rows) >= limit
+
+    for pattern in pair_patterns:
         for match in re.finditer(pattern, lowered):
-            phrase = re.split(r'[.,;:()]', match.group(1), maxsplit=1)[0]
-            phrase = _clean_phrase(' '.join(phrase.split()[:5]))
-            if not phrase or phrase in seen:
-                continue
-            seen.add(phrase)
-            rows.append({'surface': phrase, 'normalized': phrase})
-            if len(rows) >= limit:
+            if _push_phrase(match.group(1)) or _push_phrase(match.group(2)):
+                return rows
+    for pattern in single_patterns:
+        for match in re.finditer(pattern, lowered):
+            if _push_phrase(match.group(1)):
                 return rows
     return rows
+
+
+def _refine_comparator_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    prepared: list[tuple[dict[str, Any], str]] = []
+    for row in rows or []:
+        phrase = _normalize_space(row.get('normalized') or row.get('surface') or '').lower()
+        tokens = phrase.split()
+        if not tokens:
+            continue
+        if len(tokens) == 1 and tokens[0] not in _COMPARATOR_ENTITY_HINTS:
+            continue
+        if any(token in _COMPARATOR_BAD_TOKENS for token in tokens):
+            continue
+        if tokens[0] in _COMPARATOR_BAD_LEADS and not any(token in _COMPARATOR_ENTITY_HINTS for token in tokens):
+            continue
+        prepared.append((row, phrase))
+
+    keep_indices: list[int] = []
+    phrases = [phrase for _, phrase in prepared]
+    for index, phrase in enumerate(phrases):
+        is_subsumed = False
+        for other_index, other in enumerate(phrases):
+            if index == other_index or len(other) <= len(phrase):
+                continue
+            if re.search(rf'(^|\b){re.escape(phrase)}($|\b)', other):
+                is_subsumed = True
+                break
+        if not is_subsumed:
+            keep_indices.append(index)
+    return [prepared[index][0] for index in keep_indices]
 
 
 def _limitation_mentions(text: str, *, limit: int = 2) -> list[dict[str, Any]]:
@@ -594,9 +761,10 @@ def _augment_sparse_slots(
     metric_roles = {'result', 'experiment', 'interpretation'}
     limitation_roles = {'limitation', 'interpretation', 'result', 'future_work'}
     resource_roles = {'method', 'experiment', 'result'}
+    heuristic_comparators = _comparator_mentions(text, limit=3) if role_token in metric_roles else []
     return {
         'metrics': metrics or (_metric_mentions(text, limit=3) if role_token in metric_roles else []),
-        'comparators': comparators or (_comparator_mentions(text, limit=2) if role_token in metric_roles else []),
+        'comparators': _merge_raw_mention_rows(comparators, heuristic_comparators),
         'limitation_types': limitation_types or (_limitation_mentions(text, limit=2) if role_token in limitation_roles else []),
         'resource_mentions': resource_mentions or (_resource_mentions_from_text(text, limit=3) if role_token in resource_roles else []),
     }
@@ -951,6 +1119,7 @@ def _move_rows_from_windows(
             )
             metrics = _normalize_mention_rows(augmented['metrics'], anchor_ids=anchor_chunk_ids)
             comparators = _normalize_mention_rows(augmented['comparators'], anchor_ids=anchor_chunk_ids)
+            comparators = _refine_comparator_rows(comparators)
             limitation_types = _normalize_mention_rows(augmented['limitation_types'], anchor_ids=anchor_chunk_ids)
             resource_mentions = _normalize_mention_rows(augmented['resource_mentions'], anchor_ids=anchor_chunk_ids)
 

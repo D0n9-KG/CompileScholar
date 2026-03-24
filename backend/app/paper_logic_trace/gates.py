@@ -332,11 +332,13 @@ def build_quality_payload(gate_report: dict[str, Any]) -> dict[str, Any]:
     missing_expected_roles = list(completeness_audit.get('missing_expected_roles') or [])
     missing_expected_slots = list(completeness_audit.get('missing_expected_slot_fields') or [])
     noise_move_ids = list(completeness_audit.get('noise_move_ids') or [])
+    critical_role_coverage = float(completeness_audit.get('critical_role_coverage_ratio') or 0.0)
     if not passed or score < _YELLOW_THRESHOLD:
         quality_tier = 'red'
     elif (
         bool(gate_report.get('sparse_trace'))
         or score < _GREEN_THRESHOLD
+        or critical_role_coverage < 0.67
         or bool(missing_expected_roles)
         or len(missing_expected_slots) >= 2
         or bool(noise_move_ids)
