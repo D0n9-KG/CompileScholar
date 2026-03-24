@@ -271,6 +271,8 @@ _COMPARATOR_ENTITY_HINTS = {
     'models',
 }
 _COMPARATOR_BAD_TOKENS = {
+    'author',
+    'authors',
     'experienced',
     'appears',
     'appeared',
@@ -743,6 +745,7 @@ def _comparator_mentions(text: str, *, limit: int = 2) -> list[dict[str, Any]]:
         r'\bagreement between\s+([a-z0-9][a-z0-9\-\s]{2,30})\s+and\s+([a-z0-9][a-z0-9\-\s]{2,30})\b',
         r'\bagreement is found between\s+([a-z0-9][a-z0-9\-\s]{2,30})\s+and\s+([a-z0-9][a-z0-9\-\s]{2,30})\b',
         r'\b([a-z0-9][a-z0-9\-\s]{2,30})\s+and\s+([a-z0-9][a-z0-9\-\s]{2,30})\s+are\s+in\s+(?:(?:good|close|quantitative)\s+)?agreement\b',
+        r'\bcompar(?:e|es|ing)\s+([a-z0-9][a-z0-9\-\s]{2,40}?)\s+with\s+([a-z0-9][a-z0-9\-\s]{2,40})\b',
     )
     single_patterns = (
         r'\bcompared with\s+([a-z0-9][a-z0-9\-\s]{2,50})',
@@ -756,8 +759,11 @@ def _comparator_mentions(text: str, *, limit: int = 2) -> list[dict[str, Any]]:
     )
 
     def _push_phrase(raw_phrase: str) -> bool:
+        pronoun_match = re.match(r'^(?:that|those)\s+(?:for|of)\s+(.+)$', raw_phrase.strip())
+        if pronoun_match:
+            raw_phrase = pronoun_match.group(1)
         phrase = re.split(r'[.,;:()]', raw_phrase, maxsplit=1)[0]
-        phrase = re.split(r'\b(?:during|under|while|when|for|in|at|on)\b', phrase, maxsplit=1)[0]
+        phrase = re.split(r'\b(?:during|under|while|when|for|in|at|on|using|via)\b', phrase, maxsplit=1)[0]
         phrase = _clean_phrase(' '.join(phrase.split()[:6]))
         if not phrase or phrase in seen:
             return False
@@ -783,7 +789,11 @@ def _refine_comparator_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         tokens = phrase.split()
         if not tokens:
             continue
-        if len(tokens) == 1 and tokens[0] not in _COMPARATOR_ENTITY_HINTS:
+        if (
+            len(tokens) == 1
+            and tokens[0] not in _COMPARATOR_ENTITY_HINTS
+            and not (len(tokens[0]) >= 5 and tokens[0].endswith('s'))
+        ):
             continue
         if any(token in _COMPARATOR_BAD_TOKENS for token in tokens):
             continue

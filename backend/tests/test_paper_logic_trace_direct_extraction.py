@@ -938,6 +938,156 @@ def test_result_summary_extracts_comparator_from_similar_to_phrase(monkeypatch) 
     assert 'the loose sample' in comparators or 'loose sample' in comparators
 
 
+def test_result_summary_extracts_comparator_from_compared_to_that_for_phrase(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '4. Results',
+            'The normal compression lines for the clumps at different initial densities are examined and compared to that for spheres.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'result',
+                'act_type': 'report_effect',
+                'summary': 'The normal compression lines for the clumps at different initial densities are examined and compared to that for spheres.',
+                'anchor_chunk_ids': ['c-1'],
+                'comparators': [],
+                'confidence': 0.6,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+    trace = compile_paper_logic_trace(**{k: payload[k] for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']})
+    move = trace.canonical_core.moves[0]
+    comparators = {(item.normalized or item.surface).lower() for item in move.comparators}
+
+    assert 'spheres' in comparators or 'for spheres' in comparators
+    assert 'that' not in comparators
+
+
+def test_result_summary_extracts_comparator_from_compare_with_phrase(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '4. Results',
+            'The workflow makes it possible to compare experimental results with numerical simulations using discrete elements.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'result',
+                'act_type': 'report_effect',
+                'summary': 'The workflow makes it possible to compare experimental results with numerical simulations using discrete elements.',
+                'anchor_chunk_ids': ['c-1'],
+                'comparators': [],
+                'confidence': 0.6,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+    trace = compile_paper_logic_trace(**{k: payload[k] for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']})
+    move = trace.canonical_core.moves[0]
+    comparators = {(item.normalized or item.surface).lower() for item in move.comparators}
+
+    assert 'experimental results' in comparators
+    assert 'numerical simulations' in comparators
+
+
+def test_result_summary_extracts_comparator_from_agreement_with_phrase(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '4. Results',
+            'The compression law demonstrates agreement with experimental results for granular soil.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'result',
+                'act_type': 'report_effect',
+                'summary': 'The compression law demonstrates agreement with experimental results for granular soil.',
+                'anchor_chunk_ids': ['c-1'],
+                'comparators': [],
+                'confidence': 0.6,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+    trace = compile_paper_logic_trace(**{k: payload[k] for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']})
+    move = trace.canonical_core.moves[0]
+    comparators = {(item.normalized or item.surface).lower() for item in move.comparators}
+
+    assert 'experimental results' in comparators
+
+
+def test_result_summary_filters_author_only_comparator_noise(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '4. Results',
+            "This is also in agreement with the authors' compression law for granular soil.",
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'result',
+                'act_type': 'report_effect',
+                'summary': "This is also in agreement with the authors' compression law for granular soil.",
+                'anchor_chunk_ids': ['c-1'],
+                'comparators': [{'surface': 'authors'}],
+                'confidence': 0.6,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+    trace = compile_paper_logic_trace(**{k: payload[k] for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']})
+    move = trace.canonical_core.moves[0]
+    comparators = {(item.normalized or item.surface).lower() for item in move.comparators}
+
+    assert 'authors' not in comparators
+
+
 def test_result_summary_prefers_specific_comparator_phrase_over_single_word_noise(monkeypatch) -> None:
     doc = _doc_with_chunks(
         _chunk(
