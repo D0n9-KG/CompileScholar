@@ -212,6 +212,14 @@ _RESOURCE_BAD_TYPES = {
     'reference',
     'theory',
 }
+_RESOURCE_KEEP_TYPES = {
+    'dataset',
+    'instrument',
+    'platform',
+    'protocol',
+    'software',
+    'tool',
+}
 _LIMITATION_CUE_WORDS = (
     'cost',
     'costly',
@@ -689,7 +697,17 @@ def _refine_resource_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
             continue
         if type_name in _RESOURCE_BAD_TYPES:
             continue
+        if phrase.startswith('http://') or phrase.startswith('https://'):
+            continue
         if '[' in phrase or ']' in phrase or ' et al' in phrase or ' doi' in phrase:
+            continue
+        if re.search(r'^[a-z][a-z\s.\-]*&\s*[a-z][a-z\s.\-]*\(\d{4}\)$', phrase):
+            continue
+        if re.search(r'^[a-z][a-z\s.\-]*&\s*[a-z][a-z\s.\-]*\d{4}$', phrase):
+            continue
+        tokens = phrase.split()
+        has_resource_cue = any(token in _RESOURCE_CUE_WORDS for token in tokens)
+        if len(tokens) == 1 and not has_resource_cue and type_name not in _RESOURCE_KEEP_TYPES:
             continue
         prepared.append((row, phrase))
 

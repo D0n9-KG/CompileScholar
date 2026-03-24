@@ -726,6 +726,51 @@ def test_result_summary_filters_citation_theory_and_application_resource_noise(m
     assert not any('cone penetrometer' in item for item in resources)
 
 
+def test_method_summary_filters_author_year_and_generic_class_resource_noise(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '2. Method',
+            'The YADE-Open DEM software can be run from the command line, while prior Gray & Thornton (2005) references and internal BodyState classes are only explanatory context.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'method',
+                'act_type': 'propose_method',
+                'summary': 'The YADE-Open DEM software can be run from the command line, while prior Gray & Thornton (2005) references and internal BodyState classes are only explanatory context.',
+                'anchor_chunk_ids': ['c-1'],
+                'resource_mentions': [
+                    {'surface': 'YADE-Open DEM software', 'type': 'software'},
+                    {'surface': 'Gray & Thornton (2005)'},
+                    {'surface': 'BodyState'},
+                    {'surface': 'http://yade.wikia.com'},
+                ],
+                'confidence': 0.6,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+    trace = compile_paper_logic_trace(**{k: payload[k] for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']})
+    move = trace.canonical_core.moves[0]
+    resources = {(item.normalized or item.surface).lower() for item in move.resource_mentions}
+
+    assert 'yade-open dem software' in resources
+    assert not any('gray & thornton' in item for item in resources)
+    assert 'bodystate' not in resources
+    assert not any('http://' in item or 'https://' in item for item in resources)
+
+
 def test_affiliation_summary_with_email_is_filtered_after_llm_extraction(monkeypatch) -> None:
     doc = _doc_with_chunks(
         _chunk(
