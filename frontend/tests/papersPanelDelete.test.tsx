@@ -110,6 +110,18 @@ describe('PapersPanel delete flow', () => {
     })
   })
 
+  test('shows paper source, year, and ingestion metadata in the paper list item', async () => {
+    renderPanel()
+
+    const paperItem = (await screen.findByText('Attention Is All You Need')).closest('.kgListItem')
+    const metaText = paperItem?.querySelector('.kgPapersListItemMeta span')
+
+    expect(paperItem).toBeInTheDocument()
+    expect(metaText).toBeInTheDocument()
+    expect(metaText).toBeVisible()
+    expect(metaText).toHaveTextContent('attention-source · 2017 · Ingested')
+  })
+
   test('submits a delete task for the selected paper', async () => {
     const user = userEvent.setup()
     renderPanel()

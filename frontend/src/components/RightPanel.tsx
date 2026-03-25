@@ -68,8 +68,8 @@ function normalizeText(value: unknown): string {
 
 function kindLabel(kind: string, locale: UILocale) {
   const key = String(kind ?? '')
-  if (key === 'move') return pickText(locale, { zh: '鐮旂┒鍔ㄤ綔', en: 'Research Move' })
-  if (key === 'anchor') return pickText(locale, { zh: '璇佹嵁閿氱偣', en: 'Evidence Anchor' })
+  if (key === 'move') return pickText(locale, { zh: '研究动作', en: 'Research Move' })
+  if (key === 'anchor') return pickText(locale, { zh: '证据锚点', en: 'Evidence Anchor' })
   const label = KIND_LABELS[key]
   return label ? pickText(locale, label) : key || 'unknown'
 }
@@ -652,7 +652,12 @@ export default function RightPanel({ collapsed, floating = false, onToggle }: Pr
     return (
       <aside className="kgPanel kgPanel--right">
         <div className="kgPanelIcon" onClick={onToggle} title={t('展开右侧信息面板', 'Expand right info panel')}>
-          <button className="kgPanelIconBtn" type="button">
+          <button
+            className="kgPanelIconBtn"
+            type="button"
+            aria-label={t('展开右侧信息面板', 'Expand right info panel')}
+            title={t('展开右侧信息面板', 'Expand right info panel')}
+          >
             {'>'}
           </button>
         </div>
@@ -732,7 +737,7 @@ export default function RightPanel({ collapsed, floating = false, onToggle }: Pr
       <aside className={panelClass}>
         <div className="kgPanelHeader">
           <span className="kgPanelTitle">{t('问答上下文', 'Ask Context')}</span>
-          <button className="kgPanelCollapseBtn" type="button" onClick={onToggle} title={t('折叠', 'Collapse')}>
+          <button className="kgPanelCollapseBtn" type="button" onClick={onToggle} title={t('收起', 'Collapse')}>
             {'>'}
           </button>
         </div>
@@ -783,7 +788,7 @@ export default function RightPanel({ collapsed, floating = false, onToggle }: Pr
                         <span className="kgTag">
                           {t('双证据', 'Dual Evidence')}: {current.dualEvidenceCoverage ? t('已覆盖', 'Covered') : t('未覆盖', 'Missing')}
                         </span>
-                        {current.retrievalMode && <span className="kgTag">{t('检索模式', 'Mode')}: {current.retrievalMode}</span>}
+                        {current.retrievalMode && <span className="kgTag">{t('模式', 'Mode')}: {current.retrievalMode}</span>}
                         <span className="kgTag">{t('证据', 'Evidence')}: {evidence.length}</span>
                         <span className="kgTag">
                           {t('子图', 'Subgraph')}: {graphNodeCount}N / {graphEdgeCount}E
@@ -838,7 +843,7 @@ export default function RightPanel({ collapsed, floating = false, onToggle }: Pr
                         <div className="kgInfoMetricValue">{counts.citation}</div>
                       </div>
                       <div className="kgInfoMetricCard">
-                        <div className="kgInfoMetricLabel">{t('证据来源数', 'Evidence Sources')}</div>
+                        <div className="kgInfoMetricLabel">{t('证据来源', 'Evidence Sources')}</div>
                         <div className="kgInfoMetricValue">{askEvidenceStats.sourceCount}</div>
                       </div>
                       <div className="kgInfoMetricCard">
@@ -846,7 +851,7 @@ export default function RightPanel({ collapsed, floating = false, onToggle }: Pr
                         <div className="kgInfoMetricValue">{formatMetric(askEvidenceStats.avgScore, 3)}</div>
                       </div>
                       <div className="kgInfoMetricCard">
-                        <div className="kgInfoMetricLabel">{t('图密度(E/N)', 'Graph Density (E/N)')}</div>
+                        <div className="kgInfoMetricLabel">{t('图密度 (E/N)', 'Graph Density (E/N)')}</div>
                         <div className="kgInfoMetricValue">{formatMetric(density, 2)}</div>
                       </div>
                       <div className="kgInfoMetricCard">
@@ -878,11 +883,11 @@ export default function RightPanel({ collapsed, floating = false, onToggle }: Pr
                         <div className="kgInfoMetricValue">{askFusionStats.total}</div>
                       </div>
                       <div className="kgInfoMetricCard">
-                        <div className="kgInfoMetricLabel">{t('教材数', 'Textbooks')}</div>
+                        <div className="kgInfoMetricLabel">{t('教材', 'Textbooks')}</div>
                         <div className="kgInfoMetricValue">{askFusionStats.textbookCount}</div>
                       </div>
                       <div className="kgInfoMetricCard">
-                        <div className="kgInfoMetricLabel">{t('关联论文数', 'Paper Sources')}</div>
+                        <div className="kgInfoMetricLabel">{t('论文来源', 'Paper Sources')}</div>
                         <div className="kgInfoMetricValue">{askFusionStats.paperSourceCount}</div>
                       </div>
                       <div className="kgInfoMetricCard">
@@ -1274,7 +1279,7 @@ export default function RightPanel({ collapsed, floating = false, onToggle }: Pr
                 <div className="kgCard">
                   <div className="kgCardTitle">{t('问答会话面板', 'Ask Session Panel')}</div>
                   <div className="kgCardBody">
-                    {t('左侧发起提问后，这里会展示会话状态、子图指标、节点详情与证据清单。', 'After you ask from the left panel, this area shows session state, subgraph metrics, node details, and evidence list.')}
+                    {t('在左侧发起提问后，这里会展示会话状态、子图指标、节点详情与证据清单。', 'After you ask from the left panel, this area shows session state, subgraph metrics, node details, and evidence list.')}
                   </div>
                 </div>
               </div>
@@ -1289,7 +1294,7 @@ export default function RightPanel({ collapsed, floating = false, onToggle }: Pr
     <aside className={panelClass}>
       <div className="kgPanelHeader">
         <span className="kgPanelTitle">{t('节点分析', 'Node Analysis')}</span>
-        <button className="kgPanelCollapseBtn" type="button" onClick={onToggle} title={t('折叠', 'Collapse')}>
+        <button className="kgPanelCollapseBtn" type="button" onClick={onToggle} title={t('收起', 'Collapse')}>
           {'>'}
         </button>
       </div>
@@ -1313,10 +1318,10 @@ export default function RightPanel({ collapsed, floating = false, onToggle }: Pr
                     <div className="kgInfoHeroTitle">{heroTitle}</div>
                     <div className="kgInfoHeroMeta">
                       <span className="kgTag">{kindLabel(heroKind, locale)}</span>
-                      {heroSource && <span className="kgTag">{t('标号', 'Source')}: {heroSource}</span>}
+                      {heroSource && <span className="kgTag">{t('来源', 'Source')}: {heroSource}</span>}
                       <span className="kgTag">ID: {genericContext.raw.selectedNode.id}</span>
                       {genericContext.center?.qualityTier && <span className="kgTag">{t('层级', 'Tier')} {genericContext.center.qualityTier}</span>}
-                      {typeof genericContext.qualityScore === 'number' && <span className="kgTag">{t('置信', 'Confidence')} {genericContext.qualityScore}%</span>}
+                      {typeof genericContext.qualityScore === 'number' && <span className="kgTag">{t('置信度', 'Confidence')} {genericContext.qualityScore}%</span>}
                       {typeof genericContext.center?.year === 'number' && <span className="kgTag">{genericContext.center.year}</span>}
                       <span className="kgTag">{t('问答范围', 'Ask Scope')}: {askScopePaperIds.length}</span>
                     </div>
@@ -1404,16 +1409,16 @@ export default function RightPanel({ collapsed, floating = false, onToggle }: Pr
 
               {askScopePaperIds.length > 0 && (
                 <>
-                  <div className="kgSectionTitle">{t('当前 RAG 节点清单', 'Current RAG Node Scope')}</div>
+                  <div className="kgSectionTitle">{t('当前 RAG 节点范围', 'Current RAG Node Scope')}</div>
                   <div className="kgInfoSection">
-                    <div className="kgInfoNeighborMeta">{t('已选', 'Selected')} {askScopePaperIds.length} {t('个 paper 节点用于 RAG。', 'paper nodes for RAG.')}</div>
+                    <div className="kgInfoNeighborMeta">{t('已选', 'Selected')} {askScopePaperIds.length} {t('个论文节点用于 RAG。', 'paper nodes for RAG.')}</div>
                     {askScopePaperIds.slice(0, 8).map((paperId) => (
                       <div key={`rag-scope-${paperId}`} className="kgInfoNeighborMeta">
                         • {paperId}
                       </div>
                     ))}
                     {askScopePaperIds.length > 8 && (
-                      <div className="kgInfoNeighborMeta">... {t('其余', 'remaining')} {askScopePaperIds.length - 8} {t('个', '')}</div>
+                      <div className="kgInfoNeighborMeta">... {t('剩余', 'remaining')} {askScopePaperIds.length - 8} {t('个', '')}</div>
                     )}
                   </div>
                 </>
@@ -1459,7 +1464,7 @@ export default function RightPanel({ collapsed, floating = false, onToggle }: Pr
                         style={{ width: `${Math.max(8, (item.total / Math.max(genericContext.timelinePeak, 1)) * 100)}%` }}
                       />
                       <div className="kgTimelineMeta">
-                        {item.total} {t('条关系', 'relations')} | {t('引用', 'Cites')} {item.cites} | {t('支持', 'Supports')} {item.supports} | {t('挑战', 'Challenges')} {item.challenges}
+                        {item.total} {t('关系', 'relations')} | {t('引用', 'Cites')} {item.cites} | {t('支持', 'Supports')} {item.supports} | {t('挑战', 'Challenges')} {item.challenges}
                       </div>
                       {item.samples.map((sample, idx) => (
                         <div key={`${item.key}-${idx}`} className="kgTimelineSample">
@@ -1679,7 +1684,7 @@ export default function RightPanel({ collapsed, floating = false, onToggle }: Pr
               <div className="kgCard">
                 <div className="kgCardTitle">{t('节点分析面板', 'Node Analysis Panel')}</div>
                 <div className="kgCardBody">
-                  {t('在图谱中点击节点后，这里会展示属性、关系分布、证据链时间线和跳转操作。', 'After selecting a node in the graph, this panel shows properties, relation distribution, evidence timeline, and quick actions.')}
+                  {t('在图谱中选中节点后，这里会展示属性、关系分布、证据链时间线和快捷操作。', 'After selecting a node in the graph, this panel shows properties, relation distribution, evidence timeline, and quick actions.')}
                 </div>
               </div>
             </div>

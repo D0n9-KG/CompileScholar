@@ -390,6 +390,7 @@ describe('ConfigCenterPage discovery retirement', () => {
     expect(screen.getByText('External Integrations')).toBeInTheDocument()
     expect(screen.getByText('Global Community')).toBeInTheDocument()
     expect(screen.getByText((text) => /Profile Format\s+v3/i.test(text))).toBeInTheDocument()
+    expect(screen.queryByText('2026-03-12T10:00:00Z')).not.toBeInTheDocument()
   })
 
   test('shows runtime controls and trace compiler quick version switcher', async () => {

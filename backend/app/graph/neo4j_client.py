@@ -659,6 +659,7 @@ RETURN p.paper_id AS paper_id,
        p.title AS title,
        p.doi AS doi,
        p.year AS year,
+       coalesce(p.ingested, false) AS ingested,
        [x IN cos WHERE x IS NOT NULL | {collection_id: x.collection_id, name: x.name}] AS collections
 ORDER BY p.year DESC
 LIMIT $limit
@@ -675,6 +676,7 @@ RETURN p.paper_id AS paper_id,
        p.title AS title,
        p.doi AS doi,
        p.year AS year,
+       coalesce(p.ingested, false) AS ingested,
        [x IN cos WHERE x IS NOT NULL | {collection_id: x.collection_id, name: x.name}] AS collections
 ORDER BY p.year DESC
 LIMIT $limit
@@ -691,6 +693,7 @@ RETURN p.paper_id AS paper_id,
        p.title AS title,
        p.doi AS doi,
        p.year AS year,
+       coalesce(p.ingested, false) AS ingested,
        [x IN cos WHERE x IS NOT NULL | {collection_id: x.collection_id, name: x.name}] AS collections
 ORDER BY p.year DESC
 LIMIT $limit
@@ -729,6 +732,33 @@ RETURN count(DISTINCT p) AS total_count
         with self._driver.session() as session:
             row = session.run(cypher, **params).single()
         return int((row or {}).get("total_count") or 0)
+
+    def get_overview_stats(self) -> dict[str, int]:
+        cypher = """
+MATCH (p:Paper)
+WHERE coalesce(p.ingested, false) = true
+WITH collect(DISTINCT p) AS papers
+OPTIONAL MATCH (paper:Paper)-[:HAS_RESEARCH_MOVE]->(rm:ResearchMove)
+WHERE paper IN papers
+WITH papers, count(DISTINCT rm) AS research_move_count
+OPTIONAL MATCH (gc:GlobalCommunity)
+WITH papers, research_move_count, count(DISTINCT gc) AS global_community_count
+RETURN size(papers) AS paper_count,
+       research_move_count,
+       global_community_count,
+       size([paper IN papers WHERE coalesce(paper.paper_logic_trace_ready_for_l3, false)]) AS ready_for_l3_count,
+       size([paper IN papers WHERE coalesce(paper.paper_logic_trace_ready_for_l4, false)]) AS ready_for_l4_count
+"""
+        with self._driver.session() as session:
+            row = session.run(cypher).single()
+        data = dict(row or {})
+        return {
+            "paper_count": int(data.get("paper_count") or 0),
+            "research_move_count": int(data.get("research_move_count") or 0),
+            "global_community_count": int(data.get("global_community_count") or 0),
+            "ready_for_l3_count": int(data.get("ready_for_l3_count") or 0),
+            "ready_for_l4_count": int(data.get("ready_for_l4_count") or 0),
+        }
 
     def list_papers_for_management(self, limit: int = 200, query: str | None = None) -> list[dict]:
         cypher = """

@@ -46,10 +46,13 @@ describe('workspaceData cache', () => {
   test('forces a refresh when requested explicitly', async () => {
     let version = 0
     apiGetMock.mockImplementation(async (path: string) => {
-      if (path === '/graph/papers?limit=1000') {
+      if (path === '/graph/overview-stats') {
         return {
-          papers: Array.from({ length: 2 + version }, (_, idx) => idx),
-          total_count: 20 + version,
+          paper_count: 20 + version,
+          research_move_count: 500 + version,
+          global_community_count: 30 + version,
+          ready_for_l3_count: 18 + version,
+          ready_for_l4_count: 17 + version,
         }
       }
       throw new Error(`Unexpected path: ${path}`)
@@ -63,7 +66,7 @@ describe('workspaceData cache', () => {
 
     expect(second).toEqual(first)
     expect(third.paperCount).toBe(21)
-    expect(third).not.toHaveProperty('discoveryItems')
+    expect(third.researchMoveCount).toBe(501)
     expect(apiGetMock).toHaveBeenCalledTimes(2)
   })
 

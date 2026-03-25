@@ -1,22 +1,15 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
+
 import { apiGet } from '../api'
 import { useI18n } from '../i18n'
 import { useGlobalState } from '../state/store'
 import type { ModuleId } from '../state/types'
 
-type LocalizedText = {
-  zh: string
-  en: string
-}
-
-type ModuleNavItem = {
-  id: string
-  label: LocalizedText
-  note: LocalizedText
-  moduleId?: ModuleId
-  href?: string
-}
+type LocalizedText = { zh: string; en: string }
+type ApiStatus = 'checking' | 'ok' | 'error'
+type GraphStats = { nodeCount: number; edgeCount: number }
+type ModuleNavItem = { id: string; label: LocalizedText; note: LocalizedText; moduleId?: ModuleId; href?: string }
 
 const MODULES: ModuleNavItem[] = [
   { id: 'overview', moduleId: 'overview', label: { zh: '总览', en: 'Overview' }, note: { zh: '全局知识图谱', en: 'Global KG' } },
@@ -26,20 +19,16 @@ const MODULES: ModuleNavItem[] = [
   { id: 'ops', label: { zh: '运维', en: 'Ops' }, note: { zh: '任务与配置', en: 'Tasks & Config' }, href: '/ops' },
 ]
 
-type ApiStatus = 'checking' | 'ok' | 'error'
-
-export default function TopBar() {
+export default function TopBar({ graphStats }: { graphStats?: GraphStats }) {
   const { state, switchModule } = useGlobalState()
   const { locale, setLocale, t } = useI18n()
   const { activeModule, graphElements } = state
   const nav = useNavigate()
   const location = useLocation()
-
   const [apiStatus, setApiStatus] = useState<ApiStatus>('checking')
 
   useEffect(() => {
     let cancelled = false
-
     async function check() {
       try {
         await apiGet<unknown>('/health')
@@ -48,29 +37,25 @@ export default function TopBar() {
         if (!cancelled) setApiStatus('error')
       }
     }
-
     void check()
-    const interval = setInterval(() => void check(), 30_000)
+    const timer = setInterval(() => void check(), 30_000)
     return () => {
       cancelled = true
-      clearInterval(interval)
+      clearInterval(timer)
     }
   }, [])
 
-  const nodeCount = graphElements.filter((e) => e.group === 'nodes').length
-  const edgeCount = graphElements.filter((e) => e.group === 'edges').length
+  const nodeCount = graphStats?.nodeCount ?? graphElements.filter((e) => e.group === 'nodes').length
+  const edgeCount = graphStats?.edgeCount ?? graphElements.filter((e) => e.group === 'edges').length
 
-  function isActive(item: ModuleNavItem): boolean {
-    if (item.href) return location.pathname === item.href || location.pathname.startsWith(`${item.href}/`)
-    return activeModule === item.moduleId
-  }
+  const isActive = (item: ModuleNavItem) =>
+    item.href ? location.pathname === item.href || location.pathname.startsWith(`${item.href}/`) : activeModule === item.moduleId
 
-  function handleClick(item: ModuleNavItem) {
+  const openModule = (item: ModuleNavItem) => {
     if (item.href) {
       nav(item.href)
       return
     }
-
     if (!item.moduleId) return
     if (location.pathname !== '/') nav('/')
     if (activeModule !== item.moduleId) switchModule(item.moduleId)
@@ -96,12 +81,7 @@ export default function TopBar() {
 
       <nav className="kgModuleNav" aria-label={t('模块导航', 'Module Navigation')}>
         {MODULES.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            className={`kgModuleBtn${isActive(item) ? ' is-active' : ''}`}
-            onClick={() => handleClick(item)}
-          >
+          <button key={item.id} type="button" className={`kgModuleBtn${isActive(item) ? ' is-active' : ''}`} onClick={() => openModule(item)}>
             <span>{t(item.label.zh, item.label.en)}</span>
             <small>{t(item.note.zh, item.note.en)}</small>
           </button>
@@ -133,9 +113,7 @@ export default function TopBar() {
             EN
           </button>
         </div>
-        <span style={{ fontSize: 10, color: 'var(--faint)', fontFamily: 'var(--font-mono)' }}>
-          {nodeCount}N | {edgeCount}E
-        </span>
+        <span style={{ fontSize: 10, color: 'var(--faint)', fontFamily: 'var(--font-mono)' }}>{nodeCount}N | {edgeCount}E</span>
         <div
           className={`kgApiDot${apiStatus === 'error' ? ' is-error' : apiStatus === 'checking' ? ' is-checking' : ''}`}
           title={`${t('接口状态', 'API Status')}: ${apiStatus}`}

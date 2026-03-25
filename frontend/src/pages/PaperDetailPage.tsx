@@ -4,180 +4,342 @@ import { useParams, useSearchParams } from 'react-router-dom'
 import { apiGet } from '../api'
 import MarkdownView from '../components/MarkdownView'
 import SignalGraph, { type SignalGraphEdge, type SignalGraphNode } from '../components/SignalGraph'
-import type {
-  CitationAct,
-  EvidenceAnchor,
-  MoveRelation,
-  PaperLogicTrace,
-  ResearchMove,
-} from '../types/paperLogicTrace'
-import {
-  formatMoveLabel,
-  mentionTokens,
-  moveActLabel,
-  moveRoleLabel,
-  normalizeText,
-} from '../types/paperLogicTrace'
+import { useI18n, type UILocale } from '../i18n'
+import type { CitationAct, EvidenceAnchor, L2CompletenessAudit, MoveRelation, PaperLogicTrace, ResearchMove } from '../types/paperLogicTrace'
+import { mentionTokens, normalizeText } from '../types/paperLogicTrace'
 
 type TraceTab = 'moves' | 'relations' | 'anchors' | 'citations' | 'original'
-
+type TraceState = { paperId: string; trace: PaperLogicTrace | null; error: string }
+type ContentState = { paperId: string; content: string; loaded: boolean }
 type GraphMeta = {
   title: string
   typeLabel: string
   detail?: string
   badge?: string
   facts?: Array<{ label: string; value: string }>
-  moveId?: string
-  anchorId?: string
-  citationActId?: string
 }
 
-type TraceLoadState = {
-  paperId: string
-  trace: PaperLogicTrace | null
-  error: string
+function text(locale: UILocale) {
+  return locale === 'zh-CN'
+    ? {
+        loading: '正在加载 PaperLogicTrace...',
+        missingPaperId: '缺少论文 ID。',
+        graph: '轨迹工作台',
+        nodeDetail: '节点详情',
+        selectNode: '点击图中的节点查看详情。',
+        quality: '质量等级',
+        completeness: '完整度',
+        community: '社区可用',
+        l3: 'L3 可用',
+        l4: 'L4 可用',
+        missingRoles: '缺失角色',
+        sparseSlots: '稀疏槽位',
+        qualityFlags: '质量标记',
+        auditStatus: '审计状态',
+        schema: '轨迹版本',
+        paperType: '论文类型',
+        builtAt: '构建时间',
+        venue: '发表来源',
+        year: '年份',
+        role: '角色',
+        actType: '动作类型',
+        confidence: '置信度',
+        focusGraph: '在图中定位',
+        emptyContent: '暂时没有原文内容。',
+        noRelations: '没有动作关系。',
+        noCitations: '没有引用行为。',
+        noiseMoves: '噪声动作',
+        tabs: {
+          moves: '研究动作',
+          relations: '动作关系',
+          anchors: '证据锚点',
+          citations: '引用行为',
+          original: '原文内容',
+        },
+      }
+    : {
+        loading: 'Loading PaperLogicTrace...',
+        missingPaperId: 'Missing paper id.',
+        graph: 'Trace Workspace',
+        nodeDetail: 'Node Detail',
+        selectNode: 'Select a node to inspect it.',
+        quality: 'Quality Tier',
+        completeness: 'Completeness',
+        community: 'Community Ready',
+        l3: 'Ready for L3',
+        l4: 'Ready for L4',
+        missingRoles: 'Missing Roles',
+        sparseSlots: 'Sparse Slots',
+        qualityFlags: 'Quality Flags',
+        auditStatus: 'Audit Status',
+        schema: 'Trace Version',
+        paperType: 'Paper Type',
+        builtAt: 'Built At',
+        venue: 'Venue',
+        year: 'Year',
+        role: 'Role',
+        actType: 'Act Type',
+        confidence: 'Confidence',
+        focusGraph: 'Focus in Graph',
+        emptyContent: 'Original content unavailable.',
+        noRelations: 'No move relations.',
+        noCitations: 'No citation acts.',
+        noiseMoves: 'Noise Moves',
+        tabs: {
+          moves: 'Research Moves',
+          relations: 'Move Relations',
+          anchors: 'Evidence Anchors',
+          citations: 'Citation Acts',
+          original: 'Source Content',
+        },
+      }
 }
 
-type OriginalContentState = {
-  paperId: string
-  content: string
-  loaded: boolean
-}
-
-type SelectionState = {
-  paperId: string
-  nodeId: string
-}
-
-function formatLocator(anchor: EvidenceAnchor): string {
-  const locator = anchor.locator ?? {}
-  const startLine = Number(locator.start_line)
-  const endLine = Number(locator.end_line)
-  const page = Number(locator.page)
-  if (Number.isFinite(startLine) && Number.isFinite(endLine) && endLine >= startLine) {
-    return `Lines ${startLine}-${endLine}`
+function labelMap(locale: UILocale, kind: 'role' | 'act' | 'paperType', value: string | null | undefined) {
+  const key = normalizeText(value)
+  const zh = {
+    role: {
+      problem: '问题',
+      background: '背景',
+      hypothesis: '假设',
+      method: '方法',
+      experiment: '实验',
+      result: '结果',
+      interpretation: '解释',
+      limitation: '局限',
+      future_work: '未来工作',
+    },
+    act: {
+      identify_gap: '识别缺口',
+      define_task: '定义任务',
+      formulate_hypothesis: '提出假设',
+      propose_method: '提出方法',
+      adapt_method: '改造方法',
+      build_resource: '构建资源',
+      set_condition: '设定条件',
+      run_experiment: '执行实验',
+      measure_outcome: '测量结果',
+      compare_baseline: '对比基线',
+      report_effect: '报告效果',
+      explain_mechanism: '解释机制',
+      diagnose_failure: '诊断失败',
+      state_limitation: '说明局限',
+      suggest_extension: '提出扩展',
+    },
+    paperType: {
+      empirical: '经验论文',
+      theoretical: '理论论文',
+      review: '综述论文',
+      software: '软件论文',
+      benchmark: '基准论文',
+      case_study: '案例研究',
+      unknown: '未知类型',
+    },
   }
-  if (Number.isFinite(startLine)) return `Line ${startLine}`
-  if (Number.isFinite(page)) return `Page ${page}`
-  return anchor.source_ref
+  const en = {
+    role: {
+      problem: 'Problem',
+      background: 'Background',
+      hypothesis: 'Hypothesis',
+      method: 'Method',
+      experiment: 'Experiment',
+      result: 'Result',
+      interpretation: 'Interpretation',
+      limitation: 'Limitation',
+      future_work: 'Future Work',
+    },
+    act: {
+      identify_gap: 'Identify Gap',
+      define_task: 'Define Task',
+      formulate_hypothesis: 'Formulate Hypothesis',
+      propose_method: 'Propose Method',
+      adapt_method: 'Adapt Method',
+      build_resource: 'Build Resource',
+      set_condition: 'Set Condition',
+      run_experiment: 'Run Experiment',
+      measure_outcome: 'Measure Outcome',
+      compare_baseline: 'Compare Baseline',
+      report_effect: 'Report Effect',
+      explain_mechanism: 'Explain Mechanism',
+      diagnose_failure: 'Diagnose Failure',
+      state_limitation: 'State Limitation',
+      suggest_extension: 'Suggest Extension',
+    },
+    paperType: {
+      empirical: 'Empirical',
+      theoretical: 'Theoretical',
+      review: 'Review',
+      software: 'Software',
+      benchmark: 'Benchmark',
+      case_study: 'Case Study',
+      unknown: 'Unknown',
+    },
+  }
+  const dict = locale === 'zh-CN' ? zh : en
+  return (dict[kind] as Record<string, string>)[key] ?? (key || (kind === 'paperType' ? dict.paperType.unknown : 'Unknown'))
 }
 
-function formatConfidence(value: number | null | undefined): string {
-  if (!Number.isFinite(Number(value))) return '-'
-  return `${Math.round(Number(value) * 100)}%`
+function qualityTierLabel(locale: UILocale, value: string | null | undefined) {
+  const key = normalizeText(value)
+  const zh: Record<string, string> = {
+    green: '高可信',
+    yellow: '可用待补强',
+    red: '受限',
+  }
+  const en: Record<string, string> = {
+    green: 'High Confidence',
+    yellow: 'Usable with Gaps',
+    red: 'Limited',
+  }
+  const dict = locale === 'zh-CN' ? zh : en
+  return dict[key] ?? (key || '-')
 }
 
-function moveTagSummary(move: ResearchMove): string[] {
-  const tags = [
-    ...mentionTokens(move.methods),
-    ...mentionTokens(move.research_objects),
-    ...mentionTokens(move.metrics),
-    ...mentionTokens(move.comparators),
-    ...mentionTokens(move.conditions),
-  ]
-  return Array.from(new Set(tags)).slice(0, 6)
+function auditStatusLabel(locale: UILocale, value: string | null | undefined) {
+  const key = normalizeText(value)
+  const zh: Record<string, string> = {
+    not_needed: '无需补审',
+    pending: '待补审',
+    completed: '已补审',
+  }
+  const en: Record<string, string> = {
+    not_needed: 'No Further Audit Needed',
+    pending: 'Pending Audit',
+    completed: 'Audited',
+  }
+  const dict = locale === 'zh-CN' ? zh : en
+  return dict[key] ?? (key || '-')
 }
 
-function evidenceSummary(anchor: EvidenceAnchor): string {
-  const section = (anchor.section_path ?? []).filter(Boolean).join(' / ')
-  const location = formatLocator(anchor)
-  return [section, location].filter(Boolean).join(' · ')
+function relationTypeLabel(locale: UILocale, value: string | null | undefined) {
+  const key = normalizeText(value)
+  const zh: Record<string, string> = {
+    motivates: '提供动机',
+    addresses: '回应问题',
+    implements: '展开实现',
+    evaluates: '进行评估',
+    yields: '产出结果',
+    explains: '解释机制',
+    limits: '指出限制',
+    extends: '提出扩展',
+  }
+  const en: Record<string, string> = {
+    motivates: 'Motivates',
+    addresses: 'Addresses',
+    implements: 'Implements',
+    evaluates: 'Evaluates',
+    yields: 'Yields',
+    explains: 'Explains',
+    limits: 'Limits',
+    extends: 'Extends',
+  }
+  const dict = locale === 'zh-CN' ? zh : en
+  return dict[key] ?? (key || '-')
 }
 
-function buildTraceGraph(trace: PaperLogicTrace): {
-  nodes: SignalGraphNode[]
-  edges: SignalGraphEdge[]
-  metaMap: Map<string, GraphMeta>
-} {
+const fmtPct = (value: number | null | undefined) => (Number.isFinite(Number(value)) ? `${Math.round(Number(value) * 100)}%` : '-')
+const fmtReady = (ready: boolean | null | undefined, locale: UILocale) => (ready ? (locale === 'zh-CN' ? '已就绪' : 'Ready') : locale === 'zh-CN' ? '暂缓' : 'Hold')
+const fmtList = (values: string[] | null | undefined) => {
+  const list = (values ?? []).map((item) => normalizeText(item)).filter(Boolean)
+  return list.length ? list.join(', ') : '-'
+}
+
+function moveTagSummary(move: ResearchMove) {
+  return Array.from(
+    new Set([
+      ...mentionTokens(move.methods),
+      ...mentionTokens(move.research_objects),
+      ...mentionTokens(move.metrics),
+      ...mentionTokens(move.comparators),
+      ...mentionTokens(move.conditions),
+    ]),
+  ).slice(0, 8)
+}
+
+function moveLabel(move: ResearchMove, locale: UILocale) {
+  return `${move.sequence_no}. ${labelMap(locale, 'role', move.role)}`
+}
+
+function locator(anchor: EvidenceAnchor, locale: UILocale) {
+  const start = Number(anchor.locator?.start_line)
+  const end = Number(anchor.locator?.end_line)
+  if (Number.isFinite(start) && Number.isFinite(end) && end >= start) return locale === 'zh-CN' ? `第 ${start}-${end} 行` : `Lines ${start}-${end}`
+  if (Number.isFinite(start)) return locale === 'zh-CN' ? `第 ${start} 行` : `Line ${start}`
+  return normalizeText(anchor.source_ref) || '-'
+}
+
+function formatBuiltAt(value: string | null | undefined, locale: UILocale) {
+  const raw = normalizeText(value)
+  if (!raw) return '-'
+  const timestamp = new Date(raw)
+  if (Number.isNaN(timestamp.getTime())) return raw
+  return timestamp.toLocaleString(locale === 'zh-CN' ? 'zh-CN' : 'en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+function graphData(trace: PaperLogicTrace, locale: UILocale) {
   const nodes = new Map<string, SignalGraphNode>()
   const edges = new Map<string, SignalGraphEdge>()
-  const metaMap = new Map<string, GraphMeta>()
+  const meta = new Map<string, GraphMeta>()
   const rootId = 'paper:root'
-  const anchorById = new Map(trace.canonical_core.evidence_anchors.map((anchor) => [anchor.anchor_id, anchor]))
+  const anchors = new Map(trace.canonical_core.evidence_anchors.map((anchor) => [anchor.anchor_id, anchor]))
 
-  const putNode = (node: SignalGraphNode, meta: GraphMeta) => {
+  const put = (node: SignalGraphNode, value: GraphMeta) => {
     nodes.set(node.id, node)
-    metaMap.set(node.id, meta)
+    meta.set(node.id, value)
   }
 
-  putNode(
-    {
-      id: rootId,
-      label: normalizeText(trace.paper_metadata.title) || trace.paper_metadata.paper_id,
-      kind: 'root',
-      weight: 1,
-    },
-    {
-      title: normalizeText(trace.paper_metadata.title) || trace.paper_metadata.paper_id,
-      typeLabel: 'Paper Logic Trace',
-      detail: [trace.paper_metadata.paper_id, trace.paper_metadata.canonical_doi, trace.paper_metadata.venue]
-        .filter(Boolean)
-        .join(' · '),
-      badge: String(trace.quality?.quality_tier ?? ''),
-    },
-  )
+  put(
+    { id: rootId, label: normalizeText(trace.paper_metadata.title) || trace.paper_metadata.paper_id, kind: 'root', weight: 1 },
+      {
+        title: normalizeText(trace.paper_metadata.title) || trace.paper_metadata.paper_id,
+        typeLabel: locale === 'zh-CN' ? '论文轨迹' : 'Paper Trace',
+        detail: [normalizeText(trace.paper_metadata.paper_id), normalizeText(trace.paper_metadata.canonical_doi), normalizeText(trace.paper_metadata.venue)].filter(Boolean).join(' | '),
+        badge: qualityTierLabel(locale, trace.quality?.quality_tier),
+      },
+    )
 
   for (const move of trace.canonical_core.moves) {
-    const clusterId = `cluster:${move.move_id}`
     const moveId = `move:${move.move_id}`
-    putNode(
-      {
-        id: clusterId,
-        label: '',
-        kind: 'cluster',
-        weight: 0.45,
-      },
-      {
-        title: formatMoveLabel(move),
-        typeLabel: 'Move Cluster',
-        detail: `${move.anchor_ids?.length ?? 0} anchors`,
-      },
+    const clusterId = `cluster:${move.move_id}`
+    put(
+      { id: clusterId, label: '', kind: 'cluster', weight: 0.4 },
+      { title: moveLabel(move, locale), typeLabel: locale === 'zh-CN' ? '动作簇' : 'Move Cluster' },
     )
-    putNode(
+    put(
+      { id: moveId, label: moveLabel(move, locale), kind: 'move', weight: 0.76 },
       {
-        id: moveId,
-        label: formatMoveLabel(move),
-        kind: 'move',
-        weight: 0.76,
-      },
-      {
-        title: formatMoveLabel(move),
-        typeLabel: 'Research Move',
-        detail: move.summary,
-        badge: moveActLabel(move.act_type),
+        title: moveLabel(move, locale),
+        typeLabel: locale === 'zh-CN' ? '研究动作' : 'Research Move',
+        detail: normalizeText(move.summary),
+        badge: labelMap(locale, 'act', move.act_type),
         facts: [
-          { label: 'Role', value: moveRoleLabel(move.role) },
-          { label: 'Act Type', value: moveActLabel(move.act_type) },
+          { label: locale === 'zh-CN' ? '角色' : 'Role', value: labelMap(locale, 'role', move.role) },
+          { label: locale === 'zh-CN' ? '动作类型' : 'Act Type', value: labelMap(locale, 'act', move.act_type) },
+          { label: locale === 'zh-CN' ? '置信度' : 'Confidence', value: fmtPct(move.confidence) },
         ],
-        moveId: move.move_id,
       },
     )
-    edges.set(`${rootId}->${moveId}`, {
-      id: `${rootId}->${moveId}`,
-      source: rootId,
-      target: moveId,
-      kind: 'contains',
-      weight: 0.7,
-    })
+
+    edges.set(`${rootId}->${moveId}`, { id: `${rootId}->${moveId}`, source: rootId, target: moveId, kind: 'contains', weight: 0.7 })
 
     for (const anchorId of move.anchor_ids ?? []) {
-      const anchor = anchorById.get(anchorId)
+      const anchor = anchors.get(anchorId)
       if (!anchor) continue
       const anchorNodeId = `anchor:${anchor.anchor_id}`
       if (!nodes.has(anchorNodeId)) {
-        putNode(
-          {
-            id: anchorNodeId,
-            label: anchor.anchor_id,
-            kind: 'anchor',
-            weight: anchor.weak ? 0.38 : 0.5,
-          },
+        put(
+          { id: anchorNodeId, label: anchor.anchor_id, kind: 'anchor', weight: anchor.weak ? 0.38 : 0.5 },
           {
             title: anchor.anchor_id,
-            typeLabel: 'Evidence Anchor',
-            detail: anchor.quote,
-            badge: evidenceSummary(anchor),
-            anchorId: anchor.anchor_id,
+            typeLabel: locale === 'zh-CN' ? '证据锚点' : 'Evidence Anchor',
+            detail: normalizeText(anchor.quote),
+            badge: locator(anchor, locale),
           },
         )
       }
@@ -192,13 +354,13 @@ function buildTraceGraph(trace: PaperLogicTrace): {
   }
 
   for (const relation of trace.canonical_core.move_relations) {
-    const sourceId = `move:${relation.source_move_id}`
-    const targetId = `move:${relation.target_move_id}`
-    if (!nodes.has(sourceId) || !nodes.has(targetId)) continue
+    const source = `move:${relation.source_move_id}`
+    const target = `move:${relation.target_move_id}`
+    if (!nodes.has(source) || !nodes.has(target)) continue
     edges.set(relation.relation_id, {
       id: relation.relation_id,
-      source: sourceId,
-      target: targetId,
+      source,
+      target,
       kind: relation.relation_type,
       weight: relation.confidence ?? 0.55,
     })
@@ -207,69 +369,68 @@ function buildTraceGraph(trace: PaperLogicTrace): {
   for (const citation of trace.canonical_core.citation_acts) {
     const moveId = citation.source_move_id ? `move:${citation.source_move_id}` : ''
     if (!moveId || !nodes.has(moveId)) continue
-    const citationNodeId = `citation:${citation.citation_act_id}`
-    putNode(
-      {
-        id: citationNodeId,
-        label: citation.citation_act_id,
-        kind: 'citation',
-        weight: 0.42,
-      },
+    const citationId = `citation:${citation.citation_act_id}`
+    put(
+      { id: citationId, label: citation.citation_act_id, kind: 'citation', weight: 0.42 },
       {
         title: citation.citation_act_id,
-        typeLabel: 'Citation Act',
-        detail: [citation.target_paper_id, citation.purpose, citation.semantic_signal].filter(Boolean).join(' · '),
-        badge: citation.target_scope ?? '',
-        citationActId: citation.citation_act_id,
+        typeLabel: locale === 'zh-CN' ? '引用行为' : 'Citation Act',
+        detail: [normalizeText(citation.target_paper_id), normalizeText(citation.purpose), normalizeText(citation.semantic_signal)].filter(Boolean).join(' | '),
+        badge: normalizeText(citation.target_scope),
       },
     )
-    edges.set(`${moveId}->${citationNodeId}`, {
-      id: `${moveId}->${citationNodeId}`,
+    edges.set(`${moveId}->${citationId}`, {
+      id: `${moveId}->${citationId}`,
       source: moveId,
-      target: citationNodeId,
+      target: citationId,
       kind: 'cites',
       weight: citation.confidence ?? 0.45,
     })
   }
 
-  return {
-    nodes: Array.from(nodes.values()),
-    edges: Array.from(edges.values()),
-    metaMap,
-  }
+  return { nodes: Array.from(nodes.values()), edges: Array.from(edges.values()), meta }
+}
+
+function auditCards(audit: L2CompletenessAudit | undefined, labels: ReturnType<typeof text>) {
+  if (!audit) return []
+  return [
+    { label: labels.missingRoles, value: fmtList(audit.missing_expected_roles), testId: 'trace-missing-roles' },
+    { label: labels.sparseSlots, value: fmtList(audit.sparse_expected_slot_fields), testId: 'trace-sparse-slots' },
+    { label: labels.noiseMoves, value: String((audit.noise_move_ids ?? []).length) },
+  ]
 }
 
 export default function PaperDetailPage() {
+  const { locale } = useI18n()
+  const copy = text(locale)
   const { paperId = '' } = useParams<{ paperId: string }>()
   const [searchParams, setSearchParams] = useSearchParams()
-  const [traceState, setTraceState] = useState<TraceLoadState>({ paperId: '', trace: null, error: '' })
-  const [contentState, setContentState] = useState<OriginalContentState>({ paperId: '', content: '', loaded: false })
-  const [selectionState, setSelectionState] = useState<SelectionState>({ paperId: '', nodeId: 'paper:root' })
+  const [traceState, setTraceState] = useState<TraceState>({ paperId: '', trace: null, error: '' })
+  const [contentState, setContentState] = useState<ContentState>({ paperId: '', content: '', loaded: false })
+  const [selectedNodeId, setSelectedNodeId] = useState('paper:root')
 
   const tab = useMemo<TraceTab>(() => {
     const raw = normalizeText(searchParams.get('tab'))
-    const allowed: TraceTab[] = ['moves', 'relations', 'anchors', 'citations', 'original']
-    return (allowed.find((item) => item === raw) ?? 'moves') as TraceTab
+    return (['moves', 'relations', 'anchors', 'citations', 'original'] as TraceTab[]).find((item) => item === raw) ?? 'moves'
   }, [searchParams])
 
   useEffect(() => {
     if (!paperId) return
     let cancelled = false
-
     apiGet<PaperLogicTrace>(`/papers/${encodeURIComponent(paperId)}/logic-trace`)
-      .then((payload) => {
-        if (!cancelled) setTraceState({ paperId, trace: payload, error: '' })
+      .then((trace) => {
+        if (cancelled) return
+        setTraceState({ paperId, trace, error: '' })
+        setSelectedNodeId('paper:root')
       })
       .catch((cause: unknown) => {
-        if (!cancelled) {
-          setTraceState({
-            paperId,
-            trace: null,
-            error: String((cause as { message?: unknown } | null)?.message ?? cause),
-          })
-        }
+        if (cancelled) return
+        setTraceState({
+          paperId,
+          trace: null,
+          error: String((cause as { message?: unknown } | null)?.message ?? cause),
+        })
       })
-
     return () => {
       cancelled = true
     }
@@ -278,101 +439,135 @@ export default function PaperDetailPage() {
   useEffect(() => {
     if (!paperId || tab !== 'original' || (contentState.paperId === paperId && contentState.loaded)) return
     let cancelled = false
-
     apiGet<string>(`/papers/${encodeURIComponent(paperId)}/content`)
-      .then((payload) => {
-        if (!cancelled) {
-          setContentState({ paperId, content: String(payload ?? ''), loaded: true })
-        }
+      .then((content) => {
+        if (!cancelled) setContentState({ paperId, content: String(content ?? ''), loaded: true })
       })
       .catch(() => {
         if (!cancelled) setContentState({ paperId, content: '', loaded: true })
       })
-
     return () => {
       cancelled = true
     }
   }, [contentState.loaded, contentState.paperId, paperId, tab])
 
   const trace = traceState.paperId === paperId ? traceState.trace : null
-  const error = traceState.paperId === paperId ? traceState.error : ''
   const content = contentState.paperId === paperId ? contentState.content : ''
-  const selectedGraphNodeId = selectionState.paperId === paperId ? selectionState.nodeId : 'paper:root'
+  const quality = trace?.quality
+  const audit = quality?.l2_completeness_audit
+  const pageTitle = trace?.paper_metadata.title ?? (locale === 'zh-CN' ? '论文轨迹' : 'Paper Trace')
+  const graph = useMemo(
+    () => (trace ? graphData(trace, locale) : { nodes: [] as SignalGraphNode[], edges: [] as SignalGraphEdge[], meta: new Map<string, GraphMeta>() }),
+    [locale, trace],
+  )
+  const selectedMeta = graph.meta.get(selectedNodeId) ?? null
 
-  const graph = useMemo(() => (trace ? buildTraceGraph(trace) : { nodes: [], edges: [], metaMap: new Map<string, GraphMeta>() }), [trace])
-  const selectedMeta = useMemo(() => graph.metaMap.get(selectedGraphNodeId) ?? null, [graph.metaMap, selectedGraphNodeId])
-
-  function selectTab(nextTab: TraceTab) {
+  const setTab = (nextTab: TraceTab) => {
     const next = new URLSearchParams(searchParams)
     next.set('tab', nextTab)
     setSearchParams(next, { replace: true })
   }
 
-  function selectGraphNode(nodeId: string) {
-    setSelectionState({ paperId, nodeId })
-  }
-
-  if (!paperId) return <div className="page">Missing paper id.</div>
+  if (!paperId) return <div className="page">{copy.missingPaperId}</div>
 
   return (
     <div className="page paperTracePage">
       <div className="pageHeader paperTraceHeader">
         <div>
-          <h2 className="pageTitle">{trace?.paper_metadata.title ?? 'Paper Logic Trace'}</h2>
+          <h2 className="pageTitle">{pageTitle}</h2>
           <div className="pageSubtitle">{trace?.paper_metadata.paper_id ?? paperId}</div>
         </div>
-        {trace && (
+        {trace ? (
           <div className="pageActions paperTraceHeaderMeta">
             <span className="pill">
-              <span className="kicker">Schema</span> {trace.schema_version}
+              <span className="kicker">{copy.schema}</span> {trace.schema_version}
             </span>
             <span className="pill">
-              <span className="kicker">Moves</span> {trace.canonical_core.moves.length}
+              <span className="kicker">{copy.paperType}</span> {labelMap(locale, 'paperType', trace.paper_metadata.paper_type)}
             </span>
             <span className="pill">
-              <span className="kicker">Anchors</span> {trace.canonical_core.evidence_anchors.length}
-            </span>
-            <span className="pill">
-              <span className="kicker">Relations</span> {trace.canonical_core.move_relations.length}
-            </span>
-            <span className="pill">
-              <span className="kicker">Quality</span> {String(trace.quality?.quality_tier ?? '-')}
+              <span className="kicker">{copy.venue}</span> {normalizeText(trace.paper_metadata.venue) || '-'}
             </span>
           </div>
-        )}
+        ) : null}
       </div>
 
-      {error && <div className="errorBox">{error}</div>}
+      {traceState.error ? <div className="errorBox">{traceState.error}</div> : null}
       {!trace ? (
         <div className="panel">
-          <div className="panelBody">Loading paper logic trace…</div>
+          <div className="panelBody">{copy.loading}</div>
         </div>
       ) : (
         <>
+          <section className="panel">
+            <div className="panelHeader">
+              <div className="panelTitle">{locale === 'zh-CN' ? 'L2 完整性体检' : 'L2 Completeness Audit'}</div>
+            </div>
+            <div className="panelBody">
+              <div className="kgStatGrid">
+                <div className="kgStatCard">
+                  <div className="kgStatLabel">{copy.quality}</div>
+                  <div className="kgStatValue" data-testid="trace-quality-tier">{qualityTierLabel(locale, quality?.quality_tier)}</div>
+                </div>
+                <div className="kgStatCard">
+                  <div className="kgStatLabel">{copy.completeness}</div>
+                  <div className="kgStatValue" data-testid="trace-completeness-score">{fmtPct(audit?.completeness_score)}</div>
+                </div>
+                <div className="kgStatCard">
+                  <div className="kgStatLabel">{copy.community}</div>
+                  <div className="kgStatValue">{fmtReady(audit?.ready_for_community, locale)}</div>
+                </div>
+                <div className="kgStatCard">
+                  <div className="kgStatLabel">{copy.l3}</div>
+                  <div className="kgStatValue" data-testid="trace-ready-l3">{fmtReady(audit?.ready_for_l3, locale)}</div>
+                </div>
+                <div className="kgStatCard">
+                  <div className="kgStatLabel">{copy.l4}</div>
+                  <div className="kgStatValue" data-testid="trace-ready-l4">{fmtReady(audit?.ready_for_l4, locale)}</div>
+                </div>
+              </div>
+              <div className="list" style={{ marginTop: 12 }}>
+                {auditCards(audit, copy).map((card) => (
+                  <div key={card.label} className="itemCard">
+                    <div className="itemTitle">{card.label}</div>
+                    <div className="itemBody" data-testid={card.testId}>{card.value}</div>
+                  </div>
+                ))}
+                <div className="itemCard">
+                  <div className="itemTitle">{copy.qualityFlags}</div>
+                  <div className="itemBody">{fmtList(quality?.quality_flags)}</div>
+                </div>
+                <div className="itemCard">
+                  <div className="itemTitle">{copy.auditStatus}</div>
+                  <div className="itemBody">{auditStatusLabel(locale, quality?.audit_status)}</div>
+                </div>
+                <div className="itemCard">
+                  <div className="itemTitle">{copy.builtAt}</div>
+                  <div className="itemBody">{formatBuiltAt(trace.built_at, locale)}</div>
+                </div>
+                <div className="itemCard">
+                  <div className="itemTitle">{copy.year}</div>
+                  <div className="itemBody">{trace.paper_metadata.year ?? '-'}</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
           <div className="row paperTraceTabRow">
-            <button className={`chip ${tab === 'moves' ? 'chipActive' : ''}`} onClick={() => selectTab('moves')}>
-              Research Moves
-            </button>
-            <button className={`chip ${tab === 'relations' ? 'chipActive' : ''}`} onClick={() => selectTab('relations')}>
-              Move Relations
-            </button>
-            <button className={`chip ${tab === 'anchors' ? 'chipActive' : ''}`} onClick={() => selectTab('anchors')}>
-              Evidence Anchors
-            </button>
-            <button className={`chip ${tab === 'citations' ? 'chipActive' : ''}`} onClick={() => selectTab('citations')}>
-              Citation Acts
-            </button>
-            <button className={`chip ${tab === 'original' ? 'chipActive' : ''}`} onClick={() => selectTab('original')}>
-              Source Content
-            </button>
+            {(Object.keys(copy.tabs) as TraceTab[]).map((traceTab) => (
+              <button key={traceTab} className={`chip ${tab === traceTab ? 'chipActive' : ''}`} type="button" onClick={() => setTab(traceTab)}>
+                {copy.tabs[traceTab]}
+              </button>
+            ))}
           </div>
 
           <section className="panel paperTraceWorkbench">
             <div className="panelHeader">
               <div className="split">
-                <div className="panelTitle">Trace Graph</div>
+                <div className="panelTitle">{copy.graph}</div>
                 <div className="metaLine">
-                  {trace.paper_metadata.paper_type} · {trace.paper_metadata.year ?? 'unknown year'}
+                  {copy.paperType}: {labelMap(locale, 'paperType', trace.paper_metadata.paper_type)} | {copy.builtAt}:{' '}
+                  {formatBuiltAt(trace.built_at, locale)}
                 </div>
               </div>
             </div>
@@ -382,39 +577,41 @@ export default function PaperDetailPage() {
                   <SignalGraph
                     nodes={graph.nodes}
                     edges={graph.edges}
-                    selectedId={selectedGraphNodeId}
-                    onSelect={selectGraphNode}
+                    selectedId={selectedNodeId}
+                    onSelect={(id) => setSelectedNodeId(id || 'paper:root')}
                     height={420}
                   />
                 </div>
                 <aside className="paperTraceDetailCard">
-                  <div className="itemTitle">Node Detail</div>
+                  <div className="itemTitle">{copy.nodeDetail}</div>
                   {selectedMeta ? (
                     <div className="stack">
                       <div>
                         <div className="metaLine">{selectedMeta.typeLabel}</div>
-                        <div className="itemBody" style={{ fontWeight: 700 }}>{selectedMeta.title}</div>
+                        <div className="itemBody" style={{ fontWeight: 700 }}>
+                          {selectedMeta.title}
+                        </div>
                       </div>
-                      {selectedMeta.badge && <div className="badge">{selectedMeta.badge}</div>}
+                      {selectedMeta.badge ? <div className="badge">{selectedMeta.badge}</div> : null}
                       {selectedMeta.facts?.map((fact) => (
                         <div key={`${selectedMeta.title}:${fact.label}`} className="metaLine">
-                          <strong>{fact.label}</strong> · {fact.value}
+                          <strong>{fact.label}</strong>: {fact.value}
                         </div>
                       ))}
-                      {selectedMeta.detail && <div className="itemBody">{selectedMeta.detail}</div>}
+                      {selectedMeta.detail ? <div className="itemBody">{selectedMeta.detail}</div> : null}
                     </div>
                   ) : (
-                    <div className="metaLine">Select a move, anchor, or citation node.</div>
+                    <div className="metaLine">{copy.selectNode}</div>
                   )}
                 </aside>
               </div>
             </div>
           </section>
 
-          {tab === 'moves' && (
+          {tab === 'moves' ? (
             <section className="panel">
               <div className="panelHeader">
-                <div className="panelTitle">Research Moves</div>
+                <div className="panelTitle">{copy.tabs.moves}</div>
               </div>
               <div className="panelBody">
                 <div className="list">
@@ -425,20 +622,21 @@ export default function PaperDetailPage() {
                       <article key={move.move_id} className="itemCard">
                         <div className="split">
                           <div>
-                            <div className="itemTitle">{formatMoveLabel(move)}</div>
+                            <div className="itemTitle">{moveLabel(move, locale)}</div>
                             <div className="metaLine">
-                              Role · {moveRoleLabel(move.role)} | Act Type · {moveActLabel(move.act_type)}
+                              {copy.role}: {labelMap(locale, 'role', move.role)} | {copy.actType}:{' '}
+                              {labelMap(locale, 'act', move.act_type)}
                             </div>
                           </div>
                           <div className="row" style={{ gap: 8 }}>
-                            <span className="badge">{formatConfidence(move.confidence)}</span>
-                            <button className="btn btnSmall" onClick={() => selectGraphNode(`move:${move.move_id}`)}>
-                              Focus in Graph
+                            <span className="badge">{fmtPct(move.confidence)}</span>
+                            <button className="btn btnSmall" type="button" onClick={() => setSelectedNodeId(`move:${move.move_id}`)}>
+                              {copy.focusGraph}
                             </button>
                           </div>
                         </div>
-                        <div className="itemBody">{move.summary}</div>
-                        {moveTagSummary(move).length > 0 && (
+                        <div className="itemBody">{normalizeText(move.summary)}</div>
+                        {moveTagSummary(move).length ? (
                           <div className="row" style={{ gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
                             {moveTagSummary(move).map((token) => (
                               <span key={`${move.move_id}:${token}`} className="chip">
@@ -446,41 +644,50 @@ export default function PaperDetailPage() {
                               </span>
                             ))}
                           </div>
-                        )}
+                        ) : null}
                       </article>
                     ))}
                 </div>
               </div>
             </section>
-          )}
+          ) : null}
 
-          {tab === 'relations' && (
+          {tab === 'relations' ? (
             <section className="panel">
               <div className="panelHeader">
-                <div className="panelTitle">Move Relations</div>
+                <div className="panelTitle">{copy.tabs.relations}</div>
               </div>
               <div className="panelBody">
                 <div className="list">
-                  {trace.canonical_core.move_relations.map((relation: MoveRelation) => (
-                    <article key={relation.relation_id} className="itemCard">
-                      <div className="split">
-                        <div className="itemTitle">{relation.relation_type}</div>
-                        <span className="badge">{formatConfidence(relation.confidence)}</span>
-                      </div>
-                      <div className="metaLine">{relation.source_move_id}</div>
-                      <div className="metaLine">{relation.target_move_id}</div>
-                    </article>
-                  ))}
-                  {trace.canonical_core.move_relations.length === 0 && <div className="metaLine">No move relations.</div>}
+                  {trace.canonical_core.move_relations.length ? (
+                    trace.canonical_core.move_relations.map((relation: MoveRelation) => {
+                      const sourceMove = trace.canonical_core.moves.find((move) => move.move_id === relation.source_move_id)
+                      const targetMove = trace.canonical_core.moves.find((move) => move.move_id === relation.target_move_id)
+                      const relationSummary =
+                        sourceMove && targetMove
+                          ? `${moveLabel(sourceMove, locale)} -> ${moveLabel(targetMove, locale)}`
+                          : `${normalizeText(relation.source_move_id)} -> ${normalizeText(relation.target_move_id)}`
+                      return (
+                      <article key={`${relation.relation_id}:${relation.source_move_id}:${relation.target_move_id}`} className="itemCard">
+                        <div className="split">
+                          <div className="itemTitle">{relationTypeLabel(locale, relation.relation_type)}</div>
+                          <span className="badge">{fmtPct(relation.confidence)}</span>
+                        </div>
+                        <div className="metaLine">{relationSummary}</div>
+                      </article>
+                    )})
+                  ) : (
+                    <div className="metaLine">{copy.noRelations}</div>
+                  )}
                 </div>
               </div>
             </section>
-          )}
+          ) : null}
 
-          {tab === 'anchors' && (
+          {tab === 'anchors' ? (
             <section className="panel">
               <div className="panelHeader">
-                <div className="panelTitle">Evidence Anchors</div>
+                <div className="panelTitle">{copy.tabs.anchors}</div>
               </div>
               <div className="panelBody">
                 <div className="list">
@@ -489,61 +696,62 @@ export default function PaperDetailPage() {
                       <div className="split">
                         <div>
                           <div className="itemTitle">{anchor.anchor_id}</div>
-                          <div className="metaLine">{evidenceSummary(anchor)}</div>
+                          <div className="metaLine">{locator(anchor, locale)}</div>
                         </div>
-                        <button className="btn btnSmall" onClick={() => selectGraphNode(`anchor:${anchor.anchor_id}`)}>
-                          Focus in Graph
+                        <button className="btn btnSmall" type="button" onClick={() => setSelectedNodeId(`anchor:${anchor.anchor_id}`)}>
+                          {copy.focusGraph}
                         </button>
                       </div>
-                      <div className="itemBody">{anchor.quote}</div>
+                      <div className="itemBody">{normalizeText(anchor.quote)}</div>
                     </article>
                   ))}
                 </div>
               </div>
             </section>
-          )}
+          ) : null}
 
-          {tab === 'citations' && (
+          {tab === 'citations' ? (
             <section className="panel">
               <div className="panelHeader">
-                <div className="panelTitle">Citation Acts</div>
+                <div className="panelTitle">{copy.tabs.citations}</div>
               </div>
               <div className="panelBody">
                 <div className="list">
-                  {trace.canonical_core.citation_acts.map((citation: CitationAct) => (
-                    <article key={citation.citation_act_id} className="itemCard">
-                      <div className="split">
-                        <div className="itemTitle">{citation.citation_act_id}</div>
-                        <button className="btn btnSmall" onClick={() => selectGraphNode(`citation:${citation.citation_act_id}`)}>
-                          Focus in Graph
-                        </button>
-                      </div>
-                      <div className="metaLine">
-                        {citation.source_move_id ?? '-'} · {citation.target_scope ?? '-'}
-                      </div>
-                      <div className="itemBody">
-                        {[citation.target_paper_id, citation.purpose, citation.polarity, citation.semantic_signal]
-                          .filter(Boolean)
-                          .join(' · ')}
-                      </div>
-                    </article>
-                  ))}
-                  {trace.canonical_core.citation_acts.length === 0 && <div className="metaLine">No citation acts.</div>}
+                  {trace.canonical_core.citation_acts.length ? (
+                    trace.canonical_core.citation_acts.map((citation: CitationAct) => (
+                      <article key={`${citation.citation_act_id}:${citation.source_move_id || 'none'}`} className="itemCard">
+                        <div className="split">
+                          <div className="itemTitle">{citation.citation_act_id}</div>
+                          <button className="btn btnSmall" type="button" onClick={() => setSelectedNodeId(`citation:${citation.citation_act_id}`)}>
+                            {copy.focusGraph}
+                          </button>
+                        </div>
+                        <div className="metaLine">
+                          {normalizeText(citation.source_move_id) || '-'} | {normalizeText(citation.target_scope) || '-'}
+                        </div>
+                        <div className="itemBody">
+                          {[normalizeText(citation.target_paper_id), normalizeText(citation.purpose), normalizeText(citation.polarity), normalizeText(citation.semantic_signal)]
+                            .filter(Boolean)
+                            .join(' | ')}
+                        </div>
+                      </article>
+                    ))
+                  ) : (
+                    <div className="metaLine">{copy.noCitations}</div>
+                  )}
                 </div>
               </div>
             </section>
-          )}
+          ) : null}
 
-          {tab === 'original' && (
+          {tab === 'original' ? (
             <section className="panel">
               <div className="panelHeader">
-                <div className="panelTitle">Source Content</div>
+                <div className="panelTitle">{copy.tabs.original}</div>
               </div>
-              <div className="panelBody">
-                {content ? <MarkdownView markdown={content} /> : <div className="metaLine">Original content unavailable.</div>}
-              </div>
+              <div className="panelBody">{content ? <MarkdownView markdown={content} /> : <div className="metaLine">{copy.emptyContent}</div>}</div>
             </section>
-          )}
+          ) : null}
         </>
       )}
     </div>

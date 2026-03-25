@@ -142,6 +142,37 @@ export type PaperMetadata = {
   source_refs?: string[]
 }
 
+export type L2CompletenessAudit = {
+  paper_type?: PaperType | string
+  move_count?: number
+  role_counts?: Record<string, number>
+  observed_roles?: string[]
+  expected_roles?: string[]
+  missing_expected_roles?: string[]
+  critical_role_coverage_ratio?: number
+  slot_counts?: Record<string, number>
+  slot_move_ratios?: Record<string, number>
+  missing_l2_slot_fields?: string[]
+  expected_slot_fields?: string[]
+  missing_expected_slot_fields?: string[]
+  sparse_expected_slot_fields?: string[]
+  noise_move_ids?: string[]
+  signature_ready_move_count?: number
+  relation_coverage_ratio?: number
+  ready_for_community?: boolean
+  ready_for_l3?: boolean
+  ready_for_l4?: boolean
+  completeness_score?: number
+}
+
+export type TraceQuality = {
+  quality_tier?: string
+  quality_tier_score?: number
+  quality_flags?: string[]
+  audit_status?: string
+  l2_completeness_audit?: L2CompletenessAudit
+}
+
 export type PaperLogicTrace = {
   trace_id: string
   schema_version: string
@@ -156,7 +187,7 @@ export type PaperLogicTrace = {
     table_refs: TableRef[]
   }
   derived_views?: Record<string, unknown>
-  quality?: Record<string, unknown>
+  quality?: TraceQuality
 }
 
 export function normalizeText(value: unknown): string {

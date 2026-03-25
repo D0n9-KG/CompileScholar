@@ -35,6 +35,18 @@ vi.mock('../src/pages/OpsWorkbench', () => ({
   default: () => <div>Ops Workbench Page</div>,
 }))
 
+vi.mock('../src/pages/TasksPage', () => ({
+  default: () => <div>Tasks Page</div>,
+}))
+
+vi.mock('../src/pages/ConfigCenterPage', () => ({
+  default: () => <div>Config Center Page</div>,
+}))
+
+vi.mock('../src/pages/UnresolvedPage', () => ({
+  default: () => <div>Unresolved Page</div>,
+}))
+
 vi.mock('../src/pages/IngestPage', () => ({
   default: () => <div>Ingest Page</div>,
 }))
@@ -63,5 +75,21 @@ describe('App discovery route retirement', () => {
 
     expect(await screen.findByText('Ops Workbench Page')).toBeInTheDocument()
     expect(screen.queryByText('Discovery Page')).not.toBeInTheDocument()
+  })
+
+  test('opens task list route directly', async () => {
+    window.history.pushState({}, '', '/tasks')
+
+    render(<App />)
+
+    expect(await screen.findByText('Tasks Page')).toBeInTheDocument()
+  })
+
+  test('redirects imported sources route to ingest center', async () => {
+    window.history.pushState({}, '', '/imported-sources')
+
+    render(<App />)
+
+    expect(await screen.findByText('Ingest Page')).toBeInTheDocument()
   })
 })

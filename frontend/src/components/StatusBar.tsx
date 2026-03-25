@@ -1,4 +1,3 @@
-// frontend/src/components/StatusBar.tsx
 import { useI18n } from '../i18n'
 import { useGlobalState } from '../state/store'
 
@@ -10,13 +9,18 @@ const MODULE_LABELS: Record<string, { zh: string; en: string }> = {
   ops: { zh: '运维工作台', en: 'Ops Workbench' },
 }
 
-export default function StatusBar() {
+type GraphStats = {
+  nodeCount: number
+  edgeCount: number
+}
+
+export default function StatusBar({ graphStats }: { graphStats?: GraphStats }) {
   const { state } = useGlobalState()
   const { t } = useI18n()
   const { activeModule, graphElements, transitioning } = state
 
-  const nodeCount = graphElements.filter((e) => e.group === 'nodes').length
-  const edgeCount = graphElements.filter((e) => e.group === 'edges').length
+  const nodeCount = graphStats?.nodeCount ?? graphElements.filter((e) => e.group === 'nodes').length
+  const edgeCount = graphStats?.edgeCount ?? graphElements.filter((e) => e.group === 'edges').length
   const moduleText = MODULE_LABELS[activeModule] ? t(MODULE_LABELS[activeModule].zh, MODULE_LABELS[activeModule].en) : activeModule
 
   return (
@@ -31,17 +35,17 @@ export default function StatusBar() {
         <b>{nodeCount}</b>
       </div>
       <div className="kgStatusItem">
-        <span>{t('关系', 'Edges')}</span>
+        <span>{t('边', 'Edges')}</span>
         <b>{edgeCount}</b>
       </div>
-      {transitioning && (
+      {transitioning ? (
         <>
           <div className="kgStatusDivider" />
           <div className="kgStatusItem" style={{ color: 'var(--accent)' }}>
-            <span>{t('正在切换模块...', 'Switching Module...')}</span>
+            <span>{t('正在切换模块...', 'Switching module...')}</span>
           </div>
         </>
-      )}
+      ) : null}
     </footer>
   )
 }

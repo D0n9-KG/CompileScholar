@@ -20,10 +20,13 @@ vi.mock('../src/api', () => ({
       }
     }
 
-    if (path === '/graph/papers?limit=1000') {
+    if (path === '/graph/overview-stats') {
       return {
-        papers: [{ paper_id: 'p1' }, { paper_id: 'p2' }],
-        total_count: 2345,
+        paper_count: 2345,
+        research_move_count: 553,
+        global_community_count: 33,
+        ready_for_l3_count: 19,
+        ready_for_l4_count: 18,
       }
     }
 
@@ -59,12 +62,21 @@ describe('panelData loader cache', () => {
     const second = await loadOverviewStatsSnapshot()
 
     expect(first.paperCount).toBe(2345)
+    expect(first.researchMoveCount).toBe(553)
+    expect(first.globalCommunityCount).toBe(33)
+    expect(first.readyForL3Count).toBe(19)
+    expect(first.readyForL4Count).toBe(18)
     expect(second).not.toHaveProperty('discoveryItems')
     expect(vi.mocked(apiGet)).toHaveBeenCalledTimes(1)
   })
 
   test('falls back to paper list length when total_count is missing', async () => {
     vi.mocked(apiGet).mockImplementationOnce(async (path: string) => {
+      if (path === '/graph/overview-stats') {
+        return {
+          paper_count: 3,
+        }
+      }
       if (path === '/graph/papers?limit=1000') {
         return {
           papers: [{ paper_id: 'p3' }, { paper_id: 'p4' }, { paper_id: 'p5' }],
@@ -76,6 +88,8 @@ describe('panelData loader cache', () => {
     const snapshot = await loadOverviewStatsSnapshot({ force: true })
 
     expect(snapshot.paperCount).toBe(3)
+    expect(snapshot.researchMoveCount).toBe(0)
+    expect(snapshot.globalCommunityCount).toBe(0)
   })
 
   test('caches paper collections and catalog by filter key', async () => {

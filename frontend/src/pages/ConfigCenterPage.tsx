@@ -151,6 +151,19 @@ type AssistantTurn = {
   error?: string
 }
 
+function formatConfigTimestamp(value: string | undefined, locale: UILocale) {
+  if (!value) return '--'
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return value
+  return new Intl.DateTimeFormat(locale, {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date)
+}
+
 const CHAT_TURNS_STORAGE_KEY = 'logickg.config_center.assistant_turns.v1'
 const CHAT_GOAL_STORAGE_KEY = 'logickg.config_center.assistant_goal.v1'
 const ASSISTANT_WIDTH_STORAGE_KEY = 'logickg.config_center.assistant_width.v1'
@@ -1324,7 +1337,7 @@ export default function ConfigCenterPage() {
             )}
           </div>
           <div className="metaLine">
-            {t('配置档格式', 'Profile Format')} v{profile.version} - {t('更新时间', 'Updated')} {profile.updated_at || '--'}
+            {t('配置档格式', 'Profile Format')} v{profile.version} - {t('更新时间', 'Updated')} {formatConfigTimestamp(profile.updated_at, locale)}
           </div>
         </div>
         <div className="row">

@@ -202,9 +202,23 @@ const trace = {
     },
   },
   quality: {
-    gate_passed: true,
     quality_tier: 'green',
-    score: 0.94,
+    quality_tier_score: 0.94,
+    quality_flags: [],
+    audit_status: 'not_needed',
+    l2_completeness_audit: {
+      paper_type: 'empirical',
+      move_count: 2,
+      expected_roles: ['problem', 'method', 'result'],
+      missing_expected_roles: ['problem'],
+      missing_expected_slot_fields: [],
+      sparse_expected_slot_fields: ['comparators'],
+      noise_move_ids: [],
+      ready_for_community: true,
+      ready_for_l3: true,
+      ready_for_l4: false,
+      completeness_score: 0.78,
+    },
   },
 }
 
@@ -230,7 +244,7 @@ describe('PaperDetailPage paper logic trace workbench', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     window.localStorage.clear()
-    window.localStorage.setItem(LOCALE_STORAGE_KEY, 'zh-CN')
+    window.localStorage.setItem(LOCALE_STORAGE_KEY, 'en-US')
   })
 
   test('renders research move graph and shows a move detail card when a node is selected', async () => {
@@ -238,6 +252,8 @@ describe('PaperDetailPage paper logic trace workbench', () => {
 
     await waitFor(() => expect(screen.getByTestId('signal-graph-mock')).toBeInTheDocument())
     expect(container.querySelector('.paperTraceWorkbench')).not.toBeNull()
+    expect(screen.getByText('Trace Version')).toBeInTheDocument()
+    expect(screen.getByText('Trace Workspace')).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: '1. Method' }))
 
@@ -250,6 +266,19 @@ describe('PaperDetailPage paper logic trace workbench', () => {
     expect(detail.getByText('Propose a finite-element solver.')).toBeInTheDocument()
     expect(detail.getByText('Role')).toBeInTheDocument()
     expect(detail.getByText('Act Type')).toBeInTheDocument()
+  })
+
+  test('shows localized quality, completeness, and readiness summary for the current trace', async () => {
+    renderPaperDetail()
+
+    await waitFor(() => expect(screen.getByTestId('signal-graph-mock')).toBeInTheDocument())
+
+    expect(screen.getByTestId('trace-quality-tier')).toHaveTextContent('High Confidence')
+    expect(screen.getByTestId('trace-completeness-score')).toHaveTextContent('78%')
+    expect(screen.getByTestId('trace-ready-l3')).toHaveTextContent(/ready/i)
+    expect(screen.getByTestId('trace-ready-l4')).toHaveTextContent(/hold/i)
+    expect(screen.getByTestId('trace-missing-roles')).toHaveTextContent(/problem/i)
+    expect(screen.getByTestId('trace-sparse-slots')).toHaveTextContent(/comparators/i)
   })
 
   test('renders move, relation, evidence, and citation views without legacy logic-step or claim tabs', async () => {
@@ -267,9 +296,8 @@ describe('PaperDetailPage paper logic trace workbench', () => {
     expect(screen.getByText('Propose a finite-element solver.')).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: 'Move Relations' }))
-    expect(await screen.findByText('yields')).toBeInTheDocument()
-    expect(screen.getByText('move-1')).toBeInTheDocument()
-    expect(screen.getByText('move-2')).toBeInTheDocument()
+    expect(await screen.findByText('Yields')).toBeInTheDocument()
+    expect(screen.getByText('1. Method -> 2. Result')).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: 'Evidence Anchors' }))
     await waitFor(() => expect(screen.getAllByText('anchor-1').length).toBeGreaterThan(0))

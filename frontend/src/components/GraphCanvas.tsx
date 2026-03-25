@@ -24,6 +24,7 @@ type Props = {
   onOverviewModeChange: (mode: '3d' | '2d') => void
   transitioning: boolean
   onSelectNode: (node: SelectedNode | null) => void
+  onVisibleGraphStatsChange?: (stats: { nodeCount: number; edgeCount: number }) => void
 }
 
 type NodeVisual = {
@@ -159,6 +160,22 @@ function validYear(value: unknown): number | null {
 
 function kindLabel(kind: string, locale: UILocale) {
   return graphKindLabel(kind, locale)
+}
+
+function filterElementsByHiddenKinds(elements: GraphElement[], hiddenKinds: string[]): GraphElement[] {
+  if (!hiddenKinds.length) return elements
+  const hidden = new Set(hiddenKinds)
+  const visibleNodes = elements.filter((el) => {
+    if (el.group !== 'nodes') return false
+    return !hidden.has(String((el.data as GraphNodeData).kind ?? 'unknown'))
+  })
+  const visibleNodeIds = new Set(visibleNodes.map((el) => el.data.id))
+  const visibleEdges = elements.filter((el) => {
+    if (el.group !== 'edges') return false
+    const edge = el.data as GraphEdgeData
+    return visibleNodeIds.has(String(edge.source ?? '')) && visibleNodeIds.has(String(edge.target ?? ''))
+  })
+  return [...visibleNodes, ...visibleEdges]
 }
 
 function kindOrder(kind: string) {
@@ -1670,6 +1687,7 @@ export default function GraphCanvas({
   onOverviewModeChange,
   transitioning,
   onSelectNode,
+  onVisibleGraphStatsChange,
 }: Props) {
   const { state } = useGlobalState()
   const { locale, t } = useI18n()
@@ -1745,9 +1763,16 @@ export default function GraphCanvas({
     }
   }, [activeModule, expandedOverviewCommunityId, show3D, community3DRefreshKey])
 
+  const kindSourceElements = useMemo(() => {
+    if (activeModule === 'overview' && show3D && !expandedOverviewCommunityId && overview3dElements.length) {
+      return overview3dElements
+    }
+    return elements
+  }, [activeModule, elements, expandedOverviewCommunityId, overview3dElements, show3D])
+
   const availableKinds = useMemo(() => {
     const set = new Set<string>()
-    for (const el of elements) {
+    for (const el of kindSourceElements) {
       if (el.group !== 'nodes') continue
       set.add(String((el.data as GraphNodeData).kind ?? 'unknown'))
     }
@@ -1756,7 +1781,7 @@ export default function GraphCanvas({
       if (diff !== 0) return diff
       return a.localeCompare(b)
     })
-  }, [elements])
+  }, [kindSourceElements])
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -1772,22 +1797,11 @@ export default function GraphCanvas({
     }
   }, [hiddenKinds, selectedNode])
 
-  const filteredElements = useMemo(() => {
-    if (!hiddenKinds.length) return elements
-
-    const hidden = new Set(hiddenKinds)
-    const visibleNodes = elements.filter((el) => {
-      if (el.group !== 'nodes') return false
-      return !hidden.has(String((el.data as GraphNodeData).kind ?? 'unknown'))
-    })
-    const visibleNodeIds = new Set(visibleNodes.map((el) => el.data.id))
-    const visibleEdges = elements.filter((el) => {
-      if (el.group !== 'edges') return false
-      const edge = el.data as GraphEdgeData
-      return visibleNodeIds.has(String(edge.source ?? '')) && visibleNodeIds.has(String(edge.target ?? ''))
-    })
-    return [...visibleNodes, ...visibleEdges]
-  }, [elements, hiddenKinds])
+  const filteredElements = useMemo(() => filterElementsByHiddenKinds(elements, hiddenKinds), [elements, hiddenKinds])
+  const filteredOverview3dElements = useMemo(
+    () => filterElementsByHiddenKinds(overview3dElements, hiddenKinds),
+    [hiddenKinds, overview3dElements],
+  )
 
   const safeDisplayElements = useMemo(() => {
     const { maxNodes, maxEdges } = getModuleDisplayBudget(activeModule, {
@@ -1800,6 +1814,13 @@ export default function GraphCanvas({
       maxEdges,
     })
   }, [activeModule, expandedOverviewCommunityId, filteredElements, selectedNode?.id])
+
+  const activeVisibleElements = useMemo(() => {
+    if (activeModule === 'overview' && show3D && !expandedOverviewCommunityId) {
+      return filteredOverview3dElements.length ? filteredOverview3dElements : safeDisplayElements
+    }
+    return safeDisplayElements
+  }, [activeModule, expandedOverviewCommunityId, filteredOverview3dElements, safeDisplayElements, show3D])
 
   useEffect(() => {
     if (!hiddenKinds.length) return
@@ -2057,7 +2078,27 @@ export default function GraphCanvas({
     node.select()
   }, [selectedNodeId, preparedGraph.renderedEdgeCount])
 
-  const visibleNodeCount = safeDisplayElements.filter((el) => el.group === 'nodes').length
+  const visibleGraphStats = useMemo(() => {
+    if (activeModule === 'overview' && show3D && !expandedOverviewCommunityId) {
+      return {
+        nodeCount: activeVisibleElements.filter((el) => el.group === 'nodes').length,
+        edgeCount: activeVisibleElements.filter((el) => el.group === 'edges').length,
+        rawEdgeCount: activeVisibleElements.filter((el) => el.group === 'edges').length,
+      }
+    }
+    return {
+      nodeCount: safeDisplayElements.filter((el) => el.group === 'nodes').length,
+      edgeCount: preparedGraph.renderedEdgeCount,
+      rawEdgeCount: preparedGraph.rawEdgeCount,
+    }
+  }, [activeModule, activeVisibleElements, expandedOverviewCommunityId, preparedGraph.rawEdgeCount, preparedGraph.renderedEdgeCount, safeDisplayElements, show3D])
+
+  useEffect(() => {
+    onVisibleGraphStatsChange?.({
+      nodeCount: visibleGraphStats.nodeCount,
+      edgeCount: visibleGraphStats.edgeCount,
+    })
+  }, [onVisibleGraphStatsChange, visibleGraphStats.edgeCount, visibleGraphStats.nodeCount])
 
   useEffect(() => {
     const cy = cyRef.current
@@ -2211,8 +2252,8 @@ export default function GraphCanvas({
           <b>{t('语义驾驶舱', 'Semantic Cockpit')}</b>
           <div className="kgGraphLegendHeadMeta">
             <small>
-              {visibleNodeCount}N | {preparedGraph.renderedEdgeCount}E
-              {preparedGraph.renderedEdgeCount < preparedGraph.rawEdgeCount ? ` / ${preparedGraph.rawEdgeCount}` : ''}
+              {visibleGraphStats.nodeCount}N | {visibleGraphStats.edgeCount}E
+              {visibleGraphStats.edgeCount < visibleGraphStats.rawEdgeCount ? ` / ${visibleGraphStats.rawEdgeCount}` : ''}
             </small>
             {selectedNode && <span className="kgGraphFocusTag">{t('焦点', 'Focus')}: {focusLabel}</span>}
             <button
@@ -2330,7 +2371,7 @@ export default function GraphCanvas({
             )}
           >
             <Graph3D
-              elements={expandedOverviewCommunityId ? safeDisplayElements : overview3dElements.length ? overview3dElements : safeDisplayElements}
+              elements={activeVisibleElements}
               selectedNodeId={selectedNode?.id ?? null}
               onSelectNode={onSelectNode}
               transitioning={transitioning}

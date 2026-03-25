@@ -347,8 +347,12 @@ export default function PapersPanel() {
             onClick={() => selectPaper(p.paper_id)}
           >
             <div className="kgListItemTitle truncate">{p.title || p.paper_source || p.paper_id}</div>
-            <div className="kgListItemMeta" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span>{p.year ?? '—'} · {p.ingested ? t('已导入', 'Ingested') : t('仅元数据', 'Metadata Only')}</span>
+            <div className="kgListItemMeta kgPapersListItemMeta" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+              <span>
+                {[p.paper_source || p.paper_id, p.year ? String(p.year) : '', p.ingested ? t('已导入', 'Ingested') : t('仅元数据', 'Metadata Only')]
+                  .filter(Boolean)
+                  .join(' · ')}
+              </span>
               <div style={{ display: 'flex', gap: 4 }} onClick={(e) => e.stopPropagation()}>
                 <button
                   type="button"

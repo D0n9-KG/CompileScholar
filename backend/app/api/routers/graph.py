@@ -24,6 +24,15 @@ def list_papers(limit: int = 50, collection_id: str | None = None):
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 
+@router.get("/overview-stats")
+def get_overview_stats():
+    try:
+        with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
+            return client.get_overview_stats()
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
 @router.get("/paper/{paper_id:path}")
 def get_paper(paper_id: str):
     try:

@@ -22,6 +22,7 @@ class _FakeNeo4jClient:
                 "paper_id": "p-1",
                 "paper_source": "paper-1",
                 "title": "Paper 1",
+                "ingested": True,
                 "collections": [],
             }
         ]
@@ -43,6 +44,7 @@ def test_graph_papers_endpoint_returns_total_count(monkeypatch) -> None:
     payload = res.json()
     assert payload["total_count"] == 33470
     assert len(payload["papers"]) == 1
+    assert payload["papers"][0]["ingested"] is True
 
 
 def test_graph_papers_endpoint_counts_selected_collection(monkeypatch) -> None:

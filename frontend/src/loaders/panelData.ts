@@ -2,11 +2,23 @@ import { apiGet } from '../api'
 
 export type OverviewStatsSnapshot = {
   paperCount: number
+  researchMoveCount: number
+  globalCommunityCount: number
+  readyForL3Count: number
+  readyForL4Count: number
 }
 
 type PaperListResponse = {
   papers?: unknown[]
   total_count?: number
+}
+
+type OverviewStatsResponse = {
+  paper_count?: number
+  research_move_count?: number
+  global_community_count?: number
+  ready_for_l3_count?: number
+  ready_for_l4_count?: number
 }
 
 export type CollectionRow = {
@@ -100,10 +112,25 @@ export async function loadOverviewStatsSnapshot(options: LoadOptions = {}): Prom
   return loadCached(
     'overview:stats',
     async () => {
+      const statsRes = await apiGet<OverviewStatsResponse>('/graph/overview-stats')
+      if (typeof statsRes.paper_count === 'number') {
+        return {
+          paperCount: statsRes.paper_count,
+          researchMoveCount: typeof statsRes.research_move_count === 'number' ? statsRes.research_move_count : 0,
+          globalCommunityCount: typeof statsRes.global_community_count === 'number' ? statsRes.global_community_count : 0,
+          readyForL3Count: typeof statsRes.ready_for_l3_count === 'number' ? statsRes.ready_for_l3_count : 0,
+          readyForL4Count: typeof statsRes.ready_for_l4_count === 'number' ? statsRes.ready_for_l4_count : 0,
+        }
+      }
+
       const paperRes = await apiGet<PaperListResponse>('/graph/papers?limit=1000')
       const fallbackCount = Array.isArray(paperRes.papers) ? paperRes.papers.length : 0
       return {
         paperCount: typeof paperRes.total_count === 'number' ? paperRes.total_count : fallbackCount,
+        researchMoveCount: 0,
+        globalCommunityCount: 0,
+        readyForL3Count: 0,
+        readyForL4Count: 0,
       }
     },
     options,

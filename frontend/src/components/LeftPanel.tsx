@@ -8,12 +8,12 @@ const AskPanel = lazy(() => import('../panels/AskPanel'))
 const TextbooksPanel = lazy(() => import('../panels/TextbooksPanel'))
 const OpsPanel = lazy(() => import('../panels/OpsPanel'))
 
-const PANEL_ICONS: Record<string, string> = {
-  overview: 'O',
-  papers: 'P',
-  ask: 'Q',
-  textbooks: 'T',
-  ops: 'S',
+const PANEL_META: Record<string, { badge: string; zh: string; en: string }> = {
+  overview: { badge: '总', zh: '总览', en: 'Overview' },
+  papers: { badge: '文', zh: '论文', en: 'Papers' },
+  ask: { badge: '问', zh: '问答', en: 'Ask' },
+  textbooks: { badge: '教', zh: '教材', en: 'Textbooks' },
+  ops: { badge: '运', zh: '运维', en: 'Ops' },
 }
 
 type Props = {
@@ -28,6 +28,7 @@ export default function LeftPanel({ collapsed, floating = false, onToggle }: Pro
   const { activeModule } = state
   const [transitioning, setTransitioning] = useState(false)
   const prevModuleRef = useRef(activeModule)
+  const activeMeta = PANEL_META[activeModule] ?? { badge: '模', zh: '模块', en: 'Module' }
 
   useEffect(() => {
     if (prevModuleRef.current === activeModule) return
@@ -43,24 +44,6 @@ export default function LeftPanel({ collapsed, floating = false, onToggle }: Pro
     }
   }, [activeModule])
 
-  if (collapsed) {
-    return (
-      <aside className="kgPanel kgPanel--left">
-        <div className="kgPanelIcon" onClick={onToggle} title={t('灞曞紑宸︿晶闈㈡澘', 'Expand Left Panel')}>
-          <button className="kgPanelIconBtn" type="button">
-            O
-          </button>
-          <button className="kgPanelIconBtn" type="button">
-            {PANEL_ICONS[activeModule] ?? 'M'}
-          </button>
-        </div>
-        <div aria-hidden="true" style={{ display: 'none' }}>
-          <Suspense fallback={null}>{renderContent()}</Suspense>
-        </div>
-      </aside>
-    )
-  }
-
   function renderContent() {
     if (activeModule === 'overview') return <OverviewPanel />
     if (activeModule === 'papers') return <PapersPanel />
@@ -68,6 +51,36 @@ export default function LeftPanel({ collapsed, floating = false, onToggle }: Pro
     if (activeModule === 'textbooks') return <TextbooksPanel />
     if (activeModule === 'ops') return <OpsPanel />
     return null
+  }
+
+  if (collapsed) {
+    return (
+      <aside className="kgPanel kgPanel--left">
+        <div className="kgPanelIcon" title={t('展开左侧面板', 'Expand Left Panel')}>
+          <button
+            className="kgPanelIconBtn"
+            type="button"
+            onClick={onToggle}
+            aria-label={t('展开左侧面板', 'Expand Left Panel')}
+            title={t('展开左侧面板', 'Expand Left Panel')}
+          >
+            {'>'}
+          </button>
+          <button
+            className="kgPanelIconBtn"
+            type="button"
+            onClick={onToggle}
+            aria-label={t(`${activeMeta.zh} 面板`, `${activeMeta.en} panel`)}
+            title={t(`${activeMeta.zh} 面板`, `${activeMeta.en} panel`)}
+          >
+            {activeMeta.badge}
+          </button>
+        </div>
+        <div aria-hidden="true" style={{ display: 'none' }}>
+          <Suspense fallback={null}>{renderContent()}</Suspense>
+        </div>
+      </aside>
+    )
   }
 
   const panelClass = ['kgPanel', 'kgPanel--left', floating ? 'kgPanel--floating kgPanel--floating-left' : '']
@@ -78,14 +91,27 @@ export default function LeftPanel({ collapsed, floating = false, onToggle }: Pro
     <aside className={panelClass}>
       <div className="kgPanelHeader">
         <span className="kgPanelTitle">
-          {PANEL_ICONS[activeModule]} {activeModule.toUpperCase()}
+          {activeMeta.badge} {t(activeMeta.zh, activeMeta.en)}
         </span>
-        <button className="kgPanelCollapseBtn" type="button" onClick={onToggle} title={t('鏀惰捣', 'Collapse')}>
+        <button
+          className="kgPanelCollapseBtn"
+          type="button"
+          onClick={onToggle}
+          title={t('收起', 'Collapse')}
+          aria-label={t('收起左侧面板', 'Collapse left panel')}
+        >
           {'<'}
         </button>
       </div>
       <div className={`kgPanelContent${transitioning ? ' is-transitioning' : ''}`}>
-        <Suspense fallback={<PanelFallback label={activeModule.toUpperCase()} message={t('姝ｅ湪鍔犺浇妯″潡...', 'Loading module...')} />}>
+        <Suspense
+          fallback={
+            <PanelFallback
+              label={t(activeMeta.zh, activeMeta.en)}
+              message={t('正在加载模块...', 'Loading module...')}
+            />
+          }
+        >
           {renderContent()}
         </Suspense>
       </div>
