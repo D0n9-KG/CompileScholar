@@ -274,6 +274,176 @@ def test_discussion_result_chunk_is_promoted_to_result_role(monkeypatch) -> None
     assert 'result' in roles
 
 
+def test_problem_move_without_research_objects_is_backfilled_from_summary(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '1. Introduction',
+            'Granular avalanches are dense shallow flows of grains down an incline, and particle-size segregation remains a central challenge.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'problem',
+                'act_type': 'identify_gap',
+                'summary': 'Granular avalanches are dense shallow flows of grains down an incline, and particle-size segregation remains a central challenge.',
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'confidence': 0.8,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    first = payload['evidence_rows'][0]
+    normalized = {str(item.get('normalized') or '').lower() for item in first['research_objects']}
+
+    assert normalized
+    assert 'granular avalanches' in normalized or 'particle-size segregation' in normalized
+
+
+def test_research_object_filter_drops_generic_solution_and_promise_phrases(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '1. Introduction',
+            'The proposed solution will allow direct feedback from authors and encourage the scientific community.',
+            line=1,
+        ),
+        _chunk(
+            'c-2',
+            '2. Method',
+            'The YADE framework provides a stable environment for implementing DEM algorithms.',
+            line=2,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'method',
+                'act_type': 'propose_method',
+                'summary': 'The proposed solution will allow direct feedback from authors and encourage the scientific community. The YADE framework provides a stable environment for implementing DEM algorithms.',
+                'anchor_chunk_ids': ['c-1', 'c-2'],
+                'research_objects': [
+                    {'surface': 'proposed solution'},
+                    {'surface': 'will allow direct feedback from authors and encourage the scientific community'},
+                    {'surface': 'YADE framework'},
+                ],
+                'methods': [{'surface': 'discrete element method'}],
+                'confidence': 0.7,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+    normalized = {str(item.get('normalized') or '').lower() for item in move['research_objects']}
+
+    assert 'yade framework' in normalized
+    assert 'proposed solution' not in normalized
+    assert 'will allow direct feedback from authors and encourage the scientific community' not in normalized
+
+
+def test_research_object_filter_drops_descriptive_clause_phrases(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '2. Method',
+            'The YADE framework is capable of describing the mechanical behavior of assemblies of discrete elements.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'method',
+                'act_type': 'propose_method',
+                'summary': 'The YADE framework is capable of describing the mechanical behavior of assemblies of discrete elements.',
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [
+                    {'surface': 'YADE framework'},
+                    {'surface': 'capable of describing the mechanical behavior of assemblies of discrete elements'},
+                ],
+                'confidence': 0.7,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+    normalized = {str(item.get('normalized') or '').lower() for item in move['research_objects']}
+
+    assert 'yade framework' in normalized
+    assert 'capable of describing the mechanical behavior of assemblies of discrete elements' not in normalized
+
+
+def test_resource_filter_drops_verb_led_noise_phrase(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '2. Method',
+            'The YADE framework provides a stable environment for DEM algorithms.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'method',
+                'act_type': 'propose_method',
+                'summary': 'The YADE framework provides a stable environment for DEM algorithms.',
+                'anchor_chunk_ids': ['c-1'],
+                'resource_mentions': [
+                    {'surface': 'find framework'},
+                    {'surface': 'yade software'},
+                ],
+                'confidence': 0.7,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+    normalized = {str(item.get('normalized') or '').lower() for item in move['resource_mentions']}
+
+    assert 'yade software' in normalized
+    assert 'find framework' not in normalized
+
+
 def test_act_type_promotes_problem_role_and_relation_uses_addresses(monkeypatch) -> None:
     doc = _doc_with_chunks(
         _chunk('c-1', '1. Introduction', 'We investigate how travelling segregation waves break.', line=1),
@@ -500,6 +670,42 @@ def test_title_block_bibliographic_chunks_with_bullets_and_received_lines_are_fi
     assert 'bo zhou' not in joined
     assert 'published online' not in joined
     assert 'keywords anti-rotation' not in joined
+
+
+def test_title_block_long_author_list_with_affiliation_markers_is_filtered(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            'Demo Paper',
+            r'Ryoichi Furukawa a, b,\*, Yuki Shiosaka b, Kazunori Kadota c, Keisuke Takagaki a, Tetsurou Noguchi a, Atsuko Shimosaka b, Yoshiyuki Shirakawa b,\*\*',
+            line=1,
+        ),
+        _chunk(
+            'c-2',
+            'ABSTRACT',
+            'This paper investigates segregation behaviour during pharmaceutical die filling using DEM and response surface methodology.',
+            line=2,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    source_refs = {str(row['source_ref']) for row in payload['evidence_rows']}
+    joined = ' '.join(str(row['summary']) for row in payload['evidence_rows']).lower()
+
+    assert 'c-1' not in source_refs
+    assert 'c-2' in source_refs
+    assert 'ryoichi furukawa' not in joined
 
 
 def test_noise_like_llm_summary_is_dropped_after_window_extraction(monkeypatch) -> None:

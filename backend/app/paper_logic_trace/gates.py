@@ -51,6 +51,7 @@ _EXPECTED_SLOTS_BY_PAPER_TYPE: dict[str, tuple[str, ...]] = {
     'unknown': ('research_objects', 'methods'),
 }
 _SPARSE_SLOT_RATIO = 0.08
+_RESEARCH_OBJECT_REQUIRED_FOR_L4 = {'empirical', 'benchmark', 'case_study', 'theoretical', 'unknown'}
 
 
 def _safe_ratio(numerator: int | float, denominator: int | float) -> float:
@@ -208,7 +209,13 @@ def _l2_completeness_audit(
     )
     evidence_signal_count = sum(1 for field in ('metrics', 'comparators', 'effects') if slot_counts.get(field, 0) > 0)
     context_signal_count = sum(1 for field in ('conditions', 'resource_mentions', 'limitation_types') if slot_counts.get(field, 0) > 0)
-    ready_for_l4 = ready_for_l3 and evidence_signal_count >= 2 and context_signal_count >= 1
+    requires_object_signal_for_l4 = str(paper_type or 'unknown') in _RESEARCH_OBJECT_REQUIRED_FOR_L4
+    ready_for_l4 = (
+        ready_for_l3
+        and evidence_signal_count >= 2
+        and context_signal_count >= 1
+        and (slot_counts.get('research_objects', 0) > 0 or not requires_object_signal_for_l4)
+    )
 
     role_score = _safe_ratio(len(expected_roles) - len(missing_expected_roles), len(expected_roles))
     expected_slot_score = _safe_ratio(len(expected_slots) - len(missing_expected_slot_fields), len(expected_slots))

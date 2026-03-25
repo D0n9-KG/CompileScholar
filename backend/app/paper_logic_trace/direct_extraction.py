@@ -299,6 +299,13 @@ _RESOURCE_KEEP_TYPES = {
     'software',
     'tool',
 }
+_RESOURCE_BAD_LEAD_TOKENS = {
+    'find',
+    'found',
+    'provide',
+    'provides',
+    'using',
+}
 _GENERIC_LIMITATION_PHRASES = {
     'assumption',
     'methodological',
@@ -318,6 +325,114 @@ _LIMITATION_CUE_WORDS = (
     'limitations',
     'memory',
 )
+_RESEARCH_OBJECT_VERB_CUES = (
+    'investigate',
+    'investigates',
+    'study',
+    'studies',
+    'assess',
+    'assesses',
+    'quantify',
+    'quantifies',
+    'analyze',
+    'analyzes',
+    'analyse',
+    'analyses',
+    'examine',
+    'examines',
+    'characterize',
+    'characterizes',
+    'understand',
+    'understands',
+    'predict',
+    'predicts',
+    'model',
+    'models',
+    'describe',
+    'describes',
+    'address',
+    'addresses',
+    'explore',
+    'explores',
+)
+_RESEARCH_OBJECT_NOUN_CUES = (
+    'behavior of',
+    'behaviour of',
+    'response of',
+    'effect of',
+    'effects of',
+    'prediction of',
+    'predictions of',
+    'segregation in',
+    'segregation of',
+    'mixing of',
+    'packing of',
+    'packings of',
+    'compaction of',
+    'erosion in',
+    'erosion of',
+    'breakage of',
+    'rotation of',
+    'yielding of',
+    'compression of',
+)
+_RESEARCH_OBJECT_BAD_PREFIXES = (
+    'able to',
+    'capable of',
+    'designed to',
+    'enable ',
+    'enabled ',
+    'enabling ',
+    'intended to',
+    'providing ',
+    'this paper',
+    'the paper',
+    'our paper',
+    'this study',
+    'the study',
+    'our study',
+    'this work',
+    'the work',
+    'our work',
+    'we ',
+    'there ',
+    'using ',
+)
+_RESEARCH_OBJECT_BAD_LEAD_TOKENS = {
+    'allow',
+    'allows',
+    'can',
+    'could',
+    'encourage',
+    'encourages',
+    'may',
+    'might',
+    'must',
+    'provide',
+    'provides',
+    'proposed',
+    'should',
+    'will',
+    'would',
+}
+_RESEARCH_OBJECT_GENERIC_PHRASES = {
+    'proposed solution',
+    'proposed method',
+    'the proposed solution',
+    'the proposed method',
+}
+_RESEARCH_OBJECT_BAD_TOKENS = {
+    'approach',
+    'approaches',
+    'framework',
+    'frameworks',
+    'method',
+    'methods',
+    'solution',
+    'solutions',
+    'workflow',
+    'workflows',
+}
 _COMPARATOR_ENTITY_HINTS = {
     'baseline',
     'sample',
@@ -476,7 +591,7 @@ def _is_reference_section(section: object) -> bool:
 
 def _looks_like_author_line(text: str) -> bool:
     clean = _normalize_space(text)
-    if not clean or len(clean) > 120:
+    if not clean or len(clean) > 240:
         return False
     lowered = clean.lower()
     if any(marker in lowered for marker in ('paper', 'method', 'result', 'experiment', 'introduction')):
@@ -492,6 +607,9 @@ def _looks_like_author_line(text: str) -> bool:
     parts = [part.strip() for part in re.split(r',|\band\b', normalized_delimiters, flags=re.IGNORECASE) if part.strip()]
     if len(parts) < 2:
         return False
+    comma_count = normalized_delimiters.count(',')
+    if len(clean) > 120 and comma_count < 3:
+        return False
 
     name_like_parts = 0
     for part in parts:
@@ -502,6 +620,8 @@ def _looks_like_author_line(text: str) -> bool:
             continue
         if all(token[0].isupper() for token in tokens if token[0].isalpha()):
             name_like_parts += 1
+    if len(clean) > 120:
+        return name_like_parts >= 4
     return name_like_parts >= 2
 
 
@@ -889,6 +1009,8 @@ def _refine_resource_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         if re.search(r'^[a-z][a-z\s.\-]*&\s*[a-z][a-z\s.\-]*\d{4}$', phrase):
             continue
         tokens = phrase.split()
+        if tokens and tokens[0] in _RESOURCE_BAD_LEAD_TOKENS:
+            continue
         has_resource_cue = any(token in _RESOURCE_CUE_WORDS for token in tokens)
         if len(tokens) == 1 and not has_resource_cue and type_name not in _RESOURCE_KEEP_TYPES:
             continue
@@ -1080,10 +1202,98 @@ def _refine_limitation_rows(rows: list[dict[str, Any]], *, text: str) -> list[di
     return refined
 
 
+def _research_object_mentions(text: str, *, limit: int = 3) -> list[dict[str, Any]]:
+    lowered = _normalize_space(text).lower()
+    if not lowered:
+        return []
+
+    rows: list[dict[str, Any]] = []
+    seen: set[str] = set()
+
+    def _push_phrase(raw_phrase: str) -> bool:
+        phrase = re.split(r'[.,;:()]', raw_phrase, maxsplit=1)[0]
+        phrase = re.split(
+            r'\b(?:by|using|with|under|where|which|that|via|based on|for|during|while|when)\b',
+            phrase,
+            maxsplit=1,
+        )[0]
+        phrase = _clean_phrase(phrase)
+        if not phrase:
+            return False
+        if any(phrase.startswith(prefix) for prefix in _RESEARCH_OBJECT_BAD_PREFIXES):
+            return False
+        tokens = phrase.split()
+        if not tokens:
+            return False
+        if len(tokens) == 1 and tokens[0] in _RESEARCH_OBJECT_BAD_TOKENS:
+            return False
+        if phrase in seen:
+            return False
+        seen.add(phrase)
+        rows.append({'surface': phrase, 'normalized': phrase})
+        return len(rows) >= limit
+
+    subject_match = re.match(
+        r'^([a-z0-9][a-z0-9\-\s]{3,60}?)\s+(?:is|are|was|were|remain|remains|represent|represents|occur|occurs|play|plays|can)\b',
+        lowered,
+    )
+    if subject_match and _push_phrase(subject_match.group(1)):
+        return rows
+
+    for cue in _RESEARCH_OBJECT_VERB_CUES:
+        pattern = re.compile(rf'\b{re.escape(cue)}\s+([a-z0-9][a-z0-9\-\s]{{4,80}})', re.IGNORECASE)
+        for match in pattern.finditer(lowered):
+            if _push_phrase(match.group(1)):
+                return rows
+
+    for cue in _RESEARCH_OBJECT_NOUN_CUES:
+        pattern = re.compile(rf'\b{re.escape(cue)}\s+([a-z0-9][a-z0-9\-\s]{{4,80}})', re.IGNORECASE)
+        for match in pattern.finditer(lowered):
+            if _push_phrase(match.group(1)):
+                return rows
+
+    return rows
+
+
+def _refine_research_object_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    prepared: list[tuple[dict[str, Any], str]] = []
+    for row in rows or []:
+        phrase = _normalize_space(row.get('normalized') or row.get('surface') or '').lower()
+        if not phrase:
+            continue
+        if any(phrase.startswith(prefix) for prefix in _RESEARCH_OBJECT_BAD_PREFIXES):
+            continue
+        tokens = phrase.split()
+        if not tokens:
+            continue
+        if tokens[0] in _RESEARCH_OBJECT_BAD_LEAD_TOKENS:
+            continue
+        if phrase in _RESEARCH_OBJECT_GENERIC_PHRASES:
+            continue
+        if len(tokens) == 1 and any(token in _RESEARCH_OBJECT_BAD_TOKENS for token in tokens):
+            continue
+        prepared.append((row, phrase))
+
+    keep_indices: list[int] = []
+    phrases = [phrase for _, phrase in prepared]
+    for index, phrase in enumerate(phrases):
+        is_subsumed = False
+        for other_index, other in enumerate(phrases):
+            if index == other_index or len(other) <= len(phrase):
+                continue
+            if re.search(rf'(^|\b){re.escape(phrase)}($|\b)', other):
+                is_subsumed = True
+                break
+        if not is_subsumed:
+            keep_indices.append(index)
+    return [prepared[index][0] for index in keep_indices]
+
+
 def _augment_sparse_slots(
     *,
     text: str,
     role: str,
+    research_objects: list[dict[str, Any]],
     observed_variables: list[dict[str, Any]],
     metrics: list[dict[str, Any]],
     comparators: list[dict[str, Any]],
@@ -1091,12 +1301,14 @@ def _augment_sparse_slots(
     resource_mentions: list[dict[str, Any]],
 ) -> dict[str, list[dict[str, Any]]]:
     role_token = _normalize_role(role)
+    research_object_roles = {'problem', 'background', 'method', 'experiment', 'result', 'interpretation', 'limitation'}
     metric_roles = {'result', 'experiment', 'interpretation'}
     observed_variable_roles = {'experiment', 'result', 'interpretation', 'method'}
     limitation_roles = {'limitation', 'interpretation', 'result', 'future_work'}
     resource_roles = {'method', 'experiment', 'result'}
     heuristic_comparators = _comparator_mentions(text, limit=3) if role_token in metric_roles else []
     return {
+        'research_objects': research_objects or (_research_object_mentions(text, limit=3) if role_token in research_object_roles else []),
         'observed_variables': observed_variables or (_observed_variable_mentions(text, limit=3) if role_token in observed_variable_roles else []),
         'metrics': metrics or (_metric_mentions(text, limit=3) if role_token in metric_roles else []),
         'comparators': _merge_raw_mention_rows(comparators, heuristic_comparators),
@@ -1239,11 +1451,11 @@ def _fallback_move_payload(window: dict[str, Any]) -> list[dict[str, Any]]:
     summary = _summary_from_text(' '.join(chunk.text for chunk in chunks))
     role = _normalize_role(window.get('role_hint'))
     methods = _keyword_mentions(summary, limit=2) if role in {'method', 'experiment'} else []
-    research_objects = _keyword_mentions(summary, limit=2) if role not in {'method', 'experiment'} else []
     conditions = _condition_mentions(summary, limit=2)
     augmented = _augment_sparse_slots(
         text=summary,
         role=role,
+        research_objects=[],
         observed_variables=[],
         metrics=[],
         comparators=[],
@@ -1256,7 +1468,7 @@ def _fallback_move_payload(window: dict[str, Any]) -> list[dict[str, Any]]:
             'act_type': _ROLE_TO_ACT.get(role, 'define_task'),
             'summary': summary,
             'anchor_chunk_ids': anchor_chunk_ids,
-            'research_objects': research_objects,
+            'research_objects': augmented['research_objects'],
             'methods': methods,
             'observed_variables': augmented['observed_variables'],
             'metrics': augmented['metrics'],
@@ -1450,12 +1662,15 @@ def _move_rows_from_windows(
                     _window_text(window.get('chunks') or [], 1600),
                 ]),
                 role=role,
+                research_objects=research_objects,
                 observed_variables=observed_variables,
                 metrics=metrics,
                 comparators=comparators,
                 limitation_types=limitation_types,
                 resource_mentions=resource_mentions,
             )
+            research_objects = _normalize_mention_rows(augmented['research_objects'], anchor_ids=anchor_chunk_ids)
+            research_objects = _refine_research_object_rows(research_objects)
             observed_variables = _normalize_mention_rows(augmented['observed_variables'], anchor_ids=anchor_chunk_ids)
             observed_variables = _refine_observed_variable_rows(observed_variables)
             metrics = _normalize_mention_rows(augmented['metrics'], anchor_ids=anchor_chunk_ids)
