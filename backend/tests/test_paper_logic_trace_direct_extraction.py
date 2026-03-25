@@ -470,6 +470,38 @@ def test_article_metadata_chunks_are_filtered_before_move_construction(monkeypat
     assert 'keywords:' not in joined
 
 
+def test_title_block_bibliographic_chunks_with_bullets_and_received_lines_are_filtered(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk('c-1', 'Demo Paper', 'Bo Zhou · Runqiu Huang · Huabin Wang · Jianfeng Wang', line=1),
+        _chunk('c-2', 'Demo Paper', 'Received: 5 January 2013 / Published online: 23 March 2013', line=2),
+        _chunk('c-3', 'Demo Paper', 'Keywords Anti-rotation · Energy dissipation · DEM', line=3),
+        _chunk('c-4', 'Demo Paper', 'This paper aims to compare irregular-shaped particles with disc particles installed with rolling resistance.', line=4),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    source_refs = {str(row['source_ref']) for row in payload['evidence_rows']}
+    joined = ' '.join(str(row['summary']) for row in payload['evidence_rows']).lower()
+
+    assert 'c-1' not in source_refs
+    assert 'c-2' not in source_refs
+    assert 'c-3' not in source_refs
+    assert 'c-4' in source_refs
+    assert 'bo zhou' not in joined
+    assert 'published online' not in joined
+    assert 'keywords anti-rotation' not in joined
+
+
 def test_noise_like_llm_summary_is_dropped_after_window_extraction(monkeypatch) -> None:
     doc = _doc_with_chunks(
         _chunk('c-1', 'ABSTRACT', 'This paper investigates granular crushing in DEM simulations.', line=1),

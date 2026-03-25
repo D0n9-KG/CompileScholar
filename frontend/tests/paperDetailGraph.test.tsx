@@ -266,6 +266,9 @@ describe('PaperDetailPage paper logic trace workbench', () => {
     expect(detail.getByText('Propose a finite-element solver.')).toBeInTheDocument()
     expect(detail.getByText('Role')).toBeInTheDocument()
     expect(detail.getByText('Act Type')).toBeInTheDocument()
+    expect(detail.getByText('Summary')).toBeInTheDocument()
+    expect(detail.getByText('Evidence Anchors')).toBeInTheDocument()
+    expect(detail.getByText(/Lines 11-20/i)).toBeInTheDocument()
   })
 
   test('shows localized quality, completeness, and readiness summary for the current trace', async () => {

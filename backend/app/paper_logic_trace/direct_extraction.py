@@ -82,6 +82,10 @@ _FRONT_MATTER_METADATA_CUES = (
     'keyword:',
     'corresponding author',
 )
+_FRONT_MATTER_METADATA_RE = re.compile(
+    r'^\s*(?:received|accepted|published online|available online|keywords?)\b[:\s-]*',
+    re.IGNORECASE,
+)
 _NOISE_SUMMARY_PREFIXES = (
     '# abstract',
     '# article info',
@@ -484,7 +488,8 @@ def _looks_like_author_line(text: str) -> bool:
     if upper_ratio >= 0.6:
         return True
 
-    parts = [part.strip() for part in re.split(r',| and ', clean) if part.strip()]
+    normalized_delimiters = re.sub(r'[\u00b7\u2022•|/]+', ',', clean)
+    parts = [part.strip() for part in re.split(r',|\band\b', normalized_delimiters, flags=re.IGNORECASE) if part.strip()]
     if len(parts) < 2:
         return False
 
@@ -522,7 +527,7 @@ def _looks_like_affiliation_summary(text: str) -> bool:
 def _looks_like_front_matter_noise(text: str, *, section: str, paper_title: str) -> bool:
     lowered = text.lower()
     in_title_block = bool(section) and bool(paper_title) and section == paper_title
-    if in_title_block and any(cue in lowered for cue in _FRONT_MATTER_METADATA_CUES):
+    if in_title_block and (_FRONT_MATTER_METADATA_RE.match(lowered) or any(cue in lowered for cue in _FRONT_MATTER_METADATA_CUES)):
         return True
     if in_title_block and any(cue in lowered for cue in _FRONT_MATTER_INSTITUTION_CUES):
         return True

@@ -11,12 +11,19 @@ import { mentionTokens, normalizeText } from '../types/paperLogicTrace'
 type TraceTab = 'moves' | 'relations' | 'anchors' | 'citations' | 'original'
 type TraceState = { paperId: string; trace: PaperLogicTrace | null; error: string }
 type ContentState = { paperId: string; content: string; loaded: boolean }
+type GraphMetaSection = {
+  label: string
+  value?: string
+  values?: string[]
+  chips?: string[]
+}
 type GraphMeta = {
   title: string
   typeLabel: string
   detail?: string
   badge?: string
   facts?: Array<{ label: string; value: string }>
+  sections?: GraphMetaSection[]
 }
 
 function text(locale: UILocale) {
@@ -45,6 +52,11 @@ function text(locale: UILocale) {
         actType: '动作类型',
         confidence: '置信度',
         focusGraph: '在图中定位',
+        summaryLabel: '摘要',
+        evidenceAnchorsLabel: '证据锚点',
+        signalTagsLabel: '关键信号',
+        quoteLabel: '证据摘录',
+        sourceSpansLabel: '来源位置',
         emptyContent: '暂时没有原文内容。',
         noRelations: '没有动作关系。',
         noCitations: '没有引用行为。',
@@ -81,6 +93,11 @@ function text(locale: UILocale) {
         actType: 'Act Type',
         confidence: 'Confidence',
         focusGraph: 'Focus in Graph',
+        summaryLabel: 'Summary',
+        evidenceAnchorsLabel: 'Evidence Anchors',
+        signalTagsLabel: 'Signals',
+        quoteLabel: 'Quoted Evidence',
+        sourceSpansLabel: 'Source Spans',
         emptyContent: 'Original content unavailable.',
         noRelations: 'No move relations.',
         noCitations: 'No citation acts.',
@@ -286,6 +303,11 @@ function graphData(trace: PaperLogicTrace, locale: UILocale) {
   const nodes = new Map<string, SignalGraphNode>()
   const edges = new Map<string, SignalGraphEdge>()
   const meta = new Map<string, GraphMeta>()
+  const summaryLabel = locale === 'zh-CN' ? '摘要' : 'Summary'
+  const evidenceAnchorsLabel = locale === 'zh-CN' ? '证据锚点' : 'Evidence Anchors'
+  const signalTagsLabel = locale === 'zh-CN' ? '关键信号' : 'Signals'
+  const quoteLabel = locale === 'zh-CN' ? '证据摘录' : 'Quoted Evidence'
+  const sourceSpansLabel = locale === 'zh-CN' ? '来源位置' : 'Source Spans'
   const rootId = 'paper:root'
   const anchors = new Map(trace.canonical_core.evidence_anchors.map((anchor) => [anchor.anchor_id, anchor]))
 
@@ -307,6 +329,17 @@ function graphData(trace: PaperLogicTrace, locale: UILocale) {
   for (const move of trace.canonical_core.moves) {
     const moveId = `move:${move.move_id}`
     const clusterId = `cluster:${move.move_id}`
+    const moveTags = moveTagSummary(move)
+    const anchorPreview = (move.anchor_ids ?? [])
+      .map((anchorId) => anchors.get(anchorId))
+      .filter((anchor): anchor is EvidenceAnchor => Boolean(anchor))
+      .slice(0, 4)
+      .map((anchor) => {
+        const sectionPath = (anchor.section_path ?? []).map((part) => normalizeText(part)).filter(Boolean).join(' > ')
+        const loc = locator(anchor, locale)
+        if (sectionPath && sectionPath !== '-') return `${loc} · ${sectionPath}`
+        return loc
+      })
     put(
       { id: clusterId, label: '', kind: 'cluster', weight: 0.4 },
       { title: moveLabel(move, locale), typeLabel: locale === 'zh-CN' ? '动作簇' : 'Move Cluster' },
@@ -322,6 +355,12 @@ function graphData(trace: PaperLogicTrace, locale: UILocale) {
           { label: locale === 'zh-CN' ? '角色' : 'Role', value: labelMap(locale, 'role', move.role) },
           { label: locale === 'zh-CN' ? '动作类型' : 'Act Type', value: labelMap(locale, 'act', move.act_type) },
           { label: locale === 'zh-CN' ? '置信度' : 'Confidence', value: fmtPct(move.confidence) },
+          { label: evidenceAnchorsLabel, value: String((move.anchor_ids ?? []).length) },
+        ],
+        sections: [
+          { label: summaryLabel, value: normalizeText(move.summary) },
+          ...(anchorPreview.length ? [{ label: sourceSpansLabel, values: anchorPreview }] : []),
+          ...(moveTags.length ? [{ label: signalTagsLabel, chips: moveTags }] : []),
         ],
       },
     )
@@ -340,6 +379,14 @@ function graphData(trace: PaperLogicTrace, locale: UILocale) {
             typeLabel: locale === 'zh-CN' ? '证据锚点' : 'Evidence Anchor',
             detail: normalizeText(anchor.quote),
             badge: locator(anchor, locale),
+            facts: [
+              { label: locale === 'zh-CN' ? '支持类型' : 'Support Type', value: normalizeText(anchor.support_type) || '-' },
+              {
+                label: locale === 'zh-CN' ? '章节' : 'Section',
+                value: (anchor.section_path ?? []).map((part) => normalizeText(part)).filter(Boolean).join(' > ') || '-',
+              },
+            ],
+            sections: [{ label: quoteLabel, value: normalizeText(anchor.quote) }],
           },
         )
       }
@@ -377,6 +424,7 @@ function graphData(trace: PaperLogicTrace, locale: UILocale) {
         typeLabel: locale === 'zh-CN' ? '引用行为' : 'Citation Act',
         detail: [normalizeText(citation.target_paper_id), normalizeText(citation.purpose), normalizeText(citation.semantic_signal)].filter(Boolean).join(' | '),
         badge: normalizeText(citation.target_scope),
+        facts: [{ label: locale === 'zh-CN' ? '置信度' : 'Confidence', value: fmtPct(citation.confidence) }],
       },
     )
     edges.set(`${moveId}->${citationId}`, {
@@ -585,20 +633,53 @@ export default function PaperDetailPage() {
                 <aside className="paperTraceDetailCard">
                   <div className="itemTitle">{copy.nodeDetail}</div>
                   {selectedMeta ? (
-                    <div className="stack">
-                      <div>
+                    <div className="list">
+                      <div className="itemCard">
                         <div className="metaLine">{selectedMeta.typeLabel}</div>
                         <div className="itemBody" style={{ fontWeight: 700 }}>
                           {selectedMeta.title}
                         </div>
+                        {selectedMeta.badge ? <div className="badge" style={{ marginTop: 10 }}>{selectedMeta.badge}</div> : null}
                       </div>
-                      {selectedMeta.badge ? <div className="badge">{selectedMeta.badge}</div> : null}
-                      {selectedMeta.facts?.map((fact) => (
-                        <div key={`${selectedMeta.title}:${fact.label}`} className="metaLine">
-                          <strong>{fact.label}</strong>: {fact.value}
+                      {selectedMeta.facts?.length ? (
+                        <div className="itemCard">
+                          {selectedMeta.facts.map((fact) => (
+                            <div key={`${selectedMeta.title}:${fact.label}`} className="metaLine">
+                              <strong>{fact.label}</strong>: {fact.value}
+                            </div>
+                          ))}
+                        </div>
+                      ) : null}
+                      {selectedMeta.sections?.map((section) => (
+                        <div key={`${selectedMeta.title}:${section.label}`} className="itemCard">
+                          <div className="itemTitle">{section.label}</div>
+                          {section.value ? <div className="itemBody">{section.value}</div> : null}
+                          {section.values?.length ? (
+                            <div className="stack" style={{ gap: 6 }}>
+                              {section.values.map((value, index) => (
+                                <div key={`${selectedMeta.title}:${section.label}:${index}`} className="metaLine">
+                                  {value}
+                                </div>
+                              ))}
+                            </div>
+                          ) : null}
+                          {section.chips?.length ? (
+                            <div className="row" style={{ gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
+                              {section.chips.map((chip) => (
+                                <span key={`${selectedMeta.title}:${section.label}:${chip}`} className="chip">
+                                  {chip}
+                                </span>
+                              ))}
+                            </div>
+                          ) : null}
                         </div>
                       ))}
-                      {selectedMeta.detail ? <div className="itemBody">{selectedMeta.detail}</div> : null}
+                      {selectedMeta.detail && !selectedMeta.sections?.some((section) => section.value === selectedMeta.detail) ? (
+                        <div className="itemCard">
+                          <div className="itemTitle">{copy.summaryLabel}</div>
+                          <div className="itemBody">{selectedMeta.detail}</div>
+                        </div>
+                      ) : null}
                     </div>
                   ) : (
                     <div className="metaLine">{copy.selectNode}</div>
