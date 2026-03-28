@@ -216,7 +216,7 @@ class ScanUploadDoiStrategyTests(unittest.TestCase):
         self.assertEqual(units[1].get("status"), "need_doi")
         self.assertIsNone(units[1].get("doi"))
 
-        self.assertEqual(mock_crossref.resolve_reference.call_count, 2)
+        self.assertEqual(mock_crossref.resolve_reference.call_count, 3)
 
 
 if __name__ == "__main__":

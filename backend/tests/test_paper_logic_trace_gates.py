@@ -5,7 +5,7 @@ from app.paper_logic_trace.gates import (
     evaluate_hot_path_gate,
     needs_lightweight_audit,
 )
-from app.paper_logic_trace.models import EvidenceAnchor, ResearchMove
+from app.paper_logic_trace.models import EvidenceAnchor, MoveRelation, ResearchMove
 
 
 def test_hot_path_gate_rejects_anchorless_move() -> None:
@@ -129,7 +129,7 @@ def test_mixed_trace_passes_with_yellow_quality_instead_of_hard_failure() -> Non
     assert 'invalid_moves_present' in quality['quality_flags']
 
 
-def test_richer_trace_scores_green_without_audit() -> None:
+def test_richer_trace_without_context_signal_is_yellow() -> None:
     gate_report = evaluate_hot_path_gate(
         moves=[
             ResearchMove(
@@ -188,8 +188,8 @@ def test_richer_trace_scores_green_without_audit() -> None:
     quality = build_quality_payload(gate_report)
 
     assert gate_report['passed'] is True
-    assert quality['quality_tier'] == 'green'
-    assert quality['audit_status'] == 'not_needed'
+    assert quality['quality_tier'] == 'yellow'
+    assert quality['audit_status'] == 'eligible'
     assert quality['quality_tier_score'] >= 0.78
 
 
@@ -476,7 +476,7 @@ def test_unknown_trace_without_result_signal_is_not_ready_for_upper_layers() -> 
     quality = build_quality_payload(gate_report)
     audit = quality['l2_completeness_audit']
 
-    assert quality['quality_tier'] == 'green'
+    assert quality['quality_tier'] == 'yellow'
     assert audit['ready_for_community'] is True
     assert audit['ready_for_l3'] is False
     assert audit['ready_for_l4'] is False
@@ -562,7 +562,551 @@ def test_empirical_trace_without_research_objects_is_not_ready_for_l4() -> None:
     assert 'research_objects' in audit['missing_expected_slot_fields']
     assert audit['ready_for_l3'] is True
     assert audit['ready_for_l4'] is False
+
+
+def test_anchorless_relations_do_not_count_toward_l3_readiness() -> None:
+    gate_report = evaluate_hot_path_gate(
+        moves=[
+            ResearchMove(
+                move_id='m-1',
+                sequence_no=1,
+                role='problem',
+                act_type='define_task',
+                summary='We study particle crushing prediction under high stress conditions.',
+                research_objects=[{'surface': 'particle crushing prediction'}],
+                anchor_ids=['a-1'],
+                slot_provenance=[{'field': 'research_objects', 'anchor_ids': ['a-1'], 'extraction_mode': 'direct', 'support_strength': 'strong'}],
+            ),
+            ResearchMove(
+                move_id='m-2',
+                sequence_no=2,
+                role='method',
+                act_type='propose_method',
+                summary='We propose a discrete element simulation workflow.',
+                methods=[{'surface': 'discrete element simulation workflow'}],
+                anchor_ids=['a-2'],
+                slot_provenance=[{'field': 'methods', 'anchor_ids': ['a-2'], 'extraction_mode': 'direct', 'support_strength': 'strong'}],
+            ),
+            ResearchMove(
+                move_id='m-3',
+                sequence_no=3,
+                role='result',
+                act_type='report_effect',
+                summary='The workflow improves prediction accuracy over the baseline under high stress conditions.',
+                metrics=[{'surface': 'prediction accuracy'}],
+                comparators=[{'surface': 'baseline'}],
+                conditions=[{'surface': 'high stress conditions'}],
+                effects=[{'direction': 'improve'}],
+                anchor_ids=['a-3'],
+                slot_provenance=[
+                    {'field': 'metrics', 'anchor_ids': ['a-3'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                    {'field': 'comparators', 'anchor_ids': ['a-3'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                    {'field': 'conditions', 'anchor_ids': ['a-3'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                    {'field': 'effects', 'anchor_ids': ['a-3'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                ],
+            ),
+        ],
+        anchors=[
+            EvidenceAnchor(
+                anchor_id=anchor_id,
+                paper_id='paper-1',
+                source_ref=f'chunk:{idx}',
+                modality='text',
+                section_path=[],
+                locator={},
+                quote='demo',
+                citation_ids=[],
+                support_type='direct',
+                weak=False,
+            )
+            for idx, anchor_id in enumerate(['a-1', 'a-2', 'a-3'], start=1)
+        ],
+        move_relations=[
+            MoveRelation(
+                relation_id='r-1',
+                source_move_id='m-1',
+                target_move_id='m-2',
+                relation_type='addresses',
+                anchor_ids=[],
+                confidence=0.65,
+            ),
+            MoveRelation(
+                relation_id='r-2',
+                source_move_id='m-2',
+                target_move_id='m-3',
+                relation_type='yields',
+                anchor_ids=[],
+                confidence=0.65,
+            ),
+        ],
+        paper_type='empirical',
+    )
+
+    quality = build_quality_payload(gate_report)
+    audit = quality['l2_completeness_audit']
+
+    assert audit['relation_coverage_ratio'] == 0.0
+    assert audit['ready_for_l3'] is False
+    assert audit['ready_for_l4'] is False
+    assert quality['quality_tier'] == 'yellow'
+
+
+def test_unknown_effect_does_not_unlock_l4_readiness() -> None:
+    gate_report = evaluate_hot_path_gate(
+        moves=[
+            ResearchMove(
+                move_id='m-1',
+                sequence_no=1,
+                role='problem',
+                act_type='define_task',
+                summary='We study particle crushing prediction under high stress conditions.',
+                research_objects=[{'surface': 'particle crushing prediction'}],
+                anchor_ids=['a-1'],
+                slot_provenance=[{'field': 'research_objects', 'anchor_ids': ['a-1'], 'extraction_mode': 'direct', 'support_strength': 'strong'}],
+            ),
+            ResearchMove(
+                move_id='m-2',
+                sequence_no=2,
+                role='method',
+                act_type='propose_method',
+                summary='We propose a discrete element simulation workflow with x-ray microtomography.',
+                methods=[{'surface': 'discrete element simulation workflow'}],
+                resource_mentions=[{'surface': 'x-ray microtomography'}],
+                anchor_ids=['a-2'],
+                slot_provenance=[
+                    {'field': 'methods', 'anchor_ids': ['a-2'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                    {'field': 'resource_mentions', 'anchor_ids': ['a-2'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                ],
+            ),
+            ResearchMove(
+                move_id='m-3',
+                sequence_no=3,
+                role='result',
+                act_type='report_effect',
+                summary='The workflow changes prediction accuracy relative to the baseline under high stress conditions.',
+                metrics=[{'surface': 'prediction accuracy'}],
+                comparators=[{'surface': 'baseline'}],
+                conditions=[{'surface': 'high stress conditions'}],
+                effects=[{'direction': 'unknown'}],
+                anchor_ids=['a-3'],
+                slot_provenance=[
+                    {'field': 'metrics', 'anchor_ids': ['a-3'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                    {'field': 'comparators', 'anchor_ids': ['a-3'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                    {'field': 'conditions', 'anchor_ids': ['a-3'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                    {'field': 'effects', 'anchor_ids': ['a-3'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                ],
+            ),
+        ],
+        anchors=[
+            EvidenceAnchor(
+                anchor_id=anchor_id,
+                paper_id='paper-1',
+                source_ref=f'chunk:{idx}',
+                modality='text',
+                section_path=[],
+                locator={},
+                quote='demo',
+                citation_ids=[],
+                support_type='direct',
+                weak=False,
+            )
+            for idx, anchor_id in enumerate(['a-1', 'a-2', 'a-3'], start=1)
+        ],
+        move_relations=[
+            MoveRelation(
+                relation_id='r-1',
+                source_move_id='m-1',
+                target_move_id='m-2',
+                relation_type='addresses',
+                anchor_ids=['a-1'],
+                confidence=0.86,
+            ),
+            MoveRelation(
+                relation_id='r-2',
+                source_move_id='m-2',
+                target_move_id='m-3',
+                relation_type='yields',
+                anchor_ids=['a-2'],
+                confidence=0.86,
+            ),
+        ],
+        paper_type='empirical',
+    )
+
+    quality = build_quality_payload(gate_report)
+    audit = quality['l2_completeness_audit']
+
+    assert audit['ready_for_l3'] is True
+    assert audit['ready_for_l4'] is False
+    assert quality['quality_tier'] == 'yellow'
     assert audit['completeness_score'] < 1.0
+
+
+def test_empirical_trace_without_supported_comparator_is_not_ready_for_l4() -> None:
+    gate_report = evaluate_hot_path_gate(
+        moves=[
+            ResearchMove(
+                move_id='m-1',
+                sequence_no=1,
+                role='problem',
+                act_type='define_task',
+                summary='We study particle anti-rotation effects in granular materials.',
+                research_objects=[{'surface': 'particle anti-rotation effects'}],
+                anchor_ids=['a-1'],
+                slot_provenance=[{'field': 'research_objects', 'anchor_ids': ['a-1'], 'extraction_mode': 'direct', 'support_strength': 'strong'}],
+            ),
+            ResearchMove(
+                move_id='m-2',
+                sequence_no=2,
+                role='method',
+                act_type='propose_method',
+                summary='We compare DEM assemblies with rolling resistance and irregular particle shapes.',
+                methods=[{'surface': 'DEM comparison workflow'}],
+                anchor_ids=['a-2'],
+                slot_provenance=[{'field': 'methods', 'anchor_ids': ['a-2'], 'extraction_mode': 'direct', 'support_strength': 'strong'}],
+            ),
+            ResearchMove(
+                move_id='m-3',
+                sequence_no=3,
+                role='result',
+                act_type='report_effect',
+                summary='The irregular-shape workflow improves strain localization fidelity under triaxial shear.',
+                metrics=[{'surface': 'strain localization fidelity'}],
+                comparators=[{'surface': 'rolling resistance baseline'}],
+                conditions=[{'surface': 'triaxial shear'}],
+                effects=[{'direction': 'improve'}],
+                anchor_ids=['a-3'],
+                slot_provenance=[
+                    {'field': 'metrics', 'anchor_ids': ['a-3'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                    {'field': 'comparators', 'anchor_ids': ['a-3'], 'extraction_mode': 'inferred', 'support_strength': 'weak'},
+                    {'field': 'conditions', 'anchor_ids': ['a-3'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                    {'field': 'effects', 'anchor_ids': ['a-3'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                ],
+            ),
+        ],
+        anchors=[
+            EvidenceAnchor(
+                anchor_id=anchor_id,
+                paper_id='paper-1',
+                source_ref=f'chunk:{idx}',
+                modality='text',
+                section_path=[],
+                locator={},
+                quote='demo',
+                citation_ids=[],
+                support_type='direct',
+                weak=False,
+            )
+            for idx, anchor_id in enumerate(['a-1', 'a-2', 'a-3'], start=1)
+        ],
+        move_relations=[
+            MoveRelation(
+                relation_id='r-1',
+                source_move_id='m-1',
+                target_move_id='m-2',
+                relation_type='addresses',
+                anchor_ids=['a-1', 'a-2'],
+                confidence=0.82,
+            ),
+            MoveRelation(
+                relation_id='r-2',
+                source_move_id='m-2',
+                target_move_id='m-3',
+                relation_type='yields',
+                anchor_ids=['a-2', 'a-3'],
+                confidence=0.82,
+            ),
+        ],
+        paper_type='empirical',
+    )
+
+    quality = build_quality_payload(gate_report)
+    audit = quality['l2_completeness_audit']
+
+    assert audit['ready_for_l3'] is True
+    assert audit['ready_for_l4'] is False
+    assert quality['quality_tier'] == 'yellow'
+
+
+def test_limitation_only_comparator_does_not_unlock_l4_readiness() -> None:
+    gate_report = evaluate_hot_path_gate(
+        moves=[
+            ResearchMove(
+                move_id='m-1',
+                sequence_no=1,
+                role='problem',
+                act_type='define_task',
+                summary='We study anti-rotation effects in granular materials.',
+                research_objects=[{'surface': 'anti-rotation effects'}],
+                anchor_ids=['a-1'],
+                slot_provenance=[{'field': 'research_objects', 'anchor_ids': ['a-1'], 'extraction_mode': 'direct', 'support_strength': 'strong'}],
+            ),
+            ResearchMove(
+                move_id='m-2',
+                sequence_no=2,
+                role='method',
+                act_type='propose_method',
+                summary='We use DEM to compare irregular and spherical assemblies.',
+                methods=[{'surface': 'DEM comparison workflow'}],
+                anchor_ids=['a-2'],
+                slot_provenance=[{'field': 'methods', 'anchor_ids': ['a-2'], 'extraction_mode': 'direct', 'support_strength': 'strong'}],
+            ),
+            ResearchMove(
+                move_id='m-3',
+                sequence_no=3,
+                role='result',
+                act_type='report_effect',
+                summary='Irregular assemblies improve strain localization fidelity under shear.',
+                metrics=[{'surface': 'strain localization fidelity'}],
+                conditions=[{'surface': 'triaxial shear'}],
+                effects=[{'direction': 'improve'}],
+                anchor_ids=['a-3'],
+                slot_provenance=[
+                    {'field': 'metrics', 'anchor_ids': ['a-3'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                    {'field': 'conditions', 'anchor_ids': ['a-3'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                    {'field': 'effects', 'anchor_ids': ['a-3'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                ],
+            ),
+            ResearchMove(
+                move_id='m-4',
+                sequence_no=4,
+                role='limitation',
+                act_type='state_limitation',
+                summary='Rolling resistance cannot replace particle shape effects.',
+                comparators=[{'surface': 'particle shape effects'}],
+                limitation_types=[{'surface': 'mechanistic mismatch'}],
+                anchor_ids=['a-4'],
+                slot_provenance=[
+                    {'field': 'comparators', 'anchor_ids': ['a-4'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                    {'field': 'limitation_types', 'anchor_ids': ['a-4'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                ],
+            ),
+        ],
+        anchors=[
+            EvidenceAnchor(
+                anchor_id=anchor_id,
+                paper_id='paper-1',
+                source_ref=f'chunk:{idx}',
+                modality='text',
+                section_path=[],
+                locator={},
+                quote='demo',
+                citation_ids=[],
+                support_type='direct',
+                weak=False,
+            )
+            for idx, anchor_id in enumerate(['a-1', 'a-2', 'a-3', 'a-4'], start=1)
+        ],
+        move_relations=[
+            MoveRelation(
+                relation_id='r-1',
+                source_move_id='m-1',
+                target_move_id='m-2',
+                relation_type='addresses',
+                anchor_ids=['a-1', 'a-2'],
+                confidence=0.82,
+            ),
+            MoveRelation(
+                relation_id='r-2',
+                source_move_id='m-2',
+                target_move_id='m-3',
+                relation_type='yields',
+                anchor_ids=['a-2', 'a-3'],
+                confidence=0.82,
+            ),
+            MoveRelation(
+                relation_id='r-3',
+                source_move_id='m-3',
+                target_move_id='m-4',
+                relation_type='limits',
+                anchor_ids=['a-3', 'a-4'],
+                confidence=0.82,
+            ),
+        ],
+        paper_type='empirical',
+    )
+
+    quality = build_quality_payload(gate_report)
+    audit = quality['l2_completeness_audit']
+
+    assert audit['ready_for_l3'] is True
+    assert audit['ready_for_l4'] is False
+    assert quality['quality_tier'] == 'yellow'
+
+
+def test_single_supported_comparator_without_comparison_signal_does_not_unlock_l4() -> None:
+    gate_report = evaluate_hot_path_gate(
+        moves=[
+            ResearchMove(
+                move_id='m-1',
+                sequence_no=1,
+                role='problem',
+                act_type='define_task',
+                summary='We study anti-rotation effects in granular materials.',
+                research_objects=[{'surface': 'anti-rotation effects'}],
+                anchor_ids=['a-1'],
+                slot_provenance=[{'field': 'research_objects', 'anchor_ids': ['a-1'], 'extraction_mode': 'direct', 'support_strength': 'strong'}],
+            ),
+            ResearchMove(
+                move_id='m-2',
+                sequence_no=2,
+                role='method',
+                act_type='propose_method',
+                summary='We compare DEM assemblies with rolling resistance and irregular particle shapes.',
+                methods=[{'surface': 'DEM comparison workflow'}],
+                anchor_ids=['a-2'],
+                slot_provenance=[{'field': 'methods', 'anchor_ids': ['a-2'], 'extraction_mode': 'direct', 'support_strength': 'strong'}],
+            ),
+            ResearchMove(
+                move_id='m-3',
+                sequence_no=3,
+                role='result',
+                act_type='report_effect',
+                summary='The irregular-shape workflow improves strain localization fidelity under triaxial shear.',
+                metrics=[{'surface': 'strain localization fidelity'}],
+                comparators=[{'surface': 'rolling resistance baseline'}],
+                conditions=[{'surface': 'triaxial shear'}],
+                effects=[{'direction': 'improve'}],
+                anchor_ids=['a-3'],
+                slot_provenance=[
+                    {'field': 'metrics', 'anchor_ids': ['a-3'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                    {'field': 'comparators', 'anchor_ids': ['a-3'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                    {'field': 'conditions', 'anchor_ids': ['a-3'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                    {'field': 'effects', 'anchor_ids': ['a-3'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                ],
+            ),
+        ],
+        anchors=[
+            EvidenceAnchor(
+                anchor_id=anchor_id,
+                paper_id='paper-1',
+                source_ref=f'chunk:{idx}',
+                modality='text',
+                section_path=[],
+                locator={},
+                quote='demo',
+                citation_ids=[],
+                support_type='direct',
+                weak=False,
+            )
+            for idx, anchor_id in enumerate(['a-1', 'a-2', 'a-3'], start=1)
+        ],
+        move_relations=[
+            MoveRelation(
+                relation_id='r-1',
+                source_move_id='m-1',
+                target_move_id='m-2',
+                relation_type='addresses',
+                anchor_ids=['a-1'],
+                confidence=0.86,
+            ),
+            MoveRelation(
+                relation_id='r-2',
+                source_move_id='m-2',
+                target_move_id='m-3',
+                relation_type='yields',
+                anchor_ids=['a-2'],
+                confidence=0.86,
+            ),
+        ],
+        paper_type='empirical',
+    )
+
+    quality = build_quality_payload(gate_report)
+    audit = quality['l2_completeness_audit']
+
+    assert audit['ready_for_l3'] is True
+    assert audit['ready_for_l4'] is False
+    assert 'comparators' in audit['missing_supported_expected_slot_fields']
+
+
+def test_compare_baseline_move_with_supported_comparator_unlocks_l4() -> None:
+    gate_report = evaluate_hot_path_gate(
+        moves=[
+            ResearchMove(
+                move_id='m-1',
+                sequence_no=1,
+                role='problem',
+                act_type='define_task',
+                summary='We study segregation during die filling.',
+                research_objects=[{'surface': 'segregation during die filling'}],
+                anchor_ids=['a-1'],
+                slot_provenance=[{'field': 'research_objects', 'anchor_ids': ['a-1'], 'extraction_mode': 'direct', 'support_strength': 'strong'}],
+            ),
+            ResearchMove(
+                move_id='m-2',
+                sequence_no=2,
+                role='method',
+                act_type='propose_method',
+                summary='We use DEM and experiments to compare filling behavior.',
+                methods=[{'surface': 'DEM and experimental workflow'}],
+                resource_mentions=[{'surface': 'high-speed camera'}],
+                anchor_ids=['a-2'],
+                slot_provenance=[
+                    {'field': 'methods', 'anchor_ids': ['a-2'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                    {'field': 'resource_mentions', 'anchor_ids': ['a-2'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                ],
+            ),
+            ResearchMove(
+                move_id='m-3',
+                sequence_no=3,
+                role='result',
+                act_type='compare_baseline',
+                summary='The DEM predictions show good agreement with experimental results under high die velocity.',
+                metrics=[{'surface': 'filling ratio'}],
+                comparators=[{'surface': 'experimental results'}],
+                conditions=[{'surface': 'high die velocity'}],
+                effects=[{'direction': 'improve'}],
+                anchor_ids=['a-3'],
+                slot_provenance=[
+                    {'field': 'metrics', 'anchor_ids': ['a-3'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                    {'field': 'comparators', 'anchor_ids': ['a-3'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                    {'field': 'conditions', 'anchor_ids': ['a-3'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                    {'field': 'effects', 'anchor_ids': ['a-3'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                ],
+            ),
+        ],
+        anchors=[
+            EvidenceAnchor(
+                anchor_id=anchor_id,
+                paper_id='paper-1',
+                source_ref=f'chunk:{idx}',
+                modality='text',
+                section_path=[],
+                locator={},
+                quote='demo',
+                citation_ids=[],
+                support_type='direct',
+                weak=False,
+            )
+            for idx, anchor_id in enumerate(['a-1', 'a-2', 'a-3'], start=1)
+        ],
+        move_relations=[
+            MoveRelation(
+                relation_id='r-1',
+                source_move_id='m-1',
+                target_move_id='m-2',
+                relation_type='addresses',
+                anchor_ids=['a-1'],
+                confidence=0.86,
+            ),
+            MoveRelation(
+                relation_id='r-2',
+                source_move_id='m-2',
+                target_move_id='m-3',
+                relation_type='yields',
+                anchor_ids=['a-2'],
+                confidence=0.86,
+            ),
+        ],
+        paper_type='empirical',
+    )
+
+    quality = build_quality_payload(gate_report)
+    audit = quality['l2_completeness_audit']
+
+    assert audit['ready_for_l3'] is True
+    assert audit['ready_for_l4'] is True
 
 
 def test_software_trace_does_not_require_result_role_for_green_quality() -> None:
@@ -626,3 +1170,107 @@ def test_software_trace_does_not_require_result_role_for_green_quality() -> None
     assert quality['quality_tier'] == 'green'
     assert audit['missing_expected_roles'] == []
     assert audit['ready_for_l3'] is True
+
+
+def test_quality_payload_downgrades_when_title_and_summary_are_semantically_misaligned() -> None:
+    gate_report = {
+        'passed': True,
+        'invalid_move_ids': [],
+        'move_count': 4,
+        'anchor_count': 4,
+        'sparse_trace': False,
+        'quality_tier_score': 0.91,
+        'soft_flags': [],
+        'l2_completeness_audit': {
+            'paper_type': 'empirical',
+            'missing_expected_roles': [],
+            'missing_expected_slot_fields': [],
+            'noise_move_ids': [],
+            'critical_role_coverage_ratio': 1.0,
+            'ready_for_l3': True,
+            'ready_for_l4': True,
+        },
+    }
+
+    quality = build_quality_payload(
+        gate_report,
+        paper_metadata={
+            'title': '高功率光纤激光热光效应及模式不稳定阈值特性研究',
+            'authors': ['李学文', '于春雷'],
+        },
+        derived_views={
+            'paper_summaries': {
+                'one_paragraph_summary': '本文对卧式双轴圆盘反应器的功率特性进行了比较详细的研究，并给出了统一的功率关联式。',
+            }
+        },
+    )
+
+    assert quality['quality_tier'] == 'yellow'
+    assert quality['audit_status'] == 'eligible'
+    assert 'metadata_summary_mismatch' in quality['quality_flags']
+
+
+def test_quality_payload_flags_thin_route_state_seed_for_l3_follow_on_work() -> None:
+    gate_report = {
+        'passed': True,
+        'invalid_move_ids': [],
+        'move_count': 4,
+        'anchor_count': 4,
+        'sparse_trace': False,
+        'quality_tier_score': 0.9,
+        'soft_flags': [],
+        'l2_completeness_audit': {
+            'paper_type': 'empirical',
+            'missing_expected_roles': [],
+            'missing_expected_slot_fields': [],
+            'noise_move_ids': [],
+            'critical_role_coverage_ratio': 1.0,
+            'ready_for_l3': True,
+            'ready_for_l4': True,
+        },
+    }
+
+    quality = build_quality_payload(
+        gate_report,
+        derived_views={
+            'route_state_seed': {
+                'paper_id': 'paper-1',
+                'paper_type': 'empirical',
+                'source_trace_id': 'paper-1:paper_logic_trace',
+                'cutoff_year_hint': 2024,
+                'topic_scope_candidates': ['entity relation graph'],
+                'dominant_method_candidates': ['graph neural network'],
+                'active_benchmark_candidates': [],
+                'known_bottleneck_candidates': [],
+                'enabling_condition_candidates': [],
+                'measurement_protocol_candidates': [],
+                'toolchain_candidates': [],
+                'supporting_evidence_ids': ['a-1'],
+                'challenging_evidence_ids': [],
+                'source_move_ids': ['m-1', 'm-2', 'm-3'],
+                'readiness_feature_inputs': {
+                    'method_maturity_signals': ['graph neural network'],
+                    'measurement_maturity_signals': [],
+                    'data_resource_signals': [],
+                    'infrastructure_signals': [],
+                    'bottleneck_signals': [],
+                },
+            }
+        },
+    )
+
+    assert quality['quality_tier'] == 'yellow'
+    assert quality['audit_status'] == 'eligible'
+    assert 'route_state_seed_thin' in quality['quality_flags']
+    assert quality['route_state_seed_audit']['available'] is True
+    assert quality['route_state_seed_audit']['ready_for_route_compilation'] is False
+    assert quality['route_state_seed_audit']['missing_seed_components'] == [
+        'active_benchmark_candidates',
+        'measurement_protocol_candidates',
+        'toolchain_candidates',
+        'challenging_evidence_ids',
+        'readiness_feature_inputs.measurement_maturity_signals',
+        'readiness_feature_inputs.data_resource_signals',
+        'readiness_feature_inputs.infrastructure_signals',
+        'readiness_feature_inputs.bottleneck_signals',
+    ]

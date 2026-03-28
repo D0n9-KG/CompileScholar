@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from app.ingest.parse_md import parse_mineru_markdown
+from app.ingest.parse_md import _coerce_windows_extended_path, parse_mineru_markdown
 
 
 class ParseMarkdownSectionsTests(unittest.TestCase):
@@ -44,6 +44,32 @@ class ParseMarkdownSectionsTests(unittest.TestCase):
             doc = parse_mineru_markdown(str(p))
 
         self.assertIsNone(doc.paper.doi)
+
+    def test_coerce_windows_extended_path_for_long_unc(self) -> None:
+        raw = (
+            "\\\\192.168.199.138\\Share400T\\pub\\LLM_Data\\data\\hzy\\第一批文献\\文献\\文献中心\\"
+            "HZY第一批论文全文\\output\\863_Decision Tree Classification of Land Cover from Remotely Sensed Data\\"
+            "863_Decision_Tree_Classification_of_Land_Cover_from_Remotely_Sensed_Data\\"
+            "863_Decision_Tree_Classification_of_Land_Cover_from_Remotely_Sensed_Data.md"
+        )
+
+        coerced = _coerce_windows_extended_path(raw)
+
+        self.assertTrue(coerced.startswith("\\\\?\\UNC\\192.168.199.138\\Share400T\\"))
+
+
+    def test_author_line_html_sup_tags_are_stripped_from_metadata(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / "paper.md"
+            p.write_text(
+                "# Machine-learning prediction for safety of RDX-CMDB propellants\n\n"
+                "郭延芝<sup>1</sup>, 吴艳玲<sup>2</sup>, 刘润青<sup>3</sup>\n\n"
+                "Main body paragraph.\n",
+                encoding="utf-8",
+            )
+            doc = parse_mineru_markdown(str(p))
+
+        self.assertEqual(doc.paper.authors, ["郭延芝", "吴艳玲", "刘润青"])
 
 
 if __name__ == "__main__":

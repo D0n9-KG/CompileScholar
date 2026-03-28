@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+from difflib import SequenceMatcher
 from typing import Any
 
 from .models import EvidenceAnchor, MoveRelation, ResearchMove
@@ -52,6 +54,48 @@ _EXPECTED_SLOTS_BY_PAPER_TYPE: dict[str, tuple[str, ...]] = {
 }
 _SPARSE_SLOT_RATIO = 0.08
 _RESEARCH_OBJECT_REQUIRED_FOR_L4 = {'empirical', 'benchmark', 'case_study', 'theoretical', 'unknown'}
+_COMPARATOR_REQUIRED_FOR_L4 = {'empirical', 'benchmark', 'case_study', 'unknown'}
+_OUTCOME_COMPARATOR_ROLES = {'result', 'experiment', 'interpretation'}
+_TRUSTED_EXTRACTION_MODES = {'direct', 'normalized'}
+_TRUSTED_SUPPORT_STRENGTHS = {'strong', 'exact'}
+_COMPARISON_SUMMARY_PATTERNS = (
+    ' agreement with ',
+    ' agree with ',
+    ' agrees with ',
+    ' compared against ',
+    ' compared to ',
+    ' compared with ',
+    ' compare against ',
+    ' compare to ',
+    ' compare with ',
+    ' difference between ',
+    ' differences between ',
+    ' higher than ',
+    ' in contrast to ',
+    ' lower than ',
+    ' over baseline ',
+    ' over the baseline ',
+    ' relative to ',
+    ' similar to ',
+    ' unlike ',
+    ' versus ',
+    ' vs ',
+)
+_METADATA_TOKEN_RE = re.compile(r'[0-9a-z]+(?:-[0-9a-z]+)?', re.IGNORECASE)
+_METADATA_GENERIC_TOKENS = {
+    'and',
+    'for',
+    'from',
+    'into',
+    'model',
+    'models',
+    'paper',
+    'study',
+    'system',
+    'the',
+    'this',
+    'with',
+}
 
 
 def _safe_ratio(numerator: int | float, denominator: int | float) -> float:
@@ -60,8 +104,166 @@ def _safe_ratio(numerator: int | float, denominator: int | float) -> float:
     return max(0.0, min(float(numerator) / float(denominator), 1.0))
 
 
+def _is_textual_char(char: str) -> bool:
+    return char.isalnum() or '\u4e00' <= char <= '\u9fff'
+
+
+def _normalize_similarity_text(value: str | None) -> str:
+    pieces: list[str] = []
+    for char in str(value or ''):
+        pieces.append(char.lower() if _is_textual_char(char) else ' ')
+    return ' '.join(''.join(pieces).split())
+
+
+def _text_similarity(left: str | None, right: str | None) -> float:
+    normalized_left = _normalize_similarity_text(left)
+    normalized_right = _normalize_similarity_text(right)
+    if not normalized_left or not normalized_right:
+        return 0.0
+    if normalized_left == normalized_right:
+        return 1.0
+    return SequenceMatcher(a=normalized_left, b=normalized_right).ratio()
+
+
+def _semantic_text_tokens(value: str | None) -> set[str]:
+    lowered = str(value or '').lower()
+    tokens = {
+        token
+        for token in _METADATA_TOKEN_RE.findall(lowered)
+        if len(token) >= 3 and token not in _METADATA_GENERIC_TOKENS
+    }
+    for run in re.findall(r'[\u4e00-\u9fff]{2,}', lowered):
+        tokens.update(run[index : index + 2] for index in range(len(run) - 1))
+    return tokens
+
+
+def _row_value(row: Any, field: str, default: Any = None) -> Any:
+    if isinstance(row, dict):
+        return row.get(field, default)
+    return getattr(row, field, default)
+
+
+def _slot_provenance_rows(move: ResearchMove, field: str) -> list[Any]:
+    rows: list[Any] = []
+    for row in list(move.slot_provenance or []):
+        if str(_row_value(row, 'field', '') or '') != field:
+            continue
+        rows.append(row)
+    return rows
+
+
+def _has_trusted_slot_signal(move: ResearchMove, field: str) -> bool:
+    values = list(getattr(move, field, None) or [])
+    if not values:
+        return False
+    provenance_rows = _slot_provenance_rows(move, field)
+    if not provenance_rows:
+        return True
+    field_level_rows = [row for row in provenance_rows if _row_value(row, 'value_index', None) is None]
+    for provenance in field_level_rows:
+        extraction_mode = str(_row_value(provenance, 'extraction_mode', '') or '').strip().lower()
+        support_strength = str(_row_value(provenance, 'support_strength', '') or '').strip().lower()
+        if extraction_mode in _TRUSTED_EXTRACTION_MODES and support_strength in _TRUSTED_SUPPORT_STRENGTHS:
+            return True
+    provenance_by_index = {
+        int(_row_value(row, 'value_index', -1)): row
+        for row in provenance_rows
+        if _row_value(row, 'value_index', None) is not None
+    }
+    for index, _value in enumerate(values):
+        provenance = provenance_by_index.get(index)
+        if provenance is None:
+            continue
+        extraction_mode = str(_row_value(provenance, 'extraction_mode', '') or '').strip().lower()
+        support_strength = str(_row_value(provenance, 'support_strength', '') or '').strip().lower()
+        if extraction_mode in _TRUSTED_EXTRACTION_MODES and support_strength in _TRUSTED_SUPPORT_STRENGTHS:
+            return True
+    return False
+
+
+def _trusted_slot_value_indices(move: ResearchMove, field: str) -> set[int]:
+    values = list(getattr(move, field, None) or [])
+    if not values:
+        return set()
+    provenance_rows = _slot_provenance_rows(move, field)
+    if not provenance_rows:
+        return set(range(len(values)))
+    field_level_rows = [row for row in provenance_rows if _row_value(row, 'value_index', None) is None]
+    for provenance in field_level_rows:
+        extraction_mode = str(_row_value(provenance, 'extraction_mode', '') or '').strip().lower()
+        support_strength = str(_row_value(provenance, 'support_strength', '') or '').strip().lower()
+        if extraction_mode in _TRUSTED_EXTRACTION_MODES and support_strength in _TRUSTED_SUPPORT_STRENGTHS:
+            return set(range(len(values)))
+    indices: set[int] = set()
+    for provenance in provenance_rows:
+        raw_index = _row_value(provenance, 'value_index', None)
+        if raw_index is None:
+            continue
+        extraction_mode = str(_row_value(provenance, 'extraction_mode', '') or '').strip().lower()
+        support_strength = str(_row_value(provenance, 'support_strength', '') or '').strip().lower()
+        if extraction_mode not in _TRUSTED_EXTRACTION_MODES or support_strength not in _TRUSTED_SUPPORT_STRENGTHS:
+            continue
+        try:
+            index = int(raw_index)
+        except Exception:
+            continue
+        if 0 <= index < len(values):
+            indices.add(index)
+    return indices
+
+
+def _has_informative_effect_signal(move: ResearchMove) -> bool:
+    for effect in list(move.effects or []):
+        direction = str(_row_value(effect, 'direction', '') or '').strip().lower()
+        if direction and direction not in {'unknown', 'none'}:
+            return True
+    return False
+
+
+def _has_semantic_outcome_comparator_signal(move: ResearchMove) -> bool:
+    if str(move.role or '') not in _OUTCOME_COMPARATOR_ROLES:
+        return False
+    trusted_indices = _trusted_slot_value_indices(move, 'comparators')
+    if not trusted_indices:
+        return False
+    if str(move.act_type or '') == 'compare_baseline':
+        return True
+    summary = f" {str(move.summary or '').strip().lower()} "
+    if any(pattern in summary for pattern in _COMPARISON_SUMMARY_PATTERNS):
+        return True
+    if len(trusted_indices) >= 2:
+        return True
+    for effect in list(move.effects or []):
+        comparator_surface = str(_row_value(effect, 'comparator_surface', '') or '').strip()
+        if comparator_surface:
+            return True
+    return False
+
+
+def _trusted_slot_count(moves: list[ResearchMove], field: str, *, roles: set[str] | None = None) -> int:
+    count = 0
+    for move in moves:
+        if roles is not None and str(move.role or '') not in roles:
+            continue
+        if _has_trusted_slot_signal(move, field):
+            count += 1
+    return count
+
+
+def _grounded_relation_count(move_relations: list[MoveRelation]) -> int:
+    count = 0
+    for relation in move_relations:
+        relation_type = str(_row_value(relation, 'relation_type', '') or '').strip().lower()
+        if relation_type == 'motivates':
+            continue
+        anchor_ids = list(_row_value(relation, 'anchor_ids', []) or [])
+        if anchor_ids:
+            count += 1
+    return count
+
+
 def _has_core_slot_signal(move: ResearchMove) -> bool:
-    return any(bool(getattr(move, field, None)) for field in _CORE_SLOT_FIELDS)
+    return any(_has_trusted_slot_signal(move, field) for field in _CORE_SLOT_FIELDS) or _has_informative_effect_signal(move)
 
 
 def _summary_ready(move: ResearchMove) -> bool:
@@ -82,7 +284,7 @@ def _relation_coverage(moves: list[ResearchMove], move_relations: list[MoveRelat
     if len(moves) < 2:
         return 1.0
     target = max(1, len(moves) - 1)
-    return _safe_ratio(len(move_relations), target)
+    return _safe_ratio(_grounded_relation_count(move_relations), target)
 
 
 def _quality_score(
@@ -153,6 +355,86 @@ def _looks_like_noise_summary(summary: str) -> bool:
     return normalized.startswith('#') and len(normalized.split()) <= 6
 
 
+def _looks_like_suspicious_metadata_title(title: str | None) -> bool:
+    normalized = str(title or '').strip().lower()
+    if not normalized:
+        return True
+    if any(normalized.startswith(prefix) for prefix in _QUALITY_NOISE_PREFIXES):
+        return True
+    if normalized.startswith('#') and len(normalized.split()) <= 6:
+        return True
+    return False
+
+
+def _has_metadata_summary_mismatch(
+    paper_metadata: dict[str, Any] | None,
+    derived_views: dict[str, Any] | None,
+) -> bool:
+    metadata = dict(paper_metadata or {})
+    paper_summaries = dict((derived_views or {}).get('paper_summaries') or {})
+    title = str(metadata.get('title') or '').strip()
+    summary = str(paper_summaries.get('one_paragraph_summary') or '').strip()
+    if not title or not summary:
+        return False
+    if _looks_like_suspicious_metadata_title(title) or _looks_like_noise_summary(summary):
+        return False
+    title_tokens = _semantic_text_tokens(title)
+    summary_tokens = _semantic_text_tokens(summary)
+    if len(title_tokens) < 2 or len(summary_tokens) < 2:
+        return False
+    overlap = title_tokens & summary_tokens
+    overlap_coverage = _safe_ratio(len(overlap), len(title_tokens))
+    if overlap_coverage >= 0.2 or len(overlap) >= 5:
+        return False
+    return _text_similarity(title, summary) < 0.3
+
+
+def _route_state_seed_audit(derived_views: dict[str, Any] | None) -> dict[str, Any]:
+    route_state_seed = dict((derived_views or {}).get('route_state_seed') or {})
+    readiness_inputs = dict(route_state_seed.get('readiness_feature_inputs') or {})
+    if not route_state_seed:
+        return {
+            'available': False,
+            'ready_for_route_compilation': False,
+            'missing_seed_components': [],
+            'component_counts': {},
+        }
+
+    component_specs = (
+        ('topic_scope_candidates', route_state_seed.get('topic_scope_candidates')),
+        ('dominant_method_candidates', route_state_seed.get('dominant_method_candidates')),
+        ('active_benchmark_candidates', route_state_seed.get('active_benchmark_candidates')),
+        ('measurement_protocol_candidates', route_state_seed.get('measurement_protocol_candidates')),
+        ('toolchain_candidates', route_state_seed.get('toolchain_candidates')),
+        ('supporting_evidence_ids', route_state_seed.get('supporting_evidence_ids')),
+        ('challenging_evidence_ids', route_state_seed.get('challenging_evidence_ids')),
+        ('readiness_feature_inputs.method_maturity_signals', readiness_inputs.get('method_maturity_signals')),
+        ('readiness_feature_inputs.measurement_maturity_signals', readiness_inputs.get('measurement_maturity_signals')),
+        ('readiness_feature_inputs.data_resource_signals', readiness_inputs.get('data_resource_signals')),
+        ('readiness_feature_inputs.infrastructure_signals', readiness_inputs.get('infrastructure_signals')),
+        ('readiness_feature_inputs.bottleneck_signals', readiness_inputs.get('bottleneck_signals')),
+    )
+    component_counts = {
+        field: len(list(values or []))
+        for field, values in component_specs
+    }
+    component_counts['source_move_ids'] = len(list(route_state_seed.get('source_move_ids') or []))
+    missing_seed_components = [
+        field
+        for field, values in component_specs
+        if not list(values or [])
+    ]
+    if component_counts['source_move_ids'] == 0:
+        missing_seed_components.append('source_move_ids')
+
+    return {
+        'available': True,
+        'ready_for_route_compilation': not missing_seed_components,
+        'missing_seed_components': missing_seed_components,
+        'component_counts': component_counts,
+    }
+
+
 def is_noise_summary(summary: str) -> bool:
     return _looks_like_noise_summary(summary)
 
@@ -163,6 +445,7 @@ def _l2_completeness_audit(
     move_relations: list[MoveRelation],
     paper_type: str,
 ) -> dict[str, Any]:
+    paper_type_token = str(paper_type or 'unknown')
     move_count = len(moves)
     role_counts: dict[str, int] = {}
     slot_counts: dict[str, int] = {}
@@ -174,14 +457,32 @@ def _l2_completeness_audit(
         count = sum(1 for move in moves if bool(getattr(move, field, None)))
         slot_counts[field] = count
         slot_move_ratios[field] = round(_safe_ratio(count, move_count), 4)
+    supported_slot_counts = {
+        field: _trusted_slot_count(moves, field)
+        for field in _CORE_SLOT_FIELDS
+    }
+    supported_outcome_comparator_count = sum(1 for move in moves if _has_semantic_outcome_comparator_signal(move))
 
-    expected_roles = list(_EXPECTED_ROLES_BY_PAPER_TYPE.get(str(paper_type or 'unknown'), _EXPECTED_ROLES_BY_PAPER_TYPE['unknown']))
-    expected_slots = list(_EXPECTED_SLOTS_BY_PAPER_TYPE.get(str(paper_type or 'unknown'), _EXPECTED_SLOTS_BY_PAPER_TYPE['unknown']))
+    expected_roles = list(_EXPECTED_ROLES_BY_PAPER_TYPE.get(paper_type_token, _EXPECTED_ROLES_BY_PAPER_TYPE['unknown']))
+    expected_slots = list(_EXPECTED_SLOTS_BY_PAPER_TYPE.get(paper_type_token, _EXPECTED_SLOTS_BY_PAPER_TYPE['unknown']))
     missing_expected_roles = sorted(role for role in expected_roles if role not in observed_roles)
     expected_role_set = set(expected_roles)
     critical_role_ratio = _safe_ratio(len(set(observed_roles) & expected_role_set), len(expected_role_set))
     missing_l2_slot_fields = [field for field in _CORE_SLOT_FIELDS if slot_counts.get(field, 0) == 0]
     missing_expected_slot_fields = [field for field in expected_slots if slot_counts.get(field, 0) == 0]
+    informative_effect_count = sum(1 for move in moves if _has_informative_effect_signal(move))
+    missing_supported_expected_slot_fields = [
+        field
+        for field in expected_slots
+        if (
+            informative_effect_count == 0
+            if field == 'effects'
+            else supported_slot_counts.get(field, 0) == 0
+        )
+    ]
+    requires_comparator_signal_for_l4 = paper_type_token in _COMPARATOR_REQUIRED_FOR_L4
+    if requires_comparator_signal_for_l4 and supported_outcome_comparator_count == 0 and 'comparators' not in missing_supported_expected_slot_fields:
+        missing_supported_expected_slot_fields.append('comparators')
     sparse_expected_slot_fields = [
         field
         for field in expected_slots
@@ -198,36 +499,53 @@ def _l2_completeness_audit(
     )
     relation_ratio = _relation_coverage(moves, move_relations)
     has_outcome_signal = any(role in observed_roles for role in ('result', 'interpretation'))
-    requires_outcome_signal = str(paper_type or 'unknown') not in {'software'}
+    requires_outcome_signal = paper_type_token not in {'software'}
     ready_for_community = signature_ready_move_count >= 3 and (slot_counts.get('methods', 0) > 0 or slot_counts.get('research_objects', 0) > 0)
     ready_for_l3 = (
         not missing_expected_roles
         and relation_ratio >= 0.4
         and critical_role_ratio >= 0.67
         and (has_outcome_signal or not requires_outcome_signal)
-        and (slot_counts.get('methods', 0) > 0 or slot_counts.get('research_objects', 0) > 0)
+        and (supported_slot_counts.get('methods', 0) > 0 or supported_slot_counts.get('research_objects', 0) > 0)
     )
-    evidence_signal_count = sum(1 for field in ('metrics', 'comparators', 'effects') if slot_counts.get(field, 0) > 0)
-    context_signal_count = sum(1 for field in ('conditions', 'resource_mentions', 'limitation_types') if slot_counts.get(field, 0) > 0)
-    requires_object_signal_for_l4 = str(paper_type or 'unknown') in _RESEARCH_OBJECT_REQUIRED_FOR_L4
+    evidence_signal_count = sum(
+        1
+        for field in ('metrics', 'comparators')
+        if (
+            supported_outcome_comparator_count > 0
+            if field == 'comparators'
+            else supported_slot_counts.get(field, 0) > 0
+        )
+    )
+    if informative_effect_count > 0:
+        evidence_signal_count += 1
+    context_signal_count = sum(1 for field in ('conditions', 'resource_mentions', 'limitation_types') if supported_slot_counts.get(field, 0) > 0)
+    requires_object_signal_for_l4 = paper_type_token in _RESEARCH_OBJECT_REQUIRED_FOR_L4
     ready_for_l4 = (
         ready_for_l3
+        and informative_effect_count > 0
         and evidence_signal_count >= 2
         and context_signal_count >= 1
-        and (slot_counts.get('research_objects', 0) > 0 or not requires_object_signal_for_l4)
+        and (supported_slot_counts.get('research_objects', 0) > 0 or not requires_object_signal_for_l4)
+        and (supported_outcome_comparator_count > 0 or not requires_comparator_signal_for_l4)
     )
 
     role_score = _safe_ratio(len(expected_roles) - len(missing_expected_roles), len(expected_roles))
     expected_slot_score = _safe_ratio(len(expected_slots) - len(missing_expected_slot_fields), len(expected_slots))
+    supported_expected_slot_score = _safe_ratio(
+        len(expected_slots) - len(missing_supported_expected_slot_fields),
+        len(expected_slots),
+    )
     sparse_penalty = _safe_ratio(len(sparse_expected_slot_fields), len(expected_slots))
     noise_penalty = _safe_ratio(len(noise_move_ids), move_count)
     completeness_score = max(
         0.0,
         min(
             1.0,
-            role_score * 0.30
+            role_score * 0.25
             + critical_role_ratio * 0.20
-            + expected_slot_score * 0.35
+            + expected_slot_score * 0.20
+            + supported_expected_slot_score * 0.20
             + (1.0 - sparse_penalty) * 0.05
             + (1.0 - noise_penalty) * 0.05
             + relation_ratio * 0.05,
@@ -235,7 +553,7 @@ def _l2_completeness_audit(
     )
 
     return {
-        'paper_type': str(paper_type or 'unknown'),
+        'paper_type': paper_type_token,
         'move_count': move_count,
         'role_counts': role_counts,
         'observed_roles': observed_roles,
@@ -243,10 +561,13 @@ def _l2_completeness_audit(
         'missing_expected_roles': missing_expected_roles,
         'critical_role_coverage_ratio': round(critical_role_ratio, 4),
         'slot_counts': slot_counts,
+        'supported_slot_counts': supported_slot_counts,
+        'supported_semantic_outcome_comparator_count': supported_outcome_comparator_count,
         'slot_move_ratios': slot_move_ratios,
         'missing_l2_slot_fields': missing_l2_slot_fields,
         'expected_slot_fields': expected_slots,
         'missing_expected_slot_fields': missing_expected_slot_fields,
+        'missing_supported_expected_slot_fields': missing_supported_expected_slot_fields,
         'sparse_expected_slot_fields': sparse_expected_slot_fields,
         'noise_move_ids': noise_move_ids,
         'signature_ready_move_count': signature_ready_move_count,
@@ -337,10 +658,21 @@ def needs_lightweight_audit(gate_report: dict[str, Any]) -> bool:
         return True
     if bool(gate_report.get('invalid_move_ids')):
         return True
+    completeness_audit = dict(gate_report.get('l2_completeness_audit') or {})
+    paper_type = str(completeness_audit.get('paper_type') or 'unknown')
+    if not bool(completeness_audit.get('ready_for_l3')):
+        return True
+    if paper_type in _RESEARCH_OBJECT_REQUIRED_FOR_L4 and not bool(completeness_audit.get('ready_for_l4')):
+        return True
     return float(gate_report.get('quality_tier_score') or 0.0) < _GREEN_THRESHOLD
 
 
-def build_quality_payload(gate_report: dict[str, Any]) -> dict[str, Any]:
+def build_quality_payload(
+    gate_report: dict[str, Any],
+    *,
+    paper_metadata: dict[str, Any] | None = None,
+    derived_views: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     passed = bool(gate_report.get('passed'))
     score = float(gate_report.get('quality_tier_score') or 0.0)
     completeness_audit = dict(gate_report.get('l2_completeness_audit') or {})
@@ -348,6 +680,18 @@ def build_quality_payload(gate_report: dict[str, Any]) -> dict[str, Any]:
     missing_expected_slots = list(completeness_audit.get('missing_expected_slot_fields') or [])
     noise_move_ids = list(completeness_audit.get('noise_move_ids') or [])
     critical_role_coverage = float(completeness_audit.get('critical_role_coverage_ratio') or 0.0)
+    paper_type = str(completeness_audit.get('paper_type') or 'unknown')
+    ready_for_l3 = bool(completeness_audit.get('ready_for_l3'))
+    ready_for_l4 = bool(completeness_audit.get('ready_for_l4'))
+    requires_l4_for_green = paper_type in _RESEARCH_OBJECT_REQUIRED_FOR_L4
+    quality_flags = list(gate_report.get('soft_flags') or [])
+    metadata_summary_mismatch = _has_metadata_summary_mismatch(paper_metadata, derived_views)
+    route_state_seed_audit = _route_state_seed_audit(derived_views)
+    route_state_seed_thin = route_state_seed_audit['available'] and not route_state_seed_audit['ready_for_route_compilation']
+    if metadata_summary_mismatch and 'metadata_summary_mismatch' not in quality_flags:
+        quality_flags.append('metadata_summary_mismatch')
+    if route_state_seed_thin and 'route_state_seed_thin' not in quality_flags:
+        quality_flags.append('route_state_seed_thin')
     if not passed or score < _YELLOW_THRESHOLD:
         quality_tier = 'red'
     elif (
@@ -357,16 +701,25 @@ def build_quality_payload(gate_report: dict[str, Any]) -> dict[str, Any]:
         or bool(missing_expected_roles)
         or len(missing_expected_slots) >= 2
         or bool(noise_move_ids)
+        or not ready_for_l3
+        or (requires_l4_for_green and not ready_for_l4)
+        or metadata_summary_mismatch
+        or route_state_seed_thin
     ):
         quality_tier = 'yellow'
     else:
         quality_tier = 'green'
     audit_status = 'eligible' if needs_lightweight_audit(gate_report) else 'not_needed' if passed else 'blocked'
+    if metadata_summary_mismatch and passed:
+        audit_status = 'eligible'
+    if route_state_seed_thin and passed:
+        audit_status = 'eligible'
     return {
         'quality_tier': quality_tier,
         'quality_tier_score': round(score, 4),
-        'quality_flags': list(gate_report.get('soft_flags') or []),
+        'quality_flags': quality_flags,
         'hot_path_gate_report': gate_report,
         'l2_completeness_audit': completeness_audit,
         'audit_status': audit_status,
+        'route_state_seed_audit': route_state_seed_audit,
     }

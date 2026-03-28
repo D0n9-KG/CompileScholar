@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 from typing import Any, Iterable
 
+from .gates import is_noise_summary
 from .models import MentionValue, PaperLogicTrace, ResearchMove
 
 
@@ -37,6 +38,73 @@ _GENERIC_TOKENS = {
     'using',
     'we',
     'with',
+}
+_TRUSTED_EXTRACTION_MODES = {'direct', 'normalized'}
+_TRUSTED_SUPPORT_STRENGTHS = {'strong', 'exact'}
+_L1_TOOLCHAIN_RESOURCE_TYPES = {'hardware', 'instrument', 'platform', 'software', 'tool'}
+_SUMMARY_ROLE_PRIORITY = {
+    'result': 5,
+    'method': 5,
+    'experiment': 5,
+    'problem': 4,
+    'interpretation': 3,
+    'limitation': 3,
+    'future_work': 2,
+    'hypothesis': 2,
+    'background': 1,
+}
+_SUMMARY_SECTION_PRIORITY = (
+    ('abstract', 4),
+    ('summary', 4),
+    ('conclusion', 3),
+    ('discussion', 3),
+    ('result', 2),
+    ('method', 2),
+    ('experiment', 2),
+)
+_SUMMARY_NOISE_CUES = (
+    'accepted ',
+    'available online',
+    'corresponding author',
+    'received ',
+)
+_METHOD_SUMMARY_POSITIVE_CUES = (
+    ' uses ',
+    ' using ',
+    ' propose',
+    ' describes ',
+    ' represent',
+    ' model ',
+    ' simulate',
+    ' workflow',
+)
+_METHOD_SUMMARY_NEGATIVE_CUES = (
+    ' gave detailed insight ',
+    ' improve',
+    ' improved',
+    ' outperforms ',
+    ' outperformed ',
+    ' better accuracy ',
+    ' reveals ',
+    ' showed ',
+    ' shows ',
+    ' reports ',
+    ' at most ',
+)
+_SECTION_HEADING_RE = re.compile(r'^\s*(?:\d+(?:\.\d+)*|[ivx]+)\.?\s+', re.IGNORECASE)
+_PIPE_SECTION_HEADING_RE = re.compile(r'^\s*(?:section\s+)?\d+(?:\.\d+)*\s*[|:：-]\s+\S', re.IGNORECASE)
+_LATEX_TITLE_NOISE_RE = re.compile(r'(?:\\(?:mathrm|text|begin|end)\b|\$)')
+_GENERIC_SECTION_HEADINGS = {
+    'abstract',
+    'conclusion',
+    'discussion',
+    'experimental setup',
+    'introduction',
+    'materials and methods',
+    'method',
+    'methods',
+    'results',
+    'simulation procedure',
 }
 
 
@@ -102,10 +170,194 @@ def _summary_fallback_tokens(move: ResearchMove) -> dict[str, list[str]]:
     }
 
 
-def _slot_provenance_for(move: ResearchMove, field: str) -> list[dict[str, Any]]:
+def _summary_anchor_sections(trace: PaperLogicTrace) -> dict[str, str]:
+    sections: dict[str, str] = {}
+    for anchor in trace.canonical_core.evidence_anchors:
+        joined = ' > '.join(str(part or '').strip().lower() for part in (anchor.section_path or []) if str(part or '').strip())
+        sections[anchor.anchor_id] = joined
+    return sections
+
+
+def _section_priority(section_path: str) -> int:
+    lowered = str(section_path or '').lower()
+    if not lowered:
+        return 0
+    for cue, score in _SUMMARY_SECTION_PRIORITY:
+        if cue in lowered:
+            return score
+    return 0
+
+
+def _looks_like_author_fragment(summary: str) -> bool:
+    stripped = str(summary or '').strip()
+    if not stripped:
+        return False
+    lowered = stripped.lower()
+    if is_noise_summary(stripped) or lowered.startswith('©'):
+        return True
+    if any(cue in lowered for cue in _SUMMARY_NOISE_CUES):
+        return True
+    words = [token for token in re.split(r'\s+', stripped) if token]
+    if len(words) > 5:
+        return False
+    cleaned_words = [re.sub(r'[^A-Za-z.]', '', word) for word in words]
+    cleaned_words = [word for word in cleaned_words if word]
+    if not cleaned_words:
+        return False
+    if any(word.lower().strip('.') in _GENERIC_TOKENS for word in cleaned_words):
+        return False
+    decorated = 0
+    for word in cleaned_words:
+        bare = word.strip('.')
+        if not bare:
+            continue
+        if word.endswith('.'):
+            decorated += 1
+            continue
+        if bare.isupper() or bare.istitle():
+            decorated += 1
+    return decorated == len(cleaned_words)
+
+
+def _is_summary_contentful(summary: str) -> bool:
+    stripped = str(summary or '').strip()
+    if not stripped:
+        return False
+    if _looks_like_author_fragment(stripped):
+        return False
+    if len(stripped) >= 36:
+        return True
+    return len(stripped.split()) >= 5
+
+
+def _move_summary_score(move: ResearchMove, anchor_sections: dict[str, str]) -> tuple[int, int]:
+    summary = str(move.summary or '').strip()
+    if not _is_summary_contentful(summary):
+        return (-1, 0)
+    section_score = max((_section_priority(anchor_sections.get(anchor_id, '')) for anchor_id in move.anchor_ids), default=0)
+    role_score = _SUMMARY_ROLE_PRIORITY.get(str(move.role or ''), 1)
+    slot_bonus = 1 if any(bool(getattr(move, field, None)) for field in ('research_objects', 'methods', 'metrics', 'comparators', 'conditions', 'limitation_types', 'resource_mentions')) or bool(move.effects) else 0
+    length_bonus = 1 if 40 <= len(summary) <= 280 else 0
+    return (role_score + section_score * 3 + slot_bonus + length_bonus, section_score)
+
+
+def _select_summary_moves(trace: PaperLogicTrace) -> list[ResearchMove]:
+    anchor_sections = _summary_anchor_sections(trace)
+    scored_moves: list[tuple[int, int, int, ResearchMove]] = []
+    for move in trace.canonical_core.moves:
+        score, section_score = _move_summary_score(move, anchor_sections)
+        if score < 0:
+            continue
+        scored_moves.append((score, section_score, int(move.sequence_no), move))
+    if not scored_moves:
+        return [move for move in trace.canonical_core.moves if str(move.summary or '').strip()][:3]
+    ordered = sorted(scored_moves, key=lambda item: (-item[0], -item[1], item[2]))
+    selected: list[ResearchMove] = []
+    selected_ids: set[str] = set()
+
+    def pick(predicate: Any) -> None:
+        for score, section_score, sequence_no, move in ordered:
+            del score, section_score, sequence_no
+            if move.move_id in selected_ids:
+                continue
+            if not predicate(move):
+                continue
+            selected.append(move)
+            selected_ids.add(move.move_id)
+            return
+
+    pick(
+        lambda move: move.role in {'problem', 'background', 'method', 'interpretation'}
+        and (int(move.sequence_no) <= 4 or max((_section_priority(anchor_sections.get(anchor_id, '')) for anchor_id in move.anchor_ids), default=0) >= 3)
+    )
+    pick(lambda move: move.role in {'method', 'experiment'})
+    pick(lambda move: move.role in {'result', 'interpretation'})
+    pick(lambda move: move.role in {'limitation', 'future_work', 'interpretation'})
+
+    for _score, _section_score, _sequence_no, move in ordered:
+        if move.move_id in selected_ids:
+            continue
+        selected.append(move)
+        selected_ids.add(move.move_id)
+        if len(selected) >= 3:
+            break
+    return selected[:3]
+
+
+def _summary_cue_count(summary: str, cues: tuple[str, ...]) -> int:
+    lowered = f" {str(summary or '').strip().lower()} "
+    return sum(1 for cue in cues if cue in lowered)
+
+
+def _method_focus_score(move: ResearchMove) -> int:
+    summary = str(move.summary or '').strip()
+    if not _is_summary_contentful(summary):
+        return -999
+    score = 0
+    if move.role == 'method':
+        score += 4
+    elif move.role == 'experiment':
+        score += 2
+    if move.act_type in {'propose_method', 'adapt_method', 'build_resource', 'run_experiment', 'set_condition'}:
+        score += 2
+    score += len(_trusted_mentions(move, 'methods', list(move.methods))) * 4
+    if _trusted_mentions(move, 'resource_mentions', list(move.resource_mentions)):
+        score += 1
+    score += _summary_cue_count(summary, _METHOD_SUMMARY_POSITIVE_CUES) * 2
+    score -= _summary_cue_count(summary, _METHOD_SUMMARY_NEGATIVE_CUES) * 3
+    if _trusted_mentions(move, 'metrics', list(move.metrics)):
+        score -= 1
+    if _trusted_mentions(move, 'comparators', list(move.comparators)):
+        score -= 1
+    if move.effects:
+        score -= 2
+    return score
+
+
+def _select_key_method_move(trace: PaperLogicTrace) -> ResearchMove | None:
+    method_candidates = [
+        move
+        for move in trace.canonical_core.moves
+        if move.role in {'method', 'experiment'} and _is_summary_contentful(move.summary)
+    ]
+    if not method_candidates:
+        return None
+    anchor_sections = _summary_anchor_sections(trace)
+    return sorted(
+        method_candidates,
+        key=lambda move: (
+            -(_method_focus_score(move) * 2 + _move_summary_score(move, anchor_sections)[0]),
+            -_move_summary_score(move, anchor_sections)[0],
+            -_method_focus_score(move),
+            int(move.sequence_no),
+        ),
+    )[0]
+
+
+def _looks_like_section_heading(value: str | None) -> bool:
+    normalized = ' '.join(str(value or '').strip().lower().split())
+    if not normalized:
+        return False
+    if normalized in _GENERIC_SECTION_HEADINGS:
+        return True
+    if _PIPE_SECTION_HEADING_RE.match(normalized):
+        return True
+    if normalized.count('$') >= 2 or _LATEX_TITLE_NOISE_RE.search(normalized):
+        return True
+    if not _SECTION_HEADING_RE.match(normalized):
+        return False
+    tail = _SECTION_HEADING_RE.sub('', normalized).strip()
+    if not tail:
+        return True
+    return tail in _GENERIC_SECTION_HEADINGS or len(tail.split()) <= 4
+
+
+def _slot_provenance_for(move: ResearchMove, field: str, *, value_index: int | None = None) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for item in move.slot_provenance:
         if item.field != field:
+            continue
+        if value_index is not None and item.value_index not in {None, value_index}:
             continue
         rows.append(
             {
@@ -121,11 +373,28 @@ def _slot_provenance_for(move: ResearchMove, field: str) -> list[dict[str, Any]]
     return rows
 
 
-def _slot_entries(field: str, moves: list[ResearchMove], attr_name: str) -> list[dict[str, Any]]:
+def _trusted_mentions(move: ResearchMove, field: str, mentions: list[MentionValue]) -> list[MentionValue]:
+    trusted: list[MentionValue] = []
+    for index, mention in enumerate(mentions):
+        if mention.inferred:
+            continue
+        provenance = _slot_provenance_for(move, field, value_index=index)
+        if provenance:
+            extraction_mode = str(provenance[0].get('extraction_mode') or '').strip().lower()
+            support_strength = str(provenance[0].get('support_strength') or '').strip().lower()
+            if extraction_mode not in _TRUSTED_EXTRACTION_MODES or support_strength not in _TRUSTED_SUPPORT_STRENGTHS:
+                continue
+        trusted.append(mention)
+    return trusted
+
+
+def _slot_entries(field: str, moves: list[ResearchMove], attr_name: str, *, trusted_only: bool = False) -> list[dict[str, Any]]:
     entries: list[dict[str, Any]] = []
     for move in moves:
         mentions: list[MentionValue] = list(getattr(move, attr_name))
-        for mention in mentions:
+        if trusted_only:
+            mentions = _trusted_mentions(move, field, mentions)
+        for index, mention in enumerate(mentions):
             token = _mention_token(mention)
             if not token:
                 continue
@@ -137,27 +406,355 @@ def _slot_entries(field: str, moves: list[ResearchMove], attr_name: str) -> list
                     'normalized': mention.normalized,
                     'type': mention.type,
                     'anchor_ids': list(mention.anchor_ids),
-                    'provenance': _slot_provenance_for(move, field),
+                    'provenance': _slot_provenance_for(move, field, value_index=index if trusted_only else None),
                 }
             )
     return entries
 
 
-def build_l2_5_slot_inventory(moves: list[ResearchMove]) -> dict[str, list[dict[str, Any]]]:
+def _effect_entries(moves: list[ResearchMove]) -> list[dict[str, Any]]:
+    entries: list[dict[str, Any]] = []
+    for move in moves:
+        for effect in move.effects:
+            entries.append(
+                {
+                    'move_id': move.move_id,
+                    'role': move.role,
+                    'act_type': move.act_type,
+                    'direction': effect.direction,
+                    'magnitude_text': effect.magnitude_text,
+                    'magnitude_numeric': effect.magnitude_numeric,
+                    'unit': effect.unit,
+                    'comparator_surface': effect.comparator_surface,
+                    'anchor_ids': list(effect.anchor_ids),
+                    'confidence': effect.confidence,
+                }
+            )
+    return entries
+
+
+def _effect_direction_entries(effect_entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [
+        {
+            'move_id': entry['move_id'],
+            'role': entry['role'],
+            'act_type': entry['act_type'],
+            'direction': entry['direction'],
+            'comparator_surface': entry['comparator_surface'],
+            'anchor_ids': list(entry['anchor_ids']),
+            'confidence': entry['confidence'],
+        }
+        for entry in effect_entries
+        if str(entry.get('direction') or '').strip()
+    ]
+
+
+def _effect_size_entries(effect_entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [
+        {
+            'move_id': entry['move_id'],
+            'role': entry['role'],
+            'act_type': entry['act_type'],
+            'magnitude_text': entry['magnitude_text'],
+            'magnitude_numeric': entry['magnitude_numeric'],
+            'unit': entry['unit'],
+            'comparator_surface': entry['comparator_surface'],
+            'anchor_ids': list(entry['anchor_ids']),
+            'confidence': entry['confidence'],
+        }
+        for entry in effect_entries
+        if (
+            entry.get('magnitude_text') is not None
+            or entry.get('magnitude_numeric') is not None
+            or entry.get('unit') is not None
+        )
+    ]
+
+
+def _slot_entries_with_move_context(
+    field: str,
+    moves: list[ResearchMove],
+    attr_name: str,
+    *,
+    trusted_only: bool = False,
+    roles: set[str] | None = None,
+) -> list[dict[str, Any]]:
+    entries: list[dict[str, Any]] = []
+    for move in moves:
+        if roles is not None and move.role not in roles:
+            continue
+        mentions: list[MentionValue] = list(getattr(move, attr_name))
+        if trusted_only:
+            mentions = _trusted_mentions(move, field, mentions)
+        for index, mention in enumerate(mentions):
+            token = _mention_token(mention)
+            if not token:
+                continue
+            entries.append(
+                {
+                    'move_id': move.move_id,
+                    'role': move.role,
+                    'act_type': move.act_type,
+                    'summary': move.summary,
+                    'surface': mention.surface,
+                    'normalized': mention.normalized,
+                    'type': mention.type,
+                    'anchor_ids': list(mention.anchor_ids),
+                    'confidence': mention.confidence,
+                    'provenance': _slot_provenance_for(move, field, value_index=index if trusted_only else None),
+                }
+            )
+    return entries
+
+
+def _primary_contributions(moves: list[ResearchMove]) -> list[str]:
+    contributions: list[str] = []
+
+    def _add(label: str) -> None:
+        if label not in contributions:
+            contributions.append(label)
+
+    if any(move.role in {'problem', 'background', 'hypothesis'} for move in moves):
+        _add('problem_framing')
+    if any(_trusted_mentions(move, 'methods', list(move.methods)) for move in moves):
+        _add('method_proposal')
+    if any(
+        move.role in {'experiment', 'result', 'interpretation'}
+        and (
+            _trusted_mentions(move, 'metrics', list(move.metrics))
+            or move.effects
+        )
+        for move in moves
+    ):
+        _add('outcome_evidence')
+    if any(
+        move.role in {'experiment', 'result', 'interpretation'}
+        and _trusted_mentions(move, 'comparators', list(move.comparators))
+        for move in moves
+    ):
+        _add('comparison_evidence')
+    if any(_trusted_mentions(move, 'limitation_types', list(move.limitation_types)) for move in moves):
+        _add('limitation_evidence')
+    if any(_trusted_mentions(move, 'resource_mentions', list(move.resource_mentions)) for move in moves):
+        _add('resource_signal')
+    if any(move.role == 'interpretation' for move in moves):
+        _add('mechanistic_interpretation')
+    if any(move.role == 'future_work' for move in moves):
+        _add('future_direction')
+    return contributions
+
+
+def _outcome_signals(moves: list[ResearchMove]) -> list[dict[str, Any]]:
+    entries: list[dict[str, Any]] = []
+    for move in moves:
+        if move.role not in {'experiment', 'result', 'interpretation'}:
+            continue
+        metrics = _trusted_mentions(move, 'metrics', list(move.metrics))
+        comparators = _trusted_mentions(move, 'comparators', list(move.comparators))
+        conditions = _trusted_mentions(move, 'conditions', list(move.conditions))
+        effect_directions = _unique(effect.direction for effect in move.effects if str(effect.direction).strip())
+        effect_comparators = _unique(
+            str(effect.comparator_surface or '').strip().lower()
+            for effect in move.effects
+            if str(effect.comparator_surface or '').strip()
+        )
+        if not (metrics or comparators or move.effects):
+            continue
+        entries.append(
+            {
+                'move_id': move.move_id,
+                'role': move.role,
+                'act_type': move.act_type,
+                'summary': move.summary,
+                'metric_tokens': _mention_tokens(metrics),
+                'comparator_tokens': _mention_tokens(comparators),
+                'effect_directions': effect_directions,
+                'effect_comparator_tokens': effect_comparators,
+                'condition_tokens': _mention_tokens(conditions),
+                'anchor_ids': list(move.anchor_ids),
+                'confidence': move.confidence,
+            }
+        )
+    return entries
+
+
+def _comparison_signals(moves: list[ResearchMove]) -> list[dict[str, Any]]:
+    entries: list[dict[str, Any]] = []
+    for move in moves:
+        if move.role not in {'experiment', 'result', 'interpretation'}:
+            continue
+        comparators = _trusted_mentions(move, 'comparators', list(move.comparators))
+        if not comparators:
+            continue
+        conditions = _trusted_mentions(move, 'conditions', list(move.conditions))
+        entries.append(
+            {
+                'move_id': move.move_id,
+                'role': move.role,
+                'act_type': move.act_type,
+                'summary': move.summary,
+                'comparator_tokens': _mention_tokens(comparators),
+                'condition_tokens': _mention_tokens(conditions),
+                'anchor_ids': list(move.anchor_ids),
+                'confidence': move.confidence,
+            }
+        )
+    return entries
+
+
+def build_future_work_signals(moves: list[ResearchMove]) -> list[dict[str, Any]]:
+    entries: list[dict[str, Any]] = []
+    for move in moves:
+        if move.role != 'future_work':
+            continue
+        target_objects = _trusted_mentions(move, 'research_objects', list(move.research_objects))
+        methods = _trusted_mentions(move, 'methods', list(move.methods))
+        conditions = _trusted_mentions(move, 'conditions', list(move.conditions))
+        limitation_types = _trusted_mentions(move, 'limitation_types', list(move.limitation_types))
+        resource_mentions = _trusted_mentions(move, 'resource_mentions', list(move.resource_mentions))
+        if not (
+            target_objects
+            or methods
+            or conditions
+            or limitation_types
+            or resource_mentions
+            or str(move.summary or '').strip()
+        ):
+            continue
+        entries.append(
+            {
+                'move_id': move.move_id,
+                'role': move.role,
+                'act_type': move.act_type,
+                'summary': move.summary,
+                'target_object_tokens': _mention_tokens(target_objects),
+                'method_tokens': _mention_tokens(methods),
+                'condition_tokens': _mention_tokens(conditions),
+                'limitation_tokens': _mention_tokens(limitation_types),
+                'resource_tokens': _mention_tokens(resource_mentions),
+                'anchor_ids': list(move.anchor_ids),
+                'confidence': move.confidence,
+            }
+        )
+    return entries
+
+
+def build_route_compiler_contract(
+    *,
+    paper_id: str,
+    paper_type: str,
+    moves: list[ResearchMove],
+) -> dict[str, Any]:
+    topic_object_roles = {'problem', 'method', 'experiment', 'result', 'interpretation'}
+    method_roles = {'method', 'experiment'}
+    comparison_roles = {'experiment', 'result', 'interpretation'}
+
+    topic_objects = _slot_entries_with_move_context(
+        'research_objects',
+        moves,
+        'research_objects',
+        trusted_only=True,
+        roles=topic_object_roles,
+    )
+    method_signals = _slot_entries_with_move_context(
+        'methods',
+        moves,
+        'methods',
+        trusted_only=True,
+        roles=method_roles,
+    )
+    condition_signals = _slot_entries_with_move_context(
+        'conditions',
+        moves,
+        'conditions',
+        trusted_only=True,
+    )
+    limitation_signals = _slot_entries_with_move_context(
+        'limitation_types',
+        moves,
+        'limitation_types',
+        trusted_only=True,
+    )
+    resource_signals = _slot_entries_with_move_context(
+        'resource_mentions',
+        moves,
+        'resource_mentions',
+        trusted_only=True,
+    )
+    outcome_entries = _outcome_signals(moves)
+    comparison_entries = _comparison_signals(moves)
+    future_work_entries = build_future_work_signals(moves)
+
+    role_distribution: dict[str, int] = {}
+    for move in moves:
+        role_distribution[move.role] = role_distribution.get(move.role, 0) + 1
+
     return {
-        'research_objects': _slot_entries('research_objects', moves, 'research_objects'),
-        'methods': _slot_entries('methods', moves, 'methods'),
-        'metrics': _slot_entries('metrics', moves, 'metrics'),
-        'conditions': _slot_entries('conditions', moves, 'conditions'),
-        'comparators': _slot_entries('comparators', moves, 'comparators'),
-        'limitation_types': _slot_entries('limitation_types', moves, 'limitation_types'),
-        'resource_mentions': _slot_entries('resource_mentions', moves, 'resource_mentions'),
+        'paper_id': paper_id,
+        'paper_type': paper_type,
+        'primary_contributions': _primary_contributions(moves),
+        'topic_signals': {
+            'objects': topic_objects,
+            'methods': method_signals,
+        },
+        'outcome_signals': outcome_entries,
+        'comparison_signals': comparison_entries,
+        'future_direction_signals': future_work_entries,
+        'constraint_signals': {
+            'conditions': condition_signals,
+            'limitations': limitation_signals,
+            'resources': resource_signals,
+        },
+        'role_distribution': role_distribution,
+        'signal_counts': {
+            'topic_object_entries': len(topic_objects),
+            'method_entries': len(method_signals),
+            'outcome_entries': len(outcome_entries),
+            'comparison_entries': len(comparison_entries),
+            'future_work_entries': len(future_work_entries),
+            'condition_entries': len(condition_signals),
+            'limitation_entries': len(limitation_signals),
+            'resource_entries': len(resource_signals),
+        },
+    }
+
+
+def build_l2_5_slot_inventory(moves: list[ResearchMove]) -> dict[str, list[dict[str, Any]]]:
+    research_objects = _slot_entries('research_objects', moves, 'research_objects')
+    methods = _slot_entries('methods', moves, 'methods')
+    observed_variables = _slot_entries('observed_variables', moves, 'observed_variables')
+    metrics = _slot_entries('metrics', moves, 'metrics')
+    conditions = _slot_entries('conditions', moves, 'conditions')
+    comparators = _slot_entries('comparators', moves, 'comparators')
+    limitation_types = _slot_entries('limitation_types', moves, 'limitation_types')
+    resource_mentions = _slot_entries('resource_mentions', moves, 'resource_mentions')
+    effects = _effect_entries(moves)
+
+    return {
+        'research_objects': research_objects,
+        'research_object': list(research_objects),
+        'methods': methods,
+        'operation_or_method': list(methods),
+        'observed_variables': observed_variables,
+        'observed_variable': list(observed_variables),
+        'metrics': metrics,
+        'metric': list(metrics),
+        'conditions': conditions,
+        'condition_context': list(conditions),
+        'comparators': comparators,
+        'comparison_target': list(comparators),
+        'effects': effects,
+        'effect_direction': _effect_direction_entries(effects),
+        'effect_size': _effect_size_entries(effects),
+        'limitation_types': limitation_types,
+        'limitation_type': list(limitation_types),
+        'resource_mentions': resource_mentions,
     }
 
 
 def build_l1_bridge_hints(moves: list[ResearchMove]) -> dict[str, list[dict[str, Any]]]:
-    resource_candidates = _slot_entries('resource_mentions', moves, 'resource_mentions')
-    metric_candidates = _slot_entries('metrics', moves, 'metrics')
+    resource_candidates = _slot_entries('resource_mentions', moves, 'resource_mentions', trusted_only=True)
+    metric_candidates = _slot_entries('metrics', moves, 'metrics', trusted_only=True)
 
     benchmark_candidates = [
         candidate
@@ -165,12 +762,186 @@ def build_l1_bridge_hints(moves: list[ResearchMove]) -> dict[str, list[dict[str,
         if str(candidate.get('type') or '').strip().lower() == 'benchmark'
     ]
 
+    protocol_candidates: list[dict[str, Any]] = []
+    toolchain_candidates: list[dict[str, Any]] = []
+    for move in moves:
+        methods = _trusted_mentions(move, 'methods', list(move.methods))
+        metrics = _trusted_mentions(move, 'metrics', list(move.metrics))
+        comparators = _trusted_mentions(move, 'comparators', list(move.comparators))
+        conditions = _trusted_mentions(move, 'conditions', list(move.conditions))
+        resources = _trusted_mentions(move, 'resource_mentions', list(move.resource_mentions))
+        resource_tokens = _mention_tokens(resources)
+        resource_types = _unique(str(mention.type or '').strip().lower() for mention in resources if str(mention.type or '').strip())
+        method_tokens = _mention_tokens(methods)
+        metric_tokens = _mention_tokens(metrics)
+        comparator_tokens = _mention_tokens(comparators)
+        condition_tokens = _mention_tokens(conditions)
+
+        if metric_tokens and (comparator_tokens or condition_tokens or method_tokens or resource_tokens):
+            protocol_candidates.append(
+                {
+                    'move_id': move.move_id,
+                    'role': move.role,
+                    'act_type': move.act_type,
+                    'summary': move.summary,
+                    'metric_tokens': metric_tokens,
+                    'comparator_tokens': comparator_tokens,
+                    'condition_tokens': condition_tokens,
+                    'method_tokens': method_tokens,
+                    'resource_tokens': resource_tokens,
+                    'anchor_ids': list(move.anchor_ids),
+                    'confidence': move.confidence,
+                }
+            )
+
+        if resource_tokens and any(resource_type in _L1_TOOLCHAIN_RESOURCE_TYPES for resource_type in resource_types):
+            toolchain_candidates.append(
+                {
+                    'move_id': move.move_id,
+                    'role': move.role,
+                    'act_type': move.act_type,
+                    'summary': move.summary,
+                    'resource_tokens': resource_tokens,
+                    'resource_types': resource_types,
+                    'method_tokens': method_tokens,
+                    'anchor_ids': list(move.anchor_ids),
+                    'confidence': move.confidence,
+                }
+            )
+
     return {
         'resource_candidates': resource_candidates,
         'benchmark_candidates': benchmark_candidates,
         'metric_candidates': metric_candidates,
-        'protocol_candidates': [],
-        'toolchain_candidates': [],
+        'protocol_candidates': protocol_candidates,
+        'toolchain_candidates': toolchain_candidates,
+    }
+
+
+def _entry_label(entry: dict[str, Any]) -> str:
+    return str(entry.get('normalized') or entry.get('surface') or '').strip().lower()
+
+
+def _entry_labels(entries: list[dict[str, Any]], *, limit: int = 5) -> list[str]:
+    labels = [_entry_label(entry) for entry in entries if _entry_label(entry)]
+    return _unique(labels)[:limit]
+
+
+def _entry_anchor_ids(entries: list[dict[str, Any]], *, limit: int | None = None) -> list[str]:
+    flattened: list[str] = []
+    for entry in entries:
+        flattened.extend(str(anchor_id).strip() for anchor_id in (entry.get('anchor_ids') or []) if str(anchor_id).strip())
+    unique_ids = _unique(flattened)
+    if limit is None:
+        return unique_ids
+    return unique_ids[:limit]
+
+
+def _nested_token_values(rows: list[dict[str, Any]], field: str, *, limit: int = 6) -> list[str]:
+    flattened: list[str] = []
+    for row in rows:
+        flattened.extend(str(token).strip().lower() for token in (row.get(field) or []) if str(token).strip())
+    return _unique(flattened)[:limit]
+
+
+def _future_direction_labels(rows: list[dict[str, Any]], *, limit: int = 6) -> list[str]:
+    labels: list[str] = []
+    for row in rows:
+        methods = [str(token).strip().lower() for token in (row.get('method_tokens') or []) if str(token).strip()]
+        targets = [str(token).strip().lower() for token in (row.get('target_object_tokens') or []) if str(token).strip()]
+        resources = [str(token).strip().lower() for token in (row.get('resource_tokens') or []) if str(token).strip()]
+        conditions = [str(token).strip().lower() for token in (row.get('condition_tokens') or []) if str(token).strip()]
+        label = ''
+        if methods and targets:
+            label = f'{methods[0]} -> {targets[0]}'
+        elif targets and resources:
+            label = f'{targets[0]} via {resources[0]}'
+        elif methods and resources:
+            label = f'{methods[0]} with {resources[0]}'
+        elif methods:
+            label = methods[0]
+        elif targets:
+            label = targets[0]
+        elif resources:
+            label = resources[0]
+        elif conditions:
+            label = conditions[0]
+        else:
+            label = str(row.get('summary') or '').strip().lower()
+        if label:
+            labels.append(label)
+    return _unique(labels)[:limit]
+
+
+def build_route_state_seed(
+    trace: PaperLogicTrace,
+    *,
+    route_compiler_contract: dict[str, Any] | None = None,
+    l1_bridge_hints: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    moves = trace.canonical_core.moves
+    route_compiler_contract = dict(
+        route_compiler_contract
+        or build_route_compiler_contract(
+            paper_id=trace.paper_metadata.paper_id,
+            paper_type=trace.paper_metadata.paper_type,
+            moves=moves,
+        )
+    )
+    l1_bridge_hints = dict(l1_bridge_hints or build_l1_bridge_hints(moves))
+
+    topic_object_entries = list((route_compiler_contract.get('topic_signals') or {}).get('objects') or [])
+    method_entries = list((route_compiler_contract.get('topic_signals') or {}).get('methods') or [])
+    limitation_entries = list((route_compiler_contract.get('constraint_signals') or {}).get('limitations') or [])
+    condition_entries = list((route_compiler_contract.get('constraint_signals') or {}).get('conditions') or [])
+    resource_entries = list((route_compiler_contract.get('constraint_signals') or {}).get('resources') or [])
+    outcome_entries = list(route_compiler_contract.get('outcome_signals') or [])
+    comparison_entries = list(route_compiler_contract.get('comparison_signals') or [])
+    future_direction_entries = list(route_compiler_contract.get('future_direction_signals') or [])
+    benchmark_entries = list(l1_bridge_hints.get('benchmark_candidates') or [])
+    protocol_candidates = list(l1_bridge_hints.get('protocol_candidates') or [])
+    toolchain_candidates = list(l1_bridge_hints.get('toolchain_candidates') or [])
+
+    supporting_evidence_ids = _unique(
+        [
+            *_entry_anchor_ids(topic_object_entries),
+            *_entry_anchor_ids(method_entries),
+            *_entry_anchor_ids(resource_entries),
+            *_entry_anchor_ids(outcome_entries),
+            *_entry_anchor_ids(comparison_entries),
+            *_entry_anchor_ids(protocol_candidates),
+            *_entry_anchor_ids(toolchain_candidates),
+        ]
+    )
+    challenging_evidence_ids = _unique(
+        [
+            *_entry_anchor_ids(limitation_entries),
+        ]
+    )
+
+    return {
+        'paper_id': trace.paper_metadata.paper_id,
+        'paper_type': trace.paper_metadata.paper_type,
+        'source_trace_id': trace.trace_id,
+        'cutoff_year_hint': trace.paper_metadata.year,
+        'topic_scope_candidates': _entry_labels(topic_object_entries),
+        'dominant_method_candidates': _entry_labels(method_entries),
+        'active_benchmark_candidates': _entry_labels(benchmark_entries),
+        'known_bottleneck_candidates': _entry_labels(limitation_entries),
+        'enabling_condition_candidates': _entry_labels(condition_entries),
+        'alternative_route_candidates': _future_direction_labels(future_direction_entries),
+        'measurement_protocol_candidates': protocol_candidates,
+        'toolchain_candidates': toolchain_candidates,
+        'supporting_evidence_ids': supporting_evidence_ids,
+        'challenging_evidence_ids': challenging_evidence_ids,
+        'source_move_ids': [move.move_id for move in moves],
+        'readiness_feature_inputs': {
+            'method_maturity_signals': _entry_labels(method_entries),
+            'measurement_maturity_signals': _nested_token_values(protocol_candidates, 'metric_tokens'),
+            'data_resource_signals': _entry_labels(benchmark_entries),
+            'infrastructure_signals': _nested_token_values(toolchain_candidates, 'resource_tokens'),
+            'bottleneck_signals': _entry_labels(limitation_entries),
+        },
     }
 
 
@@ -204,45 +975,52 @@ def build_community_signatures(paper_id: str, moves: list[ResearchMove]) -> list
 def build_route_feature_candidates(moves: list[ResearchMove]) -> list[dict[str, Any]]:
     candidates: list[dict[str, Any]] = []
     for move in moves:
-        if move.methods:
+        methods = _trusted_mentions(move, 'methods', list(move.methods))
+        metrics = _trusted_mentions(move, 'metrics', list(move.metrics))
+        comparators = _trusted_mentions(move, 'comparators', list(move.comparators))
+        conditions = _trusted_mentions(move, 'conditions', list(move.conditions))
+        limitation_types = _trusted_mentions(move, 'limitation_types', list(move.limitation_types))
+        resource_mentions = _trusted_mentions(move, 'resource_mentions', list(move.resource_mentions))
+
+        if methods:
             candidates.append(
                 {
                     'move_id': move.move_id,
                     'candidate_type': 'method_candidate',
-                    'tokens': _mention_tokens(move.methods),
+                    'tokens': _mention_tokens(methods),
                     'anchor_ids': list(move.anchor_ids),
                 }
             )
-        if move.metrics:
+        if metrics:
             candidates.append(
                 {
                     'move_id': move.move_id,
                     'candidate_type': 'metric_candidate',
-                    'tokens': _mention_tokens(move.metrics),
+                    'tokens': _mention_tokens(metrics),
                     'anchor_ids': list(move.anchor_ids),
                 }
             )
-        if move.comparators:
+        if comparators:
             candidates.append(
                 {
                     'move_id': move.move_id,
                     'candidate_type': 'comparison_candidate',
-                    'tokens': _mention_tokens(move.comparators),
+                    'tokens': _mention_tokens(comparators),
                     'anchor_ids': list(move.anchor_ids),
                 }
             )
-        if move.conditions:
+        if conditions:
             candidates.append(
                 {
                     'move_id': move.move_id,
                     'candidate_type': 'condition_candidate',
-                    'tokens': _mention_tokens(move.conditions),
+                    'tokens': _mention_tokens(conditions),
                     'anchor_ids': list(move.anchor_ids),
                 }
             )
         benchmark_tokens = [
             _mention_token(mention)
-            for mention in move.resource_mentions
+            for mention in resource_mentions
             if str(mention.type or '').strip().lower() == 'benchmark' and _mention_token(mention)
         ]
         if benchmark_tokens:
@@ -254,12 +1032,12 @@ def build_route_feature_candidates(moves: list[ResearchMove]) -> list[dict[str, 
                     'anchor_ids': list(move.anchor_ids),
                 }
             )
-        if move.limitation_types:
+        if limitation_types:
             candidates.append(
                 {
                     'move_id': move.move_id,
                     'candidate_type': 'limitation_candidate',
-                    'tokens': _mention_tokens(move.limitation_types),
+                    'tokens': _mention_tokens(limitation_types),
                     'anchor_ids': list(move.anchor_ids),
                 }
             )
@@ -271,22 +1049,186 @@ def build_paper_summaries(trace: PaperLogicTrace) -> dict[str, Any]:
     for move in trace.canonical_core.moves:
         role_distribution[move.role] = role_distribution.get(move.role, 0) + 1
 
-    move_summaries = [move.summary.strip() for move in trace.canonical_core.moves if move.summary.strip()]
+    summary_moves = _select_summary_moves(trace)
+    move_summaries = [move.summary.strip() for move in summary_moves if move.summary.strip()]
     one_paragraph_summary = ' '.join(move_summaries[:3]).strip()
+    method_move = _select_key_method_move(trace)
+    key_method_summary = str(method_move.summary or '').strip() if method_move else ''
 
     return {
         'move_role_distribution': role_distribution,
         'one_paragraph_summary': one_paragraph_summary,
-        'key_method_summary': next((move.summary for move in trace.canonical_core.moves if move.role == 'method'), ''),
+        'key_method_summary': key_method_summary,
+    }
+
+
+def build_paper_content_profile(trace: PaperLogicTrace) -> dict[str, Any]:
+    moves = list(trace.canonical_core.moves)
+    paper_summaries = build_paper_summaries(trace)
+
+    def _role_summaries(roles: set[str], *, limit: int = 3) -> list[str]:
+        summaries: list[str] = []
+        for move in sorted(moves, key=lambda item: int(item.sequence_no)):
+            if move.role not in roles:
+                continue
+            summary = str(move.summary or '').strip()
+            if not _is_summary_contentful(summary) or summary in summaries:
+                continue
+            summaries.append(summary)
+            if len(summaries) >= limit:
+                break
+        return summaries
+
+    limitation_statements: list[dict[str, Any]] = []
+    for move in sorted(moves, key=lambda item: int(item.sequence_no)):
+        if move.role != 'limitation':
+            continue
+        summary = str(move.summary or '').strip()
+        if not _is_summary_contentful(summary):
+            continue
+        limitation_tokens = _mention_tokens(_trusted_mentions(move, 'limitation_types', list(move.limitation_types)))
+        limitation_statements.append(
+            {
+                'move_id': move.move_id,
+                'summary': summary,
+                'limitation_tokens': limitation_tokens,
+                'anchor_ids': list(move.anchor_ids),
+                'confidence': move.confidence,
+            }
+        )
+
+    citation_contexts = [
+        {
+            'citation_act_id': citation.citation_act_id,
+            'source_move_id': citation.source_move_id,
+            'target_paper_id': citation.target_paper_id,
+            'purpose': citation.purpose,
+            'polarity': citation.polarity,
+            'semantic_signal': citation.semantic_signal,
+            'target_scope': citation.target_scope,
+            'anchor_ids': list(citation.anchor_ids),
+            'confidence': citation.confidence,
+        }
+        for citation in trace.canonical_core.citation_acts
+    ]
+    figure_refs = [
+        {
+            'figure_id': figure.figure_id,
+            'caption': figure.caption,
+            'anchor_ids': list(figure.anchor_ids),
+        }
+        for figure in trace.canonical_core.figure_refs
+    ]
+    table_refs = [
+        {
+            'table_id': table.table_id,
+            'caption': table.caption,
+            'anchor_ids': list(table.anchor_ids),
+        }
+        for table in trace.canonical_core.table_refs
+    ]
+    future_work_statements = build_future_work_signals(moves)
+
+    return {
+        'paper_id': trace.paper_metadata.paper_id,
+        'paper_type': trace.paper_metadata.paper_type,
+        'one_paragraph_summary': paper_summaries.get('one_paragraph_summary', ''),
+        'key_method_summary': paper_summaries.get('key_method_summary', ''),
+        'problem_statements': _role_summaries({'problem', 'background', 'hypothesis'}),
+        'method_statements': _role_summaries({'method', 'experiment'}),
+        'key_findings': _role_summaries({'result', 'interpretation'}),
+        'limitation_statements': limitation_statements,
+        'future_work_statements': future_work_statements,
+        'citation_contexts': citation_contexts,
+        'figure_refs': figure_refs,
+        'table_refs': table_refs,
+        'coverage': {
+            'problem_statement_count': len(_role_summaries({'problem', 'background', 'hypothesis'})),
+            'method_statement_count': len(_role_summaries({'method', 'experiment'})),
+            'finding_count': len(_role_summaries({'result', 'interpretation'})),
+            'limitation_count': len(limitation_statements),
+            'future_work_count': len(future_work_statements),
+            'citation_context_count': len(citation_contexts),
+            'figure_count': len(figure_refs),
+            'table_count': len(table_refs),
+        },
+    }
+
+
+def build_paper_content_audit(
+    trace: PaperLogicTrace,
+    *,
+    paper_content_profile: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    profile = dict(paper_content_profile or build_paper_content_profile(trace))
+    coverage = dict(profile.get('coverage') or {})
+    key_method_move = _select_key_method_move(trace)
+    key_method_summary = str(profile.get('key_method_summary') or '').strip()
+    key_method_score = _method_focus_score(key_method_move) if key_method_move else None
+    method_candidates = [
+        move
+        for move in trace.canonical_core.moves
+        if move.role in {'method', 'experiment'} and _is_summary_contentful(move.summary)
+    ]
+    best_method_score = max((_method_focus_score(move) for move in method_candidates), default=None)
+
+    flags: list[str] = []
+    suspicious_title_alt = bool(trace.paper_metadata.title_alt) and _looks_like_section_heading(trace.paper_metadata.title_alt)
+    if suspicious_title_alt:
+        flags.append('suspicious_title_alt')
+    if int(coverage.get('problem_statement_count') or 0) == 0:
+        flags.append('missing_problem_statements')
+    if int(coverage.get('method_statement_count') or 0) == 0:
+        flags.append('missing_method_statements')
+    if int(coverage.get('finding_count') or 0) == 0:
+        flags.append('missing_key_findings')
+    if not key_method_summary:
+        flags.append('missing_key_method_summary')
+    elif (
+        key_method_score is not None
+        and best_method_score is not None
+        and best_method_score - key_method_score >= 3
+        and _summary_cue_count(key_method_summary, _METHOD_SUMMARY_NEGATIVE_CUES) > 0
+    ):
+        flags.append('method_summary_drift')
+
+    return {
+        'available': True,
+        'flags': flags,
+        'suspicious_title_alt': suspicious_title_alt,
+        'title_alt_heading_like': _looks_like_section_heading(trace.paper_metadata.title_alt),
+        'key_method_summary_outcome_heavy': _summary_cue_count(key_method_summary, _METHOD_SUMMARY_NEGATIVE_CUES) > 0,
+        'coverage': coverage,
     }
 
 
 def build_derived_views(trace: PaperLogicTrace) -> dict[str, Any]:
     moves = trace.canonical_core.moves
+    l2_5_slot_inventory = build_l2_5_slot_inventory(moves)
+    l1_bridge_hints = build_l1_bridge_hints(moves)
+    future_work_signals = build_future_work_signals(moves)
+    paper_content_profile = build_paper_content_profile(trace)
+    route_compiler_contract = build_route_compiler_contract(
+        paper_id=trace.paper_metadata.paper_id,
+        paper_type=trace.paper_metadata.paper_type,
+        moves=moves,
+    )
     return {
-        'l2_5_slot_inventory': build_l2_5_slot_inventory(moves),
-        'l1_bridge_hints': build_l1_bridge_hints(moves),
+        'l2_5_slot_inventory': l2_5_slot_inventory,
+        'l1_bridge_hints': l1_bridge_hints,
         'community_signatures': build_community_signatures(trace.paper_metadata.paper_id, moves),
         'route_feature_candidates': build_route_feature_candidates(moves),
+        'future_work_signals': future_work_signals,
+        'route_compiler_contract': route_compiler_contract,
+        'route_state_seed': build_route_state_seed(
+            trace,
+            route_compiler_contract=route_compiler_contract,
+            l1_bridge_hints=l1_bridge_hints,
+        ),
         'paper_summaries': build_paper_summaries(trace),
+        'paper_content_profile': paper_content_profile,
+        'paper_content_audit': build_paper_content_audit(
+            trace,
+            paper_content_profile=paper_content_profile,
+        ),
     }

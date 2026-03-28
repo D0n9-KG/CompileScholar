@@ -57,11 +57,13 @@ class PaperMetadata(BaseModel):
     paper_id: str
     canonical_doi: str | None = None
     title: str
+    title_alt: str | None = None
     year: int | None = None
     authors: list[str] = Field(default_factory=list)
     venue: str | None = None
     paper_type: PaperType = 'unknown'
     source_refs: list[str] = Field(default_factory=list)
+    metadata_enrichment: dict[str, Any] = Field(default_factory=dict)
 
 
 class EvidenceAnchor(BaseModel):

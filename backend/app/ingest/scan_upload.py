@@ -8,7 +8,8 @@ from typing import Any
 
 from app.crossref.client import CrossrefClient
 from app.graph.neo4j_client import Neo4jClient
-from app.ingest.paper_identity import resolve_document_identity
+from app.ingest.paper_identity import apply_identity_to_document, resolve_document_identity
+from app.ingest.paper_metadata_enrichment import enrich_document_metadata
 from app.ingest.parse_md import parse_mineru_markdown
 from app.schema_store import normalize_paper_type
 from app.ingest.upload_store import (
@@ -82,7 +83,10 @@ def scan_upload(upload_id: str) -> dict[str, Any]:
             doi_strategy=doi_strategy,
             crossref=crossref,
         )
-        doi = identity.doi
+        doc = apply_identity_to_document(doc, identity)
+        if crossref is not None:
+            doc, _ = enrich_document_metadata(doc, crossref=crossref)
+        doi = doc.paper.doi
 
         units.append(
             PaperUnit(

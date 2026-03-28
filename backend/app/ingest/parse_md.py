@@ -20,6 +20,9 @@ from app.text_normalization import normalize_ingested_markdown
 _HEADING_RE = re.compile(r"^(?P<hashes>#{1,6})\s+(?P<title>.+?)\s*$")
 _DOI_RE = re.compile(r"\bDOI:\s*(?P<doi>10\.\d{4,9}/[^\s]+)", re.IGNORECASE)
 _YEAR_RE = re.compile(r"\b(19|20)\d{2}\b")
+_HTML_TAG_RE = re.compile(r"<[^>]+>")
+_AUTHOR_TRAILING_NOTE_RE = re.compile(r"[\*\d\u00b9\u00b2\u00b3\u2070-\u2079]+$")
+_AUTHOR_INLINE_NOTE_RE = re.compile(r"\$?\^\{?\d+\}?")
 
 # matches [1], [2,3], [13-15], [13–15]
 _IN_TEXT_CITATION_RE = re.compile(
@@ -33,6 +36,20 @@ _REF_HEADING_RE = re.compile(
     re.IGNORECASE,
 )
 _SECTION_HEADING_RE = re.compile(r"^\s{0,3}#{1,6}\s+")
+
+
+def _coerce_windows_extended_path(path: str | os.PathLike[str]) -> str:
+    raw = str(path)
+    if os.name != "nt":
+        return raw
+    normalized = raw.replace("/", "\\")
+    if normalized.startswith("\\\\?\\") or len(normalized) < 240:
+        return normalized
+    if normalized.startswith("\\\\"):
+        return "\\\\?\\UNC\\" + normalized.lstrip("\\")
+    if re.match(r"^[A-Za-z]:\\", normalized):
+        return "\\\\?\\" + normalized
+    return normalized
 
 
 def _looks_like_reference(line: str) -> bool:
@@ -68,6 +85,14 @@ def _stable_chunk_id(paper_source: str, md_path: str, start_line: int, end_line:
 
 def _normalize_space(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
+
+
+def _clean_author_candidate(text: str) -> str:
+    clean = _HTML_TAG_RE.sub("", str(text or ""))
+    clean = _AUTHOR_INLINE_NOTE_RE.sub("", clean)
+    clean = _AUTHOR_TRAILING_NOTE_RE.sub("", clean.strip())
+    clean = clean.strip(" ,;:[](){}<>$")
+    return _normalize_space(clean)
 
 
 def _expand_citation_body(body: str) -> list[int]:
@@ -106,12 +131,13 @@ def _expand_citation_body(body: str) -> list[int]:
 
 def parse_mineru_markdown(md_path: str) -> DocumentIR:
     p = Path(md_path)
-    if not p.exists():
+    io_path = Path(_coerce_windows_extended_path(md_path))
+    if not io_path.exists():
         raise FileNotFoundError(f"Markdown not found: {md_path}")
 
     # MinerU output is sometimes not strictly UTF-8; ignore errors to keep pipeline robust.
     raw = normalize_ingested_markdown(
-        p.read_text(encoding="utf-8", errors="ignore")
+        io_path.read_text(encoding="utf-8", errors="ignore")
     )
     lines = raw.splitlines()
 
@@ -153,7 +179,7 @@ def parse_mineru_markdown(md_path: str) -> DocumentIR:
             # a crude "authors line": contains commas or "and"
             if "," in line or " and " in line:
                 candidates = re.split(r"\s+and\s+|,\s*", line.strip())
-                authors = [c.strip() for c in candidates if c.strip()]
+                authors = [candidate for candidate in (_clean_author_candidate(c) for c in candidates) if candidate]
 
     doi_search_lines = lines[: max(0, ref_start - 1)] if ref_start else lines
     m = _DOI_RE.search("\n".join(doi_search_lines))

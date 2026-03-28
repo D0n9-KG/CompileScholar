@@ -80,6 +80,8 @@ def _mock_document(
     paper_source: str = "test_paper_1",
     md_path: str = "C:/tmp/test_paper_1.md",
     title: str = "Test Paper Title",
+    title_alt: str | None = None,
+    authors: list[str] | None = None,
     doi: str | None = "10.1000/TEST123",
     year: int = 2024,
 ) -> DocumentIR:
@@ -89,8 +91,8 @@ def _mock_document(
             paper_source=paper_source,
             md_path=md_path,
             title=title,
-            title_alt=None,
-            authors=[],
+            title_alt=title_alt,
+            authors=list(authors or []),
             doi=doi,
             year=year,
         ),
@@ -401,3 +403,67 @@ def test_ingest_markdowns_builds_community_corpus_without_proposition_writes_or_
         "Research moves and textbook entities about FEM stability.\n"
         "keywords: finite element, stability"
     )
+
+
+def test_ingest_markdowns_enriches_suspicious_metadata_before_phase1(monkeypatch):  # noqa: ANN001, ANN201
+    fake = _FakeNeo4jClient(paper_exists=False)
+    doc = _mock_document(
+        paper_source="1992_论_VLW_状态方程",
+        md_path="C:/tmp/1992_论_VLW_状态方程.md",
+        title="2.1 爆轰产物 LJ 势参数",
+        title_alt="论 VLW 状态方程",
+        authors=["龙新平 $^{1}$", "何碧 $^{1", "2}$"],
+        doi="10.1000/example-doi",
+        year=2023,
+    )
+    _patch_pipeline_dependencies(monkeypatch, fake, docs=[doc])
+
+    selected = CrossrefWork(
+        doi="10.1000/example-doi",
+        title="论 VLW 状态方程",
+        year=1992,
+        venue="爆炸学报",
+        authors=["龙新平", "何碧", "蒋小华", "吴雄"],
+        score=None,
+    )
+
+    class _FakeCrossref:
+        def resolve_reference(self, query: str):  # pragma: no cover
+            raise AssertionError(f"unexpected title lookup: {query}")
+
+        def get_work_by_doi(self, doi: str):
+            assert doi == "10.1000/example-doi"
+            return selected
+
+    monkeypatch.setattr(pipeline, "CrossrefClient", lambda: _FakeCrossref())
+
+    captured: dict[str, DocumentIR] = {}
+
+    def _fake_phase1(**kwargs):  # noqa: ANN003
+        captured["doc"] = kwargs["doc"]
+        return {
+            "quality_report": {
+                "gate_passed": True,
+                "quality_tier": "green",
+                "quality_tier_score": 1.0,
+            },
+            "paper_logic_trace": {
+                "quality": {
+                    "quality_tier": "yellow",
+                    "audit_status": "eligible",
+                    "hot_path_gate_report": {"passed": True, "move_count": 1, "anchor_count": 1},
+                },
+                "canonical_core": {"moves": [{"move_id": "m-1"}]},
+            },
+        }
+
+    monkeypatch.setattr(pipeline, "run_phase1_paper_logic_trace", _fake_phase1)
+
+    pipeline.ingest_markdowns(["dummy.md"])
+
+    enriched_doc = captured["doc"]
+    assert enriched_doc.paper.title == "论 VLW 状态方程"
+    assert enriched_doc.paper.title_alt is None
+    assert enriched_doc.paper.authors == ["龙新平", "何碧", "蒋小华", "吴雄"]
+    assert enriched_doc.paper.year == 1992
+    assert enriched_doc.paper.venue == "爆炸学报"

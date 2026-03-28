@@ -1595,12 +1595,18 @@ LIMIT $limit
                 move_relations=move_relations,
                 paper_type=str(paper_metadata.get("paper_type") or "unknown"),
             )
-            quality = build_quality_payload(gate_report)
+            derived_views: dict[str, Any] = {}
             try:
                 trace_model = PaperLogicTrace.model_validate(trace)
-                trace["derived_views"] = build_derived_views(trace_model)
+                derived_views = build_derived_views(trace_model)
+                trace["derived_views"] = derived_views
             except Exception:
                 pass
+            quality = build_quality_payload(
+                gate_report,
+                paper_metadata=paper_metadata,
+                derived_views=derived_views,
+            )
             trace["quality"] = quality
             audit = dict(quality.get("l2_completeness_audit") or {})
             rows.append(

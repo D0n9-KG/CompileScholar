@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -48,6 +49,8 @@ class PaperDraft:
     doi: str | None
     year: int | None
     paper_type: str | None = None
+    venue: str | None = None
+    metadata_enrichment: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)

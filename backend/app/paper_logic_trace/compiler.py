@@ -227,7 +227,12 @@ def compile_paper_logic_trace(
         built_at=built_at or _utc_now_iso(),
         paper_metadata=metadata,
         canonical_core=canonical_core,
-        quality=build_quality_payload(gate_report),
+        quality={},
     )
     trace.derived_views = build_derived_views(trace)
+    trace.quality = build_quality_payload(
+        gate_report,
+        paper_metadata=trace.paper_metadata.model_dump(mode='json'),
+        derived_views=trace.derived_views,
+    )
     return trace

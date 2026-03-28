@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from difflib import SequenceMatcher
 from dataclasses import dataclass, replace
 from typing import Any, Callable
 
@@ -11,6 +12,9 @@ from app.ingest.models import DocumentIR
 DOI_STRATEGIES = {"extract_only", "title_crossref"}
 _DOI_RE = re.compile(r"^10\.\d{4,9}/\S+$")
 _CROSSREF_CONFIDENCE_THRESHOLD = 0.25
+_CROSSREF_EXACT_TITLE_CONFIDENCE_THRESHOLD = 0.35
+_CROSSREF_STRONG_MATCH_CONFIDENCE_THRESHOLD = 0.75
+_CROSSREF_STRONG_MATCH_TITLE_SIMILARITY = 0.8
 
 
 def normalize_doi_strategy(value: str | None) -> str:
@@ -25,6 +29,40 @@ def _normalize_doi(value: str | None) -> str | None:
     if not doi or not _DOI_RE.match(doi):
         return None
     return doi
+
+
+def _normalize_title(value: str | None) -> str:
+    text = re.sub(r"[^0-9a-z]+", " ", str(value or "").lower())
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def _title_similarity(left: str | None, right: str | None) -> float:
+    a = _normalize_title(left)
+    b = _normalize_title(right)
+    if not a or not b:
+        return 0.0
+    if a == b:
+        return 1.0
+    return SequenceMatcher(a=a, b=b).ratio()
+
+
+def _is_crossref_title_match_credible(
+    *,
+    query_title: str | None,
+    selected_title: str | None,
+    confidence: float,
+) -> bool:
+    normalized_query = _normalize_title(query_title)
+    normalized_selected = _normalize_title(selected_title)
+    if not normalized_query or not normalized_selected:
+        return False
+    if normalized_query == normalized_selected:
+        return confidence >= _CROSSREF_EXACT_TITLE_CONFIDENCE_THRESHOLD
+    similarity = _title_similarity(normalized_query, normalized_selected)
+    return (
+        confidence >= _CROSSREF_STRONG_MATCH_CONFIDENCE_THRESHOLD
+        and similarity >= _CROSSREF_STRONG_MATCH_TITLE_SIMILARITY
+    )
 
 
 @dataclass(frozen=True)
@@ -61,7 +99,16 @@ def resolve_document_identity(
             selected = result.selected if result else None
             confidence = float(result.confidence) if result else 0.0
             selected_doi = _normalize_doi(selected.doi if selected else None)
-            if selected_doi and confidence >= _CROSSREF_CONFIDENCE_THRESHOLD:
+            selected_title = selected.title if selected else None
+            if (
+                selected_doi
+                and confidence >= _CROSSREF_CONFIDENCE_THRESHOLD
+                and _is_crossref_title_match_credible(
+                    query_title=query,
+                    selected_title=selected_title,
+                    confidence=confidence,
+                )
+            ):
                 resolved_doi = selected_doi
                 doi_source = "title_crossref"
 

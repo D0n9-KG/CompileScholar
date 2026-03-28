@@ -23,6 +23,7 @@ from app.ingest.paper_identity import (
     normalize_doi_strategy,
     resolve_document_identity,
 )
+from app.ingest.paper_metadata_enrichment import enrich_document_metadata
 from app.ingest.paper_meta import load_canonical_meta
 from app.ingest.parse_md import find_mineru_markdowns, parse_mineru_markdown
 from app.llm.client import bind_active_llm_paper_count, submit_with_current_llm_context
@@ -64,7 +65,13 @@ def _resolve_main_paper_identities(parsed: list[DocumentIR]) -> tuple[list[Docum
         for doc in parsed
     ]
     resolved_docs = [apply_identity_to_document(doc, identity) for doc, identity in zip(parsed, identities)]
-    deduped_docs, _deduped_identities, duplicates = dedupe_documents_by_identity(resolved_docs, identities)
+    enriched_docs = [
+        enrich_document_metadata(doc, crossref=crossref)[0]
+        if crossref is not None
+        else doc
+        for doc in resolved_docs
+    ]
+    deduped_docs, _deduped_identities, duplicates = dedupe_documents_by_identity(enriched_docs, identities)
     return deduped_docs, duplicates
 
 

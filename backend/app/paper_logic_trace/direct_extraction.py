@@ -140,6 +140,41 @@ _PROBLEM_PURPOSE_HINTS = (
     'to examine',
     'to quantify',
 )
+_METHOD_TEXT_PATTERNS = (
+    'this paper uses',
+    'this study uses',
+    'this work uses',
+    'we use',
+    'we employ',
+    'we employed',
+    'using ',
+    'uses ',
+    'employs ',
+    'employed ',
+    'is modeled using',
+    'is modelled using',
+    'model is built',
+    'simulation uses',
+    'simulation method',
+    '本文采用',
+    '本研究采用',
+    '本工作采用',
+    '文中采用',
+    '采用',
+    '使用',
+    '利用',
+    '建立',
+    '构建',
+    '提出',
+    '模拟方法为',
+    '计算方法为',
+    '研究方法为',
+)
+_METHOD_TEXT_REGEXES = (
+    re.compile(r'^(?:本文|本研究|本工作|文中).{0,12}(?:采用|使用|利用|建立|构建|提出)'),
+    re.compile(r'(?:采用|使用|利用).{0,24}(?:方法|模型|模拟|软件|fluent|ansys|mrf)', re.IGNORECASE),
+    re.compile(r'(?:模拟方法|计算方法|研究方法).{0,8}为'),
+)
 _RESULT_TEXT_PATTERNS = (
     'results show',
     'results indicate',
@@ -155,6 +190,29 @@ _RESULT_TEXT_PATTERNS = (
     'improved',
     'decreased',
     'increased',
+)
+_PROBLEM_GAP_PATTERNS = (
+    'challenge',
+    'deficiency',
+    'however',
+    'lack of',
+    'lacks',
+    'little effort',
+    'need to',
+    'remains',
+    'still requires',
+)
+_LIMITATION_ROLE_PATTERNS = (
+    'cannot ',
+    'could not',
+    'difficult',
+    'expensive',
+    'fail to',
+    'fails to',
+    'limitation',
+    'limitations',
+    'limited',
+    'unable to',
 )
 _CONDITION_CUE_WORDS = ('under', 'with', 'at', 'during')
 _METRIC_CUE_WORDS = (
@@ -378,13 +436,50 @@ _RESEARCH_OBJECT_NOUN_CUES = (
 )
 _RESEARCH_OBJECT_BAD_PREFIXES = (
     'able to',
+    'aim to',
+    'aimed to',
+    'aims to',
     'capable of',
+    'because ',
     'designed to',
+    'due to ',
+    'explore ',
+    'explores ',
+    'explored ',
+    'examine ',
+    'examines ',
+    'examined ',
     'enable ',
     'enabled ',
     'enabling ',
+    'has been ',
+    'have been ',
+    'help ',
+    'helps ',
+    'helped ',
+    'had been ',
+    'installed ',
     'intended to',
+    'investigate ',
+    'investigates ',
+    'investigated ',
+    'is ',
+    'are ',
+    'often ',
+    'over the ',
     'providing ',
+    'quantify ',
+    'quantifies ',
+    'quantified ',
+    'create ',
+    'creates ',
+    'created ',
+    'use ',
+    'uses ',
+    'used ',
+    'simulate ',
+    'simulates ',
+    'simulating ',
     'this paper',
     'the paper',
     'our paper',
@@ -395,41 +490,171 @@ _RESEARCH_OBJECT_BAD_PREFIXES = (
     'the work',
     'our work',
     'we ',
+    'was ',
+    'were ',
     'there ',
     'using ',
 )
 _RESEARCH_OBJECT_BAD_LEAD_TOKENS = {
     'allow',
     'allows',
+    'aim',
+    'aimed',
+    'aims',
     'can',
+    'cannot',
     'could',
+    'create',
+    'created',
+    'creates',
     'encourage',
     'encourages',
+    'examine',
+    'examines',
+    'examined',
+    'explore',
+    'explores',
+    'explored',
+    'fit',
+    'fits',
+    'fitted',
+    'had',
+    'has',
+    'have',
+    'help',
+    'helped',
+    'helps',
+    'investigate',
+    'investigates',
+    'investigated',
+    'note',
+    'noted',
+    'notes',
     'may',
     'might',
     'must',
     'provide',
     'provides',
+    'report',
+    'reported',
+    'reports',
+    'result',
+    'results',
+    'produce',
+    'produces',
+    'producing',
     'proposed',
+    'describe',
+    'describes',
+    'described',
+    'show',
+    'shows',
+    'verify',
+    'verifies',
+    'verified',
+    'simulate',
+    'simulates',
+    'simulating',
     'should',
+    'use',
+    'used',
+    'uses',
+    'was',
+    'were',
     'will',
     'would',
 }
+_RESEARCH_OBJECT_BAD_SUBSTRINGS = (
+    ' as exhibited ',
+    ' as observed ',
+    ' as shown ',
+    ' because ',
+    ' cannot ',
+    ' described above',
+    ' due to ',
+    ' has been ',
+    ' help us to ',
+    ' have been ',
+    ' had been ',
+    ' investigate ',
+    ' investigates ',
+    ' investigated ',
+    ' was assessed',
+    ' was made ',
+    ' was used',
+    ' were assessed',
+    ' were made ',
+    ' were used',
+)
 _RESEARCH_OBJECT_GENERIC_PHRASES = {
     'proposed solution',
     'proposed method',
     'the proposed solution',
     'the proposed method',
 }
-_RESEARCH_OBJECT_BAD_TOKENS = {
+_RESEARCH_OBJECT_GENERIC_HEAD_TOKENS = {
     'approach',
     'approaches',
     'framework',
     'frameworks',
     'method',
     'methods',
+    'model',
+    'models',
+    'scheme',
+    'schemes',
+}
+_RESEARCH_OBJECT_GENERIC_MODIFIER_TOKENS = {
+    'conventional',
+    'current',
+    'new',
+    'novel',
+    'present',
+    'proposed',
+}
+_RESEARCH_OBJECT_BAD_TOKENS = {
+    'analysis',
+    'approach',
+    'approaches',
+    'framework',
+    'frameworks',
+    'method',
+    'methods',
+    'process',
     'solution',
     'solutions',
+    'workflow',
+    'workflows',
+}
+_METHOD_LIKE_OBJECT_HEAD_TOKENS = {
+    'algorithm',
+    'algorithms',
+    'analysis',
+    'approach',
+    'approaches',
+    'framework',
+    'frameworks',
+    'method',
+    'methods',
+    'model',
+    'models',
+    'scheme',
+    'schemes',
+    'simulation',
+    'simulations',
+    'workflow',
+    'workflows',
+}
+_STRICT_METHOD_ROLE_OBJECT_HEAD_TOKENS = {
+    'analysis',
+    'method',
+    'methods',
+    'model',
+    'models',
+    'scheme',
+    'schemes',
+    'simulation',
+    'simulations',
     'workflow',
     'workflows',
 }
@@ -486,6 +711,48 @@ _COMPARATOR_BAD_LEADS = {
     'smaller',
     'larger',
 }
+_COMPARATOR_GENERIC_SINGLE_TOKENS = {
+    'simulation',
+    'simulations',
+    'result',
+    'results',
+    'measurement',
+    'measurements',
+    'method',
+    'methods',
+    'model',
+    'models',
+    'sample',
+    'samples',
+    'case',
+    'cases',
+    'condition',
+    'conditions',
+    'group',
+    'groups',
+    'mixture',
+    'mixtures',
+}
+_COMPARATOR_BAD_PREFIXES = (
+    'validate ',
+    'validates ',
+    'validated ',
+)
+_COMPARATOR_BAD_SUFFIXES = (
+    ' one',
+    ' ones',
+)
+_COMPARATOR_TRIM_PATTERNS = (
+    r'\bby setting\b.*$',
+    r'\band their implications\b.*$',
+    r'\band implications\b.*$',
+    r'\bis attained\b.*$',
+    r'\bare attained\b.*$',
+    r'\bwhich was\b.*$',
+    r'\bwhich were\b.*$',
+    r'\bthat was\b.*$',
+    r'\bthat were\b.*$',
+)
 _REPORTING_VERB_CUES = (
     'investigate',
     'investigates',
@@ -520,7 +787,7 @@ _SECTION_ROLE_HINTS: list[tuple[tuple[str, ...], str]] = [
     (('result', 'results', 'finding', 'findings'), 'result'),
     (('discussion', 'interpretation', 'analysis'), 'interpretation'),
     (('experiment', 'evaluation', 'experimental', 'benchmark', 'ablation'), 'experiment'),
-    (('method', 'approach', 'framework', 'model', 'algorithm', 'implementation'), 'method'),
+    (('method', 'approach', 'framework', 'model', 'algorithm', 'implementation', '方法', '数学模型', '数值模型', '控制方程', '模拟方法', '计算方法'), 'method'),
     (('problem', 'motivation', 'task', 'challenge', 'gap'), 'problem'),
     (('background', 'introduction', 'preliminar', 'related work'), 'background'),
 ]
@@ -769,6 +1036,14 @@ def _looks_like_problem_statement(text: str) -> bool:
     )
 
 
+def _looks_like_method_statement(text: str) -> bool:
+    normalized = _normalize_space(text)
+    lowered = normalized.lower()
+    if any(pattern in lowered for pattern in _METHOD_TEXT_PATTERNS):
+        return True
+    return any(pattern.search(normalized) for pattern in _METHOD_TEXT_REGEXES)
+
+
 def _promote_role_from_act_type(*, role: str, act_type: str) -> str:
     promoted = _ACT_TO_ROLE.get(act_type)
     if not promoted:
@@ -780,6 +1055,66 @@ def _promote_role_from_act_type(*, role: str, act_type: str) -> str:
     if role == 'problem' and promoted in {'method', 'experiment', 'result'}:
         return promoted
     return role
+
+
+def _has_informative_effect_rows(effects: list[dict[str, Any]]) -> bool:
+    for row in effects or []:
+        direction = _normalize_space(row.get('direction') or '').lower()
+        if direction in {'increase', 'decrease', 'improve', 'worsen', 'mixed'}:
+            return True
+        if _normalize_space(row.get('magnitude_text') or ''):
+            return True
+        if _normalize_space(row.get('comparator_surface') or ''):
+            return True
+    return False
+
+
+def _stabilize_move_role_and_act_type(
+    *,
+    role: str,
+    act_type: str,
+    summary: str,
+    methods: list[dict[str, Any]],
+    metrics: list[dict[str, Any]],
+    comparators: list[dict[str, Any]],
+    effects: list[dict[str, Any]],
+    limitation_types: list[dict[str, Any]],
+) -> tuple[str, str]:
+    lowered_summary = _normalize_space(summary).lower()
+    informative_effects = _has_informative_effect_rows(effects)
+    has_problem_signal = _looks_like_problem_statement(lowered_summary)
+    has_method_signal = bool(methods) or _looks_like_method_statement(summary)
+    has_result_signal = (
+        any(pattern in lowered_summary for pattern in _RESULT_TEXT_PATTERNS)
+        or informative_effects
+        or bool(metrics and comparators)
+    )
+    has_limitation_signal = bool(limitation_types) and any(
+        pattern in lowered_summary for pattern in _LIMITATION_ROLE_PATTERNS
+    )
+
+    if role in {'background', 'interpretation', 'experiment', 'result'} and has_limitation_signal:
+        return 'limitation', 'state_limitation'
+
+    if role in {'background', 'interpretation', 'problem'} and has_method_signal and not has_result_signal and not limitation_types:
+        return 'method', 'propose_method'
+
+    if (
+        role in {'background', 'interpretation'}
+        and has_problem_signal
+        and not methods
+        and not metrics
+        and not comparators
+        and not informative_effects
+        and not limitation_types
+    ):
+        problem_act = 'identify_gap' if any(pattern in lowered_summary for pattern in _PROBLEM_GAP_PATTERNS) else 'define_task'
+        return 'problem', problem_act
+
+    if role in {'background', 'interpretation', 'experiment'} and has_result_signal and not limitation_types:
+        return 'result', 'report_effect'
+
+    return role, act_type
 
 
 def _window_max_chars(schema: dict[str, Any]) -> int:
@@ -847,6 +1182,17 @@ def _merge_raw_mention_rows(*groups: list[dict[str, Any]]) -> list[dict[str, Any
             seen.add(key)
             rows.append(dict(row))
     return rows
+
+
+def _mark_heuristic_mentions(rows: list[dict[str, Any]] | None, *, support_strength: str = 'weak') -> list[dict[str, Any]]:
+    tagged: list[dict[str, Any]] = []
+    for row in rows or []:
+        tagged_row = dict(row)
+        tagged_row['inferred'] = True
+        tagged_row['extraction_mode'] = str(tagged_row.get('extraction_mode') or 'inferred')
+        tagged_row['support_strength'] = str(tagged_row.get('support_strength') or support_strength)
+        tagged.append(tagged_row)
+    return tagged
 
 
 def _phrase_suffix_mentions(text: str, *, cue_words: tuple[str, ...], limit: int = 3) -> list[dict[str, Any]]:
@@ -1080,13 +1426,33 @@ def _refine_comparator_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     prepared: list[tuple[dict[str, Any], str]] = []
     for row in rows or []:
         phrase = _normalize_space(row.get('normalized') or row.get('surface') or '').lower()
+        for pattern in _COMPARATOR_TRIM_PATTERNS:
+            phrase = re.sub(pattern, '', phrase).strip(' ,.;:')
+        phrase = _clean_phrase(phrase)
         tokens = phrase.split()
         if not tokens:
             continue
+        row = {
+            **row,
+            'surface': phrase,
+            'normalized': phrase,
+        }
+        if any(phrase.startswith(prefix) for prefix in _COMPARATOR_BAD_PREFIXES):
+            continue
+        if len(tokens) <= 3 and any(phrase.endswith(suffix) for suffix in _COMPARATOR_BAD_SUFFIXES):
+            continue
+        if bool(row.get('inferred')) and not any(token in _COMPARATOR_ENTITY_HINTS for token in tokens):
+            if not (len(tokens) == 1 and len(tokens[0]) >= 5 and tokens[0].endswith('s') and tokens[0] not in _COMPARATOR_GENERIC_SINGLE_TOKENS):
+                continue
         if (
             len(tokens) == 1
-            and tokens[0] not in _COMPARATOR_ENTITY_HINTS
-            and not (len(tokens[0]) >= 5 and tokens[0].endswith('s'))
+            and (
+                tokens[0] in _COMPARATOR_GENERIC_SINGLE_TOKENS
+                or (
+                    tokens[0] not in _COMPARATOR_ENTITY_HINTS
+                    and not (len(tokens[0]) >= 5 and tokens[0].endswith('s'))
+                )
+            )
         ):
             continue
         if any(token in _COMPARATOR_BAD_TOKENS for token in tokens):
@@ -1263,10 +1629,18 @@ def _refine_research_object_rows(rows: list[dict[str, Any]]) -> list[dict[str, A
             continue
         if any(phrase.startswith(prefix) for prefix in _RESEARCH_OBJECT_BAD_PREFIXES):
             continue
+        if any(marker in phrase for marker in _RESEARCH_OBJECT_BAD_SUBSTRINGS):
+            continue
         tokens = phrase.split()
         if not tokens:
             continue
         if tokens[0] in _RESEARCH_OBJECT_BAD_LEAD_TOKENS:
+            continue
+        if len(tokens) >= 2 and tokens[0] in _RESEARCH_OBJECT_GENERIC_MODIFIER_TOKENS and tokens[1] in _RESEARCH_OBJECT_GENERIC_HEAD_TOKENS:
+            continue
+        if len(tokens) <= 3 and tokens[-1] in {'challenge', 'challenges', 'scheme', 'schemes'}:
+            continue
+        if len(tokens) <= 2 and tokens[-1] in {'simple', 'complex'}:
             continue
         if phrase in _RESEARCH_OBJECT_GENERIC_PHRASES:
             continue
@@ -1289,6 +1663,49 @@ def _refine_research_object_rows(rows: list[dict[str, Any]]) -> list[dict[str, A
     return [prepared[index][0] for index in keep_indices]
 
 
+def _drop_method_like_research_objects(
+    *,
+    research_objects: list[dict[str, Any]],
+    methods: list[dict[str, Any]],
+    role: str,
+) -> list[dict[str, Any]]:
+    if not research_objects or not methods:
+        method_phrases = set()
+    else:
+        method_phrases = {
+            _clean_phrase(str(row.get('normalized') or row.get('surface') or ''))
+            for row in methods
+            if _clean_phrase(str(row.get('normalized') or row.get('surface') or ''))
+        }
+
+    filtered: list[dict[str, Any]] = []
+    for row in research_objects:
+        phrase = _clean_phrase(str(row.get('normalized') or row.get('surface') or ''))
+        if not phrase:
+            continue
+        tokens = phrase.split()
+        if not tokens:
+            continue
+        if tokens[-1] not in _METHOD_LIKE_OBJECT_HEAD_TOKENS:
+            filtered.append(row)
+            continue
+        if bool(row.get('inferred')) and role in {'method', 'experiment', 'limitation'}:
+            continue
+        if role in {'method', 'experiment', 'limitation'} and len(tokens) <= 5 and tokens[-1] in _STRICT_METHOD_ROLE_OBJECT_HEAD_TOKENS:
+            continue
+        phrase_tokens = set(tokens)
+        overlaps_method = any(
+            phrase == method_phrase
+            or phrase_tokens.issubset(set(method_phrase.split()))
+            or set(method_phrase.split()).issubset(phrase_tokens)
+            for method_phrase in method_phrases
+        )
+        if overlaps_method:
+            continue
+        filtered.append(row)
+    return filtered
+
+
 def _augment_sparse_slots(
     *,
     text: str,
@@ -1306,14 +1723,14 @@ def _augment_sparse_slots(
     observed_variable_roles = {'experiment', 'result', 'interpretation', 'method'}
     limitation_roles = {'limitation', 'interpretation', 'result', 'future_work'}
     resource_roles = {'method', 'experiment', 'result'}
-    heuristic_comparators = _comparator_mentions(text, limit=3) if role_token in metric_roles else []
+    heuristic_comparators = _mark_heuristic_mentions(_comparator_mentions(text, limit=3)) if role_token in metric_roles else []
     return {
-        'research_objects': research_objects or (_research_object_mentions(text, limit=3) if role_token in research_object_roles else []),
-        'observed_variables': observed_variables or (_observed_variable_mentions(text, limit=3) if role_token in observed_variable_roles else []),
-        'metrics': metrics or (_metric_mentions(text, limit=3) if role_token in metric_roles else []),
+        'research_objects': research_objects or (_mark_heuristic_mentions(_research_object_mentions(text, limit=3)) if role_token in research_object_roles else []),
+        'observed_variables': observed_variables or (_mark_heuristic_mentions(_observed_variable_mentions(text, limit=3)) if role_token in observed_variable_roles else []),
+        'metrics': metrics or (_mark_heuristic_mentions(_metric_mentions(text, limit=3)) if role_token in metric_roles else []),
         'comparators': _merge_raw_mention_rows(comparators, heuristic_comparators),
-        'limitation_types': limitation_types or (_limitation_mentions(text, limit=2) if role_token in limitation_roles else []),
-        'resource_mentions': resource_mentions or (_resource_mentions_from_text(text, limit=3) if role_token in resource_roles else []),
+        'limitation_types': limitation_types or (_mark_heuristic_mentions(_limitation_mentions(text, limit=2)) if role_token in limitation_roles else []),
+        'resource_mentions': resource_mentions or (_mark_heuristic_mentions(_resource_mentions_from_text(text, limit=3)) if role_token in resource_roles else []),
     }
 
 
@@ -1342,7 +1759,10 @@ def _summary_from_text(text: str, *, max_chars: int = 220) -> str:
         summary = clean
     if len(summary) <= max_chars:
         return summary
-    return summary[: max_chars - 3].rstrip() + '...'
+    trimmed = summary[: max_chars - 3].rstrip()
+    if ' ' in trimmed:
+        trimmed = trimmed.rsplit(' ', 1)[0].rstrip()
+    return trimmed + '...'
 
 
 def _window_text(chunks: list[Chunk], max_chars: int) -> str:
@@ -1360,6 +1780,27 @@ def _window_text(chunks: list[Chunk], max_chars: int) -> str:
         parts.append(f'[{chunk.chunk_id}] {text}')
         total += len(text)
     return '\n\n'.join(parts)
+
+
+def _move_support_text(
+    *,
+    summary: str,
+    anchor_chunk_ids: list[str],
+    chunk_by_id: dict[str, Chunk],
+    fallback_chunks: list[Chunk],
+    max_chars: int = 1600,
+) -> str:
+    support_chunks = [chunk_by_id[chunk_id] for chunk_id in anchor_chunk_ids if chunk_id in chunk_by_id]
+    if not support_chunks:
+        support_chunks = list(fallback_chunks[:1])
+    return ' '.join(
+        part
+        for part in (
+            summary,
+            _window_text(support_chunks, max_chars),
+        )
+        if part
+    )
 
 
 def _semantic_windows(doc: DocumentIR, schema: dict[str, Any]) -> list[dict[str, Any]]:
@@ -1396,6 +1837,13 @@ def _normalize_mention_rows(rows: list[dict[str, Any]] | None, *, anchor_ids: li
         surface = _normalize_space(row.get('surface') or row.get('normalized') or '')
         if not surface:
             continue
+        inferred = bool(row.get('inferred'))
+        extraction_mode = _normalize_space(row.get('extraction_mode') or ('inferred' if inferred else 'direct')).lower() or 'direct'
+        if extraction_mode not in {'direct', 'normalized', 'inferred'}:
+            extraction_mode = 'inferred' if inferred else 'direct'
+        support_strength = _normalize_space(row.get('support_strength') or ('weak' if inferred else 'strong')).lower() or 'strong'
+        if support_strength not in {'exact', 'strong', 'weak'}:
+            support_strength = 'weak' if inferred else 'strong'
         out.append(
             {
                 'surface': surface,
@@ -1403,7 +1851,9 @@ def _normalize_mention_rows(rows: list[dict[str, Any]] | None, *, anchor_ids: li
                 'type': _normalize_space(row.get('type') or '') or None,
                 'anchor_ids': list(anchor_ids),
                 'confidence': row.get('confidence'),
-                'inferred': False,
+                'inferred': inferred,
+                'extraction_mode': extraction_mode,
+                'support_strength': support_strength,
             }
         )
     return out
@@ -1435,8 +1885,8 @@ def _slot_provenance_rows(field: str, values: list[dict[str, Any]], *, anchor_id
                 'field': field,
                 'value_index': index,
                 'anchor_ids': list(anchor_ids),
-                'extraction_mode': 'direct',
-                'support_strength': 'strong',
+                'extraction_mode': str(value.get('extraction_mode') or ('inferred' if value.get('inferred') else 'direct')),
+                'support_strength': str(value.get('support_strength') or ('weak' if value.get('inferred') else 'strong')),
                 'confidence': value.get('confidence'),
             }
         )
@@ -1450,8 +1900,8 @@ def _fallback_move_payload(window: dict[str, Any]) -> list[dict[str, Any]]:
     anchor_chunk_ids = [str(chunk.chunk_id).strip() for chunk in chunks[:2] if str(chunk.chunk_id).strip()]
     summary = _summary_from_text(' '.join(chunk.text for chunk in chunks))
     role = _normalize_role(window.get('role_hint'))
-    methods = _keyword_mentions(summary, limit=2) if role in {'method', 'experiment'} else []
-    conditions = _condition_mentions(summary, limit=2)
+    methods = _mark_heuristic_mentions(_keyword_mentions(summary, limit=2)) if role in {'method', 'experiment'} else []
+    conditions = _mark_heuristic_mentions(_condition_mentions(summary, limit=2))
     augmented = _augment_sparse_slots(
         text=summary,
         role=role,
@@ -1459,7 +1909,7 @@ def _fallback_move_payload(window: dict[str, Any]) -> list[dict[str, Any]]:
         observed_variables=[],
         metrics=[],
         comparators=[],
-        limitation_types=_keyword_mentions(summary, limit=2) if role == 'limitation' else [],
+        limitation_types=_mark_heuristic_mentions(_keyword_mentions(summary, limit=2)) if role == 'limitation' else [],
         resource_mentions=[],
     )
     return [
@@ -1647,6 +2097,7 @@ def _move_rows_from_windows(
                 continue
 
             move_id = f'{paper_id}:move:{window_index}:{move_offset}'
+            move_anchor_ids = [f'{move_id}:anchor:{anchor_index}' for anchor_index, _ in enumerate(anchor_chunk_ids, start=1)]
             research_objects = _normalize_mention_rows(raw_move.get('research_objects'), anchor_ids=anchor_chunk_ids)
             methods = _normalize_mention_rows(raw_move.get('methods'), anchor_ids=anchor_chunk_ids)
             observed_variables = _normalize_mention_rows(raw_move.get('observed_variables'), anchor_ids=anchor_chunk_ids)
@@ -1656,11 +2107,14 @@ def _move_rows_from_windows(
             limitation_types = _normalize_mention_rows(raw_move.get('limitation_types'), anchor_ids=anchor_chunk_ids)
             resource_mentions = _normalize_mention_rows(raw_move.get('resource_mentions'), anchor_ids=anchor_chunk_ids)
             effects = _normalize_effect_rows(raw_move.get('effects'), anchor_ids=anchor_chunk_ids)
+            move_support_text = _move_support_text(
+                summary=summary,
+                anchor_chunk_ids=anchor_chunk_ids,
+                chunk_by_id=chunk_by_id,
+                fallback_chunks=list(window.get('chunks') or []),
+            )
             augmented = _augment_sparse_slots(
-                text=' '.join([
-                    summary,
-                    _window_text(window.get('chunks') or [], 1600),
-                ]),
+                text=move_support_text,
                 role=role,
                 research_objects=research_objects,
                 observed_variables=observed_variables,
@@ -1671,6 +2125,11 @@ def _move_rows_from_windows(
             )
             research_objects = _normalize_mention_rows(augmented['research_objects'], anchor_ids=anchor_chunk_ids)
             research_objects = _refine_research_object_rows(research_objects)
+            research_objects = _drop_method_like_research_objects(
+                research_objects=research_objects,
+                methods=methods,
+                role=role,
+            )
             observed_variables = _normalize_mention_rows(augmented['observed_variables'], anchor_ids=anchor_chunk_ids)
             observed_variables = _refine_observed_variable_rows(observed_variables)
             metrics = _normalize_mention_rows(augmented['metrics'], anchor_ids=anchor_chunk_ids)
@@ -1685,10 +2144,20 @@ def _move_rows_from_windows(
             limitation_types = _normalize_mention_rows(augmented['limitation_types'], anchor_ids=anchor_chunk_ids)
             limitation_types = _refine_limitation_rows(
                 limitation_types,
-                text=' '.join([summary, _window_text(window.get('chunks') or [], 1600)]),
+                text=move_support_text,
             )
             resource_mentions = _normalize_mention_rows(augmented['resource_mentions'], anchor_ids=anchor_chunk_ids)
             resource_mentions = _refine_resource_rows(resource_mentions)
+            role, act_type = _stabilize_move_role_and_act_type(
+                role=role,
+                act_type=act_type,
+                summary=summary,
+                methods=methods,
+                metrics=metrics,
+                comparators=comparators,
+                effects=effects,
+                limitation_types=limitation_types,
+            )
 
             slot_provenance = [
                 *_slot_provenance_rows('research_objects', research_objects, anchor_ids=anchor_chunk_ids),
@@ -1721,7 +2190,7 @@ def _move_rows_from_windows(
                     continue
                 evidence_rows.append(
                     {
-                        'anchor_id': f'{move_id}:anchor:{anchor_index}',
+                        'anchor_id': move_anchor_ids[anchor_index - 1],
                         'paper_id': paper_id,
                         'source_ref': chunk_id,
                         'modality': 'text',
@@ -1761,6 +2230,7 @@ def _move_rows_from_windows(
                     'role': role,
                     'act_type': act_type,
                     'anchor_chunk_ids': anchor_chunk_ids,
+                    'anchor_ids': move_anchor_ids,
                 }
             )
             extracted_moves += 1
@@ -1817,13 +2287,22 @@ def _relation_row(source: dict[str, Any], target: dict[str, Any]) -> dict[str, A
         str(source.get('act_type') or ''),
         str(target.get('act_type') or ''),
     )
+    anchor_ids: list[str] = []
+    if relation_type != 'motivates':
+        seen: set[str] = set()
+        for item in list(source.get('anchor_ids') or []) + list(target.get('anchor_ids') or []):
+            token = str(item or '').strip()
+            if not token or token in seen:
+                continue
+            seen.add(token)
+            anchor_ids.append(token)
     return {
         'relation_id': f'{source_move_id}:rel:{target_move_id}',
         'source_move_id': source_move_id,
         'target_move_id': target_move_id,
         'relation_type': relation_type,
-        'anchor_ids': [],
-        'confidence': 0.65,
+        'anchor_ids': anchor_ids,
+        'confidence': 0.82 if anchor_ids else 0.65,
     }
 
 
@@ -1991,13 +2470,16 @@ def build_paper_logic_trace_inputs(
         'paper_id': paper_id,
         'canonical_doi': doc.paper.doi,
         'title': doc.paper.title or paper_id,
+        'title_alt': doc.paper.title_alt,
         'year': doc.paper.year,
         'authors': list(doc.paper.authors or []),
+        'venue': getattr(doc.paper, 'venue', None),
         'paper_type': normalize_trace_paper_type(
             doc.paper.paper_type,
             schema.get('paper_type'),
         ),
         'source_refs': [chunk.chunk_id for chunk in doc.chunks if str(chunk.chunk_id or '').strip()],
+        'metadata_enrichment': dict(getattr(doc.paper, 'metadata_enrichment', None) or {}),
     }
     return {
         'paper_metadata': paper_metadata,
