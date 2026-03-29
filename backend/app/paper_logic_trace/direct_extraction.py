@@ -688,6 +688,18 @@ _RESEARCH_OBJECT_HEAD_HINTS = {
     'variable',
     'variables',
 }
+_TRUSTED_SCOPE_RESEARCH_OBJECT_ROLES = {'problem', 'result', 'interpretation'}
+_RESEARCH_OBJECT_RELATION_PATTERNS = (
+    re.compile(r'\bwithout needing(?:\s+(?:a|an|the))?\s+([a-z0-9][a-z0-9\-\s]{3,60})', re.IGNORECASE),
+    re.compile(
+        r'\b(?:necessity|need)\s+of\s+(?:establishing|defining|specifying)'
+        r'(?:\s+a\s+mathematical\s+expression\s+of)?(?:\s+the)?\s+([a-z0-9][a-z0-9\-\s]{3,60})',
+        re.IGNORECASE,
+    ),
+    re.compile(r'\bfrom\s+([a-z0-9][a-z0-9\-\s]{3,40}?)\s+to\b', re.IGNORECASE),
+    re.compile(r'\b(?:for\s+)?addressing\s+([a-z0-9][a-z0-9\-\s]{3,40}?)\s+to\b', re.IGNORECASE),
+    re.compile(r'\binvolving\s+([a-z0-9][a-z0-9\-\s]{3,40})', re.IGNORECASE),
+)
 _METHOD_LIKE_OBJECT_HEAD_TOKENS = {
     'algorithm',
     'algorithms',
@@ -1262,12 +1274,58 @@ def _merge_raw_mention_rows(*groups: list[dict[str, Any]]) -> list[dict[str, Any
     return rows
 
 
+def _merge_preferred_mention_rows(
+    existing_rows: list[dict[str, Any]] | None,
+    preferred_rows: list[dict[str, Any]] | None,
+) -> list[dict[str, Any]]:
+    merged: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    preferred_by_key = {
+        _normalize_space((row or {}).get('surface') or (row or {}).get('normalized') or '').lower(): dict(row)
+        for row in preferred_rows or []
+        if _normalize_space((row or {}).get('surface') or (row or {}).get('normalized') or '')
+    }
+
+    for row in existing_rows or []:
+        surface = _normalize_space((row or {}).get('surface') or (row or {}).get('normalized') or '')
+        if not surface:
+            continue
+        key = surface.lower()
+        if key in seen:
+            continue
+        preferred = preferred_by_key.pop(key, None)
+        if preferred and bool((row or {}).get('inferred')):
+            merged.append(preferred)
+        else:
+            merged.append(dict(row))
+        seen.add(key)
+
+    for key, row in preferred_by_key.items():
+        if key in seen:
+            continue
+        merged.append(dict(row))
+        seen.add(key)
+
+    return merged
+
+
 def _mark_heuristic_mentions(rows: list[dict[str, Any]] | None, *, support_strength: str = 'weak') -> list[dict[str, Any]]:
     tagged: list[dict[str, Any]] = []
     for row in rows or []:
         tagged_row = dict(row)
         tagged_row['inferred'] = True
         tagged_row['extraction_mode'] = str(tagged_row.get('extraction_mode') or 'inferred')
+        tagged_row['support_strength'] = str(tagged_row.get('support_strength') or support_strength)
+        tagged.append(tagged_row)
+    return tagged
+
+
+def _mark_normalized_mentions(rows: list[dict[str, Any]] | None, *, support_strength: str = 'strong') -> list[dict[str, Any]]:
+    tagged: list[dict[str, Any]] = []
+    for row in rows or []:
+        tagged_row = dict(row)
+        tagged_row['inferred'] = False
+        tagged_row['extraction_mode'] = str(tagged_row.get('extraction_mode') or 'normalized')
         tagged_row['support_strength'] = str(tagged_row.get('support_strength') or support_strength)
         tagged.append(tagged_row)
     return tagged
@@ -1698,23 +1756,57 @@ def _research_object_mentions(text: str, *, limit: int = 3) -> list[dict[str, An
             if _push_phrase(match.group(1)):
                 return rows
 
-    relation_patterns = (
-        re.compile(r'\bwithout needing(?:\s+(?:a|an|the))?\s+([a-z0-9][a-z0-9\-\s]{3,60})', re.IGNORECASE),
-        re.compile(
-            r'\b(?:necessity|need)\s+of\s+(?:establishing|defining|specifying)'
-            r'(?:\s+a\s+mathematical\s+expression\s+of)?(?:\s+the)?\s+([a-z0-9][a-z0-9\-\s]{3,60})',
-            re.IGNORECASE,
-        ),
-        re.compile(r'\bfrom\s+([a-z0-9][a-z0-9\-\s]{3,40}?)\s+to\b', re.IGNORECASE),
-        re.compile(r'\b(?:for\s+)?addressing\s+([a-z0-9][a-z0-9\-\s]{3,40}?)\s+to\b', re.IGNORECASE),
-        re.compile(r'\binvolving\s+([a-z0-9][a-z0-9\-\s]{3,40})', re.IGNORECASE),
-    )
-    for pattern in relation_patterns:
+    for pattern in _RESEARCH_OBJECT_RELATION_PATTERNS:
         for match in pattern.finditer(lowered):
             if _push_phrase(match.group(1), require_domain_head=True):
                 return rows
 
     return rows
+
+
+def _explicit_scope_research_object_mentions(text: str, *, role: str, limit: int = 3) -> list[dict[str, Any]]:
+    role_token = _normalize_role(role)
+    if role_token not in _TRUSTED_SCOPE_RESEARCH_OBJECT_ROLES:
+        return []
+
+    lowered = _normalize_space(text).lower()
+    if not lowered:
+        return []
+
+    rows: list[dict[str, Any]] = []
+    seen: set[str] = set()
+
+    def _push_phrase(raw_phrase: str) -> bool:
+        phrase = re.split(r'[.,;:()]', raw_phrase, maxsplit=1)[0]
+        phrase = re.split(
+            r'\b(?:by|using|with|under|where|which|that|via|based on|for|during|while|when)\b',
+            phrase,
+            maxsplit=1,
+        )[0]
+        phrase = _clean_phrase(phrase)
+        if not phrase:
+            return False
+        if any(phrase.startswith(prefix) for prefix in _RESEARCH_OBJECT_BAD_PREFIXES):
+            return False
+        tokens = phrase.split()
+        if not tokens:
+            return False
+        if len(tokens) == 1 and tokens[0] in _RESEARCH_OBJECT_BAD_TOKENS:
+            return False
+        if not any(token in _RESEARCH_OBJECT_HEAD_HINTS for token in tokens[-2:]):
+            return False
+        if phrase in seen:
+            return False
+        seen.add(phrase)
+        rows.append({'surface': phrase, 'normalized': phrase})
+        return len(rows) >= limit
+
+    for pattern in _RESEARCH_OBJECT_RELATION_PATTERNS:
+        for match in pattern.finditer(lowered):
+            if _push_phrase(match.group(1)):
+                return _mark_normalized_mentions(rows)
+
+    return _mark_normalized_mentions(rows)
 
 
 def _refine_research_object_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -1834,6 +1926,11 @@ def _augment_sparse_slots(
     observed_variable_roles = {'experiment', 'result', 'interpretation', 'method'}
     limitation_roles = {'limitation', 'interpretation', 'result', 'future_work'}
     resource_roles = {'method', 'experiment', 'result'}
+    normalized_scope_research_objects = (
+        _explicit_scope_research_object_mentions(text, role=role_token, limit=3)
+        if role_token in research_object_roles
+        else []
+    )
     heuristic_research_objects = (
         _mark_heuristic_mentions(_research_object_mentions(text, limit=3))
         if role_token in research_object_roles
@@ -1841,7 +1938,10 @@ def _augment_sparse_slots(
     )
     heuristic_comparators = _mark_heuristic_mentions(_comparator_mentions(text, limit=3)) if role_token in metric_roles else []
     return {
-        'research_objects': _merge_raw_mention_rows(research_objects, heuristic_research_objects),
+        'research_objects': _merge_preferred_mention_rows(
+            _merge_raw_mention_rows(research_objects, heuristic_research_objects),
+            normalized_scope_research_objects,
+        ),
         'observed_variables': observed_variables or (_mark_heuristic_mentions(_observed_variable_mentions(text, limit=3)) if role_token in observed_variable_roles else []),
         'metrics': metrics or (_mark_heuristic_mentions(_metric_mentions(text, limit=3)) if role_token in metric_roles else []),
         'comparators': _merge_raw_mention_rows(comparators, heuristic_comparators),
@@ -2276,6 +2376,20 @@ def _move_rows_from_windows(
                 support_text=move_support_text,
                 source_sections=[chunk_by_id[chunk_id].section for chunk_id in anchor_chunk_ids if chunk_id in chunk_by_id],
             )
+            if role in _TRUSTED_SCOPE_RESEARCH_OBJECT_ROLES:
+                research_objects = _normalize_mention_rows(
+                    _merge_preferred_mention_rows(
+                        research_objects,
+                        _explicit_scope_research_object_mentions(move_support_text, role=role, limit=3),
+                    ),
+                    anchor_ids=anchor_chunk_ids,
+                )
+                research_objects = _refine_research_object_rows(research_objects)
+                research_objects = _drop_method_like_research_objects(
+                    research_objects=research_objects,
+                    methods=methods,
+                    role=role,
+                )
 
             slot_provenance = [
                 *_slot_provenance_rows('research_objects', research_objects, anchor_ids=anchor_chunk_ids),

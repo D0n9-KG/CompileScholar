@@ -464,6 +464,60 @@ def test_problem_research_object_backfill_handles_circumventing_constitutive_exp
     assert all('challenge could then be formulated' not in item for item in normalized)
 
 
+def test_problem_research_object_scope_phrase_is_promoted_to_trusted_normalized_signal(monkeypatch) -> None:
+    summary = (
+        'The biggest challenge could then be formulated as follows: can simulation proceed directly from data by '
+        'circumventing the necessity of establishing a mathematical expression of the constitutive model?'
+    )
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '1. Introduction',
+            summary,
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'problem',
+                'act_type': 'identify_gap',
+                'summary': summary,
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'confidence': 0.8,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    first = payload['evidence_rows'][0]
+    research_objects = first['research_objects']
+    constitutive_index = next(
+        index
+        for index, item in enumerate(research_objects)
+        if 'constitutive model' in str(item.get('normalized') or '').lower()
+    )
+    constitutive_object = research_objects[constitutive_index]
+    constitutive_provenance = next(
+        row
+        for row in first['slot_provenance']
+        if row['field'] == 'research_objects' and row['value_index'] == constitutive_index
+    )
+
+    assert constitutive_object['inferred'] is False
+    assert constitutive_provenance['extraction_mode'] == 'normalized'
+    assert constitutive_provenance['support_strength'] == 'strong'
+
+
 def test_backfilled_research_object_provenance_is_marked_inferred_and_weak(monkeypatch) -> None:
     doc = _doc_with_chunks(
         _chunk(
@@ -545,6 +599,115 @@ def test_result_move_without_research_objects_is_backfilled_from_conclusion_scop
     assert 'data-driven strategy' not in normalized
 
 
+def test_result_scope_backfill_promotes_explicit_domain_objects_to_trusted_normalized_signals(monkeypatch) -> None:
+    summary = 'This work extends a data-driven strategy from nonlinear elasticity to more complex scenarios involving internal variables.'
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '3. Conclusions',
+            summary,
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'result',
+                'act_type': 'report_effect',
+                'summary': summary,
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'methods': [{'surface': 'data-driven strategy'}],
+                'confidence': 0.8,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    first = payload['evidence_rows'][0]
+    research_objects = first['research_objects']
+
+    for expected in ('nonlinear elasticity', 'internal variables'):
+        value_index = next(
+            index
+            for index, item in enumerate(research_objects)
+            if str(item.get('normalized') or '').lower() == expected
+        )
+        item = research_objects[value_index]
+        provenance = next(
+            row
+            for row in first['slot_provenance']
+            if row['field'] == 'research_objects' and row['value_index'] == value_index
+        )
+
+        assert item['inferred'] is False
+        assert provenance['extraction_mode'] == 'normalized'
+        assert provenance['support_strength'] == 'strong'
+
+
+def test_result_scope_backfill_uses_stabilized_role_for_trusted_promotion(monkeypatch) -> None:
+    summary = 'This work extends a data-driven strategy from nonlinear elasticity to more complex scenarios involving internal variables.'
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '3. Conclusions',
+            summary,
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'method',
+                'act_type': 'adapt_method',
+                'summary': summary,
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'methods': [{'surface': 'data-driven strategy'}],
+                'confidence': 0.8,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    first = payload['evidence_rows'][0]
+    research_objects = first['research_objects']
+
+    assert first['role_hint'] == 'result'
+    for expected in ('nonlinear elasticity', 'internal variables'):
+        value_index = next(
+            index
+            for index, item in enumerate(research_objects)
+            if str(item.get('normalized') or '').lower() == expected
+        )
+        item = research_objects[value_index]
+        provenance = next(
+            row
+            for row in first['slot_provenance']
+            if row['field'] == 'research_objects' and row['value_index'] == value_index
+        )
+
+        assert item['inferred'] is False
+        assert provenance['extraction_mode'] == 'normalized'
+        assert provenance['support_strength'] == 'strong'
+
+
 def test_result_move_merges_partial_research_objects_with_conclusion_scope_backfill(monkeypatch) -> None:
     summary = 'This work extends a data-driven strategy from nonlinear elasticity to more complex scenarios involving internal variables.'
     doc = _doc_with_chunks(
@@ -584,6 +747,62 @@ def test_result_move_merges_partial_research_objects_with_conclusion_scope_backf
     assert 'internal variables' in normalized
     assert 'nonlinear elasticity' in normalized
     assert 'data-driven strategy' not in normalized
+
+
+def test_method_scope_backfill_keeps_broad_context_objects_as_inferred(monkeypatch) -> None:
+    summary = (
+        'Standard simulation in classical mechanics uses constitutive equations calibrated from data, but complexity '
+        'is increasing due to finer models and engineered materials. Data-driven simulation offers a potential '
+        'change of paradigm.'
+    )
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            'Abstract',
+            summary,
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'method',
+                'act_type': 'propose_method',
+                'summary': summary,
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'methods': [{'surface': 'data-driven simulation'}],
+                'confidence': 0.8,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    first = payload['evidence_rows'][0]
+    research_objects = first['research_objects']
+    engineered_index = next(
+        index
+        for index, item in enumerate(research_objects)
+        if str(item.get('normalized') or '').lower() == 'engineered materials'
+    )
+    engineered_object = research_objects[engineered_index]
+    engineered_provenance = next(
+        row
+        for row in first['slot_provenance']
+        if row['field'] == 'research_objects' and row['value_index'] == engineered_index
+    )
+
+    assert engineered_object['inferred'] is True
+    assert engineered_provenance['extraction_mode'] == 'inferred'
+    assert engineered_provenance['support_strength'] == 'weak'
 
 
 def test_result_move_backfill_handles_addressing_domain_phrase(monkeypatch) -> None:

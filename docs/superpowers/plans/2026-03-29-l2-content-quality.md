@@ -102,3 +102,11 @@ Progress note (2026-03-29, later phase):
 - Added a conservative `route_state_seed` fallback that uses inferred topic objects only when no trusted topic-object entries are available, improving downstream coverage without changing the normal trusted-first path.
 - Real-sample check: `1243_Data-Driven Computational Plasticity` now has non-empty `topic_scope_candidates`; anti-overfit check on `1607_Shear jamming and fragility in dense suspensions` kept strong topic and method candidates intact.
 - Next highest-value unresolved L2 gap: theory-heavy papers still admit some broad context objects in topic scope ordering, so the next phase should improve topic-object ranking/filtering rather than only increasing recall.
+
+Progress note (2026-03-29, trusted topic-signal phase):
+- Added regression coverage for promoting scope-explicit research objects into trusted `normalized + strong` signals, including cases where move role is only stabilized to `result` after the initial slot-augmentation pass.
+- Kept broad context phrases conservative: method/background-style objects such as `engineered materials` still remain `inferred + weak` unless a stronger scope relation is present in the source sentence.
+- Added a preferred-merge path so post-stabilization trusted scope objects can replace same-surface inferred objects without overwriting already-direct evidence.
+- Real-sample check: `1243_Data-Driven Computational Plasticity` now produces non-empty trusted `route_compiler_contract.topic_signals.objects`, with `topic_scope_candidates` narrowing to `nonlinear elasticity`, `internal variables`, and `constitutive model`.
+- Anti-overfit check: `1607_Shear jamming and fragility in dense suspensions` kept healthy topic candidates centered on `fragile shear-jammed state`, `shear-jammed states`, and `rigid-particle suspensions`.
+- Next highest-value unresolved L2 gap: trusted topic signals are materially better, but L2 still undersupplies measurement/resource/toolchain evidence on many theory-heavy papers, limiting how fully L3/L4 can reconstruct readiness and constraints from a single paper trace.
