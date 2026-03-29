@@ -197,3 +197,25 @@ Progress note (2026-03-30, window-support limitation recovery phase):
 - `1607_Shear jamming and fragility in dense suspensions`, `s870_Pb-activated amine-assisted photocatalytic hydrogen evolution reaction...`, `s93_Numerical investigation of twin-liquid film...`, and random paper `155_Characterization of force chains in granular material` did not pick up new explicit-drawback noise under the same forced-fallback audit.
 - Direct local rebuild recheck on `1243` also still surfaces the bottleneck after the change, indicating the new recovery path helps the intended real path while reducing one source of upstream-anchor fragility.
 - Next highest-value unresolved L2 gap: theory-style papers still remain materially under-typed and under-interpreted after bottlenecks are recovered, so the next phase should focus on stabilizing `interpretation` / `limitation` moves or theory-style `paper_type` inference rather than adding more limitation extractors.
+
+Progress note (2026-03-30, grounded limitation-move stabilization phase):
+- Added regression coverage for two downstream-facing failures where a `problem` move already carries an explicit drawback/limitation signal but still fails to produce a dedicated grounded constraint move:
+- the normal sparse-anchor case, where the explicit drawback sentence is present and recovered into `limitation_types`
+- the long-window case, where the drawback sentence exists in anchored chunks but falls outside truncated `move_support_text`
+- Root-cause audit showed that L2 could already recover the bottleneck phrase itself, but downstream completeness still stayed thin because:
+- `_stabilize_move_role_and_act_type` only promoted limitation roles when the cue was visible in the move summary, not support text
+- the pipeline emitted no companion `limitation` move for `problem` windows carrying explicit drawback sentences
+- companion-move generation originally looked only at truncated support text, so long intro windows could still lose the explicit drawback sentence even after limitation recovery
+- The fix keeps the original `problem` move intact, but now emits a narrow companion `limitation` move when an anchored chunk contains an explicit `main drawback ...` / `main limitation ...` sentence, and it allows support-text limitation cues to stabilize non-problem roles more reliably.
+- Verification:
+- Red-green regressions:
+- `backend/tests/test_paper_logic_trace_direct_extraction.py -k grounded_limitation_move`
+- `backend/tests/test_paper_logic_trace_direct_extraction.py -k truncates`
+- Related drawback regressions:
+- `backend/tests/test_paper_logic_trace_direct_extraction.py -k "explicit_main_drawback or later_intro_chunk or grounded_limitation_move or truncates"`
+- Focused file: `backend/tests/test_paper_logic_trace_direct_extraction.py`
+- Real-sample rechecks:
+- Forced local fallback rebuild of `1243_Data-Driven Computational Plasticity` now produces an explicit `limitation` move with summary `Its main drawback is the huge amount of data required for running simulations.` and raises `grounded_constraint_move_count` from `0` to `1`.
+- Direct local rebuild of `1243_Data-Driven Computational Plasticity` now yields grounded limitation coverage as well (`grounded_constraint_move_count=2` in the latest check), while preserving the original `problem` narrative and the recovered bottleneck candidate.
+- Anti-overfit fallback recheck on `1607_Shear jamming and fragility in dense suspensions` still produces no synthetic limitation moves, so the new companion-move path is not firing on ordinary non-explicit constraint language.
+- Next highest-value unresolved L2 gap: `1243` is now materially closer to theory/modeling completeness, but it still remains `paper_type=unknown`, so the next phase should target theory-style paper-type inference or profile selection rather than more limitation-slot logic.
