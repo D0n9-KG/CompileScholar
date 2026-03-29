@@ -7,6 +7,7 @@ from collections import defaultdict
 from typing import Any, Callable
 
 from app.ingest.models import Chunk, DocumentIR
+from app.ingest.paper_metadata_enrichment import repair_local_metadata
 from app.paper_logic_trace.models import normalize_trace_paper_type
 
 
@@ -2757,6 +2758,21 @@ def build_paper_logic_trace_inputs(
     schema: dict[str, Any],
     move_extractor: MoveExtractorFn | None = None,
 ) -> dict[str, Any]:
+    metadata_enrichment = dict(getattr(doc.paper, 'metadata_enrichment', None) or {})
+    if not metadata_enrichment:
+        repaired_doc, local_fallback_changed_fields = repair_local_metadata(doc)
+        if local_fallback_changed_fields:
+            doc = repaired_doc
+            metadata_enrichment = {
+                'mode': 'local_trace_metadata_repair',
+                'used_crossref': False,
+                'query': None,
+                'confidence': None,
+                'changed_fields': [],
+                'local_fallback_used': True,
+                'local_fallback_changed_fields': local_fallback_changed_fields,
+            }
+
     extractor = move_extractor or _default_move_extractor
     try:
         extracted = extractor(
@@ -2789,7 +2805,7 @@ def build_paper_logic_trace_inputs(
             schema.get('paper_type'),
         ),
         'source_refs': [chunk.chunk_id for chunk in doc.chunks if str(chunk.chunk_id or '').strip()],
-        'metadata_enrichment': dict(getattr(doc.paper, 'metadata_enrichment', None) or {}),
+        'metadata_enrichment': metadata_enrichment,
     }
     return {
         'paper_metadata': paper_metadata,

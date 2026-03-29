@@ -223,8 +223,8 @@ def _repair_local_metadata(doc: DocumentIR) -> tuple[DocumentIR, list[str]]:
     new_authors = list(paper.authors or [])
 
     fallback_title_candidates = [
-        _paper_source_query(paper.paper_source),
         _normalize_space(paper.title_alt),
+        _paper_source_query(paper.paper_source),
     ]
     fallback_title = next(
         (
@@ -271,6 +271,10 @@ def _repair_local_metadata(doc: DocumentIR) -> tuple[DocumentIR, list[str]]:
         authors=new_authors,
     )
     return replace(doc, paper=updated_paper), sorted(set(changed_fields))
+
+
+def repair_local_metadata(doc: DocumentIR) -> tuple[DocumentIR, list[str]]:
+    return _repair_local_metadata(doc)
 
 
 def _attach_metadata_enrichment_report(doc: DocumentIR, report: dict[str, Any]) -> DocumentIR:
@@ -450,4 +454,4 @@ def enrich_document_metadata(
     return _attach_metadata_enrichment_report(enriched, report), report
 
 
-__all__ = ['enrich_document_metadata']
+__all__ = ['enrich_document_metadata', 'repair_local_metadata']

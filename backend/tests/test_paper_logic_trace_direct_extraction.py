@@ -158,6 +158,43 @@ def test_build_paper_logic_trace_inputs_preserves_metadata_audit_fields(monkeypa
     assert payload['paper_metadata']['metadata_enrichment']['mode'] == 'skipped_unreliable_title_match'
 
 
+def test_build_paper_logic_trace_inputs_repairs_suspicious_local_title_before_export(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '1. Introduction',
+            'This work extends a data-driven strategy to nonlinear inelasticity with internal variables.',
+            line=1,
+        ),
+    )
+    doc = replace(
+        doc,
+        paper=replace(
+            doc.paper,
+            title='2.1. Non-isothermal elasto-visco-plastic behavior',
+            title_alt='Data-Driven Computational Plasticity',
+            metadata_enrichment={},
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    assert payload['paper_metadata']['title'] == 'Data-Driven Computational Plasticity'
+    assert payload['paper_metadata']['title_alt'] is None
+    assert payload['paper_metadata']['metadata_enrichment']['local_fallback_used'] is True
+    assert sorted(payload['paper_metadata']['metadata_enrichment']['local_fallback_changed_fields']) == ['title', 'title_alt']
+
+
 def test_intro_in_this_study_chunk_is_promoted_to_problem_role(monkeypatch) -> None:
     doc = _doc_with_chunks(
         _chunk('c-1', '1. Introduction', 'In this study, we combine X-ray microtomography and DEM to investigate particle packing under compression.', line=1),

@@ -192,6 +192,27 @@ def test_enrich_document_metadata_uses_local_title_fallback_when_title_search_ma
     assert crossref.resolve_reference_calls == ['卧式双轴圆盘反应器功率特性研究']
 
 
+def test_enrich_document_metadata_prefers_clean_title_alt_over_generic_paper_source_for_local_repair() -> None:
+    doc = _doc(
+        paper_source='demo-paper',
+        title='2.1. Non-isothermal elasto-visco-plastic behavior',
+        title_alt='Data-Driven Computational Plasticity',
+        authors=['Alice Smith'],
+        doi=None,
+        year=2024,
+    )
+    crossref = _FakeCrossref(title_result=None)
+
+    enriched, report = enrich_document_metadata(doc, crossref=crossref, confidence_threshold=0.55)
+
+    assert enriched.paper.title == 'Data-Driven Computational Plasticity'
+    assert enriched.paper.title_alt is None
+    assert report['used_crossref'] is False
+    assert report['local_fallback_used'] is True
+    assert sorted(report['local_fallback_changed_fields']) == ['title', 'title_alt']
+    assert report['query'] == 'Data-Driven Computational Plasticity'
+
+
 def test_enrich_document_metadata_uses_local_fallback_for_sentence_like_authors() -> None:
     doc = _doc(
         paper_source='248_《城镇污水处理厂污染物排放标准》浅释',
