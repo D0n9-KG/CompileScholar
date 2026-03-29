@@ -857,6 +857,64 @@ def test_build_route_state_seed_collects_l3_compiler_inputs_without_overclaiming
     assert 'a-24' in seed['supporting_evidence_ids']
 
 
+def test_build_route_state_seed_falls_back_to_inferred_topic_objects_when_trusted_objects_are_missing() -> None:
+    result_move = ResearchMove(
+        move_id='m-result-1',
+        sequence_no=1,
+        role='result',
+        act_type='report_effect',
+        summary='This work extends the data-driven strategy from nonlinear elasticity to scenarios involving internal variables.',
+        research_objects=[
+            MentionValue(surface='nonlinear elasticity', normalized='nonlinear elasticity', inferred=True, anchor_ids=['a-1']),
+            MentionValue(surface='internal variables', normalized='internal variables', inferred=True, anchor_ids=['a-1']),
+        ],
+        methods=[MentionValue(surface='data-driven strategy', normalized='data-driven strategy', anchor_ids=['a-1'])],
+        anchor_ids=['a-1'],
+        slot_provenance=[
+            SlotProvenance(
+                field='research_objects',
+                value_index=0,
+                anchor_ids=['a-1'],
+                extraction_mode='inferred',
+                support_strength='weak',
+            ),
+            SlotProvenance(
+                field='research_objects',
+                value_index=1,
+                anchor_ids=['a-1'],
+                extraction_mode='inferred',
+                support_strength='weak',
+            ),
+            SlotProvenance(
+                field='methods',
+                value_index=0,
+                anchor_ids=['a-1'],
+                extraction_mode='direct',
+                support_strength='strong',
+            ),
+        ],
+    )
+    trace = PaperLogicTrace(
+        trace_id='paper-1:paper_logic_trace',
+        schema_version='v2',
+        built_at='2026-03-29T00:00:00Z',
+        paper_metadata=PaperMetadata(
+            paper_id='paper-1',
+            title='Data-Driven Computational Plasticity',
+            paper_type='theoretical',
+            source_refs=['a-1'],
+        ),
+        canonical_core=CanonicalCore(moves=[result_move]),
+        quality={},
+    )
+
+    seed = build_route_state_seed(trace)
+
+    assert 'nonlinear elasticity' in seed['topic_scope_candidates']
+    assert 'internal variables' in seed['topic_scope_candidates']
+    assert 'a-1' in seed['supporting_evidence_ids']
+
+
 def test_build_derived_views_keeps_single_paper_summary_surface_while_adding_compiler_contract() -> None:
     trace = PaperLogicTrace(
         trace_id='paper-1:paper_logic_trace',

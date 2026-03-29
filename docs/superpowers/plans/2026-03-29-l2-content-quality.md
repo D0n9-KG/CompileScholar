@@ -95,3 +95,10 @@ Progress note (2026-03-29):
 - Added a regression for conclusion-section achievement claims that were being stabilized as `method` instead of `result`, then confirmed the real sample now surfaces result-backed `key_findings`.
 - Tightened `paper_content_profile.key_findings` ordering so explicit `result` summaries are listed before earlier `interpretation` summaries.
 - Next highest-value unresolved L2 gap: theory-heavy papers still show thin route-state evidence because comparator/effect/measurement signals remain sparse even after findings are recovered.
+
+Progress note (2026-03-29, later phase):
+- Added regression coverage for theory-heavy `research_objects` recovery, including conclusion-scope objects like `internal variables` and problem-scope objects like `constitutive models`.
+- Tightened research-object cleanup so generic singleton noise such as `parameters`, long `introduced into the weak form ...` clause fragments, and leading `establish ...` verb phrases do not leak into L2 topic objects.
+- Added a conservative `route_state_seed` fallback that uses inferred topic objects only when no trusted topic-object entries are available, improving downstream coverage without changing the normal trusted-first path.
+- Real-sample check: `1243_Data-Driven Computational Plasticity` now has non-empty `topic_scope_candidates`; anti-overfit check on `1607_Shear jamming and fragility in dense suspensions` kept strong topic and method candidates intact.
+- Next highest-value unresolved L2 gap: theory-heavy papers still admit some broad context objects in topic scope ordering, so the next phase should improve topic-object ranking/filtering rather than only increasing recall.

@@ -384,6 +384,44 @@ def test_problem_move_without_research_objects_is_backfilled_from_summary(monkey
     assert 'granular avalanches' in normalized or 'particle-size segregation' in normalized
 
 
+def test_problem_research_object_backfill_prefers_constitutive_model_over_goal_clause(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '1. Introduction',
+            'The paper identifies the challenge of whether simulation can proceed directly from data without needing a mathematical constitutive model.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'problem',
+                'act_type': 'identify_gap',
+                'summary': 'The paper identifies the challenge of whether simulation can proceed directly from data without needing a mathematical constitutive model.',
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'confidence': 0.8,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    first = payload['evidence_rows'][0]
+    normalized = {str(item.get('normalized') or '').lower() for item in first['research_objects']}
+
+    assert 'mathematical constitutive model' in normalized or 'constitutive model' in normalized
+    assert 'identifies the challenge of whether simulation' not in normalized
+
+
 def test_backfilled_research_object_provenance_is_marked_inferred_and_weak(monkeypatch) -> None:
     doc = _doc_with_chunks(
         _chunk(
@@ -424,6 +462,45 @@ def test_backfilled_research_object_provenance_is_marked_inferred_and_weak(monke
     assert provenance_rows
     assert all(row['extraction_mode'] == 'inferred' for row in provenance_rows)
     assert all(row['support_strength'] == 'weak' for row in provenance_rows)
+
+
+def test_result_move_without_research_objects_is_backfilled_from_conclusion_scope(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '3. Conclusions',
+            'This work extends a data-driven strategy from nonlinear elasticity to more complex scenarios involving internal variables.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'result',
+                'act_type': 'report_effect',
+                'summary': 'This work extends a data-driven strategy from nonlinear elasticity to more complex scenarios involving internal variables.',
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'methods': [{'surface': 'data-driven strategy'}],
+                'confidence': 0.8,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    first = payload['evidence_rows'][0]
+    normalized = {str(item.get('normalized') or '').lower() for item in first['research_objects']}
+
+    assert 'nonlinear elasticity' in normalized or 'internal variables' in normalized
+    assert 'data-driven strategy' not in normalized
 
 
 def test_research_object_filter_drops_generic_solution_and_promise_phrases(monkeypatch) -> None:
@@ -474,6 +551,118 @@ def test_research_object_filter_drops_generic_solution_and_promise_phrases(monke
     assert 'yade framework' in normalized
     assert 'proposed solution' not in normalized
     assert 'will allow direct feedback from authors and encourage the scientific community' not in normalized
+
+
+def test_research_object_filter_drops_introduced_into_clause_when_subject_object_is_available(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '2. Method',
+            'The constitutive model is introduced into the weak form to formulate the problem in terms of displacement, which is then discretized using the finite element method.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'method',
+                'act_type': 'adapt_method',
+                'summary': 'The constitutive model is introduced into the weak form to formulate the problem in terms of displacement, which is then discretized using the finite element method.',
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'confidence': 0.7,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+    normalized = {str(item.get('normalized') or '').lower() for item in move['research_objects']}
+
+    assert all('introduced into the weak form' not in item for item in normalized)
+
+
+def test_research_object_filter_trims_leading_establish_verb_from_domain_object(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '1. Introduction',
+            'The paper identifies the challenge of whether simulation can proceed directly from data without needing to establish mathematical constitutive models.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'problem',
+                'act_type': 'identify_gap',
+                'summary': 'The paper identifies the challenge of whether simulation can proceed directly from data without needing to establish mathematical constitutive models.',
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [{'surface': 'establish mathematical constitutive models'}],
+                'confidence': 0.7,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+    normalized = {str(item.get('normalized') or '').lower() for item in move['research_objects']}
+
+    assert 'mathematical constitutive models' in normalized or 'constitutive models' in normalized
+    assert 'establish mathematical constitutive models' not in normalized
+
+
+def test_research_object_filter_drops_generic_parameter_singleton(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '2. Method',
+            'Advanced clustering techniques and machine learning help extract manifold structures from data to identify uncorrelated parameters and predict solutions via interpolation schemes.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'method',
+                'act_type': 'adapt_method',
+                'summary': 'Advanced clustering techniques and machine learning help extract manifold structures from data to identify uncorrelated parameters and predict solutions via interpolation schemes.',
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [{'surface': 'parameters'}],
+                'confidence': 0.7,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+    normalized = {str(item.get('normalized') or '').lower() for item in move['research_objects']}
+
+    assert 'parameters' not in normalized
 
 
 def test_research_object_filter_drops_descriptive_clause_phrases(monkeypatch) -> None:

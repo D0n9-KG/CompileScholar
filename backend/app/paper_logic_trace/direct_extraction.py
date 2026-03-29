@@ -519,6 +519,12 @@ _RESEARCH_OBJECT_BAD_LEAD_TOKENS = {
     'examine',
     'examines',
     'examined',
+    'introduce',
+    'introduced',
+    'introduces',
+    'identify',
+    'identified',
+    'identifies',
     'explore',
     'explores',
     'explored',
@@ -627,11 +633,51 @@ _RESEARCH_OBJECT_BAD_TOKENS = {
     'frameworks',
     'method',
     'methods',
+    'parameter',
+    'parameters',
     'process',
     'solution',
     'solutions',
     'workflow',
     'workflows',
+}
+_RESEARCH_OBJECT_HEAD_HINTS = {
+    'behavior',
+    'behaviour',
+    'behaviors',
+    'behaviours',
+    'compaction',
+    'deformation',
+    'deformations',
+    'dynamics',
+    'elasticity',
+    'flow',
+    'flows',
+    'geometry',
+    'geometries',
+    'hardening',
+    'inelasticity',
+    'material',
+    'materials',
+    'mechanics',
+    'model',
+    'models',
+    'particle',
+    'particles',
+    'properties',
+    'property',
+    'rheology',
+    'segregation',
+    'state',
+    'states',
+    'strain',
+    'strains',
+    'stress',
+    'stresses',
+    'suspension',
+    'suspensions',
+    'variable',
+    'variables',
 }
 _METHOD_LIKE_OBJECT_HEAD_TOKENS = {
     'algorithm',
@@ -1599,7 +1645,7 @@ def _research_object_mentions(text: str, *, limit: int = 3) -> list[dict[str, An
     rows: list[dict[str, Any]] = []
     seen: set[str] = set()
 
-    def _push_phrase(raw_phrase: str) -> bool:
+    def _push_phrase(raw_phrase: str, *, require_domain_head: bool = False) -> bool:
         phrase = re.split(r'[.,;:()]', raw_phrase, maxsplit=1)[0]
         phrase = re.split(
             r'\b(?:by|using|with|under|where|which|that|via|based on|for|during|while|when)\b',
@@ -1615,6 +1661,8 @@ def _research_object_mentions(text: str, *, limit: int = 3) -> list[dict[str, An
         if not tokens:
             return False
         if len(tokens) == 1 and tokens[0] in _RESEARCH_OBJECT_BAD_TOKENS:
+            return False
+        if require_domain_head and not any(token in _RESEARCH_OBJECT_HEAD_HINTS for token in tokens[-2:]):
             return False
         if phrase in seen:
             return False
@@ -1641,6 +1689,16 @@ def _research_object_mentions(text: str, *, limit: int = 3) -> list[dict[str, An
             if _push_phrase(match.group(1)):
                 return rows
 
+    relation_patterns = (
+        re.compile(r'\bwithout needing(?:\s+(?:a|an|the))?\s+([a-z0-9][a-z0-9\-\s]{3,60})', re.IGNORECASE),
+        re.compile(r'\bfrom\s+([a-z0-9][a-z0-9\-\s]{3,40}?)\s+to\b', re.IGNORECASE),
+        re.compile(r'\binvolving\s+([a-z0-9][a-z0-9\-\s]{3,40})', re.IGNORECASE),
+    )
+    for pattern in relation_patterns:
+        for match in pattern.finditer(lowered):
+            if _push_phrase(match.group(1), require_domain_head=True):
+                return rows
+
     return rows
 
 
@@ -1650,6 +1708,13 @@ def _refine_research_object_rows(rows: list[dict[str, Any]]) -> list[dict[str, A
         phrase = _normalize_space(row.get('normalized') or row.get('surface') or '').lower()
         if not phrase:
             continue
+        tokens = phrase.split()
+        if tokens[:1] and tokens[0] in {'establish', 'establishes', 'established'}:
+            trimmed = _clean_phrase(' '.join(tokens[1:]))
+            trimmed_tokens = trimmed.split()
+            if trimmed_tokens and any(token in _RESEARCH_OBJECT_HEAD_HINTS for token in trimmed_tokens[-2:]):
+                phrase = trimmed
+                row = {**row, 'surface': phrase, 'normalized': phrase}
         if any(phrase.startswith(prefix) for prefix in _RESEARCH_OBJECT_BAD_PREFIXES):
             continue
         if any(marker in phrase for marker in _RESEARCH_OBJECT_BAD_SUBSTRINGS):

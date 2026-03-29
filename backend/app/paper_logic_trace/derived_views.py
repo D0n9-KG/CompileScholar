@@ -1016,6 +1016,15 @@ def build_route_state_seed(
     protocol_candidates = list(l1_bridge_hints.get('protocol_candidates') or [])
     toolchain_candidates = list(l1_bridge_hints.get('toolchain_candidates') or [])
 
+    if not topic_object_entries:
+        topic_object_entries = _slot_entries_with_move_context(
+            'research_objects',
+            moves,
+            'research_objects',
+            trusted_only=False,
+            roles={'problem', 'method', 'experiment', 'result', 'interpretation'},
+        )
+
     supporting_evidence_ids = _unique(
         [
             *_entry_anchor_ids(topic_object_entries),
