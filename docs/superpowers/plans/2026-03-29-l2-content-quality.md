@@ -64,7 +64,7 @@
 - [x] Keep the fix conservative: do not rewrite move text, only change summary move selection/tie-break behavior.
 - [x] Run focused derived-view tests and confirm the new regression passes.
 - [x] Re-run fresh real-paper checks on bilingual samples and inspect the actual summary text.
-- [ ] Commit the phase with a message describing bilingual summary coherence.
+- [x] Commit the phase with a message describing bilingual summary coherence.
 
 ## Chunk 3: Fresh Audit Refresh
 
@@ -86,6 +86,12 @@
 **Files:**
 - Modify only if required by fixes from earlier chunks.
 
-- [ ] Run `cd backend; .\.venv\Scripts\python.exe -m pytest -q`.
-- [ ] Review the exact output and only then claim completion for the current execution window.
-- [ ] If tests pass, record the next highest-value unresolved L2 gap and continue with another phase in the same branch.
+- [x] Run `cd backend; .\.venv\Scripts\python.exe -m pytest -q`.
+- [x] Review the exact output and only then claim completion for the current execution window.
+- [x] If tests pass, record the next highest-value unresolved L2 gap and continue with another phase in the same branch.
+
+Progress note (2026-03-29):
+- Verified a new findings-quality phase on real paper `1243_Data-Driven Computational Plasticity`.
+- Added a regression for conclusion-section achievement claims that were being stabilized as `method` instead of `result`, then confirmed the real sample now surfaces result-backed `key_findings`.
+- Tightened `paper_content_profile.key_findings` ordering so explicit `result` summaries are listed before earlier `interpretation` summaries.
+- Next highest-value unresolved L2 gap: theory-heavy papers still show thin route-state evidence because comparator/effect/measurement signals remain sparse even after findings are recovered.

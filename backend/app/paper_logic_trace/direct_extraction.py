@@ -191,6 +191,13 @@ _RESULT_TEXT_PATTERNS = (
     'decreased',
     'increased',
 )
+_CONCLUSION_SECTION_HINTS = ('conclusion', 'conclusions', 'concluding')
+_SELF_REFERENTIAL_ACHIEVEMENT_RE = re.compile(
+    r'\b(?:this|the)\s+(?:work|paper|study|article)\s+'
+    r'(?:has\s+)?(?:succeed(?:ed|s)\s+to|successfully\s+\w+|extend(?:s|ed)|'
+    r'establish(?:es|ed)|achieve(?:s|d)|demonstrat(?:e|es|ed)|show(?:s|ed))\b',
+    re.IGNORECASE,
+)
 _PROBLEM_GAP_PATTERNS = (
     'challenge',
     'deficiency',
@@ -1044,6 +1051,11 @@ def _looks_like_method_statement(text: str) -> bool:
     return any(pattern.search(normalized) for pattern in _METHOD_TEXT_REGEXES)
 
 
+def _is_conclusion_like_section(section: object) -> bool:
+    normalized = _normalize_space(section).lower()
+    return bool(normalized) and any(hint in normalized for hint in _CONCLUSION_SECTION_HINTS)
+
+
 def _promote_role_from_act_type(*, role: str, act_type: str) -> str:
     promoted = _ACT_TO_ROLE.get(act_type)
     if not promoted:
@@ -1079,15 +1091,23 @@ def _stabilize_move_role_and_act_type(
     comparators: list[dict[str, Any]],
     effects: list[dict[str, Any]],
     limitation_types: list[dict[str, Any]],
+    support_text: str = '',
+    source_sections: list[object] | None = None,
 ) -> tuple[str, str]:
     lowered_summary = _normalize_space(summary).lower()
+    lowered_support = _normalize_space(support_text).lower()
     informative_effects = _has_informative_effect_rows(effects)
     has_problem_signal = _looks_like_problem_statement(lowered_summary)
     has_method_signal = bool(methods) or _looks_like_method_statement(summary)
     has_result_signal = (
         any(pattern in lowered_summary for pattern in _RESULT_TEXT_PATTERNS)
+        or any(pattern in lowered_support for pattern in _RESULT_TEXT_PATTERNS)
         or informative_effects
         or bool(metrics and comparators)
+    )
+    conclusion_like = any(_is_conclusion_like_section(section) for section in (source_sections or []))
+    has_conclusion_achievement_signal = conclusion_like and bool(
+        _SELF_REFERENTIAL_ACHIEVEMENT_RE.search(_normalize_space(support_text) or _normalize_space(summary))
     )
     has_limitation_signal = bool(limitation_types) and any(
         pattern in lowered_summary for pattern in _LIMITATION_ROLE_PATTERNS
@@ -1095,6 +1115,9 @@ def _stabilize_move_role_and_act_type(
 
     if role in {'background', 'interpretation', 'experiment', 'result'} and has_limitation_signal:
         return 'limitation', 'state_limitation'
+
+    if role in {'method', 'background', 'interpretation', 'experiment'} and has_conclusion_achievement_signal and not limitation_types:
+        return 'result', 'report_effect'
 
     if role in {'background', 'interpretation', 'problem'} and has_method_signal and not has_result_signal and not limitation_types:
         return 'method', 'propose_method'
@@ -2157,6 +2180,8 @@ def _move_rows_from_windows(
                 comparators=comparators,
                 effects=effects,
                 limitation_types=limitation_types,
+                support_text=move_support_text,
+                source_sections=[chunk_by_id[chunk_id].section for chunk_id in anchor_chunk_ids if chunk_id in chunk_by_id],
             )
 
             slot_provenance = [

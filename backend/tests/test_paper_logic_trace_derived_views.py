@@ -776,6 +776,53 @@ def test_build_paper_content_profile_exports_single_paper_story_surfaces() -> No
     assert derived['paper_content_profile']['coverage']['figure_count'] == 1
 
 
+def test_build_paper_content_profile_prioritizes_result_summaries_over_earlier_interpretation() -> None:
+    interpretation = ResearchMove(
+        move_id='m-int-1',
+        sequence_no=1,
+        role='interpretation',
+        act_type='explain_mechanism',
+        summary='Continuum thermodynamics assumes the system state is defined by observable and internal state variables.',
+        anchor_ids=['a-1'],
+    )
+    result_one = ResearchMove(
+        move_id='m-result-1',
+        sequence_no=2,
+        role='result',
+        act_type='report_effect',
+        summary='This work extends the data-driven strategy to inelastic scenarios involving internal variables.',
+        anchor_ids=['a-2'],
+    )
+    result_two = ResearchMove(
+        move_id='m-result-2',
+        sequence_no=3,
+        role='result',
+        act_type='report_effect',
+        summary='The approach includes plastic strain rate and accumulated plastic deformation in the behavior manifold.',
+        anchor_ids=['a-3'],
+    )
+    trace = PaperLogicTrace(
+        trace_id='paper-1:paper_logic_trace',
+        schema_version='v2',
+        built_at='2026-03-29T00:00:00Z',
+        paper_metadata=PaperMetadata(
+            paper_id='paper-1',
+            title='Data-Driven Computational Plasticity',
+            paper_type='theoretical',
+            source_refs=['a-1'],
+        ),
+        canonical_core=CanonicalCore(
+            moves=[interpretation, result_one, result_two],
+        ),
+        quality={},
+    )
+
+    profile = build_paper_content_profile(trace)
+
+    assert profile['key_findings'][:2] == [result_one.summary, result_two.summary]
+    assert profile['coverage']['finding_count'] == 3
+
+
 def test_build_route_state_seed_collects_l3_compiler_inputs_without_overclaiming() -> None:
     trace = PaperLogicTrace(
         trace_id='paper-1:paper_logic_trace',

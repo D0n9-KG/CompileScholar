@@ -2675,6 +2675,43 @@ def test_result_like_summary_stabilizes_interpretation_move_to_result(monkeypatc
     assert move['act_hint'] == 'report_effect'
 
 
+def test_conclusion_achievement_summary_stabilizes_method_move_to_result(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '3. Conclusions',
+            'This work succeeded to extend the data-driven strategy from nonlinear elasticity to more complex scenarios involving internal variables.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'method',
+                'act_type': 'propose_method',
+                'summary': 'This work extends a data-driven strategy from nonlinear elasticity to more complex scenarios involving internal variables.',
+                'anchor_chunk_ids': ['c-1'],
+                'methods': [{'surface': 'data-driven strategy'}],
+                'confidence': 0.6,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+
+    assert move['role_hint'] == 'result'
+    assert move['act_hint'] == 'report_effect'
+
+
 def test_limitation_like_summary_stabilizes_result_move_to_limitation(monkeypatch) -> None:
     doc = _doc_with_chunks(
         _chunk(

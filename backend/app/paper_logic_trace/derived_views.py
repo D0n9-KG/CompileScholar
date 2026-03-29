@@ -1193,6 +1193,18 @@ def build_paper_content_profile(trace: PaperLogicTrace) -> dict[str, Any]:
                 break
         return summaries
 
+    def _finding_summaries(*, limit: int = 3) -> list[str]:
+        summaries = _role_summaries({'result'}, limit=limit)
+        if len(summaries) >= limit:
+            return summaries
+        for summary in _role_summaries({'interpretation'}, limit=limit):
+            if summary in summaries:
+                continue
+            summaries.append(summary)
+            if len(summaries) >= limit:
+                break
+        return summaries
+
     limitation_statements: list[dict[str, Any]] = []
     for move in sorted(moves, key=lambda item: int(item.sequence_no)):
         if move.role != 'limitation':
@@ -1242,6 +1254,7 @@ def build_paper_content_profile(trace: PaperLogicTrace) -> dict[str, Any]:
         for table in trace.canonical_core.table_refs
     ]
     future_work_statements = build_future_work_signals(moves)
+    finding_summaries = _finding_summaries()
 
     return {
         'paper_id': trace.paper_metadata.paper_id,
@@ -1250,7 +1263,7 @@ def build_paper_content_profile(trace: PaperLogicTrace) -> dict[str, Any]:
         'key_method_summary': paper_summaries.get('key_method_summary', ''),
         'problem_statements': _role_summaries({'problem', 'background', 'hypothesis'}),
         'method_statements': _role_summaries({'method', 'experiment'}),
-        'key_findings': _role_summaries({'result', 'interpretation'}),
+        'key_findings': finding_summaries,
         'limitation_statements': limitation_statements,
         'future_work_statements': future_work_statements,
         'citation_contexts': citation_contexts,
@@ -1259,7 +1272,7 @@ def build_paper_content_profile(trace: PaperLogicTrace) -> dict[str, Any]:
         'coverage': {
             'problem_statement_count': len(_role_summaries({'problem', 'background', 'hypothesis'})),
             'method_statement_count': len(_role_summaries({'method', 'experiment'})),
-            'finding_count': len(_role_summaries({'result', 'interpretation'})),
+            'finding_count': len(finding_summaries),
             'limitation_count': len(limitation_statements),
             'future_work_count': len(future_work_statements),
             'citation_context_count': len(citation_contexts),
