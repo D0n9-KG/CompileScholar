@@ -805,6 +805,118 @@ def test_method_scope_backfill_keeps_broad_context_objects_as_inferred(monkeypat
     assert engineered_provenance['support_strength'] == 'weak'
 
 
+def test_method_prediction_target_is_promoted_to_trusted_normalized_signal(monkeypatch) -> None:
+    summary = (
+        'Image-based ML approaches, including CNNs, cGANs, and GNNs, have been used to predict mechanical field '
+        'distributions in composite microstructures, achieving significant speedups.'
+    )
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '1. Introduction',
+            summary,
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'method',
+                'act_type': 'adapt_method',
+                'summary': summary,
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'methods': [
+                    {'surface': 'convolutional neural networks'},
+                    {'surface': 'graph neural networks'},
+                ],
+                'confidence': 0.8,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    first = payload['evidence_rows'][0]
+    research_objects = first['research_objects']
+    target_index = next(
+        index
+        for index, item in enumerate(research_objects)
+        if str(item.get('normalized') or '').lower() == 'mechanical field distributions in composite microstructures'
+    )
+    target_object = research_objects[target_index]
+    target_provenance = next(
+        row
+        for row in first['slot_provenance']
+        if row['field'] == 'research_objects' and row['value_index'] == target_index
+    )
+
+    assert target_object['inferred'] is False
+    assert target_provenance['extraction_mode'] == 'normalized'
+    assert target_provenance['support_strength'] == 'strong'
+
+
+def test_problem_prediction_target_in_composites_is_promoted_to_trusted_normalized_signal(monkeypatch) -> None:
+    summary = (
+        'Existing ML approaches for predicting mechanical fields in composites have significant computational costs '
+        'for generating large training datasets via FEA.'
+    )
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '1. Introduction',
+            summary,
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'problem',
+                'act_type': 'identify_gap',
+                'summary': summary,
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'confidence': 0.8,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    first = payload['evidence_rows'][0]
+    research_objects = first['research_objects']
+    target_index = next(
+        index
+        for index, item in enumerate(research_objects)
+        if str(item.get('normalized') or '').lower() == 'mechanical fields in composites'
+    )
+    target_object = research_objects[target_index]
+    target_provenance = next(
+        row
+        for row in first['slot_provenance']
+        if row['field'] == 'research_objects' and row['value_index'] == target_index
+    )
+
+    assert target_object['inferred'] is False
+    assert target_provenance['extraction_mode'] == 'normalized'
+    assert target_provenance['support_strength'] == 'strong'
+
+
 def test_result_move_backfill_handles_addressing_domain_phrase(monkeypatch) -> None:
     summary = (
         'This work succeeded to extend the data-driven strategy proposed in our former works for addressing '

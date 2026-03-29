@@ -655,20 +655,30 @@ _RESEARCH_OBJECT_HEAD_HINTS = {
     'behaviour',
     'behaviors',
     'behaviours',
+    'composite',
+    'composites',
     'compaction',
     'deformation',
     'deformations',
+    'distribution',
+    'distributions',
     'dynamics',
     'elasticity',
+    'field',
+    'fields',
     'flow',
     'flows',
     'geometry',
     'geometries',
     'hardening',
     'inelasticity',
+    'laminate',
+    'laminates',
     'material',
     'materials',
     'mechanics',
+    'microstructure',
+    'microstructures',
     'model',
     'models',
     'particle',
@@ -689,6 +699,7 @@ _RESEARCH_OBJECT_HEAD_HINTS = {
     'variables',
 }
 _TRUSTED_SCOPE_RESEARCH_OBJECT_ROLES = {'problem', 'result', 'interpretation'}
+_TRUSTED_PREDICTION_TARGET_RESEARCH_OBJECT_ROLES = {'problem', 'method', 'result', 'interpretation'}
 _RESEARCH_OBJECT_RELATION_PATTERNS = (
     re.compile(r'\bwithout needing(?:\s+(?:a|an|the))?\s+([a-z0-9][a-z0-9\-\s]{3,60})', re.IGNORECASE),
     re.compile(
@@ -699,6 +710,14 @@ _RESEARCH_OBJECT_RELATION_PATTERNS = (
     re.compile(r'\bfrom\s+([a-z0-9][a-z0-9\-\s]{3,40}?)\s+to\b', re.IGNORECASE),
     re.compile(r'\b(?:for\s+)?addressing\s+([a-z0-9][a-z0-9\-\s]{3,40}?)\s+to\b', re.IGNORECASE),
     re.compile(r'\binvolving\s+([a-z0-9][a-z0-9\-\s]{3,40})', re.IGNORECASE),
+)
+_RESEARCH_OBJECT_PREDICTION_PATTERNS = (
+    re.compile(
+        r'\b(?:predict|predicting|predicted|prediction\s+of)\s+'
+        r'([a-z0-9][a-z0-9\-\s]{3,90}?)'
+        r'(?=,|\b(?:is|are|was|were|have|has|with|using|by|through|while|when|that|which|to|and|achieving)\b|$)',
+        re.IGNORECASE,
+    ),
 )
 _METHOD_LIKE_OBJECT_HEAD_TOKENS = {
     'algorithm',
@@ -1809,6 +1828,51 @@ def _explicit_scope_research_object_mentions(text: str, *, role: str, limit: int
     return _mark_normalized_mentions(rows)
 
 
+def _explicit_prediction_target_research_object_mentions(text: str, *, role: str, limit: int = 3) -> list[dict[str, Any]]:
+    role_token = _normalize_role(role)
+    if role_token not in _TRUSTED_PREDICTION_TARGET_RESEARCH_OBJECT_ROLES:
+        return []
+
+    lowered = _normalize_space(text).lower()
+    if not lowered:
+        return []
+
+    rows: list[dict[str, Any]] = []
+    seen: set[str] = set()
+
+    def _push_phrase(raw_phrase: str) -> bool:
+        phrase = re.split(r'[.,;:()]', raw_phrase, maxsplit=1)[0]
+        phrase = re.split(
+            r'\b(?:by|using|with|under|where|which|that|via|based on|for|during|while|when|achieving)\b',
+            phrase,
+            maxsplit=1,
+        )[0]
+        phrase = _clean_phrase(phrase)
+        if not phrase:
+            return False
+        if any(phrase.startswith(prefix) for prefix in _RESEARCH_OBJECT_BAD_PREFIXES):
+            return False
+        tokens = phrase.split()
+        if not tokens:
+            return False
+        if len(tokens) == 1 and tokens[0] in _RESEARCH_OBJECT_BAD_TOKENS:
+            return False
+        if not any(token in _RESEARCH_OBJECT_HEAD_HINTS for token in tokens[-2:]):
+            return False
+        if phrase in seen:
+            return False
+        seen.add(phrase)
+        rows.append({'surface': phrase, 'normalized': phrase})
+        return len(rows) >= limit
+
+    for pattern in _RESEARCH_OBJECT_PREDICTION_PATTERNS:
+        for match in pattern.finditer(lowered):
+            if _push_phrase(match.group(1)):
+                return _mark_normalized_mentions(rows)
+
+    return _mark_normalized_mentions(rows)
+
+
 def _refine_research_object_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     prepared: list[tuple[dict[str, Any], str]] = []
     for row in rows or []:
@@ -1931,17 +1995,27 @@ def _augment_sparse_slots(
         if role_token in research_object_roles
         else []
     )
+    normalized_prediction_target_research_objects = (
+        _explicit_prediction_target_research_object_mentions(text, role=role_token, limit=3)
+        if role_token in research_object_roles
+        else []
+    )
     heuristic_research_objects = (
         _mark_heuristic_mentions(_research_object_mentions(text, limit=3))
         if role_token in research_object_roles
         else []
     )
     heuristic_comparators = _mark_heuristic_mentions(_comparator_mentions(text, limit=3)) if role_token in metric_roles else []
+    merged_research_objects = _merge_preferred_mention_rows(
+        _merge_raw_mention_rows(research_objects, heuristic_research_objects),
+        normalized_scope_research_objects,
+    )
+    merged_research_objects = _merge_preferred_mention_rows(
+        merged_research_objects,
+        normalized_prediction_target_research_objects,
+    )
     return {
-        'research_objects': _merge_preferred_mention_rows(
-            _merge_raw_mention_rows(research_objects, heuristic_research_objects),
-            normalized_scope_research_objects,
-        ),
+        'research_objects': merged_research_objects,
         'observed_variables': observed_variables or (_mark_heuristic_mentions(_observed_variable_mentions(text, limit=3)) if role_token in observed_variable_roles else []),
         'metrics': metrics or (_mark_heuristic_mentions(_metric_mentions(text, limit=3)) if role_token in metric_roles else []),
         'comparators': _merge_raw_mention_rows(comparators, heuristic_comparators),
@@ -2376,11 +2450,15 @@ def _move_rows_from_windows(
                 support_text=move_support_text,
                 source_sections=[chunk_by_id[chunk_id].section for chunk_id in anchor_chunk_ids if chunk_id in chunk_by_id],
             )
-            if role in _TRUSTED_SCOPE_RESEARCH_OBJECT_ROLES:
+            if role in (_TRUSTED_SCOPE_RESEARCH_OBJECT_ROLES | _TRUSTED_PREDICTION_TARGET_RESEARCH_OBJECT_ROLES):
+                explicit_research_objects = _merge_preferred_mention_rows(
+                    _explicit_scope_research_object_mentions(move_support_text, role=role, limit=3),
+                    _explicit_prediction_target_research_object_mentions(move_support_text, role=role, limit=3),
+                )
                 research_objects = _normalize_mention_rows(
                     _merge_preferred_mention_rows(
                         research_objects,
-                        _explicit_scope_research_object_mentions(move_support_text, role=role, limit=3),
+                        explicit_research_objects,
                     ),
                     anchor_ids=anchor_chunk_ids,
                 )
