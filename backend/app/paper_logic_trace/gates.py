@@ -281,6 +281,27 @@ def _trusted_slot_count(moves: list[ResearchMove], field: str, *, roles: set[str
     return count
 
 
+def _has_grounded_constraint_context(move: ResearchMove) -> bool:
+    return _has_trusted_slot_signal(move, 'conditions') or _has_trusted_slot_signal(move, 'limitation_types')
+
+
+def _uses_theory_modeling_evidence_profile(
+    *,
+    paper_type_token: str,
+    observed_roles: list[str],
+    supported_slot_counts: dict[str, int],
+) -> bool:
+    if paper_type_token == 'theoretical':
+        return True
+    observed_role_set = set(observed_roles)
+    return (
+        'interpretation' in observed_role_set
+        and 'result' not in observed_role_set
+        and supported_slot_counts.get('methods', 0) > 0
+        and supported_slot_counts.get('research_objects', 0) > 0
+    )
+
+
 def _grounded_relation_count(move_relations: list[MoveRelation]) -> int:
     count = 0
     for relation in move_relations:
@@ -591,7 +612,7 @@ def _l2_completeness_audit(
         evidence_signal_count += 1
     context_signal_count = sum(1 for field in ('conditions', 'resource_mentions', 'limitation_types') if supported_slot_counts.get(field, 0) > 0)
     requires_object_signal_for_l4 = paper_type_token in _RESEARCH_OBJECT_REQUIRED_FOR_L4
-    ready_for_l4 = (
+    empirical_ready_for_l4 = (
         ready_for_l3
         and informative_effect_count > 0
         and evidence_signal_count >= 2
@@ -599,6 +620,26 @@ def _l2_completeness_audit(
         and (supported_slot_counts.get('research_objects', 0) > 0 or not requires_object_signal_for_l4)
         and (supported_outcome_comparator_count > 0 or not requires_comparator_signal_for_l4)
     )
+    theory_modeling_profile = _uses_theory_modeling_evidence_profile(
+        paper_type_token=paper_type_token,
+        observed_roles=observed_roles,
+        supported_slot_counts=supported_slot_counts,
+    )
+    grounded_constraint_move_count = sum(
+        1
+        for move in moves
+        if str(move.role or '') in {'interpretation', 'limitation', 'future_work'} and _has_grounded_constraint_context(move)
+    )
+    theory_context_signal_count = sum(1 for field in ('conditions', 'limitation_types') if supported_slot_counts.get(field, 0) > 0)
+    theory_modeling_ready_for_l4 = (
+        theory_modeling_profile
+        and ready_for_l3
+        and supported_slot_counts.get('research_objects', 0) > 0
+        and supported_slot_counts.get('methods', 0) > 0
+        and theory_context_signal_count >= 1
+        and grounded_constraint_move_count > 0
+    )
+    ready_for_l4 = empirical_ready_for_l4 or theory_modeling_ready_for_l4
 
     role_score = _safe_ratio(len(expected_roles) - len(missing_expected_roles), len(expected_roles))
     expected_slot_score = _safe_ratio(len(expected_slots) - len(missing_expected_slot_fields), len(expected_slots))
@@ -642,6 +683,8 @@ def _l2_completeness_audit(
         'noise_move_ids': noise_move_ids,
         'signature_ready_move_count': signature_ready_move_count,
         'relation_coverage_ratio': round(relation_ratio, 4),
+        'l4_evidence_profile': 'theory_modeling' if theory_modeling_profile else 'empirical_default',
+        'grounded_constraint_move_count': grounded_constraint_move_count,
         'ready_for_community': ready_for_community,
         'ready_for_l3': ready_for_l3,
         'ready_for_l4': ready_for_l4,

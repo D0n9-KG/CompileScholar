@@ -151,3 +151,15 @@ Progress note (2026-03-29, local title-repair handoff phase):
 - Wired a no-network local metadata repair step into `build_paper_logic_trace_inputs` for direct trace construction when no upstream `metadata_enrichment` record is present, so manual audits and direct extraction runs do not silently bypass the existing title-fix logic.
 - Real-sample recheck: rerunning `1243_Data-Driven_Computational_Plasticity.md` through the direct trace builder now restores the canonical title to `Data-Driven Computational Plasticity` and removes the prior title-level mismatch failure mode from the single-paper output.
 - Next highest-value unresolved L2 gap: the remaining yellow cases are now more concentrated in substantive slot coverage differences between theory-style papers and the current empirical-default expectations, rather than in obvious summary or title-surface defects.
+
+Progress note (2026-03-29, theory-modeling completeness calibration phase):
+- Added regression coverage for a theory/modeling evidence profile that should be considered L3/L4-ready even without empirical `metrics` / `comparators` / `effects`, as long as the trace has grounded `problem -> method -> interpretation` structure plus explicit constraint/context evidence.
+- Added a paired negative control showing that a theory-like trace with only topic and method content, but no grounded interpretation/constraint move, must remain yellow and not unlock L4.
+- Reworked `l2_completeness_audit` to keep the existing empirical-default L4 path unchanged, while adding a narrow theory/modeling readiness branch that requires trusted object + method support and at least one grounded constraint/context move in `interpretation` / `limitation` / `future_work`.
+- This calibration is profile-based rather than a blanket per-paper-type relaxation: empirical traces still need effect/comparator-style evidence, while theory/modeling traces can qualify through explanatory completeness and explicit constraint coverage.
+- Verification:
+- Focused regression: `backend/tests/test_paper_logic_trace_gates.py -k theoretical`
+- Focused file: `backend/tests/test_paper_logic_trace_gates.py`
+- Full backend suite: `cd backend; .\.venv\Scripts\python.exe -m pytest -q` -> `520 passed, 1 warning`
+- Real-sample check after the gate change shows no false green on existing audited traces: `1243_Data-Driven Computational Plasticity` remains yellow because its current extracted content still lacks grounded constraint moves and strong topic-object support in the saved audit artifact, not because theory papers are still being forced through an empirical comparator/effect gate.
+- Next highest-value unresolved L2 gap: improve actual extraction/stabilization of theory-style constraint and limitation content, and reduce `paper_type` / role drift on real papers such as `1243`, so the richer theory/modeling branch can be reached by real traces instead of only synthetic regressions.

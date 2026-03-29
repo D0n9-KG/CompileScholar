@@ -1172,6 +1172,178 @@ def test_software_trace_does_not_require_result_role_for_green_quality() -> None
     assert audit['ready_for_l3'] is True
 
 
+def test_theoretical_trace_with_grounded_constraints_can_be_ready_for_l3_and_l4() -> None:
+    gate_report = evaluate_hot_path_gate(
+        moves=[
+            ResearchMove(
+                move_id='m-1',
+                sequence_no=1,
+                role='problem',
+                act_type='define_task',
+                summary='We study data-driven computational plasticity for nonlinear elasticity under non-isothermal loading.',
+                research_objects=[{'surface': 'data-driven computational plasticity'}, {'surface': 'nonlinear elasticity'}],
+                conditions=[{'surface': 'non-isothermal loading'}],
+                anchor_ids=['a-1'],
+                slot_provenance=[
+                    {'field': 'research_objects', 'anchor_ids': ['a-1'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                    {'field': 'conditions', 'anchor_ids': ['a-1'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                ],
+            ),
+            ResearchMove(
+                move_id='m-2',
+                sequence_no=2,
+                role='method',
+                act_type='propose_method',
+                summary='We derive an incremental variational formulation with constitutive updates driven by material data instead of fixed yield laws.',
+                methods=[{'surface': 'incremental variational formulation'}],
+                research_objects=[{'surface': 'constitutive updates'}],
+                anchor_ids=['a-2'],
+                slot_provenance=[
+                    {'field': 'methods', 'anchor_ids': ['a-2'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                    {'field': 'research_objects', 'anchor_ids': ['a-2'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                ],
+            ),
+            ResearchMove(
+                move_id='m-3',
+                sequence_no=3,
+                role='interpretation',
+                act_type='explain_mechanism',
+                summary='The formulation remains thermodynamically consistent under path-dependent loading but is limited by rate-independent assumptions.',
+                conditions=[{'surface': 'path-dependent loading'}],
+                limitation_types=[{'surface': 'rate-independent assumptions'}],
+                anchor_ids=['a-3'],
+                slot_provenance=[
+                    {'field': 'conditions', 'anchor_ids': ['a-3'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                    {'field': 'limitation_types', 'anchor_ids': ['a-3'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                ],
+            ),
+        ],
+        anchors=[
+            EvidenceAnchor(
+                anchor_id=anchor_id,
+                paper_id='paper-1',
+                source_ref=f'chunk:{idx}',
+                modality='text',
+                section_path=[],
+                locator={},
+                quote='demo',
+                citation_ids=[],
+                support_type='direct',
+                weak=False,
+            )
+            for idx, anchor_id in enumerate(['a-1', 'a-2', 'a-3'], start=1)
+        ],
+        move_relations=[
+            MoveRelation(
+                relation_id='r-1',
+                source_move_id='m-1',
+                target_move_id='m-2',
+                relation_type='addresses',
+                anchor_ids=['a-1'],
+                confidence=0.84,
+            ),
+            MoveRelation(
+                relation_id='r-2',
+                source_move_id='m-2',
+                target_move_id='m-3',
+                relation_type='explains',
+                anchor_ids=['a-2'],
+                confidence=0.84,
+            ),
+        ],
+        paper_type='theoretical',
+    )
+
+    quality = build_quality_payload(gate_report)
+    audit = quality['l2_completeness_audit']
+
+    assert audit['missing_expected_roles'] == []
+    assert audit['missing_expected_slot_fields'] == []
+    assert audit['ready_for_l3'] is True
+    assert audit['ready_for_l4'] is True
+    assert quality['quality_tier'] == 'green'
+
+
+def test_theoretical_trace_without_grounded_constraint_signal_is_not_ready_for_l4() -> None:
+    gate_report = evaluate_hot_path_gate(
+        moves=[
+            ResearchMove(
+                move_id='m-1',
+                sequence_no=1,
+                role='problem',
+                act_type='define_task',
+                summary='We study constitutive-model selection in nonlinear solids.',
+                research_objects=[{'surface': 'constitutive-model selection'}],
+                anchor_ids=['a-1'],
+                slot_provenance=[{'field': 'research_objects', 'anchor_ids': ['a-1'], 'extraction_mode': 'direct', 'support_strength': 'strong'}],
+            ),
+            ResearchMove(
+                move_id='m-2',
+                sequence_no=2,
+                role='method',
+                act_type='propose_method',
+                summary='We derive a variational update rule for the constitutive model family.',
+                methods=[{'surface': 'variational update rule'}],
+                conditions=[{'surface': 'incremental loading'}],
+                anchor_ids=['a-2'],
+                slot_provenance=[
+                    {'field': 'methods', 'anchor_ids': ['a-2'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                    {'field': 'conditions', 'anchor_ids': ['a-2'], 'extraction_mode': 'direct', 'support_strength': 'strong'},
+                ],
+            ),
+            ResearchMove(
+                move_id='m-3',
+                sequence_no=3,
+                role='interpretation',
+                act_type='explain_mechanism',
+                summary='The framework provides a conceptual interpretation of constitutive updates.',
+                anchor_ids=['a-3'],
+            ),
+        ],
+        anchors=[
+            EvidenceAnchor(
+                anchor_id=anchor_id,
+                paper_id='paper-1',
+                source_ref=f'chunk:{idx}',
+                modality='text',
+                section_path=[],
+                locator={},
+                quote='demo',
+                citation_ids=[],
+                support_type='direct',
+                weak=False,
+            )
+            for idx, anchor_id in enumerate(['a-1', 'a-2', 'a-3'], start=1)
+        ],
+        move_relations=[
+            MoveRelation(
+                relation_id='r-1',
+                source_move_id='m-1',
+                target_move_id='m-2',
+                relation_type='addresses',
+                anchor_ids=['a-1'],
+                confidence=0.84,
+            ),
+            MoveRelation(
+                relation_id='r-2',
+                source_move_id='m-2',
+                target_move_id='m-3',
+                relation_type='explains',
+                anchor_ids=['a-2'],
+                confidence=0.84,
+            ),
+        ],
+        paper_type='theoretical',
+    )
+
+    quality = build_quality_payload(gate_report)
+    audit = quality['l2_completeness_audit']
+
+    assert audit['ready_for_l3'] is True
+    assert audit['ready_for_l4'] is False
+    assert quality['quality_tier'] == 'yellow'
+
+
 def test_quality_payload_downgrades_when_title_and_summary_are_semantically_misaligned() -> None:
     gate_report = {
         'passed': True,
