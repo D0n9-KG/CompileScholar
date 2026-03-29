@@ -38,10 +38,10 @@
 - Test: `backend/tests/test_scan_upload_metadata_enrichment.py`
 - Test: `backend/tests/test_paper_identity.py`
 
-- [ ] Verify the current branch is `codex/l2-content-quality`.
-- [ ] Confirm the existing full-suite evidence is fresh or rerun it if needed.
-- [ ] Stage only the L2-quality files listed above.
-- [ ] Commit the staged baseline with a message describing metadata cleanup plus Chinese method-role recovery.
+- [x] Verify the current branch is `codex/l2-content-quality`.
+- [x] Confirm the existing full-suite evidence is fresh or rerun it if needed.
+- [x] Stage only the L2-quality files listed above.
+- [x] Commit the staged baseline with a message describing metadata cleanup plus Chinese method-role recovery.
 
 ## Chunk 2: Bilingual Summary Coherence
 
@@ -50,8 +50,8 @@
 **Files:**
 - Modify: `backend/tests/test_paper_logic_trace_derived_views.py`
 
-- [ ] Write a regression test where bilingual paper moves contain both Chinese and English summary candidates.
-- [ ] Run the targeted pytest selection and confirm the new test fails for the current summary selector.
+- [x] Write a regression test where bilingual paper moves contain both Chinese and English summary candidates.
+- [x] Run the targeted pytest selection and confirm the new test fails for the current summary selector.
 
 ### Task 3: Implement minimal language-coherent summary selection
 
@@ -59,11 +59,11 @@
 - Modify: `backend/app/paper_logic_trace/derived_views.py`
 - Test: `backend/tests/test_paper_logic_trace_derived_views.py`
 
-- [ ] Add lightweight language-signal helpers for summary sentences and selected move groups.
-- [ ] Prefer same-language sentence bundles when building `one_paragraph_summary`, while preserving current role/quality priorities.
-- [ ] Keep the fix conservative: do not rewrite move text, only change summary move selection/tie-break behavior.
-- [ ] Run focused derived-view tests and confirm the new regression passes.
-- [ ] Re-run fresh real-paper checks on bilingual samples and inspect the actual summary text.
+- [x] Add lightweight language-signal helpers for summary sentences and selected move groups.
+- [x] Prefer same-language sentence bundles when building `one_paragraph_summary`, while preserving current role/quality priorities.
+- [x] Keep the fix conservative: do not rewrite move text, only change summary move selection/tie-break behavior.
+- [x] Run focused derived-view tests and confirm the new regression passes.
+- [x] Re-run fresh real-paper checks on bilingual samples and inspect the actual summary text.
 - [ ] Commit the phase with a message describing bilingual summary coherence.
 
 ## Chunk 3: Fresh Audit Refresh

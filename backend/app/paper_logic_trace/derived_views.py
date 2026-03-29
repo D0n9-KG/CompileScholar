@@ -106,6 +106,8 @@ _GENERIC_SECTION_HEADINGS = {
     'results',
     'simulation procedure',
 }
+_SUMMARY_CJK_RE = re.compile(r'[\u4e00-\u9fff]')
+_SUMMARY_LATIN_RE = re.compile(r'[A-Za-z]')
 
 
 def _unique(values: Iterable[str]) -> list[str]:
@@ -241,6 +243,83 @@ def _move_summary_score(move: ResearchMove, anchor_sections: dict[str, str]) -> 
     return (role_score + section_score * 3 + slot_bonus + length_bonus, section_score)
 
 
+def _summary_language(summary: str) -> str:
+    text = str(summary or '')
+    cjk_count = len(_SUMMARY_CJK_RE.findall(text))
+    latin_count = len(_SUMMARY_LATIN_RE.findall(text))
+    if cjk_count >= 8 and cjk_count >= latin_count:
+        return 'cjk'
+    if latin_count >= 24 and latin_count >= cjk_count * 2:
+        return 'latin'
+    if cjk_count >= 4 and latin_count >= 8:
+        return 'mixed'
+    return 'unknown'
+
+
+def _summary_role_bucket(move: ResearchMove) -> str:
+    if move.role in {'problem', 'background'}:
+        return 'opening'
+    if move.role in {'method', 'experiment'}:
+        return 'method'
+    if move.role in {'result', 'interpretation'}:
+        return 'outcome'
+    if move.role in {'limitation', 'future_work'}:
+        return 'extension'
+    return 'other'
+
+
+def _preferred_summary_language_from_pool(
+    scored_moves: list[tuple[int, int, int, ResearchMove]],
+) -> str | None:
+    language_metrics: dict[str, dict[str, Any]] = {}
+    for score, _section_score, _sequence_no, move in scored_moves:
+        language = _summary_language(move.summary)
+        if language not in {'cjk', 'latin'}:
+            continue
+        bucket = _summary_role_bucket(move)
+        metrics = language_metrics.setdefault(
+            language,
+            {
+                'core_buckets': set(),
+                'extension_count': 0,
+                'total_score': 0,
+                'move_count': 0,
+            },
+        )
+        if bucket in {'opening', 'method', 'outcome'}:
+            metrics['core_buckets'].add(bucket)
+        elif bucket == 'extension':
+            metrics['extension_count'] += 1
+        metrics['total_score'] += int(score)
+        metrics['move_count'] += 1
+    if not language_metrics:
+        return None
+    return sorted(
+        language_metrics,
+        key=lambda language: (
+            -len(language_metrics[language]['core_buckets']),
+            -int(language_metrics[language]['extension_count']),
+            -int(language_metrics[language]['total_score']),
+            -int(language_metrics[language]['move_count']),
+        ),
+    )[0]
+
+
+def _preferred_summary_language(selected: list[ResearchMove]) -> str | None:
+    counts: dict[str, int] = {}
+    order: list[str] = []
+    for move in selected:
+        language = _summary_language(move.summary)
+        if language not in {'cjk', 'latin'}:
+            continue
+        counts[language] = counts.get(language, 0) + 1
+        if language not in order:
+            order.append(language)
+    if not counts:
+        return None
+    return sorted(counts, key=lambda language: (-counts[language], order.index(language)))[0]
+
+
 def _select_summary_moves(trace: PaperLogicTrace) -> list[ResearchMove]:
     anchor_sections = _summary_anchor_sections(trace)
     scored_moves: list[tuple[int, int, int, ResearchMove]] = []
@@ -252,29 +331,64 @@ def _select_summary_moves(trace: PaperLogicTrace) -> list[ResearchMove]:
     if not scored_moves:
         return [move for move in trace.canonical_core.moves if str(move.summary or '').strip()][:3]
     ordered = sorted(scored_moves, key=lambda item: (-item[0], -item[1], item[2]))
+    global_preferred_language = _preferred_summary_language_from_pool(ordered)
     selected: list[ResearchMove] = []
     selected_ids: set[str] = set()
+    opening_front_predicate = lambda move: move.role in {'problem', 'background'} and (
+        int(move.sequence_no) <= 4
+        or max((_section_priority(anchor_sections.get(anchor_id, '')) for anchor_id in move.anchor_ids), default=0) >= 3
+    )
 
     def pick(predicate: Any) -> None:
-        for score, section_score, sequence_no, move in ordered:
-            del score, section_score, sequence_no
-            if move.move_id in selected_ids:
-                continue
-            if not predicate(move):
-                continue
-            selected.append(move)
-            selected_ids.add(move.move_id)
+        candidates = [
+            (score, section_score, sequence_no, move)
+            for score, section_score, sequence_no, move in ordered
+            if move.move_id not in selected_ids and predicate(move)
+        ]
+        if not candidates:
             return
+        preferred_language = global_preferred_language or _preferred_summary_language(selected)
+        chosen = candidates[0]
+        if preferred_language:
+            matching_candidates = [
+                candidate
+                for candidate in candidates
+                if _summary_language(candidate[3].summary) == preferred_language
+            ]
+            if matching_candidates:
+                chosen = matching_candidates[0]
+        move = chosen[3]
+        selected.append(move)
+        selected_ids.add(move.move_id)
 
-    pick(
-        lambda move: move.role in {'problem', 'background', 'method', 'interpretation'}
-        and (int(move.sequence_no) <= 4 or max((_section_priority(anchor_sections.get(anchor_id, '')) for anchor_id in move.anchor_ids), default=0) >= 3)
-    )
+    if global_preferred_language:
+        pick(lambda move: opening_front_predicate(move) and _summary_language(move.summary) == global_preferred_language)
+    if not selected and global_preferred_language:
+        pick(lambda move: move.role in {'problem', 'background'} and _summary_language(move.summary) == global_preferred_language)
+    if not selected:
+        pick(opening_front_predicate)
+    if not selected:
+        pick(
+            lambda move: move.role in {'method', 'interpretation'}
+            and (int(move.sequence_no) <= 4 or max((_section_priority(anchor_sections.get(anchor_id, '')) for anchor_id in move.anchor_ids), default=0) >= 3)
+        )
     pick(lambda move: move.role in {'method', 'experiment'})
     pick(lambda move: move.role in {'result', 'interpretation'})
-    pick(lambda move: move.role in {'limitation', 'future_work', 'interpretation'})
+    pick(lambda move: move.role in {'limitation', 'future_work'})
 
-    for _score, _section_score, _sequence_no, move in ordered:
+    fallback_order = ordered
+    if global_preferred_language:
+        fallback_order = sorted(
+            ordered,
+            key=lambda item: (
+                _summary_language(item[3].summary) != global_preferred_language,
+                -item[0],
+                -item[1],
+                item[2],
+            ),
+        )
+
+    for _score, _section_score, _sequence_no, move in fallback_order:
         if move.move_id in selected_ids:
             continue
         selected.append(move)

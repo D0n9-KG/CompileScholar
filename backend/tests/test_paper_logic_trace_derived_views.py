@@ -971,6 +971,186 @@ def test_build_paper_summaries_prefers_method_focused_sentence_over_outcome_colo
     assert summaries['key_method_summary'] == focused_method.summary
 
 
+def test_build_paper_summaries_prefers_language_coherent_interpretation_when_scores_are_similar() -> None:
+    problem_zh = ResearchMove(
+        move_id='m-problem-zh',
+        sequence_no=1,
+        role='problem',
+        act_type='define_task',
+        summary='本文针对固体火箭发动机装药结构完整性评估问题，系统梳理现有建模路线、验证方式以及工程应用中的主要分析挑战。',
+        anchor_ids=['a-1'],
+    )
+    method_zh = ResearchMove(
+        move_id='m-method-zh',
+        sequence_no=2,
+        role='method',
+        act_type='propose_method',
+        summary='文献综述了结构完整性数值仿真中采用的模型、方法与软件平台，并比较了不同路线在工程实现中的适用边界。',
+        anchor_ids=['a-2'],
+    )
+    interpretation_en = ResearchMove(
+        move_id='m-interp-en',
+        sequence_no=3,
+        role='interpretation',
+        act_type='explain_mechanism',
+        summary='The paper interprets the critical importance of structural integrity analysis for motor grains by linking grain failure to mission failure rates.',
+        anchor_ids=['a-3'],
+    )
+    interpretation_zh = ResearchMove(
+        move_id='m-interp-zh',
+        sequence_no=4,
+        role='interpretation',
+        act_type='explain_mechanism',
+        summary='文章进一步解释了结构完整性分析为何会直接影响发动机任务可靠性，并将这一点与任务失效率和结构失效风险联系起来。',
+        anchor_ids=['a-4'],
+    )
+    trace = PaperLogicTrace(
+        trace_id='paper-3b:paper_logic_trace',
+        schema_version='v2',
+        built_at='2026-03-29T00:00:00Z',
+        paper_metadata=PaperMetadata(
+            paper_id='paper-3b',
+            title='Recent Progress upon Structural Integrity Analysis of Solid Rocket Motor Grain',
+            title_alt='固体火箭发动机装药结构完整性研究进展',
+            paper_type='empirical',
+            source_refs=['a-1'],
+        ),
+        canonical_core=CanonicalCore(
+            moves=[problem_zh, method_zh, interpretation_en, interpretation_zh],
+        ),
+        quality={},
+    )
+
+    summaries = build_paper_summaries(trace)
+
+    assert interpretation_zh.summary in summaries['one_paragraph_summary']
+    assert interpretation_en.summary not in summaries['one_paragraph_summary']
+
+
+def test_build_paper_summaries_prefers_complete_single_language_bundle_over_mixed_bundle() -> None:
+    problem_zh = ResearchMove(
+        move_id='m-problem-zh-2',
+        sequence_no=1,
+        role='problem',
+        act_type='identify_gap',
+        summary='目前，在工艺与结构方案设计过程中，搅拌器布置以及曝气等因素在设计初期没有明确且统一的设计思路。',
+        anchor_ids=['a-1'],
+    )
+    problem_en = ResearchMove(
+        move_id='m-problem-en-2',
+        sequence_no=2,
+        role='problem',
+        act_type='identify_gap',
+        summary='Current design of submersible agitators relies on empirical power consumption data, which can lead to inefficient layouts and excessive energy consumption.',
+        anchor_ids=['a-2'],
+    )
+    method_en = ResearchMove(
+        move_id='m-method-en-2',
+        sequence_no=3,
+        role='method',
+        act_type='propose_method',
+        summary='The simulation method uses the momentum source method together with the Multi-Reference Frame method to analyze pool layouts and agitator operating conditions.',
+        anchor_ids=['a-3'],
+    )
+    result_en = ResearchMove(
+        move_id='m-result-en-2',
+        sequence_no=4,
+        role='result',
+        act_type='report_effect',
+        summary='The results show that cylindrical columns reduce flow resistance and rounded corners improve the overall flow pattern.',
+        anchor_ids=['a-4'],
+    )
+    trace = PaperLogicTrace(
+        trace_id='paper-3c:paper_logic_trace',
+        schema_version='v2',
+        built_at='2026-03-29T00:00:00Z',
+        paper_metadata=PaperMetadata(
+            paper_id='paper-3c',
+            title='Application of CFD simulation in submersible agitator layout and optimization of operating conditions',
+            title_alt='CFD 模拟在潜水搅拌设备布置及工况优化中的应用',
+            paper_type='empirical',
+            source_refs=['a-1'],
+        ),
+        canonical_core=CanonicalCore(
+            moves=[problem_zh, problem_en, method_en, result_en],
+        ),
+        quality={},
+    )
+
+    summaries = build_paper_summaries(trace)
+
+    assert problem_en.summary in summaries['one_paragraph_summary']
+    assert method_en.summary in summaries['one_paragraph_summary']
+    assert result_en.summary in summaries['one_paragraph_summary']
+    assert problem_zh.summary not in summaries['one_paragraph_summary']
+
+
+def test_build_paper_summaries_can_use_later_opening_move_to_preserve_language_bundle() -> None:
+    problem_zh = ResearchMove(
+        move_id='m-problem-zh-3',
+        sequence_no=1,
+        role='problem',
+        act_type='identify_gap',
+        summary='针对固体火箭发动机装药结构完整性的计算与评估问题，总结相关模型与分析挑战。',
+        anchor_ids=['a-1'],
+    )
+    method_zh = ResearchMove(
+        move_id='m-method-zh-3',
+        sequence_no=2,
+        role='method',
+        act_type='propose_method',
+        summary='文献综述了结构完整性研究中常见的数值仿真方法与软件平台。',
+        anchor_ids=['a-2'],
+    )
+    result_en = ResearchMove(
+        move_id='m-result-en-3',
+        sequence_no=3,
+        role='result',
+        act_type='report_effect',
+        summary='The paper explains that structural integrity analysis is crucial because grain failure contributes to the vast majority of engine failures.',
+        anchor_ids=['a-3'],
+    )
+    problem_en = ResearchMove(
+        move_id='m-problem-en-3',
+        sequence_no=5,
+        role='problem',
+        act_type='identify_gap',
+        summary='Composite solid propellants exhibit complex viscoelastic and damage behavior, creating major challenges for structural integrity analysis in engineering practice.',
+        anchor_ids=['a-4'],
+    )
+    method_en = ResearchMove(
+        move_id='m-method-en-3',
+        sequence_no=6,
+        role='method',
+        act_type='adapt_method',
+        summary='Summarizes numerical simulation methods for structural integrity analysis, including defect analysis, grain optimization, and finite element program development.',
+        anchor_ids=['a-5'],
+    )
+    trace = PaperLogicTrace(
+        trace_id='paper-3d:paper_logic_trace',
+        schema_version='v2',
+        built_at='2026-03-29T00:00:00Z',
+        paper_metadata=PaperMetadata(
+            paper_id='paper-3d',
+            title='Recent Progress upon Structural Integrity Analysis of Solid Rocket Motor Grain',
+            title_alt='固体火箭发动机装药结构完整性研究进展',
+            paper_type='empirical',
+            source_refs=['a-1'],
+        ),
+        canonical_core=CanonicalCore(
+            moves=[problem_zh, method_zh, result_en, problem_en, method_en],
+        ),
+        quality={},
+    )
+
+    summaries = build_paper_summaries(trace)
+
+    assert problem_en.summary in summaries['one_paragraph_summary']
+    assert method_en.summary in summaries['one_paragraph_summary']
+    assert result_en.summary in summaries['one_paragraph_summary']
+    assert problem_zh.summary not in summaries['one_paragraph_summary']
+
+
 def test_build_paper_content_audit_flags_suspicious_title_alt_and_missing_findings() -> None:
     trace = PaperLogicTrace(
         trace_id='paper-4:paper_logic_trace',
