@@ -183,3 +183,17 @@ Progress note (2026-03-29, explicit drawback bottleneck extraction phase):
 - Random paper `155_Characterization of force chains in granular material` surfaced content-grounded limitations around `restrictive and cumbersome visualization`, `qualitative methods`, and `lack of directional information`, rather than generic drawback spam.
 - Additional stability audit showed the more macro remaining gap: direct local rebuilds still depend heavily on `_extract_window_moves_llm`, so the same paper can preserve or lose explicit bottleneck/constraint content depending on whether the upstream window extractor anchors the right intro chunks.
 - Next highest-value unresolved L2 gap: reduce direct-extraction role/anchor instability for theory-style intro and constraint-heavy windows, so explicit bottleneck / limitation content survives even when the upstream move extractor is sparse or summary-compressive, instead of widening more slot heuristics.
+
+Progress note (2026-03-30, window-support limitation recovery phase):
+- Added regression coverage for a stability failure mode where a `problem` move is correctly extracted from an introduction window, but the upstream move extractor anchors only the earlier chunk while the explicit `main drawback ...` sentence lives in a later chunk of the same window.
+- Root-cause audit showed the local slot augmenter was already capable of extracting the bottleneck phrase, but `_move_support_text` only saw the anchored chunk(s), so explicit limitation content could disappear before local normalization whenever the upstream move extractor produced sparse anchors.
+- Added a narrow window-level recovery path for explicit limitation phrases only: when a `problem` / `background` / `interpretation` / `limitation` / `future_work` / `result` move shares a window with later chunks containing `main drawback ...` / `main limitation ...`, those chunks are added back into support and their normalized limitation rows are merged conservatively.
+- Verification:
+- Red-green regression: `backend/tests/test_paper_logic_trace_direct_extraction.py -k later_intro_chunk`
+- Related drawback regressions: `backend/tests/test_paper_logic_trace_direct_extraction.py -k "explicit_main_drawback or later_intro_chunk"`
+- Focused file: `backend/tests/test_paper_logic_trace_direct_extraction.py`
+- Real-sample stability recheck with forced local fallback extraction:
+- `1243_Data-Driven Computational Plasticity` now recovers `huge amount of data required for running simulations` as a bottleneck candidate even when the move is built from a sparse intro/problem window.
+- `1607_Shear jamming and fragility in dense suspensions`, `s870_Pb-activated amine-assisted photocatalytic hydrogen evolution reaction...`, `s93_Numerical investigation of twin-liquid film...`, and random paper `155_Characterization of force chains in granular material` did not pick up new explicit-drawback noise under the same forced-fallback audit.
+- Direct local rebuild recheck on `1243` also still surfaces the bottleneck after the change, indicating the new recovery path helps the intended real path while reducing one source of upstream-anchor fragility.
+- Next highest-value unresolved L2 gap: theory-style papers still remain materially under-typed and under-interpreted after bottlenecks are recovered, so the next phase should focus on stabilizing `interpretation` / `limitation` moves or theory-style `paper_type` inference rather than adding more limitation extractors.

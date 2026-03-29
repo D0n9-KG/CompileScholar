@@ -2134,6 +2134,33 @@ def _move_support_text(
     )
 
 
+def _recover_window_explicit_limitation_rows(
+    *,
+    role: str,
+    anchor_chunk_ids: list[str],
+    window_chunks: list[Chunk],
+    limit: int = 2,
+) -> tuple[list[str], list[dict[str, Any]]]:
+    role_token = _normalize_role(role)
+    if role_token not in {'problem', 'background', 'interpretation', 'limitation', 'future_work', 'result'}:
+        return list(anchor_chunk_ids), []
+    recovered_anchor_chunk_ids = list(anchor_chunk_ids)
+    seen_anchor_chunk_ids = {chunk_id for chunk_id in recovered_anchor_chunk_ids if chunk_id}
+    recovered_rows: list[dict[str, Any]] = []
+    for chunk in window_chunks:
+        chunk_id = str(chunk.chunk_id or '').strip()
+        chunk_rows = _mark_normalized_mentions(_explicit_limitation_mentions(chunk.text, limit=limit))
+        if not chunk_rows:
+            continue
+        if chunk_id and chunk_id not in seen_anchor_chunk_ids:
+            seen_anchor_chunk_ids.add(chunk_id)
+            recovered_anchor_chunk_ids.append(chunk_id)
+        recovered_rows = _merge_preferred_mention_rows(recovered_rows, chunk_rows)
+        if len(recovered_rows) >= limit:
+            return recovered_anchor_chunk_ids, recovered_rows[:limit]
+    return recovered_anchor_chunk_ids, recovered_rows
+
+
 def _semantic_windows(doc: DocumentIR, schema: dict[str, Any]) -> list[dict[str, Any]]:
     max_chars = _window_max_chars(schema)
     windows: list[dict[str, Any]] = []
@@ -2428,7 +2455,6 @@ def _move_rows_from_windows(
                 continue
 
             move_id = f'{paper_id}:move:{window_index}:{move_offset}'
-            move_anchor_ids = [f'{move_id}:anchor:{anchor_index}' for anchor_index, _ in enumerate(anchor_chunk_ids, start=1)]
             research_objects = _normalize_mention_rows(raw_move.get('research_objects'), anchor_ids=anchor_chunk_ids)
             methods = _normalize_mention_rows(raw_move.get('methods'), anchor_ids=anchor_chunk_ids)
             observed_variables = _normalize_mention_rows(raw_move.get('observed_variables'), anchor_ids=anchor_chunk_ids)
@@ -2477,6 +2503,29 @@ def _move_rows_from_windows(
                 limitation_types,
                 text=move_support_text,
             )
+            anchor_chunk_ids, explicit_window_limitation_types = _recover_window_explicit_limitation_rows(
+                role=role,
+                anchor_chunk_ids=anchor_chunk_ids,
+                window_chunks=list(window.get('chunks') or []),
+            )
+            if explicit_window_limitation_types:
+                move_support_text = _move_support_text(
+                    summary=summary,
+                    anchor_chunk_ids=anchor_chunk_ids,
+                    chunk_by_id=chunk_by_id,
+                    fallback_chunks=list(window.get('chunks') or []),
+                )
+                limitation_types = _normalize_mention_rows(
+                    _merge_preferred_mention_rows(
+                        limitation_types,
+                        explicit_window_limitation_types,
+                    ),
+                    anchor_ids=anchor_chunk_ids,
+                )
+                limitation_types = _refine_limitation_rows(
+                    limitation_types,
+                    text=move_support_text,
+                )
             resource_mentions = _normalize_mention_rows(augmented['resource_mentions'], anchor_ids=anchor_chunk_ids)
             resource_mentions = _refine_resource_rows(resource_mentions)
             role, act_type = _stabilize_move_role_and_act_type(
@@ -2510,6 +2559,7 @@ def _move_rows_from_windows(
                     role=role,
                 )
 
+            move_anchor_ids = [f'{move_id}:anchor:{anchor_index}' for anchor_index, _ in enumerate(anchor_chunk_ids, start=1)]
             slot_provenance = [
                 *_slot_provenance_rows('research_objects', research_objects, anchor_ids=anchor_chunk_ids),
                 *_slot_provenance_rows('methods', methods, anchor_ids=anchor_chunk_ids),
