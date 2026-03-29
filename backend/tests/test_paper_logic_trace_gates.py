@@ -1266,6 +1266,9 @@ def test_quality_payload_flags_thin_route_state_seed_for_l3_follow_on_work() -> 
     assert quality['route_state_seed_audit']['ready_for_route_compilation'] is False
     assert quality['route_state_seed_audit']['missing_seed_components'] == [
         'active_benchmark_candidates',
+        'known_bottleneck_candidates',
+        'enabling_condition_candidates',
+        'alternative_route_candidates',
         'measurement_protocol_candidates',
         'toolchain_candidates',
         'challenging_evidence_ids',
@@ -1274,3 +1277,133 @@ def test_quality_payload_flags_thin_route_state_seed_for_l3_follow_on_work() -> 
         'readiness_feature_inputs.infrastructure_signals',
         'readiness_feature_inputs.bottleneck_signals',
     ]
+    assert quality['route_state_seed_audit']['missing_required_seed_components'] == []
+    assert quality['route_state_seed_audit']['route_compilation_blockers'] == ['context_groups<2']
+
+
+def test_quality_payload_accepts_route_seed_with_challenge_and_bottleneck_signals_even_without_benchmark_or_toolchain() -> None:
+    gate_report = {
+        'passed': True,
+        'invalid_move_ids': [],
+        'move_count': 6,
+        'anchor_count': 6,
+        'sparse_trace': False,
+        'quality_tier_score': 0.9,
+        'soft_flags': [],
+        'l2_completeness_audit': {
+            'paper_type': 'empirical',
+            'missing_expected_roles': [],
+            'missing_expected_slot_fields': [],
+            'noise_move_ids': [],
+            'critical_role_coverage_ratio': 1.0,
+            'ready_for_l3': True,
+            'ready_for_l4': True,
+        },
+    }
+
+    quality = build_quality_payload(
+        gate_report,
+        derived_views={
+            'route_state_seed': {
+                'paper_id': 'paper-1',
+                'paper_type': 'empirical',
+                'source_trace_id': 'paper-1:paper_logic_trace',
+                'cutoff_year_hint': 2024,
+                'topic_scope_candidates': ['nonlinear elasticity', 'internal variables'],
+                'dominant_method_candidates': ['data-driven constitutive modeling'],
+                'active_benchmark_candidates': [],
+                'known_bottleneck_candidates': ['huge amount of data required'],
+                'enabling_condition_candidates': [],
+                'alternative_route_candidates': [],
+                'measurement_protocol_candidates': [],
+                'toolchain_candidates': [],
+                'supporting_evidence_ids': ['a-1', 'a-2'],
+                'challenging_evidence_ids': ['a-3'],
+                'source_move_ids': ['m-1', 'm-2', 'm-3', 'm-4'],
+                'readiness_feature_inputs': {
+                    'method_maturity_signals': ['data-driven constitutive modeling'],
+                    'measurement_maturity_signals': [],
+                    'data_resource_signals': [],
+                    'infrastructure_signals': [],
+                    'bottleneck_signals': ['huge amount of data required'],
+                },
+            }
+        },
+    )
+
+    assert quality['quality_tier'] == 'green'
+    assert quality['audit_status'] == 'not_needed'
+    assert 'route_state_seed_thin' not in quality['quality_flags']
+    assert quality['route_state_seed_audit']['available'] is True
+    assert quality['route_state_seed_audit']['ready_for_route_compilation'] is True
+
+
+def test_quality_payload_accepts_route_seed_with_measurement_and_enabling_signals_without_benchmark_data_resources() -> None:
+    gate_report = {
+        'passed': True,
+        'invalid_move_ids': [],
+        'move_count': 6,
+        'anchor_count': 6,
+        'sparse_trace': False,
+        'quality_tier_score': 0.9,
+        'soft_flags': [],
+        'l2_completeness_audit': {
+            'paper_type': 'empirical',
+            'missing_expected_roles': [],
+            'missing_expected_slot_fields': [],
+            'noise_move_ids': [],
+            'critical_role_coverage_ratio': 1.0,
+            'ready_for_l3': True,
+            'ready_for_l4': True,
+        },
+    }
+
+    quality = build_quality_payload(
+        gate_report,
+        derived_views={
+            'route_state_seed': {
+                'paper_id': 'paper-1',
+                'paper_type': 'empirical',
+                'source_trace_id': 'paper-1:paper_logic_trace',
+                'cutoff_year_hint': 2024,
+                'topic_scope_candidates': ['photocatalytic hydrogen evolution reaction'],
+                'dominant_method_candidates': ['quantum mechanics in explicit solvent'],
+                'active_benchmark_candidates': [],
+                'known_bottleneck_candidates': [],
+                'enabling_condition_candidates': ['acidic solvent'],
+                'alternative_route_candidates': [],
+                'measurement_protocol_candidates': [
+                    {
+                        'move_id': 'm-3',
+                        'role': 'result',
+                        'act_type': 'report_effect',
+                        'summary': 'Reports calculated energy barriers for the proposed mechanism.',
+                        'metric_tokens': ['energy barrier'],
+                        'comparator_tokens': ['dark reaction'],
+                        'condition_tokens': [],
+                        'method_tokens': ['quantum mechanical calculations in explicit solvent'],
+                        'resource_tokens': [],
+                        'anchor_ids': ['a-3'],
+                        'confidence': 0.91,
+                    }
+                ],
+                'toolchain_candidates': [],
+                'supporting_evidence_ids': ['a-1', 'a-2', 'a-3'],
+                'challenging_evidence_ids': [],
+                'source_move_ids': ['m-1', 'm-2', 'm-3'],
+                'readiness_feature_inputs': {
+                    'method_maturity_signals': ['quantum mechanics in explicit solvent'],
+                    'measurement_maturity_signals': ['energy barrier'],
+                    'data_resource_signals': [],
+                    'infrastructure_signals': [],
+                    'bottleneck_signals': [],
+                },
+            }
+        },
+    )
+
+    assert quality['quality_tier'] == 'green'
+    assert quality['audit_status'] == 'not_needed'
+    assert 'route_state_seed_thin' not in quality['quality_flags']
+    assert quality['route_state_seed_audit']['available'] is True
+    assert quality['route_state_seed_audit']['ready_for_route_compilation'] is True

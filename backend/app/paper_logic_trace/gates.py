@@ -81,6 +81,37 @@ _COMPARISON_SUMMARY_PATTERNS = (
     ' versus ',
     ' vs ',
 )
+_ROUTE_STATE_SEED_REQUIRED_COMPONENTS = (
+    'topic_scope_candidates',
+    'dominant_method_candidates',
+    'supporting_evidence_ids',
+    'readiness_feature_inputs.method_maturity_signals',
+    'source_move_ids',
+)
+_ROUTE_STATE_SEED_CONTEXT_GROUPS: dict[str, tuple[str, ...]] = {
+    'challenge_signal': ('challenging_evidence_ids',),
+    'bottleneck_signal': (
+        'known_bottleneck_candidates',
+        'readiness_feature_inputs.bottleneck_signals',
+    ),
+    'measurement_signal': (
+        'measurement_protocol_candidates',
+        'readiness_feature_inputs.measurement_maturity_signals',
+    ),
+    'resource_signal': (
+        'active_benchmark_candidates',
+        'readiness_feature_inputs.data_resource_signals',
+    ),
+    'infrastructure_signal': (
+        'toolchain_candidates',
+        'readiness_feature_inputs.infrastructure_signals',
+    ),
+    'enabling_signal': (
+        'enabling_condition_candidates',
+        'alternative_route_candidates',
+    ),
+}
+_ROUTE_STATE_SEED_MIN_CONTEXT_GROUPS = 2
 _METADATA_TOKEN_RE = re.compile(r'[0-9a-z]+(?:-[0-9a-z]+)?', re.IGNORECASE)
 _METADATA_GENERIC_TOKENS = {
     'and',
@@ -404,6 +435,9 @@ def _route_state_seed_audit(derived_views: dict[str, Any] | None) -> dict[str, A
         ('topic_scope_candidates', route_state_seed.get('topic_scope_candidates')),
         ('dominant_method_candidates', route_state_seed.get('dominant_method_candidates')),
         ('active_benchmark_candidates', route_state_seed.get('active_benchmark_candidates')),
+        ('known_bottleneck_candidates', route_state_seed.get('known_bottleneck_candidates')),
+        ('enabling_condition_candidates', route_state_seed.get('enabling_condition_candidates')),
+        ('alternative_route_candidates', route_state_seed.get('alternative_route_candidates')),
         ('measurement_protocol_candidates', route_state_seed.get('measurement_protocol_candidates')),
         ('toolchain_candidates', route_state_seed.get('toolchain_candidates')),
         ('supporting_evidence_ids', route_state_seed.get('supporting_evidence_ids')),
@@ -427,10 +461,46 @@ def _route_state_seed_audit(derived_views: dict[str, Any] | None) -> dict[str, A
     if component_counts['source_move_ids'] == 0:
         missing_seed_components.append('source_move_ids')
 
+    missing_required_seed_components = [
+        field
+        for field in _ROUTE_STATE_SEED_REQUIRED_COMPONENTS
+        if component_counts.get(field, 0) == 0
+    ]
+
+    context_group_coverage: dict[str, dict[str, Any]] = {}
+    covered_context_groups: list[str] = []
+    missing_context_groups: list[str] = []
+    for group_name, fields in _ROUTE_STATE_SEED_CONTEXT_GROUPS.items():
+        covered_fields = [field for field in fields if component_counts.get(field, 0) > 0]
+        covered = bool(covered_fields)
+        context_group_coverage[group_name] = {
+            'covered': covered,
+            'fields': list(fields),
+            'covered_fields': covered_fields,
+        }
+        if covered:
+            covered_context_groups.append(group_name)
+        else:
+            missing_context_groups.append(group_name)
+
+    covered_context_group_count = len(covered_context_groups)
+    route_compilation_blockers = list(missing_required_seed_components)
+    if covered_context_group_count < _ROUTE_STATE_SEED_MIN_CONTEXT_GROUPS:
+        route_compilation_blockers.append(
+            f'context_groups<{_ROUTE_STATE_SEED_MIN_CONTEXT_GROUPS}'
+        )
+
     return {
         'available': True,
-        'ready_for_route_compilation': not missing_seed_components,
+        'ready_for_route_compilation': not route_compilation_blockers,
         'missing_seed_components': missing_seed_components,
+        'missing_required_seed_components': missing_required_seed_components,
+        'route_compilation_blockers': route_compilation_blockers,
+        'context_group_coverage': context_group_coverage,
+        'covered_context_groups': covered_context_groups,
+        'missing_context_groups': missing_context_groups,
+        'covered_context_group_count': covered_context_group_count,
+        'min_context_groups_for_route_compilation': _ROUTE_STATE_SEED_MIN_CONTEXT_GROUPS,
         'component_counts': component_counts,
     }
 
