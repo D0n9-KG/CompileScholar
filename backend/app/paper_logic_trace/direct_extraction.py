@@ -213,6 +213,7 @@ _PROBLEM_GAP_PATTERNS = (
 _LIMITATION_ROLE_PATTERNS = (
     'cannot ',
     'could not',
+    'drawback',
     'difficult',
     'expensive',
     'fail to',
@@ -1671,6 +1672,31 @@ def _limitation_mentions(text: str, *, limit: int = 2) -> list[dict[str, Any]]:
     return rows
 
 
+def _explicit_limitation_mentions(text: str, *, limit: int = 2) -> list[dict[str, Any]]:
+    lowered = _normalize_space(text).lower()
+    rows: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    patterns = (
+        r'\b(?:its|their|the)?\s*(?:main\s+)?drawback(?:s)?(?:\s+of\s+[a-z0-9][a-z0-9\-\s]{0,30})?\s+(?:is|are)\s+(?:the\s+)?([a-z0-9][a-z0-9\-\s]{4,80})',
+        r'\b(?:main\s+)?limitation(?:s)?(?:\s+of\s+[a-z0-9][a-z0-9\-\s]{0,30})?\s+(?:is|are)\s+(?:the\s+)?([a-z0-9][a-z0-9\-\s]{4,80})',
+    )
+    for pattern in patterns:
+        for match in re.finditer(pattern, lowered):
+            phrase = re.split(
+                r'\b(?:in the present work|in this work|we will|which|that|while|when|because|but|and)\b',
+                match.group(1),
+                maxsplit=1,
+            )[0]
+            phrase = _clean_phrase(' '.join(phrase.split()[:8]))
+            if not phrase or phrase in seen:
+                continue
+            seen.add(phrase)
+            rows.append({'surface': phrase, 'normalized': phrase})
+            if len(rows) >= limit:
+                return rows
+    return rows
+
+
 def _trim_limitation_phrase(phrase: str) -> str:
     clean = _normalize_space(phrase).strip(' ,.;:')
     clean = re.split(r'\b(?:which|that|while|when|because|but|and)\b', clean, maxsplit=1)[0]
@@ -1990,6 +2016,7 @@ def _augment_sparse_slots(
     metric_roles = {'result', 'experiment', 'interpretation'}
     observed_variable_roles = {'experiment', 'result', 'interpretation', 'method'}
     limitation_roles = {'limitation', 'interpretation', 'result', 'future_work'}
+    explicit_limitation_roles = limitation_roles | {'problem', 'background'}
     resource_roles = {'method', 'experiment', 'result'}
     normalized_scope_research_objects = (
         _explicit_scope_research_object_mentions(text, role=role_token, limit=3)
@@ -2007,6 +2034,16 @@ def _augment_sparse_slots(
         else []
     )
     heuristic_comparators = _mark_heuristic_mentions(_comparator_mentions(text, limit=3)) if role_token in metric_roles else []
+    heuristic_limitation_types = (
+        _mark_heuristic_mentions(_limitation_mentions(text, limit=2))
+        if role_token in limitation_roles
+        else []
+    )
+    normalized_limitation_types = (
+        _mark_normalized_mentions(_explicit_limitation_mentions(text, limit=2))
+        if role_token in explicit_limitation_roles
+        else []
+    )
     merged_research_objects = _merge_preferred_mention_rows(
         _merge_raw_mention_rows(research_objects, heuristic_research_objects),
         normalized_scope_research_objects,
@@ -2020,7 +2057,10 @@ def _augment_sparse_slots(
         'observed_variables': observed_variables or (_mark_heuristic_mentions(_observed_variable_mentions(text, limit=3)) if role_token in observed_variable_roles else []),
         'metrics': metrics or (_mark_heuristic_mentions(_metric_mentions(text, limit=3)) if role_token in metric_roles else []),
         'comparators': _merge_raw_mention_rows(comparators, heuristic_comparators),
-        'limitation_types': limitation_types or (_mark_heuristic_mentions(_limitation_mentions(text, limit=2)) if role_token in limitation_roles else []),
+        'limitation_types': _merge_preferred_mention_rows(
+            _merge_raw_mention_rows(limitation_types, heuristic_limitation_types),
+            normalized_limitation_types,
+        ),
         'resource_mentions': resource_mentions or (_mark_heuristic_mentions(_resource_mentions_from_text(text, limit=3)) if role_token in resource_roles else []),
     }
 

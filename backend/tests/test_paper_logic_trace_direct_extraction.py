@@ -1751,6 +1751,61 @@ def test_problem_research_object_filter_drops_data_collection_process_fragments(
     assert all('way of collecting data from adequate experiments' not in item for item in normalized)
 
 
+def test_problem_summary_with_explicit_main_drawback_gains_trusted_bottleneck_signal(monkeypatch) -> None:
+    summary = (
+        'Very little has been done with big-data in scientific computing despite promising first attempts. '
+        'The main drawback of data-driven approaches is the huge amount of data required for running simulations.'
+    )
+    quote = (
+        'This unprecedented possibility of directly determine knowledge from data or, in other words, to extract models '
+        'from experiments in a automated way, is being followed with great interest in many fields of science and '
+        'engineering. In [8] authors followed a similar rationale extending the data-driven framework to nonlinear '
+        'elasticity and inelasticity, where model-based simulations where replaced by data-driven simulations operating '
+        'on a new kind of constitutive models defined directly from data. Its main drawback is the huge amount of data '
+        'required for running simulations. In the present work we will assume that all the needed data is available.'
+    )
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '1. Introduction',
+            quote,
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'problem',
+                'act_type': 'identify_gap',
+                'summary': summary,
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'limitation_types': [],
+                'confidence': 0.8,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+    trace = compile_paper_logic_trace(
+        **{k: payload[k] for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']}
+    )
+    move = trace.canonical_core.moves[0]
+    bottlenecks = [str(item).lower() for item in ((trace.derived_views.get('route_state_seed') or {}).get('known_bottleneck_candidates') or [])]
+
+    limitations = {str(item.normalized or item.surface or '').lower() for item in move.limitation_types}
+
+    assert any('huge amount of data required' in item for item in limitations)
+    assert any('huge amount of data required' in item for item in bottlenecks)
+
+
 def test_method_research_object_filter_drops_free_energy_process_fragment(monkeypatch) -> None:
     summary = 'A continuum-thermodynamics framework defines state variables, free energy, and dissipation potentials.'
     quote = 'A simple elastoviscoplastic model consists of choosing as free energy and dissipation potentials.'

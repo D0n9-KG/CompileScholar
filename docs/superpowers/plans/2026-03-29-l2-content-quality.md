@@ -163,3 +163,23 @@ Progress note (2026-03-29, theory-modeling completeness calibration phase):
 - Full backend suite: `cd backend; .\.venv\Scripts\python.exe -m pytest -q` -> `520 passed, 1 warning`
 - Real-sample check after the gate change shows no false green on existing audited traces: `1243_Data-Driven Computational Plasticity` remains yellow because its current extracted content still lacks grounded constraint moves and strong topic-object support in the saved audit artifact, not because theory papers are still being forced through an empirical comparator/effect gate.
 - Next highest-value unresolved L2 gap: improve actual extraction/stabilization of theory-style constraint and limitation content, and reduce `paper_type` / role drift on real papers such as `1243`, so the richer theory/modeling branch can be reached by real traces instead of only synthetic regressions.
+
+Progress note (2026-03-29, explicit drawback bottleneck extraction phase):
+- Added regression coverage for a real `1243_Data-Driven Computational Plasticity` failure mode where an introduction/problem move explicitly states a bottleneck (`the main drawback ... is the huge amount of data required for running simulations`) but previously exported no `limitation_types` and therefore contributed no trusted bottleneck signal to `route_state_seed`.
+- Added a narrow explicit-limitation extraction path for phrases such as `main drawback is ...` / `main limitation is ...`, promoting those rows as `normalized + strong` rather than weak heuristic noise.
+- Kept the broader heuristic limitation path unchanged for normal cases, but allowed the new explicit-limitation path to run in `problem` / `background` moves as well, so explicit bottleneck sentences in introductions are no longer dropped just because the move is not already labeled `limitation`.
+- Verification:
+- Focused regression: `backend/tests/test_paper_logic_trace_direct_extraction.py -k explicit_main_drawback`
+- Focused file: `backend/tests/test_paper_logic_trace_direct_extraction.py` -> `95 passed`
+- Full backend suite: `cd backend; .\.venv\Scripts\python.exe -m pytest -q` -> `521 passed, 1 warning`
+- Real-sample recheck with current direct local rebuild of `1243_Data-Driven Computational Plasticity`:
+- `route_state_seed.known_bottleneck_candidates` now includes `huge amount of data required` and `huge amount of data required for running simulations`
+- `route_state_seed.challenging_evidence_ids` is no longer empty
+- `topic_scope_candidates` stay centered on `nonlinear elasticity`, `internal variables`, and `mathematical constitutive model`
+- Anti-overfit recheck on `1607_Shear jamming and fragility in dense suspensions` remained reasonable: bottlenecks stayed centered on content-grounded constraints such as `computational cost`, `finite size effect`, `particles too soft`, and `narrow range of area fractions`, rather than introducing unrelated generic limitation noise.
+- Broader macro audit on real direct rebuilds stayed directionally healthy rather than overfit to `1243`:
+- `s870_Pb-activated amine-assisted photocatalytic hydrogen evolution reaction...` stayed clean, with no new generic limitation noise.
+- `s93_Numerical investigation of twin-liquid film...` still shows some older heuristic limitation phrases such as `indicating limitation` / `difficult`, but those were not introduced by the new explicit-drawback path.
+- Random paper `155_Characterization of force chains in granular material` surfaced content-grounded limitations around `restrictive and cumbersome visualization`, `qualitative methods`, and `lack of directional information`, rather than generic drawback spam.
+- Additional stability audit showed the more macro remaining gap: direct local rebuilds still depend heavily on `_extract_window_moves_llm`, so the same paper can preserve or lose explicit bottleneck/constraint content depending on whether the upstream window extractor anchors the right intro chunks.
+- Next highest-value unresolved L2 gap: reduce direct-extraction role/anchor instability for theory-style intro and constraint-heavy windows, so explicit bottleneck / limitation content survives even when the upstream move extractor is sparse or summary-compressive, instead of widening more slot heuristics.
