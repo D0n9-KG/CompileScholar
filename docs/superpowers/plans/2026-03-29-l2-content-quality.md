@@ -219,3 +219,24 @@ Progress note (2026-03-30, grounded limitation-move stabilization phase):
 - Direct local rebuild of `1243_Data-Driven Computational Plasticity` now yields grounded limitation coverage as well (`grounded_constraint_move_count=2` in the latest check), while preserving the original `problem` narrative and the recovered bottleneck candidate.
 - Anti-overfit fallback recheck on `1607_Shear jamming and fragility in dense suspensions` still produces no synthetic limitation moves, so the new companion-move path is not firing on ordinary non-explicit constraint language.
 - Next highest-value unresolved L2 gap: `1243` is now materially closer to theory/modeling completeness, but it still remains `paper_type=unknown`, so the next phase should target theory-style paper-type inference or profile selection rather than more limitation-slot logic.
+
+Progress note (2026-03-30, content-based theory-profile selection phase):
+- Added regression coverage for a theory-like trace that remains `paper_type='unknown'` but already contains the structure L2 actually needs downstream: grounded `problem + method + result + limitation`, trusted object/method support, and no empirical benchmark/comparator evidence.
+- Root-cause audit on the current `1243` direct rebuild showed that after the earlier limitation phases it still failed L4 for a purely profile-selection reason:
+- the trace already had grounded limitation moves and `grounded_constraint_move_count > 0`
+- but `_uses_theory_modeling_evidence_profile` still forced `paper_type='unknown'` through the empirical-default branch
+- and the theoretical expectation logic still treated `interpretation` / `conditions` as strictly required even when the same theory-style constraint content was already captured as trusted `limitation` / `limitation_types`
+- Reworked the theory-profile gate narrowly rather than globally:
+- for `paper_type='theoretical'`, trusted `limitation` can now satisfy the theory-side explanatory role that was previously hard-coded as `interpretation`
+- for `paper_type='theoretical'`, trusted `limitation_types` can satisfy the theory-side constraint/context expectation that was previously hard-coded as `conditions`
+- for `paper_type='unknown'`, the gate can now select `theory_modeling` only when the trace has a narrow theory-like signature: supported `problem + method + limitation`, no `experiment` role, trusted limitation support, and no trusted `metrics` / `comparators`
+- Verification:
+- Red-green regression: `backend/tests/test_paper_logic_trace_gates.py -k theory_like_limitation_profile`
+- Related theoretical gate checks: `backend/tests/test_paper_logic_trace_gates.py -k theoretical`
+- Focused file: `backend/tests/test_paper_logic_trace_gates.py`
+- Real-sample rechecks:
+- `1243_Data-Driven Computational Plasticity` now turns `green` on a direct local rebuild with `l4_evidence_profile='theory_modeling'`, `ready_for_l4=True`, and `grounded_constraint_move_count=2`, even though the metadata `paper_type` still remains `unknown`.
+- Anti-overfit direct rebuild checks:
+- `s870_Pb-activated amine-assisted photocatalytic hydrogen evolution reaction...` stays on `empirical_default` and does not get promoted into the theory/modeling branch.
+- `s93_Numerical investigation of twin-liquid film...` likewise stays on `empirical_default` while preserving its existing green empirical path.
+- Next highest-value unresolved L2 gap: now that theory-style limitation content can actually unlock the right downstream profile, the remaining macro issue is repeated/overlapping move clutter in some direct rebuilds (for example duplicated problem/limitation content within long introductions), so the next phase should likely target move deduplication / compression rather than more gate widening.

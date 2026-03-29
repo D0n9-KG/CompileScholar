@@ -294,12 +294,45 @@ def _uses_theory_modeling_evidence_profile(
     if paper_type_token == 'theoretical':
         return True
     observed_role_set = set(observed_roles)
-    return (
-        'interpretation' in observed_role_set
-        and 'result' not in observed_role_set
+    has_unknown_theory_like_limitation_profile = (
+        paper_type_token == 'unknown'
+        and 'problem' in observed_role_set
+        and 'method' in observed_role_set
+        and 'limitation' in observed_role_set
+        and 'experiment' not in observed_role_set
         and supported_slot_counts.get('methods', 0) > 0
         and supported_slot_counts.get('research_objects', 0) > 0
+        and supported_slot_counts.get('limitation_types', 0) > 0
+        and supported_slot_counts.get('metrics', 0) == 0
+        and supported_slot_counts.get('comparators', 0) == 0
     )
+    return (
+        (
+            'interpretation' in observed_role_set
+            and 'result' not in observed_role_set
+            and supported_slot_counts.get('methods', 0) > 0
+            and supported_slot_counts.get('research_objects', 0) > 0
+        )
+        or has_unknown_theory_like_limitation_profile
+    )
+
+
+def _expected_role_present(*, role: str, observed_role_set: set[str], paper_type_token: str) -> bool:
+    if role in observed_role_set:
+        return True
+    return paper_type_token == 'theoretical' and role == 'interpretation' and 'limitation' in observed_role_set
+
+
+def _expected_slot_present(*, field: str, slot_counts: dict[str, int], paper_type_token: str) -> bool:
+    if slot_counts.get(field, 0) > 0:
+        return True
+    return paper_type_token == 'theoretical' and field == 'conditions' and slot_counts.get('limitation_types', 0) > 0
+
+
+def _expected_supported_slot_present(*, field: str, supported_slot_counts: dict[str, int], paper_type_token: str) -> bool:
+    if supported_slot_counts.get(field, 0) > 0:
+        return True
+    return paper_type_token == 'theoretical' and field == 'conditions' and supported_slot_counts.get('limitation_types', 0) > 0
 
 
 def _grounded_relation_count(move_relations: list[MoveRelation]) -> int:
@@ -556,11 +589,36 @@ def _l2_completeness_audit(
 
     expected_roles = list(_EXPECTED_ROLES_BY_PAPER_TYPE.get(paper_type_token, _EXPECTED_ROLES_BY_PAPER_TYPE['unknown']))
     expected_slots = list(_EXPECTED_SLOTS_BY_PAPER_TYPE.get(paper_type_token, _EXPECTED_SLOTS_BY_PAPER_TYPE['unknown']))
-    missing_expected_roles = sorted(role for role in expected_roles if role not in observed_roles)
-    expected_role_set = set(expected_roles)
-    critical_role_ratio = _safe_ratio(len(set(observed_roles) & expected_role_set), len(expected_role_set))
+    observed_role_set = set(observed_roles)
+    missing_expected_roles = sorted(
+        role
+        for role in expected_roles
+        if not _expected_role_present(
+            role=role,
+            observed_role_set=observed_role_set,
+            paper_type_token=paper_type_token,
+        )
+    )
+    matched_expected_role_count = sum(
+        1
+        for role in expected_roles
+        if _expected_role_present(
+            role=role,
+            observed_role_set=observed_role_set,
+            paper_type_token=paper_type_token,
+        )
+    )
+    critical_role_ratio = _safe_ratio(matched_expected_role_count, len(expected_roles))
     missing_l2_slot_fields = [field for field in _CORE_SLOT_FIELDS if slot_counts.get(field, 0) == 0]
-    missing_expected_slot_fields = [field for field in expected_slots if slot_counts.get(field, 0) == 0]
+    missing_expected_slot_fields = [
+        field
+        for field in expected_slots
+        if not _expected_slot_present(
+            field=field,
+            slot_counts=slot_counts,
+            paper_type_token=paper_type_token,
+        )
+    ]
     informative_effect_count = sum(1 for move in moves if _has_informative_effect_signal(move))
     missing_supported_expected_slot_fields = [
         field
@@ -568,7 +626,11 @@ def _l2_completeness_audit(
         if (
             informative_effect_count == 0
             if field == 'effects'
-            else supported_slot_counts.get(field, 0) == 0
+            else not _expected_supported_slot_present(
+                field=field,
+                supported_slot_counts=supported_slot_counts,
+                paper_type_token=paper_type_token,
+            )
         )
     ]
     requires_comparator_signal_for_l4 = paper_type_token in _COMPARATOR_REQUIRED_FOR_L4
