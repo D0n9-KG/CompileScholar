@@ -446,7 +446,11 @@ _RESEARCH_OBJECT_BAD_PREFIXES = (
     'aim to',
     'aimed to',
     'aims to',
+    'being ',
     'capable of',
+    'consist of ',
+    'consists of ',
+    'defined directly from ',
     'because ',
     'designed to',
     'due to ',
@@ -496,6 +500,7 @@ _RESEARCH_OBJECT_BAD_PREFIXES = (
     'this work',
     'the work',
     'our work',
+    'way of ',
     'we ',
     'was ',
     'were ',
@@ -508,12 +513,16 @@ _RESEARCH_OBJECT_BAD_LEAD_TOKENS = {
     'aim',
     'aimed',
     'aims',
+    'being',
     'can',
     'cannot',
+    'consist',
+    'consists',
     'could',
     'create',
     'created',
     'creates',
+    'defined',
     'encourage',
     'encourages',
     'examine',
@@ -1691,7 +1700,13 @@ def _research_object_mentions(text: str, *, limit: int = 3) -> list[dict[str, An
 
     relation_patterns = (
         re.compile(r'\bwithout needing(?:\s+(?:a|an|the))?\s+([a-z0-9][a-z0-9\-\s]{3,60})', re.IGNORECASE),
+        re.compile(
+            r'\b(?:necessity|need)\s+of\s+(?:establishing|defining|specifying)'
+            r'(?:\s+a\s+mathematical\s+expression\s+of)?(?:\s+the)?\s+([a-z0-9][a-z0-9\-\s]{3,60})',
+            re.IGNORECASE,
+        ),
         re.compile(r'\bfrom\s+([a-z0-9][a-z0-9\-\s]{3,40}?)\s+to\b', re.IGNORECASE),
+        re.compile(r'\b(?:for\s+)?addressing\s+([a-z0-9][a-z0-9\-\s]{3,40}?)\s+to\b', re.IGNORECASE),
         re.compile(r'\binvolving\s+([a-z0-9][a-z0-9\-\s]{3,40})', re.IGNORECASE),
     )
     for pattern in relation_patterns:
@@ -1709,6 +1724,12 @@ def _refine_research_object_rows(rows: list[dict[str, Any]]) -> list[dict[str, A
         if not phrase:
             continue
         tokens = phrase.split()
+        if tokens[:3] in (['its', 'role', 'in'], ['their', 'role', 'in']):
+            trimmed = _clean_phrase(' '.join(tokens[3:]))
+            if trimmed:
+                phrase = trimmed
+                row = {**row, 'surface': phrase, 'normalized': phrase}
+                tokens = phrase.split()
         if tokens[:1] and tokens[0] in {'establish', 'establishes', 'established'}:
             trimmed = _clean_phrase(' '.join(tokens[1:]))
             trimmed_tokens = trimmed.split()
@@ -1727,6 +1748,8 @@ def _refine_research_object_rows(rows: list[dict[str, Any]]) -> list[dict[str, A
         if len(tokens) >= 2 and tokens[0] in _RESEARCH_OBJECT_GENERIC_MODIFIER_TOKENS and tokens[1] in _RESEARCH_OBJECT_GENERIC_HEAD_TOKENS:
             continue
         if len(tokens) <= 3 and tokens[-1] in {'challenge', 'challenges', 'scheme', 'schemes'}:
+            continue
+        if len(tokens) <= 4 and tokens[-1] == 'way':
             continue
         if len(tokens) <= 2 and tokens[-1] in {'simple', 'complex'}:
             continue
@@ -1811,9 +1834,14 @@ def _augment_sparse_slots(
     observed_variable_roles = {'experiment', 'result', 'interpretation', 'method'}
     limitation_roles = {'limitation', 'interpretation', 'result', 'future_work'}
     resource_roles = {'method', 'experiment', 'result'}
+    heuristic_research_objects = (
+        _mark_heuristic_mentions(_research_object_mentions(text, limit=3))
+        if role_token in research_object_roles
+        else []
+    )
     heuristic_comparators = _mark_heuristic_mentions(_comparator_mentions(text, limit=3)) if role_token in metric_roles else []
     return {
-        'research_objects': research_objects or (_mark_heuristic_mentions(_research_object_mentions(text, limit=3)) if role_token in research_object_roles else []),
+        'research_objects': _merge_raw_mention_rows(research_objects, heuristic_research_objects),
         'observed_variables': observed_variables or (_mark_heuristic_mentions(_observed_variable_mentions(text, limit=3)) if role_token in observed_variable_roles else []),
         'metrics': metrics or (_mark_heuristic_mentions(_metric_mentions(text, limit=3)) if role_token in metric_roles else []),
         'comparators': _merge_raw_mention_rows(comparators, heuristic_comparators),

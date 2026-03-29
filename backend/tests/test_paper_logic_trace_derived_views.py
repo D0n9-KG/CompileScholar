@@ -915,6 +915,134 @@ def test_build_route_state_seed_falls_back_to_inferred_topic_objects_when_truste
     assert 'a-1' in seed['supporting_evidence_ids']
 
 
+def test_build_route_state_seed_ranks_specific_inferred_topic_objects_above_broad_background_terms() -> None:
+    broad_problem_move = ResearchMove(
+        move_id='m-problem-0',
+        sequence_no=1,
+        role='problem',
+        act_type='identify_gap',
+        summary='Big-data is becoming a key protagonist in scientific computing.',
+        research_objects=[
+            MentionValue(surface='big-data', normalized='big-data', inferred=True, anchor_ids=['a-0']),
+        ],
+        anchor_ids=['a-0'],
+        slot_provenance=[
+            SlotProvenance(
+                field='research_objects',
+                value_index=0,
+                anchor_ids=['a-0'],
+                extraction_mode='inferred',
+                support_strength='weak',
+            ),
+        ],
+    )
+    challenge_move = ResearchMove(
+        move_id='m-problem-1',
+        sequence_no=2,
+        role='problem',
+        act_type='identify_gap',
+        summary='The challenge is to avoid relying on a constitutive model when simulating from data.',
+        research_objects=[
+            MentionValue(surface='constitutive model', normalized='constitutive model', inferred=True, anchor_ids=['a-1']),
+        ],
+        anchor_ids=['a-1'],
+        slot_provenance=[
+            SlotProvenance(
+                field='research_objects',
+                value_index=0,
+                anchor_ids=['a-1'],
+                extraction_mode='inferred',
+                support_strength='weak',
+            ),
+        ],
+    )
+    result_move = ResearchMove(
+        move_id='m-result-2',
+        sequence_no=3,
+        role='result',
+        act_type='report_effect',
+        summary='This work extends the data-driven strategy from nonlinear elasticity to scenarios involving internal variables.',
+        research_objects=[
+            MentionValue(surface='nonlinear elasticity', normalized='nonlinear elasticity', inferred=True, anchor_ids=['a-2']),
+            MentionValue(surface='internal variables', normalized='internal variables', inferred=True, anchor_ids=['a-2']),
+        ],
+        methods=[MentionValue(surface='data-driven strategy', normalized='data-driven strategy', anchor_ids=['a-2'])],
+        anchor_ids=['a-2'],
+        slot_provenance=[
+            SlotProvenance(
+                field='research_objects',
+                value_index=0,
+                anchor_ids=['a-2'],
+                extraction_mode='inferred',
+                support_strength='weak',
+            ),
+            SlotProvenance(
+                field='research_objects',
+                value_index=1,
+                anchor_ids=['a-2'],
+                extraction_mode='inferred',
+                support_strength='weak',
+            ),
+            SlotProvenance(
+                field='methods',
+                value_index=0,
+                anchor_ids=['a-2'],
+                extraction_mode='direct',
+                support_strength='strong',
+            ),
+        ],
+    )
+    method_like_result_move = ResearchMove(
+        move_id='m-result-3',
+        sequence_no=4,
+        role='result',
+        act_type='report_effect',
+        summary='The LaTIn technique is suggested for problem discretization.',
+        research_objects=[
+            MentionValue(surface='latin technique', normalized='latin technique', inferred=True, anchor_ids=['a-3']),
+        ],
+        methods=[MentionValue(surface='LaTIn', normalized='latin technique', anchor_ids=['a-3'])],
+        anchor_ids=['a-3'],
+        slot_provenance=[
+            SlotProvenance(
+                field='research_objects',
+                value_index=0,
+                anchor_ids=['a-3'],
+                extraction_mode='inferred',
+                support_strength='weak',
+            ),
+            SlotProvenance(
+                field='methods',
+                value_index=0,
+                anchor_ids=['a-3'],
+                extraction_mode='direct',
+                support_strength='strong',
+            ),
+        ],
+    )
+    trace = PaperLogicTrace(
+        trace_id='paper-1b:paper_logic_trace',
+        schema_version='v2',
+        built_at='2026-03-29T00:00:00Z',
+        paper_metadata=PaperMetadata(
+            paper_id='paper-1b',
+            title='Data-Driven Computational Plasticity',
+            paper_type='theoretical',
+            source_refs=['a-0', 'a-1', 'a-2', 'a-3'],
+        ),
+        canonical_core=CanonicalCore(
+            moves=[broad_problem_move, challenge_move, result_move, method_like_result_move],
+        ),
+        quality={},
+    )
+
+    seed = build_route_state_seed(trace)
+
+    assert seed['topic_scope_candidates'].index('constitutive model') < seed['topic_scope_candidates'].index('big-data')
+    assert seed['topic_scope_candidates'].index('nonlinear elasticity') < seed['topic_scope_candidates'].index('big-data')
+    assert seed['topic_scope_candidates'].index('internal variables') < seed['topic_scope_candidates'].index('latin technique')
+
+
 def test_build_derived_views_keeps_single_paper_summary_surface_while_adding_compiler_contract() -> None:
     trace = PaperLogicTrace(
         trace_id='paper-1:paper_logic_trace',

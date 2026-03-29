@@ -62,6 +62,14 @@ _SUMMARY_SECTION_PRIORITY = (
     ('method', 2),
     ('experiment', 2),
 )
+_TOPIC_ROLE_PRIORITY = {
+    'result': 5,
+    'interpretation': 4,
+    'problem': 4,
+    'experiment': 3,
+    'method': 2,
+    'background': 1,
+}
 _SUMMARY_NOISE_CUES = (
     'accepted ',
     'available online',
@@ -941,6 +949,37 @@ def _entry_labels(entries: list[dict[str, Any]], *, limit: int = 5) -> list[str]
     return _unique(labels)[:limit]
 
 
+def _rank_topic_object_entries(entries: list[dict[str, Any]], method_entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    label_counts: dict[str, int] = {}
+    label_order: dict[str, int] = {}
+    for index, entry in enumerate(entries):
+        label = _entry_label(entry)
+        if not label:
+            continue
+        label_counts[label] = label_counts.get(label, 0) + 1
+        label_order.setdefault(label, index)
+
+    method_labels = {_entry_label(entry) for entry in method_entries if _entry_label(entry)}
+
+    def _score(entry: dict[str, Any]) -> tuple[int, int, int]:
+        label = _entry_label(entry)
+        tokens = _WORD_RE.findall(label)
+        role = str(entry.get('role') or '').strip().lower()
+        semantic_score = _TOPIC_ROLE_PRIORITY.get(role, 1) * 10
+        semantic_score += min(len(tokens), 4) * 2
+        if len(tokens) <= 1:
+            semantic_score -= 3
+        if label in method_labels:
+            semantic_score -= 8
+        return (
+            label_counts.get(label, 0),
+            semantic_score,
+            -label_order.get(label, 0),
+        )
+
+    return sorted(entries, key=_score, reverse=True)
+
+
 def _entry_anchor_ids(entries: list[dict[str, Any]], *, limit: int | None = None) -> list[str]:
     flattened: list[str] = []
     for entry in entries:
@@ -1024,6 +1063,7 @@ def build_route_state_seed(
             trusted_only=False,
             roles={'problem', 'method', 'experiment', 'result', 'interpretation'},
         )
+    topic_object_entries = _rank_topic_object_entries(topic_object_entries, method_entries)
 
     supporting_evidence_ids = _unique(
         [

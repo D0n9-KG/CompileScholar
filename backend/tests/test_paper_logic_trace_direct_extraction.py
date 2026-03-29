@@ -422,6 +422,48 @@ def test_problem_research_object_backfill_prefers_constitutive_model_over_goal_c
     assert 'identifies the challenge of whether simulation' not in normalized
 
 
+def test_problem_research_object_backfill_handles_circumventing_constitutive_expression_phrase(monkeypatch) -> None:
+    summary = (
+        'The biggest challenge could then be formulated as follows: can simulation proceed directly from data by '
+        'circumventing the necessity of establishing a mathematical expression of the constitutive model?'
+    )
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '1. Introduction',
+            summary,
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'problem',
+                'act_type': 'identify_gap',
+                'summary': summary,
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'confidence': 0.8,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    first = payload['evidence_rows'][0]
+    normalized = {str(item.get('normalized') or '').lower() for item in first['research_objects']}
+
+    assert 'mathematical constitutive model' in normalized or 'constitutive model' in normalized
+    assert all('challenge could then be formulated' not in item for item in normalized)
+
+
 def test_backfilled_research_object_provenance_is_marked_inferred_and_weak(monkeypatch) -> None:
     doc = _doc_with_chunks(
         _chunk(
@@ -501,6 +543,90 @@ def test_result_move_without_research_objects_is_backfilled_from_conclusion_scop
 
     assert 'nonlinear elasticity' in normalized or 'internal variables' in normalized
     assert 'data-driven strategy' not in normalized
+
+
+def test_result_move_merges_partial_research_objects_with_conclusion_scope_backfill(monkeypatch) -> None:
+    summary = 'This work extends a data-driven strategy from nonlinear elasticity to more complex scenarios involving internal variables.'
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '3. Conclusions',
+            summary,
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'result',
+                'act_type': 'report_effect',
+                'summary': summary,
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [{'surface': 'internal variables'}],
+                'methods': [{'surface': 'data-driven strategy'}],
+                'confidence': 0.8,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    first = payload['evidence_rows'][0]
+    normalized = {str(item.get('normalized') or '').lower() for item in first['research_objects']}
+
+    assert 'internal variables' in normalized
+    assert 'nonlinear elasticity' in normalized
+    assert 'data-driven strategy' not in normalized
+
+
+def test_result_move_backfill_handles_addressing_domain_phrase(monkeypatch) -> None:
+    summary = (
+        'This work succeeded to extend the data-driven strategy proposed in our former works for addressing '
+        'nonlinear elasticity to more complex scenarios involving internal variables.'
+    )
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '3. Conclusions',
+            summary,
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'result',
+                'act_type': 'report_effect',
+                'summary': summary,
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [{'surface': 'internal variables'}],
+                'methods': [{'surface': 'data-driven strategy'}],
+                'confidence': 0.8,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    first = payload['evidence_rows'][0]
+    normalized = {str(item.get('normalized') or '').lower() for item in first['research_objects']}
+
+    assert 'internal variables' in normalized
+    assert 'nonlinear elasticity' in normalized
 
 
 def test_research_object_filter_drops_generic_solution_and_promise_phrases(monkeypatch) -> None:
@@ -1202,6 +1328,99 @@ def test_research_object_filter_drops_reporting_verb_fragments(monkeypatch) -> N
     assert 'shear localization' in normalized
     assert 'have been conducted to quantify the segregation' not in normalized
     assert 'investigate its role in shear localization' not in normalized
+
+
+def test_problem_research_object_filter_drops_data_collection_process_fragments(monkeypatch) -> None:
+    summary = (
+        'Very little has been done with big-data in scientific computing despite promising first attempts. '
+        'The main drawback of data-driven approaches is the huge amount of data required for running simulations.'
+    )
+    quote = (
+        'This unprecedented possibility of directly determine knowledge from data or, in other words, to extract models '
+        'from experiments in a automated way, is being followed with great interest in many fields of science and '
+        'engineering. In [8] authors followed a similar rationale extending the data-driven framework to nonlinear '
+        'elasticity and inelasticity, where model-based simulations where replaced by data-driven simulations operating '
+        'on a new kind of constitutive models defined directly from data. Its main drawback is the huge amount of data '
+        'required for running simulations. In the present work we will assume that all the needed data is available. '
+        'We will not address the way of collecting data from adequate experiments and the use of eventual inverse '
+        'techniques to enrich the behavior description, issues that will be reported in incoming works.'
+    )
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '1. Introduction',
+            quote,
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'problem',
+                'act_type': 'identify_gap',
+                'summary': summary,
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'confidence': 0.8,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    first = payload['evidence_rows'][0]
+    normalized = {str(item.get('normalized') or '').lower() for item in first['research_objects']}
+
+    assert 'experiments in automated way' not in normalized
+    assert 'defined directly from data' not in normalized
+    assert all('way of collecting data from adequate experiments' not in item for item in normalized)
+
+
+def test_method_research_object_filter_drops_free_energy_process_fragment(monkeypatch) -> None:
+    summary = 'A continuum-thermodynamics framework defines state variables, free energy, and dissipation potentials.'
+    quote = 'A simple elastoviscoplastic model consists of choosing as free energy and dissipation potentials.'
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '2. Method',
+            quote,
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'method',
+                'act_type': 'adapt_method',
+                'summary': summary,
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'methods': [{'surface': 'continuum-thermodynamics framework'}],
+                'confidence': 0.8,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    first = payload['evidence_rows'][0]
+    normalized = {str(item.get('normalized') or '').lower() for item in first['research_objects']}
+
+    assert 'consists of choosing as free energy and dissipation potentials' not in normalized
 
 
 def test_research_object_filter_drops_auxiliary_clause_fragments(monkeypatch) -> None:
