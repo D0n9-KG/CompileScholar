@@ -132,3 +132,15 @@ Progress note (2026-03-29, route-state seed audit calibration phase):
 - `1243_Data-Driven Computational Plasticity` no longer trips `route_state_seed_thin`; its route seed now compiles on the strength of explicit challenge and bottleneck coverage while still honestly reporting missing benchmark/protocol/toolchain fields.
 - `s1338_Integrated convolutional and graph neural networks for predicting mechanical fields in composite microstructures`, `s870_Pb-activated amine-assisted photocatalytic hydrogen evolution reaction...`, and `s93_Numerical investigation of twin-liquid film...` likewise stop failing solely for absent benchmark/data-resource slots; each now passes route-seed readiness through the context signals it actually contains.
 - Next highest-value unresolved L2 gap: several real papers still remain yellow because their paper summary selection drifts away from the paper title/topic center or because title metadata is mis-extracted, which weakens single-paper readability even when the underlying topic/method slots are now materially better.
+
+Progress note (2026-03-29, title-aligned summary selection phase):
+- Added regression coverage for two summary-selection failure modes seen in real-paper audits:
+- opening/problem sentences that stay in broad domain context even when a later sentence is much closer to the paper title and topic center
+- generic method-context sentences that outrank later method sentences carrying the paper’s actual target object
+- Updated `build_paper_summaries` to use title/title-alt lexical alignment as a conservative tie-break inside the existing role-based summary selector, while preserving current language-coherence and role-priority behavior.
+- The change only reorders comparable summary candidates; it does not rewrite text or override stronger language/role constraints with a title match.
+- Real-sample recomputation after the change:
+- `s1338_Integrated convolutional and graph neural networks for predicting mechanical fields in composite microstructures` now produces a summary centered on predicting mechanical field distributions in composite microstructures and turns green on recomputed quality.
+- `s93_Numerical investigation of twin-liquid film on spiked rotating disk reactor with highly viscous fluid` now selects a much more title-aligned opening/result bundle and likewise turns green on recomputed quality.
+- `1243_Data-Driven Computational Plasticity` remains yellow, but now for a clearly narrower reason: the canonical title metadata itself is still wrong (`2.1. Non-isothermal elasto-visco-plastic behavior`), so the remaining gap has shifted from summary drift to metadata title recovery.
+- Next highest-value unresolved L2 gap: recover or correct mis-extracted canonical titles when `title` is section-heading-like and `title_alt` carries the true paper title, because this still harms single-paper readability and triggers honest metadata-summary mismatch flags on otherwise improved traces.

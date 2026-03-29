@@ -1384,6 +1384,116 @@ def test_build_paper_summaries_can_use_later_opening_move_to_preserve_language_b
     assert problem_zh.summary not in summaries['one_paragraph_summary']
 
 
+def test_build_paper_summaries_prefers_title_aligned_opening_over_generic_background() -> None:
+    generic_problem = ResearchMove(
+        move_id='m-problem-generic-title',
+        sequence_no=1,
+        role='problem',
+        act_type='identify_gap',
+        summary='Chemical absorption remains a central CCUS strategy, but high-viscosity absorbents create practical transport challenges in industrial process design.',
+        anchor_ids=['a-1'],
+    )
+    aligned_problem = ResearchMove(
+        move_id='m-problem-aligned-title',
+        sequence_no=2,
+        role='problem',
+        act_type='define_task',
+        summary='This study investigates twin-liquid film behavior on a spiked rotating disk reactor under highly viscous fluid conditions.',
+        anchor_ids=['a-2'],
+    )
+    method_move = ResearchMove(
+        move_id='m-method-title',
+        sequence_no=3,
+        role='method',
+        act_type='propose_method',
+        summary='The paper applies the Volume of Fluid method to simulate laminar incompressible flow and track the gas-liquid interface in the reactor.',
+        anchor_ids=['a-3'],
+    )
+    result_move = ResearchMove(
+        move_id='m-result-title',
+        sequence_no=4,
+        role='result',
+        act_type='report_effect',
+        summary='The open-window region drastically reduces film thickness and alters velocity fluctuations across the reactor surface.',
+        anchor_ids=['a-4'],
+    )
+    trace = PaperLogicTrace(
+        trace_id='paper-title-align-opening:paper_logic_trace',
+        schema_version='v2',
+        built_at='2026-03-29T00:00:00Z',
+        paper_metadata=PaperMetadata(
+            paper_id='paper-title-align-opening',
+            title='Numerical investigation of twin-liquid film on spiked rotating disk reactor with highly viscous fluid',
+            paper_type='empirical',
+            source_refs=['a-1'],
+        ),
+        canonical_core=CanonicalCore(
+            moves=[generic_problem, aligned_problem, method_move, result_move],
+        ),
+        quality={},
+    )
+
+    summaries = build_paper_summaries(trace)
+
+    assert aligned_problem.summary in summaries['one_paragraph_summary']
+    assert generic_problem.summary not in summaries['one_paragraph_summary']
+
+
+def test_build_paper_summaries_prefers_title_aligned_method_over_generic_method_context() -> None:
+    problem_move = ResearchMove(
+        move_id='m-problem-method-title',
+        sequence_no=1,
+        role='problem',
+        act_type='identify_gap',
+        summary='Analytical models for composite laminates remain limited to specific geometries, loading cases, and boundary conditions.',
+        anchor_ids=['a-1'],
+    )
+    generic_method = ResearchMove(
+        move_id='m-method-generic-title',
+        sequence_no=2,
+        role='method',
+        act_type='propose_method',
+        summary='Machine learning methods can provide faster surrogate models by learning input-output mappings without repeatedly solving governing equations.',
+        anchor_ids=['a-2'],
+    )
+    aligned_method = ResearchMove(
+        move_id='m-method-aligned-title',
+        sequence_no=3,
+        role='method',
+        act_type='propose_method',
+        summary='Image-based neural networks are used to predict mechanical field distributions in composite microstructures under applied strain.',
+        anchor_ids=['a-3'],
+    )
+    result_move = ResearchMove(
+        move_id='m-result-method-title',
+        sequence_no=4,
+        role='result',
+        act_type='report_effect',
+        summary='The integrated model improves stress-field accuracy relative to earlier surrogate baselines.',
+        anchor_ids=['a-4'],
+    )
+    trace = PaperLogicTrace(
+        trace_id='paper-title-align-method:paper_logic_trace',
+        schema_version='v2',
+        built_at='2026-03-29T00:00:00Z',
+        paper_metadata=PaperMetadata(
+            paper_id='paper-title-align-method',
+            title='Integrated convolutional and graph neural networks for predicting mechanical fields in composite microstructures',
+            paper_type='empirical',
+            source_refs=['a-1'],
+        ),
+        canonical_core=CanonicalCore(
+            moves=[problem_move, generic_method, aligned_method, result_move],
+        ),
+        quality={},
+    )
+
+    summaries = build_paper_summaries(trace)
+
+    assert aligned_method.summary in summaries['one_paragraph_summary']
+    assert generic_method.summary not in summaries['one_paragraph_summary']
+
+
 def test_build_paper_content_audit_flags_suspicious_title_alt_and_missing_findings() -> None:
     trace = PaperLogicTrace(
         trace_id='paper-4:paper_logic_trace',

@@ -251,6 +251,42 @@ def _move_summary_score(move: ResearchMove, anchor_sections: dict[str, str]) -> 
     return (role_score + section_score * 3 + slot_bonus + length_bonus, section_score)
 
 
+def _looks_like_section_heading(value: str | None) -> bool:
+    normalized = ' '.join(str(value or '').strip().lower().split())
+    if not normalized:
+        return False
+    if normalized in _GENERIC_SECTION_HEADINGS:
+        return True
+    if _PIPE_SECTION_HEADING_RE.match(normalized):
+        return True
+    if normalized.count('$') >= 2 or _LATEX_TITLE_NOISE_RE.search(normalized):
+        return True
+    if not _SECTION_HEADING_RE.match(normalized):
+        return False
+    tail = _SECTION_HEADING_RE.sub('', normalized).strip()
+    if not tail:
+        return True
+    return tail in _GENERIC_SECTION_HEADINGS or len(tail.split()) <= 4
+
+
+def _title_alignment_terms(*values: str | None) -> set[str]:
+    terms: set[str] = set()
+    for value in values:
+        if _looks_like_section_heading(value):
+            continue
+        terms.update(_summary_terms(str(value or '')))
+    return terms
+
+
+def _title_alignment_score(summary: str, title_terms: set[str]) -> int:
+    if not title_terms:
+        return 0
+    summary_terms = set(_summary_terms(summary))
+    if not summary_terms:
+        return 0
+    return len(summary_terms & title_terms)
+
+
 def _summary_language(summary: str) -> str:
     text = str(summary or '')
     cjk_count = len(_SUMMARY_CJK_RE.findall(text))
@@ -330,11 +366,14 @@ def _preferred_summary_language(selected: list[ResearchMove]) -> str | None:
 
 def _select_summary_moves(trace: PaperLogicTrace) -> list[ResearchMove]:
     anchor_sections = _summary_anchor_sections(trace)
+    title_terms = _title_alignment_terms(trace.paper_metadata.title, trace.paper_metadata.title_alt)
+    title_alignment_by_move_id: dict[str, int] = {}
     scored_moves: list[tuple[int, int, int, ResearchMove]] = []
     for move in trace.canonical_core.moves:
         score, section_score = _move_summary_score(move, anchor_sections)
         if score < 0:
             continue
+        title_alignment_by_move_id[move.move_id] = _title_alignment_score(move.summary, title_terms)
         scored_moves.append((score, section_score, int(move.sequence_no), move))
     if not scored_moves:
         return [move for move in trace.canonical_core.moves if str(move.summary or '').strip()][:3]
@@ -356,7 +395,6 @@ def _select_summary_moves(trace: PaperLogicTrace) -> list[ResearchMove]:
         if not candidates:
             return
         preferred_language = global_preferred_language or _preferred_summary_language(selected)
-        chosen = candidates[0]
         if preferred_language:
             matching_candidates = [
                 candidate
@@ -364,7 +402,17 @@ def _select_summary_moves(trace: PaperLogicTrace) -> list[ResearchMove]:
                 if _summary_language(candidate[3].summary) == preferred_language
             ]
             if matching_candidates:
-                chosen = matching_candidates[0]
+                candidates = matching_candidates
+        candidates = sorted(
+            candidates,
+            key=lambda item: (
+                -(item[0] + min(title_alignment_by_move_id.get(item[3].move_id, 0), 3) * 2),
+                -title_alignment_by_move_id.get(item[3].move_id, 0),
+                -item[1],
+                item[2],
+            ),
+        )
+        chosen = candidates[0]
         move = chosen[3]
         selected.append(move)
         selected_ids.add(move.move_id)
@@ -390,6 +438,7 @@ def _select_summary_moves(trace: PaperLogicTrace) -> list[ResearchMove]:
             ordered,
             key=lambda item: (
                 _summary_language(item[3].summary) != global_preferred_language,
+                -title_alignment_by_move_id.get(item[3].move_id, 0),
                 -item[0],
                 -item[1],
                 item[2],
@@ -454,24 +503,6 @@ def _select_key_method_move(trace: PaperLogicTrace) -> ResearchMove | None:
             int(move.sequence_no),
         ),
     )[0]
-
-
-def _looks_like_section_heading(value: str | None) -> bool:
-    normalized = ' '.join(str(value or '').strip().lower().split())
-    if not normalized:
-        return False
-    if normalized in _GENERIC_SECTION_HEADINGS:
-        return True
-    if _PIPE_SECTION_HEADING_RE.match(normalized):
-        return True
-    if normalized.count('$') >= 2 or _LATEX_TITLE_NOISE_RE.search(normalized):
-        return True
-    if not _SECTION_HEADING_RE.match(normalized):
-        return False
-    tail = _SECTION_HEADING_RE.sub('', normalized).strip()
-    if not tail:
-        return True
-    return tail in _GENERIC_SECTION_HEADINGS or len(tail.split()) <= 4
 
 
 def _slot_provenance_for(move: ResearchMove, field: str, *, value_index: int | None = None) -> list[dict[str, Any]]:
