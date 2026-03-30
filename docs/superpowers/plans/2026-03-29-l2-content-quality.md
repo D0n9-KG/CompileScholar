@@ -612,3 +612,24 @@ Progress note (2026-03-30, operative method-summary preference phase):
 - Remaining macro gap after this phase:
 - some setup-heavy empirical traces, such as `04_1901_On dense granular flows`, can still let a high-priority setup/stress-distribution sentence outrank the cleaner grounded method sentence (`Prandtl mixing length approach`) because the selector still considers method-role sentences that carry no grounded method mentions when their section score is high
 - Next highest-value unresolved L2 gap: continue tightening `key_method_summary` so method-role setup/condition sentences without grounded method evidence no longer outrank real method sentences in setup-heavy papers, while still preserving a fallback summary when extraction is sparse.
+
+Progress note (2026-03-30, grounded key-method summary gating phase):
+- Root-cause audit on `04_1901_On dense granular flows` showed the remaining `key_method_summary` failure was narrower than general summary scoring:
+- once route-seed methods were already clean, the summary selector could still choose a setup/condition sentence like `Describes the stress distribution in the experimental geometry ...` simply because it lived in a method-heavy section and carried grounded `conditions` / `research_objects`, even though another move in the same paper contained the actual grounded method sentence `The paper proposes a Prandtl mixing length approach ...`
+- Added a regression for this exact failure mode:
+- when a trace contains at least one method/experiment move with grounded trusted `methods`, `key_method_summary` should be selected from those grounded method moves rather than from setup/condition sentences that lack any grounded method mention
+- Implemented the fix narrowly in `_select_key_method_move(...)`:
+- preserved the existing summary-ranking logic
+- added a conservative gating step so, if any contentful method/experiment move carries trusted `methods`, the selector first narrows candidates to that grounded subset
+- kept the old behavior as a fallback when extraction is sparse and no grounded method mentions are available anywhere in the trace
+- Verification:
+- Targeted regressions:
+- `backend/tests/test_paper_logic_trace_derived_views.py -k "prefers_grounded_method_move_over_setup_condition_sentence or prefers_operative_method_over_governing_equation_context or prefers_method_focused_sentence_over_outcome_colored_sentence"` -> `3 passed`
+- Focused file: `backend/tests/test_paper_logic_trace_derived_views.py` -> `34 passed`
+- Full backend suite: `cd backend; .\.venv\Scripts\python.exe -m pytest -q` -> `583 passed, 1 warning`
+- Real-sample rechecks after the change:
+- `04_1901_On dense granular flows` now uses the grounded method sentence about the `Prandtl mixing length approach` as `key_method_summary` instead of the earlier setup/stress-distribution sentence
+- `1607`, `1732`, `1243`, and `s870` remain stable under the same change, keeping operative or framework-level method summaries that are still faithful to their paper-level method story
+- Remaining macro gap after this phase:
+- route-state method candidates and key-method summaries are now materially cleaner, but some traces still keep method labels that are accurate yet not maximally canonical, such as renamed clause-style variants (`stress-controlled flow determination`) or parallel near-duplicates (`latin` / `latin method`)
+- Next highest-value unresolved L2 gap: continue tightening canonical method-label normalization and de-dup compression so L2 presents the shortest stable per-paper method vocabulary while staying faithful enough to support downstream L3/L4 synthesis.

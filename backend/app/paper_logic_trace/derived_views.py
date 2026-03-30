@@ -730,6 +730,13 @@ def _select_key_method_move(trace: PaperLogicTrace) -> ResearchMove | None:
     ]
     if not method_candidates:
         return None
+    grounded_method_candidates = [
+        move
+        for move in method_candidates
+        if _trusted_mentions(move, 'methods', list(move.methods))
+    ]
+    if grounded_method_candidates:
+        method_candidates = grounded_method_candidates
     anchor_sections = _summary_anchor_sections(trace)
     return sorted(
         method_candidates,

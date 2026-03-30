@@ -1879,16 +1879,29 @@ def test_build_paper_summaries_prefers_grounded_method_move_over_setup_condition
         role='method',
         act_type='set_condition',
         summary='Describes the stress distribution in the experimental geometry under equilibrium and Janssen effect assumptions, stating constant normal stress and linearly varying tangential stress with distance from the walls.',
+        research_objects=[
+            MentionValue(surface='stress distribution in the experimental geometry', normalized='stress distribution in the experimental geometry', anchor_ids=['a-1']),
+        ],
+        conditions=[
+            MentionValue(surface='high column with janssen effect', normalized='high column with janssen effect', anchor_ids=['a-1']),
+        ],
         anchor_ids=['a-1'],
+        slot_provenance=[
+            SlotProvenance(field='research_objects', value_index=0, anchor_ids=['a-1'], extraction_mode='direct', support_strength='strong'),
+            SlotProvenance(field='conditions', value_index=0, anchor_ids=['a-1'], extraction_mode='direct', support_strength='strong'),
+        ],
     )
     grounded_method = ResearchMove(
         move_id='m-method-grounded',
         sequence_no=2,
         role='method',
         act_type='propose_method',
-        summary='The paper proposes a Prandtl mixing length approach as an alternative description for dense granular flows.',
+        summary='The paper proposes a Prandtl mixing length approach as an alternative description for dense granular flows, generalizing the Bagnold shear stress by introducing a coherence length scale l instead of the grain diameter d.',
         methods=[
             MentionValue(surface='Prandtl mixing length approach', normalized='prandtl mixing length approach', anchor_ids=['a-2']),
+        ],
+        effects=[
+            EffectValue(direction='unknown', object='dense granular flows'),
         ],
         anchor_ids=['a-2'],
         slot_provenance=[
