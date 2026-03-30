@@ -709,3 +709,28 @@ Progress note (2026-03-31, shared-corpus severe audit and theory-method route re
 - Remaining highest-value shared-corpus severe gap after this phase:
 - `p002` still has no `key_findings`, with the missing content concentrated in Chinese validation/comparison sentences such as `计算结果表明 ...` / `经比较可知 ...` / `经过卫星在轨验证 ...`
 - Next phase should fix that result/validation recovery conservatively, focusing on section-role splitting and result stabilization rather than adding narrow one-paper rules.
+
+Progress note (2026-03-31, Chinese validation-result recovery phase):
+- I investigated the remaining shared-corpus severe gap on `p002` end-to-end rather than patching the empty `key_findings` symptom directly.
+- Root cause was structural:
+- the paper's later validation/comparison material lived under section titles such as `3 改进算法验证与比较`, but the section-role classifier did not recognize Chinese evaluation/result cues like `验证` / `比较` / `结果`
+- as a result, the validation section was merged into a large generic background window that also contained earlier calculation content
+- once merged, the window extractor spent its limited move budget on method-like calculation content, and the actual comparison / validation findings never made it into canonical `result` moves
+- I added a narrow regression for this exact failure mode:
+- when a paper moves from a Chinese `计算` section into a Chinese `验证与比较` section, the validation content should no longer be swallowed by the earlier calculation window, and the trace should export non-empty `key_findings`
+- Implemented the fix conservatively in `direct_extraction.py`:
+- extended Chinese section-role hints so section labels containing `验证` / `比较` / `对比` / `实验` / `测试` map to `experiment`, and labels containing `结果` map to `result`
+- added strong Chinese result cue phrases such as `结果表明` / `计算结果表明` / `实验结果表明` / `经比较可知` alongside the existing English result patterns
+- kept the change at the role/window layer rather than adding domain-specific slot heuristics or hard-coded propellant vocabulary
+- Verification:
+- targeted regression: `backend/tests/test_paper_logic_trace_direct_extraction.py -k chinese_validation_section_recovers_key_findings_after_calculation_section` -> `1 passed`
+- focused file: `backend/tests/test_paper_logic_trace_direct_extraction.py` -> `145 passed`
+- full backend suite: `cd backend; .\.venv\Scripts\python.exe -m pytest -q` -> `587 passed, 1 warning`
+- Real-sample rechecks after the change:
+- shared-corpus `p002` now clears the earlier severe failure and exports three non-empty findings, with the first centered on the real paper result that the improved algorithm is closer to the actual in-orbit value than the original method
+- anti-overfit rechecks stayed directionally healthy:
+- `p003` still keeps three strong findings centered on shear jamming / isotropic jamming transitions and retains its prior method set
+- local `1243_Data-Driven Computational Plasticity` remains healthy, still exporting theory-style findings and method candidates without being dragged toward an empirical comparison profile
+- Remaining macro gap after this phase:
+- the shared severe sample no longer shows the earlier `missing_key_findings` failure on `p002`, but some findings on validation-heavy engineering papers are still phrased more generically than ideal
+- Given the current policy, that wording issue is below the threshold for another immediate rule-expansion phase unless a larger-scale audit shows it recurring as a real downstream blocker.

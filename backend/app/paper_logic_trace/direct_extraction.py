@@ -259,6 +259,12 @@ _NON_ASCII_METHOD_TEXT_PATTERNS = tuple(
     if not pattern.isascii()
 )
 _RESULT_TEXT_PATTERNS = (
+    '结果表明',
+    '计算结果表明',
+    '实验结果表明',
+    '试验结果表明',
+    '仿真结果表明',
+    '经比较可知',
     'results show',
     'results indicate',
     'we show that',
@@ -1207,9 +1213,9 @@ _REPORTING_VERB_CUES = (
 _SECTION_ROLE_HINTS: list[tuple[tuple[str, ...], str]] = [
     (('future work', 'future directions', 'future'), 'future_work'),
     (('limitation', 'limitations', 'threats to validity'), 'limitation'),
-    (('result', 'results', 'finding', 'findings', '结论', '结语'), 'result'),
+    (('result', 'results', 'finding', 'findings', '结果', '结论', '结语'), 'result'),
     (('discussion', 'interpretation', 'analysis'), 'interpretation'),
-    (('experiment', 'evaluation', 'experimental', 'benchmark', 'ablation'), 'experiment'),
+    (('experiment', 'evaluation', 'experimental', 'benchmark', 'ablation', '实验', '验证', '比较', '对比', '测试'), 'experiment'),
     (('method', 'approach', 'framework', 'model', 'algorithm', 'implementation', '方法', '数学模型', '数值模型', '控制方程', '模拟方法', '计算方法'), 'method'),
     (('problem', 'motivation', 'task', 'challenge', 'gap'), 'problem'),
     (('background', 'introduction', 'preliminar', 'related work'), 'background'),

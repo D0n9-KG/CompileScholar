@@ -730,6 +730,76 @@ def test_theoretical_protocol_section_promotes_formalism_into_method_layer(monke
     assert any(move.role == 'method' for move in trace.canonical_core.moves)
 
 
+def test_chinese_validation_section_recovers_key_findings_after_calculation_section(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '2.1 混合比计算',
+            '本文提出了一种改进算法，用于计算推进剂加注混合比。',
+            line=1,
+        ),
+        _chunk(
+            'c-2',
+            '3 改进算法验证与比较',
+            (
+                '计算结果表明，按照改进算法得到的混合比分配推进剂，会剩余燃烧剂0.96kg，'
+                '按照原算法得到的混合比分配推进剂会剩余氧化剂2.83kg，因此改进算法相对原算法节约了推进剂共1.87kg。'
+            ),
+            line=2,
+        ),
+    )
+
+    def _fake_extract_window_moves_llm(*, window, **kwargs):
+        section_path = ' > '.join(window.get('section_path') or [])
+        if '混合比计算' in section_path:
+            return [
+                {
+                    'role': 'method',
+                    'act_type': 'propose_method',
+                    'summary': '本文提出了一种改进算法，用于计算推进剂加注混合比。',
+                    'anchor_chunk_ids': ['c-1'],
+                    'methods': [{'surface': '改进算法'}],
+                    'confidence': 0.8,
+                }
+            ]
+        if '验证与比较' in section_path:
+            return [
+                {
+                    'role': 'result',
+                    'act_type': 'report_effect',
+                    'summary': (
+                        '计算结果表明，按照改进算法得到的混合比分配推进剂，会剩余燃烧剂0.96kg，'
+                        '按照原算法得到的混合比分配推进剂会剩余氧化剂2.83kg，因此改进算法相对原算法节约了推进剂共1.87kg。'
+                    ),
+                    'anchor_chunk_ids': ['c-2'],
+                    'confidence': 0.8,
+                }
+            ]
+        return []
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        _fake_extract_window_moves_llm,
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    trace = compile_paper_logic_trace(
+        **{
+            k: payload[k]
+            for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']
+        }
+    )
+
+    assert any(move.role == 'result' for move in trace.canonical_core.moves)
+    assert trace.derived_views['paper_content_profile']['key_findings']
+
+
 def test_fallback_background_results_window_with_generic_simulations_text_stays_non_method(monkeypatch) -> None:
     doc = _doc_with_chunks(
         _chunk(
