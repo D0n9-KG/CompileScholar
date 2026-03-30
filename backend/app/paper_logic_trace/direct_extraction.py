@@ -78,15 +78,24 @@ _FRONT_MATTER_INSTITUTION_CUES = (
 _FRONT_MATTER_METADATA_CUES = (
     'available online',
     'article history',
+    'article number',
+    'article no',
     'received ',
     'accepted ',
     'in revised form',
     'keywords:',
     'keyword:',
     'corresponding author',
+    '\u6587\u7ae0\u7f16\u53f7',
+    '\u4e2d\u56fe\u5206\u7c7b\u53f7',
+    '\u6587\u732e\u6807\u5fd7\u7801',
 )
 _FRONT_MATTER_METADATA_RE = re.compile(
-    r'^\s*(?:received|accepted|published online|available online|keywords?)\b[:\s-]*',
+    r'^\s*(?:received|accepted|published online|available online|keywords?|article\s*(?:number|no\.?)|\u6587\u7ae0\u7f16\u53f7|\u4e2d\u56fe\u5206\u7c7b\u53f7|\u6587\u732e\u6807\u5fd7\u7801)\b[:\s\-\uFF1A]*',
+    re.IGNORECASE,
+)
+_LEADING_ARTICLE_METADATA_RE = re.compile(
+    r'^(?:(?:(?:article\s*(?:number|no\.?)|\u6587\u7ae0\u7f16\u53f7|\u4e2d\u56fe\u5206\u7c7b\u53f7|\u6587\u732e\u6807\u5fd7\u7801|[^\d\s]{2,16})\s*[:\uFF1A]?\s*)?\d{4}-\d{4}\(\d{4}\)\d{2}-\d{4}(?:-\d{2})?\s*)+',
     re.IGNORECASE,
 )
 _NOISE_SUMMARY_PREFIXES = (
@@ -159,6 +168,15 @@ _METHOD_TEXT_PATTERNS = (
     'model is built',
     'simulation uses',
     'simulation method',
+    '\u672c\u6587\u91c7\u7528',
+    '\u672c\u7814\u7a76\u91c7\u7528',
+    '\u672c\u5de5\u4f5c\u91c7\u7528',
+    '\u6587\u4e2d\u91c7\u7528',
+    '\u91c7\u7528',
+    '\u4f7f\u7528',
+    '\u5229\u7528',
+    '\u63d0\u51fa',
+    '\u6784\u5efa',
     '本文采用',
     '本研究采用',
     '本工作采用',
@@ -174,6 +192,8 @@ _METHOD_TEXT_PATTERNS = (
     '研究方法为',
 )
 _METHOD_TEXT_REGEXES = (
+    re.compile(r'^(?:\u672c\u6587|\u672c\u7814\u7a76|\u672c\u5de5\u4f5c|\u6587\u4e2d).{0,12}(?:\u91c7\u7528|\u4f7f\u7528|\u5229\u7528|\u63d0\u51fa|\u6784\u5efa)'),
+    re.compile(r'(?:\u91c7\u7528|\u4f7f\u7528|\u5229\u7528|\u63d0\u51fa).{0,24}(?:\u65b9\u6cd5|\u6a21\u578b|\u6a21\u62df|\u8f6f\u4ef6|\u8bd5\u9a8c|\u7b97\u6cd5)', re.IGNORECASE),
     re.compile(r'^(?:本文|本研究|本工作|文中).{0,12}(?:采用|使用|利用|建立|构建|提出)'),
     re.compile(r'(?:采用|使用|利用).{0,24}(?:方法|模型|模拟|软件|fluent|ansys|mrf)', re.IGNORECASE),
     re.compile(r'(?:模拟方法|计算方法|研究方法).{0,8}为'),
@@ -493,6 +513,20 @@ _METHOD_REPORTING_CONTEXT_TOKENS = {
     'results',
     'ten',
 }
+_METHOD_WEAK_STATEMENT_REGEXES = (
+    re.compile(r'^(?:it|this|these|those)\s+(?:is|are)\s+consistent\b', re.IGNORECASE),
+    re.compile(r'^(?:solid|dashed)\s+lines?\s+are\s+fits?\b', re.IGNORECASE),
+    re.compile(r'^(?:these|those)\s+simulations?\b', re.IGNORECASE),
+    re.compile(r'^(?:using|uses?)\s*[$\\({\[]', re.IGNORECASE),
+    re.compile(r'\b(?:did|does|do)\s+not\s+include\b', re.IGNORECASE),
+    re.compile(r'\b(?:similar|same)\s+stress\s+dependence\b', re.IGNORECASE),
+)
+_METHOD_BAD_PHRASE_REGEXES = (
+    re.compile(r'^(?:it|this|these|those)\s+(?:is|are)\s+consistent\b', re.IGNORECASE),
+    re.compile(r'^(?:solid|dashed)\s+lines?\s+are\s+fits?\b', re.IGNORECASE),
+    re.compile(r'^(?:these|those)\s+simulations?\b', re.IGNORECASE),
+    re.compile(r'^(?:did|does|do)\s+not\s+include\b', re.IGNORECASE),
+)
 _METHOD_LEADING_VERB_PATTERNS = (
     re.compile(
         r'^(?:we\s+)?(?:adopt(?:ed|ing|s)?|apply(?:ing|ied|ies)|employ(?:ed|ing|s)?|'
@@ -533,6 +567,13 @@ _METHOD_BAD_LEAD_TOKENS = {
     'estimated',
     'estimates',
     'estimating',
+    'fit',
+    'fits',
+    'fitted',
+    'include',
+    'included',
+    'includes',
+    'including',
     'mimic',
     'mimicked',
     'mimicking',
@@ -1340,6 +1381,8 @@ def _looks_like_problem_statement(text: str) -> bool:
 def _looks_like_method_statement(text: str) -> bool:
     normalized = _normalize_space(text)
     lowered = normalized.lower()
+    if any(pattern.search(normalized) for pattern in _METHOD_WEAK_STATEMENT_REGEXES):
+        return False
     if any(pattern in lowered for pattern in _METHOD_TEXT_PATTERNS):
         return True
     return any(pattern.search(normalized) for pattern in _METHOD_TEXT_REGEXES)
@@ -1716,6 +1759,8 @@ def _method_mentions_from_text(text: str, *, limit: int = 3) -> list[dict[str, A
     normalized = _normalize_space(text)
     if not normalized:
         return []
+    if any(pattern.search(normalized) for pattern in _METHOD_WEAK_STATEMENT_REGEXES):
+        return []
 
     rows: list[dict[str, Any]] = []
     seen: set[str] = set()
@@ -1731,6 +1776,8 @@ def _method_mentions_from_text(text: str, *, limit: int = 3) -> list[dict[str, A
             phrase = pattern.sub('', phrase)
         phrase = _clean_phrase(phrase)
         if not phrase or phrase in seen or phrase in _METHOD_GENERIC_PHRASES:
+            return False
+        if any(pattern.search(phrase) for pattern in _METHOD_BAD_PHRASE_REGEXES):
             return False
         tokens = phrase.split()
         if not tokens:
@@ -1748,6 +1795,8 @@ def _method_mentions_from_text(text: str, *, limit: int = 3) -> list[dict[str, A
             return False
         if tokens[0] in _METHOD_BAD_LEAD_TOKENS:
             return False
+        if tokens[0] in _METHOD_LIGHT_CONTEXT_TOKENS and head_token not in _METHOD_HEAD_TOKENS:
+            return False
         if (
             len(tokens) <= 3
             and head_token in _METHOD_HEAD_TOKENS
@@ -1758,6 +1807,11 @@ def _method_mentions_from_text(text: str, *, limit: int = 3) -> list[dict[str, A
             head_token in _METHOD_HEAD_TOKENS
             and meaningful_prefix
             and all(token in _METHOD_GENERIC_MODIFIER_TOKENS for token in meaningful_prefix)
+        ):
+            return False
+        if (
+            head_token in {'simulation', 'simulations', 'test', 'tests'}
+            and not meaningful_prefix
         ):
             return False
         if (
@@ -2521,6 +2575,8 @@ def _strip_summary_prefixes(text: str) -> str:
     stripped = _normalize_space(text)
     if not stripped:
         return ''
+    stripped = stripped.lstrip('\ufeff')
+    stripped = _LEADING_ARTICLE_METADATA_RE.sub('', stripped)
     stripped = re.sub(r'\[[^\]]*:[^\]]*:[0-9a-f]{8,}\]\s*', ' ', stripped, flags=re.IGNORECASE)
     stripped = re.sub(r'^(?:keywords?|key\s+words?|\u5173\u952e\u8bcd)\s*[:\uFF1A]\s*', '', stripped, flags=re.IGNORECASE)
     stripped = re.sub(r'^(?:abstract|\u6458\u8981)\s*[:\uFF1A]\s*', '', stripped, flags=re.IGNORECASE)
@@ -2532,6 +2588,8 @@ def _is_summary_sentence_noise(text: str) -> bool:
     if not clean:
         return True
     lowered = clean.lower()
+    if _FRONT_MATTER_METADATA_RE.match(clean) or any(cue in lowered for cue in _FRONT_MATTER_METADATA_CUES):
+        return True
     if _looks_like_heading_only(clean, section=''):
         return True
     if _looks_like_author_line(clean):
@@ -2667,6 +2725,36 @@ def _method_summary_sentence_score(sentence: str) -> int:
     if any(
         cue in lowered
         for cue in (
+            'we present',
+            'we introduce',
+            'introduced ',
+            'presented ',
+            'named ',
+            '\u63d0\u51fa',
+            '\u5229\u7528',
+            '\u4f7f\u7528',
+            '\u91c7\u7528',
+        )
+    ):
+        score += 4
+    if any(
+        cue in lowered
+        for cue in (
+            'we propose',
+            'proposed ',
+            'named ',
+            'called ',
+            '\u63d0\u51fa',
+            '\u79f0\u4e3a',
+            '\u79f0\u4e4b\u4e3a',
+        )
+    ):
+        score += 3
+    if any(cue in lowered for cue in ('problem', 'problems', 'issue', 'issues', 'challenge', 'difficulty', 'difficult', '\u95ee\u9898')):
+        score -= 3
+    if any(
+        cue in lowered
+        for cue in (
             'we use',
             'we employ',
             'we propose',
@@ -2683,6 +2771,8 @@ def _method_summary_sentence_score(sentence: str) -> int:
         )
     ):
         score += 4
+    if any(pattern.search(clean) for pattern in _METHOD_WEAK_STATEMENT_REGEXES):
+        score -= 6
     if any(token in lowered for token in ('software', 'solver', 'framework', 'protocol')):
         score += 2
     if _is_summary_sentence_noise(clean):

@@ -587,6 +587,32 @@ def test_clean_summary_candidate_drops_original_paper_prefix_before_content_sent
     assert 'original paper' not in cleaned.lower()
 
 
+def test_clean_summary_candidate_drops_leading_article_number_front_matter() -> None:
+    text = (
+        '文章编号：1000-4750(2012)09-0359-04 文章编号：1000-4750(2012)09-0359-04 '
+        '利用静态松弛试验确定松弛模量的方法存在一定的问题。'
+    )
+
+    cleaned = _clean_summary_candidate(text)
+
+    assert '文章编号' not in cleaned
+    assert cleaned.startswith('利用静态松弛试验确定松弛模量的方法存在一定的问题')
+
+
+def test_summary_from_role_text_method_prefers_explicit_chinese_method_sentence_over_broad_context() -> None:
+    text = (
+        '文章编号：1000-4750(2012)09-0359-04 建立准确的粘弹性本构方程至关重要。 '
+        '利用静态松弛试验确定松弛模量的方法存在一定的问题。 '
+        '针对这一问题，在Joonas Sorvari所做工作的基础上，提出一种改进方法，称之为改进型Sorvari法。'
+    )
+
+    summary = _summary_from_role_text(text, role='method')
+
+    assert '改进型Sorvari法' in summary
+    assert '文章编号' not in summary
+    assert '建立准确的粘弹性本构方程' not in summary
+
+
 def test_fallback_method_summary_can_use_later_explicit_method_chunk(monkeypatch) -> None:
     doc = _doc_with_chunks(
         _chunk('c-1', 'Background', 'Key words: mixer; blade gap; CFX.', line=1),
@@ -661,6 +687,64 @@ def test_fallback_background_window_with_late_method_context_stays_problem(monke
 
     assert move['role_hint'] == 'problem'
     assert move['act_hint'] in {'identify_gap', 'define_task'}
+
+
+def test_fallback_interpretation_clause_consistent_with_model_stays_non_method(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '4. Discussion',
+            'It is consistent with a Herschel-Bulkley model of viscosity.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+
+    assert move['role_hint'] != 'method'
+    assert move['act_hint'] != 'propose_method'
+    assert not move['methods']
+
+
+def test_fallback_theory_clause_using_symbol_stays_non_method(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '3. Theory',
+            'uses $\\Phi$ to decline.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+
+    assert move['role_hint'] != 'method'
+    assert move['act_hint'] != 'propose_method'
+    assert not move['methods']
 
 
 def test_discussion_result_chunk_is_promoted_to_result_role(monkeypatch) -> None:
@@ -1845,6 +1929,49 @@ def test_method_backfill_filters_intrusive_descriptor_when_named_method_exists(m
 
     assert 'latin method' in normalized_methods
     assert 'intrusive' not in normalized_methods
+
+
+def test_method_backfill_filters_reporting_models_clause_fragment(monkeypatch) -> None:
+    summary = (
+        'These simulations did not include viscous dissipation in their models [24,25], '
+        'but they do report shear localization in which the shear rate is continuous.'
+    )
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '2. Method',
+            summary,
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'method',
+                'act_type': 'propose_method',
+                'summary': summary,
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'methods': [],
+                'confidence': 0.7,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+    normalized_methods = {str(item.get('normalized') or '').lower() for item in move['methods']}
+
+    assert 'these simulations' not in normalized_methods
+    assert 'did not include viscous dissipation in their models' not in normalized_methods
 
 
 def test_research_object_filter_trims_leading_establish_verb_from_domain_object(monkeypatch) -> None:

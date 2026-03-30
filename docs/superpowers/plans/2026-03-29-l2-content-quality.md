@@ -368,3 +368,24 @@ Progress note (2026-03-30, fallback summary cleanup and method precision phase):
 - `1732_改性双基推进剂松弛模量的确定方法` still leaks front-matter article-number text into the leading problem summary and can choose broad context as `key_method_summary`
 - `781` reduces to an almost-empty BOM-only fallback trace, which confirms there is still a small class of source/cleanup failures that should be dropped or neutralized rather than exported as a fake `problem`
 - Next highest-value unresolved L2 gap: keep the new fallback recall/structure gains, but now target clause-fragment and front-matter contamination more directly, especially false `method` moves created from model-description / equation / reporting sentences and boilerplate Chinese header text that still pollutes single-paper readability.
+
+Progress note (2026-03-30, weak method-clause and front-matter noise phase):
+- Added a new red-green regression cluster for the next macro error class revealed by the fresh audit rather than by the earlier familiar papers alone:
+- front-matter cleanup now strips article-number prefixes before summary selection, including repeated `article number` / `文章编号` style prefixes in the leading sentence
+- fallback method-role heuristics are now narrower for weak clause fragments:
+- sentences starting with weak method-like clauses such as `uses $...`, `it is consistent with ...`, `these simulations ...`, and `did not include ...` are no longer treated as method statements by default
+- method mention backfill now drops the corresponding low-information phrase fragments instead of exporting them as pseudo-method names
+- method summary scoring now gives extra preference to explicit proposal / naming cues, which helps real fallback windows choose actual method-introduction sentences over nearby method-context sentences that mainly state a problem with an existing method
+- Verification:
+- Targeted red-green selection for the new regressions -> `5 passed`
+- Focused file: `backend/tests/test_paper_logic_trace_direct_extraction.py` -> `133 passed`
+- Full backend suite: `cd backend; .\.venv\Scripts\python.exe -m pytest -q` -> `561 passed, 1 warning`
+- Fresh forced-fallback audit recheck after the change:
+- `1607_Shear jamming and fragility in dense suspensions` improved materially at the paper-summary level: `key_method_summary` now returns `we employ an algorithm to mimic stress-controlled rheology [24].` instead of the earlier weak fragment `uses a similar stress dependence;`
+- `1505_Velocity Profiles in Slowly Sheared Bubble Rafts` no longer exports the earlier worst false method clauses `It is consistent with ...` and `These simulations did not include ...`; the trace regains a `problem` move and the remaining method clutter is now concentrated in later clause-fragment summaries rather than in broad reporting wrappers
+- The single-sentence false positives from the new regression set now stay out of `method` completely, which confirms the fix is catching a real corpus pattern and not only a synthetic test case
+- Remaining macro gap after this phase:
+- some method noise is now clearly a second-order trimming issue rather than a first-order role trigger issue, for example `using a rate-controlled setup.`, `uses $\Phi$ to decline.`, `power-law model for viscosity ...`, and `highly nonlinear and not consistent ...`
+- the `1732` Chinese sample still shows a broader mojibake/front-matter readability problem in real output, even though explicit article-number stripping and summary-selection regressions are now covered
+- `781` still shows that a tiny class of almost-empty / BOM-dominated markdowns should probably be dropped earlier instead of becoming a fake one-move `problem` trace
+- Next highest-value unresolved L2 gap: continue from weak-clause filtering into cue-trim cleanup, so fallback `method` summaries are not allowed to collapse from a longer matched sentence into a leftover clause fragment when the surrounding sentence does not actually contain a downstream-usable method statement.
