@@ -389,3 +389,24 @@ Progress note (2026-03-30, weak method-clause and front-matter noise phase):
 - the `1732` Chinese sample still shows a broader mojibake/front-matter readability problem in real output, even though explicit article-number stripping and summary-selection regressions are now covered
 - `781` still shows that a tiny class of almost-empty / BOM-dominated markdowns should probably be dropped earlier instead of becoming a fake one-move `problem` trace
 - Next highest-value unresolved L2 gap: continue from weak-clause filtering into cue-trim cleanup, so fallback `method` summaries are not allowed to collapse from a longer matched sentence into a leftover clause fragment when the surrounding sentence does not actually contain a downstream-usable method statement.
+
+Progress note (2026-03-30, method cue-trim boundary phase):
+- Root-cause audit on the remaining real-sample method clutter found a deeper failure mode than the previous phase:
+- `_trim_to_first_method_cue(...)` and method-statement detection were still using bare substring hits for literal cues such as `uses `, which meant ordinary words like `causes` could falsely trigger method trimming and produce clause fragments such as `uses a similar stress dependence` or `uses $\Phi$ to decline`
+- in mixed prior-work/current-work sentences, earlier literature context like `performed ... using a rate-controlled setup` could still outrank the actual current-work sentence because the method-cue logic recognized the `using ...` clause but did not recognize nearby current-work sentences like `we simulate ...`
+- Reworked the method-cue logic conservatively rather than broadening generic extraction:
+- English literal method cues now use word-boundary-aware matching instead of raw substring search, so `causes` no longer contains a fake `uses` cue
+- explicit current-work cues such as `we simulate`, `we perform`, and `we apply` are now recognized as method statements, helping the selector prefer the paper's own method sentence over prior-work `using ...` references
+- prior-work author-name sentences such as `X and Y performed ...` are now treated as weak method statements for fallback selection instead of being promoted as the paper's own method
+- Verification:
+- Targeted red-green selection for the new boundary/trim regressions -> `3 passed`
+- Focused file: `backend/tests/test_paper_logic_trace_direct_extraction.py` -> `136 passed`
+- Full backend suite: `cd backend; .\.venv\Scripts\python.exe -m pytest -q` -> `564 passed, 1 warning`
+- Fresh forced-fallback audit recheck after the change:
+- `1534_Hidden structure in liquids` no longer exports the earlier fake method move `uses $\Phi$ to decline.`; its trace now stays `problem + limitation` instead of inventing a method from the word `causes`
+- `1607_Shear jamming and fragility in dense suspensions` keeps the improved `key_method_summary` and closes the earlier `causes ... stress dependence` cue-trim failure mode, though it still has a smaller residual clause-fragment tail later in the trace
+- `1505_Velocity Profiles in Slowly Sheared Bubble Rafts` remains yellow but the residual clutter is now narrower and more interpretable; the next cleanup no longer needs to fight raw `causes/uses` false positives
+- Remaining macro gap after this phase:
+- there is still a smaller cluster of residual method clutter that comes from long matched sentences whose surviving clause is not quite wrong enough to be caught by the current weak-statement filters, for example `using a rate-controlled setup.`, `power-law model for viscosity ...`, and `highly nonlinear and not consistent ...`
+- the `1732` Chinese sample still points to a broader mojibake/front-matter readability issue, and `781` still points to nearly-empty markdown handling
+- Next highest-value unresolved L2 gap: tighten second-order clause-fragment cleanup and figure/caption-style method pollution without undoing the recall gains from the last several fallback phases.

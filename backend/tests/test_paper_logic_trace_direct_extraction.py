@@ -11,6 +11,7 @@ from app.paper_logic_trace.direct_extraction import (
     _refine_limitation_rows,
     _role_for_chunk,
     _summary_from_role_text,
+    _trim_to_first_method_cue,
     build_paper_logic_trace_inputs,
 )
 
@@ -613,6 +614,30 @@ def test_summary_from_role_text_method_prefers_explicit_chinese_method_sentence_
     assert '建立准确的粘弹性本构方程' not in summary
 
 
+def test_trim_to_first_method_cue_does_not_match_inside_causes_word() -> None:
+    text = (
+        'Deformability of particles also causes a similar stress dependence; '
+        'contact deformation can enhance tangential constraints.'
+    )
+
+    trimmed = _trim_to_first_method_cue(text)
+
+    assert trimmed == text
+    assert not trimmed.startswith('uses a similar stress dependence')
+
+
+def test_summary_from_role_text_method_prefers_current_work_sentence_over_prior_using_clause() -> None:
+    text = (
+        'Gadala-Maria and Acrivos performed shear reversal tests using a rate-controlled setup. '
+        'Here, we simulate a stress-controlled shear reversal test.'
+    )
+
+    summary = _summary_from_role_text(text, role='method')
+
+    assert 'we simulate a stress-controlled shear reversal test' in summary.lower()
+    assert 'using a rate-controlled setup' not in summary.lower()
+
+
 def test_fallback_method_summary_can_use_later_explicit_method_chunk(monkeypatch) -> None:
     doc = _doc_with_chunks(
         _chunk('c-1', 'Background', 'Key words: mixer; blade gap; CFX.', line=1),
@@ -724,6 +749,35 @@ def test_fallback_theory_clause_using_symbol_stays_non_method(monkeypatch) -> No
             'c-1',
             '3. Theory',
             'uses $\\Phi$ to decline.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+
+    assert move['role_hint'] != 'method'
+    assert move['act_hint'] != 'propose_method'
+    assert not move['methods']
+
+
+def test_fallback_theory_clause_with_causes_word_stays_non_method(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '3. Theory',
+            'The temperature determined by the solution to Eq. (2.2) varies as quenching causes $\\Phi$ to decline.',
             line=1,
         ),
     )

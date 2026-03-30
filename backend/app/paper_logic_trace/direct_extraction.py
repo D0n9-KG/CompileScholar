@@ -156,9 +156,12 @@ _METHOD_TEXT_PATTERNS = (
     'this paper uses',
     'this study uses',
     'this work uses',
+    'we apply',
     'we use',
     'we employ',
     'we employed',
+    'we perform',
+    'we simulate',
     'using ',
     'uses ',
     'employs ',
@@ -197,6 +200,16 @@ _METHOD_TEXT_REGEXES = (
     re.compile(r'^(?:本文|本研究|本工作|文中).{0,12}(?:采用|使用|利用|建立|构建|提出)'),
     re.compile(r'(?:采用|使用|利用).{0,24}(?:方法|模型|模拟|软件|fluent|ansys|mrf)', re.IGNORECASE),
     re.compile(r'(?:模拟方法|计算方法|研究方法).{0,8}为'),
+)
+_ASCII_METHOD_TEXT_PATTERN_REGEXES = tuple(
+    re.compile(rf'(?<![a-z]){re.escape(pattern)}', re.IGNORECASE)
+    for pattern in _METHOD_TEXT_PATTERNS
+    if pattern.isascii()
+)
+_NON_ASCII_METHOD_TEXT_PATTERNS = tuple(
+    pattern.lower()
+    for pattern in _METHOD_TEXT_PATTERNS
+    if not pattern.isascii()
 )
 _RESULT_TEXT_PATTERNS = (
     'results show',
@@ -515,6 +528,8 @@ _METHOD_REPORTING_CONTEXT_TOKENS = {
 }
 _METHOD_WEAK_STATEMENT_REGEXES = (
     re.compile(r'^(?:it|this|these|those)\s+(?:is|are)\s+consistent\b', re.IGNORECASE),
+    re.compile(r'^[A-Z][A-Za-z\-]+(?:\s+and\s+[A-Z][A-Za-z\-]+)?\s+(?:performed|conducted|reported|used)\b'),
+    re.compile(r'^[A-Z][A-Za-z\-]+\s+et\s+al\.\s+(?:performed|conducted|reported|used)\b', re.IGNORECASE),
     re.compile(r'^(?:solid|dashed)\s+lines?\s+are\s+fits?\b', re.IGNORECASE),
     re.compile(r'^(?:these|those)\s+simulations?\b', re.IGNORECASE),
     re.compile(r'^(?:using|uses?)\s*[$\\({\[]', re.IGNORECASE),
@@ -1378,12 +1393,27 @@ def _looks_like_problem_statement(text: str) -> bool:
     )
 
 
+def _method_text_cue_positions(text: str) -> list[int]:
+    normalized = _normalize_space(text)
+    if not normalized:
+        return []
+    lowered = normalized.lower()
+    positions: list[int] = []
+    for pattern in _ASCII_METHOD_TEXT_PATTERN_REGEXES:
+        positions.extend(match.start() for match in pattern.finditer(normalized))
+    for pattern in _NON_ASCII_METHOD_TEXT_PATTERNS:
+        start = lowered.find(pattern)
+        while start >= 0:
+            positions.append(start)
+            start = lowered.find(pattern, start + 1)
+    return sorted(set(positions))
+
+
 def _looks_like_method_statement(text: str) -> bool:
     normalized = _normalize_space(text)
-    lowered = normalized.lower()
     if any(pattern.search(normalized) for pattern in _METHOD_WEAK_STATEMENT_REGEXES):
         return False
-    if any(pattern in lowered for pattern in _METHOD_TEXT_PATTERNS):
+    if _method_text_cue_positions(normalized):
         return True
     return any(pattern.search(normalized) for pattern in _METHOD_TEXT_REGEXES)
 
@@ -2689,11 +2719,7 @@ def _clean_summary_candidate(text: str) -> str:
 def _trim_to_first_method_cue(text: str) -> str:
     cleaned = _clean_summary_candidate(text)
     lowered = cleaned.lower()
-    statement_cue_positions: list[int] = []
-    for pattern in _METHOD_TEXT_PATTERNS:
-        position = lowered.find(pattern)
-        if position >= 0:
-            statement_cue_positions.append(position)
+    statement_cue_positions = _method_text_cue_positions(cleaned)
     for pattern in _METHOD_TEXT_REGEXES:
         match = pattern.search(cleaned)
         if match:
@@ -2755,6 +2781,9 @@ def _method_summary_sentence_score(sentence: str) -> int:
     if any(
         cue in lowered
         for cue in (
+            'we apply',
+            'we perform',
+            'we simulate',
             'we use',
             'we employ',
             'we propose',
@@ -2773,6 +2802,8 @@ def _method_summary_sentence_score(sentence: str) -> int:
         score += 4
     if any(pattern.search(clean) for pattern in _METHOD_WEAK_STATEMENT_REGEXES):
         score -= 6
+    if re.search(r'\[[0-9,\-\s;]+\]', clean) and not any(cue in lowered for cue in ('we ', 'this paper', 'this study', 'this work')):
+        score -= 2
     if any(token in lowered for token in ('software', 'solver', 'framework', 'protocol')):
         score += 2
     if _is_summary_sentence_noise(clean):
