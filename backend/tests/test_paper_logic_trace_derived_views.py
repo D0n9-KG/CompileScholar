@@ -974,6 +974,98 @@ def test_build_route_state_seed_collects_l3_compiler_inputs_without_overclaiming
     assert 'a-24' in seed['supporting_evidence_ids']
 
 
+def test_build_route_state_seed_excludes_prior_work_method_signal_when_current_method_evidence_is_sufficient() -> None:
+    prior_work_method = ResearchMove(
+        move_id='m-method-0',
+        sequence_no=1,
+        role='method',
+        act_type='adapt_method',
+        summary='Previous work by Zapas, KelchnerLee, FloryA, and Joonas Sorvari used numerical methods to improve the accuracy of relaxation modulus determination.',
+        methods=[
+            MentionValue(surface='Sorvari method', normalized='sorvari method', anchor_ids=['a-1']),
+        ],
+        anchor_ids=['a-1'],
+        slot_provenance=[
+            SlotProvenance(field='methods', value_index=0, anchor_ids=['a-1'], extraction_mode='direct', support_strength='strong'),
+        ],
+    )
+    current_method = ResearchMove(
+        move_id='m-method-1',
+        sequence_no=2,
+        role='method',
+        act_type='propose_method',
+        summary='The paper proposes an improved Sorvari method to determine the relaxation modulus of modified double-base propellant.',
+        methods=[
+            MentionValue(surface='improved Sorvari method', normalized='improved sorvari method', anchor_ids=['a-2']),
+        ],
+        anchor_ids=['a-2'],
+        slot_provenance=[
+            SlotProvenance(field='methods', value_index=0, anchor_ids=['a-2'], extraction_mode='direct', support_strength='strong'),
+        ],
+    )
+    current_experiment_method = ResearchMove(
+        move_id='m-method-exp-1',
+        sequence_no=3,
+        role='method',
+        act_type='run_experiment',
+        summary='进行了改性双基推进剂的拉伸松弛试验，并利用提出的改进型Sorvari法得到改性双基推进剂的松弛模量。',
+        methods=[
+            MentionValue(surface='拉伸松弛试验', normalized='tensile relaxation test', anchor_ids=['a-3']),
+            MentionValue(surface='改进型Sorvari法', normalized='improved sorvari method', anchor_ids=['a-3']),
+        ],
+        anchor_ids=['a-3'],
+        slot_provenance=[
+            SlotProvenance(field='methods', value_index=0, anchor_ids=['a-3'], extraction_mode='direct', support_strength='strong'),
+            SlotProvenance(field='methods', value_index=1, anchor_ids=['a-3'], extraction_mode='direct', support_strength='strong'),
+        ],
+    )
+    current_method_detail = ResearchMove(
+        move_id='m-method-2',
+        sequence_no=4,
+        role='method',
+        act_type='propose_method',
+        summary='The improved Sorvari method iteratively solves for alpha(t) values and then calculates the relaxation modulus.',
+        methods=[
+            MentionValue(surface='numerical iteration', normalized='numerical iteration', anchor_ids=['a-4']),
+        ],
+        anchor_ids=['a-4'],
+        slot_provenance=[
+            SlotProvenance(field='methods', value_index=0, anchor_ids=['a-4'], extraction_mode='direct', support_strength='strong'),
+        ],
+    )
+    trace = PaperLogicTrace(
+        trace_id='paper-1732:paper_logic_trace',
+        schema_version='v2',
+        built_at='2026-03-30T00:00:00Z',
+        paper_metadata=PaperMetadata(
+            paper_id='paper-1732',
+            title='Determination Way of Relaxation Modulus of Modified DB Propellant',
+            title_alt='改性双基推进剂松弛模量的确定方法',
+            paper_type='empirical',
+            source_refs=['a-1'],
+        ),
+        canonical_core=CanonicalCore(
+            moves=[prior_work_method, current_method, current_experiment_method, current_method_detail],
+        ),
+        quality={},
+    )
+
+    contract = build_route_compiler_contract(
+        paper_id=trace.paper_metadata.paper_id,
+        paper_type=trace.paper_metadata.paper_type,
+        moves=list(trace.canonical_core.moves),
+    )
+    seed = build_route_state_seed(trace)
+
+    method_labels = [entry['normalized'] for entry in contract['topic_signals']['methods']]
+
+    assert 'sorvari method' not in method_labels
+    assert 'improved sorvari method' in method_labels
+    assert 'tensile relaxation test' in method_labels
+    assert 'numerical iteration' in method_labels
+    assert 'sorvari method' not in seed['dominant_method_candidates']
+
+
 def test_build_route_state_seed_falls_back_to_inferred_topic_objects_when_trusted_objects_are_missing() -> None:
     result_move = ResearchMove(
         move_id='m-result-1',

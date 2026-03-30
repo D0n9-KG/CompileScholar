@@ -908,6 +908,28 @@ def build_future_work_signals(moves: list[ResearchMove]) -> list[dict[str, Any]]
     return entries
 
 
+def _filter_prior_work_method_signal_entries(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    if not entries:
+        return []
+    current_or_neutral_entries = [
+        entry
+        for entry in entries
+        if not _summary_has_prior_work_cue(str(entry.get('summary') or ''))
+        or _summary_has_current_work_cue(str(entry.get('summary') or ''))
+    ]
+    current_or_neutral_labels = _unique(_entry_label(entry) for entry in current_or_neutral_entries if _entry_label(entry))
+    if len(current_or_neutral_labels) < 2:
+        return list(entries)
+    return [
+        entry
+        for entry in entries
+        if not (
+            _summary_has_prior_work_cue(str(entry.get('summary') or ''))
+            and not _summary_has_current_work_cue(str(entry.get('summary') or ''))
+        )
+    ]
+
+
 def build_route_compiler_contract(
     *,
     paper_id: str,
@@ -932,6 +954,7 @@ def build_route_compiler_contract(
         trusted_only=True,
         roles=method_roles,
     )
+    method_signals = _filter_prior_work_method_signal_entries(method_signals)
     condition_signals = _slot_entries_with_move_context(
         'conditions',
         moves,

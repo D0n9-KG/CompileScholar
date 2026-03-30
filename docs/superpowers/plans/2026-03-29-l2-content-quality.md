@@ -476,3 +476,21 @@ Progress note (2026-03-30, paper-content profile prioritization phase):
 - some canonical `method` moves in real papers are still semantically broader than ideal, for example `1607` still keeps general setup/overview method summaries such as `The authors describe their simulation system ...` alongside stronger current-work method sentences
 - `problem_statements` can still retain one broad setup/background sentence as the final fallback item when a paper genuinely has only one or two explicit problem/task moves
 - Next highest-value unresolved L2 gap: continue from content-profile prioritization into canonical move-level cleanup for broad setup/prior-work method sentences, so L2 itself becomes cleaner rather than relying on derived-view ranking to hide the remaining noise.
+
+Progress note (2026-03-30, prior-work method-signal suppression phase):
+- Followed the next gap from the previous phase into the L3 bridge itself: even after `paper_content_profile.method_statements` was cleaned up, prior-work review moves could still leak trusted method mentions into `route_compiler_contract.topic_signals.methods` and then into `route_state_seed.dominant_method_candidates`.
+- Added a red-green regression for the concrete bilingual-method case where current-paper method evidence is already sufficient (`improved Sorvari method`, `tensile relaxation test`, `numerical iteration`), but a prior-work review move still exports `sorvari method` into L3 method candidates.
+- Reworked method-signal compilation conservatively rather than changing canonical moves:
+- `build_route_compiler_contract(...)` now filters prior-work method entries only when there are already at least two non-prior-work method labels available in the same paper
+- the filter uses the same summary-level current-work / prior-work cue family added in the previous phase, so it removes review-derived method entries without dropping sparse papers that only have literature-context method mentions
+- Verification:
+- Red-green regression: `backend/tests/test_paper_logic_trace_derived_views.py -k "excludes_prior_work_method_signal_when_current_method_evidence_is_sufficient"` -> `1 passed`
+- Focused file: `backend/tests/test_paper_logic_trace_derived_views.py` -> `26 passed`
+- Full backend suite: `cd backend; .\.venv\Scripts\python.exe -m pytest -q` -> `575 passed, 1 warning`
+- Real-sample rechecks on stored current traces after the change:
+- `1732_改性双基推进剂松弛模量的确定方法` no longer exports `sorvari method` from the prior-work review move into `route_compiler_contract.topic_signals.methods` or `route_state_seed.dominant_method_candidates`; the surviving method candidates are now centered on `改进型sorvari法`, `拉伸松弛试验`, `improved sorvari method`, and `numerical iteration`
+- `1607_Shear jamming and fragility in dense suspensions` remains effectively unchanged under the same filter, confirming the phase is narrow: its L3 method candidates still center on stress-controlled rheology, Stokesian dynamics, and the soft-constraint / governing-equation mechanics of the actual paper rather than losing legitimate method content
+- Remaining macro gap after this phase:
+- some current-paper method signals are still too broad or low-yield at the canonical/contract level, for example `1607` still exports generic mechanics/setup labels such as `force and torque balance equations`, `linear resistance`, and `brownian simulations` alongside stronger method tokens
+- some theory-style papers such as `1243` still surface framework/mechanics labels that are individually grounded but not yet compressed into the most downstream-useful method vocabulary
+- Next highest-value unresolved L2 gap: tighten method-signal ranking or filtering for broad setup/framework labels that are technically correct but still less useful than the paper's core operative method, so L3 receives a shorter and more decision-useful method maturity picture per paper.
