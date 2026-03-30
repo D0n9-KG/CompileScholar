@@ -7,6 +7,7 @@ from app.paper_logic_trace.compiler import compile_paper_logic_trace
 from app.paper_logic_trace.direct_extraction import (
     _build_move_relation_rows,
     _build_research_move_prompt,
+    _refine_limitation_rows,
     _role_for_chunk,
     build_paper_logic_trace_inputs,
 )
@@ -156,6 +157,34 @@ def test_build_paper_logic_trace_inputs_preserves_metadata_audit_fields(monkeypa
 
     assert payload['paper_metadata']['title_alt'] == '1.2《污水综合排放标准》不适应污水处理厂建设管理需求'
     assert payload['paper_metadata']['metadata_enrichment']['mode'] == 'skipped_unreliable_title_match'
+
+
+def test_refine_limitation_rows_rewrites_indicating_limitation_to_specific_scope() -> None:
+    rows = [{'surface': 'indicating limitation', 'normalized': 'indicating limitation', 'inferred': True}]
+
+    refined = _refine_limitation_rows(
+        rows,
+        text=(
+            'Unfortunately, this rotating disk could not accommodate such highly viscous fluid. '
+            'The dragged film was so thick that the open windows were jammed, indicating a limitation of the classical setup.'
+        ),
+    )
+
+    assert [row['normalized'] for row in refined] == ['limitation of classical setup']
+
+
+def test_refine_limitation_rows_rewrites_bare_difficult_to_difficult_for_clause() -> None:
+    rows = [{'surface': 'difficult', 'normalized': 'difficult', 'inferred': True}]
+
+    refined = _refine_limitation_rows(
+        rows,
+        text=(
+            'If there is no wall-bounded film on the spoke, it is difficult for the free film to stabilize '
+            'within the following window.'
+        ),
+    )
+
+    assert [row['normalized'] for row in refined] == ['difficult for free film to stabilize']
 
 
 def test_build_paper_logic_trace_inputs_repairs_suspicious_local_title_before_export(monkeypatch) -> None:

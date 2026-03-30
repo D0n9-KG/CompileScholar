@@ -381,6 +381,18 @@ _GENERIC_LIMITATION_PHRASES = {
     'technique_limitation',
     'data_processing_error',
     'validity_boundary',
+    'difficult',
+    'difficulty',
+    'indicating limitation',
+    'showing limitation',
+    'suggesting limitation',
+}
+_LOW_VALUE_LIMITATION_PHRASES = {
+    'difficult',
+    'difficulty',
+    'indicating limitation',
+    'showing limitation',
+    'suggesting limitation',
 }
 _LIMITATION_CUE_WORDS = (
     'cost',
@@ -1747,9 +1759,57 @@ def _refine_limitation_rows(rows: list[dict[str, Any]], *, text: str) -> list[di
                     base = _trim_limitation_phrase(req_match.group(1))
                     if base:
                         candidate = f'requiring {base}'
+            if not candidate and phrase in {'difficult', 'difficulty'}:
+                difficult_for_match = re.search(
+                    r'\bdifficult\s+for\s+(?:the\s+)?([a-z0-9][a-z0-9\-\s]{2,30})\s+to\s+([a-z0-9][a-z0-9\-\s]{2,30})',
+                    lowered_text,
+                )
+                if difficult_for_match:
+                    subject = _trim_limitation_phrase(difficult_for_match.group(1))
+                    subject = re.sub(r'^(?:the|a|an)\s+', '', subject).strip()
+                    action = re.split(
+                        r'\b(?:within|under|with|during|where|which|that|while|when|because|but|and)\b',
+                        difficult_for_match.group(2),
+                        maxsplit=1,
+                    )[0]
+                    action = _trim_limitation_phrase(action)
+                    if subject and action:
+                        candidate = f'difficult for {subject} to {action}'
+                if not candidate:
+                    difficult_to_match = re.search(r'\bdifficult\s+to\s+([a-z0-9][a-z0-9\-\s]{2,40})', lowered_text)
+                    if difficult_to_match:
+                        action = re.split(
+                            r'\b(?:within|under|with|during|where|which|that|while|when|because|but|and)\b',
+                            difficult_to_match.group(1),
+                            maxsplit=1,
+                        )[0]
+                        action = _trim_limitation_phrase(action)
+                        if action:
+                            candidate = f'difficult to {action}'
+                if not candidate:
+                    difficulty_match = re.search(
+                        r'\bdifficulty(?:\s+of|\s+lies\s+in)\s+([a-z0-9][a-z0-9\-\s]{4,50})',
+                        lowered_text,
+                    )
+                    if difficulty_match:
+                        base = _trim_limitation_phrase(difficulty_match.group(1))
+                        if base:
+                            candidate = f'difficulty of {base}'
+            if not candidate and phrase.endswith('limitation'):
+                limitation_of_match = re.search(
+                    r'\blimitation(?:s)?\s+of\s+(?:the\s+)?([a-z0-9][a-z0-9\-\s]{3,40})',
+                    lowered_text,
+                )
+                if limitation_of_match:
+                    base = _trim_limitation_phrase(limitation_of_match.group(1))
+                    base = re.sub(r'^(?:the|a|an)\s+', '', base).strip()
+                    if base:
+                        candidate = f'limitation of {base}'
             if candidate:
                 row = {**row, 'surface': candidate, 'normalized': candidate}
                 phrase = candidate
+            elif phrase in _LOW_VALUE_LIMITATION_PHRASES:
+                continue
         prepared.append((row, phrase))
 
     seen: set[str] = set()

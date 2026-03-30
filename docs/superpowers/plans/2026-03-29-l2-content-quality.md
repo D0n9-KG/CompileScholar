@@ -260,3 +260,23 @@ Progress note (2026-03-30, companion-limitation dedup phase):
 - `s870_Pb-activated amine-assisted photocatalytic hydrogen evolution reaction...` still stays on `empirical_default`, remains `yellow`, and emits no limitation moves.
 - `s93_Numerical investigation of twin-liquid film...` still stays on the existing green empirical path; its remaining limitation content is the older heuristic-style noise (`indicating limitation`, `difficult`) rather than a new artifact introduced by the companion-move dedup.
 - Next highest-value unresolved L2 gap: the new duplication bug is closed, but L2 still has a broader compression/cleanup problem rather than a pure recall problem. In practical terms, single-paper traces like `1243` are now structurally sufficient for downstream L3/L4, yet some empirical papers still retain legacy heuristic limitation clutter and overlapping move phrasing, so the next phase should target macro move compression / noise cleanup without narrowing recall to a few hand-tuned papers.
+
+Progress note (2026-03-30, generic limitation-noise cleanup phase):
+- Added red-green helper regressions for two corpus-level low-information limitation patterns that were still leaking through `s93` and similar papers:
+- summary-derived phrases like `indicating limitation` that mention the existence of a limitation but not its actual scope
+- cue-word fallbacks that collapse a real clause such as `it is difficult for the free film to stabilize ...` into the near-empty singleton `difficult`
+- Reworked `_refine_limitation_rows` conservatively rather than widening extraction:
+- low-information phrases such as `difficult`, `difficulty`, and `indicating limitation` are now treated as placeholders that must be rewritten from the supporting text into a more specific limitation phrase when possible
+- new rewrite paths recover patterns such as `limitation of <scope>`, `difficult for <object> to <action>`, `difficult to <action>`, and `difficulty of <scope>`
+- if no specific rewrite can be recovered, these placeholder phrases are dropped instead of being exported as misleading L2 content
+- Verification:
+- Red-green regressions: `backend/tests/test_paper_logic_trace_direct_extraction.py -k "refine_limitation_rows_rewrites"`
+- Focused file: `backend/tests/test_paper_logic_trace_direct_extraction.py` -> `101 passed`
+- Full backend suite: `cd backend; .\.venv\Scripts\python.exe -m pytest -q` -> `529 passed, 1 warning`
+- Real-sample rechecks:
+- `1243_Data-Driven Computational Plasticity` remains stable after the cleanup: still `green`, still `theory_modeling`, still `ready_for_l4=True`, and still keeps the single grounded drawback limitation `huge amount of data required for running simulations`.
+- `s93_Numerical investigation of twin-liquid film...` improves materially at the content level rather than only numerically:
+- the older limitation bundle `jammed open windows`, `thick dragged film`, `could not accommodate highly viscous fluid`, `indicating limitation` is reduced to the more specific grounded pair `jammed open windows` and `could not accommodate highly viscous fluid`
+- the separate singleton `difficult` limitation is rewritten to the more content-grounded phrase `due to non-slip boundary condition`
+- `s870_Pb-activated amine-assisted photocatalytic hydrogen evolution reaction...` remains untouched by the cleanup: still `empirical_default`, still `yellow`, and still emits no limitation moves
+- Next highest-value unresolved L2 gap: limitation noise is cleaner now, but the broader macro gap remains overlapping move phrasing and under-compressed narrative redundancy across roles. In other words, L2 is getting closer to being both faithful and downstream-usable, yet some papers still spread one idea across several adjacent moves or keep weak summary phrasing when the underlying evidence is good. The next phase should therefore focus on move-level compression / redundancy cleanup, not on adding more slot-specific heuristics.
