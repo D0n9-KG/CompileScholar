@@ -375,6 +375,178 @@ _RESOURCE_BAD_LEAD_TOKENS = {
     'provides',
     'using',
 }
+_METHOD_HEAD_TOKENS = {
+    'algorithm',
+    'algorithms',
+    'approach',
+    'approaches',
+    'dynamics',
+    'equation',
+    'equations',
+    'framework',
+    'frameworks',
+    'law',
+    'laws',
+    'learning',
+    'method',
+    'methods',
+    'model',
+    'models',
+    'network',
+    'networks',
+    'protocol',
+    'protocols',
+    'simulation',
+    'simulations',
+    'solver',
+    'solvers',
+    'technique',
+    'techniques',
+    'test',
+    'tests',
+}
+_METHOD_BACKTRACK_STOP_TOKENS = {
+    *_STOP_TOKENS,
+    'analysis',
+    'analyses',
+    'article',
+    'authors',
+    'construct',
+    'constructing',
+    'constructs',
+    'describe',
+    'describes',
+    'described',
+    'determine',
+    'determines',
+    'determined',
+    'employ',
+    'employed',
+    'employing',
+    'employs',
+    'examines',
+    'examine',
+    'examined',
+    'introduce',
+    'introduced',
+    'introduces',
+    'introducing',
+    'investigation',
+    'investigations',
+    'paper',
+    'study',
+    'using',
+    'used',
+    'uses',
+    'use',
+}
+_METHOD_GENERIC_PHRASES = {
+    'algorithm',
+    'algorithms',
+    'approach',
+    'approaches',
+    'framework',
+    'frameworks',
+    'method',
+    'methods',
+    'model',
+    'models',
+    'network',
+    'networks',
+    'protocol',
+    'protocols',
+    'simulation',
+    'simulations',
+    'technique',
+    'techniques',
+}
+_METHOD_GENERIC_MODIFIER_TOKENS = {
+    'basic',
+    'classical',
+    'common',
+    'conventional',
+    'current',
+    'efficient',
+    'general',
+    'generic',
+    'new',
+    'novel',
+    'original',
+    'present',
+    'proposed',
+    'simple',
+    'standard',
+}
+_METHOD_LEADING_VERB_PATTERNS = (
+    re.compile(
+        r'^(?:we\s+)?(?:adopt(?:ed|ing|s)?|apply(?:ing|ied|ies)|employ(?:ed|ing|s)?|'
+        r'focus(?:ed|es|ing)?\s+on|introduc(?:e|ed|es|ing)|use(?:d|s|ing)?)\s+',
+        re.IGNORECASE,
+    ),
+)
+_METHOD_BAD_LEAD_TOKENS = {
+    'calculate',
+    'calculated',
+    'calculates',
+    'calculating',
+    'characterize',
+    'characterized',
+    'characterizes',
+    'characterizing',
+    'compute',
+    'computed',
+    'computes',
+    'computing',
+    'define',
+    'defined',
+    'defines',
+    'defining',
+    'derive',
+    'derived',
+    'derives',
+    'deriving',
+    'determine',
+    'determined',
+    'determines',
+    'determining',
+    'estimate',
+    'estimated',
+    'estimates',
+    'estimating',
+    'mimic',
+    'mimicked',
+    'mimicking',
+    'mimics',
+    'predict',
+    'predicted',
+    'predicting',
+    'predicts',
+    'quantify',
+    'quantified',
+    'quantifies',
+    'quantifying',
+    'reproduce',
+    'reproduced',
+    'reproduces',
+    'reproducing',
+    'represent',
+    'represented',
+    'represents',
+    'representing',
+    'simulate',
+    'simulated',
+    'simulates',
+    'simulating',
+    'solve',
+    'solved',
+    'solves',
+    'solving',
+    'study',
+    'studied',
+    'studies',
+    'studying',
+}
+_METHOD_AUGMENTATION_ACTS = {'propose_method', 'adapt_method', 'run_experiment'}
 _GENERIC_LIMITATION_PHRASES = {
     'assumption',
     'methodological',
@@ -1508,6 +1680,91 @@ def _resource_mentions_from_text(text: str, *, limit: int = 3) -> list[dict[str,
     return rows
 
 
+def _method_mentions_from_text(text: str, *, limit: int = 3) -> list[dict[str, Any]]:
+    normalized = _normalize_space(text)
+    if not normalized:
+        return []
+
+    rows: list[dict[str, Any]] = []
+    seen: set[str] = set()
+
+    def _push_phrase(raw_phrase: str) -> bool:
+        phrase = re.split(r'[.;:,()]', raw_phrase, maxsplit=1)[0]
+        phrase = re.split(
+            r'\b(?:to|for|with|under|where|which|that|while|when|during|from)\b',
+            phrase,
+            maxsplit=1,
+        )[0]
+        for pattern in _METHOD_LEADING_VERB_PATTERNS:
+            phrase = pattern.sub('', phrase)
+        phrase = _clean_phrase(phrase)
+        if not phrase or phrase in seen or phrase in _METHOD_GENERIC_PHRASES:
+            return False
+        tokens = phrase.split()
+        if not tokens:
+            return False
+        if len(tokens) == 1 and tokens[0] in _METHOD_HEAD_TOKENS:
+            return False
+        if tokens[0] in _METHOD_BAD_LEAD_TOKENS:
+            return False
+        if (
+            len(tokens) <= 3
+            and tokens[-1] in _METHOD_HEAD_TOKENS
+            and all(token in _METHOD_GENERIC_MODIFIER_TOKENS for token in tokens[:-1])
+        ):
+            return False
+        seen.add(phrase)
+        rows.append({'surface': phrase, 'normalized': phrase})
+        return len(rows) >= limit
+
+    english_head_regex = (
+        r'(?:algorithm|algorithms|approach|approaches|dynamics|equation|equations|framework|frameworks|'
+        r'law|laws|learning|method|methods|model|models|network|networks|protocol|protocols|'
+        r'simulation|simulations|solver|solvers|technique|techniques|test|tests)'
+    )
+    english_patterns = (
+        re.compile(
+            rf'\b(?:using|uses|used|employing|employs|employed|via|through|based on)\s+'
+            rf'(?:a|an|the)?\s*([a-z0-9][a-z0-9\-\s]{{2,90}}?(?:{english_head_regex}))\b',
+            re.IGNORECASE,
+        ),
+        re.compile(
+            rf'\b([a-z0-9][a-z0-9\-\s]{{2,70}}?(?:{english_head_regex}))\b',
+            re.IGNORECASE,
+        ),
+    )
+
+    lowered = normalized.lower()
+    for pattern in english_patterns:
+        for match in pattern.finditer(lowered):
+            if _push_phrase(match.group(1)):
+                return rows
+
+    for segment in re.split(r'[.!?;:]', normalized):
+        tokens = [token.lower() for token in _WORD_RE.findall(segment) if token]
+        for index, token in enumerate(tokens):
+            if token not in _METHOD_HEAD_TOKENS:
+                continue
+            start = index
+            while start > 0 and index - start < 4:
+                candidate = tokens[start - 1]
+                if candidate in _METHOD_BACKTRACK_STOP_TOKENS:
+                    break
+                start -= 1
+            if _push_phrase(' '.join(tokens[start : index + 1])):
+                return rows
+
+    for pattern in (
+        re.compile(r'(?:采用|使用|利用|基于)([\u4e00-\u9fffA-Za-z0-9\-]{2,40}?(?:方法|模型|模拟|仿真|算法|技术|协议|神经网络|有限元法))'),
+        re.compile(r'([A-Za-z]{2,12}\s*技术)'),
+    ):
+        for match in pattern.finditer(normalized):
+            if _push_phrase(match.group(1).lower()):
+                return rows
+
+    return rows
+
+
 def _refine_resource_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     prepared: list[tuple[dict[str, Any], str]] = []
     for row in rows or []:
@@ -2038,13 +2295,16 @@ def _drop_method_like_research_objects(
     role: str,
 ) -> list[dict[str, Any]]:
     if not research_objects or not methods:
-        method_phrases = set()
+        method_rows: list[tuple[str, bool]] = []
     else:
-        method_phrases = {
-            _clean_phrase(str(row.get('normalized') or row.get('surface') or ''))
+        method_rows = [
+            (
+                _clean_phrase(str(row.get('normalized') or row.get('surface') or '')),
+                bool(row.get('inferred')),
+            )
             for row in methods
             if _clean_phrase(str(row.get('normalized') or row.get('surface') or ''))
-        }
+        ]
 
     filtered: list[dict[str, Any]] = []
     for row in research_objects:
@@ -2062,13 +2322,20 @@ def _drop_method_like_research_objects(
         if role in {'method', 'experiment', 'limitation'} and len(tokens) <= 5 and tokens[-1] in _STRICT_METHOD_ROLE_OBJECT_HEAD_TOKENS:
             continue
         phrase_tokens = set(tokens)
-        overlaps_method = any(
+        overlapping_methods = [
+            method_inferred
+            for method_phrase, method_inferred in method_rows
+            if (
             phrase == method_phrase
             or phrase_tokens.issubset(set(method_phrase.split()))
             or set(method_phrase.split()).issubset(phrase_tokens)
-            for method_phrase in method_phrases
-        )
-        if overlaps_method:
+            )
+        ]
+        overlaps_direct_method = any(not method_inferred for method_inferred in overlapping_methods)
+        overlaps_inferred_method = any(method_inferred for method_inferred in overlapping_methods)
+        if overlaps_direct_method:
+            continue
+        if overlaps_inferred_method and bool(row.get('inferred')):
             continue
         filtered.append(row)
     return filtered
@@ -2078,7 +2345,9 @@ def _augment_sparse_slots(
     *,
     text: str,
     role: str,
+    act_type: str = '',
     research_objects: list[dict[str, Any]],
+    methods: list[dict[str, Any]],
     observed_variables: list[dict[str, Any]],
     metrics: list[dict[str, Any]],
     comparators: list[dict[str, Any]],
@@ -2128,6 +2397,11 @@ def _augment_sparse_slots(
     )
     return {
         'research_objects': merged_research_objects,
+        'methods': methods or (
+            _mark_heuristic_mentions(_method_mentions_from_text(text, limit=3))
+            if str(act_type or '').strip() in _METHOD_AUGMENTATION_ACTS
+            else []
+        ),
         'observed_variables': observed_variables or (_mark_heuristic_mentions(_observed_variable_mentions(text, limit=3)) if role_token in observed_variable_roles else []),
         'metrics': metrics or (_mark_heuristic_mentions(_metric_mentions(text, limit=3)) if role_token in metric_roles else []),
         'comparators': _merge_raw_mention_rows(comparators, heuristic_comparators),
@@ -2642,12 +2916,14 @@ def _fallback_move_payload(window: dict[str, Any]) -> list[dict[str, Any]]:
     anchor_chunk_ids = [str(chunk.chunk_id).strip() for chunk in chunks[:2] if str(chunk.chunk_id).strip()]
     summary = _summary_from_text(' '.join(chunk.text for chunk in chunks))
     role = _normalize_role(window.get('role_hint'))
-    methods = _mark_heuristic_mentions(_keyword_mentions(summary, limit=2)) if role in {'method', 'experiment'} else []
+    methods = _mark_heuristic_mentions(_method_mentions_from_text(summary, limit=2)) if role in {'method', 'experiment'} else []
     conditions = _mark_heuristic_mentions(_condition_mentions(summary, limit=2))
     augmented = _augment_sparse_slots(
         text=summary,
         role=role,
+        act_type=_ROLE_TO_ACT.get(role, 'define_task'),
         research_objects=[],
+        methods=methods,
         observed_variables=[],
         metrics=[],
         comparators=[],
@@ -2661,7 +2937,7 @@ def _fallback_move_payload(window: dict[str, Any]) -> list[dict[str, Any]]:
             'summary': summary,
             'anchor_chunk_ids': anchor_chunk_ids,
             'research_objects': augmented['research_objects'],
-            'methods': methods,
+            'methods': augmented['methods'],
             'observed_variables': augmented['observed_variables'],
             'metrics': augmented['metrics'],
             'comparators': augmented['comparators'],
@@ -2858,7 +3134,9 @@ def _move_rows_from_windows(
             augmented = _augment_sparse_slots(
                 text=move_support_text,
                 role=role,
+                act_type=act_type,
                 research_objects=research_objects,
+                methods=methods,
                 observed_variables=observed_variables,
                 metrics=metrics,
                 comparators=comparators,
@@ -2866,6 +3144,7 @@ def _move_rows_from_windows(
                 resource_mentions=resource_mentions,
             )
             research_objects = _normalize_mention_rows(augmented['research_objects'], anchor_ids=anchor_chunk_ids)
+            methods = _normalize_mention_rows(augmented['methods'], anchor_ids=anchor_chunk_ids)
             research_objects = _refine_research_object_rows(research_objects)
             research_objects = _drop_method_like_research_objects(
                 research_objects=research_objects,
@@ -2925,6 +3204,11 @@ def _move_rows_from_windows(
                 support_text=move_support_text,
                 source_sections=[chunk_by_id[chunk_id].section for chunk_id in anchor_chunk_ids if chunk_id in chunk_by_id],
             )
+            if not methods and act_type in _METHOD_AUGMENTATION_ACTS:
+                methods = _normalize_mention_rows(
+                    _mark_heuristic_mentions(_method_mentions_from_text(move_support_text, limit=3)),
+                    anchor_ids=anchor_chunk_ids,
+                )
             if role in (_TRUSTED_SCOPE_RESEARCH_OBJECT_ROLES | _TRUSTED_PREDICTION_TARGET_RESEARCH_OBJECT_ROLES):
                 explicit_research_objects = _merge_preferred_mention_rows(
                     _explicit_scope_research_object_mentions(move_support_text, role=role, limit=3),
@@ -2938,6 +3222,12 @@ def _move_rows_from_windows(
                     anchor_ids=anchor_chunk_ids,
                 )
                 research_objects = _refine_research_object_rows(research_objects)
+                research_objects = _drop_method_like_research_objects(
+                    research_objects=research_objects,
+                    methods=methods,
+                    role=role,
+                )
+            elif methods:
                 research_objects = _drop_method_like_research_objects(
                     research_objects=research_objects,
                     methods=methods,

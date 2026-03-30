@@ -1113,6 +1113,259 @@ def test_research_object_filter_drops_introduced_into_clause_when_subject_object
     assert all('introduced into the weak form' not in item for item in normalized)
 
 
+def test_method_move_without_methods_backfills_particle_dynamics_simulation(monkeypatch) -> None:
+    summary = 'This article examines the fragility of shear jammed states using particle dynamics simulations with idealized conditions.'
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '2. Method',
+            summary,
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'method',
+                'act_type': 'propose_method',
+                'summary': summary,
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'methods': [],
+                'confidence': 0.7,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+    normalized_methods = {str(item.get('normalized') or '').lower() for item in move['methods']}
+
+    assert 'particle dynamics simulations' in normalized_methods
+
+
+def test_method_move_without_methods_backfills_finite_element_method(monkeypatch) -> None:
+    summary = 'The constitutive model is introduced into the weak form to formulate the problem in terms of displacement, which is then discretized using the finite element method.'
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '2. Method',
+            summary,
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'method',
+                'act_type': 'adapt_method',
+                'summary': summary,
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'methods': [],
+                'confidence': 0.7,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+    normalized_methods = {str(item.get('normalized') or '').lower() for item in move['methods']}
+
+    assert 'finite element method' in normalized_methods
+
+
+def test_set_condition_move_does_not_backfill_incidental_algorithm_reference_as_method(monkeypatch) -> None:
+    summary = (
+        'The penalty parameters are selected to keep particle overlap below 2% of the particle radius, '
+        'which is fundamentally different from hard-sphere algorithms.'
+    )
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '2. Method',
+            summary,
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'method',
+                'act_type': 'set_condition',
+                'summary': summary,
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'methods': [],
+                'conditions': [],
+                'confidence': 0.7,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+
+    assert move['act_hint'] == 'set_condition'
+    assert move['methods'] == []
+
+
+def test_promoted_method_move_backfills_method_mentions_after_role_stabilization(monkeypatch) -> None:
+    summary = 'This article examines the fragility of shear jammed states using particle dynamics simulations with idealized conditions.'
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '1. Introduction',
+            summary,
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'problem',
+                'act_type': 'define_task',
+                'summary': summary,
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'methods': [],
+                'confidence': 0.7,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+    normalized_methods = {str(item.get('normalized') or '').lower() for item in move['methods']}
+
+    assert move['role_hint'] == 'method'
+    assert move['act_hint'] == 'propose_method'
+    assert 'particle dynamics simulations' in normalized_methods
+
+
+def test_method_backfill_filters_generic_efficient_method_fragment(monkeypatch) -> None:
+    summary = (
+        'We also omit Brownian motions, which are relevant for smaller particles. '
+        'Stokesian Dynamics (SD) is an efficient method to reproduce particle dynamics in this Stokes regime. '
+        'Recently, the SD approach was extended to be coupled with frictional contact mechanics.'
+    )
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '2. Method',
+            summary,
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'method',
+                'act_type': 'propose_method',
+                'summary': summary,
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'methods': [],
+                'confidence': 0.7,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+    normalized_methods = {str(item.get('normalized') or '').lower() for item in move['methods']}
+
+    assert 'stokesian dynamics' in normalized_methods
+    assert 'sd approach' in normalized_methods
+    assert 'efficient method' not in normalized_methods
+    assert 'smaller particles stokesian dynamics' not in normalized_methods
+    assert 'reproduce particle dynamics' not in normalized_methods
+
+
+def test_method_backfill_filters_focus_on_simple_model_fragment(monkeypatch) -> None:
+    summary = (
+        'In this article, we focus on a simple model and employ a soft-constraint approach '
+        'to represent contact constraints between particles.'
+    )
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '2. Method',
+            summary,
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'method',
+                'act_type': 'propose_method',
+                'summary': summary,
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'methods': [],
+                'confidence': 0.7,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+    normalized_methods = {str(item.get('normalized') or '').lower() for item in move['methods']}
+
+    assert 'soft-constraint approach' in normalized_methods
+    assert 'focus on simple model' not in normalized_methods
+    assert 'simple model' not in normalized_methods
+
+
 def test_research_object_filter_trims_leading_establish_verb_from_domain_object(monkeypatch) -> None:
     doc = _doc_with_chunks(
         _chunk(

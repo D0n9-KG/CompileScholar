@@ -299,3 +299,28 @@ Progress note (2026-03-30, nearby method-dedup phase):
 - `1243_Data-Driven Computational Plasticity` remains structurally healthy, with `move_count=11`, `method_count=5`, and the grounded drawback limitation still preserved.
 - `1607_Shear jamming and fragility in dense suspensions` keeps its distinct stress-controlled / Stokesian / contact-force method chain (`move_count=19`, `method_count=10`) rather than collapsing into one over-merged method blob.
 - Next highest-value unresolved L2 gap: L2 single-paper traces are now less cluttered by repeated limitation/method restatements, but several papers still show over-split method ladders or thin experiment/result anchoring where the extracted moves are distinct enough to avoid dedup yet still not ideal for downstream L3/L4 route reconstruction. The next phase should inspect those remaining high-frequency content patterns from fresh corpus samples before changing any more compression rules.
+
+Progress note (2026-03-30, method-backfill noise cleanup phase):
+- Added red-green regression coverage for three concrete method-slot noise patterns surfaced by the new sparse-method backfill path:
+- generic head phrases such as `efficient method`
+- action-led sentence fragments such as `focus on simple model`
+- cross-sentence token-backtrack pollution such as `smaller particles stokesian dynamics`
+- Root-cause audit showed `_method_mentions_from_text` had two independent failure modes:
+- broad method-head matching could preserve short generic `modifier + head` phrases and verb-led fragments when a summary clearly mentioned a real method elsewhere in the same sentence
+- the token-backtrack fallback ignored sentence boundaries, so context words from the preceding sentence could leak into the extracted method phrase
+- Reworked `_method_mentions_from_text` conservatively rather than broadening dedup or slot merging:
+- strip only a narrow set of leading method-intro verbs such as `employ`, `use`, and `focus on` before normalizing the candidate phrase
+- reject short phrases that are only generic modifiers attached to a generic method head
+- reject remaining action-led method candidates such as `reproduce ...` / `represent ...` / `simulate ...`
+- constrain the token-backtrack fallback to operate within sentence/clause segments instead of across the whole summary text
+- Verification:
+- Red-green regressions: `backend/tests/test_paper_logic_trace_direct_extraction.py -k "generic_efficient_method_fragment or focus_on_simple_model_fragment"`
+- Focused method/object regressions: `backend/tests/test_paper_logic_trace_direct_extraction.py -k "backfills_particle_dynamics_simulation or backfills_finite_element_method or incidental_algorithm_reference_as_method or promoted_method_move_backfills_method_mentions_after_role_stabilization or descriptive_clause_phrases or scheme_reporting_and_description_fragments or generic_efficient_method_fragment or focus_on_simple_model_fragment"` -> `8 passed`
+- Focused file: `backend/tests/test_paper_logic_trace_direct_extraction.py` -> `111 passed`
+- Full backend suite: `cd backend; .\.venv\Scripts\python.exe -m pytest -q` -> `539 passed, 1 warning`
+- Real-sample forced-local-fallback recheck after the change:
+- `1607_Shear jamming and fragility in dense suspensions` now keeps method candidates centered on `stokesian dynamics`, `sd approach`, and `soft-constraint approach`, while dropping prior noise such as `efficient method`, `focus on simple model`, `simple model`, `reproduce particle dynamics`, and `smaller particles stokesian dynamics`
+- the cleanup stayed narrow: earlier sparse-method wins such as `particle dynamics simulations` and `finite element method` remain covered by regression tests, and the research-object preservation regressions introduced in the previous subphase remain green
+- Macro gap observed after the cleanup:
+- the sparse local-fallback path is now less noisy on empirical method-heavy papers, but it still undersupplies role structure on harder papers such as `1243_Data-Driven Computational Plasticity` and Chinese paper `282_叶片间隙对潜水搅拌器流场特性的影响`, where fallback extraction remains problem-dominant and can miss method/result moves entirely
+- Next highest-value unresolved L2 gap: move from slot-level cleanup to fallback window-role / summary stabilization for theory-heavy and Chinese papers, because L2 still falls short of the “single paper can stand on its own for L3/L4” target whenever the upstream move extractor is sparse or unavailable.
