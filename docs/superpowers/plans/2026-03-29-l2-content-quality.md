@@ -561,3 +561,31 @@ Progress note (2026-03-30, move-aware method candidate compression phase):
 - Remaining macro gap after this phase:
 - route-seed method candidates are now better distributed across moves, but some papers still keep context or implementation-detail phrases such as `harmonic penalty function`, `controlled flow rate via aperture or moving wall`, `silo flow`, or `gravity-driven flow` in the compressed top list when the underlying method extraction itself is broad
 - Next highest-value unresolved L2 gap: continue compressing route-seed methods toward the shortest stable core method vocabulary without overfitting, especially by demoting context/setup labels that are still treated as non-secondary in mixed empirical papers.
+
+Progress note (2026-03-30, setup-context method filler compression phase):
+- Follow-up audit on the new route-seed outputs showed a second residual selection-layer problem after the cross-move compression landed:
+- papers with enough core methods could still spend top-method slots on setup/context filler labels such as `controlled flow rate via aperture or moving wall`, `silo flow`, `gravity-driven flow`, or `simple shear flow assumption`
+- sparse papers with only contextual method evidence still needed to keep one grounded label rather than collapsing to an empty method list
+- Added a paired regression set for this next gap:
+- when core methods already exist, setup/context filler labels should not back-fill `dominant_method_candidates`
+- when a setup/context label is the only grounded method signal, the best grounded label should still be preserved
+- Reworked route-seed method compression narrowly inside `derived_views.py`:
+- introduced `_is_contextual_method_filler_entry(...)` to distinguish contextual/setup method labels from the more method-relevant secondary detail labels already handled in the previous phase
+- treated contextual fillers as secondary during route-seed selection, so they no longer enter the first-pass / second-pass primary method pool
+- capped secondary-detail backfill at a shorter core-method target (`<= 4` labels) and only fall back to a single contextual label when no stronger method candidate is available
+- kept all changes local to route-state method candidate selection and readiness inputs; canonical move evidence and the broader method-entry pool remain intact
+- Verification:
+- Targeted regressions: `backend/tests/test_paper_logic_trace_derived_views.py -k "deprioritizes_clause_style_method_labels_when_named_methods_exist or omits_setup_context_method_fillers_when_core_methods_exist or keeps_setup_context_method_label_when_it_is_the_only_grounded_signal"` -> `3 passed`
+- Focused file: `backend/tests/test_paper_logic_trace_derived_views.py` -> `32 passed`
+- Full backend suite: `cd backend; .\.venv\Scripts\python.exe -m pytest -q` -> `581 passed, 1 warning`
+- Real-sample rechecks after the change:
+- `1607_Shear jamming and fragility in dense suspensions` now compresses to four core route-seed methods: `stress-controlled rheology algorithm`, `soft-constraint approach`, `stress-controlled shear reversal test`, and `stokesian dynamics`, dropping the earlier secondary tail
+- `1732` remains healthy and concise with `numerical iteration`, `改进型sorvari法`, `拉伸松弛试验`, and `improved sorvari method`
+- `1243_Data-Driven Computational Plasticity` remains stable and still preserves framework-level methods because those are part of the paper's actual method story
+- `04_1901_On dense granular flows` now compresses to `prandtl mixing length approach` plus `local rheology described by a friction μ(i)` instead of back-filling setup/context phrases
+- Additional non-overfit spot checks stayed directionally healthy:
+- `02_1416_Young-Dupre Revisited` still keeps `adsorption isotherm analysis`
+- neural-network and photocatalysis samples still keep domain-specific methods such as `genetic algorithm backpropagation (gabp) neural network model` and `quantum mechanics in explicit solvent`
+- Remaining macro gap after this phase:
+- some route-seed method labels are now shorter and cleaner, but old or degraded traces can still surface renamed clause-style labels such as `stress-controlled flow determination`, and paper-level `key_method_summary` selection can still drift toward governing-equation/setup prose even when route-seed methods are already good
+- Next highest-value unresolved L2 gap: continue tightening canonical method-label compression and paper-level method-summary selection so L2 not only picks the right method slots, but also phrases the single-paper method story in the shortest accurate form for downstream L3/L4 use.

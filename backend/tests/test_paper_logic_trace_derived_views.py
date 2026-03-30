@@ -1284,13 +1284,12 @@ def test_build_route_state_seed_deprioritizes_clause_style_method_labels_when_na
     )
 
     seed = build_route_state_seed(trace)
-    method_ranks = {label: index for index, label in enumerate(seed['dominant_method_candidates'])}
-
-    assert method_ranks['stress-controlled rheology algorithm'] < method_ranks['determine shear rate from given shear stress']
-    if 'determine particle velocities from shear rate' in method_ranks:
-        assert method_ranks['stokesian dynamics'] < method_ranks['determine particle velocities from shear rate']
-    assert method_ranks['soft-constraint approach'] < method_ranks['determine shear rate from given shear stress']
-    assert method_ranks['stress-controlled shear reversal test'] < method_ranks['determine shear rate from given shear stress']
+    assert seed['dominant_method_candidates'] == [
+        'stress-controlled rheology algorithm',
+        'soft-constraint approach',
+        'stress-controlled shear reversal test',
+        'stokesian dynamics',
+    ]
 
 
 def test_build_route_state_seed_keeps_clause_style_method_label_when_it_is_the_only_grounded_method_signal() -> None:
@@ -1327,6 +1326,131 @@ def test_build_route_state_seed_keeps_clause_style_method_label_when_it_is_the_o
     seed = build_route_state_seed(trace)
 
     assert seed['dominant_method_candidates'] == ['determine shear rate from given shear stress']
+
+
+def test_build_route_state_seed_omits_setup_context_method_fillers_when_core_methods_exist() -> None:
+    move_core_1 = ResearchMove(
+        move_id='m-method-1',
+        sequence_no=1,
+        role='method',
+        act_type='propose_method',
+        summary='The paper proposes a Prandtl mixing length approach as an alternative description for dense granular flows.',
+        methods=[
+            MentionValue(surface='Prandtl mixing length approach', normalized='prandtl mixing length approach', anchor_ids=['a-1']),
+        ],
+        anchor_ids=['a-1'],
+        slot_provenance=[
+            SlotProvenance(field='methods', value_index=0, anchor_ids=['a-1'], extraction_mode='direct', support_strength='strong'),
+        ],
+    )
+    move_core_2 = ResearchMove(
+        move_id='m-method-2',
+        sequence_no=2,
+        role='method',
+        act_type='propose_method',
+        summary='The approach shows that a local rheology model can be used as a particular case of the mixing length description.',
+        methods=[
+            MentionValue(surface='local rheology model', normalized='local rheology model', anchor_ids=['a-2']),
+        ],
+        anchor_ids=['a-2'],
+        slot_provenance=[
+            SlotProvenance(field='methods', value_index=0, anchor_ids=['a-2'], extraction_mode='direct', support_strength='strong'),
+        ],
+    )
+    move_setup = ResearchMove(
+        move_id='m-method-3',
+        sequence_no=3,
+        role='method',
+        act_type='propose_method',
+        summary='Describes a simplified experimental geometry with controlled flow rate and rough walls to create a uniform flow driven by gravity.',
+        methods=[
+            MentionValue(surface='controlled flow rate via aperture or moving wall', normalized='controlled flow rate via aperture or moving wall', anchor_ids=['a-3']),
+            MentionValue(surface='silo flow', normalized='silo flow', anchor_ids=['a-3']),
+            MentionValue(surface='gravity-driven flow', normalized='gravity-driven flow', anchor_ids=['a-3']),
+        ],
+        anchor_ids=['a-3'],
+        slot_provenance=[
+            SlotProvenance(field='methods', value_index=0, anchor_ids=['a-3'], extraction_mode='direct', support_strength='strong'),
+            SlotProvenance(field='methods', value_index=1, anchor_ids=['a-3'], extraction_mode='direct', support_strength='strong'),
+            SlotProvenance(field='methods', value_index=2, anchor_ids=['a-3'], extraction_mode='direct', support_strength='strong'),
+        ],
+    )
+    move_analysis = ResearchMove(
+        move_id='m-method-4',
+        sequence_no=4,
+        role='method',
+        act_type='propose_method',
+        summary='The work proceeds by comparing data from different experiments in the same geometry and by performing a transverse analysis across configurations.',
+        methods=[
+            MentionValue(surface='cross-experiment comparison within geometry', normalized='cross-experiment comparison within geometry', anchor_ids=['a-4']),
+            MentionValue(surface='cross-configuration analysis', normalized='cross-configuration analysis', anchor_ids=['a-4']),
+        ],
+        anchor_ids=['a-4'],
+        slot_provenance=[
+            SlotProvenance(field='methods', value_index=0, anchor_ids=['a-4'], extraction_mode='direct', support_strength='strong'),
+            SlotProvenance(field='methods', value_index=1, anchor_ids=['a-4'], extraction_mode='direct', support_strength='strong'),
+        ],
+    )
+    trace = PaperLogicTrace(
+        trace_id='paper-1901:paper_logic_trace',
+        schema_version='v2',
+        built_at='2026-03-30T00:00:00Z',
+        paper_metadata=PaperMetadata(
+            paper_id='paper-1901',
+            title='On dense granular flows',
+            paper_type='empirical',
+            source_refs=['a-1'],
+        ),
+        canonical_core=CanonicalCore(
+            moves=[move_core_1, move_core_2, move_setup, move_analysis],
+        ),
+        quality={},
+    )
+
+    seed = build_route_state_seed(trace)
+
+    assert seed['dominant_method_candidates'] == [
+        'prandtl mixing length approach',
+        'local rheology model',
+    ]
+
+
+def test_build_route_state_seed_keeps_setup_context_method_label_when_it_is_the_only_grounded_signal() -> None:
+    move_setup = ResearchMove(
+        move_id='m-method-1',
+        sequence_no=1,
+        role='method',
+        act_type='propose_method',
+        summary='Describes a simplified experimental geometry with controlled flow rate and rough walls to create a uniform flow driven by gravity.',
+        methods=[
+            MentionValue(surface='controlled flow rate via aperture or moving wall', normalized='controlled flow rate via aperture or moving wall', anchor_ids=['a-1']),
+            MentionValue(surface='silo flow', normalized='silo flow', anchor_ids=['a-1']),
+        ],
+        anchor_ids=['a-1'],
+        slot_provenance=[
+            SlotProvenance(field='methods', value_index=0, anchor_ids=['a-1'], extraction_mode='direct', support_strength='strong'),
+            SlotProvenance(field='methods', value_index=1, anchor_ids=['a-1'], extraction_mode='direct', support_strength='strong'),
+        ],
+    )
+    trace = PaperLogicTrace(
+        trace_id='paper-setup-only:paper_logic_trace',
+        schema_version='v2',
+        built_at='2026-03-30T00:00:00Z',
+        paper_metadata=PaperMetadata(
+            paper_id='paper-setup-only',
+            title='Setup Demo',
+            paper_type='empirical',
+            source_refs=['a-1'],
+        ),
+        canonical_core=CanonicalCore(
+            moves=[move_setup],
+        ),
+        quality={},
+    )
+
+    seed = build_route_state_seed(trace)
+
+    assert seed['dominant_method_candidates'] == ['controlled flow rate via aperture or moving wall']
 
 
 def test_build_route_state_seed_falls_back_to_inferred_topic_objects_when_trusted_objects_are_missing() -> None:

@@ -239,6 +239,22 @@ _METHOD_SIGNAL_SECONDARY_DETAIL_CUES = (
     'simulation',
     'simulations',
 )
+_METHOD_SIGNAL_CONTEXTUAL_LABEL_CUES = (
+    'assumption',
+    'flow rate',
+    'moving wall',
+    'aperture',
+    'rough wall',
+    'rough walls',
+)
+_METHOD_SIGNAL_SETUP_SUMMARY_CUES = (
+    'experimental geometry',
+    'experimental setup',
+    'simulation setup',
+    'controlled flow rate',
+    'rough walls',
+    'uniform flow driven by gravity',
+)
 _SECTION_HEADING_RE = re.compile(r'^\s*(?:\d+(?:\.\d+)*|[ivx]+)\.?\s+', re.IGNORECASE)
 _PIPE_SECTION_HEADING_RE = re.compile(r'^\s*(?:section\s+)?\d+(?:\.\d+)*\s*[|:：-]\s+\S', re.IGNORECASE)
 _LATEX_TITLE_NOISE_RE = re.compile(r'(?:\\(?:mathrm|text|begin|end)\b|\$)')
@@ -1199,6 +1215,10 @@ def _entry_labels(entries: list[dict[str, Any]], *, limit: int = 5) -> list[str]
     return _unique(labels)[:limit]
 
 
+def _has_operative_method_label_cue(label: str) -> bool:
+    return any(cue in label for cue in _METHOD_SIGNAL_OPERATIVE_LABEL_CUES)
+
+
 def _is_secondary_method_detail_entry(entry: dict[str, Any]) -> bool:
     label = _entry_label(entry)
     summary = str(entry.get('summary') or '')
@@ -1210,6 +1230,23 @@ def _is_secondary_method_detail_entry(entry: dict[str, Any]) -> bool:
         return True
     if _summary_cue_count(summary, _METHOD_SIGNAL_BROAD_SUMMARY_CUES) > 0:
         return True
+    return False
+
+
+def _is_contextual_method_filler_entry(entry: dict[str, Any]) -> bool:
+    label = _entry_label(entry)
+    summary = str(entry.get('summary') or '').lower()
+    if not label:
+        return False
+    if 'comparison' in label or label.startswith('cross-'):
+        return True
+    if any(cue in label for cue in _METHOD_SIGNAL_CONTEXTUAL_LABEL_CUES):
+        return True
+    if any(cue in summary for cue in _METHOD_SIGNAL_SETUP_SUMMARY_CUES):
+        if label.endswith('flow') and not _has_operative_method_label_cue(label):
+            return True
+        if any(cue in label for cue in _METHOD_SIGNAL_CONTEXTUAL_LABEL_CUES):
+            return True
     return False
 
 
@@ -1226,7 +1263,7 @@ def _method_candidate_labels(entries: list[dict[str, Any]], *, limit: int = 5) -
         if not label or label in seen_labels:
             return False
         move_id = str(entry.get('move_id') or '').strip()
-        is_secondary = _is_secondary_method_detail_entry(entry)
+        is_secondary = _is_secondary_method_detail_entry(entry) or _is_contextual_method_filler_entry(entry)
         if primary_only and (not move_id or move_id in seen_primary_moves or is_secondary):
             return False
         selected.append(label)
@@ -1241,15 +1278,26 @@ def _method_candidate_labels(entries: list[dict[str, Any]], *, limit: int = 5) -
             return selected[:limit]
 
     for entry in entries:
-        if _is_secondary_method_detail_entry(entry):
+        if _is_secondary_method_detail_entry(entry) or _is_contextual_method_filler_entry(entry):
             continue
         if try_add(entry):
             if len(selected) >= limit:
                 return selected[:limit]
 
-    for entry in entries:
-        if try_add(entry):
-            if len(selected) >= limit:
+    secondary_detail_cap = min(limit, 4)
+    if len(selected) < secondary_detail_cap:
+        for entry in entries:
+            if not _is_secondary_method_detail_entry(entry) or _is_contextual_method_filler_entry(entry):
+                continue
+            if try_add(entry):
+                if len(selected) >= secondary_detail_cap:
+                    return selected[:limit]
+
+    if not selected:
+        for entry in entries:
+            if not _is_contextual_method_filler_entry(entry):
+                continue
+            if try_add(entry):
                 return selected[:limit]
 
     return selected[:limit]
