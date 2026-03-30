@@ -517,3 +517,24 @@ Progress note (2026-03-30, operative method ranking phase):
 - Remaining macro gap after this phase:
 - some route-seed method candidates are now better ranked but still too clause-like or solver-step-like, for example `determine shear rate from given shear stress` and `determine particle velocities from shear rate` can outrank shorter canonical method names in `1607`
 - Next highest-value unresolved L2 gap: compress or down-rank verbose clause-style method labels when shorter canonical method names from the same paper already exist, so route-state method maturity reflects a concise core method vocabulary rather than implementation-step phrasing.
+
+Progress note (2026-03-30, clause-style method label deprioritization phase):
+- Continued the route-seed method cleanup into a more semantic ranking issue: after framework/setup labels were pushed down, some verbose clause-style method labels (`determine ... from ...`) could still outrank shorter canonical method names even when the same paper already had cleaner method names such as `stress-controlled rheology algorithm`, `stokesian dynamics`, or `soft-constraint approach`.
+- Added a paired regression set for this next gap:
+- clause-style method labels should rank below shorter named methods when those named methods already exist in the same paper
+- clause-style labels should still be preserved when they are the only grounded method signal available
+- Reworked `_rank_method_signal_entries(...)` narrowly:
+- added a label-level penalty for verb-led clause-style method labels such as `determine ...`, `predict ...`, `calculate ...`, `derive ...`, and similar implementation-step phrasing
+- kept the penalty local to route-seed method ranking, so the underlying canonical/contract method evidence remains available rather than being deleted
+- Verification:
+- Red-green regressions: `backend/tests/test_paper_logic_trace_derived_views.py -k "deprioritizes_clause_style_method_labels_when_named_methods_exist or keeps_clause_style_method_label_when_it_is_the_only_grounded_method_signal"` -> `2 passed`
+- Focused file: `backend/tests/test_paper_logic_trace_derived_views.py` -> `30 passed`
+- Full backend suite: `cd backend; .\.venv\Scripts\python.exe -m pytest -q` -> `579 passed, 1 warning`
+- Real-sample rechecks after the change:
+- `1607_Shear jamming and fragility in dense suspensions` now ranks concise core method names first in `dominant_method_candidates`: `stress-controlled rheology algorithm`, `stokesian dynamics`, `soft-constraint approach`, `harmonic penalty function`, with the more verbose clause label `determine shear rate from given shear stress` pushed later
+- `1732_改性双基推进剂松弛模量的确定方法` remains healthy under the same change, still centered on `numerical iteration`, `improved sorvari method`, `改进型sorvari法`, and `拉伸松弛试验`
+- `1243_Data-Driven Computational Plasticity` remains stable, keeping framework-level method vocabulary because that is still a meaningful part of the paper's core method story rather than a clause-label artifact
+- Additional random spot checks on stored audit traces stayed directionally healthy and did not collapse useful domain methods in CFD / DEM / neural-network samples
+- Remaining macro gap after this phase:
+- some route-seed method candidates are now cleaner but still somewhat over-complete, for example `1607` still includes secondary method internals such as `harmonic penalty function`, and some other random traces still keep mixed method-step phrases like `cross-experiment comparison within geometry` or `controlled flow rate via aperture or moving wall`
+- Next highest-value unresolved L2 gap: refine method candidate compression one level further, so route-state method maturity emphasizes the paper's shortest stable core method vocabulary and demotes secondary implementation details and analysis-step phrases when stronger method names are already present.

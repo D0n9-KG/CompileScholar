@@ -210,6 +210,20 @@ _METHOD_SIGNAL_GENERIC_LABEL_CUES = (
     'evolution law',
     'evolution laws',
 )
+_METHOD_SIGNAL_CLAUSE_LEAD_CUES = (
+    'determine ',
+    'predict ',
+    'estimate ',
+    'calculate ',
+    'solve ',
+    'identify ',
+    'infer ',
+    'compute ',
+    'fit ',
+    'generate ',
+    'derive ',
+    'optimize ',
+)
 _SECTION_HEADING_RE = re.compile(r'^\s*(?:\d+(?:\.\d+)*|[ivx]+)\.?\s+', re.IGNORECASE)
 _PIPE_SECTION_HEADING_RE = re.compile(r'^\s*(?:section\s+)?\d+(?:\.\d+)*\s*[|:：-]\s+\S', re.IGNORECASE)
 _LATEX_TITLE_NOISE_RE = re.compile(r'(?:\\(?:mathrm|text|begin|end)\b|\$)')
@@ -1238,6 +1252,8 @@ def _rank_method_signal_entries(entries: list[dict[str, Any]]) -> list[dict[str,
             score += 4
         if any(cue in label for cue in _METHOD_SIGNAL_GENERIC_LABEL_CUES):
             score -= 6
+        if any(label.startswith(cue) for cue in _METHOD_SIGNAL_CLAUSE_LEAD_CUES):
+            score -= 12
         if label.endswith('method') and 'improved' not in label and _summary_has_prior_work_cue(summary):
             score -= 4
         if 'framework' in label and 'propose' not in summary_lower and 'proposes' not in summary_lower:

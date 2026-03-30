@@ -1206,6 +1206,113 @@ def test_build_route_state_seed_keeps_framework_method_when_it_is_the_only_groun
     assert seed['dominant_method_candidates'] == ['continuum-thermodynamics framework']
 
 
+def test_build_route_state_seed_deprioritizes_clause_style_method_labels_when_named_methods_exist() -> None:
+    move_algorithm = ResearchMove(
+        move_id='m-method-1',
+        sequence_no=1,
+        role='method',
+        act_type='propose_method',
+        summary='The authors employ an algorithm to mimic stress-controlled rheology, building on an extended Stokesian Dynamics approach.',
+        methods=[
+            MentionValue(surface='stress-controlled rheology algorithm', normalized='stress-controlled rheology algorithm', anchor_ids=['a-1']),
+            MentionValue(surface='Stokesian Dynamics', normalized='stokesian dynamics', anchor_ids=['a-1']),
+        ],
+        anchor_ids=['a-1'],
+        slot_provenance=[
+            SlotProvenance(field='methods', value_index=0, anchor_ids=['a-1'], extraction_mode='direct', support_strength='strong'),
+            SlotProvenance(field='methods', value_index=1, anchor_ids=['a-1'], extraction_mode='direct', support_strength='strong'),
+        ],
+    )
+    move_solver = ResearchMove(
+        move_id='m-method-2',
+        sequence_no=2,
+        role='method',
+        act_type='propose_method',
+        summary='Proposes a simulation framework to determine particle velocities and shear rate from a given shear stress by solving linear equations derived from stress decomposition.',
+        methods=[
+            MentionValue(surface='determine shear rate from given shear stress', normalized='determine shear rate from given shear stress', anchor_ids=['a-2']),
+            MentionValue(surface='determine particle velocities from shear rate', normalized='determine particle velocities from shear rate', anchor_ids=['a-2']),
+        ],
+        anchor_ids=['a-2'],
+        slot_provenance=[
+            SlotProvenance(field='methods', value_index=0, anchor_ids=['a-2'], extraction_mode='direct', support_strength='strong'),
+            SlotProvenance(field='methods', value_index=1, anchor_ids=['a-2'], extraction_mode='direct', support_strength='strong'),
+        ],
+    )
+    move_contacts = ResearchMove(
+        move_id='m-method-3',
+        sequence_no=3,
+        role='method',
+        act_type='propose_method',
+        summary='The authors model contact forces using a soft-constraint approach with harmonic penalty functions and a Coulomb friction law.',
+        methods=[
+            MentionValue(surface='soft-constraint approach', normalized='soft-constraint approach', anchor_ids=['a-3']),
+        ],
+        anchor_ids=['a-3'],
+        slot_provenance=[
+            SlotProvenance(field='methods', value_index=0, anchor_ids=['a-3'], extraction_mode='direct', support_strength='strong'),
+        ],
+    )
+    trace = PaperLogicTrace(
+        trace_id='paper-1607:paper_logic_trace',
+        schema_version='v2',
+        built_at='2026-03-30T00:00:00Z',
+        paper_metadata=PaperMetadata(
+            paper_id='paper-1607',
+            title='Shear jamming and fragility in dense suspensions',
+            paper_type='empirical',
+            source_refs=['a-1'],
+        ),
+        canonical_core=CanonicalCore(
+            moves=[move_algorithm, move_solver, move_contacts],
+        ),
+        quality={},
+    )
+
+    seed = build_route_state_seed(trace)
+    method_ranks = {label: index for index, label in enumerate(seed['dominant_method_candidates'])}
+
+    assert method_ranks['stress-controlled rheology algorithm'] < method_ranks['determine shear rate from given shear stress']
+    assert method_ranks['stokesian dynamics'] < method_ranks['determine particle velocities from shear rate']
+    assert method_ranks['soft-constraint approach'] < method_ranks['determine shear rate from given shear stress']
+
+
+def test_build_route_state_seed_keeps_clause_style_method_label_when_it_is_the_only_grounded_method_signal() -> None:
+    move_solver = ResearchMove(
+        move_id='m-method-1',
+        sequence_no=1,
+        role='method',
+        act_type='propose_method',
+        summary='Proposes a simulation framework to determine particle velocities and shear rate from a given shear stress by solving linear equations derived from stress decomposition.',
+        methods=[
+            MentionValue(surface='determine shear rate from given shear stress', normalized='determine shear rate from given shear stress', anchor_ids=['a-1']),
+        ],
+        anchor_ids=['a-1'],
+        slot_provenance=[
+            SlotProvenance(field='methods', value_index=0, anchor_ids=['a-1'], extraction_mode='direct', support_strength='strong'),
+        ],
+    )
+    trace = PaperLogicTrace(
+        trace_id='paper-solver:paper_logic_trace',
+        schema_version='v2',
+        built_at='2026-03-30T00:00:00Z',
+        paper_metadata=PaperMetadata(
+            paper_id='paper-solver',
+            title='Solver Demo',
+            paper_type='empirical',
+            source_refs=['a-1'],
+        ),
+        canonical_core=CanonicalCore(
+            moves=[move_solver],
+        ),
+        quality={},
+    )
+
+    seed = build_route_state_seed(trace)
+
+    assert seed['dominant_method_candidates'] == ['determine shear rate from given shear stress']
+
+
 def test_build_route_state_seed_falls_back_to_inferred_topic_objects_when_trusted_objects_are_missing() -> None:
     result_move = ResearchMove(
         move_id='m-result-1',
