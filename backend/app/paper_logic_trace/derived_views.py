@@ -255,6 +255,21 @@ _METHOD_SIGNAL_SETUP_SUMMARY_CUES = (
     'rough walls',
     'uniform flow driven by gravity',
 )
+_METHOD_FAMILY_SUFFIX_TOKENS = {
+    'algorithm',
+    'approach',
+    'framework',
+    'method',
+    'model',
+    'procedure',
+    'protocol',
+    'simulation',
+    'simulations',
+    'solver',
+    'test',
+    'workflow',
+}
+_PAREN_CONTENT_RE = re.compile(r'\([^)]*\)')
 _SECTION_HEADING_RE = re.compile(r'^\s*(?:\d+(?:\.\d+)*|[ivx]+)\.?\s+', re.IGNORECASE)
 _PIPE_SECTION_HEADING_RE = re.compile(r'^\s*(?:section\s+)?\d+(?:\.\d+)*\s*[|:：-]\s+\S', re.IGNORECASE)
 _LATEX_TITLE_NOISE_RE = re.compile(r'(?:\\(?:mathrm|text|begin|end)\b|\$)')
@@ -1251,6 +1266,16 @@ def _has_operative_method_label_cue(label: str) -> bool:
     return any(cue in label for cue in _METHOD_SIGNAL_OPERATIVE_LABEL_CUES)
 
 
+def _method_candidate_fingerprint(label: str) -> str:
+    cleaned = _PAREN_CONTENT_RE.sub(' ', str(label or '').lower())
+    tokens = _WORD_RE.findall(cleaned)
+    while tokens and tokens[-1] in _METHOD_FAMILY_SUFFIX_TOKENS:
+        tokens.pop()
+    if tokens:
+        return ' '.join(tokens)
+    return ' '.join(_WORD_RE.findall(str(label or '').lower()))
+
+
 def _is_secondary_method_detail_entry(entry: dict[str, Any]) -> bool:
     label = _entry_label(entry)
     summary = str(entry.get('summary') or '')
@@ -1288,11 +1313,13 @@ def _method_candidate_labels(entries: list[dict[str, Any]], *, limit: int = 5) -
 
     selected: list[str] = []
     seen_labels: set[str] = set()
+    seen_fingerprints: set[str] = set()
     seen_primary_moves: set[str] = set()
 
     def try_add(entry: dict[str, Any], *, primary_only: bool = False) -> bool:
         label = _entry_label(entry)
-        if not label or label in seen_labels:
+        fingerprint = _method_candidate_fingerprint(label)
+        if not label or label in seen_labels or (fingerprint and fingerprint in seen_fingerprints):
             return False
         move_id = str(entry.get('move_id') or '').strip()
         is_secondary = _is_secondary_method_detail_entry(entry) or _is_contextual_method_filler_entry(entry)
@@ -1300,6 +1327,8 @@ def _method_candidate_labels(entries: list[dict[str, Any]], *, limit: int = 5) -
             return False
         selected.append(label)
         seen_labels.add(label)
+        if fingerprint:
+            seen_fingerprints.add(fingerprint)
         if primary_only and move_id:
             seen_primary_moves.add(move_id)
         return True

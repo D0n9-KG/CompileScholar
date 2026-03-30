@@ -1453,6 +1453,75 @@ def test_build_route_state_seed_keeps_setup_context_method_label_when_it_is_the_
     assert seed['dominant_method_candidates'] == ['controlled flow rate via aperture or moving wall']
 
 
+def test_build_route_state_seed_deduplicates_generic_method_label_variants() -> None:
+    move_latin = ResearchMove(
+        move_id='m-method-1',
+        sequence_no=1,
+        role='method',
+        act_type='propose_method',
+        summary='The LaTIn method uses a mixed formulation involving strain and stress fields, iterating between equilibrium and constitutive manifolds to find a solution.',
+        methods=[
+            MentionValue(surface='LaTIn method', normalized='latin method', anchor_ids=['a-1']),
+            MentionValue(surface='LaTIn', normalized='latin', anchor_ids=['a-1']),
+        ],
+        anchor_ids=['a-1'],
+        slot_provenance=[
+            SlotProvenance(field='methods', value_index=0, anchor_ids=['a-1'], extraction_mode='direct', support_strength='strong'),
+            SlotProvenance(field='methods', value_index=1, anchor_ids=['a-1'], extraction_mode='direct', support_strength='strong'),
+        ],
+    )
+    move_solver = ResearchMove(
+        move_id='m-method-2',
+        sequence_no=2,
+        role='method',
+        act_type='adapt_method',
+        summary='The solver alternates between global equilibrium and local constitutive updates in the LaTIn framework.',
+        methods=[
+            MentionValue(surface='LaTIn solver', normalized='latin solver', anchor_ids=['a-2']),
+        ],
+        anchor_ids=['a-2'],
+        slot_provenance=[
+            SlotProvenance(field='methods', value_index=0, anchor_ids=['a-2'], extraction_mode='direct', support_strength='strong'),
+        ],
+    )
+    move_other = ResearchMove(
+        move_id='m-method-3',
+        sequence_no=3,
+        role='method',
+        act_type='adapt_method',
+        summary='The constitutive problem is also discretized using the finite element method.',
+        methods=[
+            MentionValue(surface='finite element method', normalized='finite element method', anchor_ids=['a-3']),
+        ],
+        anchor_ids=['a-3'],
+        slot_provenance=[
+            SlotProvenance(field='methods', value_index=0, anchor_ids=['a-3'], extraction_mode='direct', support_strength='strong'),
+        ],
+    )
+    trace = PaperLogicTrace(
+        trace_id='paper-1243-dup:paper_logic_trace',
+        schema_version='v2',
+        built_at='2026-03-30T00:00:00Z',
+        paper_metadata=PaperMetadata(
+            paper_id='paper-1243-dup',
+            title='Data-Driven Computational Plasticity',
+            paper_type='theoretical',
+            source_refs=['a-1'],
+        ),
+        canonical_core=CanonicalCore(
+            moves=[move_latin, move_solver, move_other],
+        ),
+        quality={},
+    )
+
+    seed = build_route_state_seed(trace)
+
+    assert seed['dominant_method_candidates'] == [
+        'latin method',
+        'finite element method',
+    ]
+
+
 def test_build_route_state_seed_falls_back_to_inferred_topic_objects_when_trusted_objects_are_missing() -> None:
     result_move = ResearchMove(
         move_id='m-result-1',

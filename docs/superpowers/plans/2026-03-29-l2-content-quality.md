@@ -633,3 +633,28 @@ Progress note (2026-03-30, grounded key-method summary gating phase):
 - Remaining macro gap after this phase:
 - route-state method candidates and key-method summaries are now materially cleaner, but some traces still keep method labels that are accurate yet not maximally canonical, such as renamed clause-style variants (`stress-controlled flow determination`) or parallel near-duplicates (`latin` / `latin method`)
 - Next highest-value unresolved L2 gap: continue tightening canonical method-label normalization and de-dup compression so L2 presents the shortest stable per-paper method vocabulary while staying faithful enough to support downstream L3/L4 synthesis.
+
+Progress note (2026-03-30, method-family de-dup compression phase):
+- After the earlier route-seed cleanup phases, the next remaining L2 readability problem shifted from ranking noise to near-duplicate canonical method variants inside the same paper.
+- Audit on current real traces and stored random samples showed repeated family-level duplication patterns such as:
+- `latin method` / `latin` / `latin solver`
+- `volume of fluid method` / `volume of fluid model`
+- `generalized regression neural network` / `generalized regression neural network (grnn) model`
+- Added a regression for this route-state compression gap:
+- when multiple candidate labels belong to the same method family and differ only by a generic trailing type token (`method`, `model`, `solver`, `framework`, etc.), `dominant_method_candidates` should keep the best-ranked representative rather than spending multiple slots on the same family
+- Implemented the fix narrowly inside route-seed selection:
+- added `_method_candidate_fingerprint(...)`, which strips parenthetical acronyms and generic trailing method-family suffixes to compute a conservative family fingerprint
+- reused the existing ranking order, but deduplicated selected method candidates by fingerprint so only the highest-ranked label for each family survives into `dominant_method_candidates`
+- kept the change local to route-state method compression; canonical move mentions and the broader method-entry pool are unchanged
+- Verification:
+- Targeted regressions: `backend/tests/test_paper_logic_trace_derived_views.py -k "deduplicates_generic_method_label_variants or deprioritizes_clause_style_method_labels_when_named_methods_exist or omits_setup_context_method_fillers_when_core_methods_exist"` -> `3 passed`
+- Focused file: `backend/tests/test_paper_logic_trace_derived_views.py` -> `35 passed`
+- Full backend suite: `cd backend; .\.venv\Scripts\python.exe -m pytest -q` -> `584 passed, 1 warning`
+- Real-sample rechecks after the change:
+- `1243_Data-Driven Computational Plasticity` now compresses from redundant `latin method` / `latin` variants down to `latin method`, while retaining distinct core methods such as `continuum-thermodynamics framework`
+- `20260329_random_audit_s93_v3` now keeps `volume of fluid method` without also spending another slot on `volume of fluid model`
+- `08_1267` no longer keeps the exact duplicate family pair `generalized regression neural network` / `generalized regression neural network (grnn) model`, while still preserving distinct neural-network method families
+- Macro anti-overfit recheck on the stored audit set showed the family-level duplicate scan dropping from 7 papers with duplicate groups to 0
+- Remaining macro gap after this phase:
+- route-state methods are now cleaner and less redundant, but some labels are still accurate yet suboptimal because they reflect clause-level paraphrase or orthographic drift rather than the shortest stable canonical form, for example `stress-controlled flow determination` or `general regression neural network`
+- Next highest-value unresolved L2 gap: continue tightening alias normalization / paraphrase compression for method labels without collapsing genuinely distinct methods or overfitting to a few papers.
