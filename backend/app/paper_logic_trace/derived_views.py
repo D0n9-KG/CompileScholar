@@ -676,6 +676,24 @@ def _method_focus_score(move: ResearchMove) -> int:
     summary = str(move.summary or '').strip()
     if not _is_summary_contentful(summary):
         return -999
+    trusted_methods = _trusted_mentions(move, 'methods', list(move.methods))
+    primary_method_mentions = 0
+    secondary_method_mentions = 0
+    contextual_method_mentions = 0
+    for mention in trusted_methods:
+        entry = {
+            'surface': mention.surface,
+            'normalized': mention.normalized,
+            'summary': summary,
+            'role': move.role,
+            'act_type': move.act_type,
+        }
+        if _is_contextual_method_filler_entry(entry):
+            contextual_method_mentions += 1
+        elif _is_secondary_method_detail_entry(entry):
+            secondary_method_mentions += 1
+        else:
+            primary_method_mentions += 1
     score = 0
     if move.role == 'method':
         score += 4
@@ -683,11 +701,18 @@ def _method_focus_score(move: ResearchMove) -> int:
         score += 2
     if move.act_type in {'propose_method', 'adapt_method', 'build_resource', 'run_experiment', 'set_condition'}:
         score += 2
-    score += len(_trusted_mentions(move, 'methods', list(move.methods))) * 4
+    score += primary_method_mentions * 5
+    score += secondary_method_mentions * 2
+    score -= contextual_method_mentions * 2
     if _trusted_mentions(move, 'resource_mentions', list(move.resource_mentions)):
         score += 1
     score += _summary_cue_count(summary, _METHOD_SUMMARY_POSITIVE_CUES) * 2
     score -= _summary_cue_count(summary, _METHOD_SUMMARY_NEGATIVE_CUES) * 3
+    score -= _summary_cue_count(summary, _METHOD_SIGNAL_BROAD_SUMMARY_CUES) * 4
+    if _summary_has_current_work_cue(summary):
+        score += 2
+    if _summary_has_prior_work_cue(summary) and not _summary_has_current_work_cue(summary):
+        score -= 6
     if _trusted_mentions(move, 'metrics', list(move.metrics)):
         score -= 1
     if _trusted_mentions(move, 'comparators', list(move.comparators)):

@@ -589,3 +589,26 @@ Progress note (2026-03-30, setup-context method filler compression phase):
 - Remaining macro gap after this phase:
 - some route-seed method labels are now shorter and cleaner, but old or degraded traces can still surface renamed clause-style labels such as `stress-controlled flow determination`, and paper-level `key_method_summary` selection can still drift toward governing-equation/setup prose even when route-seed methods are already good
 - Next highest-value unresolved L2 gap: continue tightening canonical method-label compression and paper-level method-summary selection so L2 not only picks the right method slots, but also phrases the single-paper method story in the shortest accurate form for downstream L3/L4 use.
+
+Progress note (2026-03-30, operative method-summary preference phase):
+- The next L2 readability gap was no longer mainly in route-state candidates; it had shifted into `paper_summaries.key_method_summary`.
+- Root-cause audit on real `1607` showed that the summary selector could still overvalue a broad governing-equation method sentence simply because it carried many trusted method labels, even when a neighboring move contained a much clearer operative current-work method sentence (`employ an algorithm to mimic stress-controlled rheology ...`).
+- Added a regression for this summary-selection failure mode:
+- when a paper contains both a broad governing-equation/context sentence and a more operative current-work method sentence, `key_method_summary` should choose the operative method sentence
+- Reworked `_method_focus_score(...)` narrowly:
+- replaced the old raw `len(trusted_methods)` reward with a quality-aware count that distinguishes primary method mentions from secondary detail labels and contextual fillers
+- added a penalty for broad method-summary cues already used in route-seed cleanup (`governing equations`, `simulation model considers`, `initial configuration generation method`, etc.)
+- lightly rewarded explicit current-work phrasing and penalized prior-work-only method summaries, keeping key-method selection aligned with the single-paper method story rather than generic context
+- Verification:
+- Targeted regressions:
+- `backend/tests/test_paper_logic_trace_derived_views.py -k "prefers_operative_method_over_governing_equation_context or prefers_method_focused_sentence_over_outcome_colored_sentence or prefers_content_moves_over_author_line_noise"` -> `3 passed`
+- Focused file: `backend/tests/test_paper_logic_trace_derived_views.py` -> `33 passed`
+- Full backend suite: `cd backend; .\.venv\Scripts\python.exe -m pytest -q` -> `583 passed, 1 warning`
+- Real-sample rechecks after the change:
+- `1607_Shear jamming and fragility in dense suspensions` no longer uses the old governing-equation sentence as `key_method_summary`; it now surfaces the paper's actual operative method story centered on the soft-constraint / stress-controlled simulation pipeline
+- `1732` stays strong and still summarizes the tensile relaxation experiment plus improved Sorvari method coherently
+- `1243_Data-Driven Computational Plasticity` still uses the `LaTIn` method sentence as its key method summary
+- `s870` remains healthy, still centered on `Quantum Mechanics (QM) in explicit solvent`
+- Remaining macro gap after this phase:
+- some setup-heavy empirical traces, such as `04_1901_On dense granular flows`, can still let a high-priority setup/stress-distribution sentence outrank the cleaner grounded method sentence (`Prandtl mixing length approach`) because the selector still considers method-role sentences that carry no grounded method mentions when their section score is high
+- Next highest-value unresolved L2 gap: continue tightening `key_method_summary` so method-role setup/condition sentences without grounded method evidence no longer outrank real method sentences in setup-heavy papers, while still preserving a fallback summary when extraction is sparse.

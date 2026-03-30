@@ -13,7 +13,7 @@ from app.paper_logic_trace.derived_views import (
     build_route_feature_candidates,
     build_route_state_seed,
 )
-from app.paper_logic_trace.models import CanonicalCore, CitationAct, EffectValue, FigureRef, MentionValue, PaperLogicTrace, PaperMetadata, ResearchMove, SlotProvenance, TableRef
+from app.paper_logic_trace.models import CanonicalCore, CitationAct, EffectValue, EvidenceAnchor, FigureRef, MentionValue, PaperLogicTrace, PaperMetadata, ResearchMove, SlotProvenance, TableRef
 
 
 def _build_problem_move() -> ResearchMove:
@@ -1798,6 +1798,142 @@ def test_build_paper_summaries_prefers_method_focused_sentence_over_outcome_colo
     summaries = build_paper_summaries(trace)
 
     assert summaries['key_method_summary'] == focused_method.summary
+
+
+def test_build_paper_summaries_prefers_operative_method_over_governing_equation_context() -> None:
+    operative_method = ResearchMove(
+        move_id='m-method-operative',
+        sequence_no=1,
+        role='method',
+        act_type='propose_method',
+        summary='The authors employ an algorithm to mimic stress-controlled rheology, building on an extended Stokesian Dynamics approach.',
+        methods=[
+            MentionValue(surface='stress-controlled rheology algorithm', normalized='stress-controlled rheology algorithm', anchor_ids=['a-1']),
+            MentionValue(surface='Stokesian Dynamics', normalized='stokesian dynamics', anchor_ids=['a-1']),
+        ],
+        anchor_ids=['a-1'],
+        slot_provenance=[
+            SlotProvenance(field='methods', value_index=0, anchor_ids=['a-1'], extraction_mode='direct', support_strength='strong'),
+            SlotProvenance(field='methods', value_index=1, anchor_ids=['a-1'], extraction_mode='direct', support_strength='strong'),
+        ],
+    )
+    governing_context = ResearchMove(
+        move_id='m-method-governing',
+        sequence_no=2,
+        role='method',
+        act_type='adapt_method',
+        summary='Describes the governing equations for dense suspensions under stress-controlled quasi-static conditions, adapting hydrodynamic and non-hydrodynamic interaction models.',
+        methods=[
+            MentionValue(surface='force and torque balance equations', normalized='force and torque balance equations', anchor_ids=['a-2']),
+            MentionValue(surface='linear resistance', normalized='linear resistance', anchor_ids=['a-2']),
+            MentionValue(surface='pair-wise hydrodynamic lubrication', normalized='pair-wise hydrodynamic lubrication', anchor_ids=['a-2']),
+            MentionValue(surface='regularization with cutoff length', normalized='regularization with cutoff length', anchor_ids=['a-2']),
+        ],
+        anchor_ids=['a-2'],
+        slot_provenance=[
+            SlotProvenance(field='methods', value_index=0, anchor_ids=['a-2'], extraction_mode='direct', support_strength='strong'),
+            SlotProvenance(field='methods', value_index=1, anchor_ids=['a-2'], extraction_mode='direct', support_strength='strong'),
+            SlotProvenance(field='methods', value_index=2, anchor_ids=['a-2'], extraction_mode='direct', support_strength='strong'),
+            SlotProvenance(field='methods', value_index=3, anchor_ids=['a-2'], extraction_mode='direct', support_strength='strong'),
+        ],
+    )
+    supporting_method = ResearchMove(
+        move_id='m-method-supporting',
+        sequence_no=3,
+        role='method',
+        act_type='propose_method',
+        summary='The authors model contact forces using a soft-constraint approach with harmonic penalty functions and a Coulomb friction law.',
+        methods=[
+            MentionValue(surface='soft-constraint approach', normalized='soft-constraint approach', anchor_ids=['a-3']),
+        ],
+        anchor_ids=['a-3'],
+        slot_provenance=[
+            SlotProvenance(field='methods', value_index=0, anchor_ids=['a-3'], extraction_mode='direct', support_strength='strong'),
+        ],
+    )
+    trace = PaperLogicTrace(
+        trace_id='paper-method-governing:paper_logic_trace',
+        schema_version='v2',
+        built_at='2026-03-30T00:00:00Z',
+        paper_metadata=PaperMetadata(
+            paper_id='paper-method-governing',
+            title='Shear jamming and fragility in dense suspensions',
+            paper_type='empirical',
+            source_refs=['a-1'],
+        ),
+        canonical_core=CanonicalCore(
+            moves=[operative_method, governing_context, supporting_method],
+        ),
+        quality={},
+    )
+
+    summaries = build_paper_summaries(trace)
+
+    assert summaries['key_method_summary'] == operative_method.summary
+
+
+def test_build_paper_summaries_prefers_grounded_method_move_over_setup_condition_sentence() -> None:
+    setup_condition = ResearchMove(
+        move_id='m-method-setup-condition',
+        sequence_no=1,
+        role='method',
+        act_type='set_condition',
+        summary='Describes the stress distribution in the experimental geometry under equilibrium and Janssen effect assumptions, stating constant normal stress and linearly varying tangential stress with distance from the walls.',
+        anchor_ids=['a-1'],
+    )
+    grounded_method = ResearchMove(
+        move_id='m-method-grounded',
+        sequence_no=2,
+        role='method',
+        act_type='propose_method',
+        summary='The paper proposes a Prandtl mixing length approach as an alternative description for dense granular flows.',
+        methods=[
+            MentionValue(surface='Prandtl mixing length approach', normalized='prandtl mixing length approach', anchor_ids=['a-2']),
+        ],
+        anchor_ids=['a-2'],
+        slot_provenance=[
+            SlotProvenance(field='methods', value_index=0, anchor_ids=['a-2'], extraction_mode='direct', support_strength='strong'),
+        ],
+    )
+    trace = PaperLogicTrace(
+        trace_id='paper-method-grounded:paper_logic_trace',
+        schema_version='v2',
+        built_at='2026-03-30T00:00:00Z',
+        paper_metadata=PaperMetadata(
+            paper_id='paper-method-grounded',
+            title='On dense granular flows',
+            paper_type='empirical',
+            source_refs=['src-1'],
+        ),
+        canonical_core=CanonicalCore(
+            moves=[setup_condition, grounded_method],
+            evidence_anchors=[
+                EvidenceAnchor(
+                    anchor_id='a-1',
+                    paper_id='paper-method-grounded',
+                    source_ref='src-1',
+                    modality='text',
+                    section_path=['Methods'],
+                    quote='Stress distribution is characterized in the experimental geometry.',
+                    support_type='direct',
+                ),
+                EvidenceAnchor(
+                    anchor_id='a-2',
+                    paper_id='paper-method-grounded',
+                    source_ref='src-1',
+                    modality='text',
+                    section_path=['Introduction'],
+                    quote='A Prandtl mixing length approach is proposed.',
+                    support_type='direct',
+                ),
+            ],
+        ),
+        quality={},
+    )
+
+    summaries = build_paper_summaries(trace)
+
+    assert summaries['key_method_summary'] == grounded_method.summary
 
 
 def test_build_paper_summaries_prefers_language_coherent_interpretation_when_scores_are_similar() -> None:
