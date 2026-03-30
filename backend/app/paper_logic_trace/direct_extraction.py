@@ -58,6 +58,8 @@ _NOISE_SECTION_TOKENS = {
 }
 _IMAGE_ONLY_RE = re.compile(r'^\s*!\[[^\]]*\]\([^)]+\)\s*$')
 _MARKDOWN_HEADING_RE = re.compile(r'^\s*#{1,6}\s*(.+?)\s*$')
+_SUMMARY_CJK_RE = re.compile(r'[\u4e00-\u9fff]')
+_SUMMARY_LATIN_RE = re.compile(r'[A-Za-z]')
 _FRONT_MATTER_INSTITUTION_CUES = (
     'university',
     'universite',
@@ -2307,6 +2309,316 @@ def _normalize_effect_rows(rows: list[dict[str, Any]] | None, *, anchor_ids: lis
     return out
 
 
+def _content_tokens(text: str, *, min_len: int = 4) -> set[str]:
+    return {
+        token.lower()
+        for token in _WORD_RE.findall(_normalize_space(text))
+        if token and len(token) >= min_len and token.lower() not in _STOP_TOKENS
+    }
+
+
+def _mention_tokens(rows: list[dict[str, Any]] | None, *, min_len: int = 3) -> set[str]:
+    tokens: set[str] = set()
+    for row in rows or []:
+        tokens.update(_content_tokens(str(row.get('normalized') or row.get('surface') or ''), min_len=min_len))
+    return tokens
+
+
+def _overlap_containment(left: set[str], right: set[str]) -> float:
+    if not left or not right:
+        return 0.0
+    shared = left & right
+    return min(len(shared) / len(left), len(shared) / len(right))
+
+
+def _move_slot_count(row: dict[str, Any]) -> int:
+    return sum(
+        len(list(row.get(field) or []))
+        for field in (
+            'research_objects',
+            'methods',
+            'observed_variables',
+            'metrics',
+            'comparators',
+            'conditions',
+            'effects',
+            'limitation_types',
+            'resource_mentions',
+        )
+    )
+
+
+def _summary_language(summary: str) -> str:
+    text = str(summary or '')
+    cjk_count = len(_SUMMARY_CJK_RE.findall(text))
+    latin_count = len(_SUMMARY_LATIN_RE.findall(text))
+    if cjk_count >= 8 and cjk_count >= latin_count:
+        return 'cjk'
+    if latin_count >= 24 and latin_count >= cjk_count * 2:
+        return 'latin'
+    if cjk_count >= 4 and latin_count >= 8:
+        return 'mixed'
+    return 'unknown'
+
+
+def _method_name_count(row: dict[str, Any]) -> int:
+    seen: set[str] = set()
+    for method in row.get('methods') or []:
+        token = _normalize_space(method.get('normalized') or method.get('surface') or '').lower()
+        if token:
+            seen.add(token)
+    return len(seen)
+
+
+def _is_bilingual_method_duplicate_candidate(
+    left: dict[str, Any],
+    right: dict[str, Any],
+    *,
+    act_type: str,
+) -> bool:
+    if act_type != 'propose_method':
+        return False
+    left_language = _summary_language(str(left.get('summary') or ''))
+    right_language = _summary_language(str(right.get('summary') or ''))
+    if {left_language, right_language} != {'cjk', 'latin'}:
+        return False
+    return _method_name_count(left) >= 2 and _method_name_count(right) >= 2
+
+
+def _prefer_richer_move_row(left: dict[str, Any], right: dict[str, Any]) -> dict[str, Any]:
+    left_score = (
+        _move_slot_count(left),
+        len(_content_tokens(str(left.get('summary') or ''))),
+        len(_normalize_space(left.get('summary') or '')),
+    )
+    right_score = (
+        _move_slot_count(right),
+        len(_content_tokens(str(right.get('summary') or ''))),
+        len(_normalize_space(right.get('summary') or '')),
+    )
+    return right if right_score > left_score else left
+
+
+def _merge_effect_rows(rows: list[dict[str, Any]] | None, preferred_rows: list[dict[str, Any]] | None, *, anchor_ids: list[str]) -> list[dict[str, Any]]:
+    seen: set[tuple[str, str, str]] = set()
+    merged: list[dict[str, Any]] = []
+    for row in list(preferred_rows or []) + list(rows or []):
+        normalized_row = _normalize_effect_rows([dict(row)], anchor_ids=anchor_ids)
+        if not normalized_row:
+            continue
+        candidate = normalized_row[0]
+        key = (
+            str(candidate.get('direction') or ''),
+            str(candidate.get('magnitude_text') or ''),
+            str(candidate.get('comparator_surface') or ''),
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        merged.append(candidate)
+    return merged
+
+
+def _apply_move_row_payload(
+    rows: list[dict[str, Any]],
+    *,
+    move_id: str,
+    sequence_no: int,
+    role: str,
+    act_type: str,
+    summary: str,
+    confidence: float,
+    anchor_ids: list[str],
+    research_objects: list[dict[str, Any]],
+    methods: list[dict[str, Any]],
+    observed_variables: list[dict[str, Any]],
+    metrics: list[dict[str, Any]],
+    comparators: list[dict[str, Any]],
+    conditions: list[dict[str, Any]],
+    effects: list[dict[str, Any]],
+    limitation_types: list[dict[str, Any]],
+    resource_mentions: list[dict[str, Any]],
+    slot_provenance: list[dict[str, Any]],
+) -> None:
+    for index, row in enumerate(rows):
+        row['anchor_id'] = anchor_ids[index]
+        row['move_id'] = move_id
+        row['sequence_no'] = sequence_no
+        row['role_hint'] = role
+        row['act_hint'] = act_type
+        row['summary'] = summary
+        row['confidence'] = confidence
+        row['research_objects'] = research_objects
+        row['methods'] = methods
+        row['observed_variables'] = observed_variables
+        row['metrics'] = metrics
+        row['comparators'] = comparators
+        row['conditions'] = conditions
+        row['effects'] = effects
+        row['limitation_types'] = limitation_types
+        row['resource_mentions'] = resource_mentions
+        row['slot_provenance'] = slot_provenance
+
+
+def _compress_adjacent_redundant_method_moves(
+    evidence_rows: list[dict[str, Any]],
+    move_defs: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    ordered = sorted(move_defs, key=lambda row: int(row.get('sequence_no') or 0))
+    if len(ordered) < 2:
+        return evidence_rows, ordered
+
+    max_lookahead = 2
+    index = 0
+    while index < len(ordered) - 1:
+        current = ordered[index]
+        if (
+            str(current.get('role') or '') != 'method'
+            or str(current.get('act_type') or '') not in {'propose_method', 'adapt_method'}
+        ):
+            index += 1
+            continue
+
+        current_id = str(current.get('move_id') or '')
+        current_rows = [row for row in evidence_rows if str(row.get('move_id') or '') == current_id]
+        if not current_rows:
+            index += 1
+            continue
+
+        current_row = current_rows[0]
+        merged = False
+        lookahead_end = min(len(ordered), index + 1 + max_lookahead)
+        for candidate_index in range(index + 1, lookahead_end):
+            nxt = ordered[candidate_index]
+            if (
+                str(nxt.get('role') or '') != 'method'
+                or str(current.get('act_type') or '') != str(nxt.get('act_type') or '')
+            ):
+                continue
+
+            next_id = str(nxt.get('move_id') or '')
+            next_rows = [row for row in evidence_rows if str(row.get('move_id') or '') == next_id]
+            if not next_rows:
+                continue
+
+            next_row = next_rows[0]
+            summary_overlap = _overlap_containment(
+                _content_tokens(str(current_row.get('summary') or '')),
+                _content_tokens(str(next_row.get('summary') or '')),
+            )
+            method_overlap = _overlap_containment(
+                _mention_tokens(current_row.get('methods')),
+                _mention_tokens(next_row.get('methods')),
+            )
+            bilingual_duplicate = _is_bilingual_method_duplicate_candidate(
+                current_row,
+                next_row,
+                act_type=str(current.get('act_type') or ''),
+            )
+            if method_overlap < 0.5:
+                continue
+            if summary_overlap < 0.35 and not bilingual_duplicate:
+                continue
+
+            richer_row = _prefer_richer_move_row(current_row, next_row)
+            combined_anchor_chunk_ids: list[str] = []
+            for chunk_id in list(current.get('anchor_chunk_ids') or []) + list(nxt.get('anchor_chunk_ids') or []):
+                token = str(chunk_id or '').strip()
+                if token and token not in combined_anchor_chunk_ids:
+                    combined_anchor_chunk_ids.append(token)
+            merged_research_objects = _normalize_mention_rows(
+                _merge_preferred_mention_rows(current_row.get('research_objects'), next_row.get('research_objects')),
+                anchor_ids=combined_anchor_chunk_ids,
+            )
+            merged_methods = _normalize_mention_rows(
+                _merge_preferred_mention_rows(current_row.get('methods'), next_row.get('methods')),
+                anchor_ids=combined_anchor_chunk_ids,
+            )
+            merged_observed_variables = _normalize_mention_rows(
+                _merge_preferred_mention_rows(current_row.get('observed_variables'), next_row.get('observed_variables')),
+                anchor_ids=combined_anchor_chunk_ids,
+            )
+            merged_metrics = _normalize_mention_rows(
+                _merge_preferred_mention_rows(current_row.get('metrics'), next_row.get('metrics')),
+                anchor_ids=combined_anchor_chunk_ids,
+            )
+            merged_comparators = _normalize_mention_rows(
+                _merge_preferred_mention_rows(current_row.get('comparators'), next_row.get('comparators')),
+                anchor_ids=combined_anchor_chunk_ids,
+            )
+            merged_conditions = _normalize_mention_rows(
+                _merge_preferred_mention_rows(current_row.get('conditions'), next_row.get('conditions')),
+                anchor_ids=combined_anchor_chunk_ids,
+            )
+            merged_limitation_types = _normalize_mention_rows(
+                _merge_preferred_mention_rows(current_row.get('limitation_types'), next_row.get('limitation_types')),
+                anchor_ids=combined_anchor_chunk_ids,
+            )
+            merged_resource_mentions = _normalize_mention_rows(
+                _merge_preferred_mention_rows(current_row.get('resource_mentions'), next_row.get('resource_mentions')),
+                anchor_ids=combined_anchor_chunk_ids,
+            )
+            merged_effects = _merge_effect_rows(
+                current_row.get('effects'),
+                next_row.get('effects'),
+                anchor_ids=combined_anchor_chunk_ids,
+            )
+            merged_slot_provenance = [
+                *_slot_provenance_rows('research_objects', merged_research_objects, anchor_ids=combined_anchor_chunk_ids),
+                *_slot_provenance_rows('methods', merged_methods, anchor_ids=combined_anchor_chunk_ids),
+                *_slot_provenance_rows('observed_variables', merged_observed_variables, anchor_ids=combined_anchor_chunk_ids),
+                *_slot_provenance_rows('metrics', merged_metrics, anchor_ids=combined_anchor_chunk_ids),
+                *_slot_provenance_rows('comparators', merged_comparators, anchor_ids=combined_anchor_chunk_ids),
+                *_slot_provenance_rows('conditions', merged_conditions, anchor_ids=combined_anchor_chunk_ids),
+                *_slot_provenance_rows('limitation_types', merged_limitation_types, anchor_ids=combined_anchor_chunk_ids),
+                *_slot_provenance_rows('resource_mentions', merged_resource_mentions, anchor_ids=combined_anchor_chunk_ids),
+            ]
+            merged_confidence = max(float(current_row.get('confidence') or 0.0), float(next_row.get('confidence') or 0.0))
+            combined_rows = [*current_rows, *next_rows]
+            combined_anchor_ids = [f'{current_id}:anchor:{anchor_index}' for anchor_index in range(1, len(combined_rows) + 1)]
+            _apply_move_row_payload(
+                combined_rows,
+                move_id=current_id,
+                sequence_no=int(current.get('sequence_no') or index + 1),
+                role='method',
+                act_type=str(current.get('act_type') or 'propose_method'),
+                summary=str(richer_row.get('summary') or current_row.get('summary') or ''),
+                confidence=merged_confidence,
+                anchor_ids=combined_anchor_ids,
+                research_objects=merged_research_objects,
+                methods=merged_methods,
+                observed_variables=merged_observed_variables,
+                metrics=merged_metrics,
+                comparators=merged_comparators,
+                conditions=merged_conditions,
+                effects=merged_effects,
+                limitation_types=merged_limitation_types,
+                resource_mentions=merged_resource_mentions,
+                slot_provenance=merged_slot_provenance,
+            )
+            current['anchor_chunk_ids'] = combined_anchor_chunk_ids
+            current['anchor_ids'] = combined_anchor_ids
+            ordered.pop(candidate_index)
+            move_defs[:] = [row for row in move_defs if str(row.get('move_id') or '') != next_id]
+            merged = True
+            break
+
+        if merged:
+            continue
+
+        index += 1
+        continue
+
+    for new_sequence_no, move_def in enumerate(ordered, start=1):
+        move_def['sequence_no'] = new_sequence_no
+        move_id = str(move_def.get('move_id') or '')
+        for row in evidence_rows:
+            if str(row.get('move_id') or '') == move_id:
+                row['sequence_no'] = new_sequence_no
+    move_defs[:] = ordered
+    return evidence_rows, ordered
+
+
 def _slot_provenance_rows(field: str, values: list[dict[str, Any]], *, anchor_ids: list[str]) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for index, value in enumerate(values):
@@ -2890,9 +3202,10 @@ def _move_rows_from_windows(
                 }
                 extracted_moves += 1
 
+    evidence_rows, move_defs = _compress_adjacent_redundant_method_moves(evidence_rows, move_defs)
     report = {
         'window_count': len(windows),
-        'move_count': extracted_moves,
+        'move_count': len(move_defs),
     }
     return evidence_rows, move_defs, report
 

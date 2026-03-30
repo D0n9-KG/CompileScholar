@@ -280,3 +280,22 @@ Progress note (2026-03-30, generic limitation-noise cleanup phase):
 - the separate singleton `difficult` limitation is rewritten to the more content-grounded phrase `due to non-slip boundary condition`
 - `s870_Pb-activated amine-assisted photocatalytic hydrogen evolution reaction...` remains untouched by the cleanup: still `empirical_default`, still `yellow`, and still emits no limitation moves
 - Next highest-value unresolved L2 gap: limitation noise is cleaner now, but the broader macro gap remains overlapping move phrasing and under-compressed narrative redundancy across roles. In other words, L2 is getting closer to being both faithful and downstream-usable, yet some papers still spread one idea across several adjacent moves or keep weak summary phrasing when the underlying evidence is good. The next phase should therefore focus on move-level compression / redundancy cleanup, not on adding more slot-specific heuristics.
+
+Progress note (2026-03-30, nearby method-dedup phase):
+- Added regression coverage for two method-clutter cases that were still leaking through after the companion-limitation cleanup:
+- nearby `method -> result -> method` duplication where the later method restates the same proposal with richer slot content
+- bilingual nearby duplication where the Chinese abstract and English abstract each emit the same `propose_method` move but lexical summary overlap is low across languages
+- Reworked `_compress_adjacent_redundant_method_moves` conservatively rather than broadening generic compression:
+- widened the merge scan only to a tiny `max_lookahead = 2`, so the earlier move can absorb one nearby duplicate even when a single interleaved move sits between them
+- kept the existing summary-overlap and method-signature thresholds for normal same-language merges
+- added a narrow bilingual exception only for `propose_method` pairs with one CJK summary and one Latin summary plus at least two grounded method mentions on both sides, so common Chinese/English abstract restatements can merge without opening the door to generic English method collapse
+- Verification:
+- Targeted regressions:
+- `backend/tests/test_paper_logic_trace_direct_extraction.py -k "adjacent_redundant_method_moves_merge_into_one_richer_move or adjacent_method_moves_with_distinct_method_signatures_do_not_merge or nearby_redundant_method_moves_merge_across_interleaved_result_move or bilingual_nearby_redundant_method_moves_merge_when_method_signature_matches"`
+- Focused file: `backend/tests/test_paper_logic_trace_direct_extraction.py` -> `105 passed`
+- Full backend suite: `cd backend; .\.venv\Scripts\python.exe -m pytest -q` -> `533 passed, 1 warning`
+- Real-sample rechecks after the change:
+- `1267` now rebuilds to `move_count=7` with `method_count=4`, keeping the main neural-network proposal once while preserving the distinct training-data method move and later GRNN/BP method elaborations.
+- `1243_Data-Driven Computational Plasticity` remains structurally healthy, with `move_count=11`, `method_count=5`, and the grounded drawback limitation still preserved.
+- `1607_Shear jamming and fragility in dense suspensions` keeps its distinct stress-controlled / Stokesian / contact-force method chain (`move_count=19`, `method_count=10`) rather than collapsing into one over-merged method blob.
+- Next highest-value unresolved L2 gap: L2 single-paper traces are now less cluttered by repeated limitation/method restatements, but several papers still show over-split method ladders or thin experiment/result anchoring where the extracted moves are distinct enough to avoid dedup yet still not ideal for downstream L3/L4 route reconstruction. The next phase should inspect those remaining high-frequency content patterns from fresh corpus samples before changing any more compression rules.

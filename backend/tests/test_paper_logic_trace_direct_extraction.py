@@ -2073,6 +2073,451 @@ def test_same_window_explicit_drawback_emits_only_one_companion_limitation_move(
     )
 
 
+def test_adjacent_redundant_method_moves_merge_into_one_richer_move(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '中文摘要',
+            '针对推进剂性能预测建立广义回归神经网络与遗传算法反向传播神经网络模型，并结合配方变量进行建模与对照分析。',
+            line=1,
+        ),
+        _chunk(
+            'c-2',
+            'Abstract',
+            'General regression neural network and genetic algorithm back propagation neural network models are established to predict propellant mechanical performance and burning rate from formulation variables and particle-size settings.',
+            line=4,
+        ),
+    )
+
+    def _fake_extract_window_moves_llm(**kwargs):
+        chunk_ids = [str(chunk.chunk_id) for chunk in (kwargs.get('window', {}).get('chunks') or [])]
+        if chunk_ids == ['c-1']:
+            return [
+                {
+                    'role': 'method',
+                    'act_type': 'propose_method',
+                    'summary': 'Two neural network models, Generalized Regression Neural Network (GRNN) and Genetic Algorithm Backpropagation (GABP) neural network, are established to predict propellant properties.',
+                    'anchor_chunk_ids': ['c-1'],
+                    'research_objects': [{'surface': 'propellant', 'normalized': 'propellant'}],
+                    'methods': [
+                        {'surface': 'Generalized Regression Neural Network (GRNN)', 'normalized': 'generalized regression neural network (grnn)'},
+                        {'surface': 'Genetic Algorithm Backpropagation (GABP) neural network', 'normalized': 'genetic algorithm backpropagation (gabp) neural network'},
+                    ],
+                    'confidence': 0.78,
+                }
+            ]
+        if chunk_ids == ['c-2']:
+            return [
+                {
+                    'role': 'method',
+                    'act_type': 'propose_method',
+                    'summary': 'Establishes general regression neural network (GRNN) and genetic algorithm back propagation (GABP) neural network models to predict propellant mechanical performance and burning rate based on fine ammonium perchlorate content.',
+                    'anchor_chunk_ids': ['c-2'],
+                    'research_objects': [
+                        {'surface': 'composite solid propellant', 'normalized': 'composite solid propellant'},
+                        {'surface': 'mechanical performance', 'normalized': 'mechanical performance'},
+                        {'surface': 'burning rate', 'normalized': 'burning rate'},
+                    ],
+                    'methods': [
+                        {'surface': 'general regression neural network', 'normalized': 'general regression neural network'},
+                        {'surface': 'genetic algorithm back propagation neural network', 'normalized': 'genetic algorithm back propagation neural network'},
+                    ],
+                    'confidence': 0.84,
+                }
+            ]
+        return []
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        _fake_extract_window_moves_llm,
+    )
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._semantic_windows',
+        lambda *_args, **_kwargs: [
+            {
+                'window_id': 'w-1',
+                'role_hint': 'method',
+                'act_hint': 'propose_method',
+                'section_path': ['中文摘要'],
+                'chunks': [doc.chunks[0]],
+                'char_count': len(doc.chunks[0].text),
+            },
+            {
+                'window_id': 'w-2',
+                'role_hint': 'method',
+                'act_hint': 'propose_method',
+                'section_path': ['Abstract'],
+                'chunks': [doc.chunks[1]],
+                'char_count': len(doc.chunks[1].text),
+            },
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+    trace = compile_paper_logic_trace(
+        **{k: payload[k] for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']}
+    )
+
+    method_moves = [move for move in trace.canonical_core.moves if move.role == 'method']
+
+    assert len(method_moves) == 1
+    assert 'mechanical performance and burning rate' in method_moves[0].summary.lower()
+    assert len(method_moves[0].anchor_ids) == 2
+    normalized_methods = [str(item.normalized or item.surface or '').lower() for item in method_moves[0].methods]
+    assert any('regression' in item and 'network' in item for item in normalized_methods)
+    assert any('genetic' in item and 'algorithm' in item for item in normalized_methods)
+
+
+def test_adjacent_method_moves_with_distinct_method_signatures_do_not_merge(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '2. Simulation model',
+            'We employ an algorithm to mimic stress-controlled rheology while extending Stokesian Dynamics under quasistatic conditions.',
+            line=1,
+        ),
+        _chunk(
+            'c-2',
+            '2. Simulation model (continued)',
+            'The SD approach is extended with frictional contact mechanics to reproduce discontinuous shear thickening and analyze viscosity divergence.',
+            line=4,
+        ),
+    )
+
+    def _fake_extract_window_moves_llm(**kwargs):
+        chunk_ids = [str(chunk.chunk_id) for chunk in (kwargs.get('window', {}).get('chunks') or [])]
+        if chunk_ids == ['c-1']:
+            return [
+                {
+                    'role': 'method',
+                    'act_type': 'propose_method',
+                    'summary': 'The authors employ an algorithm to mimic stress-controlled rheology, extending Stokesian Dynamics by coupling it with frictional contact mechanics to reproduce discontinuous shear thickening.',
+                    'anchor_chunk_ids': ['c-1'],
+                    'methods': [
+                        {'surface': 'stress-controlled rheology algorithm', 'normalized': 'stress-controlled rheology algorithm'},
+                        {'surface': 'Stokesian Dynamics', 'normalized': 'stokesian dynamics'},
+                    ],
+                    'confidence': 0.8,
+                }
+            ]
+        if chunk_ids == ['c-2']:
+            return [
+                {
+                    'role': 'method',
+                    'act_type': 'propose_method',
+                    'summary': 'The SD approach is extended by coupling it with frictional contact mechanics to reproduce discontinuous shear thickening, noting that hydrodynamic contributions vanish at viscosity divergence.',
+                    'anchor_chunk_ids': ['c-2'],
+                    'methods': [
+                        {
+                            'surface': 'Stokesian Dynamics extended with frictional contact mechanics',
+                            'normalized': 'stokesian dynamics extended with frictional contact mechanics',
+                        }
+                    ],
+                    'confidence': 0.81,
+                }
+            ]
+        return []
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        _fake_extract_window_moves_llm,
+    )
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._semantic_windows',
+        lambda *_args, **_kwargs: [
+            {
+                'window_id': 'w-1',
+                'role_hint': 'method',
+                'act_hint': 'propose_method',
+                'section_path': ['2. Simulation model'],
+                'chunks': [doc.chunks[0]],
+                'char_count': len(doc.chunks[0].text),
+            },
+            {
+                'window_id': 'w-2',
+                'role_hint': 'method',
+                'act_hint': 'propose_method',
+                'section_path': ['2. Simulation model (continued)'],
+                'chunks': [doc.chunks[1]],
+                'char_count': len(doc.chunks[1].text),
+            },
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+    trace = compile_paper_logic_trace(
+        **{k: payload[k] for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']}
+    )
+
+    method_moves = [move for move in trace.canonical_core.moves if move.role == 'method']
+
+    assert len(method_moves) == 2
+
+
+def test_nearby_redundant_method_moves_merge_across_interleaved_result_move(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '中文摘要',
+            '建立广义回归神经网络与遗传算法反向传播神经网络模型，用于推进剂性能预测。',
+            line=1,
+        ),
+        _chunk(
+            'c-2',
+            'Abstract',
+            'The predicted values agree well with the measured burning rate and mechanical performance.',
+            line=4,
+        ),
+        _chunk(
+            'c-3',
+            'Abstract',
+            'General regression neural network and genetic algorithm back propagation neural network models are established to predict propellant burning rate and mechanical performance from formulation variables.',
+            line=7,
+        ),
+    )
+
+    def _fake_extract_window_moves_llm(**kwargs):
+        chunk_ids = [str(chunk.chunk_id) for chunk in (kwargs.get('window', {}).get('chunks') or [])]
+        if chunk_ids == ['c-1']:
+            return [
+                {
+                    'role': 'method',
+                    'act_type': 'propose_method',
+                    'summary': 'Establishes general regression neural network (GRNN) and genetic algorithm back propagation (GABP) neural network models to predict propellant burning rate and mechanical performance.',
+                    'anchor_chunk_ids': ['c-1'],
+                    'research_objects': [{'surface': 'propellant', 'normalized': 'propellant'}],
+                    'methods': [
+                        {'surface': 'GRNN', 'normalized': 'general regression neural network'},
+                        {'surface': 'GABP neural network', 'normalized': 'genetic algorithm back propagation neural network'},
+                    ],
+                    'confidence': 0.78,
+                }
+            ]
+        if chunk_ids == ['c-2']:
+            return [
+                {
+                    'role': 'result',
+                    'act_type': 'report_effect',
+                    'summary': 'The predictions agree well with measured burning rate and mechanical performance.',
+                    'anchor_chunk_ids': ['c-2'],
+                    'research_objects': [{'surface': 'burning rate', 'normalized': 'burning rate'}],
+                    'observed_variables': [{'surface': 'mechanical performance', 'normalized': 'mechanical performance'}],
+                    'confidence': 0.76,
+                }
+            ]
+        if chunk_ids == ['c-3']:
+            return [
+                {
+                    'role': 'method',
+                    'act_type': 'propose_method',
+                    'summary': 'Established general regression neural network and genetic algorithm back propagation neural network models to predict propellant burning rate and mechanical performance from formulation variables.',
+                    'anchor_chunk_ids': ['c-3'],
+                    'research_objects': [
+                        {'surface': 'propellant', 'normalized': 'propellant'},
+                        {'surface': 'burning rate', 'normalized': 'burning rate'},
+                        {'surface': 'mechanical performance', 'normalized': 'mechanical performance'},
+                    ],
+                    'methods': [
+                        {'surface': 'general regression neural network', 'normalized': 'general regression neural network'},
+                        {'surface': 'genetic algorithm back propagation neural network', 'normalized': 'genetic algorithm back propagation neural network'},
+                    ],
+                    'confidence': 0.84,
+                }
+            ]
+        return []
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        _fake_extract_window_moves_llm,
+    )
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._semantic_windows',
+        lambda *_args, **_kwargs: [
+            {
+                'window_id': 'w-1',
+                'role_hint': 'method',
+                'act_hint': 'propose_method',
+                'section_path': ['中文摘要'],
+                'chunks': [doc.chunks[0]],
+                'char_count': len(doc.chunks[0].text),
+            },
+            {
+                'window_id': 'w-2',
+                'role_hint': 'result',
+                'act_hint': 'report_effect',
+                'section_path': ['Abstract'],
+                'chunks': [doc.chunks[1]],
+                'char_count': len(doc.chunks[1].text),
+            },
+            {
+                'window_id': 'w-3',
+                'role_hint': 'method',
+                'act_hint': 'propose_method',
+                'section_path': ['Abstract'],
+                'chunks': [doc.chunks[2]],
+                'char_count': len(doc.chunks[2].text),
+            },
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+    trace = compile_paper_logic_trace(
+        **{k: payload[k] for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']}
+    )
+
+    method_moves = [move for move in trace.canonical_core.moves if move.role == 'method']
+    result_moves = [move for move in trace.canonical_core.moves if move.role == 'result']
+
+    assert len(method_moves) == 1
+    assert len(result_moves) == 1
+    assert 'burning rate and mechanical performance' in method_moves[0].summary.lower()
+    assert len(method_moves[0].anchor_ids) == 2
+
+
+def test_bilingual_nearby_redundant_method_moves_merge_when_method_signature_matches(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '中文摘要',
+            '针对推进剂中细高氯酸铵含量及粒度对推进剂力学性能、燃速的影响，分别建立广义回归神经网络与遗传算法反向传播神经网络模型。',
+            line=1,
+        ),
+        _chunk(
+            'c-2',
+            'Abstract',
+            'The predicted values agree well with the measured burning rate and mechanical performance.',
+            line=4,
+        ),
+        _chunk(
+            'c-3',
+            'Abstract',
+            'General regression neural network and genetic algorithm back propagation neural network models are established to predict propellant burning rate and mechanical performance from formulation variables.',
+            line=7,
+        ),
+    )
+
+    def _fake_extract_window_moves_llm(**kwargs):
+        chunk_ids = [str(chunk.chunk_id) for chunk in (kwargs.get('window', {}).get('chunks') or [])]
+        if chunk_ids == ['c-1']:
+            return [
+                {
+                    'role': 'method',
+                    'act_type': 'propose_method',
+                    'summary': '针对推进剂力学性能与燃速预测，建立广义回归神经网络(GRNN)和遗传算法反向传播(GABP)神经网络模型。',
+                    'anchor_chunk_ids': ['c-1'],
+                    'research_objects': [
+                        {'surface': '推进剂力学性能', 'normalized': 'propellant mechanical performance'},
+                        {'surface': '燃速', 'normalized': 'burning rate'},
+                    ],
+                    'methods': [
+                        {'surface': '广义回归神经网络', 'normalized': 'general regression neural network'},
+                        {'surface': '遗传算法反向传播神经网络', 'normalized': 'genetic algorithm back propagation neural network'},
+                    ],
+                    'confidence': 0.78,
+                }
+            ]
+        if chunk_ids == ['c-2']:
+            return [
+                {
+                    'role': 'result',
+                    'act_type': 'report_effect',
+                    'summary': 'The predictions agree well with measured burning rate and mechanical performance.',
+                    'anchor_chunk_ids': ['c-2'],
+                    'research_objects': [{'surface': 'burning rate', 'normalized': 'burning rate'}],
+                    'observed_variables': [{'surface': 'mechanical performance', 'normalized': 'mechanical performance'}],
+                    'confidence': 0.76,
+                }
+            ]
+        if chunk_ids == ['c-3']:
+            return [
+                {
+                    'role': 'method',
+                    'act_type': 'propose_method',
+                    'summary': 'Established general regression neural network and genetic algorithm back propagation neural network models to predict propellant burning rate and mechanical performance from formulation variables.',
+                    'anchor_chunk_ids': ['c-3'],
+                    'research_objects': [
+                        {'surface': 'propellant mechanical performance', 'normalized': 'propellant mechanical performance'},
+                        {'surface': 'burning rate', 'normalized': 'burning rate'},
+                    ],
+                    'methods': [
+                        {'surface': 'general regression neural network', 'normalized': 'general regression neural network'},
+                        {'surface': 'genetic algorithm back propagation neural network', 'normalized': 'genetic algorithm back propagation neural network'},
+                    ],
+                    'confidence': 0.84,
+                }
+            ]
+        return []
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        _fake_extract_window_moves_llm,
+    )
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._semantic_windows',
+        lambda *_args, **_kwargs: [
+            {
+                'window_id': 'w-1',
+                'role_hint': 'method',
+                'act_hint': 'propose_method',
+                'section_path': ['中文摘要'],
+                'chunks': [doc.chunks[0]],
+                'char_count': len(doc.chunks[0].text),
+            },
+            {
+                'window_id': 'w-2',
+                'role_hint': 'result',
+                'act_hint': 'report_effect',
+                'section_path': ['Abstract'],
+                'chunks': [doc.chunks[1]],
+                'char_count': len(doc.chunks[1].text),
+            },
+            {
+                'window_id': 'w-3',
+                'role_hint': 'method',
+                'act_hint': 'propose_method',
+                'section_path': ['Abstract'],
+                'chunks': [doc.chunks[2]],
+                'char_count': len(doc.chunks[2].text),
+            },
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+    trace = compile_paper_logic_trace(
+        **{k: payload[k] for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']}
+    )
+
+    method_moves = [move for move in trace.canonical_core.moves if move.role == 'method']
+    result_moves = [move for move in trace.canonical_core.moves if move.role == 'result']
+
+    assert len(method_moves) == 1
+    assert len(result_moves) == 1
+    assert len(method_moves[0].anchor_ids) == 2
+    normalized_methods = [str(item.normalized or item.surface or '').lower() for item in method_moves[0].methods]
+    assert any('general' in item and 'regression' in item for item in normalized_methods)
+    assert any('genetic' in item and 'algorithm' in item for item in normalized_methods)
+
+
 def test_method_research_object_filter_drops_free_energy_process_fragment(monkeypatch) -> None:
     summary = 'A continuum-thermodynamics framework defines state variables, free energy, and dissipation potentials.'
     quote = 'A simple elastoviscoplastic model consists of choosing as free energy and dissipation potentials.'
