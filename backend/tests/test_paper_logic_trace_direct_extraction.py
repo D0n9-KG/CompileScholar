@@ -7,8 +7,10 @@ from app.paper_logic_trace.compiler import compile_paper_logic_trace
 from app.paper_logic_trace.direct_extraction import (
     _build_move_relation_rows,
     _build_research_move_prompt,
+    _clean_summary_candidate,
     _refine_limitation_rows,
     _role_for_chunk,
+    _summary_from_role_text,
     build_paper_logic_trace_inputs,
 )
 
@@ -460,6 +462,186 @@ def test_fallback_explicit_challenge_sentence_stays_problem_despite_method_like_
             'Background',
             'The biggest challenge is whether simulation can proceed directly from data without a constitutive model.',
             line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+
+    assert move['role_hint'] == 'problem'
+    assert move['act_hint'] in {'identify_gap', 'define_task'}
+
+
+def test_fallback_method_summary_strips_leading_keyword_prefix(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            'Background',
+            'Key words: mixer; blade gap; CFX; effective mixing ratio We use the finite element method to analyze blade-gap flow.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+
+    assert move['role_hint'] == 'method'
+    assert 'finite element method' in move['summary'].lower()
+    assert 'key words:' not in move['summary'].lower()
+
+
+def test_summary_from_role_text_background_skips_leading_front_matter() -> None:
+    text = (
+        'John Doe, Jane Smith. '
+        'Department of Engineering, Demo University, City 12345. '
+        'Abstract: Particle mixing under variable blade gaps is studied.'
+    )
+
+    summary = _summary_from_role_text(text, role='background')
+
+    assert 'particle mixing under variable blade gaps is studied' in summary.lower()
+    assert 'john doe' not in summary.lower()
+    assert 'demo university' not in summary.lower()
+
+
+def test_summary_from_role_text_method_prefers_explicit_software_use_sentence() -> None:
+    text = (
+        'With the development of CFD technology, numerical simulation has become an important tool. '
+        'We use CFX software to simulate blade-gap flow.'
+    )
+
+    summary = _summary_from_role_text(text, role='method')
+
+    assert 'use cfx software' in summary.lower()
+    assert 'cfd technology' not in summary.lower()
+    assert 'numerical simulation has become an important tool' not in summary.lower()
+
+
+def test_summary_from_role_text_method_prefers_named_method_sentence_over_generic_descriptor() -> None:
+    text = (
+        'The less intrusive approach from the point of view of implementation in standard simulation software is considered. '
+        'Another approach based on the direct use of data was successfully proposed in the LaTIn method.'
+    )
+
+    summary = _summary_from_role_text(text, role='method')
+
+    assert 'latin method' in summary.lower()
+    assert 'less intrusive approach' not in summary.lower()
+
+
+def test_clean_summary_candidate_removes_embedded_chunk_markers() -> None:
+    text = (
+        'The method is evaluated. '
+        '[demo-paper:137-138:10df73f44ca346df] Simulations end up in jammed states.'
+    )
+
+    cleaned = _clean_summary_candidate(text)
+
+    assert '[' not in cleaned
+    assert '10df73f44ca346df' not in cleaned
+
+
+def test_clean_summary_candidate_drops_leading_text_before_abstract_marker() -> None:
+    text = (
+        'John Doe, Jane Smith (Demo University, City 12345) '
+        'Abstract: Particle mixing under variable blade gaps is studied.'
+    )
+
+    cleaned = _clean_summary_candidate(text)
+
+    assert cleaned.lower().startswith('particle mixing under variable blade gaps is studied')
+    assert 'john doe' not in cleaned.lower()
+
+
+def test_clean_summary_candidate_drops_original_paper_prefix_before_content_sentence() -> None:
+    text = (
+        'ORIGINAL PAPER John Doe and Jane Smith Springer-Verlag 2019 '
+        'The phenomenon of shear-induced jamming is a factor in dense suspensions.'
+    )
+
+    cleaned = _clean_summary_candidate(text)
+
+    assert cleaned.lower().startswith('the phenomenon of shear-induced jamming')
+    assert 'original paper' not in cleaned.lower()
+
+
+def test_fallback_method_summary_can_use_later_explicit_method_chunk(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk('c-1', 'Background', 'Key words: mixer; blade gap; CFX.', line=1),
+        _chunk(
+            'c-2',
+            'Background',
+            'With the development of CFD technology, numerical simulation has become an important tool.',
+            line=2,
+        ),
+        _chunk(
+            'c-3',
+            'Background',
+            'We use CFX software to simulate blade-gap flow and compare different blade gaps.',
+            line=3,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+
+    assert move['role_hint'] == 'method'
+    assert 'use cfx software' in move['summary'].lower()
+    assert 'cfd technology' not in move['summary'].lower()
+
+
+def test_fallback_background_window_with_late_method_context_stays_problem(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            'Background',
+            'Research on fragile configurations remains limited.',
+            line=1,
+        ),
+        _chunk(
+            'c-2',
+            'Background',
+            'The governing mechanism is still unclear.',
+            line=2,
+        ),
+        _chunk(
+            'c-3',
+            'Background',
+            'It is necessary to develop continuum models based on particle-scale physics.',
+            line=3,
         ),
     )
 
@@ -1455,6 +1637,214 @@ def test_method_backfill_filters_focus_on_simple_model_fragment(monkeypatch) -> 
     assert 'soft-constraint approach' in normalized_methods
     assert 'focus on simple model' not in normalized_methods
     assert 'simple model' not in normalized_methods
+
+
+def test_method_backfill_prefers_named_method_over_reporting_wrapper(monkeypatch) -> None:
+    summary = (
+        'Another approach based on the direct use of data was successfully proposed in the LaTIn method.'
+    )
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '2. Method',
+            summary,
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'method',
+                'act_type': 'propose_method',
+                'summary': summary,
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'methods': [],
+                'confidence': 0.7,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+    normalized_methods = {str(item.get('normalized') or '').lower() for item in move['methods']}
+
+    assert 'latin method' in normalized_methods
+    assert 'another approach' not in normalized_methods
+    assert 'was successfully proposed in the latin method' not in normalized_methods
+
+
+def test_method_backfill_filters_equation_and_law_fragments(monkeypatch) -> None:
+    summary = (
+        'The constitutive equation is required to close the problem, and the hardening law is illustrated in Fig. 1.'
+    )
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '2. Method',
+            summary,
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'method',
+                'act_type': 'propose_method',
+                'summary': summary,
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'methods': [],
+                'confidence': 0.7,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+    normalized_methods = {str(item.get('normalized') or '').lower() for item in move['methods']}
+
+    assert 'constitutive equation' not in normalized_methods
+    assert 'hardening law' not in normalized_methods
+
+
+def test_method_backfill_filters_pronoun_led_generic_model_fragment(monkeypatch) -> None:
+    summary = "Hooke's law is more than a law, it is simply a model."
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '2. Method',
+            summary,
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'method',
+                'act_type': 'propose_method',
+                'summary': summary,
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'methods': [],
+                'confidence': 0.7,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+    normalized_methods = {str(item.get('normalized') or '').lower() for item in move['methods']}
+
+    assert 'it is simply model' not in normalized_methods
+    assert 'simply model' not in normalized_methods
+
+
+def test_method_backfill_filters_reporting_simulation_count_fragments(monkeypatch) -> None:
+    summary = 'Only jammed results of ten simulations are plotted.'
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '2. Method',
+            summary,
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'method',
+                'act_type': 'propose_method',
+                'summary': summary,
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'methods': [],
+                'confidence': 0.7,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+    normalized_methods = {str(item.get('normalized') or '').lower() for item in move['methods']}
+
+    assert 'only jammed results of ten simulations' not in normalized_methods
+    assert 'ten simulations' not in normalized_methods
+
+
+def test_method_backfill_filters_intrusive_descriptor_when_named_method_exists(monkeypatch) -> None:
+    summary = (
+        'The less intrusive approach from the point of view of implementation in standard simulation software '
+        'is the LaTIn method.'
+    )
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '2. Method',
+            summary,
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'method',
+                'act_type': 'propose_method',
+                'summary': summary,
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'methods': [],
+                'confidence': 0.7,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+    normalized_methods = {str(item.get('normalized') or '').lower() for item in move['methods']}
+
+    assert 'latin method' in normalized_methods
+    assert 'intrusive' not in normalized_methods
 
 
 def test_research_object_filter_trims_leading_establish_verb_from_domain_object(monkeypatch) -> None:

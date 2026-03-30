@@ -347,3 +347,24 @@ Progress note (2026-03-30, fallback role/summary stabilization phase):
 - Remaining macro gap after this phase:
 - the structural fallback path is better, but theory-heavy fallback `method` summaries are still content-noisy (`intrusive`, `another approach`, `hardening law`) and some mixed Chinese windows still keep front-matter/keyword clutter in their summaries
 - Next highest-value unresolved L2 gap: clean fallback summary/method content quality on theory-heavy and mixed-language papers without undoing the structural gains, especially for cases like `1243` and `282` where the roles are closer to correct but the extracted single-paper content is still not yet precise enough for downstream L3/L4 use.
+
+Progress note (2026-03-30, fallback summary cleanup and method precision phase):
+- Added red-green regression coverage for the next layer of fallback content-quality failures after role stabilization:
+- summary cleaning now strips embedded chunk markers, `Abstract:` / `摘要：`, `Original Paper ... 2019 ...` prefixes, and leading author / affiliation / keyword noise before summary selection
+- method summary selection now prefers explicit method-statement sentences over generic context sentences, including later fallback-window sentences such as `we use CFX software ...`
+- method mention backfill is narrower and more content-faithful: it now rejects generic descriptor fragments (`another approach`, `simple model`), equation / law pseudo-methods, pronoun-led model fragments, and reporting/count wrappers such as `ten simulations`
+- Verification:
+- Focused regression file: `backend/tests/test_paper_logic_trace_direct_extraction.py` -> `128 passed`
+- Full backend suite: `cd backend; .\.venv\Scripts\python.exe -m pytest -q` -> `556 passed, 1 warning`
+- Real-sample forced-fallback rechecks:
+- `282` improved materially at the content level, not just structurally:
+- the abstract summary now starts with the actual Chinese content instead of author/keyword clutter
+- the fallback method move now centers on the CFX simulation sentence and keeps method mentions narrowed to `cfx`
+- `1607_Shear jamming and fragility in dense suspensions` now drops the earlier worst method-slot noise (`efficient method`, `simple model`, `smaller particles stokesian dynamics`) and keeps stronger method candidates such as `stokesian dynamics`, `sd approach`, and `soft-constraint approach`
+- `1243_Data-Driven Computational Plasticity` likewise no longer exports the earlier worst fallback method junk (`intrusive`, `it is simply model`, `simple model`), but it still has thin formula-led / clause-fragment fallback windows
+- Fresh anti-overfit fallback audit on additional papers after the change surfaced the next macro gaps more clearly:
+- `1505_Velocity Profiles in Slowly Sheared Bubble Rafts` still over-promotes model-discussion clauses like `It is consistent with ...`, `solid lines are fits ...`, and `These simulations did not include ...` into `method`
+- `1534_Hidden structure in liquids` still admits an equation-fragment pseudo-method (`uses Φ to decline.`) and formula-led problem clutter
+- `1732_改性双基推进剂松弛模量的确定方法` still leaks front-matter article-number text into the leading problem summary and can choose broad context as `key_method_summary`
+- `781` reduces to an almost-empty BOM-only fallback trace, which confirms there is still a small class of source/cleanup failures that should be dropped or neutralized rather than exported as a fake `problem`
+- Next highest-value unresolved L2 gap: keep the new fallback recall/structure gains, but now target clause-fragment and front-matter contamination more directly, especially false `method` moves created from model-description / equation / reporting sentences and boilerplate Chinese header text that still pollutes single-paper readability.

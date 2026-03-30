@@ -381,12 +381,8 @@ _METHOD_HEAD_TOKENS = {
     'approach',
     'approaches',
     'dynamics',
-    'equation',
-    'equations',
     'framework',
     'frameworks',
-    'law',
-    'laws',
     'learning',
     'method',
     'methods',
@@ -469,18 +465,42 @@ _METHOD_GENERIC_MODIFIER_TOKENS = {
     'efficient',
     'general',
     'generic',
+    'another',
     'new',
     'novel',
     'original',
     'present',
     'proposed',
     'simple',
+    'simply',
     'standard',
+}
+_METHOD_LIGHT_CONTEXT_TOKENS = {
+    'it',
+    'its',
+    'that',
+    'the',
+    'this',
+    'these',
+    'those',
+}
+_METHOD_REPORTING_CONTEXT_TOKENS = {
+    'beginning',
+    'jammed',
+    'one',
+    'only',
+    'plotted',
+    'results',
+    'ten',
 }
 _METHOD_LEADING_VERB_PATTERNS = (
     re.compile(
         r'^(?:we\s+)?(?:adopt(?:ed|ing|s)?|apply(?:ing|ied|ies)|employ(?:ed|ing|s)?|'
         r'focus(?:ed|es|ing)?\s+on|introduc(?:e|ed|es|ing)|use(?:d|s|ing)?)\s+',
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r'^.*?\b(?:proposed|used|applied|employed|introduced)\s+(?:in|by|with)\s+(?:the\s+)?',
         re.IGNORECASE,
     ),
 )
@@ -1715,14 +1735,38 @@ def _method_mentions_from_text(text: str, *, limit: int = 3) -> list[dict[str, A
         tokens = phrase.split()
         if not tokens:
             return False
+        head_token = tokens[-1]
+        prefix_tokens = tokens[:-1]
+        meaningful_prefix = [
+            token
+            for token in prefix_tokens
+            if token not in _STOP_TOKENS and token not in _METHOD_LIGHT_CONTEXT_TOKENS
+        ]
         if len(tokens) == 1 and tokens[0] in _METHOD_HEAD_TOKENS:
+            return False
+        if len(tokens) == 1 and tokens[0] not in _METHOD_HEAD_TOKENS and len(tokens[0]) > 6:
             return False
         if tokens[0] in _METHOD_BAD_LEAD_TOKENS:
             return False
         if (
             len(tokens) <= 3
-            and tokens[-1] in _METHOD_HEAD_TOKENS
-            and all(token in _METHOD_GENERIC_MODIFIER_TOKENS for token in tokens[:-1])
+            and head_token in _METHOD_HEAD_TOKENS
+            and all(token in _METHOD_GENERIC_MODIFIER_TOKENS for token in prefix_tokens)
+        ):
+            return False
+        if (
+            head_token in _METHOD_HEAD_TOKENS
+            and meaningful_prefix
+            and all(token in _METHOD_GENERIC_MODIFIER_TOKENS for token in meaningful_prefix)
+        ):
+            return False
+        if (
+            head_token in {'simulation', 'simulations', 'test', 'tests'}
+            and meaningful_prefix
+            and all(
+                token in _METHOD_REPORTING_CONTEXT_TOKENS or token.isdigit()
+                for token in meaningful_prefix
+            )
         ):
             return False
         seen.add(phrase)
@@ -1730,8 +1774,8 @@ def _method_mentions_from_text(text: str, *, limit: int = 3) -> list[dict[str, A
         return len(rows) >= limit
 
     english_head_regex = (
-        r'(?:algorithm|algorithms|approach|approaches|dynamics|equation|equations|framework|frameworks|'
-        r'law|laws|learning|method|methods|model|models|network|networks|protocol|protocols|'
+        r'(?:algorithm|algorithms|approach|approaches|dynamics|framework|frameworks|'
+        r'learning|method|methods|model|models|network|networks|protocol|protocols|'
         r'simulation|simulations|solver|solvers|technique|techniques|test|tests)'
     )
     english_patterns = (
@@ -2456,6 +2500,88 @@ def _summary_from_text(text: str, *, max_chars: int = 220) -> str:
     return trimmed + '...'
 
 
+def _summary_sentences(text: str) -> list[str]:
+    return [
+        sentence.strip()
+        for sentence in re.split(r'(?<=[.!?;\uFF1B\u3002\uFF01\uFF1F])\s+', _normalize_space(text))
+        if sentence.strip()
+    ]
+
+
+def _strip_summary_prefixes(text: str) -> str:
+    stripped = _normalize_space(text)
+    if not stripped:
+        return ''
+    stripped = re.sub(r'^\[[^\]]+\]\s*', '', stripped)
+    stripped = re.sub(r'^(?:keywords?|key\s+words?|鍏抽敭璇?\s*[:锛歖\s*', '', stripped, flags=re.IGNORECASE)
+    return stripped
+
+
+def _strip_summary_prefixes(text: str) -> str:
+    stripped = _normalize_space(text)
+    if not stripped:
+        return ''
+    stripped = re.sub(r'\[[^\]]*:[^\]]*:[0-9a-f]{8,}\]\s*', ' ', stripped, flags=re.IGNORECASE)
+    stripped = re.sub(r'^(?:keywords?|key\s+words?|\u5173\u952e\u8bcd)\s*[:\uFF1A]\s*', '', stripped, flags=re.IGNORECASE)
+    stripped = re.sub(r'^(?:abstract|\u6458\u8981)\s*[:\uFF1A]\s*', '', stripped, flags=re.IGNORECASE)
+    return stripped
+
+
+def _is_summary_sentence_noise(text: str) -> bool:
+    clean = _strip_summary_prefixes(text)
+    if not clean:
+        return True
+    lowered = clean.lower()
+    if _looks_like_heading_only(clean, section=''):
+        return True
+    if _looks_like_author_line(clean):
+        return True
+    if _looks_like_affiliation_summary(clean):
+        return True
+    if any(lowered.startswith(prefix) for prefix in _NOISE_SUMMARY_PREFIXES):
+        return True
+    if lowered.startswith('received ') or lowered.startswith('accepted ') or lowered.startswith('copyright '):
+        return True
+    if lowered.startswith('international conference'):
+        return True
+    return False
+
+
+def _clean_summary_candidate(text: str) -> str:
+    cleaned = _normalize_space(text)
+    if not cleaned:
+        return ''
+    cleaned = re.sub(r'^\[[^\]]+\]\s*', '', cleaned)
+    cleaned = re.sub(r'^(?:keywords?|key\s+words?|关键词)\s*[:：]\s*', '', cleaned, flags=re.IGNORECASE)
+    return cleaned
+
+
+def _trim_to_first_method_cue(text: str) -> str:
+    cleaned = _clean_summary_candidate(text)
+    lowered = cleaned.lower()
+    cue_positions: list[int] = []
+    for pattern in _METHOD_TEXT_PATTERNS:
+        position = lowered.find(pattern)
+        if position >= 0:
+            cue_positions.append(position)
+    for pattern in _METHOD_TEXT_REGEXES:
+        match = pattern.search(cleaned)
+        if match:
+            cue_positions.append(match.start())
+    for row in _method_mentions_from_text(cleaned, limit=3):
+        phrase = _normalize_space(row.get('surface') or row.get('normalized') or '').lower()
+        if not phrase:
+            continue
+        position = lowered.find(phrase)
+        if position >= 0:
+            cue_positions.append(position)
+    if cue_positions:
+        start = min(cue_positions)
+        if start > 0:
+            cleaned = cleaned[start:].lstrip(' ;:-')
+    return cleaned
+
+
 def _summary_from_role_text(text: str, *, role: str, max_chars: int = 220) -> str:
     clean = _normalize_space(text)
     if not clean:
@@ -2478,8 +2604,135 @@ def _summary_from_role_text(text: str, *, role: str, max_chars: int = 220) -> st
 
     matched = next((sentence for sentence in sentences if _matches(sentence)), None)
     if matched:
-        return _summary_from_text(matched, max_chars=max_chars)
-    return _summary_from_text(clean, max_chars=max_chars)
+        matched_clean = _trim_to_first_method_cue(matched) if role == 'method' else _clean_summary_candidate(matched)
+        return _summary_from_text(matched_clean, max_chars=max_chars)
+    return _summary_from_text(_clean_summary_candidate(clean), max_chars=max_chars)
+
+
+def _clean_summary_candidate(text: str) -> str:
+    cleaned = _strip_summary_prefixes(text)
+    if not cleaned:
+        return ''
+    abstract_match = re.search(r'(?:\babstract\b|\u6458\u8981)\s*[:\uFF1A]\s*', cleaned, flags=re.IGNORECASE)
+    if abstract_match and abstract_match.start() > 0:
+        cleaned = cleaned[abstract_match.end():]
+    if cleaned.lower().startswith('original paper'):
+        year_boundary = re.search(r'\b(?:19|20)\d{2}\s+(?=(?:the|this|we)\b)', cleaned, flags=re.IGNORECASE)
+        if year_boundary:
+            cleaned = cleaned[year_boundary.end():]
+    sentences = _summary_sentences(cleaned)
+    while sentences and _is_summary_sentence_noise(sentences[0]):
+        sentences.pop(0)
+    if sentences:
+        cleaned = ' '.join(sentences)
+    return cleaned
+
+
+def _trim_to_first_method_cue(text: str) -> str:
+    cleaned = _clean_summary_candidate(text)
+    lowered = cleaned.lower()
+    statement_cue_positions: list[int] = []
+    for pattern in _METHOD_TEXT_PATTERNS:
+        position = lowered.find(pattern)
+        if position >= 0:
+            statement_cue_positions.append(position)
+    for pattern in _METHOD_TEXT_REGEXES:
+        match = pattern.search(cleaned)
+        if match:
+            statement_cue_positions.append(match.start())
+    cue_positions = list(statement_cue_positions)
+    if not cue_positions:
+        for row in _method_mentions_from_text(cleaned, limit=3):
+            phrase = _normalize_space(row.get('surface') or row.get('normalized') or '').lower()
+            if not phrase:
+                continue
+            position = lowered.find(phrase)
+            if position >= 0:
+                cue_positions.append(position)
+    if cue_positions:
+        start = min(cue_positions)
+        if start > 0:
+            cleaned = cleaned[start:].lstrip(' ;:-')
+    return cleaned
+
+
+def _method_summary_sentence_score(sentence: str) -> int:
+    clean = _clean_summary_candidate(sentence)
+    lowered = clean.lower()
+    method_mentions = _method_mentions_from_text(clean, limit=3)
+    score = 0
+    if _looks_like_method_statement(clean):
+        score += 6
+    score += 3 * len(method_mentions)
+    if any(
+        cue in lowered
+        for cue in (
+            'we use',
+            'we employ',
+            'we propose',
+            'using ',
+            'uses ',
+            'employs ',
+            'employed ',
+            'based on',
+            'proposed in',
+            '鍒╃敤',
+            '浣跨敤',
+            '閲囩敤',
+            '鍩轰簬',
+        )
+    ):
+        score += 4
+    if any(token in lowered for token in ('software', 'solver', 'framework', 'protocol')):
+        score += 2
+    if _is_summary_sentence_noise(clean):
+        score -= 10
+    return score
+
+
+def _summary_from_role_text(text: str, *, role: str, max_chars: int = 220) -> str:
+    clean = _normalize_space(text)
+    if not clean:
+        return ''
+    sentences = _summary_sentences(clean)
+    if not sentences:
+        return _summary_from_text(clean, max_chars=max_chars)
+
+    def _matches(sentence: str) -> bool:
+        lowered = sentence.lower()
+        if role == 'problem':
+            return _looks_like_problem_statement(lowered)
+        if role == 'method':
+            return _looks_like_method_statement(sentence) or bool(_method_mentions_from_text(sentence, limit=1))
+        if role == 'result':
+            return any(pattern in lowered for pattern in _RESULT_TEXT_PATTERNS)
+        if role == 'limitation':
+            return bool(_explicit_limitation_mentions(sentence, limit=1) or _limitation_mentions(sentence, limit=1))
+        return False
+
+    matched = None
+    if role == 'method':
+        candidates: list[tuple[int, int, str]] = []
+        for index, sentence in enumerate(sentences):
+            cleaned_sentence = _clean_summary_candidate(sentence)
+            if not cleaned_sentence or not _matches(cleaned_sentence):
+                continue
+            candidates.append((_method_summary_sentence_score(cleaned_sentence), -index, cleaned_sentence))
+        if candidates:
+            matched = max(candidates)[2]
+    else:
+        matched = next(
+            (
+                cleaned_sentence
+                for sentence in sentences
+                if (cleaned_sentence := _clean_summary_candidate(sentence)) and _matches(cleaned_sentence)
+            ),
+            None,
+        )
+    if matched:
+        matched_clean = _trim_to_first_method_cue(matched) if role == 'method' else _clean_summary_candidate(matched)
+        return _summary_from_text(matched_clean, max_chars=max_chars)
+    return _summary_from_text(_clean_summary_candidate(clean), max_chars=max_chars)
 
 
 def _window_text(chunks: list[Chunk], max_chars: int) -> str:
@@ -3244,10 +3497,22 @@ def _move_rows_from_windows(
                 source_sections=[chunk_by_id[chunk_id].section for chunk_id in anchor_chunk_ids if chunk_id in chunk_by_id],
             )
             if raw_move.get('source_mode') == 'fallback':
-                summary = _summary_from_role_text(move_support_text, role=role)
+                summary_support_text = move_support_text
+                if role == 'method':
+                    summary_support_text = _move_support_text(
+                        summary=summary,
+                        anchor_chunk_ids=[
+                            str(chunk.chunk_id).strip()
+                            for chunk in (window.get('chunks') or [])
+                            if str(chunk.chunk_id).strip()
+                        ],
+                        chunk_by_id=chunk_by_id,
+                        fallback_chunks=list(window.get('chunks') or []),
+                    )
+                summary = _summary_from_role_text(summary_support_text, role=role)
             if not methods and act_type in _METHOD_AUGMENTATION_ACTS:
                 methods = _normalize_mention_rows(
-                    _mark_heuristic_mentions(_method_mentions_from_text(move_support_text, limit=3)),
+                    _mark_heuristic_mentions(_method_mentions_from_text(summary, limit=3)),
                     anchor_ids=anchor_chunk_ids,
                 )
             if role in (_TRUSTED_SCOPE_RESEARCH_OBJECT_ROLES | _TRUSTED_PREDICTION_TARGET_RESEARCH_OBJECT_ROLES):
