@@ -194,7 +194,7 @@ _RESULT_TEXT_PATTERNS = (
     'decreased',
     'increased',
 )
-_CONCLUSION_SECTION_HINTS = ('conclusion', 'conclusions', 'concluding')
+_CONCLUSION_SECTION_HINTS = ('conclusion', 'conclusions', 'concluding', '结论', '结语')
 _SELF_REFERENTIAL_ACHIEVEMENT_RE = re.compile(
     r'\b(?:this|the)\s+(?:work|paper|study|article)\s+'
     r'(?:has\s+)?(?:succeed(?:ed|s)\s+to|successfully\s+\w+|extend(?:s|ed)|'
@@ -1065,7 +1065,7 @@ _REPORTING_VERB_CUES = (
 _SECTION_ROLE_HINTS: list[tuple[tuple[str, ...], str]] = [
     (('future work', 'future directions', 'future'), 'future_work'),
     (('limitation', 'limitations', 'threats to validity'), 'limitation'),
-    (('result', 'results', 'finding', 'findings'), 'result'),
+    (('result', 'results', 'finding', 'findings', '结论', '结语'), 'result'),
     (('discussion', 'interpretation', 'analysis'), 'interpretation'),
     (('experiment', 'evaluation', 'experimental', 'benchmark', 'ablation'), 'experiment'),
     (('method', 'approach', 'framework', 'model', 'algorithm', 'implementation', '方法', '数学模型', '数值模型', '控制方程', '模拟方法', '计算方法'), 'method'),
@@ -1372,7 +1372,13 @@ def _stabilize_move_role_and_act_type(
     lowered_support = _normalize_space(support_text).lower()
     informative_effects = _has_informative_effect_rows(effects)
     has_problem_signal = _looks_like_problem_statement(lowered_summary)
-    has_method_signal = bool(methods) or _looks_like_method_statement(summary)
+    has_method_signal = (
+        bool(methods)
+        or _looks_like_method_statement(summary)
+        or _looks_like_method_statement(support_text)
+        or bool(_method_mentions_from_text(summary, limit=1))
+        or bool(_method_mentions_from_text(support_text, limit=1))
+    )
     has_result_signal = (
         any(pattern in lowered_summary for pattern in _RESULT_TEXT_PATTERNS)
         or any(pattern in lowered_support for pattern in _RESULT_TEXT_PATTERNS)
@@ -1393,7 +1399,13 @@ def _stabilize_move_role_and_act_type(
     if role in {'method', 'background', 'interpretation', 'experiment'} and has_conclusion_achievement_signal and not limitation_types:
         return 'result', 'report_effect'
 
-    if role in {'background', 'interpretation', 'problem'} and has_method_signal and not has_result_signal and not limitation_types:
+    if (
+        role in {'background', 'interpretation', 'problem'}
+        and has_method_signal
+        and not has_problem_signal
+        and not has_result_signal
+        and not limitation_types
+    ):
         return 'method', 'propose_method'
 
     if (
@@ -2444,6 +2456,32 @@ def _summary_from_text(text: str, *, max_chars: int = 220) -> str:
     return trimmed + '...'
 
 
+def _summary_from_role_text(text: str, *, role: str, max_chars: int = 220) -> str:
+    clean = _normalize_space(text)
+    if not clean:
+        return ''
+    sentences = [sentence.strip() for sentence in re.split(r'(?<=[.!?。！？])\s+', clean) if sentence.strip()]
+    if not sentences:
+        return _summary_from_text(clean, max_chars=max_chars)
+
+    def _matches(sentence: str) -> bool:
+        lowered = sentence.lower()
+        if role == 'problem':
+            return _looks_like_problem_statement(lowered)
+        if role == 'method':
+            return _looks_like_method_statement(sentence) or bool(_method_mentions_from_text(sentence, limit=1))
+        if role == 'result':
+            return any(pattern in lowered for pattern in _RESULT_TEXT_PATTERNS)
+        if role == 'limitation':
+            return bool(_explicit_limitation_mentions(sentence, limit=1) or _limitation_mentions(sentence, limit=1))
+        return False
+
+    matched = next((sentence for sentence in sentences if _matches(sentence)), None)
+    if matched:
+        return _summary_from_text(matched, max_chars=max_chars)
+    return _summary_from_text(clean, max_chars=max_chars)
+
+
 def _window_text(chunks: list[Chunk], max_chars: int) -> str:
     parts: list[str] = []
     total = 0
@@ -2914,8 +2952,8 @@ def _fallback_move_payload(window: dict[str, Any]) -> list[dict[str, Any]]:
     if not chunks:
         return []
     anchor_chunk_ids = [str(chunk.chunk_id).strip() for chunk in chunks[:2] if str(chunk.chunk_id).strip()]
-    summary = _summary_from_text(' '.join(chunk.text for chunk in chunks))
     role = _normalize_role(window.get('role_hint'))
+    summary = _summary_from_role_text(' '.join(chunk.text for chunk in chunks), role=role)
     methods = _mark_heuristic_mentions(_method_mentions_from_text(summary, limit=2)) if role in {'method', 'experiment'} else []
     conditions = _mark_heuristic_mentions(_condition_mentions(summary, limit=2))
     augmented = _augment_sparse_slots(
@@ -2936,6 +2974,7 @@ def _fallback_move_payload(window: dict[str, Any]) -> list[dict[str, Any]]:
             'act_type': _ROLE_TO_ACT.get(role, 'define_task'),
             'summary': summary,
             'anchor_chunk_ids': anchor_chunk_ids,
+            'source_mode': 'fallback',
             'research_objects': augmented['research_objects'],
             'methods': augmented['methods'],
             'observed_variables': augmented['observed_variables'],
@@ -3204,6 +3243,8 @@ def _move_rows_from_windows(
                 support_text=move_support_text,
                 source_sections=[chunk_by_id[chunk_id].section for chunk_id in anchor_chunk_ids if chunk_id in chunk_by_id],
             )
+            if raw_move.get('source_mode') == 'fallback':
+                summary = _summary_from_role_text(move_support_text, role=role)
             if not methods and act_type in _METHOD_AUGMENTATION_ACTS:
                 methods = _normalize_mention_rows(
                     _mark_heuristic_mentions(_method_mentions_from_text(move_support_text, limit=3)),

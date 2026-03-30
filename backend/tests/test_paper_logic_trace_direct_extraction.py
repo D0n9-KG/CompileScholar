@@ -390,6 +390,97 @@ def test_role_for_chunk_promotes_work_presented_aims_to_intro_to_problem() -> No
     assert role == 'problem'
 
 
+def test_fallback_background_window_stabilizes_to_method_using_later_support_sentence(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            'Background',
+            (
+                'Research on blade-gap effects in mixer flow fields remains limited. '
+                'The governing mechanism is still unclear. '
+                'We then use the finite element method to solve the representative flow problem.'
+            ),
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+    normalized_methods = {str(item.get('normalized') or '').lower() for item in move['methods']}
+
+    assert move['role_hint'] == 'method'
+    assert move['act_hint'] == 'propose_method'
+    assert 'finite element method' in normalized_methods
+    assert 'finite element method' in move['summary'].lower()
+
+
+def test_fallback_chinese_conclusion_section_promotes_to_result_role(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '4 结论',
+            '随着叶片间隙的增加，有效搅拌比先增加后减小，当Tip = 6 mm时有效搅拌比最大。',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+
+    assert move['role_hint'] == 'result'
+    assert move['act_hint'] == 'report_effect'
+
+
+def test_fallback_explicit_challenge_sentence_stays_problem_despite_method_like_terms(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            'Background',
+            'The biggest challenge is whether simulation can proceed directly from data without a constitutive model.',
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+
+    assert move['role_hint'] == 'problem'
+    assert move['act_hint'] in {'identify_gap', 'define_task'}
+
+
 def test_discussion_result_chunk_is_promoted_to_result_role(monkeypatch) -> None:
     doc = _doc_with_chunks(
         _chunk('c-1', '4. Discussion', 'Results show that particle recirculation decreases once the travelling wave structure stabilizes.', line=1),

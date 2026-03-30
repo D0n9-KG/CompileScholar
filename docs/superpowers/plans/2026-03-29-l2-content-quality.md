@@ -324,3 +324,26 @@ Progress note (2026-03-30, method-backfill noise cleanup phase):
 - Macro gap observed after the cleanup:
 - the sparse local-fallback path is now less noisy on empirical method-heavy papers, but it still undersupplies role structure on harder papers such as `1243_Data-Driven Computational Plasticity` and Chinese paper `282_叶片间隙对潜水搅拌器流场特性的影响`, where fallback extraction remains problem-dominant and can miss method/result moves entirely
 - Next highest-value unresolved L2 gap: move from slot-level cleanup to fallback window-role / summary stabilization for theory-heavy and Chinese papers, because L2 still falls short of the “single paper can stand on its own for L3/L4” target whenever the upstream move extractor is sparse or unavailable.
+
+Progress note (2026-03-30, fallback role/summary stabilization phase):
+- Added red-green regression coverage for two fallback-structure failures that were blocking single-paper usability when upstream move extraction is sparse:
+- a long `background` window whose first two sentences are problem/context but whose later support sentence clearly states the method
+- a Chinese `4 结论` section that should surface as `result` under fallback rather than collapsing into the default `background -> problem` path
+- Root-cause audit showed two different structural causes:
+- fallback `background` moves were immediately assigned `identify_gap`, which promotes them to `problem` before stabilization; if the first-two-sentence fallback summary did not itself contain a method cue, later method sentences in the same window were ignored
+- Chinese conclusion sections lacked section-level result cues, so fallback could not recover a `result` role when the conclusion text did not happen to contain the existing English result phrases
+- Reworked fallback stabilization conservatively rather than widening extraction globally:
+- let method-role stabilization consider method mentions recovered from full `support_text`, not only explicit summary-level method-statement patterns
+- require explicit problem-signal summaries to stay `problem` even if method-like terms appear in the same sentence/window, preventing challenge statements such as `can simulation proceed ... without a constitutive model` from being retyped as `method`
+- add Chinese conclusion section cues (`结论`, `结语`) to the section-role/result hints
+- when a move originates from local fallback, reselect its summary after role stabilization using a role-aware sentence picker, so fallback `method` / `result` moves are not forced to keep a stale problem-context opening sentence
+- Verification:
+- Red-green regressions: `backend/tests/test_paper_logic_trace_direct_extraction.py -k "later_support_sentence or chinese_conclusion_section_promotes_to_result_role or explicit_challenge_sentence_stays_problem_despite_method_like_terms"` -> `3 passed`
+- Focused file: `backend/tests/test_paper_logic_trace_direct_extraction.py` -> `114 passed`
+- Full backend suite: `cd backend; .\.venv\Scripts\python.exe -m pytest -q` -> `542 passed, 1 warning`
+- Real-sample forced-local-fallback rechecks after the change:
+- `282_叶片间隙对潜水搅拌器流场特性的影响` improves structurally from an almost-all-`problem` fallback trace to `problem + result + method + result`, which is materially closer to an L2 trace that can feed later layers
+- `1243_Data-Driven Computational Plasticity` no longer collapses entirely into `problem`; fallback now retains `problem + limitation + method ...` structure, while the explicit challenge sentence about the constitutive model correctly remains `problem`
+- Remaining macro gap after this phase:
+- the structural fallback path is better, but theory-heavy fallback `method` summaries are still content-noisy (`intrusive`, `another approach`, `hardening law`) and some mixed Chinese windows still keep front-matter/keyword clutter in their summaries
+- Next highest-value unresolved L2 gap: clean fallback summary/method content quality on theory-heavy and mixed-language papers without undoing the structural gains, especially for cases like `1243` and `282` where the roles are closer to correct but the extracted single-paper content is still not yet precise enough for downstream L3/L4 use.
