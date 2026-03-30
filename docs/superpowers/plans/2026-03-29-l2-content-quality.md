@@ -258,6 +258,26 @@ Progress note (2026-03-30, companion-limitation dedup phase):
 - The surviving `1243` limitation move still carries grounded content rather than a compressed generic phrase, with `limitation_types` centered on `huge amount of data required for running simulations`.
 - Anti-overfit direct rebuild checks stayed stable:
 - `s870_Pb-activated amine-assisted photocatalytic hydrogen evolution reaction...` still stays on `empirical_default`, remains `yellow`, and emits no limitation moves.
+
+Progress note (2026-03-30, fallback method-summary calibration phase):
+- Added regression coverage for three related fallback failures in `direct_extraction`:
+- chunk-marker pollution such as `[c-1]` or long hashed anchor ids leaking into summary/method scoring
+- prior-work author sentences like `Gadala-Maria and Acrivos [31] performed ...` outranking current-work method sentences
+- background/result windows mentioning generic `simulations` or prior models being incorrectly stabilized to `method`
+- Root-cause audit showed the remaining bad `1607` method summaries were not caused by `_summary_from_role_text` alone:
+- one path came from chunk-marker noise creating fake method mentions (`73f44 ca 346 df simulations`)
+- another path came from prior-work reporting sentences scoring as stronger methods than current-work `Here, we simulate ...`
+- a third path came from fallback role stabilization treating any support-text method noun phrase as enough to promote `background/problem -> method`
+- The fix stayed narrow and behavior-based:
+- strip inline chunk markers before method-statement / method-mention detection
+- suppress prior-work author-reporting sentences even when they appear after a lead-in clause and citation
+- use full-window support only for fallback role stabilization, so later true method sentences can still rescue a sparse fallback anchor
+- require stronger support-text method mentions for role promotion, so `finite element method` can still promote a current-work window while generic `simulations` / `models` in captions and background reviews do not
+- Real-sample recheck after the change:
+- `1607_Shear jamming and fragility in dense suspensions` no longer emits the bad method summaries `using a rate-controlled setup.` or `These SJ states can be con simulations ...`; surviving method summaries are centered on `we perform dynamic simulations ...`, `we employ an algorithm to mimic stress-controlled rheology [24].`, and `we employ a soft-constraint approach.`
+- `1505_Velocity Profiles in Slowly Sheared Bubble Rafts` no longer emits the earlier fake method summary `using continuous functions of shear rate ...`; however, the direct fallback trace still remains thin on explicit method recovery, so this paper now reads as cleaner but still incomplete rather than falsely method-rich.
+- `781.md` remains a separate residual class: near-empty / encoding-damaged markdown can still collapse into a fake `problem` trace (`ERROR UnicodeEncodeError ...`), so the next phase should target BOM / mojibake / empty-content guards rather than more method heuristics.
+- Next highest-value unresolved L2 gap: keep improving single-paper completeness on degraded markdowns and method-thin fallback cases without reintroducing background/caption method clutter, with special attention to encoding-damaged inputs like `781` and readability-heavy Chinese papers like `1732`.
 - `s93_Numerical investigation of twin-liquid film...` still stays on the existing green empirical path; its remaining limitation content is the older heuristic-style noise (`indicating limitation`, `difficult`) rather than a new artifact introduced by the companion-move dedup.
 - Next highest-value unresolved L2 gap: the new duplication bug is closed, but L2 still has a broader compression/cleanup problem rather than a pure recall problem. In practical terms, single-paper traces like `1243` are now structurally sufficient for downstream L3/L4, yet some empirical papers still retain legacy heuristic limitation clutter and overlapping move phrasing, so the next phase should target macro move compression / noise cleanup without narrowing recall to a few hand-tuned papers.
 

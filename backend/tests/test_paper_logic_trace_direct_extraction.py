@@ -8,6 +8,7 @@ from app.paper_logic_trace.direct_extraction import (
     _build_move_relation_rows,
     _build_research_move_prompt,
     _clean_summary_candidate,
+    _method_mentions_from_text,
     _refine_limitation_rows,
     _role_for_chunk,
     _summary_from_role_text,
@@ -636,6 +637,130 @@ def test_summary_from_role_text_method_prefers_current_work_sentence_over_prior_
 
     assert 'we simulate a stress-controlled shear reversal test' in summary.lower()
     assert 'using a rate-controlled setup' not in summary.lower()
+
+
+def test_summary_from_role_text_method_penalizes_prior_work_author_sentence_with_citation() -> None:
+    text = (
+        'To understand the roles of shear-induced structure, Gadala-Maria and Acrivos [31] '
+        'performed shear reversal tests using a rate-controlled setup. '
+        'Here, we simulate a stress-controlled shear reversal test.'
+    )
+
+    summary = _summary_from_role_text(text, role='method')
+
+    assert 'we simulate a stress-controlled shear reversal test' in summary.lower()
+    assert 'using a rate-controlled setup' not in summary.lower()
+
+
+def test_method_mentions_from_text_ignores_inline_chunk_markers() -> None:
+    text = (
+        '[1607_Shear_jamming_and_fragility_in_dense_suspensions:137-138:10df73f44ca346df] '
+        'simulations for phi >= 0.77 indeed end up in jammed states.'
+    )
+
+    assert _method_mentions_from_text(text, limit=3) == []
+
+
+def test_fallback_background_results_window_with_generic_simulations_text_stays_non_method(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '3.2 Features of shear-jammed states',
+            'Fig. 3 The larger is phi, the smaller is the average strain to reach a jammed state. '
+            'Only jammed results of ten simulations are plotted.',
+            line=1,
+        ),
+        _chunk(
+            'c-2',
+            '3.2 Features of shear-jammed states',
+            'These jammed states indeed end up in jammed states, but require larger strain for lower phi in the simulations.',
+            line=2,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    assert all(row['role_hint'] != 'method' for row in payload['evidence_rows'])
+
+
+def test_fallback_background_prior_model_using_clause_stays_non_method(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            'Background',
+            'Many common complex fluids flow only when the applied stress exceeds a critical value.',
+            line=1,
+        ),
+        _chunk(
+            'c-2',
+            'Background',
+            'It is common to model the response of such materials to external stress using continuous functions '
+            'of shear rate, such as appear in Bingham and Herschel-Bulkley models [1].',
+            line=2,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    assert all(row['role_hint'] != 'method' for row in payload['evidence_rows'])
+
+
+def test_fallback_method_summary_reselection_ignores_chunk_markers_and_prior_using_clause(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '2. Method',
+            'Gadala-Maria and Acrivos performed shear reversal tests using a rate-controlled setup.',
+            line=1,
+        ),
+        _chunk(
+            'c-2',
+            '2. Method',
+            'Here, we simulate a stress-controlled shear reversal test.',
+            line=2,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    method_summaries = {
+        row['summary'].lower()
+        for row in payload['evidence_rows']
+        if row['role_hint'] == 'method'
+    }
+
+    assert any('we simulate a stress-controlled shear reversal test' in summary for summary in method_summaries)
+    assert all('using a rate-controlled setup' not in summary for summary in method_summaries)
 
 
 def test_fallback_method_summary_can_use_later_explicit_method_chunk(monkeypatch) -> None:

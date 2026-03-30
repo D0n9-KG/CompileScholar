@@ -58,6 +58,7 @@ _NOISE_SECTION_TOKENS = {
 }
 _IMAGE_ONLY_RE = re.compile(r'^\s*!\[[^\]]*\]\([^)]+\)\s*$')
 _MARKDOWN_HEADING_RE = re.compile(r'^\s*#{1,6}\s*(.+?)\s*$')
+_INLINE_CHUNK_MARKER_RE = re.compile(r'\[(?:[^\]]*:[^\]]*|[A-Za-z]+-\d+)\]\s*')
 _SUMMARY_CJK_RE = re.compile(r'[\u4e00-\u9fff]')
 _SUMMARY_LATIN_RE = re.compile(r'[A-Za-z]')
 _FRONT_MATTER_INSTITUTION_CUES = (
@@ -151,6 +152,48 @@ _PROBLEM_PURPOSE_HINTS = (
     'to study',
     'to examine',
     'to quantify',
+)
+_CURRENT_WORK_METHOD_CUES = (
+    'here, we',
+    'here we',
+    'this article',
+    'in this paper',
+    'in this study',
+    'in this work',
+    'our approach',
+    'our model',
+    'our simulation',
+    'this paper',
+    'this study',
+    'this work',
+    'we apply',
+    'we employ',
+    'we perform',
+    'we propose',
+    'we simulate',
+    'we use',
+    'is built',
+    'is constructed',
+    'is developed',
+    'is introduced',
+    'is proposed',
+    '\u672c\u6587',
+    '\u672c\u7814\u7a76',
+    '\u672c\u5de5\u4f5c',
+    '\u6587\u4e2d',
+)
+_CURRENT_WORK_METHOD_REGEXES = (
+    re.compile(
+        r'\bwe\b(?:\s+\w+){0,3}\s+(?:use|apply|employ|perform|simulate|propose|present|introduce|develop|construct)\b',
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r'\bthis\s+(?:paper|study|work|article)\b(?:\s+\w+){0,8}\s+'
+        r'(?:examine|examines|use|uses|apply|applies|employ|employs|perform|performs|'
+        r'simulate|simulates|propose|proposes|present|presents|introduce|introduces|'
+        r'develop|develops|construct|constructs)\b',
+        re.IGNORECASE,
+    ),
 )
 _METHOD_TEXT_PATTERNS = (
     'this paper uses',
@@ -526,10 +569,29 @@ _METHOD_REPORTING_CONTEXT_TOKENS = {
     'results',
     'ten',
 }
+_SUPPORT_METHOD_PROMOTION_HEAD_TOKENS = {
+    'algorithm',
+    'algorithms',
+    'approach',
+    'approaches',
+    'framework',
+    'frameworks',
+    'method',
+    'methods',
+    'protocol',
+    'protocols',
+    'software',
+    'solver',
+    'solvers',
+    'workflow',
+    'workflows',
+}
 _METHOD_WEAK_STATEMENT_REGEXES = (
     re.compile(r'^(?:it|this|these|those)\s+(?:is|are)\s+consistent\b', re.IGNORECASE),
     re.compile(r'^[A-Z][A-Za-z\-]+(?:\s+and\s+[A-Z][A-Za-z\-]+)?\s+(?:performed|conducted|reported|used)\b'),
     re.compile(r'^[A-Z][A-Za-z\-]+\s+et\s+al\.\s+(?:performed|conducted|reported|used)\b', re.IGNORECASE),
+    re.compile(r'\b[A-Z][A-Za-z\-]+(?:\s+and\s+[A-Z][A-Za-z\-]+)?(?:\s+\[[0-9,\-\s]+\])?\s+(?:performed|conducted|reported|used)\b'),
+    re.compile(r'\b[A-Z][A-Za-z\-]+\s+et\s+al\.(?:\s+\[[0-9,\-\s]+\])?\s+(?:performed|conducted|reported|used)\b', re.IGNORECASE),
     re.compile(r'^(?:solid|dashed)\s+lines?\s+are\s+fits?\b', re.IGNORECASE),
     re.compile(r'^(?:these|those)\s+simulations?\b', re.IGNORECASE),
     re.compile(r'^(?:using|uses?)\s*[$\\({\[]', re.IGNORECASE),
@@ -1393,6 +1455,29 @@ def _looks_like_problem_statement(text: str) -> bool:
     )
 
 
+def _strip_inline_chunk_markers(text: str) -> str:
+    return _normalize_space(_INLINE_CHUNK_MARKER_RE.sub(' ', _normalize_space(text)))
+
+
+def _has_current_work_method_context(text: str) -> bool:
+    normalized = _strip_inline_chunk_markers(text)
+    lowered = normalized.lower()
+    return any(cue in lowered for cue in _CURRENT_WORK_METHOD_CUES) or any(
+        pattern.search(normalized) for pattern in _CURRENT_WORK_METHOD_REGEXES
+    )
+
+
+def _has_promotable_support_method_mentions(text: str) -> bool:
+    for row in _method_mentions_from_text(text, limit=3):
+        phrase = _normalize_space(row.get('normalized') or row.get('surface') or '').lower()
+        if not phrase:
+            continue
+        tokens = phrase.split()
+        if tokens and tokens[-1] in _SUPPORT_METHOD_PROMOTION_HEAD_TOKENS:
+            return True
+    return False
+
+
 def _method_text_cue_positions(text: str) -> list[int]:
     normalized = _normalize_space(text)
     if not normalized:
@@ -1410,7 +1495,7 @@ def _method_text_cue_positions(text: str) -> list[int]:
 
 
 def _looks_like_method_statement(text: str) -> bool:
-    normalized = _normalize_space(text)
+    normalized = _strip_inline_chunk_markers(text)
     if any(pattern.search(normalized) for pattern in _METHOD_WEAK_STATEMENT_REGEXES):
         return False
     if _method_text_cue_positions(normalized):
@@ -1470,7 +1555,11 @@ def _stabilize_move_role_and_act_type(
         or _looks_like_method_statement(summary)
         or _looks_like_method_statement(support_text)
         or bool(_method_mentions_from_text(summary, limit=1))
-        or bool(_method_mentions_from_text(support_text, limit=1))
+        or _has_promotable_support_method_mentions(support_text)
+    )
+    has_current_work_method_signal = (
+        _has_current_work_method_context(summary)
+        or _has_current_work_method_context(support_text)
     )
     has_result_signal = (
         any(pattern in lowered_summary for pattern in _RESULT_TEXT_PATTERNS)
@@ -1495,6 +1584,7 @@ def _stabilize_move_role_and_act_type(
     if (
         role in {'background', 'interpretation', 'problem'}
         and has_method_signal
+        and has_current_work_method_signal
         and not has_problem_signal
         and not has_result_signal
         and not limitation_types
@@ -1786,7 +1876,7 @@ def _resource_mentions_from_text(text: str, *, limit: int = 3) -> list[dict[str,
 
 
 def _method_mentions_from_text(text: str, *, limit: int = 3) -> list[dict[str, Any]]:
-    normalized = _normalize_space(text)
+    normalized = _strip_inline_chunk_markers(text)
     if not normalized:
         return []
     if any(pattern.search(normalized) for pattern in _METHOD_WEAK_STATEMENT_REGEXES):
@@ -2607,6 +2697,7 @@ def _strip_summary_prefixes(text: str) -> str:
         return ''
     stripped = stripped.lstrip('\ufeff')
     stripped = _LEADING_ARTICLE_METADATA_RE.sub('', stripped)
+    stripped = re.sub(r'^(?:\[[^\]]+\]\s*)+', '', stripped)
     stripped = re.sub(r'\[[^\]]*:[^\]]*:[0-9a-f]{8,}\]\s*', ' ', stripped, flags=re.IGNORECASE)
     stripped = re.sub(r'^(?:keywords?|key\s+words?|\u5173\u952e\u8bcd)\s*[:\uFF1A]\s*', '', stripped, flags=re.IGNORECASE)
     stripped = re.sub(r'^(?:abstract|\u6458\u8981)\s*[:\uFF1A]\s*', '', stripped, flags=re.IGNORECASE)
@@ -3605,6 +3696,18 @@ def _move_rows_from_windows(
                 )
             resource_mentions = _normalize_mention_rows(augmented['resource_mentions'], anchor_ids=anchor_chunk_ids)
             resource_mentions = _refine_resource_rows(resource_mentions)
+            role_support_text = move_support_text
+            if raw_move.get('source_mode') == 'fallback':
+                role_support_text = _move_support_text(
+                    summary=summary,
+                    anchor_chunk_ids=[
+                        str(chunk.chunk_id).strip()
+                        for chunk in (window.get('chunks') or [])
+                        if str(chunk.chunk_id).strip()
+                    ],
+                    chunk_by_id=chunk_by_id,
+                    fallback_chunks=list(window.get('chunks') or []),
+                )
             role, act_type = _stabilize_move_role_and_act_type(
                 role=role,
                 act_type=act_type,
@@ -3614,7 +3717,7 @@ def _move_rows_from_windows(
                 comparators=comparators,
                 effects=effects,
                 limitation_types=limitation_types,
-                support_text=move_support_text,
+                support_text=role_support_text,
                 source_sections=[chunk_by_id[chunk_id].section for chunk_id in anchor_chunk_ids if chunk_id in chunk_by_id],
             )
             if raw_move.get('source_mode') == 'fallback':
