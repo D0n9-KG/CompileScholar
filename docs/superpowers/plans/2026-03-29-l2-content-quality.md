@@ -494,3 +494,26 @@ Progress note (2026-03-30, prior-work method-signal suppression phase):
 - some current-paper method signals are still too broad or low-yield at the canonical/contract level, for example `1607` still exports generic mechanics/setup labels such as `force and torque balance equations`, `linear resistance`, and `brownian simulations` alongside stronger method tokens
 - some theory-style papers such as `1243` still surface framework/mechanics labels that are individually grounded but not yet compressed into the most downstream-useful method vocabulary
 - Next highest-value unresolved L2 gap: tighten method-signal ranking or filtering for broad setup/framework labels that are technically correct but still less useful than the paper's core operative method, so L3 receives a shorter and more decision-useful method maturity picture per paper.
+
+Progress note (2026-03-30, operative method ranking phase):
+- Continued the cleanup one layer deeper into `route_state_seed`: after prior-work method review was suppressed, the next repeated gap was that `dominant_method_candidates` still used near-insertion order, so broad framework/setup labels could crowd out more operative method signals in papers with dense method sections.
+- Added a paired regression set for this next macro issue:
+- when operative current-paper methods are available, `dominant_method_candidates` should prioritize them above broad framework labels such as `force and torque balance equations` / `linear resistance`
+- when a theory-style paper only has a framework-level grounded method signal, that framework label should still be preserved rather than dropped wholesale
+- Implemented the fix narrowly inside `build_route_state_seed(...)`:
+- kept `route_compiler_contract.topic_signals.methods` as the fuller trusted method-entry pool
+- added a dedicated `_rank_method_signal_entries(...)` path only for route-seed method candidate selection
+- the new ranking prefers operative summaries and operative method labels (`algorithm`, `approach`, `test`, `simulation`, `iteration`, etc.), penalizes broad summary contexts (`governing equations`, `simulation model considers`, `parameters are selected`, etc.), and lightly penalizes generic framework labels such as `equations`, `laws`, `resistance`, and `regularization`
+- Verification:
+- Red-green regressions: `backend/tests/test_paper_logic_trace_derived_views.py -k "prioritizes_operational_methods_over_broad_framework_labels or keeps_framework_method_when_it_is_the_only_grounded_method_signal"` -> `2 passed`
+- Focused file: `backend/tests/test_paper_logic_trace_derived_views.py` -> `28 passed`
+- Full backend suite: `cd backend; .\.venv\Scripts\python.exe -m pytest -q` -> `577 passed, 1 warning`
+- Real-sample rechecks after the change:
+- `1607_Shear jamming and fragility in dense suspensions` no longer lets framework labels such as `force and torque balance equations` and `linear resistance` crowd out its route-seed top methods; the top-five candidate list now centers on operational method content (`determine shear rate from given shear stress`, `determine particle velocities from shear rate`, `stress-controlled rheology algorithm`, `stokesian dynamics`, `soft-constraint approach`)
+- `1732_改性双基推进剂松弛模量的确定方法` stays healthy under the same ranking and is further compressed toward operative method content: `numerical iteration`, `improved sorvari method`, `改进型sorvari法`, `拉伸松弛试验`
+- `1243_Data-Driven Computational Plasticity` still retains `continuum-thermodynamics framework`, confirming the phase is not deleting framework methods when they are genuinely part of the paper's main method story
+- Additional non-overfit spot checks on previously stored random audit traces stayed directionally healthy rather than collapsing method diversity:
+- CFD / propulsion / DEM / neural-network samples continued to surface domain-appropriate operative methods such as `mrf method`, `gabp neural network model`, and `discrete element method`
+- Remaining macro gap after this phase:
+- some route-seed method candidates are now better ranked but still too clause-like or solver-step-like, for example `determine shear rate from given shear stress` and `determine particle velocities from shear rate` can outrank shorter canonical method names in `1607`
+- Next highest-value unresolved L2 gap: compress or down-rank verbose clause-style method labels when shorter canonical method names from the same paper already exist, so route-state method maturity reflects a concise core method vocabulary rather than implementation-step phrasing.

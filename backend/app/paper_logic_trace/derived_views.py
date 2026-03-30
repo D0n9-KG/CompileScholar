@@ -159,6 +159,57 @@ _BACKGROUND_CONTEXT_CUES = (
     'paper describes',
     'simulation model considers',
 )
+_METHOD_SIGNAL_OPERATIVE_SUMMARY_CUES = (
+    ' employ ',
+    ' employs ',
+    ' propose',
+    ' proposes ',
+    ' simulate',
+    ' models contact forces',
+    ' determine particle velocities',
+    ' determine shear rate',
+    ' iterative ',
+    ' iteration',
+    '试验',
+)
+_METHOD_SIGNAL_BROAD_SUMMARY_CUES = (
+    'describes the governing equations',
+    'governing equations',
+    'framework is described',
+    'simulation model considers',
+    'global step enforces',
+    'parameters are selected',
+    'describe their simulation system',
+    'initial configuration generation method',
+)
+_METHOD_SIGNAL_OPERATIVE_LABEL_CUES = (
+    'algorithm',
+    'approach',
+    'test',
+    'protocol',
+    'workflow',
+    'procedure',
+    'simulation',
+    'dynamics',
+    'iteration',
+    '试验',
+)
+_METHOD_SIGNAL_GENERIC_LABEL_CUES = (
+    'equation',
+    'equations',
+    'law',
+    'laws',
+    'resistance',
+    'regularization',
+    'parameter',
+    'parameters',
+    'variable',
+    'variables',
+    'state law',
+    'state laws',
+    'evolution law',
+    'evolution laws',
+)
 _SECTION_HEADING_RE = re.compile(r'^\s*(?:\d+(?:\.\d+)*|[ivx]+)\.?\s+', re.IGNORECASE)
 _PIPE_SECTION_HEADING_RE = re.compile(r'^\s*(?:section\s+)?\d+(?:\.\d+)*\s*[|:：-]\s+\S', re.IGNORECASE)
 _LATEX_TITLE_NOISE_RE = re.compile(r'(?:\\(?:mathrm|text|begin|end)\b|\$)')
@@ -1150,6 +1201,57 @@ def _rank_topic_object_entries(entries: list[dict[str, Any]], method_entries: li
     return sorted(entries, key=_score, reverse=True)
 
 
+def _rank_method_signal_entries(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    label_counts: dict[str, int] = {}
+    label_order: dict[str, int] = {}
+    for index, entry in enumerate(entries):
+        label = _entry_label(entry)
+        if not label:
+            continue
+        label_counts[label] = label_counts.get(label, 0) + 1
+        label_order.setdefault(label, index)
+
+    act_priority = {
+        'propose_method': 6,
+        'run_experiment': 5,
+        'adapt_method': 3,
+        'build_resource': 2,
+        'set_condition': 1,
+    }
+
+    def _score(entry: dict[str, Any]) -> tuple[int, int, int, int]:
+        label = _entry_label(entry)
+        summary = str(entry.get('summary') or '')
+        summary_lower = summary.lower()
+        tokens = _WORD_RE.findall(label)
+        score = act_priority.get(str(entry.get('act_type') or '').strip().lower(), 0) * 5
+        score += min(len(tokens), 4)
+        if len(tokens) <= 1:
+            score -= 2
+        if _summary_has_current_work_cue(summary):
+            score += 10
+        if _summary_has_prior_work_cue(summary) and not _summary_has_current_work_cue(summary):
+            score -= 12
+        score += _summary_cue_count(summary, _METHOD_SIGNAL_OPERATIVE_SUMMARY_CUES) * 3
+        score -= _summary_cue_count(summary, _METHOD_SIGNAL_BROAD_SUMMARY_CUES) * 4
+        if any(cue in label for cue in _METHOD_SIGNAL_OPERATIVE_LABEL_CUES):
+            score += 4
+        if any(cue in label for cue in _METHOD_SIGNAL_GENERIC_LABEL_CUES):
+            score -= 6
+        if label.endswith('method') and 'improved' not in label and _summary_has_prior_work_cue(summary):
+            score -= 4
+        if 'framework' in label and 'propose' not in summary_lower and 'proposes' not in summary_lower:
+            score -= 2
+        return (
+            score,
+            label_counts.get(label, 0),
+            -label_order.get(label, 0),
+            len(tokens),
+        )
+
+    return sorted(entries, key=_score, reverse=True)
+
+
 def _entry_anchor_ids(entries: list[dict[str, Any]], *, limit: int | None = None) -> list[str]:
     flattened: list[str] = []
     for entry in entries:
@@ -1234,11 +1336,12 @@ def build_route_state_seed(
             roles={'problem', 'method', 'experiment', 'result', 'interpretation'},
         )
     topic_object_entries = _rank_topic_object_entries(topic_object_entries, method_entries)
+    ranked_method_entries = _rank_method_signal_entries(method_entries)
 
     supporting_evidence_ids = _unique(
         [
             *_entry_anchor_ids(topic_object_entries),
-            *_entry_anchor_ids(method_entries),
+            *_entry_anchor_ids(ranked_method_entries),
             *_entry_anchor_ids(resource_entries),
             *_entry_anchor_ids(outcome_entries),
             *_entry_anchor_ids(comparison_entries),
@@ -1258,7 +1361,7 @@ def build_route_state_seed(
         'source_trace_id': trace.trace_id,
         'cutoff_year_hint': trace.paper_metadata.year,
         'topic_scope_candidates': _entry_labels(topic_object_entries),
-        'dominant_method_candidates': _entry_labels(method_entries),
+        'dominant_method_candidates': _entry_labels(ranked_method_entries),
         'active_benchmark_candidates': _entry_labels(benchmark_entries),
         'known_bottleneck_candidates': _entry_labels(limitation_entries),
         'enabling_condition_candidates': _entry_labels(condition_entries),
@@ -1269,7 +1372,7 @@ def build_route_state_seed(
         'challenging_evidence_ids': challenging_evidence_ids,
         'source_move_ids': [move.move_id for move in moves],
         'readiness_feature_inputs': {
-            'method_maturity_signals': _entry_labels(method_entries),
+            'method_maturity_signals': _entry_labels(ranked_method_entries),
             'measurement_maturity_signals': _nested_token_values(protocol_candidates, 'metric_tokens'),
             'data_resource_signals': _entry_labels(benchmark_entries),
             'infrastructure_signals': _nested_token_values(toolchain_candidates, 'resource_tokens'),

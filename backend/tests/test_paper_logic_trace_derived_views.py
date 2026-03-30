@@ -1066,6 +1066,146 @@ def test_build_route_state_seed_excludes_prior_work_method_signal_when_current_m
     assert 'sorvari method' not in seed['dominant_method_candidates']
 
 
+def test_build_route_state_seed_prioritizes_operational_methods_over_broad_framework_labels() -> None:
+    move_algorithm = ResearchMove(
+        move_id='m-method-1',
+        sequence_no=1,
+        role='method',
+        act_type='propose_method',
+        summary='The authors employ an algorithm to mimic stress-controlled rheology, building on an extended Stokesian Dynamics approach.',
+        methods=[
+            MentionValue(surface='stress-controlled rheology algorithm', normalized='stress-controlled rheology algorithm', anchor_ids=['a-1']),
+            MentionValue(surface='Stokesian Dynamics', normalized='stokesian dynamics', anchor_ids=['a-1']),
+        ],
+        anchor_ids=['a-1'],
+        slot_provenance=[
+            SlotProvenance(field='methods', value_index=0, anchor_ids=['a-1'], extraction_mode='direct', support_strength='strong'),
+            SlotProvenance(field='methods', value_index=1, anchor_ids=['a-1'], extraction_mode='direct', support_strength='strong'),
+        ],
+    )
+    move_framework = ResearchMove(
+        move_id='m-method-2',
+        sequence_no=2,
+        role='method',
+        act_type='adapt_method',
+        summary='Describes the governing equations for dense suspensions under stress-controlled quasi-static conditions, adapting hydrodynamic and non-hydrodynamic interaction models.',
+        methods=[
+            MentionValue(surface='force and torque balance equations', normalized='force and torque balance equations', anchor_ids=['a-2']),
+            MentionValue(surface='linear resistance', normalized='linear resistance', anchor_ids=['a-2']),
+            MentionValue(surface='pair-wise hydrodynamic lubrication', normalized='pair-wise hydrodynamic lubrication', anchor_ids=['a-2']),
+        ],
+        anchor_ids=['a-2'],
+        slot_provenance=[
+            SlotProvenance(field='methods', value_index=0, anchor_ids=['a-2'], extraction_mode='direct', support_strength='strong'),
+            SlotProvenance(field='methods', value_index=1, anchor_ids=['a-2'], extraction_mode='direct', support_strength='strong'),
+            SlotProvenance(field='methods', value_index=2, anchor_ids=['a-2'], extraction_mode='direct', support_strength='strong'),
+        ],
+    )
+    move_solver = ResearchMove(
+        move_id='m-method-3',
+        sequence_no=3,
+        role='method',
+        act_type='propose_method',
+        summary='Proposes a simulation framework to determine particle velocities and shear rate from a given shear stress by solving linear equations derived from stress decomposition.',
+        methods=[
+            MentionValue(surface='determine shear rate from given shear stress', normalized='determine shear rate from given shear stress', anchor_ids=['a-3']),
+        ],
+        anchor_ids=['a-3'],
+        slot_provenance=[
+            SlotProvenance(field='methods', value_index=0, anchor_ids=['a-3'], extraction_mode='direct', support_strength='strong'),
+        ],
+    )
+    move_contacts = ResearchMove(
+        move_id='m-method-4',
+        sequence_no=4,
+        role='method',
+        act_type='propose_method',
+        summary='The authors model contact forces using a soft-constraint approach with harmonic penalty functions and a Coulomb friction law.',
+        methods=[
+            MentionValue(surface='soft-constraint approach', normalized='soft-constraint approach', anchor_ids=['a-4']),
+        ],
+        anchor_ids=['a-4'],
+        slot_provenance=[
+            SlotProvenance(field='methods', value_index=0, anchor_ids=['a-4'], extraction_mode='direct', support_strength='strong'),
+        ],
+    )
+    move_validation = ResearchMove(
+        move_id='m-method-5',
+        sequence_no=5,
+        role='method',
+        act_type='adapt_method',
+        summary='The authors simulate a stress-controlled shear reversal test to confirm the concept of fragile matter in dense suspensions.',
+        methods=[
+            MentionValue(surface='stress-controlled shear reversal test', normalized='stress-controlled shear reversal test', anchor_ids=['a-5']),
+        ],
+        anchor_ids=['a-5'],
+        slot_provenance=[
+            SlotProvenance(field='methods', value_index=0, anchor_ids=['a-5'], extraction_mode='direct', support_strength='strong'),
+        ],
+    )
+    trace = PaperLogicTrace(
+        trace_id='paper-1607:paper_logic_trace',
+        schema_version='v2',
+        built_at='2026-03-30T00:00:00Z',
+        paper_metadata=PaperMetadata(
+            paper_id='paper-1607',
+            title='Shear jamming and fragility in dense suspensions',
+            paper_type='empirical',
+            source_refs=['a-1'],
+        ),
+        canonical_core=CanonicalCore(
+            moves=[move_algorithm, move_framework, move_solver, move_contacts, move_validation],
+        ),
+        quality={},
+    )
+
+    seed = build_route_state_seed(trace)
+    top_methods = seed['dominant_method_candidates'][:5]
+
+    assert 'stress-controlled rheology algorithm' in top_methods
+    assert 'stokesian dynamics' in top_methods
+    assert 'soft-constraint approach' in top_methods
+    assert 'stress-controlled shear reversal test' in top_methods
+    assert 'force and torque balance equations' not in top_methods
+    assert 'linear resistance' not in top_methods
+
+
+def test_build_route_state_seed_keeps_framework_method_when_it_is_the_only_grounded_method_signal() -> None:
+    framework_move = ResearchMove(
+        move_id='m-method-1',
+        sequence_no=1,
+        role='method',
+        act_type='adapt_method',
+        summary='A continuum-thermodynamics framework is described, assuming state variables, a free energy, and dissipation potentials to define state laws and evolution laws for elastoviscoplastic behavior.',
+        methods=[
+            MentionValue(surface='continuum-thermodynamics framework', normalized='continuum-thermodynamics framework', anchor_ids=['a-1']),
+        ],
+        anchor_ids=['a-1'],
+        slot_provenance=[
+            SlotProvenance(field='methods', value_index=0, anchor_ids=['a-1'], extraction_mode='direct', support_strength='strong'),
+        ],
+    )
+    trace = PaperLogicTrace(
+        trace_id='paper-1243:paper_logic_trace',
+        schema_version='v2',
+        built_at='2026-03-30T00:00:00Z',
+        paper_metadata=PaperMetadata(
+            paper_id='paper-1243',
+            title='Data-Driven Computational Plasticity',
+            paper_type='theoretical',
+            source_refs=['a-1'],
+        ),
+        canonical_core=CanonicalCore(
+            moves=[framework_move],
+        ),
+        quality={},
+    )
+
+    seed = build_route_state_seed(trace)
+
+    assert seed['dominant_method_candidates'] == ['continuum-thermodynamics framework']
+
+
 def test_build_route_state_seed_falls_back_to_inferred_topic_objects_when_trusted_objects_are_missing() -> None:
     result_move = ResearchMove(
         move_id='m-result-1',
