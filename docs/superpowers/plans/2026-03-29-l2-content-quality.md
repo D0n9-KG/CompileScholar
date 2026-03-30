@@ -453,3 +453,26 @@ Progress note (2026-03-30, method cue-trim boundary phase):
 - there is still a smaller cluster of residual method clutter that comes from long matched sentences whose surviving clause is not quite wrong enough to be caught by the current weak-statement filters, for example `using a rate-controlled setup.`, `power-law model for viscosity ...`, and `highly nonlinear and not consistent ...`
 - the `1732` Chinese sample still points to a broader mojibake/front-matter readability issue, and `781` still points to nearly-empty markdown handling
 - Next highest-value unresolved L2 gap: tighten second-order clause-fragment cleanup and figure/caption-style method pollution without undoing the recall gains from the last several fallback phases.
+
+Progress note (2026-03-30, paper-content profile prioritization phase):
+- Shifted this phase from raw move extraction into `derived_views.paper_content_profile`, because the next repeated corpus-level gap was no longer missing slots but single-paper story drift: the exported `problem_statements` / `method_statements` lists could still surface prior-work method review or broad background/setup sentences ahead of the paper's own main content.
+- Added red-green regression coverage for two concrete downstream-facing failures:
+- `method_statements` should prefer the paper's own method/experiment narrative over prior-work review when enough current-paper method content is already present
+- `problem_statements` should prefer genuine `problem` moves over earlier `background` setup context when the three-statement budget is already filled by actual problem/task content
+- Reworked `build_paper_content_profile(...)` conservatively rather than changing canonical move extraction:
+- `_role_summaries(...)` now ranks candidate summaries by role-aware content score instead of pure sequence order
+- method-summary ranking now penalizes explicit prior-work cues (`previous work`, `prior work`, `reported by`, `et al`, etc.) and prefers current-paper method signals
+- when at least two non-prior-work method summaries are already available, prior-work method-review summaries are no longer allowed to occupy the limited `method_statements` budget
+- author-fragment detection and summary-content checks are now CJK-safe, so short but complete Chinese method summaries are not discarded just because they lack English-style whitespace tokenization
+- Verification:
+- Red-green regressions: `backend/tests/test_paper_logic_trace_derived_views.py -k "prefers_current_work_method_statements_over_prior_work_review or prefers_problem_statements_over_background_context_when_limit_reached"` -> `2 passed`
+- Focused file: `backend/tests/test_paper_logic_trace_derived_views.py` -> `25 passed`
+- Full backend suite: `cd backend; .\.venv\Scripts\python.exe -m pytest -q` -> `574 passed, 1 warning`
+- Real-sample rechecks on stored current traces after the change:
+- `1732_改性双基推进剂松弛模量的确定方法` now exports only current-paper method content in `paper_content_profile.method_statements`: the improved Sorvari method description, the Chinese method-introduction sentence, and the Chinese tensile-relaxation experiment sentence. The earlier prior-work summary (`Previous work by Zapas ...`) no longer displaces the paper's own method story.
+- `1243_Data-Driven Computational Plasticity` keeps the meaningful challenge/problem sentence in `problem_statements` while dropping the earlier generic finite-element background sentence from the top-three content profile.
+- `1505_Velocity Profiles in Slowly Sheared Bubble Rafts` now prioritizes the two actual problem/gap statements before any broader setup context, which is a better single-paper summary surface even though one background/setup sentence still remains as the third fallback item.
+- Remaining macro gap after this phase:
+- some canonical `method` moves in real papers are still semantically broader than ideal, for example `1607` still keeps general setup/overview method summaries such as `The authors describe their simulation system ...` alongside stronger current-work method sentences
+- `problem_statements` can still retain one broad setup/background sentence as the final fallback item when a paper genuinely has only one or two explicit problem/task moves
+- Next highest-value unresolved L2 gap: continue from content-profile prioritization into canonical move-level cleanup for broad setup/prior-work method sentences, so L2 itself becomes cleaner rather than relying on derived-view ranking to hide the remaining noise.

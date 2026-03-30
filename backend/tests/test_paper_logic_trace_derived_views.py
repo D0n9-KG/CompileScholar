@@ -823,6 +823,123 @@ def test_build_paper_content_profile_prioritizes_result_summaries_over_earlier_i
     assert profile['coverage']['finding_count'] == 3
 
 
+def test_build_paper_content_profile_prefers_current_work_method_statements_over_prior_work_review() -> None:
+    prior_work_method = ResearchMove(
+        move_id='m-method-0',
+        sequence_no=1,
+        role='method',
+        act_type='adapt_method',
+        summary='Previous work by Zapas, KelchnerLee, FloryA, and Joonas Sorvari used numerical methods to improve the accuracy of relaxation modulus determination.',
+        anchor_ids=['a-1'],
+    )
+    current_method = ResearchMove(
+        move_id='m-method-1',
+        sequence_no=2,
+        role='method',
+        act_type='propose_method',
+        summary='The paper proposes an improved Sorvari method to determine the relaxation modulus of modified double-base propellant.',
+        anchor_ids=['a-2'],
+    )
+    current_experiment_method = ResearchMove(
+        move_id='m-method-exp-1',
+        sequence_no=3,
+        role='method',
+        act_type='run_experiment',
+        summary='进行了改性双基推进剂的拉伸松弛试验，并利用提出的改进型Sorvari法得到改性双基推进剂的松弛模量。',
+        anchor_ids=['a-3'],
+    )
+    current_method_detail = ResearchMove(
+        move_id='m-method-2',
+        sequence_no=4,
+        role='method',
+        act_type='propose_method',
+        summary='The improved Sorvari method iteratively solves for alpha(t) values and then calculates the relaxation modulus.',
+        anchor_ids=['a-4'],
+    )
+    trace = PaperLogicTrace(
+        trace_id='paper-1732:paper_logic_trace',
+        schema_version='v2',
+        built_at='2026-03-30T00:00:00Z',
+        paper_metadata=PaperMetadata(
+            paper_id='paper-1732',
+            title='Determination Way of Relaxation Modulus of Modified DB Propellant',
+            title_alt='改性双基推进剂松弛模量的确定方法',
+            paper_type='empirical',
+            source_refs=['a-1'],
+        ),
+        canonical_core=CanonicalCore(
+            moves=[prior_work_method, current_method, current_experiment_method, current_method_detail],
+        ),
+        quality={},
+    )
+
+    profile = build_paper_content_profile(trace)
+
+    assert prior_work_method.summary not in profile['method_statements']
+    assert current_method.summary in profile['method_statements']
+    assert current_experiment_method.summary in profile['method_statements']
+    assert current_method_detail.summary in profile['method_statements']
+
+
+def test_build_paper_content_profile_prefers_problem_statements_over_background_context_when_limit_reached() -> None:
+    background = ResearchMove(
+        move_id='m-bg-1',
+        sequence_no=1,
+        role='background',
+        act_type='build_resource',
+        summary='The paper describes the experimental setup and measurement techniques used to study velocity profiles in slowly sheared bubble rafts.',
+        anchor_ids=['a-1'],
+    )
+    problem_one = ResearchMove(
+        move_id='m-problem-1',
+        sequence_no=2,
+        role='problem',
+        act_type='identify_gap',
+        summary='Quantitative experimental studies of velocity profiles in jammed systems have only recently been carried out.',
+        anchor_ids=['a-2'],
+    )
+    problem_two = ResearchMove(
+        move_id='m-problem-2',
+        sequence_no=3,
+        role='problem',
+        act_type='identify_gap',
+        summary='For slow shear rates, prior work focused on the high shear-rate continuum limit rather than rearrangement-scale fluctuations.',
+        anchor_ids=['a-3'],
+    )
+    problem_three = ResearchMove(
+        move_id='m-problem-3',
+        sequence_no=4,
+        role='problem',
+        act_type='define_task',
+        summary='The paper investigates whether the coexistence of flowing and jammed states persists in the low shear-rate limit.',
+        anchor_ids=['a-4'],
+    )
+    trace = PaperLogicTrace(
+        trace_id='paper-1505:paper_logic_trace',
+        schema_version='v2',
+        built_at='2026-03-30T00:00:00Z',
+        paper_metadata=PaperMetadata(
+            paper_id='paper-1505',
+            title='Velocity Profiles in Slowly Sheared Bubble Rafts',
+            paper_type='empirical',
+            source_refs=['a-1'],
+        ),
+        canonical_core=CanonicalCore(
+            moves=[background, problem_one, problem_two, problem_three],
+        ),
+        quality={},
+    )
+
+    profile = build_paper_content_profile(trace)
+
+    assert profile['problem_statements'] == [
+        problem_one.summary,
+        problem_two.summary,
+        problem_three.summary,
+    ]
+    assert background.summary not in profile['problem_statements']
+
+
 def test_build_route_state_seed_collects_l3_compiler_inputs_without_overclaiming() -> None:
     trace = PaperLogicTrace(
         trace_id='paper-1:paper_logic_trace',

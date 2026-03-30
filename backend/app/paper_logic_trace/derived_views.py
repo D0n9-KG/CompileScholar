@@ -99,6 +99,66 @@ _METHOD_SUMMARY_NEGATIVE_CUES = (
     ' reports ',
     ' at most ',
 )
+_CONTENT_PROFILE_CURRENT_WORK_CUES = (
+    ' this paper ',
+    ' this study ',
+    ' this work ',
+    ' this article ',
+    ' in this paper ',
+    ' in this study ',
+    ' in this work ',
+    ' our approach ',
+    ' our method ',
+    ' our model ',
+    ' we propose ',
+    ' we present ',
+    ' we develop ',
+    ' we introduce ',
+    ' we use ',
+    ' we employ ',
+    ' we perform ',
+    ' 本文',
+    ' 本研究',
+    ' 本工作',
+    ' 文中',
+)
+_CONTENT_PROFILE_PRIOR_WORK_CUES = (
+    ' previous work ',
+    ' prior work ',
+    ' previous study ',
+    ' previous studies ',
+    ' prior study ',
+    ' prior studies ',
+    ' earlier work ',
+    ' earlier studies ',
+    ' work by ',
+    ' studies by ',
+    ' reported by ',
+    ' proposed by ',
+    ' developed by ',
+    ' has addressed ',
+    ' have addressed ',
+    ' has been conducted ',
+    ' have been conducted ',
+    ' et al',
+    ' ref. [',
+    ' refs. [',
+    ' in [',
+    ' 前人',
+    ' 已有研究',
+    ' 已有工作',
+    ' 前期研究',
+    ' 文献',
+)
+_BACKGROUND_CONTEXT_CUES = (
+    'describes the experimental setup',
+    'experimental setup',
+    'measurement techniques',
+    'study was conducted',
+    'system properties',
+    'paper describes',
+    'simulation model considers',
+)
 _SECTION_HEADING_RE = re.compile(r'^\s*(?:\d+(?:\.\d+)*|[ivx]+)\.?\s+', re.IGNORECASE)
 _PIPE_SECTION_HEADING_RE = re.compile(r'^\s*(?:section\s+)?\d+(?:\.\d+)*\s*[|:：-]\s+\S', re.IGNORECASE)
 _LATEX_TITLE_NOISE_RE = re.compile(r'(?:\\(?:mathrm|text|begin|end)\b|\$)')
@@ -202,6 +262,8 @@ def _looks_like_author_fragment(summary: str) -> bool:
     stripped = str(summary or '').strip()
     if not stripped:
         return False
+    if _SUMMARY_CJK_RE.search(stripped):
+        return False
     lowered = stripped.lower()
     if is_noise_summary(stripped) or lowered.startswith('©'):
         return True
@@ -235,6 +297,9 @@ def _is_summary_contentful(summary: str) -> bool:
         return False
     if _looks_like_author_fragment(stripped):
         return False
+    cjk_count = len(_SUMMARY_CJK_RE.findall(stripped))
+    if cjk_count >= 10 and len(stripped) >= 16:
+        return True
     if len(stripped) >= 36:
         return True
     return len(stripped.split()) >= 5
@@ -458,6 +523,57 @@ def _select_summary_moves(trace: PaperLogicTrace) -> list[ResearchMove]:
 def _summary_cue_count(summary: str, cues: tuple[str, ...]) -> int:
     lowered = f" {str(summary or '').strip().lower()} "
     return sum(1 for cue in cues if cue in lowered)
+
+
+def _summary_has_current_work_cue(summary: str) -> bool:
+    return _summary_cue_count(summary, _CONTENT_PROFILE_CURRENT_WORK_CUES) > 0
+
+
+def _summary_has_prior_work_cue(summary: str) -> bool:
+    return _summary_cue_count(summary, _CONTENT_PROFILE_PRIOR_WORK_CUES) > 0
+
+
+def _content_profile_role_summary_score(
+    move: ResearchMove,
+    *,
+    requested_roles: set[str],
+    anchor_sections: dict[str, str],
+    title_terms: set[str],
+) -> tuple[int, int, int, int]:
+    summary = str(move.summary or '').strip()
+    base_score, section_score = _move_summary_score(move, anchor_sections)
+    title_score = min(_title_alignment_score(summary, title_terms), 3)
+    score = base_score + title_score * 2
+    sequence_no = int(move.sequence_no)
+
+    if requested_roles == {'method', 'experiment'}:
+        if move.role == 'method':
+            score += 8
+        elif move.role == 'experiment':
+            score += 5
+        if _summary_has_current_work_cue(summary):
+            score += 6
+        if _summary_has_prior_work_cue(summary) and not _summary_has_current_work_cue(summary):
+            score -= 14
+        if move.act_type == 'adapt_method' and _summary_has_prior_work_cue(summary):
+            score -= 4
+    elif requested_roles == {'problem', 'background', 'hypothesis'}:
+        if move.role == 'problem':
+            score += 8
+        elif move.role == 'hypothesis':
+            score += 6
+        elif move.role == 'background':
+            score -= 4
+            if _summary_cue_count(summary, _BACKGROUND_CONTEXT_CUES) > 0:
+                score -= 4
+    elif requested_roles == {'result'}:
+        if move.role == 'result':
+            score += 8
+    elif requested_roles == {'interpretation'}:
+        if move.role == 'interpretation':
+            score += 6
+
+    return (score, section_score, title_score, -sequence_no)
 
 
 def _method_focus_score(move: ResearchMove) -> int:
@@ -1259,11 +1375,39 @@ def build_paper_summaries(trace: PaperLogicTrace) -> dict[str, Any]:
 def build_paper_content_profile(trace: PaperLogicTrace) -> dict[str, Any]:
     moves = list(trace.canonical_core.moves)
     paper_summaries = build_paper_summaries(trace)
+    anchor_sections = _summary_anchor_sections(trace)
+    title_terms = _title_alignment_terms(trace.paper_metadata.title, trace.paper_metadata.title_alt)
 
     def _role_summaries(roles: set[str], *, limit: int = 3) -> list[str]:
         summaries: list[str] = []
-        for move in sorted(moves, key=lambda item: int(item.sequence_no)):
+        eligible_moves = [move for move in moves if move.role in roles]
+        ordered_moves = sorted(
+            eligible_moves,
+            key=lambda move: _content_profile_role_summary_score(
+                move,
+                requested_roles=roles,
+                anchor_sections=anchor_sections,
+                title_terms=title_terms,
+            ),
+            reverse=True,
+        )
+        skip_prior_work_method_ids: set[str] = set()
+        if roles == {'method', 'experiment'}:
+            contentful_current_or_neutral = [
+                move
+                for move in ordered_moves
+                if _is_summary_contentful(move.summary) and not _summary_has_prior_work_cue(move.summary)
+            ]
+            if len(contentful_current_or_neutral) >= max(2, limit - 1):
+                skip_prior_work_method_ids = {
+                    move.move_id
+                    for move in ordered_moves
+                    if _summary_has_prior_work_cue(move.summary)
+                }
+        for move in ordered_moves:
             if move.role not in roles:
+                continue
+            if move.move_id in skip_prior_work_method_ids:
                 continue
             summary = str(move.summary or '').strip()
             if not _is_summary_contentful(summary) or summary in summaries:
