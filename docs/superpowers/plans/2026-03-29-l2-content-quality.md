@@ -658,3 +658,33 @@ Progress note (2026-03-30, method-family de-dup compression phase):
 - Remaining macro gap after this phase:
 - route-state methods are now cleaner and less redundant, but some labels are still accurate yet suboptimal because they reflect clause-level paraphrase or orthographic drift rather than the shortest stable canonical form, for example `stress-controlled flow determination` or `general regression neural network`
 - Next highest-value unresolved L2 gap: continue tightening alias normalization / paraphrase compression for method labels without collapsing genuinely distinct methods or overfitting to a few papers.
+
+Progress note (2026-03-31, severe method-layer fallback recovery phase):
+- Following the new severity-first policy, I paused micro-polishing and ran a macro audit over 77 local real traces (`manual_random_content_audit` + stored `runs` outputs) to find only issues that materially break single-paper L2 usefulness.
+- That audit showed the remaining truly severe failures had narrowed to one pattern:
+- a paper could contain grounded trusted `methods`, but only on `problem` / `result` moves rather than explicit `method` / `experiment` moves
+- in those cases, the whole method layer could collapse at once: `method_statements=[]`, `key_method_summary=''`, and `route_state_seed.dominant_method_candidates=[]`
+- The severe cases were concentrated in a small number of real papers such as:
+- `09_257_CFD` (`Application of CFD simulation in submersible agitator layout and optimization of operating conditions`)
+- `03_1991_基于人工神经网络和混合遗传算法的炸药爆速预测`
+- Added a regression for this high-severity gap:
+- when no `method` / `experiment` move carries grounded trusted `methods`, L2 should conservatively fall back to grounded `methods` found on `problem` / `result` / `interpretation` moves instead of leaving the method layer empty
+- Implemented the fix narrowly:
+- added `_METHOD_SIGNAL_FALLBACK_ROLES = {'problem', 'result', 'interpretation'}`
+- `build_route_compiler_contract(...)` now falls back to those roles for method signals only when normal `method` / `experiment` method signals are absent
+- `_select_key_method_move(...)` now falls back to contentful grounded-method moves from those roles only when no normal method candidates exist
+- `build_paper_content_profile(...)._role_summaries({'method','experiment'})` now uses the same fallback only when explicit method-role content is absent
+- Kept the fallback strictly gated so ordinary papers with explicit `method` / `experiment` coverage are unaffected
+- Verification:
+- Targeted regression: `backend/tests/test_paper_logic_trace_derived_views.py -k "falls_back_to_problem_method_signal_when_method_role_is_missing"` -> `1 passed`
+- Focused file: `backend/tests/test_paper_logic_trace_derived_views.py` -> `36 passed`
+- Full backend suite: `cd backend; .\.venv\Scripts\python.exe -m pytest -q` -> `585 passed, 1 warning`
+- Real severe-case rechecks after the change:
+- `09_257_CFD` no longer has an empty method layer; it now surfaces `cfd simulation` in `route_state_seed`, restores a non-empty `method_statements`, and clears both `missing_method_statements` and `missing_key_method_summary`
+- the alternate `09_257_CFD` artifact in `fresh_lang_check` likewise stays non-empty and method-grounded
+- `03_1991_基于人工神经网络和混合遗传算法的炸药爆速预测` no longer has an empty method layer either; it now exports non-empty route-state methods and method statements, leaving only the older `suspicious_title_alt` issue
+- Macro severity re-audit after the change:
+- `SEVERE_ROWS` dropped from `4` to `0` on the 77-trace local audit set
+- Remaining macro gap after this phase:
+- the severe empty-method failure is closed, but some fallback-recovered papers still produce method labels or summaries that are merely acceptable rather than ideal, especially when the only available method evidence is mixed into `problem` / `result` prose
+- Given the current policy, these remaining imperfections are below the threshold for immediate fixing unless a broader high-severity pattern emerges in larger-scale sampling.

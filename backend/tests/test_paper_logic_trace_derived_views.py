@@ -1522,6 +1522,64 @@ def test_build_route_state_seed_deduplicates_generic_method_label_variants() -> 
     ]
 
 
+def test_build_derived_views_falls_back_to_problem_method_signal_when_method_role_is_missing() -> None:
+    problem_move = ResearchMove(
+        move_id='m-problem-method-fallback',
+        sequence_no=1,
+        role='problem',
+        act_type='define_task',
+        summary='The paper aims to apply CFD simulation to optimize the layout and operating conditions of submersible agitators, aiming to determine the best arrangement, installation angle, and configuration power to improve flow conditions and reduce energy consumption.',
+        methods=[
+            MentionValue(surface='CFD simulation', normalized='cfd simulation', anchor_ids=['a-1']),
+        ],
+        research_objects=[
+            MentionValue(surface='submersible agitators', normalized='submersible agitators', anchor_ids=['a-1']),
+        ],
+        anchor_ids=['a-1'],
+        slot_provenance=[
+            SlotProvenance(field='methods', value_index=0, anchor_ids=['a-1'], extraction_mode='direct', support_strength='strong'),
+            SlotProvenance(field='research_objects', value_index=0, anchor_ids=['a-1'], extraction_mode='direct', support_strength='strong'),
+        ],
+    )
+    result_move = ResearchMove(
+        move_id='m-result-method-fallback',
+        sequence_no=2,
+        role='result',
+        act_type='report_effect',
+        summary='The results show that cylindrical columns reduce flow resistance and rounded corners improve the overall flow pattern.',
+        metrics=[
+            MentionValue(surface='flow resistance', normalized='flow resistance', anchor_ids=['a-2']),
+        ],
+        anchor_ids=['a-2'],
+        slot_provenance=[
+            SlotProvenance(field='metrics', value_index=0, anchor_ids=['a-2'], extraction_mode='direct', support_strength='strong'),
+        ],
+    )
+    trace = PaperLogicTrace(
+        trace_id='paper-problem-method-fallback:paper_logic_trace',
+        schema_version='v2',
+        built_at='2026-03-30T00:00:00Z',
+        paper_metadata=PaperMetadata(
+            paper_id='paper-problem-method-fallback',
+            title='Application of CFD simulation in submersible agitator layout and optimization of operating conditions',
+            paper_type='empirical',
+            source_refs=['a-1'],
+        ),
+        canonical_core=CanonicalCore(
+            moves=[problem_move, result_move],
+        ),
+        quality={},
+    )
+
+    derived = build_derived_views(trace)
+
+    assert derived['route_state_seed']['dominant_method_candidates'] == ['cfd simulation']
+    assert derived['paper_content_profile']['method_statements'] == [problem_move.summary]
+    assert derived['paper_summaries']['key_method_summary'] == problem_move.summary
+    assert 'missing_method_statements' not in derived['paper_content_audit']['flags']
+    assert 'missing_key_method_summary' not in derived['paper_content_audit']['flags']
+
+
 def test_build_route_state_seed_falls_back_to_inferred_topic_objects_when_trusted_objects_are_missing() -> None:
     result_move = ResearchMove(
         move_id='m-result-1',

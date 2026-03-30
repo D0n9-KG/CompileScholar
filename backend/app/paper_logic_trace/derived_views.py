@@ -70,6 +70,7 @@ _TOPIC_ROLE_PRIORITY = {
     'method': 2,
     'background': 1,
 }
+_METHOD_SIGNAL_FALLBACK_ROLES = {'problem', 'result', 'interpretation'}
 _SUMMARY_NOISE_CUES = (
     'accepted ',
     'available online',
@@ -744,6 +745,14 @@ def _select_key_method_move(trace: PaperLogicTrace) -> ResearchMove | None:
         if move.role in {'method', 'experiment'} and _is_summary_contentful(move.summary)
     ]
     if not method_candidates:
+        method_candidates = [
+            move
+            for move in trace.canonical_core.moves
+            if move.role in _METHOD_SIGNAL_FALLBACK_ROLES
+            and _is_summary_contentful(move.summary)
+            and _trusted_mentions(move, 'methods', list(move.methods))
+        ]
+    if not method_candidates:
         return None
     grounded_method_candidates = [
         move
@@ -1097,6 +1106,14 @@ def build_route_compiler_contract(
         trusted_only=True,
         roles=method_roles,
     )
+    if not method_signals:
+        method_signals = _slot_entries_with_move_context(
+            'methods',
+            moves,
+            'methods',
+            trusted_only=True,
+            roles=_METHOD_SIGNAL_FALLBACK_ROLES,
+        )
     method_signals = _filter_prior_work_method_signal_entries(method_signals)
     condition_signals = _slot_entries_with_move_context(
         'conditions',
@@ -1704,6 +1721,15 @@ def build_paper_content_profile(trace: PaperLogicTrace) -> dict[str, Any]:
     def _role_summaries(roles: set[str], *, limit: int = 3) -> list[str]:
         summaries: list[str] = []
         eligible_moves = [move for move in moves if move.role in roles]
+        fallback_roles_active = False
+        if not eligible_moves and roles == {'method', 'experiment'}:
+            fallback_roles_active = True
+            eligible_moves = [
+                move
+                for move in moves
+                if move.role in _METHOD_SIGNAL_FALLBACK_ROLES
+                and _trusted_mentions(move, 'methods', list(move.methods))
+            ]
         ordered_moves = sorted(
             eligible_moves,
             key=lambda move: _content_profile_role_summary_score(
@@ -1728,7 +1754,7 @@ def build_paper_content_profile(trace: PaperLogicTrace) -> dict[str, Any]:
                     if _summary_has_prior_work_cue(move.summary)
                 }
         for move in ordered_moves:
-            if move.role not in roles:
+            if move.role not in roles and not fallback_roles_active:
                 continue
             if move.move_id in skip_prior_work_method_ids:
                 continue
