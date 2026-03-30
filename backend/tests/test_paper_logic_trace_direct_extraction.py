@@ -3903,6 +3903,31 @@ def test_article_metadata_chunks_are_filtered_before_move_construction(monkeypat
     assert 'available online' not in joined
     assert 'keywords:' not in joined
 
+def test_leading_article_number_line_without_section_is_filtered_before_move_construction(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk('c-1', None, '文章编号：1000-4750(2012)09-0359-04', line=1),
+        _chunk('c-2', 'Demo Paper', '# Demo Paper', line=2),
+        _chunk('c-3', 'ABSTRACT', '本文提出一种改进方法来获取松弛模量参数。', line=3),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    source_refs = {str(row['source_ref']) for row in payload['evidence_rows']}
+    joined = ' '.join(str(row['summary']) for row in payload['evidence_rows'])
+
+    assert 'c-1' not in source_refs
+    assert '文章编号' not in joined
+
 
 def test_title_block_bibliographic_chunks_with_bullets_and_received_lines_are_filtered(monkeypatch) -> None:
     doc = _doc_with_chunks(

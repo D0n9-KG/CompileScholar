@@ -205,12 +205,50 @@ def parse_mineru_markdown(md_path: str) -> DocumentIR:
         penalty = 20 * t.count("\ufffd") + 10 * t.count("?")
         return ascii_alnum - penalty + len(t)
 
+    def is_numbered_section_heading(t: str) -> bool:
+        return bool(re.match(r"^\d+(?:\.\d+)*\b", _normalize_space(t)))
+
+    def has_cjk(t: str) -> bool:
+        return bool(re.search(r"[\u4e00-\u9fff]", t))
+
+    def has_latin(t: str) -> bool:
+        return bool(re.search(r"[A-Za-z]", t))
+
     title = None
     title_alt = None
     if heading_titles:
         ranked = sorted({t for t in heading_titles if t}, key=title_score, reverse=True)
         title = ranked[0] if ranked else None
-        title_alt = ranked[1] if len(ranked) > 1 else None
+        if title:
+            title_has_cjk = has_cjk(title)
+            title_has_latin = has_latin(title)
+            preferred_alt = next(
+                (
+                    candidate
+                    for candidate in heading_titles
+                    if candidate
+                    and candidate != title
+                    and not is_numbered_section_heading(candidate)
+                    and (
+                        (title_has_latin and has_cjk(candidate))
+                        or (title_has_cjk and has_latin(candidate))
+                    )
+                ),
+                None,
+            )
+            if preferred_alt:
+                title_alt = preferred_alt
+            else:
+                title_alt = next(
+                    (
+                        candidate
+                        for candidate in ranked
+                        if candidate != title and not is_numbered_section_heading(candidate)
+                    ),
+                    None,
+                )
+        else:
+            title_alt = ranked[1] if len(ranked) > 1 else None
 
     chunks: list[Chunk] = []
     references: list[ReferenceEntry] = []

@@ -1334,6 +1334,8 @@ def _looks_like_affiliation_summary(text: str) -> bool:
 def _looks_like_front_matter_noise(text: str, *, section: str, paper_title: str) -> bool:
     lowered = text.lower()
     in_title_block = bool(section) and bool(paper_title) and section == paper_title
+    if not section and (_FRONT_MATTER_METADATA_RE.match(lowered) or any(cue in lowered for cue in _FRONT_MATTER_METADATA_CUES)):
+        return True
     if in_title_block and (_FRONT_MATTER_METADATA_RE.match(lowered) or any(cue in lowered for cue in _FRONT_MATTER_METADATA_CUES)):
         return True
     if in_title_block and any(cue in lowered for cue in _FRONT_MATTER_INSTITUTION_CUES):

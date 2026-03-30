@@ -286,6 +286,21 @@ Progress note (2026-03-30, BOM-only empty-markdown guard phase):
 - Real-sample recheck: `781.md` now yields `evidence_rows = 0` under forced local fallback extraction instead of a fake `problem` trace.
 - Anti-regression check: `1607_Shear jamming and fragility in dense suspensions` kept the improved method/profile behavior from the previous phase after the BOM cleanup.
 - Next highest-value unresolved L2 gap: broader mojibake / readability-heavy markdowns, especially Chinese papers like `1732`, still need a more general degraded-text handling pass beyond the BOM-only empty-file guard.
+
+Progress note (2026-03-30, readable-Chinese front-matter and bilingual-title phase):
+- Root-cause recheck on `1732_改性双基推进剂松弛模量的确定方法` showed the source markdown itself is readable, not fundamentally mojibake:
+- Chinese abstract/body text are intact
+- the concrete L2 issues were instead a leaked front-matter chunk (`文章编号...`) and a bad `title_alt` choice (`1.3 Sorvari法`) caused by heading ranking
+- Added regression coverage for two narrow failures:
+- a leading article-number metadata line with `section=None` should be filtered before fallback move construction
+- a bilingual title page should prefer the real cross-language title as `title_alt` instead of a later numbered section heading
+- Applied two conservative fixes:
+- in `direct_extraction`, sectionless lines matching explicit front-matter metadata cues now count as noise even outside the title block
+- in `parse_md`, `title_alt` now prefers a non-numbered bilingual counterpart heading before falling back to the next raw heading-score candidate
+- Real-sample recheck after the change:
+- `1732` no longer emits the fake `problem` summary based on `文章编号：1000-4750(2012)09-0359-04`
+- `1732` now keeps `title='DETERMINATION WAY OF RELAXATION MODULUS OF MODIFIED DB PROPELLANT'` and `title_alt='改性双基推进剂松弛模量的确定方法'`, which is materially more faithful than the previous `title_alt='1.3 Sorvari法'`
+- Residual gap after this phase: `1732` is cleaner and metadata-aligned, but its fallback role structure still skews `method/result` with a thin explicit `problem` layer, so the next phase should target problem recovery/compression for method-heavy bilingual abstracts rather than more front-matter cleanup.
 - `s93_Numerical investigation of twin-liquid film...` still stays on the existing green empirical path; its remaining limitation content is the older heuristic-style noise (`indicating limitation`, `difficult`) rather than a new artifact introduced by the companion-move dedup.
 - Next highest-value unresolved L2 gap: the new duplication bug is closed, but L2 still has a broader compression/cleanup problem rather than a pure recall problem. In practical terms, single-paper traces like `1243` are now structurally sufficient for downstream L3/L4, yet some empirical papers still retain legacy heuristic limitation clutter and overlapping move phrasing, so the next phase should target macro move compression / noise cleanup without narrowing recall to a few hand-tuned papers.
 
