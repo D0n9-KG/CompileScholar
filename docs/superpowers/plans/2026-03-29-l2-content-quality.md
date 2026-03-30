@@ -278,6 +278,14 @@ Progress note (2026-03-30, fallback method-summary calibration phase):
 - `1505_Velocity Profiles in Slowly Sheared Bubble Rafts` no longer emits the earlier fake method summary `using continuous functions of shear rate ...`; however, the direct fallback trace still remains thin on explicit method recovery, so this paper now reads as cleaner but still incomplete rather than falsely method-rich.
 - `781.md` remains a separate residual class: near-empty / encoding-damaged markdown can still collapse into a fake `problem` trace (`ERROR UnicodeEncodeError ...`), so the next phase should target BOM / mojibake / empty-content guards rather than more method heuristics.
 - Next highest-value unresolved L2 gap: keep improving single-paper completeness on degraded markdowns and method-thin fallback cases without reintroducing background/caption method clutter, with special attention to encoding-damaged inputs like `781` and readability-heavy Chinese papers like `1732`.
+
+Progress note (2026-03-30, BOM-only empty-markdown guard phase):
+- Added a regression for the concrete degraded-markdown case where a document contains only a UTF-8 BOM (`\ufeff`) and previously still emitted a fake fallback `problem` move.
+- Root-cause check showed this was not paper content at all: `781.md` is literally a 3-byte BOM file, but `direct_extraction._normalize_space` preserved `\ufeff`, so `_semantic_windows` still treated it as non-empty text.
+- Applied the narrowest fix at the L2 layer: treat BOM characters as ignorable whitespace inside `direct_extraction._normalize_space`, so BOM-only chunks collapse to empty and never form fallback windows or summaries.
+- Real-sample recheck: `781.md` now yields `evidence_rows = 0` under forced local fallback extraction instead of a fake `problem` trace.
+- Anti-regression check: `1607_Shear jamming and fragility in dense suspensions` kept the improved method/profile behavior from the previous phase after the BOM cleanup.
+- Next highest-value unresolved L2 gap: broader mojibake / readability-heavy markdowns, especially Chinese papers like `1732`, still need a more general degraded-text handling pass beyond the BOM-only empty-file guard.
 - `s93_Numerical investigation of twin-liquid film...` still stays on the existing green empirical path; its remaining limitation content is the older heuristic-style noise (`indicating limitation`, `difficult`) rather than a new artifact introduced by the companion-move dedup.
 - Next highest-value unresolved L2 gap: the new duplication bug is closed, but L2 still has a broader compression/cleanup problem rather than a pure recall problem. In practical terms, single-paper traces like `1243` are now structurally sufficient for downstream L3/L4, yet some empirical papers still retain legacy heuristic limitation clutter and overlapping move phrasing, so the next phase should target macro move compression / noise cleanup without narrowing recall to a few hand-tuned papers.
 

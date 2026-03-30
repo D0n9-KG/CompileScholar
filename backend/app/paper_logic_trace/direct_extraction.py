@@ -1257,7 +1257,8 @@ _ALLOWED_ACTS = (
 
 
 def _normalize_space(value: object) -> str:
-    return _SPACE_RE.sub(' ', str(value or '').strip())
+    text = str(value or '').replace('\ufeff', ' ').strip()
+    return _SPACE_RE.sub(' ', text)
 
 
 def _normalize_role(value: object) -> str:

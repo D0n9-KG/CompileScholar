@@ -725,6 +725,26 @@ def test_fallback_background_prior_model_using_clause_stays_non_method(monkeypat
     assert all(row['role_hint'] != 'method' for row in payload['evidence_rows'])
 
 
+def test_bom_only_chunk_does_not_produce_fallback_move(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk('c-1', None, '\ufeff', line=1),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    assert payload['evidence_rows'] == []
+
+
 def test_fallback_method_summary_reselection_ignores_chunk_markers_and_prior_using_clause(monkeypatch) -> None:
     doc = _doc_with_chunks(
         _chunk(
