@@ -661,6 +661,75 @@ def test_method_mentions_from_text_ignores_inline_chunk_markers() -> None:
     assert _method_mentions_from_text(text, limit=3) == []
 
 
+def test_theoretical_protocol_section_promotes_formalism_into_method_layer(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            'Glass preparation protocol',
+            (
+                "The 'state following' formalism is designed to describe this regime in which "
+                'a typical equilibrium configuration selects a long-lived glass basin, which is then '
+                'adiabatically followed upon increasing the density and applying a shear strain.'
+            ),
+            line=1,
+        ),
+        _chunk(
+            'c-2',
+            'Results',
+            'We find that the glass generically yields at a finite shear strain and jams at higher densities.',
+            line=2,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'background',
+                'act_type': 'build_resource',
+                'summary': (
+                    "The 'state following' formalism is designed to describe this regime in which "
+                    'a typical equilibrium configuration selects a long-lived glass basin, which is then '
+                    'adiabatically followed upon increasing the density and applying a shear strain.'
+                ),
+                'resource_mentions': [
+                    {
+                        'surface': 'state following formalism',
+                        'normalized': 'state following formalism',
+                        'type': 'theoretical_framework',
+                    }
+                ],
+                'anchor_chunk_ids': ['c-1'],
+                'confidence': 0.9,
+            },
+            {
+                'role': 'result',
+                'act_type': 'report_effect',
+                'summary': 'We find that the glass generically yields at a finite shear strain and jams at higher densities.',
+                'anchor_chunk_ids': ['c-2'],
+                'confidence': 0.9,
+            },
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'paper_type': 'theoretical', 'rules': {}},
+    )
+
+    trace = compile_paper_logic_trace(
+        **{
+            k: payload[k]
+            for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']
+        }
+    )
+
+    assert 'state following formalism' in trace.derived_views['route_state_seed']['dominant_method_candidates']
+    assert any(move.role == 'method' for move in trace.canonical_core.moves)
+
+
 def test_fallback_background_results_window_with_generic_simulations_text_stays_non_method(monkeypatch) -> None:
     doc = _doc_with_chunks(
         _chunk(

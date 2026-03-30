@@ -688,3 +688,24 @@ Progress note (2026-03-31, severe method-layer fallback recovery phase):
 - Remaining macro gap after this phase:
 - the severe empty-method failure is closed, but some fallback-recovered papers still produce method labels or summaries that are merely acceptable rather than ideal, especially when the only available method evidence is mixed into `problem` / `result` prose
 - Given the current policy, these remaining imperfections are below the threshold for immediate fixing unless a broader high-severity pattern emerges in larger-scale sampling.
+
+Progress note (2026-03-31, shared-corpus severe audit and theory-method route recovery phase):
+- To avoid overfitting to the older local audit pool, I ran a fresh severity-first audit on a new 10-paper random sample copied from the shared corpus under `\\192.168.199.138\Share400T\pub\LLM_Data\data\hzy\第一批文献\文献\文献中心\HZY第一批论文全文\output`.
+- That shared sample surfaced only two truly high-severity patterns worth acting on:
+- `p007`: `missing_route_methods`
+- `p002`: `missing_key_findings`
+- I fixed `p007` first because it was a direct blocker for downstream L3/L4 route reconstruction:
+- root cause: some theory-heavy papers already exposed their real method content as `resource_mentions` of type `method` / `theoretical_framework`, but the method layer never promoted those framework signals into `methods`, so route-state methods stayed empty despite grounded method evidence being present
+- added a conservative fallback that promotes method-like `resource_mentions` into `methods` only when the method layer is otherwise empty
+- widened current-work method cues to include third-person summaries such as `the paper` / `the study` / `the work` / `the article`
+- added method-section hints such as `protocol` so theory-like sections are less likely to stay trapped as generic background
+- Verification for this phase:
+- targeted regression: `backend/tests/test_paper_logic_trace_direct_extraction.py -k theoretical_protocol_section_promotes_formalism_into_method_layer` -> `1 passed`
+- focused file: `backend/tests/test_paper_logic_trace_direct_extraction.py` -> `144 passed`
+- full backend suite: `cd backend; .\.venv\Scripts\python.exe -m pytest -q` -> `586 passed, 1 warning`
+- Real-sample shared-corpus recheck:
+- `p007` now exports non-empty route methods (`mean-field random first order transition scenario`, `state following formalism`, `exact computation of glass free energy in infinite dimensions`, `replica symmetric approximation`) and clears the earlier severe route-method failure
+- anti-overfit spot checks on `p003` and local `1243_Data-Driven Computational Plasticity` stayed directionally healthy rather than picking up spurious framework promotions
+- Remaining highest-value shared-corpus severe gap after this phase:
+- `p002` still has no `key_findings`, with the missing content concentrated in Chinese validation/comparison sentences such as `计算结果表明 ...` / `经比较可知 ...` / `经过卫星在轨验证 ...`
+- Next phase should fix that result/validation recovery conservatively, focusing on section-role splitting and result stabilization rather than adding narrow one-paper rules.

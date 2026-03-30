@@ -154,6 +154,10 @@ _PROBLEM_PURPOSE_HINTS = (
     'to quantify',
 )
 _CURRENT_WORK_METHOD_CUES = (
+    'the article',
+    'the paper',
+    'the study',
+    'the work',
     'here, we',
     'here we',
     'this article',
@@ -1210,6 +1214,17 @@ _SECTION_ROLE_HINTS: list[tuple[tuple[str, ...], str]] = [
     (('problem', 'motivation', 'task', 'challenge', 'gap'), 'problem'),
     (('background', 'introduction', 'preliminar', 'related work'), 'background'),
 ]
+_METHOD_SECTION_HINTS = (
+    'algorithm',
+    'approach',
+    'framework',
+    'implementation',
+    'method',
+    'model',
+    'procedure',
+    'protocol',
+    'workflow',
+)
 _ROLE_TO_ACT: dict[str, str] = {
     'problem': 'define_task',
     'background': 'identify_gap',
@@ -1434,6 +1449,11 @@ def _role_for_section(section: object) -> str:
     return 'background'
 
 
+def _is_method_like_section(section: object) -> bool:
+    label = _normalize_space(section).lower()
+    return bool(label) and any(hint in label for hint in _METHOD_SECTION_HINTS)
+
+
 def _role_for_chunk(chunk: Chunk, *, paper_title: object) -> str:
     role = _role_for_section(chunk.section)
     text = _normalize_space(chunk.text).lower()
@@ -1551,6 +1571,7 @@ def _stabilize_move_role_and_act_type(
 ) -> tuple[str, str]:
     lowered_summary = _normalize_space(summary).lower()
     lowered_support = _normalize_space(support_text).lower()
+    method_section_like = any(_is_method_like_section(section) for section in (source_sections or []))
     informative_effects = _has_informative_effect_rows(effects)
     has_problem_signal = _looks_like_problem_statement(lowered_summary)
     has_method_signal = (
@@ -1587,7 +1608,7 @@ def _stabilize_move_role_and_act_type(
     if (
         role in {'background', 'interpretation', 'problem'}
         and has_method_signal
-        and has_current_work_method_signal
+        and (has_current_work_method_signal or method_section_like)
         and not has_problem_signal
         and not has_result_signal
         and not limitation_types
@@ -2036,6 +2057,37 @@ def _refine_resource_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         if not is_subsumed:
             keep_indices.append(index)
     return [prepared[index][0] for index in keep_indices]
+
+
+def _method_rows_from_resource_mentions(
+    resource_mentions: list[dict[str, Any]],
+    *,
+    limit: int = 3,
+) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for row in resource_mentions or []:
+        type_name = _normalize_space(row.get('type') or '').lower()
+        if type_name not in {'method', 'theoretical_framework'}:
+            continue
+        phrase = _clean_phrase(str(row.get('normalized') or row.get('surface') or ''))
+        if not phrase:
+            continue
+        lowered = phrase.lower()
+        if lowered in seen:
+            continue
+        seen.add(lowered)
+        rows.append(
+            {
+                'surface': phrase,
+                'normalized': phrase,
+                'inferred': row.get('inferred'),
+                'confidence': row.get('confidence'),
+            }
+        )
+        if len(rows) >= limit:
+            break
+    return rows
 
 
 def _comparator_mentions(text: str, *, limit: int = 2) -> list[dict[str, Any]]:
@@ -3699,6 +3751,12 @@ def _move_rows_from_windows(
                 )
             resource_mentions = _normalize_mention_rows(augmented['resource_mentions'], anchor_ids=anchor_chunk_ids)
             resource_mentions = _refine_resource_rows(resource_mentions)
+            source_sections = [chunk_by_id[chunk_id].section for chunk_id in anchor_chunk_ids if chunk_id in chunk_by_id]
+            if not methods:
+                methods = _normalize_mention_rows(
+                    _method_rows_from_resource_mentions(resource_mentions),
+                    anchor_ids=anchor_chunk_ids,
+                )
             role_support_text = move_support_text
             if raw_move.get('source_mode') == 'fallback':
                 role_support_text = _move_support_text(
@@ -3721,7 +3779,7 @@ def _move_rows_from_windows(
                 effects=effects,
                 limitation_types=limitation_types,
                 support_text=role_support_text,
-                source_sections=[chunk_by_id[chunk_id].section for chunk_id in anchor_chunk_ids if chunk_id in chunk_by_id],
+                source_sections=source_sections,
             )
             if raw_move.get('source_mode') == 'fallback':
                 summary_support_text = move_support_text
