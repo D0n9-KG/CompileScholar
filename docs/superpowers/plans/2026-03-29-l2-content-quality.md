@@ -240,3 +240,23 @@ Progress note (2026-03-30, content-based theory-profile selection phase):
 - `s870_Pb-activated amine-assisted photocatalytic hydrogen evolution reaction...` stays on `empirical_default` and does not get promoted into the theory/modeling branch.
 - `s93_Numerical investigation of twin-liquid film...` likewise stays on `empirical_default` while preserving its existing green empirical path.
 - Next highest-value unresolved L2 gap: now that theory-style limitation content can actually unlock the right downstream profile, the remaining macro issue is repeated/overlapping move clutter in some direct rebuilds (for example duplicated problem/limitation content within long introductions), so the next phase should likely target move deduplication / compression rather than more gate widening.
+
+Progress note (2026-03-30, companion-limitation dedup phase):
+- Added a regression for the concrete direct-extraction clutter case where two raw moves from the same introduction window both recover the same explicit `main drawback ...` sentence and previously emitted two identical companion `limitation` moves.
+- Root-cause audit showed the duplicate was not a gate or compile artifact: `_move_rows_from_windows` generated companion limitation moves independently per raw move, so the same explicit limitation sentence could be materialized multiple times inside one semantic window whenever upstream move extraction split the surrounding introduction into overlapping `problem` summaries.
+- Reworked companion limitation emission conservatively:
+- dedup is limited to the current semantic window
+- the dedup key is the normalized explicit limitation sentence itself, so it only collapses repeated restatements of the same recovered drawback
+- when a duplicate is detected, richer slot content from the later raw move is merged back into the already-created limitation move instead of silently discarding it
+- Verification:
+- Red-green regression: `backend/tests/test_paper_logic_trace_direct_extraction.py -k one_companion_limitation_move`
+- Related drawback regressions: `backend/tests/test_paper_logic_trace_direct_extraction.py -k "explicit_main_drawback or later_intro_chunk or grounded_limitation_move or truncates or one_companion_limitation_move"`
+- Focused file: `backend/tests/test_paper_logic_trace_direct_extraction.py` -> `99 passed`
+- Full backend suite: `cd backend; .\.venv\Scripts\python.exe -m pytest -q` -> `527 passed, 1 warning`
+- Real-sample rechecks:
+- `1243_Data-Driven Computational Plasticity` now keeps a single grounded companion limitation move on direct local rebuild: summary `Its main drawback is the huge amount of data required for running simulations.`, one `limitation` move instead of repeated same-sentence clones, and `l4_evidence_profile='theory_modeling'` with `ready_for_l4=True` remains intact.
+- The surviving `1243` limitation move still carries grounded content rather than a compressed generic phrase, with `limitation_types` centered on `huge amount of data required for running simulations`.
+- Anti-overfit direct rebuild checks stayed stable:
+- `s870_Pb-activated amine-assisted photocatalytic hydrogen evolution reaction...` still stays on `empirical_default`, remains `yellow`, and emits no limitation moves.
+- `s93_Numerical investigation of twin-liquid film...` still stays on the existing green empirical path; its remaining limitation content is the older heuristic-style noise (`indicating limitation`, `difficult`) rather than a new artifact introduced by the companion-move dedup.
+- Next highest-value unresolved L2 gap: the new duplication bug is closed, but L2 still has a broader compression/cleanup problem rather than a pure recall problem. In practical terms, single-paper traces like `1243` are now structurally sufficient for downstream L3/L4, yet some empirical papers still retain legacy heuristic limitation clutter and overlapping move phrasing, so the next phase should target macro move compression / noise cleanup without narrowing recall to a few hand-tuned papers.

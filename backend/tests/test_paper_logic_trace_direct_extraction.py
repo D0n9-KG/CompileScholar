@@ -1982,6 +1982,68 @@ def test_problem_drawback_signal_creates_limitation_move_even_when_support_text_
     )
 
 
+def test_same_window_explicit_drawback_emits_only_one_companion_limitation_move(monkeypatch) -> None:
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '1. Introduction',
+            (
+                'Data-driven simulation is attracting broad interest across mechanics and scientific computing. '
+                'The main drawback of data-driven approaches is the huge amount of data required for running simulations.'
+            ),
+            line=1,
+        ),
+        _chunk(
+            'c-2',
+            '1. Introduction',
+            'In the present work we will assume that all the needed data is available.',
+            line=4,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'problem',
+                'act_type': 'identify_gap',
+                'summary': 'Data-driven simulation is attracting broad interest across mechanics and scientific computing.',
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'limitation_types': [],
+                'confidence': 0.8,
+            },
+            {
+                'role': 'problem',
+                'act_type': 'identify_gap',
+                'summary': 'Very little has been done in applying big-data to scientific computing despite promising first attempts.',
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'limitation_types': [],
+                'confidence': 0.8,
+            },
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+    trace = compile_paper_logic_trace(
+        **{k: payload[k] for k in ['paper_metadata', 'evidence_rows', 'figure_rows', 'table_rows', 'citation_rows', 'move_relation_rows']}
+    )
+
+    limitation_moves = [move for move in trace.canonical_core.moves if move.role == 'limitation']
+
+    assert len(limitation_moves) == 1
+    assert all(
+        any('huge amount of data required' in str(item.normalized or item.surface or '').lower() for item in move.limitation_types)
+        for move in limitation_moves
+    )
+
+
 def test_method_research_object_filter_drops_free_energy_process_fragment(monkeypatch) -> None:
     summary = 'A continuum-thermodynamics framework defines state variables, free energy, and dissipation potentials.'
     quote = 'A simple elastoviscoplastic model consists of choosing as free energy and dissipation potentials.'

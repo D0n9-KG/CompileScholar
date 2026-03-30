@@ -2449,6 +2449,7 @@ def _move_rows_from_windows(
         raw_moves = _extract_window_moves_llm(doc=doc, schema=schema, window=window)
         if not raw_moves:
             raw_moves = _fallback_move_payload(window)
+        companion_limitation_moves: dict[str, dict[str, Any]] = {}
         for move_offset, raw_move in enumerate(raw_moves, start=1):
             role = _normalize_role(raw_move.get('role') or window.get('role_hint'))
             act_type = _normalize_act_type(raw_move.get('act_type'), role=role)
@@ -2663,17 +2664,112 @@ def _move_rows_from_windows(
                 and limitation_types
                 and role != 'limitation'
             ):
+                limitation_summary = _summary_from_text(companion_limitation_sentence)
+                companion_limitation_key = _normalize_space(companion_limitation_sentence).lower()
+                existing_limitation_move = companion_limitation_moves.get(companion_limitation_key)
+                if existing_limitation_move is not None:
+                    existing_anchor_chunk_ids = existing_limitation_move['anchor_chunk_ids']
+                    existing_anchor_ids = existing_limitation_move['anchor_ids']
+                    merged_research_objects = _normalize_mention_rows(
+                        _merge_preferred_mention_rows(existing_limitation_move['research_objects'], research_objects),
+                        anchor_ids=existing_anchor_chunk_ids,
+                    )
+                    merged_conditions = _normalize_mention_rows(
+                        _merge_preferred_mention_rows(existing_limitation_move['conditions'], conditions),
+                        anchor_ids=existing_anchor_chunk_ids,
+                    )
+                    merged_limitation_types = _normalize_mention_rows(
+                        _merge_preferred_mention_rows(existing_limitation_move['limitation_types'], limitation_types),
+                        anchor_ids=existing_anchor_chunk_ids,
+                    )
+                    for chunk_id in anchor_chunk_ids:
+                        if chunk_id in existing_anchor_chunk_ids:
+                            continue
+                        chunk = chunk_by_id.get(chunk_id)
+                        if chunk is None:
+                            continue
+                        existing_anchor_chunk_ids.append(chunk_id)
+                        anchor_id = f"{existing_limitation_move['move_id']}:anchor:{len(existing_anchor_ids) + 1}"
+                        existing_anchor_ids.append(anchor_id)
+                        merged_research_objects = _normalize_mention_rows(
+                            merged_research_objects,
+                            anchor_ids=existing_anchor_chunk_ids,
+                        )
+                        merged_conditions = _normalize_mention_rows(
+                            merged_conditions,
+                            anchor_ids=existing_anchor_chunk_ids,
+                        )
+                        merged_limitation_types = _normalize_mention_rows(
+                            merged_limitation_types,
+                            anchor_ids=existing_anchor_chunk_ids,
+                        )
+                        merged_slot_provenance = [
+                            *_slot_provenance_rows('research_objects', merged_research_objects, anchor_ids=existing_anchor_chunk_ids),
+                            *_slot_provenance_rows('conditions', merged_conditions, anchor_ids=existing_anchor_chunk_ids),
+                            *_slot_provenance_rows('limitation_types', merged_limitation_types, anchor_ids=existing_anchor_chunk_ids),
+                        ]
+                        evidence_rows.append(
+                            {
+                                'anchor_id': anchor_id,
+                                'paper_id': paper_id,
+                                'source_ref': chunk_id,
+                                'modality': 'text',
+                                'section_path': [str(chunk.section).strip()] if str(chunk.section or '').strip() else [],
+                                'locator': {
+                                    'chunk_id': chunk.chunk_id,
+                                    'start_line': chunk.span.start_line,
+                                    'end_line': chunk.span.end_line,
+                                },
+                                'quote': _normalize_space(chunk.text),
+                                'citation_ids': [],
+                                'support_type': 'direct',
+                                'weak': False,
+                                'move_id': existing_limitation_move['move_id'],
+                                'sequence_no': existing_limitation_move['sequence_no'],
+                                'role_hint': 'limitation',
+                                'act_hint': 'state_limitation',
+                                'summary': limitation_summary,
+                                'confidence': confidence,
+                                'research_objects': merged_research_objects,
+                                'methods': [],
+                                'observed_variables': [],
+                                'metrics': [],
+                                'comparators': [],
+                                'conditions': merged_conditions,
+                                'effects': [],
+                                'limitation_types': merged_limitation_types,
+                                'resource_mentions': [],
+                                'slot_provenance': merged_slot_provenance,
+                            }
+                        )
+                    merged_slot_provenance = [
+                        *_slot_provenance_rows('research_objects', merged_research_objects, anchor_ids=existing_anchor_chunk_ids),
+                        *_slot_provenance_rows('conditions', merged_conditions, anchor_ids=existing_anchor_chunk_ids),
+                        *_slot_provenance_rows('limitation_types', merged_limitation_types, anchor_ids=existing_anchor_chunk_ids),
+                    ]
+                    existing_limitation_move['research_objects'] = merged_research_objects
+                    existing_limitation_move['conditions'] = merged_conditions
+                    existing_limitation_move['limitation_types'] = merged_limitation_types
+                    existing_limitation_move['slot_provenance'] = merged_slot_provenance
+                    for row in evidence_rows:
+                        if row.get('move_id') != existing_limitation_move['move_id']:
+                            continue
+                        row['research_objects'] = merged_research_objects
+                        row['conditions'] = merged_conditions
+                        row['limitation_types'] = merged_limitation_types
+                        row['slot_provenance'] = merged_slot_provenance
+                    continue
                 limitation_move_id = f'{move_id}:limitation'
                 limitation_move_anchor_ids = [
                     f'{limitation_move_id}:anchor:{anchor_index}'
                     for anchor_index, _ in enumerate(anchor_chunk_ids, start=1)
                 ]
-                limitation_summary = _summary_from_text(companion_limitation_sentence)
                 limitation_slot_provenance = [
                     *_slot_provenance_rows('research_objects', research_objects, anchor_ids=anchor_chunk_ids),
                     *_slot_provenance_rows('conditions', conditions, anchor_ids=anchor_chunk_ids),
                     *_slot_provenance_rows('limitation_types', limitation_types, anchor_ids=anchor_chunk_ids),
                 ]
+                limitation_sequence_no = len(move_defs) + 1
                 for anchor_index, chunk_id in enumerate(anchor_chunk_ids, start=1):
                     chunk = chunk_by_id.get(chunk_id)
                     if chunk is None:
@@ -2695,7 +2791,7 @@ def _move_rows_from_windows(
                             'support_type': 'direct',
                             'weak': False,
                             'move_id': limitation_move_id,
-                            'sequence_no': len(move_defs) + 1,
+                            'sequence_no': limitation_sequence_no,
                             'role_hint': 'limitation',
                             'act_hint': 'state_limitation',
                             'summary': limitation_summary,
@@ -2715,13 +2811,23 @@ def _move_rows_from_windows(
                 move_defs.append(
                     {
                         'move_id': limitation_move_id,
-                        'sequence_no': len(move_defs) + 1,
+                        'sequence_no': limitation_sequence_no,
                         'role': 'limitation',
                         'act_type': 'state_limitation',
                         'anchor_chunk_ids': anchor_chunk_ids,
                         'anchor_ids': limitation_move_anchor_ids,
                     }
                 )
+                companion_limitation_moves[companion_limitation_key] = {
+                    'move_id': limitation_move_id,
+                    'sequence_no': limitation_sequence_no,
+                    'anchor_chunk_ids': list(anchor_chunk_ids),
+                    'anchor_ids': list(limitation_move_anchor_ids),
+                    'research_objects': list(research_objects),
+                    'conditions': list(conditions),
+                    'limitation_types': list(limitation_types),
+                    'slot_provenance': list(limitation_slot_provenance),
+                }
                 extracted_moves += 1
 
     report = {
