@@ -538,3 +538,26 @@ Progress note (2026-03-30, clause-style method label deprioritization phase):
 - Remaining macro gap after this phase:
 - some route-seed method candidates are now cleaner but still somewhat over-complete, for example `1607` still includes secondary method internals such as `harmonic penalty function`, and some other random traces still keep mixed method-step phrases like `cross-experiment comparison within geometry` or `controlled flow rate via aperture or moving wall`
 - Next highest-value unresolved L2 gap: refine method candidate compression one level further, so route-state method maturity emphasizes the paper's shortest stable core method vocabulary and demotes secondary implementation details and analysis-step phrases when stronger method names are already present.
+
+Progress note (2026-03-30, move-aware method candidate compression phase):
+- Root-cause audit on the next residual `route_state_seed` gap showed the remaining issue was no longer only label ranking. Even after clause-style penalties, same-move secondary labels could still crowd out other moves' core methods because route-seed selection ranked the full method pool globally and then truncated.
+- Added a stronger regression for this selection-layer failure mode:
+- when a paper already has named methods from multiple moves, route-seed method selection should surface one core non-secondary label per move before it spends slots on same-move detail labels
+- clause-style labels should still remain available when they are the only grounded method evidence rather than being deleted entirely
+- Implemented the fix narrowly inside `build_route_state_seed(...)`:
+- kept the fuller ranked method-entry pool unchanged
+- added `_is_secondary_method_detail_entry(...)` to conservatively identify clause-style / analysis-step / implementation-detail method labels for route-seed compression only
+- added `_method_candidate_labels(...)` so route-state selection now runs in three passes: first non-secondary label per move, then remaining non-secondary labels, then secondary/detail labels only if there is still room
+- reused this compressed label set for both `dominant_method_candidates` and `readiness_feature_inputs.method_maturity_signals`, keeping downstream readiness aligned with the cleaned route-seed view
+- Verification:
+- Targeted regressions: `backend/tests/test_paper_logic_trace_derived_views.py -k "deprioritizes_clause_style_method_labels_when_named_methods_exist or keeps_clause_style_method_label_when_it_is_the_only_grounded_method_signal"` -> `2 passed`
+- Focused file: `backend/tests/test_paper_logic_trace_derived_views.py` -> `30 passed`
+- Full backend suite: `cd backend; .\.venv\Scripts\python.exe -m pytest -q` -> `579 passed, 1 warning`
+- Real-sample rechecks after the change:
+- `1607_Shear jamming and fragility in dense suspensions` now surfaces cross-move core methods earlier in `dominant_method_candidates`, with `stress-controlled shear reversal test` promoted ahead of the old clause label tail and the top list centered on `stress-controlled rheology algorithm`, `soft-constraint approach`, `stress-controlled shear reversal test`, and `stokesian dynamics`
+- `1732` stays healthy and concise under the same compression, still centered on `numerical iteration`, `改进型sorvari法`, `拉伸松弛试验`, and `improved sorvari method`
+- `1243_Data-Driven Computational Plasticity` remains stable and still preserves framework-level method vocabulary when that is genuinely the paper's main method story rather than detail noise
+- Additional non-overfit spot checks on stored random audit traces stayed directionally healthy: the phase did not collapse domain-specific method diversity in neural-network / CFD / DEM / photocatalysis samples, though some older traces still expose broader context-heavy method labels
+- Remaining macro gap after this phase:
+- route-seed method candidates are now better distributed across moves, but some papers still keep context or implementation-detail phrases such as `harmonic penalty function`, `controlled flow rate via aperture or moving wall`, `silo flow`, or `gravity-driven flow` in the compressed top list when the underlying method extraction itself is broad
+- Next highest-value unresolved L2 gap: continue compressing route-seed methods toward the shortest stable core method vocabulary without overfitting, especially by demoting context/setup labels that are still treated as non-secondary in mixed empirical papers.

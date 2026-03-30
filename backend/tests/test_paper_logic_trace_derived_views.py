@@ -1253,6 +1253,20 @@ def test_build_route_state_seed_deprioritizes_clause_style_method_labels_when_na
             SlotProvenance(field='methods', value_index=0, anchor_ids=['a-3'], extraction_mode='direct', support_strength='strong'),
         ],
     )
+    move_validation = ResearchMove(
+        move_id='m-method-4',
+        sequence_no=4,
+        role='method',
+        act_type='adapt_method',
+        summary='The authors simulate a stress-controlled shear reversal test to confirm the concept of fragile matter in dense suspensions.',
+        methods=[
+            MentionValue(surface='stress-controlled shear reversal test', normalized='stress-controlled shear reversal test', anchor_ids=['a-4']),
+        ],
+        anchor_ids=['a-4'],
+        slot_provenance=[
+            SlotProvenance(field='methods', value_index=0, anchor_ids=['a-4'], extraction_mode='direct', support_strength='strong'),
+        ],
+    )
     trace = PaperLogicTrace(
         trace_id='paper-1607:paper_logic_trace',
         schema_version='v2',
@@ -1264,7 +1278,7 @@ def test_build_route_state_seed_deprioritizes_clause_style_method_labels_when_na
             source_refs=['a-1'],
         ),
         canonical_core=CanonicalCore(
-            moves=[move_algorithm, move_solver, move_contacts],
+            moves=[move_algorithm, move_solver, move_contacts, move_validation],
         ),
         quality={},
     )
@@ -1273,8 +1287,10 @@ def test_build_route_state_seed_deprioritizes_clause_style_method_labels_when_na
     method_ranks = {label: index for index, label in enumerate(seed['dominant_method_candidates'])}
 
     assert method_ranks['stress-controlled rheology algorithm'] < method_ranks['determine shear rate from given shear stress']
-    assert method_ranks['stokesian dynamics'] < method_ranks['determine particle velocities from shear rate']
+    if 'determine particle velocities from shear rate' in method_ranks:
+        assert method_ranks['stokesian dynamics'] < method_ranks['determine particle velocities from shear rate']
     assert method_ranks['soft-constraint approach'] < method_ranks['determine shear rate from given shear stress']
+    assert method_ranks['stress-controlled shear reversal test'] < method_ranks['determine shear rate from given shear stress']
 
 
 def test_build_route_state_seed_keeps_clause_style_method_label_when_it_is_the_only_grounded_method_signal() -> None:

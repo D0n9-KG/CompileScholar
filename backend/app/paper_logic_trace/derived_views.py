@@ -224,6 +224,21 @@ _METHOD_SIGNAL_CLAUSE_LEAD_CUES = (
     'derive ',
     'optimize ',
 )
+_METHOD_SIGNAL_SECONDARY_DETAIL_CUES = (
+    'comparison',
+    'analysis',
+    'function',
+    'law',
+    'laws',
+    'equation',
+    'equations',
+    'resistance',
+    'regularization',
+    'parameter',
+    'parameters',
+    'simulation',
+    'simulations',
+)
 _SECTION_HEADING_RE = re.compile(r'^\s*(?:\d+(?:\.\d+)*|[ivx]+)\.?\s+', re.IGNORECASE)
 _PIPE_SECTION_HEADING_RE = re.compile(r'^\s*(?:section\s+)?\d+(?:\.\d+)*\s*[|:：-]\s+\S', re.IGNORECASE)
 _LATEX_TITLE_NOISE_RE = re.compile(r'(?:\\(?:mathrm|text|begin|end)\b|\$)')
@@ -1184,6 +1199,62 @@ def _entry_labels(entries: list[dict[str, Any]], *, limit: int = 5) -> list[str]
     return _unique(labels)[:limit]
 
 
+def _is_secondary_method_detail_entry(entry: dict[str, Any]) -> bool:
+    label = _entry_label(entry)
+    summary = str(entry.get('summary') or '')
+    if not label:
+        return False
+    if any(label.startswith(cue) for cue in _METHOD_SIGNAL_CLAUSE_LEAD_CUES):
+        return True
+    if any(cue in label for cue in _METHOD_SIGNAL_SECONDARY_DETAIL_CUES):
+        return True
+    if _summary_cue_count(summary, _METHOD_SIGNAL_BROAD_SUMMARY_CUES) > 0:
+        return True
+    return False
+
+
+def _method_candidate_labels(entries: list[dict[str, Any]], *, limit: int = 5) -> list[str]:
+    if not entries:
+        return []
+
+    selected: list[str] = []
+    seen_labels: set[str] = set()
+    seen_primary_moves: set[str] = set()
+
+    def try_add(entry: dict[str, Any], *, primary_only: bool = False) -> bool:
+        label = _entry_label(entry)
+        if not label or label in seen_labels:
+            return False
+        move_id = str(entry.get('move_id') or '').strip()
+        is_secondary = _is_secondary_method_detail_entry(entry)
+        if primary_only and (not move_id or move_id in seen_primary_moves or is_secondary):
+            return False
+        selected.append(label)
+        seen_labels.add(label)
+        if primary_only and move_id:
+            seen_primary_moves.add(move_id)
+        return True
+
+    for entry in entries:
+        try_add(entry, primary_only=True)
+        if len(selected) >= limit:
+            return selected[:limit]
+
+    for entry in entries:
+        if _is_secondary_method_detail_entry(entry):
+            continue
+        if try_add(entry):
+            if len(selected) >= limit:
+                return selected[:limit]
+
+    for entry in entries:
+        if try_add(entry):
+            if len(selected) >= limit:
+                return selected[:limit]
+
+    return selected[:limit]
+
+
 def _rank_topic_object_entries(entries: list[dict[str, Any]], method_entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
     label_counts: dict[str, int] = {}
     label_order: dict[str, int] = {}
@@ -1353,6 +1424,7 @@ def build_route_state_seed(
         )
     topic_object_entries = _rank_topic_object_entries(topic_object_entries, method_entries)
     ranked_method_entries = _rank_method_signal_entries(method_entries)
+    method_candidate_labels = _method_candidate_labels(ranked_method_entries)
 
     supporting_evidence_ids = _unique(
         [
@@ -1377,7 +1449,7 @@ def build_route_state_seed(
         'source_trace_id': trace.trace_id,
         'cutoff_year_hint': trace.paper_metadata.year,
         'topic_scope_candidates': _entry_labels(topic_object_entries),
-        'dominant_method_candidates': _entry_labels(ranked_method_entries),
+        'dominant_method_candidates': method_candidate_labels,
         'active_benchmark_candidates': _entry_labels(benchmark_entries),
         'known_bottleneck_candidates': _entry_labels(limitation_entries),
         'enabling_condition_candidates': _entry_labels(condition_entries),
@@ -1388,7 +1460,7 @@ def build_route_state_seed(
         'challenging_evidence_ids': challenging_evidence_ids,
         'source_move_ids': [move.move_id for move in moves],
         'readiness_feature_inputs': {
-            'method_maturity_signals': _entry_labels(ranked_method_entries),
+            'method_maturity_signals': method_candidate_labels,
             'measurement_maturity_signals': _nested_token_values(protocol_candidates, 'metric_tokens'),
             'data_resource_signals': _entry_labels(benchmark_entries),
             'infrastructure_signals': _nested_token_values(toolchain_candidates, 'resource_tokens'),
