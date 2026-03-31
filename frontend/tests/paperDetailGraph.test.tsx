@@ -100,6 +100,7 @@ const trace = {
           {
             surface: 'finite-element solver',
             normalized: 'finite element solver',
+            type: 'computational',
             anchor_ids: ['anchor-1'],
             confidence: 0.9,
             inferred: false,
@@ -113,7 +114,17 @@ const trace = {
         limitation_types: [],
         resource_mentions: [],
         anchor_ids: ['anchor-1'],
-        slot_provenance: [],
+        slot_provenance: [
+          {
+            field: 'methods',
+            value_index: 0,
+            anchor_ids: ['anchor-1'],
+            extraction_mode: 'direct',
+            support_strength: 'strong',
+            confidence: 0.9,
+            notes: 'Method mention from the core proposal sentence.',
+          },
+        ],
         confidence: 0.83,
         audit_state: 'hot_path',
       },
@@ -240,6 +251,10 @@ function renderPaperDetail() {
   )
 }
 
+function byTextContent(text: string) {
+  return (_content: string, element: Element | null) => element?.textContent?.includes(text) ?? false
+}
+
 describe('PaperDetailPage paper logic trace workbench', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -252,7 +267,7 @@ describe('PaperDetailPage paper logic trace workbench', () => {
 
     await waitFor(() => expect(screen.getByTestId('signal-graph-mock')).toBeInTheDocument())
     expect(container.querySelector('.paperTraceWorkbench')).not.toBeNull()
-    expect(screen.getByText('Trace Version')).toBeInTheDocument()
+    expect(screen.getAllByText('Trace Version').length).toBeGreaterThan(0)
     expect(screen.getByText('Trace Workspace')).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: '1. Method' }))
@@ -267,8 +282,65 @@ describe('PaperDetailPage paper logic trace workbench', () => {
     expect(detail.getByText('Role')).toBeInTheDocument()
     expect(detail.getByText('Act Type')).toBeInTheDocument()
     expect(detail.getByText('Summary')).toBeInTheDocument()
-    expect(detail.getByText('Evidence Anchors')).toBeInTheDocument()
-    expect(detail.getByText(/Lines 11-20/i)).toBeInTheDocument()
+    expect(detail.getAllByText('Evidence Anchors').length).toBeGreaterThan(0)
+    expect(detail.getAllByText(/Lines 11-20/i).length).toBeGreaterThan(0)
+  })
+
+  test('shows complete move detail sections including ids, slot values, and provenance', async () => {
+    const { container } = renderPaperDetail()
+
+    await waitFor(() => expect(screen.getByTestId('signal-graph-mock')).toBeInTheDocument())
+    fireEvent.click(screen.getByRole('button', { name: '1. Method' }))
+
+    const detail = within(container.querySelector('.paperTraceDetailCard') as HTMLElement)
+    expect(detail.getByText('Move ID')).toBeInTheDocument()
+    expect(detail.getByText(byTextContent('Move ID: move-1'), { selector: '.metaLine' })).toBeInTheDocument()
+    expect(detail.getByText('Audit State')).toBeInTheDocument()
+    expect(detail.getByText(byTextContent('Audit State: hot_path'), { selector: '.metaLine' })).toBeInTheDocument()
+    expect(detail.getByText('Research Objects')).toBeInTheDocument()
+    expect(detail.getByText(/granular stability/i, { selector: '.metaLine' })).toBeInTheDocument()
+    expect(detail.getByText('Methods')).toBeInTheDocument()
+    expect(detail.getByText(/finite element solver/i, { selector: '.metaLine' })).toBeInTheDocument()
+    expect(detail.getByText('Slot Provenance')).toBeInTheDocument()
+    expect(detail.getByText(/Method mention from the core proposal sentence/i)).toBeInTheDocument()
+  })
+
+  test('shows complete anchor detail sections including source and citation metadata', async () => {
+    const { container } = renderPaperDetail()
+
+    await waitFor(() => expect(screen.getByTestId('signal-graph-mock')).toBeInTheDocument())
+    fireEvent.click(screen.getByRole('button', { name: 'anchor-2' }))
+
+    const detail = within(container.querySelector('.paperTraceDetailCard') as HTMLElement)
+    expect(detail.getByText('Evidence Anchor')).toBeInTheDocument()
+    expect(detail.getByText('anchor-2')).toBeInTheDocument()
+    expect(detail.getByText('Source Ref')).toBeInTheDocument()
+    expect(detail.getByText(byTextContent('Source Ref: chunk-2'), { selector: '.metaLine' })).toBeInTheDocument()
+    expect(detail.getByText('Modality')).toBeInTheDocument()
+    expect(detail.getByText(byTextContent('Modality: text'), { selector: '.metaLine' })).toBeInTheDocument()
+    expect(detail.getByText('Citation IDs')).toBeInTheDocument()
+    expect(detail.getByText('cite-1')).toBeInTheDocument()
+  })
+
+  test('shows rich citation detail with source move, target paper, and supporting anchors', async () => {
+    const { container } = renderPaperDetail()
+
+    await waitFor(() => expect(screen.getByTestId('signal-graph-mock')).toBeInTheDocument())
+    fireEvent.click(screen.getByRole('button', { name: 'cite-1' }))
+
+    const detail = within(container.querySelector('.paperTraceDetailCard') as HTMLElement)
+    expect(detail.getByText('Citation Act')).toBeInTheDocument()
+    expect(detail.getByText('cite-1')).toBeInTheDocument()
+    expect(detail.getByText('Source Move')).toBeInTheDocument()
+    expect(detail.getByText(byTextContent('Source Move: 1. Method | move-1'), { selector: '.metaLine' })).toBeInTheDocument()
+    expect(detail.getByText('Target Paper')).toBeInTheDocument()
+    expect(detail.getByText(byTextContent('Target Paper: doi:10.1000/cited'), { selector: '.metaLine' })).toBeInTheDocument()
+    expect(detail.getByText('Purpose')).toBeInTheDocument()
+    expect(detail.getByText(byTextContent('Purpose: background'), { selector: '.metaLine' })).toBeInTheDocument()
+    expect(detail.getByText('Semantic Signal')).toBeInTheDocument()
+    expect(detail.getByText(/method_transfer_hint/i)).toBeInTheDocument()
+    expect(detail.getByText('Supporting Anchors')).toBeInTheDocument()
+    expect(detail.getByText(/anchor-1 \| Lines 11-20 \| Method \| chunk-1/i)).toBeInTheDocument()
   })
 
   test('shows localized quality, completeness, and readiness summary for the current trace', async () => {
@@ -296,7 +368,7 @@ describe('PaperDetailPage paper logic trace workbench', () => {
 
     expect(screen.getAllByText('1. Method').length).toBeGreaterThan(0)
     expect(screen.getAllByText('2. Result').length).toBeGreaterThan(0)
-    expect(screen.getByText('Propose a finite-element solver.')).toBeInTheDocument()
+    expect(screen.getAllByText('Propose a finite-element solver.').length).toBeGreaterThan(0)
 
     fireEvent.click(screen.getByRole('button', { name: 'Move Relations' }))
     expect(await screen.findByText('Yields')).toBeInTheDocument()

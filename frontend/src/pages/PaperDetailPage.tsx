@@ -1,11 +1,21 @@
-import { useEffect, useMemo, useState } from 'react'
+﻿import { useEffect, useMemo, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 
 import { apiGet } from '../api'
 import MarkdownView from '../components/MarkdownView'
 import SignalGraph, { type SignalGraphEdge, type SignalGraphNode } from '../components/SignalGraph'
 import { useI18n, type UILocale } from '../i18n'
-import type { CitationAct, EvidenceAnchor, L2CompletenessAudit, MoveRelation, PaperLogicTrace, ResearchMove } from '../types/paperLogicTrace'
+import type {
+  CitationAct,
+  EffectValue,
+  EvidenceAnchor,
+  L2CompletenessAudit,
+  MentionValue,
+  MoveRelation,
+  PaperLogicTrace,
+  ResearchMove,
+  SlotProvenance,
+} from '../types/paperLogicTrace'
 import { mentionTokens, normalizeText } from '../types/paperLogicTrace'
 
 type TraceTab = 'moves' | 'relations' | 'anchors' | 'citations' | 'original'
@@ -299,6 +309,136 @@ function formatBuiltAt(value: string | null | undefined, locale: UILocale) {
   })
 }
 
+function detailLabel(locale: UILocale, zh: string, en: string) {
+  return locale === 'zh-CN' ? zh : en
+}
+
+function cleanValues(values: Array<string | null | undefined>) {
+  return values.map((value) => normalizeText(value)).filter(Boolean)
+}
+
+function formatMentionDetails(mentions: MentionValue[] | null | undefined, locale: UILocale) {
+  return (mentions ?? [])
+    .map((mention) => {
+      const primary = normalizeText(mention.normalized || mention.surface)
+      const detailBits = cleanValues([
+        mention.surface && normalizeText(mention.surface) !== primary
+          ? `${detailLabel(locale, '原文', 'Surface')}: ${normalizeText(mention.surface)}`
+          : '',
+        mention.type ? `${detailLabel(locale, '类型', 'Type')}: ${normalizeText(mention.type)}` : '',
+        Number.isFinite(Number(mention.confidence)) ? `${detailLabel(locale, '置信度', 'Confidence')}: ${fmtPct(mention.confidence)}` : '',
+        mention.inferred ? detailLabel(locale, '推断项', 'Inferred') : '',
+        (mention.anchor_ids ?? []).length
+          ? `${detailLabel(locale, '锚点', 'Anchors')}: ${(mention.anchor_ids ?? []).join(', ')}`
+          : '',
+      ])
+      return cleanValues([primary, detailBits.join(' | ')]).join(' | ')
+    })
+    .filter(Boolean)
+}
+
+function formatEffectDetails(effects: EffectValue[] | null | undefined, locale: UILocale) {
+  return (effects ?? [])
+    .map((effect) =>
+      cleanValues([
+        `${detailLabel(locale, '方向', 'Direction')}: ${normalizeText(effect.direction) || '-'}`,
+        effect.comparator_surface ? `${detailLabel(locale, '比较对象', 'Comparator')}: ${normalizeText(effect.comparator_surface)}` : '',
+        effect.magnitude_text ? `${detailLabel(locale, '幅度文本', 'Magnitude')}: ${normalizeText(effect.magnitude_text)}` : '',
+        Number.isFinite(Number(effect.magnitude_numeric))
+          ? `${detailLabel(locale, '数值', 'Value')}: ${String(effect.magnitude_numeric)}${normalizeText(effect.unit) ? ` ${normalizeText(effect.unit)}` : ''}`
+          : '',
+        Number.isFinite(Number(effect.confidence)) ? `${detailLabel(locale, '置信度', 'Confidence')}: ${fmtPct(effect.confidence)}` : '',
+        (effect.anchor_ids ?? []).length
+          ? `${detailLabel(locale, '锚点', 'Anchors')}: ${(effect.anchor_ids ?? []).join(', ')}`
+          : '',
+      ]).join(' | '),
+    )
+    .filter(Boolean)
+}
+
+function formatSlotProvenanceDetails(items: SlotProvenance[] | null | undefined, locale: UILocale) {
+  return (items ?? [])
+    .map((item) =>
+      cleanValues([
+        `${detailLabel(locale, '字段', 'Field')}: ${normalizeText(item.field) || '-'}`,
+        Number.isFinite(Number(item.value_index)) ? `${detailLabel(locale, '值序号', 'Value Index')}: ${Number(item.value_index) + 1}` : '',
+        `${detailLabel(locale, '抽取方式', 'Extraction Mode')}: ${normalizeText(item.extraction_mode) || '-'}`,
+        `${detailLabel(locale, '支撑强度', 'Support Strength')}: ${normalizeText(item.support_strength) || '-'}`,
+        Number.isFinite(Number(item.confidence)) ? `${detailLabel(locale, '置信度', 'Confidence')}: ${fmtPct(item.confidence)}` : '',
+        (item.anchor_ids ?? []).length ? `${detailLabel(locale, '锚点', 'Anchors')}: ${(item.anchor_ids ?? []).join(', ')}` : '',
+        item.notes ? `${detailLabel(locale, '备注', 'Notes')}: ${normalizeText(item.notes)}` : '',
+      ]).join(' | '),
+    )
+    .filter(Boolean)
+}
+
+function formatAnchorReference(anchor: EvidenceAnchor, locale: UILocale) {
+  return cleanValues([
+    anchor.anchor_id,
+    locator(anchor, locale),
+    (anchor.section_path ?? []).map((part) => normalizeText(part)).filter(Boolean).join(' > '),
+    normalizeText(anchor.source_ref),
+  ]).join(' | ')
+}
+
+function formatMoveReference(move: ResearchMove | null | undefined, locale: UILocale) {
+  return move ? cleanValues([moveLabel(move, locale), normalizeText(move.move_id)]).join(' | ') : '-'
+}
+
+function formatMoveSummaryReference(move: ResearchMove | null | undefined, locale: UILocale) {
+  return move ? cleanValues([formatMoveReference(move, locale), normalizeText(move.summary)]).join(' | ') : '-'
+}
+
+function formatRoleDistributionDetails(value: Record<string, unknown> | null | undefined, locale: UILocale) {
+  return Object.entries(value ?? {})
+    .map(([role, count]) => `${labelMap(locale, 'role', role)}: ${normalizeText(count)}`)
+    .filter(Boolean)
+}
+
+function formatRelationReference(
+  relation: MoveRelation,
+  moveById: Map<string, ResearchMove>,
+  locale: UILocale,
+) {
+  const source = moveById.get(relation.source_move_id)
+  const target = moveById.get(relation.target_move_id)
+  return cleanValues([
+    relationTypeLabel(locale, relation.relation_type),
+    `${source ? moveLabel(source, locale) : normalizeText(relation.source_move_id)} -> ${target ? moveLabel(target, locale) : normalizeText(relation.target_move_id)}`,
+    Number.isFinite(Number(relation.confidence)) ? `${detailLabel(locale, '置信度', 'Confidence')}: ${fmtPct(relation.confidence)}` : '',
+    (relation.anchor_ids ?? []).length ? `${detailLabel(locale, '锚点', 'Anchors')}: ${(relation.anchor_ids ?? []).join(', ')}` : '',
+  ]).join(' | ')
+}
+
+function formatCitationReference(
+  citation: CitationAct,
+  moveById: Map<string, ResearchMove>,
+  locale: UILocale,
+) {
+  const sourceMove = citation.source_move_id ? moveById.get(citation.source_move_id) : null
+  return cleanValues([
+    normalizeText(citation.citation_act_id),
+    sourceMove ? `${detailLabel(locale, '来源动作', 'Source Move')}: ${moveLabel(sourceMove, locale)}` : '',
+    citation.target_paper_id ? `${detailLabel(locale, '目标论文', 'Target Paper')}: ${normalizeText(citation.target_paper_id)}` : '',
+    citation.purpose ? `${detailLabel(locale, '目的', 'Purpose')}: ${normalizeText(citation.purpose)}` : '',
+    citation.semantic_signal ? `${detailLabel(locale, '语义信号', 'Semantic Signal')}: ${normalizeText(citation.semantic_signal)}` : '',
+    citation.target_scope ? `${detailLabel(locale, '范围', 'Scope')}: ${normalizeText(citation.target_scope)}` : '',
+    citation.polarity ? `${detailLabel(locale, '极性', 'Polarity')}: ${normalizeText(citation.polarity)}` : '',
+    Number.isFinite(Number(citation.confidence)) ? `${detailLabel(locale, '置信度', 'Confidence')}: ${fmtPct(citation.confidence)}` : '',
+    (citation.anchor_ids ?? []).length ? `${detailLabel(locale, '锚点', 'Anchors')}: ${(citation.anchor_ids ?? []).join(', ')}` : '',
+  ]).join(' | ')
+}
+
+function formatRecordDetails(value: Record<string, unknown> | null | undefined) {
+  return Object.entries(value ?? {})
+    .map(([key, item]) => `${normalizeText(key)}: ${normalizeText(item)}`)
+    .filter(Boolean)
+}
+
+function sectionHasContent(section: GraphMetaSection) {
+  return Boolean(normalizeText(section.value)) || Boolean(section.values?.length) || Boolean(section.chips?.length)
+}
+
 function graphData(trace: PaperLogicTrace, locale: UILocale) {
   const nodes = new Map<string, SignalGraphNode>()
   const edges = new Map<string, SignalGraphEdge>()
@@ -309,7 +449,24 @@ function graphData(trace: PaperLogicTrace, locale: UILocale) {
   const quoteLabel = locale === 'zh-CN' ? '证据摘录' : 'Quoted Evidence'
   const sourceSpansLabel = locale === 'zh-CN' ? '来源位置' : 'Source Spans'
   const rootId = 'paper:root'
+  const derivedViews = (trace.derived_views ?? {}) as Record<string, unknown>
+  const paperSummaries = (derivedViews.paper_summaries ?? {}) as Record<string, unknown>
+  const paperSummary = normalizeText(paperSummaries.one_paragraph_summary)
+  const keyMethodSummary = normalizeText(paperSummaries.key_method_summary)
+  const roleDistribution = formatRoleDistributionDetails(
+    (paperSummaries.move_role_distribution as Record<string, unknown> | undefined) ?? undefined,
+    locale,
+  )
+  const moveById = new Map(trace.canonical_core.moves.map((move) => [move.move_id, move]))
   const anchors = new Map(trace.canonical_core.evidence_anchors.map((anchor) => [anchor.anchor_id, anchor]))
+  const anchorToMoves = new Map<string, ResearchMove[]>()
+  for (const move of trace.canonical_core.moves) {
+    for (const anchorId of move.anchor_ids ?? []) {
+      const linkedMoves = anchorToMoves.get(anchorId) ?? []
+      linkedMoves.push(move)
+      anchorToMoves.set(anchorId, linkedMoves)
+    }
+  }
 
   const put = (node: SignalGraphNode, value: GraphMeta) => {
     nodes.set(node.id, node)
@@ -321,8 +478,40 @@ function graphData(trace: PaperLogicTrace, locale: UILocale) {
       {
         title: normalizeText(trace.paper_metadata.title) || trace.paper_metadata.paper_id,
         typeLabel: locale === 'zh-CN' ? '论文轨迹' : 'Paper Trace',
-        detail: [normalizeText(trace.paper_metadata.paper_id), normalizeText(trace.paper_metadata.canonical_doi), normalizeText(trace.paper_metadata.venue)].filter(Boolean).join(' | '),
+        detail: paperSummary || [normalizeText(trace.paper_metadata.paper_id), normalizeText(trace.paper_metadata.canonical_doi), normalizeText(trace.paper_metadata.venue)].filter(Boolean).join(' | '),
         badge: qualityTierLabel(locale, trace.quality?.quality_tier),
+        facts: [
+          { label: 'Paper ID', value: normalizeText(trace.paper_metadata.paper_id) || '-' },
+          { label: 'DOI', value: normalizeText(trace.paper_metadata.canonical_doi) || '-' },
+          { label: 'Paper Type', value: labelMap(locale, 'paperType', trace.paper_metadata.paper_type) },
+          { label: 'Year', value: trace.paper_metadata.year != null ? String(trace.paper_metadata.year) : '-' },
+          { label: 'Venue', value: normalizeText(trace.paper_metadata.venue) || '-' },
+          { label: 'Trace ID', value: normalizeText(trace.trace_id) || '-' },
+          { label: 'Trace Version', value: normalizeText(trace.schema_version) || '-' },
+          { label: 'Built At', value: formatBuiltAt(trace.built_at, locale) },
+          { label: 'Audit Status', value: auditStatusLabel(locale, trace.quality?.audit_status) },
+          { label: 'Completeness', value: fmtPct(trace.quality?.l2_completeness_audit?.completeness_score) },
+          { label: 'Move Count', value: String(trace.canonical_core.moves.length) },
+          { label: 'Anchor Count', value: String(trace.canonical_core.evidence_anchors.length) },
+          { label: 'Relation Count', value: String(trace.canonical_core.move_relations.length) },
+          { label: 'Citation Count', value: String(trace.canonical_core.citation_acts.length) },
+          { label: 'Ready for Community', value: fmtReady(trace.quality?.l2_completeness_audit?.ready_for_community, locale) },
+          { label: 'Ready for L3', value: fmtReady(trace.quality?.l2_completeness_audit?.ready_for_l3, locale) },
+          { label: 'Ready for L4', value: fmtReady(trace.quality?.l2_completeness_audit?.ready_for_l4, locale) },
+        ],
+        sections: [
+          { label: 'Paper Summary', value: paperSummary },
+          { label: 'Key Method Summary', value: keyMethodSummary },
+          { label: 'Role Distribution', values: roleDistribution },
+          { label: 'Authors', values: (trace.paper_metadata.authors ?? []).map((author) => normalizeText(author)).filter(Boolean) },
+          { label: 'Source Refs', values: (trace.paper_metadata.source_refs ?? []).map((sourceRef) => normalizeText(sourceRef)).filter(Boolean) },
+          {
+            label: 'Missing Roles',
+            values: (trace.quality?.l2_completeness_audit?.missing_expected_roles ?? []).map((role) => labelMap(locale, 'role', role)),
+          },
+          { label: 'Sparse Slots', values: (trace.quality?.l2_completeness_audit?.sparse_expected_slot_fields ?? []).map((field) => normalizeText(field)).filter(Boolean) },
+          { label: 'Quality Flags', values: (trace.quality?.quality_flags ?? []).map((flag) => normalizeText(flag)).filter(Boolean) },
+        ],
       },
     )
 
@@ -352,14 +541,80 @@ function graphData(trace: PaperLogicTrace, locale: UILocale) {
         detail: normalizeText(move.summary),
         badge: labelMap(locale, 'act', move.act_type),
         facts: [
+          { label: 'Move ID', value: normalizeText(move.move_id) || '-' },
+          { label: 'Sequence', value: String(move.sequence_no) },
           { label: locale === 'zh-CN' ? '角色' : 'Role', value: labelMap(locale, 'role', move.role) },
           { label: locale === 'zh-CN' ? '动作类型' : 'Act Type', value: labelMap(locale, 'act', move.act_type) },
           { label: locale === 'zh-CN' ? '置信度' : 'Confidence', value: fmtPct(move.confidence) },
           { label: evidenceAnchorsLabel, value: String((move.anchor_ids ?? []).length) },
+          { label: 'Audit State', value: normalizeText(move.audit_state) || '-' },
         ],
         sections: [
           { label: summaryLabel, value: normalizeText(move.summary) },
+          ...(formatMentionDetails(move.research_objects, locale).length
+            ? [{ label: 'Research Objects', values: formatMentionDetails(move.research_objects, locale) }]
+            : []),
+          ...(formatMentionDetails(move.methods, locale).length
+            ? [{ label: 'Methods', values: formatMentionDetails(move.methods, locale) }]
+            : []),
+          ...(formatMentionDetails(move.observed_variables, locale).length
+            ? [{ label: 'Observed Variables', values: formatMentionDetails(move.observed_variables, locale) }]
+            : []),
+          ...(formatMentionDetails(move.metrics, locale).length
+            ? [{ label: 'Metrics', values: formatMentionDetails(move.metrics, locale) }]
+            : []),
+          ...(formatMentionDetails(move.comparators, locale).length
+            ? [{ label: 'Comparators', values: formatMentionDetails(move.comparators, locale) }]
+            : []),
+          ...(formatMentionDetails(move.conditions, locale).length
+            ? [{ label: 'Conditions', values: formatMentionDetails(move.conditions, locale) }]
+            : []),
+          ...(formatEffectDetails(move.effects, locale).length
+            ? [{ label: 'Effects', values: formatEffectDetails(move.effects, locale) }]
+            : []),
+          ...(formatMentionDetails(move.limitation_types, locale).length
+            ? [{ label: 'Limitation Types', values: formatMentionDetails(move.limitation_types, locale) }]
+            : []),
+          ...(formatMentionDetails(move.resource_mentions, locale).length
+            ? [{ label: 'Resource Mentions', values: formatMentionDetails(move.resource_mentions, locale) }]
+            : []),
           ...(anchorPreview.length ? [{ label: sourceSpansLabel, values: anchorPreview }] : []),
+          ...((move.anchor_ids ?? []).length
+            ? [{
+                label: evidenceAnchorsLabel,
+                values: (move.anchor_ids ?? [])
+                  .map((anchorId) => anchors.get(anchorId))
+                  .filter((anchor): anchor is EvidenceAnchor => Boolean(anchor))
+                  .map((anchor) => formatAnchorReference(anchor, locale)),
+              }]
+            : []),
+          ...(trace.canonical_core.move_relations.some((relation) => relation.source_move_id === move.move_id)
+            ? [{
+                label: 'Outgoing Relations',
+                values: trace.canonical_core.move_relations
+                  .filter((relation) => relation.source_move_id === move.move_id)
+                  .map((relation) => formatRelationReference(relation, moveById, locale)),
+              }]
+            : []),
+          ...(trace.canonical_core.move_relations.some((relation) => relation.target_move_id === move.move_id)
+            ? [{
+                label: 'Incoming Relations',
+                values: trace.canonical_core.move_relations
+                  .filter((relation) => relation.target_move_id === move.move_id)
+                  .map((relation) => formatRelationReference(relation, moveById, locale)),
+              }]
+            : []),
+          ...(trace.canonical_core.citation_acts.some((citation) => normalizeText(citation.source_move_id) === move.move_id)
+            ? [{
+                label: 'Citation Acts',
+                values: trace.canonical_core.citation_acts
+                  .filter((citation) => normalizeText(citation.source_move_id) === move.move_id)
+                  .map((citation) => formatCitationReference(citation, moveById, locale)),
+              }]
+            : []),
+          ...(formatSlotProvenanceDetails(move.slot_provenance, locale).length
+            ? [{ label: 'Slot Provenance', values: formatSlotProvenanceDetails(move.slot_provenance, locale) }]
+            : []),
           ...(moveTags.length ? [{ label: signalTagsLabel, chips: moveTags }] : []),
         ],
       },
@@ -380,13 +635,33 @@ function graphData(trace: PaperLogicTrace, locale: UILocale) {
             detail: normalizeText(anchor.quote),
             badge: locator(anchor, locale),
             facts: [
+              { label: 'Anchor ID', value: normalizeText(anchor.anchor_id) || '-' },
+              { label: 'Paper ID', value: normalizeText(anchor.paper_id) || '-' },
+              { label: 'Source Ref', value: normalizeText(anchor.source_ref) || '-' },
+              { label: 'Modality', value: normalizeText(anchor.modality) || '-' },
               { label: locale === 'zh-CN' ? '支持类型' : 'Support Type', value: normalizeText(anchor.support_type) || '-' },
               {
                 label: locale === 'zh-CN' ? '章节' : 'Section',
                 value: (anchor.section_path ?? []).map((part) => normalizeText(part)).filter(Boolean).join(' > ') || '-',
               },
+              { label: 'Weak Evidence', value: anchor.weak ? 'yes' : 'no' },
             ],
-            sections: [{ label: quoteLabel, value: normalizeText(anchor.quote) }],
+            sections: [
+              { label: quoteLabel, value: normalizeText(anchor.quote) },
+              { label: 'Locator Details', values: formatRecordDetails(anchor.locator as Record<string, unknown> | undefined) },
+              {
+                label: 'Linked Moves',
+                values: (anchorToMoves.get(anchor.anchor_id) ?? []).map((linkedMove) => `${moveLabel(linkedMove, locale)} | ${normalizeText(linkedMove.move_id)}`),
+              },
+              { label: 'Citation IDs', values: (anchor.citation_ids ?? []).map((citationId) => normalizeText(citationId)).filter(Boolean) },
+              { label: 'Source Span', values: [formatAnchorReference(anchor, locale)] },
+              {
+                label: 'Linked Citation Acts',
+                values: trace.canonical_core.citation_acts
+                  .filter((citation) => (citation.anchor_ids ?? []).includes(anchor.anchor_id))
+                  .map((citation) => formatCitationReference(citation, moveById, locale)),
+              },
+            ],
           },
         )
       }
@@ -417,14 +692,33 @@ function graphData(trace: PaperLogicTrace, locale: UILocale) {
     const moveId = citation.source_move_id ? `move:${citation.source_move_id}` : ''
     if (!moveId || !nodes.has(moveId)) continue
     const citationId = `citation:${citation.citation_act_id}`
+    const sourceMove = citation.source_move_id ? moveById.get(citation.source_move_id) : null
+    const citationAnchors = (citation.anchor_ids ?? [])
+      .map((anchorId) => anchors.get(anchorId))
+      .filter((anchor): anchor is EvidenceAnchor => Boolean(anchor))
     put(
       { id: citationId, label: citation.citation_act_id, kind: 'citation', weight: 0.42 },
       {
         title: citation.citation_act_id,
         typeLabel: locale === 'zh-CN' ? '引用行为' : 'Citation Act',
-        detail: [normalizeText(citation.target_paper_id), normalizeText(citation.purpose), normalizeText(citation.semantic_signal)].filter(Boolean).join(' | '),
         badge: normalizeText(citation.target_scope),
-        facts: [{ label: locale === 'zh-CN' ? '置信度' : 'Confidence', value: fmtPct(citation.confidence) }],
+        facts: [
+          { label: 'Citation Act ID', value: normalizeText(citation.citation_act_id) || '-' },
+          { label: 'Source Move', value: formatMoveReference(sourceMove, locale) },
+          { label: 'Target Paper', value: normalizeText(citation.target_paper_id) || '-' },
+          { label: 'Purpose', value: normalizeText(citation.purpose) || '-' },
+          { label: 'Semantic Signal', value: normalizeText(citation.semantic_signal) || '-' },
+          { label: 'Polarity', value: normalizeText(citation.polarity) || '-' },
+          { label: 'Target Scope', value: normalizeText(citation.target_scope) || '-' },
+          { label: 'Confidence', value: fmtPct(citation.confidence) },
+          { label: 'Anchor Count', value: String(citationAnchors.length) },
+        ],
+        sections: [
+          { label: 'Source Move Summary', value: formatMoveSummaryReference(sourceMove, locale) },
+          { label: 'Anchor IDs', values: (citation.anchor_ids ?? []).map((anchorId) => normalizeText(anchorId)).filter(Boolean) },
+          { label: 'Supporting Anchors', values: citationAnchors.map((anchor) => formatAnchorReference(anchor, locale)) },
+          { label: 'Supporting Quotes', values: citationAnchors.map((anchor) => normalizeText(anchor.quote)).filter(Boolean) },
+        ],
       },
     )
     edges.set(`${moveId}->${citationId}`, {
@@ -509,6 +803,7 @@ export default function PaperDetailPage() {
     [locale, trace],
   )
   const selectedMeta = graph.meta.get(selectedNodeId) ?? graph.meta.get('paper:root') ?? null
+  const selectedSections = (selectedMeta?.sections ?? []).filter(sectionHasContent)
   const graphHeight = useMemo(() => {
     if (!trace) return 420
     const moveCount = trace.canonical_core.moves.length
@@ -674,7 +969,7 @@ export default function PaperDetailPage() {
                           ))}
                         </div>
                       ) : null}
-                      {selectedMeta.sections?.map((section) => (
+                      {selectedSections.map((section) => (
                         <div key={`${selectedMeta.title}:${section.label}`} className="itemCard">
                           <div className="itemTitle">{section.label}</div>
                           {section.value ? <div className="itemBody">{section.value}</div> : null}
@@ -698,7 +993,7 @@ export default function PaperDetailPage() {
                           ) : null}
                         </div>
                       ))}
-                      {selectedMeta.detail && !selectedMeta.sections?.some((section) => section.value === selectedMeta.detail) ? (
+                      {selectedMeta.detail && !selectedSections.some((section) => section.value === selectedMeta.detail) ? (
                         <div className="itemCard">
                           <div className="itemTitle">{copy.summaryLabel}</div>
                           <div className="itemBody">{selectedMeta.detail}</div>
