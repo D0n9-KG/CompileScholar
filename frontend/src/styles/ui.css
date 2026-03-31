@@ -3088,6 +3088,112 @@
   max-width: 1840px;
 }
 
+.paperTracePage {
+  display: grid;
+  gap: 14px;
+  max-width: 1720px;
+}
+
+.paperTraceHeader {
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.paperTraceHeaderMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.paperTraceTabRow {
+  margin-bottom: 0;
+  border: 1px solid rgba(146, 168, 217, 0.2);
+  border-radius: 14px;
+  background: rgba(146, 168, 217, 0.07);
+  padding: 8px 10px;
+  gap: 8px;
+  overflow-x: auto;
+}
+
+.paperTraceTabRow .chip {
+  white-space: nowrap;
+}
+
+.paperTraceWorkbench > .panelBody {
+  display: grid;
+  gap: 14px;
+}
+
+.paperTraceWorkbenchGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.68fr) minmax(320px, 0.78fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.paperTraceGraphPane {
+  min-width: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.paperTraceGraphMeta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.paperTraceGraphStats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.paperTraceGraphStat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(146, 168, 217, 0.24);
+  background: rgba(146, 168, 217, 0.1);
+  color: rgba(228, 239, 255, 0.9);
+  font-size: 11.5px;
+}
+
+.paperTraceGraphHint {
+  max-width: 520px;
+  color: rgba(184, 207, 238, 0.78);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.paperTraceGraphPane .signalGraphCanvas {
+  width: 100%;
+}
+
+.paperTraceDetailCard {
+  position: sticky;
+  top: 14px;
+  align-self: start;
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+  border: 1px solid rgba(146, 168, 217, 0.24);
+  border-radius: 16px;
+  background:
+    linear-gradient(170deg, rgba(15, 27, 50, 0.86), rgba(9, 16, 31, 0.9)),
+    radial-gradient(circle at 100% 0, rgba(118, 224, 255, 0.14), transparent 42%);
+  padding: 16px;
+}
+
+.paperTraceDetailCard .list {
+  gap: 10px;
+}
+
 .pdWorkspace {
   --pd-panel-offset: 214px;
   --pd-panel-max-h: calc(100vh - var(--pd-panel-offset));
@@ -4577,6 +4683,15 @@
 
   .askContextWorkbench {
     grid-template-columns: 250px minmax(0, 1fr) 290px;
+  }
+
+  .paperTraceWorkbenchGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .paperTraceDetailCard {
+    position: static;
+    max-height: none;
   }
 
 }

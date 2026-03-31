@@ -455,7 +455,7 @@ export default function PaperDetailPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [traceState, setTraceState] = useState<TraceState>({ paperId: '', trace: null, error: '' })
   const [contentState, setContentState] = useState<ContentState>({ paperId: '', content: '', loaded: false })
-  const [selectedNodeId, setSelectedNodeId] = useState('paper:root')
+  const [selectedNodeId, setSelectedNodeId] = useState('')
 
   const tab = useMemo<TraceTab>(() => {
     const raw = normalizeText(searchParams.get('tab'))
@@ -469,7 +469,7 @@ export default function PaperDetailPage() {
       .then((trace) => {
         if (cancelled) return
         setTraceState({ paperId, trace, error: '' })
-        setSelectedNodeId('paper:root')
+        setSelectedNodeId('')
       })
       .catch((cause: unknown) => {
         if (cancelled) return
@@ -508,7 +508,13 @@ export default function PaperDetailPage() {
     () => (trace ? graphData(trace, locale) : { nodes: [] as SignalGraphNode[], edges: [] as SignalGraphEdge[], meta: new Map<string, GraphMeta>() }),
     [locale, trace],
   )
-  const selectedMeta = graph.meta.get(selectedNodeId) ?? null
+  const selectedMeta = graph.meta.get(selectedNodeId) ?? graph.meta.get('paper:root') ?? null
+  const graphHeight = useMemo(() => {
+    if (!trace) return 420
+    const moveCount = trace.canonical_core.moves.length
+    const anchorCount = trace.canonical_core.evidence_anchors.length
+    return Math.min(720, Math.max(540, 330 + moveCount * 12 + Math.min(anchorCount, 28) * 2))
+  }, [trace])
 
   const setTab = (nextTab: TraceTab) => {
     const next = new URLSearchParams(searchParams)
@@ -622,12 +628,30 @@ export default function PaperDetailPage() {
             <div className="panelBody">
               <div className="paperTraceWorkbenchGrid">
                 <div className="paperTraceGraphPane">
+                  <div className="paperTraceGraphMeta">
+                    <div className="paperTraceGraphStats">
+                      <span className="paperTraceGraphStat">
+                        {trace.canonical_core.moves.length} {locale === 'zh-CN' ? '动作' : 'Moves'}
+                      </span>
+                      <span className="paperTraceGraphStat">
+                        {trace.canonical_core.evidence_anchors.length} {locale === 'zh-CN' ? '锚点' : 'Anchors'}
+                      </span>
+                      <span className="paperTraceGraphStat">
+                        {trace.canonical_core.move_relations.length} {locale === 'zh-CN' ? '关系' : 'Relations'}
+                      </span>
+                    </div>
+                    <div className="paperTraceGraphHint">
+                      {locale === 'zh-CN'
+                        ? '编号节点表示研究动作，外围小节点表示对应证据锚点。'
+                        : 'Numbered nodes are research moves, and the outer dots are supporting evidence anchors.'}
+                    </div>
+                  </div>
                   <SignalGraph
                     nodes={graph.nodes}
                     edges={graph.edges}
-                    selectedId={selectedNodeId}
-                    onSelect={(id) => setSelectedNodeId(id || 'paper:root')}
-                    height={420}
+                    selectedId={selectedNodeId || undefined}
+                    onSelect={(id) => setSelectedNodeId(id)}
+                    height={graphHeight}
                   />
                 </div>
                 <aside className="paperTraceDetailCard">

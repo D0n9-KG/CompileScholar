@@ -60,11 +60,12 @@ const PAPER_FLOW_ANCHOR_RADIUS = 15
 const PAPER_FLOW_FIRST_RING_RADIUS = 58
 const PAPER_FLOW_RING_STEP = 46
 const PAPER_FLOW_CLUSTER_PADDING = 26
-const PAPER_FLOW_CLUSTER_GAP = 108
-const PAPER_FLOW_ROW_GAP = 122
-const PAPER_FLOW_SIDE_PADDING = 92
-const PAPER_FLOW_TOP_PADDING = 126
-const PAPER_FLOW_BOTTOM_PADDING = 94
+const PAPER_FLOW_CLUSTER_GAP = 82
+const PAPER_FLOW_ROW_GAP = 86
+const PAPER_FLOW_SIDE_PADDING = 80
+const PAPER_FLOW_TOP_PADDING = 98
+const PAPER_FLOW_BOTTOM_PADDING = 82
+const PAPER_FLOW_MAX_COLUMNS = 8
 
 function anchorRingCapacity(radius: number): number {
   return Math.max(5, Math.floor((2 * Math.PI * radius) / (PAPER_FLOW_ANCHOR_RADIUS * 2 + 12)))
@@ -83,6 +84,84 @@ function computeClusterRadius(anchorCount: number): number {
   return ringRadius + PAPER_FLOW_ANCHOR_RADIUS + PAPER_FLOW_CLUSTER_PADDING
 }
 
+function chunkRadii(radii: number[], columns: number): number[][] {
+  const rows: number[][] = []
+  for (let index = 0; index < radii.length; index += columns) {
+    rows.push(radii.slice(index, index + columns))
+  }
+  return rows
+}
+
+function buildClusterFrame(
+  rows: number[][],
+  rootY: number,
+  viewportHeight: number,
+): {
+  naturalWidth: number
+  height: number
+  contentBottomY: number
+  rowWidths: number[]
+  rowRadii: number[]
+} {
+  const rowWidths = rows.map(
+    (row) =>
+      row.reduce((sum, radius) => sum + radius * 2, 0) +
+      PAPER_FLOW_CLUSTER_GAP * Math.max(0, row.length - 1),
+  )
+  const rowRadii = rows.map((row) => row.reduce((max, radius) => Math.max(max, radius), 0))
+  const widestRow = rowWidths.reduce((max, value) => Math.max(max, value), 0)
+  let yCursor = rootY + PAPER_FLOW_ROOT_RADIUS + PAPER_FLOW_TOP_PADDING
+  for (const rowRadius of rowRadii) {
+    yCursor += rowRadius * 2 + PAPER_FLOW_ROW_GAP
+  }
+  const contentBottomY = yCursor - PAPER_FLOW_ROW_GAP
+  const naturalWidth = Math.ceil(widestRow + PAPER_FLOW_SIDE_PADDING * 2)
+  const height = Math.max(
+    780,
+    Math.floor(viewportHeight),
+    Math.ceil(contentBottomY + PAPER_FLOW_BOTTOM_PADDING),
+  )
+  return { naturalWidth, height, contentBottomY, rowWidths, rowRadii }
+}
+
+function choosePaperFlowColumns(
+  radii: number[],
+  viewportWidth: number,
+  viewportHeight: number,
+): number {
+  if (radii.length <= 1) return Math.max(1, radii.length)
+  const maxColumns = Math.min(
+    radii.length,
+    viewportWidth >= 1560 ? PAPER_FLOW_MAX_COLUMNS
+      : viewportWidth >= 1320 ? 7
+      : viewportWidth >= 1140 ? 6
+      : viewportWidth >= 920 ? 5
+      : viewportWidth >= 720 ? 4
+      : 3,
+  )
+  const minColumns = radii.length <= 2 ? radii.length : 2
+  const targetRatio = Math.max(1, viewportWidth) / Math.max(1, viewportHeight)
+  let bestColumns = minColumns
+  let bestScore = Number.POSITIVE_INFINITY
+
+  for (let columns = minColumns; columns <= maxColumns; columns += 1) {
+    const rows = chunkRadii(radii, columns)
+    const frame = buildClusterFrame(rows, 108, viewportHeight)
+    const frameRatio = frame.naturalWidth / Math.max(1, frame.height)
+    const ratioPenalty = Math.abs(Math.log(Math.max(frameRatio, 0.01) / Math.max(targetRatio, 0.01)))
+    const rowPenalty = rows.length * 0.018
+    const lastRow = rows[rows.length - 1]
+    const raggedPenalty = lastRow?.length === 1 && columns > 3 ? 0.05 : 0
+    const score = ratioPenalty + rowPenalty + raggedPenalty
+    if (score < bestScore) {
+      bestScore = score
+      bestColumns = columns
+    }
+  }
+
+  return bestColumns
+}
+
 function buildClusterSlots(
   radii: number[],
   viewportWidth: number,
@@ -97,31 +176,26 @@ function buildClusterSlots(
   const rootY = 108
   if (radii.length <= 0) {
     return {
-      width: Math.max(1280, Math.floor(viewportWidth)),
-      height: Math.max(940, Math.floor(viewportHeight)),
+      width: Math.max(920, Math.floor(viewportWidth)),
+      height: Math.max(780, Math.floor(viewportHeight)),
       rootY,
       contentBottomY: rootY + PAPER_FLOW_ROOT_RADIUS,
       slots: [],
     }
   }
 
-  const columns = radii.length <= 2 ? radii.length : 2
-  const rows: number[][] = []
-  for (let index = 0; index < radii.length; index += columns) {
-    rows.push(radii.slice(index, index + columns))
-  }
-
-  const rowWidths = rows.map((row) => row.reduce((sum, radius) => sum + radius * 2, 0) + PAPER_FLOW_CLUSTER_GAP * Math.max(0, row.length - 1))
-  const widestRow = rowWidths.reduce((max, value) => Math.max(max, value), 0)
-  const width = Math.max(1280, Math.floor(viewportWidth), Math.ceil(widestRow + PAPER_FLOW_SIDE_PADDING * 2))
+  const columns = choosePaperFlowColumns(radii, viewportWidth, viewportHeight)
+  const rows = chunkRadii(radii, columns)
+  const frame = buildClusterFrame(rows, rootY, viewportHeight)
+  const width = Math.max(frame.naturalWidth, Math.floor(viewportWidth * 0.72))
 
   const slots: Array<{ x: number; y: number }> = []
   let yCursor = rootY + PAPER_FLOW_ROOT_RADIUS + PAPER_FLOW_TOP_PADDING
 
   for (let rowIndex = 0; rowIndex < rows.length; rowIndex += 1) {
     const row = rows[rowIndex]
-    const rowRadius = row.reduce((max, radius) => Math.max(max, radius), 0)
-    const rowWidth = rowWidths[rowIndex]
+    const rowRadius = frame.rowRadii[rowIndex]
+    const rowWidth = frame.rowWidths[rowIndex]
     const startX = (width - rowWidth) / 2
     let xCursor = startX
     const centerY = yCursor + rowRadius
@@ -138,11 +212,7 @@ function buildClusterSlots(
   }
 
   const contentBottomY = yCursor - PAPER_FLOW_ROW_GAP
-  const height = Math.max(
-    940,
-    Math.floor(viewportHeight),
-    Math.ceil(contentBottomY + PAPER_FLOW_BOTTOM_PADDING),
-  )
+  const height = Math.max(frame.height, Math.ceil(contentBottomY + PAPER_FLOW_BOTTOM_PADDING))
 
   return { width, height, rootY, contentBottomY, slots }
 }
@@ -157,6 +227,17 @@ function isMoveKind(kind: string | undefined): boolean {
 
 function isAnchorKind(kind: string | undefined): boolean {
   return kind === 'anchor'
+}
+
+function paperFlowLabel(node: SignalGraphNode): string {
+  if (node.kind === 'move') {
+    const labelIndex = String(node.label ?? '').match(/^\s*(\d+)/)?.[1]
+    if (labelIndex) return labelIndex
+    const idIndex = parseTrailingIndex(String(node.id ?? ''))
+    return Number.isFinite(idIndex) && idIndex !== Number.MAX_SAFE_INTEGER ? String(idIndex) : ''
+  }
+  if (node.kind === 'citation') return 'C'
+  return ''
 }
 
 export function buildPaperFlowPositions(
@@ -332,6 +413,7 @@ export default function SignalGraph({
           data: {
             id: node.id,
             label: node.label,
+            flowLabel: paperFlowLabel(node),
             kind: node.kind ?? 'entity',
             weight: clamp01(node.weight),
           },
@@ -377,7 +459,7 @@ export default function SignalGraph({
       ? {
           name: 'preset' as const,
           fit: true,
-          padding: 38,
+          padding: 52,
           animate: true,
           animationDuration: 260,
           positions: (node: cytoscape.NodeSingular) => {
@@ -404,9 +486,9 @@ export default function SignalGraph({
         {
           selector: 'node',
           style: {
-            label: hasPaperFlow ? '' : 'data(label)',
+            label: hasPaperFlow ? 'data(flowLabel)' : 'data(label)',
             color: 'rgba(233, 243, 255, 0.94)',
-            'font-size': '8.5px',
+            'font-size': hasPaperFlow ? '9.5px' : '8.5px',
             'text-wrap': 'wrap',
             'text-max-width': '92px',
             'text-background-color': isExecutive ? 'rgba(10, 18, 34, 0.82)' : 'rgba(8, 16, 31, 0.78)',
@@ -445,10 +527,10 @@ export default function SignalGraph({
           selector: 'node[kind = "root"]',
           style: {
             shape: 'ellipse',
-            width: hasPaperFlow ? 84 : 150,
-            height: hasPaperFlow ? 84 : 150,
+            width: hasPaperFlow ? 90 : 150,
+            height: hasPaperFlow ? 90 : 150,
             'font-size': hasPaperFlow ? '0px' : '10px',
-            'font-weight': 760,
+            'font-weight': 700,
             'background-color': isExecutive ? 'rgba(60, 111, 197, 0.94)' : 'rgba(64, 108, 196, 0.94)',
             color: 'rgba(243, 248, 255, 0.98)',
             'text-background-opacity': hasPaperFlow ? 0 : 0.18,
@@ -500,13 +582,13 @@ export default function SignalGraph({
           selector: 'node[kind = "citation"]',
           style: {
             shape: 'roundrectangle',
-            width: hasPaperFlow ? 'mapData(weight, 0, 1, 82, 104)' : 'mapData(weight, 0, 1, 118, 176)',
+            width: hasPaperFlow ? 'mapData(weight, 0, 1, 70, 90)' : 'mapData(weight, 0, 1, 118, 176)',
             height: hasPaperFlow ? 24 : 44,
             'background-color': isExecutive ? 'rgba(218, 164, 108, 0.9)' : 'rgba(245, 190, 127, 0.9)',
             color: 'rgba(33, 24, 12, 0.95)',
             'text-background-opacity': 0.2,
-            'text-max-width': hasPaperFlow ? '78px' : '156px',
-            'font-size': hasPaperFlow ? '7px' : '10px',
+            'text-max-width': hasPaperFlow ? '48px' : '156px',
+            'font-size': hasPaperFlow ? '8px' : '10px',
             'border-color': hasPaperFlow ? 'rgba(250, 220, 170, 0.92)' : 'rgba(216, 232, 255, 0.88)',
             'border-width': hasPaperFlow ? 1.4 : 1.7,
           },
@@ -515,14 +597,17 @@ export default function SignalGraph({
           selector: 'node[kind = "move"]',
           style: {
             shape: 'ellipse',
-            width: hasPaperFlow ? 'mapData(weight, 0, 1, 34, 40)' : 'mapData(weight, 0, 1, 98, 118)',
-            height: hasPaperFlow ? 'mapData(weight, 0, 1, 34, 40)' : 'mapData(weight, 0, 1, 98, 118)',
-            'font-size': hasPaperFlow ? '0px' : '8.5px',
-            'font-weight': 720,
+            width: hasPaperFlow ? 'mapData(weight, 0, 1, 44, 54)' : 'mapData(weight, 0, 1, 98, 118)',
+            height: hasPaperFlow ? 'mapData(weight, 0, 1, 44, 54)' : 'mapData(weight, 0, 1, 98, 118)',
+            'font-size': hasPaperFlow ? '12px' : '8.5px',
+            'min-zoomed-font-size': 7,
+            'font-weight': 700,
             'text-max-width': '82px',
             'background-color': isExecutive ? 'rgba(77, 210, 220, 0.92)' : 'rgba(85, 214, 223, 0.94)',
-            color: 'rgba(8, 16, 26, 0.95)',
-            'text-background-opacity': hasPaperFlow ? 0 : 0.14,
+            color: 'rgba(244, 251, 255, 0.98)',
+            'text-outline-width': hasPaperFlow ? 1.5 : 0,
+            'text-outline-color': hasPaperFlow ? 'rgba(8, 16, 26, 0.5)' : 'transparent',
+            'text-background-opacity': hasPaperFlow ? 0.18 : 0.14,
             'border-color': 'rgba(182, 247, 255, 0.9)',
             'border-width': 2,
             'z-index': 11,
@@ -531,11 +616,12 @@ export default function SignalGraph({
         {
           selector: 'node[kind = "anchor"]',
           style: {
+            label: '',
             shape: 'ellipse',
             width: hasPaperFlow ? 'mapData(weight, 0, 1, 30, 34)' : 'mapData(weight, 0, 1, 136, 208)',
             height: hasPaperFlow ? 'mapData(weight, 0, 1, 30, 34)' : 48,
             'font-size': hasPaperFlow ? '0px' : '10px',
-            'font-weight': 620,
+            'font-weight': 600,
             'text-max-width': hasPaperFlow ? '72px' : '180px',
             'background-color': isExecutive ? 'rgba(246, 190, 106, 0.92)' : 'rgba(245, 181, 96, 0.94)',
             color: 'rgba(40, 24, 7, 0.96)',
@@ -598,6 +684,18 @@ export default function SignalGraph({
             'line-dash-pattern': [7, 4],
             'line-color': isExecutive ? 'rgba(114, 190, 244, 0.7)' : 'rgba(118, 214, 255, 0.72)',
             'target-arrow-color': isExecutive ? 'rgba(114, 190, 244, 0.75)' : 'rgba(118, 214, 255, 0.78)',
+            'target-arrow-shape': 'none',
+            opacity: 0.38,
+          },
+        },
+        {
+          selector: 'edge[kind = "evidenced_by"]',
+          style: {
+            'line-style': 'dotted',
+            'line-color': isExecutive ? 'rgba(255, 208, 148, 0.46)' : 'rgba(255, 213, 154, 0.5)',
+            'target-arrow-color': isExecutive ? 'rgba(255, 208, 148, 0.48)' : 'rgba(255, 213, 154, 0.54)',
+            'target-arrow-shape': 'none',
+            opacity: 0.44,
           },
         },
         {
