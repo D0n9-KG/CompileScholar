@@ -215,7 +215,14 @@ export default function TasksPage() {
           <div className="split">
             <div className="panelTitle">{t('队列', 'Queue')}</div>
             <div className="row">
-              <select className="select" style={{ width: 160 }} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+              <select
+                id="tasks-status-filter"
+                name="statusFilter"
+                className="select"
+                style={{ width: 160 }}
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+              >
                 <option value="all">{t('全部', 'All')}</option>
                 <option value="queued">{t('排队中', 'Queued')}</option>
                 <option value="running">{t('进行中', 'Running')}</option>
@@ -223,7 +230,15 @@ export default function TasksPage() {
                 <option value="failed">{t('失败', 'Failed')}</option>
                 <option value="canceled">{t('已取消', 'Canceled')}</option>
               </select>
-              <input className="input" style={{ width: 260, maxWidth: '70vw' }} value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t('搜索任务…', 'Search tasks...')} />
+              <input
+                id="tasks-query"
+                name="taskQuery"
+                className="input"
+                style={{ width: 260, maxWidth: '70vw' }}
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={t('搜索任务…', 'Search tasks...')}
+              />
             </div>
           </div>
         </div>

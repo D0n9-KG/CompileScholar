@@ -1854,7 +1854,13 @@ export default function ConfigCenterPage() {
                 <div className="panelBody cc-grid cc-grid--compact">
                   <label className="cc-field">
                     <span className="cc-label">{t('论文类型', 'Paper Type')}</span>
-                    <select className="input" value={schemaPaperType} onChange={(event) => setSchemaPaperType(event.target.value as PaperType)}>
+                    <select
+                      id="cfg-schema-paper-type"
+                      name="schemaPaperType"
+                      className="input"
+                      value={schemaPaperType}
+                      onChange={(event) => setSchemaPaperType(event.target.value as PaperType)}
+                    >
                       {SCHEMA_PAPER_TYPES.map((item) => (
                         <option key={item.value} value={item.value}>
                           {t(item.zh, item.en)}
@@ -1878,7 +1884,13 @@ export default function ConfigCenterPage() {
 
                   <label id="cfg-schema-version-switch" className="cc-field">
                     <span className="cc-label">{t('切换到版本', 'Version to Activate')}</span>
-                    <select className="input" value={schemaActivateVersion} onChange={(event) => setSchemaActivateVersion(event.target.value)}>
+                    <select
+                      id="cfg-schema-activate-version"
+                      name="schemaActivateVersion"
+                      className="input"
+                      value={schemaActivateVersion}
+                      onChange={(event) => setSchemaActivateVersion(event.target.value)}
+                    >
                       <option value="">{t('选择版本…', 'Select a version...')}</option>
                       {schemaVersions.map((item) => (
                         <option key={item.version} value={String(item.version)}>
@@ -2031,6 +2043,8 @@ export default function ConfigCenterPage() {
 
               <div className="cc-chat-composer">
                 <textarea
+                  id="cc-goal-input"
+                  name="goal"
                   className="textarea cc-chat-input"
                   value={goal}
                   onChange={(event) => setGoal(event.target.value)}
