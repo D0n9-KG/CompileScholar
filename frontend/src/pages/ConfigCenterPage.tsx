@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
 import { apiGet, apiPost, apiPut } from '../api'
-import { LOCALE_STORAGE_KEY, resolveInitialLocale, translate, useI18n } from '../i18n'
+import { LOCALE_STORAGE_KEY, resolveInitialLocale, translate, useI18n, type UILocale } from '../i18n'
 import SchemaPage from './SchemaPage'
 import './config-center.css'
 
