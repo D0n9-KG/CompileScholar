@@ -1886,6 +1886,50 @@ def test_method_move_without_methods_backfills_finite_element_method(monkeypatch
     assert 'finite element method' in normalized_methods
 
 
+def test_method_move_without_methods_backfills_correlation_analysis(monkeypatch) -> None:
+    summary = 'This work attempts to find correlations between the impact sensitivity of explosives and their easily calculated physicochemical properties.'
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '2. Method',
+            summary,
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'method',
+                'act_type': 'propose_method',
+                'summary': summary,
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'methods': [],
+                'confidence': 0.7,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+    normalized_methods = {str(item.get('normalized') or '').lower() for item in move['methods']}
+
+    assert 'correlation analysis' in normalized_methods
+    assert any(
+        str(item.get('normalized') or '').lower() == 'correlation analysis'
+        and not bool(item.get('inferred'))
+        for item in move['methods']
+    )
+
+
 def test_set_condition_move_does_not_backfill_incidental_algorithm_reference_as_method(monkeypatch) -> None:
     summary = (
         'The penalty parameters are selected to keep particle overlap below 2% of the particle radius, '
@@ -1968,6 +2012,50 @@ def test_promoted_method_move_backfills_method_mentions_after_role_stabilization
     assert move['role_hint'] == 'method'
     assert move['act_hint'] == 'propose_method'
     assert 'particle dynamics simulations' in normalized_methods
+
+
+def test_promoted_method_move_backfills_trusted_correlation_analysis_after_role_stabilization(monkeypatch) -> None:
+    summary = 'This work attempts to find correlations between the impact sensitivity of explosives and their easily calculated physicochemical properties.'
+    doc = _doc_with_chunks(
+        _chunk(
+            'c-1',
+            '1. Introduction',
+            summary,
+            line=1,
+        ),
+    )
+
+    monkeypatch.setattr(
+        'app.paper_logic_trace.direct_extraction._extract_window_moves_llm',
+        lambda **kwargs: [
+            {
+                'role': 'problem',
+                'act_type': 'define_task',
+                'summary': summary,
+                'anchor_chunk_ids': ['c-1'],
+                'research_objects': [],
+                'methods': [],
+                'confidence': 0.7,
+            }
+        ],
+    )
+
+    payload = build_paper_logic_trace_inputs(
+        doc=doc,
+        paper_id='doi:10.1000/demo',
+        cite_rec=None,
+        schema={'rules': {}},
+    )
+
+    move = payload['evidence_rows'][0]
+
+    assert move['role_hint'] == 'method'
+    assert move['act_hint'] == 'propose_method'
+    assert any(
+        str(item.get('normalized') or '').lower() == 'correlation analysis'
+        and not bool(item.get('inferred'))
+        for item in move['methods']
+    )
 
 
 def test_method_backfill_filters_generic_efficient_method_fragment(monkeypatch) -> None:

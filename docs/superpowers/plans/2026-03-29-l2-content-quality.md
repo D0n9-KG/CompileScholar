@@ -734,3 +734,24 @@ Progress note (2026-03-31, Chinese validation-result recovery phase):
 - Remaining macro gap after this phase:
 - the shared severe sample no longer shows the earlier `missing_key_findings` failure on `p002`, but some findings on validation-heavy engineering papers are still phrased more generically than ideal
 - Given the current policy, that wording issue is below the threshold for another immediate rule-expansion phase unless a larger-scale audit shows it recurring as a real downstream blocker.
+
+Progress note (2026-03-31, fresh shared-corpus readiness audit for L2 -> L3/L4 handoff):
+- I completed a fresh deterministic 8-paper audit on the shared corpus using seed `20260402`, continuing the partially finished run under `backend/.codex_tmp/manual_random_content_audit/20260331_share_sample_audit_seed20260402` so the sample stayed fixed while the latest code was evaluated.
+- Fresh aggregate result on the current code:
+- `8/8` papers produced non-empty `problem_statements`, `method_statements`, `key_findings`, and `one_paragraph_summary`
+- `7/8` papers were `route_state_seed.ready_for_route_compilation = true`
+- `5/8` papers were `ready_for_l4 = true`
+- `5/8` papers were `quality_tier = green`, `3/8` stayed `yellow`
+- The old severe empty-field failure mode is materially improved on this fresh sample:
+- rerun `p006 = 1619_Shear_Yielding_and_Shear_Jamming_of_Dense_Hard_Sphere_Glasses` now has non-empty route methods and a usable theory-heavy summary/method/finding bundle
+- rerun `p007 = 1862_Adversarial_uncertainty_quantification_in_physics-informed_neural_networks` now has non-empty route methods and remains route-ready, though still yellow for `sparse_expected_slots` plus `metadata_summary_mismatch`
+- Manual content inspection showed the remaining macro gaps are no longer mostly empty slots; they are now mixed between one real route blocker and several readability/trust issues:
+- `p002` still has a substantive L3 blocker: `dominant_method_candidates=[]`, `route_ready=false`, and the canonical title is still wrong (`RELATION BETWEEN ...`) while `title_alt` carries the true paper title `Initiation of Solid Explosives by Mechanical Impact`
+- `p005` is a stronger human-facing quality issue than the current gates admit: its first `problem_statement` and summary opening are contaminated by journal boilerplate (`Citation ... View Table of Contents ... Preface ...`), yet the trace still scores `green`
+- recurring metadata noise is still visible even when the main trace is otherwise usable: `title_alt` fields such as `Design of data experiments`, `Accepted Manuscript`, `ARTICLES YOU MAY BE INTERESTED IN`, and `III. BASIC PRINCIPLE OF THE CNN` still survive in several fresh traces
+- Current readiness conclusion from the fresh sample:
+- L2 is now materially strong enough for single-paper browsing and for most L3 route-seed compilation on current papers
+- L2 is not yet trustworthy enough to claim uniformly clean single-paper representation, because metadata/title noise and front-matter boilerplate can still survive into human-facing summaries without tripping the current severe audit
+- L4 support is improved but still not broad enough for a blanket claim of downstream readiness; the fresh sample still leaves `3/8` papers yellow and `3/8` not ready for L4
+- Next highest-value unresolved gap after this audit:
+- strengthen boilerplate / front-matter contamination filtering and title-alt promotion heuristics at the summary-move and metadata layers, because these are now the most visible non-overfit blockers to calling L2 “complete and accurate” for large-scale single-paper use.

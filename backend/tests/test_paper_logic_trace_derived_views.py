@@ -940,6 +940,109 @@ def test_build_paper_content_profile_prefers_problem_statements_over_background_
     assert background.summary not in profile['problem_statements']
 
 
+def test_build_paper_content_profile_uses_problem_framing_method_when_only_background_is_presentational() -> None:
+    background = ResearchMove(
+        move_id='m-bg-1',
+        sequence_no=1,
+        role='background',
+        act_type='build_resource',
+        summary='Presents a table of explosive compounds with properties including critical pressure for explosion initiation.',
+        anchor_ids=['a-1'],
+    )
+    method = ResearchMove(
+        move_id='m-method-1',
+        sequence_no=2,
+        role='method',
+        act_type='propose_method',
+        summary='This work attempts to find correlations between the impact sensitivity of explosives and their easily calculated physicochemical properties because the sensitivity of explosives remains difficult to calculate.',
+        methods=[
+            MentionValue(
+                surface='correlation analysis',
+                normalized='correlation analysis',
+                anchor_ids=['a-2'],
+                inferred=False,
+            )
+        ],
+        anchor_ids=['a-2'],
+        slot_provenance=[
+            SlotProvenance(
+                field='methods',
+                value_index=0,
+                anchor_ids=['a-2'],
+                extraction_mode='normalized',
+                support_strength='strong',
+            )
+        ],
+    )
+    trace = PaperLogicTrace(
+        trace_id='paper-problem-fallback:paper_logic_trace',
+        schema_version='v2',
+        built_at='2026-04-01T00:00:00Z',
+        paper_metadata=PaperMetadata(
+            paper_id='paper-problem-fallback',
+            title='Initiation of Solid Explosives by Mechanical Impact',
+            paper_type='empirical',
+            source_refs=['a-1'],
+        ),
+        canonical_core=CanonicalCore(
+            moves=[background, method],
+        ),
+        quality={},
+    )
+
+    profile = build_paper_content_profile(trace)
+
+    assert profile['problem_statements'] == [method.summary]
+    assert background.summary not in profile['problem_statements']
+
+
+def test_build_paper_content_profile_uses_current_work_method_as_problem_fallback_when_problem_role_is_missing() -> None:
+    method = ResearchMove(
+        move_id='m-method-only-1',
+        sequence_no=1,
+        role='method',
+        act_type='propose_method',
+        summary='This work attempts to find correlations between impact sensitivity and easily calculated physicochemical properties of explosives, focusing on the stage of explosion initiation.',
+        methods=[
+            MentionValue(
+                surface='correlation analysis',
+                normalized='correlation analysis',
+                anchor_ids=['a-1'],
+                inferred=False,
+            )
+        ],
+        anchor_ids=['a-1'],
+        slot_provenance=[
+            SlotProvenance(
+                field='methods',
+                value_index=0,
+                anchor_ids=['a-1'],
+                extraction_mode='normalized',
+                support_strength='strong',
+            )
+        ],
+    )
+    trace = PaperLogicTrace(
+        trace_id='paper-problem-method-only:paper_logic_trace',
+        schema_version='v2',
+        built_at='2026-04-01T00:00:00Z',
+        paper_metadata=PaperMetadata(
+            paper_id='paper-problem-method-only',
+            title='Initiation of Solid Explosives by Mechanical Impact',
+            paper_type='empirical',
+            source_refs=['a-1'],
+        ),
+        canonical_core=CanonicalCore(
+            moves=[method],
+        ),
+        quality={},
+    )
+
+    profile = build_paper_content_profile(trace)
+
+    assert profile['problem_statements'] == [method.summary]
+
+
 def test_build_route_state_seed_collects_l3_compiler_inputs_without_overclaiming() -> None:
     trace = PaperLogicTrace(
         trace_id='paper-1:paper_logic_trace',
@@ -2421,3 +2524,51 @@ def test_build_paper_content_audit_flags_pipe_and_formula_style_title_alt_noise(
 
         assert 'suspicious_title_alt' in audit['flags']
         assert audit['title_alt_heading_like'] is True
+
+
+def test_build_paper_summaries_and_problem_profile_skip_front_matter_noise_moves() -> None:
+    noise_problem = ResearchMove(
+        move_id='m-noise-problem',
+        sequence_no=1,
+        role='problem',
+        act_type='identify_gap',
+        summary='Citation: Journal of Rheology 64, 227 (2020); doi: 10.1122/1.5129680 View Table of Contents: https://example.com/toc Published by Example Press',
+        anchor_ids=['a-1'],
+    )
+    method_move = ResearchMove(
+        move_id='m-clean-method',
+        sequence_no=2,
+        role='method',
+        act_type='propose_method',
+        summary='The authors develop an empirical constitutive law for dense non-Brownian suspensions near jamming.',
+        anchor_ids=['a-2'],
+    )
+    result_move = ResearchMove(
+        move_id='m-clean-result',
+        sequence_no=3,
+        role='result',
+        act_type='report_effect',
+        summary='The constitutive law predicts the viscous-to-inertial transition in transient suspension flow.',
+        anchor_ids=['a-3'],
+    )
+    trace = PaperLogicTrace(
+        trace_id='paper-front-matter-noise:paper_logic_trace',
+        schema_version='v2',
+        built_at='2026-03-31T00:00:00Z',
+        paper_metadata=PaperMetadata(
+            paper_id='paper-front-matter-noise',
+            title='Shear thickening in dense non-Brownian suspensions: Viscous to inertial transition',
+            paper_type='empirical',
+            source_refs=['a-1'],
+        ),
+        canonical_core=CanonicalCore(
+            moves=[noise_problem, method_move, result_move],
+        ),
+        quality={},
+    )
+
+    summaries = build_paper_summaries(trace)
+    profile = build_paper_content_profile(trace)
+
+    assert 'Citation:' not in summaries['one_paragraph_summary']
+    assert profile['problem_statements'] == []

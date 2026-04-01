@@ -36,10 +36,37 @@ type GraphMeta = {
   sections?: GraphMetaSection[]
 }
 
+function formatTraceError(raw: string) {
+  const text = String(raw ?? '').trim()
+  if (!text) return ''
+
+  const trimQuotes = (value: string) => {
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      return value.slice(1, -1).trim()
+    }
+    return value
+  }
+
+  const normalized = trimQuotes(text)
+  try {
+    const parsed = JSON.parse(normalized) as { detail?: unknown } | string
+    if (typeof parsed === 'string') return trimQuotes(parsed)
+    if (parsed && typeof parsed === 'object' && parsed.detail != null) return trimQuotes(String(parsed.detail))
+  } catch {
+    // Keep the original message when it is not valid JSON.
+  }
+  return normalized
+}
+
 function text(locale: UILocale) {
   return locale === 'zh-CN'
     ? {
         loading: '正在加载 PaperLogicTrace...',
+        unavailable: '论文轨迹暂不可用',
+        unavailableHint: '这篇论文记录已经存在，但当前还没有可展示的 PaperLogicTrace。请先完成该论文的重建或重新抽取。',
         missingPaperId: '缺少论文 ID。',
         graph: '轨迹工作台',
         nodeDetail: '节点详情',
@@ -81,6 +108,8 @@ function text(locale: UILocale) {
       }
     : {
         loading: 'Loading PaperLogicTrace...',
+        unavailable: 'Paper trace unavailable',
+        unavailableHint: 'This paper record exists, but no PaperLogicTrace is currently available to render. Rebuild or re-extract this paper first.',
         missingPaperId: 'Missing paper id.',
         graph: 'Trace Workspace',
         nodeDetail: 'Node Detail',
@@ -794,7 +823,9 @@ export default function PaperDetailPage() {
   }, [contentState.loaded, contentState.paperId, paperId, tab])
 
   const trace = traceState.paperId === paperId ? traceState.trace : null
+  const traceError = traceState.paperId === paperId ? formatTraceError(traceState.error) : ''
   const content = contentState.paperId === paperId ? contentState.content : ''
+  const isTraceUnavailable = !trace && Boolean(traceError)
   const quality = trace?.quality
   const audit = quality?.l2_completeness_audit
   const pageTitle = trace?.paper_metadata.title ?? (locale === 'zh-CN' ? '论文轨迹' : 'Paper Trace')
@@ -841,8 +872,18 @@ export default function PaperDetailPage() {
         ) : null}
       </div>
 
-      {traceState.error ? <div className="errorBox">{traceState.error}</div> : null}
-      {!trace ? (
+      {trace && traceError ? <div className="errorBox">{traceError}</div> : null}
+      {isTraceUnavailable ? (
+        <div className="panel">
+          <div className="panelHeader">
+            <div className="panelTitle">{copy.unavailable}</div>
+          </div>
+          <div className="panelBody stackSm">
+            <div>{copy.unavailableHint}</div>
+            <div className="errorBox">{traceError}</div>
+          </div>
+        </div>
+      ) : !trace ? (
         <div className="panel">
           <div className="panelBody">{copy.loading}</div>
         </div>

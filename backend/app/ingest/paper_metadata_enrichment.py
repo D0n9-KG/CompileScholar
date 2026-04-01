@@ -17,6 +17,10 @@ _TITLE_NOISE_RE = re.compile(
     r'^\s*(?:abstract|appendix|conclusion|discussion|introduction|references?|results?)\s*$',
     re.IGNORECASE,
 )
+_FRONT_MATTER_TITLE_RE = re.compile(
+    r'^\s*(?:accepted manuscript|article info|articles you may be interested in|graphical abstract|highlights|open access|research|table of contents)\s*$',
+    re.IGNORECASE,
+)
 _PAPER_SOURCE_PREFIX_RE = re.compile(r'^\s*\d+[_\-\s]+')
 _SPACE_RE = re.compile(r'\s+')
 _BROKEN_AUTHOR_RE = re.compile(r'[\${}\^]')
@@ -107,6 +111,8 @@ def _looks_suspicious_title(title: str | None) -> bool:
     if clean.count('$') >= 2 or _LATEX_TITLE_NOISE_RE.search(clean):
         return True
     if _TITLE_NOISE_RE.match(clean):
+        return True
+    if _FRONT_MATTER_TITLE_RE.match(clean):
         return True
     return False
 

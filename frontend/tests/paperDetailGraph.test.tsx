@@ -382,4 +382,27 @@ describe('PaperDetailPage paper logic trace workbench', () => {
     await waitFor(() => expect(screen.getAllByText('cite-1').length).toBeGreaterThan(0))
     expect(screen.getByText(/method_transfer_hint/)).toBeInTheDocument()
   })
+
+  test('stops showing loading and renders a readable unavailable state when the paper trace is missing', async () => {
+    apiGetMock.mockImplementation(async (path: string) => {
+      if (path === '/papers/doi%3A10.1000%2Fmissing/logic-trace') {
+        throw new Error('{"detail":"PaperLogicTrace not found: doi:10.1000/missing"}')
+      }
+      throw new Error(`unexpected apiGet path: ${path}`)
+    })
+
+    render(
+      <I18nProvider>
+        <MemoryRouter initialEntries={['/papers/doi%3A10.1000%2Fmissing']}>
+          <Routes>
+            <Route path="/papers/:paperId" element={<PaperDetailPage />} />
+          </Routes>
+        </MemoryRouter>
+      </I18nProvider>,
+    )
+
+    expect(await screen.findByText('Paper trace unavailable')).toBeInTheDocument()
+    expect(screen.getByText('PaperLogicTrace not found: doi:10.1000/missing')).toBeInTheDocument()
+    expect(screen.queryByText('Loading PaperLogicTrace...')).not.toBeInTheDocument()
+  })
 })

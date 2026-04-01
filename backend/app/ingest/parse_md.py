@@ -36,6 +36,43 @@ _REF_HEADING_RE = re.compile(
     re.IGNORECASE,
 )
 _SECTION_HEADING_RE = re.compile(r"^\s{0,3}#{1,6}\s+")
+_HEADING_ENUMERATOR_RE = re.compile(r"^\s*(?:(?:[ivxlcdm]+|\d+(?:\.\d+)*)(?:[.)]|)\s+)", re.IGNORECASE)
+_FRONT_MATTER_HEADING_TITLES = {
+    'accepted manuscript',
+    'article info',
+    'articles you may be interested in',
+    'graphical abstract',
+    'highlights',
+    'open access',
+    'research',
+    'table of contents',
+}
+_BODY_SECTION_TITLES = {
+    'abstract',
+    'background',
+    'conclusion',
+    'conclusions',
+    'discussion',
+    'experimental setup',
+    'experiment',
+    'experiments',
+    'introduction',
+    'material and methods',
+    'materials and methods',
+    'method',
+    'methods',
+    'problem statement',
+    'results',
+}
+_FRONT_MATTER_LINE_PREFIXES = (
+    'citation:',
+    'view online:',
+    'view table of contents:',
+    'published by',
+    'find out more',
+    'available online',
+    'article history',
+)
 
 
 def _coerce_windows_extended_path(path: str | os.PathLike[str]) -> str:
@@ -85,6 +122,49 @@ def _stable_chunk_id(paper_source: str, md_path: str, start_line: int, end_line:
 
 def _normalize_space(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
+
+
+def _canonical_heading_title(text: str) -> str:
+    normalized = _normalize_space(text).lower()
+    normalized = _HEADING_ENUMERATOR_RE.sub('', normalized)
+    return normalized.strip(" -:|")
+
+
+def _is_front_matter_heading(text: str) -> bool:
+    normalized = _canonical_heading_title(text)
+    return normalized in _FRONT_MATTER_HEADING_TITLES
+
+
+def _is_body_section_heading(text: str) -> bool:
+    normalized = _canonical_heading_title(text)
+    return normalized in _BODY_SECTION_TITLES
+
+
+def _looks_like_short_prebody_heading(text: str) -> bool:
+    normalized = _normalize_space(text)
+    if not normalized:
+        return False
+    if len(normalized) > 40:
+        return False
+    return len(normalized.split()) <= 4
+
+
+def _is_front_matter_line(text: str) -> bool:
+    normalized = _normalize_space(text).lower()
+    if not normalized:
+        return False
+    return any(normalized.startswith(prefix) for prefix in _FRONT_MATTER_LINE_PREFIXES)
+
+
+def _should_skip_prebody_block(text: str) -> bool:
+    normalized = _normalize_space(text)
+    if not normalized:
+        return True
+    if _is_front_matter_line(normalized):
+        return True
+    if len(normalized) <= 40 and len(normalized.split()) <= 4 and not re.search(r"[.!?。！？;；:,，:]", normalized):
+        return True
+    return False
 
 
 def _clean_author_candidate(text: str) -> str:
@@ -145,6 +225,7 @@ def parse_mineru_markdown(md_path: str) -> DocumentIR:
 
     section_cursor: str | None = None
     heading_titles: list[str] = []
+    heading_entries: list[tuple[int, str]] = []
     authors: list[str] = []
     doi: str | None = None
     year: int | None = None
@@ -174,6 +255,7 @@ def parse_mineru_markdown(md_path: str) -> DocumentIR:
             t = _normalize_space(m.group("title"))
             if t:
                 heading_titles.append(t)
+                heading_entries.append((i, t))
             continue
         if not authors and i > 1 and line.strip() and not line.startswith("![](") and "School of" not in line:
             # a crude "authors line": contains commas or "and"
@@ -214,21 +296,53 @@ def parse_mineru_markdown(md_path: str) -> DocumentIR:
     def has_latin(t: str) -> bool:
         return bool(re.search(r"[A-Za-z]", t))
 
+    first_body_heading_line = next(
+        (line_no for line_no, text in heading_entries if _is_body_section_heading(text)),
+        None,
+    )
+
     title = None
     title_alt = None
     if heading_titles:
-        ranked = sorted({t for t in heading_titles if t}, key=title_score, reverse=True)
+        title_candidate_entries = [
+            (line_no, text)
+            for line_no, text in heading_entries
+            if first_body_heading_line is None or line_no < first_body_heading_line
+        ]
+        if not title_candidate_entries:
+            title_candidate_entries = list(heading_entries)
+        clean_title_candidate_entries = [
+            (line_no, text)
+            for line_no, text in title_candidate_entries
+            if not _is_front_matter_heading(text) and not is_numbered_section_heading(text)
+        ]
+        if clean_title_candidate_entries:
+            title_candidate_entries = clean_title_candidate_entries
+        ranked = sorted(
+            {text for _, text in title_candidate_entries if text},
+            key=title_score,
+            reverse=True,
+        )
         title = ranked[0] if ranked else None
         if title:
+            title_line = next(
+                (line_no for line_no, text in title_candidate_entries if text == title),
+                None,
+            )
             title_has_cjk = has_cjk(title)
             title_has_latin = has_latin(title)
             preferred_alt = next(
                 (
                     candidate
-                    for candidate in heading_titles
+                    for line_no, candidate in title_candidate_entries
                     if candidate
                     and candidate != title
+                    and not _is_front_matter_heading(candidate)
                     and not is_numbered_section_heading(candidate)
+                    and (
+                        title_line is None
+                        or abs(line_no - title_line) <= 4
+                    )
                     and (
                         (title_has_latin and has_cjk(candidate))
                         or (title_has_cjk and has_latin(candidate))
@@ -242,8 +356,14 @@ def parse_mineru_markdown(md_path: str) -> DocumentIR:
                 title_alt = next(
                     (
                         candidate
-                        for candidate in ranked
-                        if candidate != title and not is_numbered_section_heading(candidate)
+                        for line_no, candidate in title_candidate_entries
+                        if candidate != title
+                        and not _is_front_matter_heading(candidate)
+                        and not is_numbered_section_heading(candidate)
+                        and (
+                            title_line is None
+                            or abs(line_no - title_line) <= 4
+                        )
                     ),
                     None,
                 )
@@ -266,20 +386,49 @@ def parse_mineru_markdown(md_path: str) -> DocumentIR:
             block_start = end_line + 1
             return
         text = "\n".join(current).strip()
+        if first_body_heading_line is not None and block_start < first_body_heading_line and _should_skip_prebody_block(text):
+            current = []
+            block_start = end_line + 1
+            return
         if text:
             blocks.append((block_start, end_line, text, section_cursor))
         current = []
         block_start = end_line + 1
 
+    skip_front_matter_section = False
+    accepted_prebody_titles = {value for value in (title, title_alt) if value}
+
     for idx, line in enumerate(lines, start=1):
         if ref_start and idx >= ref_start:
             # do not include references in content chunks; we'll parse references separately
             break
-        if _HEADING_RE.match(line):
+        heading_match = _HEADING_RE.match(line)
+        if heading_match:
             flush_block(idx - 1)
-            section_cursor = _normalize_space(_HEADING_RE.match(line).group("title"))  # type: ignore[union-attr]
+            heading_title = _normalize_space(heading_match.group("title"))
+            if _is_front_matter_heading(heading_title):
+                skip_front_matter_section = True
+                section_cursor = None
+                continue
+            if (
+                first_body_heading_line is not None
+                and idx < first_body_heading_line
+                and heading_title not in accepted_prebody_titles
+                and _looks_like_short_prebody_heading(heading_title)
+            ):
+                skip_front_matter_section = True
+                section_cursor = None
+                continue
+            skip_front_matter_section = False
+            section_cursor = heading_title
             # headings themselves become tiny chunks so we can point spans at them if needed
             blocks.append((idx, idx, line.strip(), section_cursor))
+            continue
+        if skip_front_matter_section:
+            continue
+        if _is_front_matter_line(line):
+            flush_block(idx - 1)
+            block_start = idx + 1
             continue
         if line.strip() == "":
             flush_block(idx - 1)

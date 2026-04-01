@@ -258,3 +258,26 @@ def test_enrich_document_metadata_drops_suspicious_title_alt_when_primary_title_
     assert report['local_fallback_changed_fields'] == ['title_alt']
     assert crossref.get_work_by_doi_calls == []
     assert crossref.resolve_reference_calls == []
+
+
+def test_enrich_document_metadata_drops_front_matter_title_alt_when_primary_title_is_clean() -> None:
+    for title_alt in (
+        'Accepted Manuscript',
+        'ARTICLES YOU MAY BE INTERESTED IN',
+    ):
+        doc = _doc(
+            title='Adversarial Uncertainty Quantification in Physics-Informed Neural Networks',
+            title_alt=title_alt,
+            authors=['Alice Smith', 'Bob Jones'],
+            doi=None,
+            year=2024,
+        )
+        crossref = _FakeCrossref(title_result=None)
+
+        enriched, report = enrich_document_metadata(doc, crossref=crossref, confidence_threshold=0.55)
+
+        assert enriched.paper.title == 'Adversarial Uncertainty Quantification in Physics-Informed Neural Networks'
+        assert enriched.paper.title_alt is None
+        assert report['used_crossref'] is False
+        assert report['local_fallback_used'] is True
+        assert report['local_fallback_changed_fields'] == ['title_alt']

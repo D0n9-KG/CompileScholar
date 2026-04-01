@@ -29,10 +29,17 @@ _QUALITY_NOISE_PREFIXES = (
     'article info',
     'articleinfo',
     'available online',
+    'citation:',
     'credit author statement',
+    'find out more',
     'keywords:',
     'keyword:',
     'article history',
+    'accepted manuscript',
+    'preface:',
+    'published by',
+    'view online:',
+    'view table of contents:',
 )
 _EXPECTED_ROLES_BY_PAPER_TYPE: dict[str, tuple[str, ...]] = {
     'empirical': ('problem', 'method', 'result'),

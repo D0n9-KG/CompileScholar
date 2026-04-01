@@ -160,6 +160,40 @@ _BACKGROUND_CONTEXT_CUES = (
     'paper describes',
     'simulation model considers',
 )
+_PROBLEM_SIGNAL_CUES = (
+    ' challenge ',
+    ' challenges ',
+    ' difficult ',
+    ' difficult to ',
+    ' difficulty ',
+    ' gap ',
+    ' gaps ',
+    ' hardly ',
+    ' lack ',
+    ' lacks ',
+    ' lacking ',
+    ' limitation ',
+    ' limitations ',
+    ' need ',
+    ' need for ',
+    ' need to ',
+    ' no consensus ',
+    ' question ',
+    ' remains difficult ',
+    ' remains unclear ',
+    ' shortcomings ',
+    ' unable to ',
+    ' unclear ',
+    ' unknown ',
+    ' whether ',
+)
+_PRESENTATIONAL_BACKGROUND_CUES = (
+    ' presents a table ',
+    ' present a table ',
+    ' table presents ',
+    ' the table presents ',
+    ' figure presents ',
+)
 _METHOD_SIGNAL_OPERATIVE_SUMMARY_CUES = (
     ' employ ',
     ' employs ',
@@ -643,6 +677,34 @@ def _summary_has_current_work_cue(summary: str) -> bool:
 
 def _summary_has_prior_work_cue(summary: str) -> bool:
     return _summary_cue_count(summary, _CONTENT_PROFILE_PRIOR_WORK_CUES) > 0
+
+
+def _summary_has_problem_signal(summary: str) -> bool:
+    return _summary_cue_count(summary, _PROBLEM_SIGNAL_CUES) > 0
+
+
+def _is_presentational_background_summary(move: ResearchMove) -> bool:
+    if move.role != 'background':
+        return False
+    summary = f" {str(move.summary or '').strip().lower()} "
+    if not summary.strip():
+        return False
+    if _summary_cue_count(summary, _PRESENTATIONAL_BACKGROUND_CUES) > 0:
+        return True
+    return move.act_type == 'build_resource' and _summary_cue_count(summary, _BACKGROUND_CONTEXT_CUES) > 0
+
+
+def _is_problem_framing_method_move(move: ResearchMove, *, require_problem_signal: bool = True) -> bool:
+    summary = str(move.summary or '').strip()
+    if move.role not in {'method', 'experiment'} or not _is_summary_contentful(summary):
+        return False
+    if _summary_has_prior_work_cue(summary) and not _summary_has_current_work_cue(summary):
+        return False
+    if not _summary_has_current_work_cue(summary):
+        return False
+    if require_problem_signal and not _summary_has_problem_signal(summary):
+        return False
+    return bool(_trusted_mentions(move, 'methods', list(move.methods))) or move.act_type in {'propose_method', 'adapt_method'}
 
 
 def _content_profile_role_summary_score(
@@ -1718,8 +1780,8 @@ def build_paper_content_profile(trace: PaperLogicTrace) -> dict[str, Any]:
     anchor_sections = _summary_anchor_sections(trace)
     title_terms = _title_alignment_terms(trace.paper_metadata.title, trace.paper_metadata.title_alt)
 
-    def _role_summaries(roles: set[str], *, limit: int = 3) -> list[str]:
-        summaries: list[str] = []
+    def _role_summary_moves(roles: set[str], *, limit: int = 3) -> list[ResearchMove]:
+        summary_moves: list[ResearchMove] = []
         eligible_moves = [move for move in moves if move.role in roles]
         fallback_roles_active = False
         if not eligible_moves and roles == {'method', 'experiment'}:
@@ -1759,12 +1821,64 @@ def build_paper_content_profile(trace: PaperLogicTrace) -> dict[str, Any]:
             if move.move_id in skip_prior_work_method_ids:
                 continue
             summary = str(move.summary or '').strip()
-            if not _is_summary_contentful(summary) or summary in summaries:
+            if not _is_summary_contentful(summary) or any(existing.summary == summary for existing in summary_moves):
                 continue
-            summaries.append(summary)
-            if len(summaries) >= limit:
+            summary_moves.append(move)
+            if len(summary_moves) >= limit:
                 break
-        return summaries
+        if roles == {'problem', 'background', 'hypothesis'}:
+            has_explicit_problem = any(move.role in {'problem', 'hypothesis'} for move in summary_moves)
+            has_problem_signal = any(_summary_has_problem_signal(move.summary) for move in summary_moves)
+            fallback_candidates: list[ResearchMove] = []
+            if not summary_moves:
+                fallback_candidates = sorted(
+                    [
+                        move
+                        for move in moves
+                        if _is_problem_framing_method_move(move, require_problem_signal=False)
+                    ],
+                    key=lambda move: _content_profile_role_summary_score(
+                        move,
+                        requested_roles={'method', 'experiment'},
+                        anchor_sections=anchor_sections,
+                        title_terms=title_terms,
+                    ),
+                    reverse=True,
+                )
+                if fallback_candidates:
+                    summary_moves = [fallback_candidates[0]]
+            elif (not has_explicit_problem) and (not has_problem_signal):
+                fallback_candidates = sorted(
+                    [move for move in moves if _is_problem_framing_method_move(move, require_problem_signal=True)],
+                    key=lambda move: _content_profile_role_summary_score(
+                        move,
+                        requested_roles={'method', 'experiment'},
+                        anchor_sections=anchor_sections,
+                        title_terms=title_terms,
+                    ),
+                    reverse=True,
+                )
+                if fallback_candidates:
+                    kept_moves = [
+                        move
+                        for move in summary_moves
+                        if not _is_presentational_background_summary(move) and _summary_has_problem_signal(move.summary)
+                    ]
+                    summary_moves = [fallback_candidates[0], *kept_moves]
+        deduped_moves: list[ResearchMove] = []
+        seen_summaries: set[str] = set()
+        for move in summary_moves:
+            summary = str(move.summary or '').strip()
+            if not summary or summary in seen_summaries:
+                continue
+            deduped_moves.append(move)
+            seen_summaries.add(summary)
+            if len(deduped_moves) >= limit:
+                break
+        return deduped_moves
+
+    def _role_summaries(roles: set[str], *, limit: int = 3) -> list[str]:
+        return [str(move.summary or '').strip() for move in _role_summary_moves(roles, limit=limit)]
 
     def _finding_summaries(*, limit: int = 3) -> list[str]:
         summaries = _role_summaries({'result'}, limit=limit)

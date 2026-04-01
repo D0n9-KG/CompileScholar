@@ -248,6 +248,21 @@ _METHOD_TEXT_REGEXES = (
     re.compile(r'(?:采用|使用|利用).{0,24}(?:方法|模型|模拟|软件|fluent|ansys|mrf)', re.IGNORECASE),
     re.compile(r'(?:模拟方法|计算方法|研究方法).{0,8}为'),
 )
+_CURRENT_WORK_METHOD_CUES = (
+    'this paper',
+    'this study',
+    'this work',
+    'we ',
+    '本文',
+    '本研究',
+    '本工作',
+    '文中',
+)
+_CORRELATION_ANALYSIS_REGEX = re.compile(
+    r'\b(?:attempts?\s+to\s+find|tries?\s+to\s+find|seeks?\s+to\s+find|finds?|'
+    r'establish(?:es|ed|ing)?)\s+correlations?\s+between\b',
+    re.IGNORECASE,
+)
 _ASCII_METHOD_TEXT_PATTERN_REGEXES = tuple(
     re.compile(rf'(?<![a-z]){re.escape(pattern)}', re.IGNORECASE)
     for pattern in _METHOD_TEXT_PATTERNS
@@ -1905,6 +1920,19 @@ def _resource_mentions_from_text(text: str, *, limit: int = 3) -> list[dict[str,
     return rows
 
 
+def _explicit_method_mentions(text: str, *, limit: int = 2) -> list[dict[str, Any]]:
+    normalized = _normalize_space(text)
+    if not normalized:
+        return []
+    lowered = normalized.lower()
+    if (
+        _CORRELATION_ANALYSIS_REGEX.search(normalized)
+        and any(cue in lowered for cue in _CURRENT_WORK_METHOD_CUES)
+    ):
+        return [{'surface': 'correlation analysis', 'normalized': 'correlation analysis'}][:limit]
+    return []
+
+
 def _method_mentions_from_text(text: str, *, limit: int = 3) -> list[dict[str, Any]]:
     normalized = _strip_inline_chunk_markers(text)
     if not normalized:
@@ -2021,6 +2049,13 @@ def _method_mentions_from_text(text: str, *, limit: int = 3) -> list[dict[str, A
         for match in pattern.finditer(normalized):
             if _push_phrase(match.group(1).lower()):
                 return rows
+
+    if (
+        _CORRELATION_ANALYSIS_REGEX.search(normalized)
+        and any(cue in lowered for cue in _CURRENT_WORK_METHOD_CUES)
+        and _push_phrase('correlation analysis')
+    ):
+        return rows
 
     return rows
 
@@ -2662,6 +2697,11 @@ def _augment_sparse_slots(
         if role_token in research_object_roles
         else []
     )
+    normalized_method_mentions = (
+        _mark_normalized_mentions(_explicit_method_mentions(text, limit=2))
+        if str(act_type or '').strip() in _METHOD_AUGMENTATION_ACTS
+        else []
+    )
     heuristic_research_objects = (
         _mark_heuristic_mentions(_research_object_mentions(text, limit=3))
         if role_token in research_object_roles
@@ -2686,13 +2726,17 @@ def _augment_sparse_slots(
         merged_research_objects,
         normalized_prediction_target_research_objects,
     )
-    return {
-        'research_objects': merged_research_objects,
-        'methods': methods or (
+    merged_methods = _merge_preferred_mention_rows(
+        methods or (
             _mark_heuristic_mentions(_method_mentions_from_text(text, limit=3))
             if str(act_type or '').strip() in _METHOD_AUGMENTATION_ACTS
             else []
         ),
+        normalized_method_mentions,
+    )
+    return {
+        'research_objects': merged_research_objects,
+        'methods': merged_methods,
         'observed_variables': observed_variables or (_mark_heuristic_mentions(_observed_variable_mentions(text, limit=3)) if role_token in observed_variable_roles else []),
         'metrics': metrics or (_mark_heuristic_mentions(_metric_mentions(text, limit=3)) if role_token in metric_roles else []),
         'comparators': _merge_raw_mention_rows(comparators, heuristic_comparators),
@@ -3802,8 +3846,17 @@ def _move_rows_from_windows(
                     )
                 summary = _summary_from_role_text(summary_support_text, role=role)
             if not methods and act_type in _METHOD_AUGMENTATION_ACTS:
+                normalized_method_mentions = _mark_normalized_mentions(
+                    _merge_preferred_mention_rows(
+                        _explicit_method_mentions(summary, limit=2),
+                        _explicit_method_mentions(move_support_text, limit=2),
+                    )
+                )
                 methods = _normalize_mention_rows(
-                    _mark_heuristic_mentions(_method_mentions_from_text(summary, limit=3)),
+                    _merge_preferred_mention_rows(
+                        _mark_heuristic_mentions(_method_mentions_from_text(summary, limit=3)),
+                        normalized_method_mentions,
+                    ),
                     anchor_ids=anchor_chunk_ids,
                 )
             if role in (_TRUSTED_SCOPE_RESEARCH_OBJECT_ROLES | _TRUSTED_PREDICTION_TARGET_RESEARCH_OBJECT_ROLES):
