@@ -2,20 +2,9 @@
 
 ## What This Is
 
-LogicKG is now a working scientific-reasoning compiler pilot built on top of the existing paper and textbook workbench.
+LogicKG is a scientific-reasoning compiler workbench built on top of the existing paper and textbook platform.
 
-v1.0 ships a bounded but real workflow that turns:
-
-- packetized historical slices
-- paper-grounded `L1` snapshots
-- multi-paper `RouteState` packages
-- replay inspection and failure reports
-- reviewed priors / anti-patterns
-- audited `DecisionEpisode` exports
-
-into auditable artifacts that can be rerun and inspected end to end.
-
-The project goal is no longer "make the paper QA system stronger." The shipped direction is to compile historically bounded, reviewable reasoning artifacts that can later support question discovery and hypothesis work.
+`v1.0` proved a bounded end-to-end `RoutePacket -> replay -> review -> DecisionEpisode` export flow on a real jamming slice. `v1.1` now focuses on turning that bounded success into a reproducible canonical baseline and validating the same flow on one additional topic before the project chooses its next major direction.
 
 ## Core Value
 
@@ -24,19 +13,21 @@ Produce auditable, replayable, trainable scientific-reasoning artifacts rather t
 ## Current State
 
 - Shipped milestone: `v1.0` on `2026-04-02`
-- Audit closeout status: `tech_debt`
+- Active planning milestone: `v1.1 Canonical Asset Promotion And Cross-Topic Validation`
 - Stable bounded pilot: `jamming transition in frictionless sphere packings near point J` with `cutoff_year = 2010`
 - End-to-end Phase 03 -> 06 artifact flow is verified on real local bundles
 - Reviewed anti-pattern carryover now works across route variants through stable `route_family_id`
+- The committed repo captures the primary pilot packet and reports, but the full package/review/export truth is still split between committed docs and `tmp/` runtime bundles
 
-What is now real rather than planned:
+## Current Milestone: v1.1 Canonical Asset Promotion And Cross-Topic Validation
 
-- committed bounded packet selection and replay entry points
-- typed `HistoricalEnvironmentSnapshot` assets that feed replay
-- grouped `support / alternative / held_out` route-state packaging
-- replay failure taxonomy and rerun comparison artifacts
-- auditable prior / anti-pattern review bundles
-- dedicated audited `DecisionEpisode` export bundles and CLI
+**Goal:** Convert the bounded jamming pilot into a reproducible canonical baseline and validate the same package -> review -> export flow on a second topic so the next major milestone direction is evidence-backed.
+
+**Target features:**
+- committed canonical manifests and audit notes for the bounded jamming packet, subset packets, replay package, review bundle, and export bundle boundaries
+- reproducible local rerun instructions and scripts that rebuild the canonical jamming flow without hardcoded machine-specific paths
+- one second bounded topic that runs through package, review, and audited export with comparable quality summaries
+- a milestone closeout decision package that recommends either ops/productization or question-discovery for the following milestone
 
 ## Requirements
 
@@ -51,23 +42,25 @@ What is now real rather than planned:
 
 ### Active
 
-- [ ] Promote the current bounded jamming packet, replay, review, and export artifacts from `tmp/` into committed canonical assets.
-- [ ] Run at least one cross-topic Phase 03 -> 06 validation slice to confirm that the current packaging, review, and export rules generalize beyond the jamming pilot.
-- [ ] Decide whether the next milestone should focus on productizing packet/review/export operations or on building question-discovery work on top of stable `DecisionEpisode` samples.
-- [ ] Improve thin support density and resolve the remaining Phase 01 pilot limitations where runtime subset execution still covered for missing local trace exports.
+- [ ] Canonicalize the jamming pilot asset surfaces beyond packet-level docs so the repo reflects the full bounded compiler flow instead of pointing back to `tmp/` bundles.
+- [ ] Rebuild the bounded jamming compiler flow from committed manifests plus local trace inputs and keep provenance and audit boundaries explicit.
+- [ ] Run one second-topic Phase 03 -> 06 validation slice and compare its package, review, and export quality against the jamming baseline.
+- [ ] Finish `v1.1` with an evidence-backed recommendation for whether the next milestone should prioritize operational productization or question-discovery work.
 
 ### Out of Scope
 
-- Open-ended hypothesis generation or unconstrained `L4` ideation before reviewed priors and negative patterns are stable.
-- Full-corpus automatic packet discovery before packet, review, and export contracts are canonicalized.
-- A wholesale `L2` rewrite before replay-driven evidence justifies it.
-- Treating `L3/L4` as single-paper abstractions instead of multi-paper historical compilation layers.
+- Open-ended question discovery or hypothesis generation before a second topic proves the reviewed `DecisionEpisode` flow generalizes.
+- Full UI productization of packet/replay/review/export operations during the same milestone; `v1.1` is about proving and packaging the flow, not polishing every operator surface.
+- Full-corpus automatic packet discovery before canonical bounded assets and rerun provenance are stable.
+- A wholesale `L2` rewrite unless cross-topic validation isolates a specific failure owner that justifies it.
 
 ## Context
 
-- Tech stack remains `FastAPI + React + Vite + Neo4j + FAISS`, with the new reasoning flow intentionally layered into the existing platform instead of spun out into a second prototype.
-- v1.0 proved that the current architecture can run a real bounded route-packet -> review -> export loop without relying on toy fixtures.
-- The milestone is complete, but the current success is still bounded. Canonical asset promotion and cross-topic validation are the main next-step questions, not new schema invention.
+- Tech stack remains `FastAPI + React + Vite + Neo4j + FAISS`, with the reasoning flow layered into the existing platform instead of split into a second prototype.
+- `v1.0` proved the architecture can run a real bounded route-packet -> review -> export loop without toy fixtures.
+- Committed packet docs already exist under `docs/replay/pilot_packets/`, but the Phase 03 -> 06 package/review/export truth is still partially runtime-only.
+- `tmp/phase3_route_state_package/`, `tmp/phase5_multi_route_prior_induction/`, and `tmp/phase6_decision_episode_audit_export/` remain the key evidence surfaces that `v1.1` needs to canonicalize or rehydrate cleanly.
+- The second-topic validation must stay bounded and auditable rather than broadening into generalized benchmark claims.
 
 ## Key Decisions
 
@@ -79,14 +72,24 @@ What is now real rather than planned:
 | Keep export bundles separate from replay and review bundles | Audit-grade packaging should not mutate runtime artifacts | `Good` |
 | Prefer conservative audit truth over optimistic promotion stories | Honest bounded outputs are more useful than overclaiming generalized readiness | `Good` |
 | Use stable `route_family_id` for reviewed anti-pattern carryover | The real mismatch was between route variants in the same family, not unrelated route ids | `Good` |
-| Delay broad productization until pilot assets are canonical | `tmp/`-only success is enough to close v1.0, but not enough to claim operational maturity | `Revisit next milestone` |
+| Use `v1.1` to settle the next direction with canonicalization plus one cross-topic run | The current next-step uncertainty is about maturity and reuse, not about inventing a brand-new reasoning layer | `Pending` |
 
-## Next Milestone Goals
+## Evolution
 
-1. Canonicalize the current bounded pilot assets so the shipped path no longer depends on `tmp/` roots for the main demonstration slice.
-2. Run at least one cross-topic validation slice through Phase 03 -> 06 to stress the same packaging, review, and export seams in another domain.
-3. Choose between an ops/productization milestone and a question-discovery milestone based on what the cross-topic run reveals.
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `$gsd-transition`):
+1. Requirements invalidated? Move to Out of Scope with reason
+2. Requirements validated? Move to Validated with phase reference
+3. New requirements emerged? Add to Active
+4. Decisions to log? Add to Key Decisions
+5. "What This Is" still accurate? Update if drifted
+
+**After each milestone** (via `$gsd-complete-milestone`):
+1. Full review of all sections
+2. Core Value check: still the right priority?
+3. Audit Out of Scope: reasons still valid?
+4. Update Context with current state
 
 ---
-
-*Last updated: 2026-04-02 after v1.0 milestone completion*
+*Last updated: 2026-04-02 after starting v1.1 milestone planning*
