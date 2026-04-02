@@ -1,0 +1,219 @@
+{
+  "packet_id": "jamming_frictionless_packings_2010_packet_01",
+  "schema_version": "v1",
+  "built_at": "2026-04-01T23:45:00Z",
+  "topic_scope_candidate": "jamming transition in frictionless sphere packings near point J",
+  "cutoff_year": 2010,
+  "packet_status": "reviewed",
+  "packet_composition": {
+    "target_size": 7,
+    "actual_size": 7,
+    "role_counts": {
+      "core_method": 3,
+      "resource_or_benchmark": 1,
+      "limitation_or_critique": 1,
+      "survey_or_review": 1,
+      "alternative_route": 1
+    },
+    "coverage_ok": true,
+    "missing_roles": []
+  },
+  "l1_snapshot_ref": {
+    "snapshot_id": "jamming_env_2010_snapshot",
+    "resource_registry_ref": "l1:jamming:resource-registry:2010",
+    "resource_timeline_ref": "l1:jamming:resource-timeline:2010",
+    "benchmark_timeline_ref": "l1:jamming:benchmark-timeline:2010",
+    "toolchain_timeline_ref": "l1:jamming:toolchain-timeline:2010",
+    "protocol_registry_ref": "l1:jamming:protocol-registry:2010"
+  },
+  "inclusion_rules": {
+    "scope_definition": "Compile a bounded 1998-2010 packet around the classic point-J route in frictionless sphere packings, while keeping frictional and hard-sphere variants visible as nearby but distinct alternatives.",
+    "scope_aliases": [
+      "point J jamming",
+      "frictionless granular packings near jamming",
+      "frictionless sphere packing jamming transition"
+    ],
+    "accepted_year_range": {
+      "min_year": 1998,
+      "max_year": 2010
+    },
+    "hard_exclusion_rules": [
+      "exclude papers published after 2010 from packet inputs",
+      "exclude generic granular rheology papers that do not directly constrain point-J or nearby packing routes",
+      "exclude later review syntheses from training input even if they summarize the same route"
+    ],
+    "role_assignment_rules": [
+      "core_method papers must directly build or scale the frictionless point-J route",
+      "resource_or_benchmark papers must define a canonical packing reference, protocol, or evaluation frame reused by the route",
+      "limitation_or_critique papers must expose instability, protocol dependence, or ambiguity in the baseline point-J picture",
+      "alternative_route papers must stay historically visible at the cutoff while remaining meaningfully distinct from the main frictionless route"
+    ],
+    "leakage_policy": "Papers after the cutoff are excluded from packet input. Later reviews and retrospective syntheses are audit-only, never training input. Hindsight labels and post-cutoff judgments cannot be used in packet compilation."
+  },
+  "included_items": [
+    {
+      "paper_id": "777",
+      "trace_id": "777:paper_logic_trace",
+      "paper_year": 1998,
+      "item_role": "survey_or_review",
+      "inclusion_reason": "Provides the early jamming-diagram and fragile-matter framing that defines the packet's conceptual boundary before the point-J line is formalized.",
+      "source_selector": "manual",
+      "evidence_for_inclusion": [
+        "title_scope_match",
+        "manual_year_audit",
+        "packet_role:survey_or_review"
+      ],
+      "title": "Jamming, Force Chains, and Fragile Matter"
+    },
+    {
+      "paper_id": "1742",
+      "trace_id": "1742:paper_logic_trace",
+      "paper_year": 2000,
+      "item_role": "resource_or_benchmark",
+      "inclusion_reason": "Supplies the maximally-random-jammed framing and compression-protocol reference point used as a canonical benchmark for random packing claims.",
+      "source_selector": "manual",
+      "evidence_for_inclusion": [
+        "title_scope_match",
+        "manual_year_audit",
+        "packet_role:resource_or_benchmark"
+      ],
+      "title": "Is Random Close Packing of Spheres Well Defined?"
+    },
+    {
+      "paper_id": "1746",
+      "trace_id": "1746:paper_logic_trace",
+      "paper_year": 2002,
+      "item_role": "core_method",
+      "inclusion_reason": "Introduces the numerical route around random packings of frictionless particles and ties the packing threshold to the jamming threshold.",
+      "source_selector": "manual",
+      "evidence_for_inclusion": [
+        "title_scope_match",
+        "manual_year_audit",
+        "packet_role:core_method"
+      ],
+      "title": "Random Packings of Frictionless Particles"
+    },
+    {
+      "paper_id": "1591",
+      "trace_id": "1591:paper_logic_trace",
+      "paper_year": 2003,
+      "item_role": "core_method",
+      "inclusion_reason": "Stabilizes point J as the main frictionless route by explicitly grounding jamming at zero temperature and zero applied stress.",
+      "source_selector": "manual",
+      "evidence_for_inclusion": [
+        "title_scope_match",
+        "manual_year_audit",
+        "packet_role:core_method"
+      ],
+      "title": "Jamming at zero temperature and zero applied stress: The epitome of disorder"
+    },
+    {
+      "paper_id": "820",
+      "trace_id": "820:paper_logic_trace",
+      "paper_year": 2006,
+      "item_role": "core_method",
+      "inclusion_reason": "Adds linear-response critical scaling and thus strengthens the route's quantitative readout near the jamming transition.",
+      "source_selector": "manual",
+      "evidence_for_inclusion": [
+        "title_scope_match",
+        "manual_year_audit",
+        "packet_role:core_method"
+      ],
+      "title": "Critical Scaling in Linear Response of Frictionless Granular Packings near Jamming"
+    },
+    {
+      "paper_id": "814",
+      "trace_id": "814:paper_logic_trace",
+      "paper_year": 2010,
+      "item_role": "alternative_route",
+      "inclusion_reason": "Keeps the frictional-sphere route visible as a nearby alternative so replay can compare the main frictionless route against a historically real competing path.",
+      "source_selector": "manual",
+      "evidence_for_inclusion": [
+        "title_scope_match",
+        "manual_year_audit",
+        "packet_role:alternative_route"
+      ],
+      "title": "Jamming of frictional spheres and random loose packing"
+    },
+    {
+      "paper_id": "1647",
+      "trace_id": "1647:paper_logic_trace",
+      "paper_year": 2010,
+      "item_role": "limitation_or_critique",
+      "inclusion_reason": "Explicitly challenges the idea of a single universal jamming density and therefore acts as the packet's main critique / stability check.",
+      "source_selector": "manual",
+      "evidence_for_inclusion": [
+        "title_scope_match",
+        "manual_year_audit",
+        "packet_role:limitation_or_critique"
+      ],
+      "title": "Jamming Transitions in Amorphous Packings of Frictionless Spheres Occur over a Continuous Range of Volume Fractions"
+    }
+  ],
+  "excluded_items": [
+    {
+      "paper_id": "1628",
+      "paper_year": 2011,
+      "exclusion_reason": "after_cutoff",
+      "notes": "Quasistatic shear-flow probe paper is relevant but not historically visible at the 2010 cutoff."
+    },
+    {
+      "paper_id": "1654",
+      "paper_year": 2014,
+      "exclusion_reason": "after_cutoff",
+      "notes": "Finite-system synthesis is useful for audit but beyond the pilot cutoff."
+    },
+    {
+      "paper_id": "1632",
+      "paper_year": 2016,
+      "exclusion_reason": "after_cutoff",
+      "notes": "Later hard-sphere equilibrium sampling result is audit-only for this packet."
+    },
+    {
+      "paper_id": "770",
+      "paper_year": 2019,
+      "exclusion_reason": "after_cutoff",
+      "notes": "Later review is useful for retrospective audit but cannot enter packet input."
+    },
+    {
+      "paper_id": "1845",
+      "paper_year": 2024,
+      "exclusion_reason": "off_topic",
+      "notes": "Deep-learning jamming analogy is outside the physical granular route for this pilot."
+    }
+  ],
+  "packet_quality": {
+    "quality_tier": "yellow",
+    "ready_for_route_state": true,
+    "quality_flags": [
+      "small_pilot_packet",
+      "trace_exports_live_out_of_repo",
+      "l1_snapshot_needs_real_backfill"
+    ],
+    "topic_boundary_confidence": 0.83,
+    "leakage_risk": "low",
+    "manual_review_status": "completed"
+  },
+  "compiler_hints": {
+    "preferred_scope_label": "jamming transition in frictionless sphere packings near point J",
+    "preferred_method_labels": [
+      "point J",
+      "frictionless sphere packings",
+      "linear response scaling"
+    ],
+    "preferred_benchmark_labels": [
+      "maximally random jammed state",
+      "packing fraction phi_c"
+    ],
+    "preferred_bottleneck_labels": [
+      "protocol dependence of phi_J",
+      "finite-size sensitivity",
+      "random close packing ambiguity"
+    ],
+    "expected_alternative_routes": [
+      "frictional sphere packing route",
+      "maximally-random-jammed hard-sphere route"
+    ],
+    "notes_for_route_state_compiler": "Keep the main route centered on frictionless point-J packings. Use the frictional route as the primary alternative and preserve protocol / density ambiguity as a first-class bottleneck signal."
+  }
+}

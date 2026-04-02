@@ -3,6 +3,7 @@ from __future__ import annotations
 import pytest
 
 from app.research_logic.decision_prior_builder import DecisionPriorBuilder, build_decision_prior_card
+from app.research_logic.prior_induction import build_prior_candidate_registry
 from app.research_logic.models import RouteState
 from app.research_logic.route_comparison_builder import build_route_comparison_case
 from app.research_logic.why_now_builder import build_why_now_case
@@ -402,3 +403,97 @@ def test_decision_prior_builder_marks_missing_counterexample_search_yellow() -> 
 def test_decision_prior_builder_raises_on_empty_cluster() -> None:
     with pytest.raises(ValueError, match='at least one supporting RouteState'):
         DecisionPriorBuilder().build([])
+
+
+def test_prior_candidate_registry_emits_multiple_clusters_and_anti_patterns() -> None:
+    support_cluster_a = [
+        _route_state(
+            route_state_id='route-a1',
+            support_ids=['a1-e1', 'a1-e2'],
+            challenge_ids=['a1-c1'],
+            method_score=0.76,
+            measurement_score=0.79,
+            data_resource_score=0.88,
+            infrastructure_score=0.6,
+            cost_cycle_score=0.48,
+            overall_score=0.69,
+            bottleneck_label='GPU training remains costly',
+            bottleneck_type='compute',
+            bottleneck_severity='high',
+        ),
+        _route_state(
+            route_state_id='route-a2',
+            support_ids=['a2-e1', 'a2-e2'],
+            challenge_ids=['a2-c1'],
+            method_score=0.77,
+            measurement_score=0.8,
+            data_resource_score=0.9,
+            infrastructure_score=0.61,
+            cost_cycle_score=0.49,
+            overall_score=0.7,
+            bottleneck_label='GPU training remains costly',
+            bottleneck_type='compute',
+            bottleneck_severity='high',
+        ),
+    ]
+    support_cluster_b = [
+        _route_state(
+            route_state_id='route-b1',
+            method_label='probabilistic graphical model',
+            support_ids=['b1-e1', 'b1-e2'],
+            challenge_ids=['b1-c1'],
+            method_score=0.63,
+            measurement_score=0.74,
+            data_resource_score=0.67,
+            infrastructure_score=0.58,
+            cost_cycle_score=0.56,
+            overall_score=0.62,
+            bottleneck_label='evaluation protocols stay brittle',
+            bottleneck_type='evaluation',
+            bottleneck_severity='medium',
+        ),
+        _route_state(
+            route_state_id='route-b2',
+            method_label='probabilistic graphical model',
+            support_ids=['b2-e1', 'b2-e2'],
+            challenge_ids=['b2-c1'],
+            method_score=0.64,
+            measurement_score=0.73,
+            data_resource_score=0.68,
+            infrastructure_score=0.57,
+            cost_cycle_score=0.57,
+            overall_score=0.61,
+            bottleneck_label='evaluation protocols stay brittle',
+            bottleneck_type='evaluation',
+            bottleneck_severity='medium',
+        ),
+    ]
+    alternative_route = _route_state(
+        route_state_id='route-alt',
+        method_label='feature-engineering pipeline',
+        support_ids=['alt-e1', 'alt-e2'],
+        challenge_ids=['alt-c1'],
+        method_score=0.62,
+        measurement_score=0.6,
+        data_resource_score=0.45,
+        infrastructure_score=0.84,
+        cost_cycle_score=0.8,
+        overall_score=0.62,
+        bottleneck_label='manual tuning remains brittle',
+        bottleneck_type='engineering',
+        bottleneck_severity='low',
+        positive_signal_confidence=0.25,
+    )
+
+    registry = build_prior_candidate_registry(
+        support_route_states=[*support_cluster_a, *support_cluster_b],
+        alternative_route_states=[alternative_route],
+        held_out_route_states=[],
+        built_at='2026-04-02T02:10:00Z',
+    )
+
+    assert len(registry.prior_candidates) == 2
+    assert all(len(candidate.supporting_route_state_ids) == 2 for candidate in registry.prior_candidates)
+    assert registry.anti_pattern_candidates
+    assert registry.anti_pattern_candidates[0].warning_signal_pattern.signals
+    assert registry.anti_pattern_candidates[0].failure_examples.route_state_ids

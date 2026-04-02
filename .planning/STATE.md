@@ -2,48 +2,48 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 5
-current_phase_name: multi route prior induction
+current_phase: 6
+current_phase_name: decision episode audit export
 current_plan: Not started
 status: planning
-stopped_at: Phase 5 context gathered (assumptions mode)
-last_updated: "2026-04-02T06:50:51.608Z"
+stopped_at: Phase 5 verified and closed out
+last_updated: "2026-04-02T07:50:24.378Z"
 last_activity: 2026-04-02
 progress:
   total_phases: 6
-  completed_phases: 4
-  total_plans: 12
-  completed_plans: 12
-  percent: 100
+  completed_phases: 5
+  total_plans: 16
+  completed_plans: 14
+  percent: 88
 ---
 
 # Project State
 
 ## Project Reference
 
-See: `.planning/PROJECT.md` (updated 2026-04-01)
+See: `.planning/PROJECT.md` (updated 2026-04-02)
 
 **Core value:** Produce auditable, replayable, trainable scientific-reasoning artifacts rather than paper-like summaries or one-off knowledge graphs.
-**Current focus:** Phase 04 — replay-failure-taxonomy-and-l2-surgical-loop
+**Current focus:** Phase 06 — decision-episode-audit-export
 
 ## Current Position
 
-Phase: 04 (replay-failure-taxonomy-and-l2-surgical-loop) — EXECUTING
-Plan: 3 of 3
-**Current Phase:** 5
-**Current Phase Name:** multi route prior induction
+Phase: 06 (decision-episode-audit-export) — READY
+Plan: Not started
+**Current Phase:** 6
+**Current Phase Name:** decision episode audit export
 **Total Phases:** 6
 **Current Plan:** Not started
-**Total Plans in Phase:** 3
+**Total Plans in Phase:** 2
 **Status:** Ready to plan
-**Progress:** [██████████] 100%
+**Progress:** [█████████░] 88%
 **Last Activity:** 2026-04-02
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 12
+- Total plans completed: 14
 - Average duration: not yet normalized
 - Total execution time: not yet normalized
 
@@ -55,13 +55,13 @@ Plan: 3 of 3
 | 2 | 3 | not yet normalized | - |
 | 3 | 3 | not yet normalized | - |
 | 4 | 3 | not yet normalized | - |
-| 5 | 0 | 0 | - |
+| 5 | 2 | not yet normalized | - |
 | 6 | 0 | 0 | - |
 
 **Recent Trend:**
 
-- Last 5 plans: 03-02 completed, 03-03 completed, 04-01 completed, 04-02 completed, 04-03 completed
-- Trend: the project now has a replay-native failure taxonomy and a same-slice Phase 4 delta report; the next bottleneck is the unchanged live jamming L2 queue rather than missing replay structure
+- Last 5 plans: 04-01 completed, 04-02 completed, 04-03 completed, 05-01 completed, 05-02 completed
+- Trend: the project now has replay-native failure taxonomy plus a multi-route prior review path; the next bottleneck is promoting reviewed Phase 5 outputs into audited Phase 6 episode exports
 
 ## Decisions Made
 
@@ -78,6 +78,8 @@ Plan: 3 of 3
 | 3 | Treat a multi-paper method landscape as sufficient route grounding even when one exact dominant-method label is not repeated across every paper. | Real packaged alternative / held-out routes were being falsely downgraded by an over-strict single-method heuristic. |
 | 4 | Keep failure taxonomy classification inside the replay artifact boundary and split full records from aggregate summary counts. | Preserve auditability and avoid a second diagnostics pipeline. |
 | 4 | Record the same-slice Phase 4 rerun as a flat live delta instead of forcing a paper-only success story. | The real jamming artifacts remained green but kept the same four nonblocking failure records. |
+| 5 | Keep package-level prior review conservative and separate from live replay prior consumption. | The package-only support cluster should stay reviewable without automatically becoming a training-ready accepted prior. |
+| 5 | Record accepted anti-pattern ids explicitly even when accepted prior ids remain empty. | Phase 5 needs auditable review outcomes, not an all-or-nothing prior promotion story. |
 
 ## Pending Todos
 
@@ -98,5 +100,5 @@ Plan: 3 of 3
 ## Session
 
 **Last Date:** 2026-04-02T06:50:51.604Z
-**Stopped At:** Phase 5 context gathered (assumptions mode)
-**Resume File:** .planning/phases/05-multi-route-prior-induction/05-CONTEXT.md
+**Stopped At:** Phase 5 verified and closed out
+**Resume File:** .planning/phases/06-decision-episode-audit-export/06-CONTEXT.md

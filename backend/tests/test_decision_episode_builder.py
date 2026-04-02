@@ -506,3 +506,85 @@ def test_decision_episode_builder_rejects_visible_hindsight() -> None:
                 'input_visible': True,
             },
         )
+
+
+def test_decision_episode_builder_distinguishes_green_and_non_green_prior_support() -> None:
+    route_main = _route_state(
+        route_state_id='route-main',
+        support_ids=['m-e1', 'm-e2'],
+        challenge_ids=['m-c1'],
+        method_score=0.78,
+        measurement_score=0.81,
+        data_resource_score=0.9,
+        infrastructure_score=0.61,
+        cost_cycle_score=0.49,
+        overall_score=0.7,
+    )
+    route_peer_1 = _route_state(
+        route_state_id='route-peer-1',
+        support_ids=['p1-e1', 'p1-e2'],
+        challenge_ids=['p1-c1'],
+        method_score=0.76,
+        measurement_score=0.8,
+        data_resource_score=0.87,
+        infrastructure_score=0.6,
+        cost_cycle_score=0.48,
+        overall_score=0.69,
+    )
+    route_peer_2 = _route_state(
+        route_state_id='route-peer-2',
+        support_ids=['p2-e1', 'p2-e2'],
+        challenge_ids=['p2-c1'],
+        method_score=0.75,
+        measurement_score=0.78,
+        data_resource_score=0.86,
+        infrastructure_score=0.59,
+        cost_cycle_score=0.47,
+        overall_score=0.68,
+    )
+
+    green_prior = build_decision_prior_card(
+        [route_main, route_peer_1, route_peer_2],
+        why_now_cases=[build_why_now_case(route_main), build_why_now_case(route_peer_1), build_why_now_case(route_peer_2)],
+        held_out_route_states=[
+            _route_state(
+                route_state_id='route-held-out',
+                support_ids=['h-e1', 'h-e2'],
+                challenge_ids=['h-c1'],
+                method_score=0.77,
+                measurement_score=0.79,
+                data_resource_score=0.88,
+                infrastructure_score=0.61,
+                cost_cycle_score=0.49,
+                overall_score=0.69,
+            )
+        ],
+        reviewer_ids=['expert-1'],
+        built_at='2026-04-02T03:00:00Z',
+        prior_id='prior:green-support',
+    )
+    yellow_prior = build_decision_prior_card(
+        [route_main, route_peer_1],
+        built_at='2026-04-02T03:05:00Z',
+        prior_id='prior:yellow-support',
+    )
+
+    green_episode = build_decision_episode(
+        route_main,
+        route_packet=_route_packet(route_main),
+        why_now_case=build_why_now_case(route_main),
+        prior_cards=[green_prior],
+        built_at='2026-04-02T03:10:00Z',
+    )
+    yellow_episode = build_decision_episode(
+        route_main,
+        route_packet=_route_packet(route_main),
+        why_now_case=build_why_now_case(route_main),
+        prior_cards=[yellow_prior],
+        built_at='2026-04-02T03:15:00Z',
+    )
+
+    assert green_episode.relevant_priors.selected_prior_ids == ['prior:green-support']
+    assert 'weak_prior_support' not in green_episode.quality.quality_flags
+    assert yellow_episode.relevant_priors.selected_prior_ids == ['prior:yellow-support']
+    assert 'weak_prior_support' in yellow_episode.quality.quality_flags

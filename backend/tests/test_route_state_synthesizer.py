@@ -168,6 +168,24 @@ def _trace(paper_id: str, year: int, prefix: str, *, thin: bool = False) -> Pape
     return trace
 
 
+def _rename_methods(trace: PaperLogicTrace, prefix: str) -> PaperLogicTrace:
+    for move_index, move in enumerate(trace.canonical_core.moves, start=1):
+        renamed_methods: list[MentionValue] = []
+        for method_index, method in enumerate(move.methods, start=1):
+            renamed_methods.append(
+                MentionValue(
+                    surface=f'{prefix} method {move_index}-{method_index}',
+                    normalized=f'{prefix} method {move_index}-{method_index}',
+                    type=method.type,
+                    anchor_ids=list(method.anchor_ids),
+                    confidence=method.confidence,
+                )
+            )
+        move.methods = renamed_methods
+    trace.derived_views = build_derived_views(trace)
+    return trace
+
+
 def _packet(traces: list[PaperLogicTrace], *, cutoff_year: int) -> dict:
     return {
         'packet_id': f'packet-{cutoff_year}',
@@ -244,6 +262,82 @@ def _packet(traces: list[PaperLogicTrace], *, cutoff_year: int) -> dict:
     }
 
 
+def _l1_snapshot(*, cutoff_year: int, snapshot_id: str = 'imagenet_2011_snapshot') -> dict:
+    return {
+        'snapshot_id': snapshot_id,
+        'built_at': '2026-04-02T09:00:00Z',
+        'topic_scope': 'large-scale image recognition with deep neural networks',
+        'cutoff_year': cutoff_year,
+        'grounding_mode': 'paper_grounded_l1_lite',
+        'source_packet_id': f'packet-{cutoff_year}',
+        'source_trace_ids': ['paper-thin:paper_logic_trace'],
+        'source_paper_ids': ['paper-thin'],
+        'resource_registry': [
+            {
+                'label': 'imagenet-1k',
+                'status': 'available',
+                'confidence': 0.82,
+                'source_paper_ids': ['paper-thin'],
+                'source_trace_ids': ['paper-thin:paper_logic_trace'],
+                'source_move_ids': ['pt-m1'],
+                'evidence_ids': ['l1-r1'],
+                'resource_types': ['dataset'],
+            }
+        ],
+        'benchmark_timeline': [
+            {
+                'label': 'wn18rr',
+                'status': 'available',
+                'confidence': 0.8,
+                'source_paper_ids': ['paper-thin'],
+                'source_trace_ids': ['paper-thin:paper_logic_trace'],
+                'source_move_ids': ['pt-m1'],
+                'evidence_ids': ['l1-b1'],
+                'benchmark_type': 'benchmark',
+                'metric_tokens': ['mrr'],
+                'comparator_tokens': ['baseline retriever'],
+            }
+        ],
+        'toolchain_timeline': [
+            {
+                'label': 'cuda stack',
+                'status': 'available',
+                'confidence': 0.78,
+                'source_paper_ids': ['paper-thin'],
+                'source_trace_ids': ['paper-thin:paper_logic_trace'],
+                'source_move_ids': ['pt-m1'],
+                'evidence_ids': ['l1-t1'],
+                'resource_types': ['compute'],
+                'method_tokens': ['graph neural network'],
+            }
+        ],
+        'protocol_registry': [
+            {
+                'label': 'top-1 accuracy',
+                'status': 'available',
+                'confidence': 0.79,
+                'source_paper_ids': ['paper-thin'],
+                'source_trace_ids': ['paper-thin:paper_logic_trace'],
+                'source_move_ids': ['pt-m1'],
+                'evidence_ids': ['l1-p1'],
+                'metric_tokens': ['top-1 accuracy'],
+                'comparator_tokens': ['baseline retriever'],
+                'condition_tokens': ['standard split'],
+                'method_tokens': ['evaluation'],
+                'resource_tokens': ['imagenet-1k'],
+            }
+        ],
+        'unresolved_questions': ['External benchmark governance remains unmodeled.'],
+        'quality': {
+            'quality_tier': 'yellow',
+            'quality_flags': ['paper_only_snapshot'],
+            'audit_status': 'eligible',
+            'paper_only_snapshot': True,
+            'completeness_score': 0.74,
+        },
+    }
+
+
 def test_route_state_synthesizer_compiles_green_route_state_from_packetized_traces() -> None:
     traces = [_trace('paper-a', 2011, 'pa'), _trace('paper-b', 2011, 'pb')]
 
@@ -288,3 +382,69 @@ def test_route_state_synthesizer_marks_thin_single_paper_state_yellow() -> None:
     assert route_state.quality.ready_for_prior_selection is False
     assert 'dominant_method_not_multi_paper' in route_state.quality.quality_flags
     assert 'missing_challenging_evidence' in route_state.quality.quality_flags
+
+
+def test_route_state_synthesizer_allows_multi_paper_method_landscape_without_single_repeated_method() -> None:
+    trace_a = _trace('paper-a', 2011, 'pa')
+    trace_b = _rename_methods(_trace('paper-b', 2011, 'pb'), 'route-b')
+
+    route_state = synthesize_route_state(
+        _packet([trace_a, trace_b], cutoff_year=2011),
+        [trace_a, trace_b],
+        built_at='2026-04-02T23:10:00Z',
+    )
+
+    assert route_state.quality.quality_tier == 'green'
+    assert route_state.quality.ready_for_route_comparison is True
+    assert 'dominant_method_not_multi_paper' not in route_state.quality.quality_flags
+
+
+def test_route_state_synthesizer_merges_l1_snapshot_into_route_landscape() -> None:
+    trace = _trace('paper-thin', 2011, 'pt', thin=True)
+
+    route_state = synthesize_route_state(
+        _packet([trace], cutoff_year=2011),
+        [trace],
+        l1_snapshot=_l1_snapshot(cutoff_year=2011),
+        built_at='2026-04-02T09:10:00Z',
+    )
+
+    assert [benchmark.label for benchmark in route_state.route_landscape.active_benchmarks] == ['wn18rr']
+    assert [infra.label for infra in route_state.route_landscape.toolchains_and_infrastructure] == ['cuda stack']
+    assert [protocol.label for protocol in route_state.route_landscape.measurement_protocols] == ['top-1 accuracy']
+    assert any(feature.feature_type == 'protocol' for feature in route_state.why_now_features.acceleration_factors)
+    assert 'l1-b1' in route_state.evidence_bundle.supporting_evidence_ids
+    assert route_state.source_packet.l1_snapshot_ref == 'imagenet_2011_snapshot'
+    assert route_state.compiler_metadata.l1_snapshot_version == 'imagenet_2011_snapshot'
+    assert route_state.uncertainty_points.open_questions == [
+        'External benchmark governance remains unmodeled.',
+        'paper-grounded L1-lite may still miss external benchmark, toolchain, or protocol history',
+    ]
+
+
+def test_route_state_synthesizer_rejects_l1_snapshot_cutoff_mismatch() -> None:
+    trace = _trace('paper-thin', 2011, 'pt', thin=True)
+
+    with pytest.raises(ValueError, match='l1_snapshot cutoff_year must match RoutePacket cutoff_year'):
+        synthesize_route_state(
+            _packet([trace], cutoff_year=2011),
+            [trace],
+            l1_snapshot=_l1_snapshot(cutoff_year=2012),
+            built_at='2026-04-02T09:20:00Z',
+        )
+
+
+def test_route_state_synthesizer_prefers_explicit_l1_snapshot_over_packet_placeholder_ref() -> None:
+    trace = _trace('paper-thin', 2011, 'pt', thin=True)
+    packet = _packet([trace], cutoff_year=2011)
+    packet['l1_snapshot_ref']['snapshot_id'] = 'packet_placeholder_snapshot'
+
+    route_state = synthesize_route_state(
+        packet,
+        [trace],
+        l1_snapshot=_l1_snapshot(cutoff_year=2011, snapshot_id='actual_l1_snapshot_v1'),
+        built_at='2026-04-02T09:30:00Z',
+    )
+
+    assert route_state.source_packet.l1_snapshot_ref == 'actual_l1_snapshot_v1'
+    assert route_state.compiler_metadata.l1_snapshot_version == 'actual_l1_snapshot_v1'

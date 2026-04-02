@@ -304,6 +304,8 @@ _METHOD_FAMILY_SUFFIX_TOKENS = {
     'test',
     'workflow',
 }
+_COMPLETENESS_GROUNDED_ROLES = {'method', 'experiment', 'result', 'interpretation', 'future_work', 'limitation'}
+_EXPECTED_COMPLETENESS_FIELDS = ('metrics', 'comparators', 'conditions', 'limitation_types', 'resource_mentions')
 _PAREN_CONTENT_RE = re.compile(r'\([^)]*\)')
 _SECTION_HEADING_RE = re.compile(r'^\s*(?:\d+(?:\.\d+)*|[ivx]+)\.?\s+', re.IGNORECASE)
 _PIPE_SECTION_HEADING_RE = re.compile(r'^\s*(?:section\s+)?\d+(?:\.\d+)*\s*[|:：-]\s+\S', re.IGNORECASE)
@@ -1122,6 +1124,70 @@ def build_future_work_signals(moves: list[ResearchMove]) -> list[dict[str, Any]]
     return entries
 
 
+def build_completeness_signals(moves: list[ResearchMove]) -> list[dict[str, Any]]:
+    entries: list[dict[str, Any]] = []
+    for move in moves:
+        if move.role not in _COMPLETENESS_GROUNDED_ROLES:
+            continue
+        research_objects = _trusted_mentions(move, 'research_objects', list(move.research_objects))
+        methods = _trusted_mentions(move, 'methods', list(move.methods))
+        metrics = _trusted_mentions(move, 'metrics', list(move.metrics))
+        comparators = _trusted_mentions(move, 'comparators', list(move.comparators))
+        conditions = _trusted_mentions(move, 'conditions', list(move.conditions))
+        limitation_types = _trusted_mentions(move, 'limitation_types', list(move.limitation_types))
+        resource_mentions = _trusted_mentions(move, 'resource_mentions', list(move.resource_mentions))
+        if not (
+            research_objects
+            or methods
+            or metrics
+            or comparators
+            or conditions
+            or limitation_types
+            or resource_mentions
+            or move.effects
+        ):
+            continue
+        missing_fields = [
+            field
+            for field, mentions in {
+                'metrics': metrics,
+                'comparators': comparators,
+                'conditions': conditions,
+                'limitation_types': limitation_types,
+                'resource_mentions': resource_mentions,
+            }.items()
+            if not mentions
+        ]
+        if not missing_fields:
+            continue
+        present_fields = [
+            field
+            for field in ('research_objects', 'methods', *_EXPECTED_COMPLETENESS_FIELDS)
+            if (
+                (field == 'research_objects' and research_objects)
+                or (field == 'methods' and methods)
+                or (field == 'metrics' and metrics)
+                or (field == 'comparators' and comparators)
+                or (field == 'conditions' and conditions)
+                or (field == 'limitation_types' and limitation_types)
+                or (field == 'resource_mentions' and resource_mentions)
+            )
+        ]
+        entries.append(
+            {
+                'move_id': move.move_id,
+                'role': move.role,
+                'act_type': move.act_type,
+                'summary': move.summary,
+                'present_fields': present_fields,
+                'missing_fields': missing_fields,
+                'anchor_ids': list(move.anchor_ids),
+                'confidence': move.confidence,
+            }
+        )
+    return entries
+
+
 def _filter_prior_work_method_signal_entries(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
     if not entries:
         return []
@@ -1198,6 +1264,7 @@ def build_route_compiler_contract(
     outcome_entries = _outcome_signals(moves)
     comparison_entries = _comparison_signals(moves)
     future_work_entries = build_future_work_signals(moves)
+    completeness_entries = build_completeness_signals(moves)
 
     role_distribution: dict[str, int] = {}
     for move in moves:
@@ -1214,6 +1281,7 @@ def build_route_compiler_contract(
         'outcome_signals': outcome_entries,
         'comparison_signals': comparison_entries,
         'future_direction_signals': future_work_entries,
+        'completeness_signals': completeness_entries,
         'constraint_signals': {
             'conditions': condition_signals,
             'limitations': limitation_signals,
@@ -1226,6 +1294,7 @@ def build_route_compiler_contract(
             'outcome_entries': len(outcome_entries),
             'comparison_entries': len(comparison_entries),
             'future_work_entries': len(future_work_entries),
+            'completeness_entries': len(completeness_entries),
             'condition_entries': len(condition_signals),
             'limitation_entries': len(limitation_signals),
             'resource_entries': len(resource_signals),
@@ -1598,6 +1667,7 @@ def build_route_state_seed(
     outcome_entries = list(route_compiler_contract.get('outcome_signals') or [])
     comparison_entries = list(route_compiler_contract.get('comparison_signals') or [])
     future_direction_entries = list(route_compiler_contract.get('future_direction_signals') or [])
+    completeness_entries = list(route_compiler_contract.get('completeness_signals') or [])
     benchmark_entries = list(l1_bridge_hints.get('benchmark_candidates') or [])
     protocol_candidates = list(l1_bridge_hints.get('protocol_candidates') or [])
     toolchain_candidates = list(l1_bridge_hints.get('toolchain_candidates') or [])
@@ -1621,6 +1691,7 @@ def build_route_state_seed(
             *_entry_anchor_ids(resource_entries),
             *_entry_anchor_ids(outcome_entries),
             *_entry_anchor_ids(comparison_entries),
+            *_entry_anchor_ids(future_direction_entries),
             *_entry_anchor_ids(protocol_candidates),
             *_entry_anchor_ids(toolchain_candidates),
         ]
@@ -1642,6 +1713,29 @@ def build_route_state_seed(
         'known_bottleneck_candidates': _entry_labels(limitation_entries),
         'enabling_condition_candidates': _entry_labels(condition_entries),
         'alternative_route_candidates': _future_direction_labels(future_direction_entries),
+        'comparison_signal_entries': [
+            {
+                **entry,
+                'evidence_ids': list(entry.get('anchor_ids') or []),
+            }
+            for entry in comparison_entries
+        ],
+        'alternative_route_signal_entries': [
+            {
+                **entry,
+                'derived_label': _future_direction_labels([entry], limit=1)[0] if _future_direction_labels([entry], limit=1) else '',
+                'evidence_ids': list(entry.get('anchor_ids') or []),
+            }
+            for entry in future_direction_entries
+        ],
+        'completeness_signals': [
+            {
+                **entry,
+                'coverage_flag': 'l2_expected_slot_missing',
+                'evidence_ids': list(entry.get('anchor_ids') or []),
+            }
+            for entry in completeness_entries
+        ],
         'measurement_protocol_candidates': protocol_candidates,
         'toolchain_candidates': toolchain_candidates,
         'supporting_evidence_ids': supporting_evidence_ids,
