@@ -104,7 +104,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 06-01: Define the audited export format and leakage-safe assembly path for `DecisionEpisode`
+- [x] 06-01: Define the audited export format and leakage-safe assembly path for `DecisionEpisode`
 - [ ] 06-02: Produce and inspect a first batch of training / eval-ready decision samples
 
 ## Progress
@@ -119,8 +119,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 3. Grounded Route Replay Compilation | 3/3 | Completed | 2026-04-02 |
 | 4. Replay Failure Taxonomy And L2 Surgical Loop | 3/3 | Complete | 2026-04-02 |
 | 5. Multi-Route Prior Induction | 2/2 | Complete | 2026-04-02 |
-| 6. Decision Episode Audit Export | 0/2 | Not started | - |
+| 6. Decision Episode Audit Export | 1/2 | In Progress | - |
 
 ---
 *Roadmap defined: 2026-04-01*
-*Last updated: 2026-04-02 after Phase 5 added multi-route prior review bundles and accepted anti-pattern outputs on the jamming package*
+*Last updated: 2026-04-02 after Phase 6 plan 01 added audited DecisionEpisode export assembly and dedicated export bundle writers*

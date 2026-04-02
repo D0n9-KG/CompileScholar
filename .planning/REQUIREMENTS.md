@@ -40,7 +40,7 @@
 ### L4 Decision Layer
 
 - [x] **L4-01**: 系统可以从多个 `RouteState` 归纳出 `DecisionPriorCard` / `AntiPatternCard`，并显式记录 support、counterexample、held-out consistency 与 review status。
-- [ ] **L4-02**: 系统可以组装 `DecisionEpisode`，把 `L1/L2/L3/L4` 对象放进同一个可训练、可评估、可审计的样本中，同时把 hindsight 仅保留在 label / eval 侧。
+- [x] **L4-02**: 系统可以组装 `DecisionEpisode`，把 `L1/L2/L3/L4` 对象放进同一个可训练、可评估、可审计的样本中，同时把 hindsight 仅保留在 label / eval 侧。
 
 ### Evaluation
 
@@ -84,7 +84,7 @@
 | L2-02 | Phase 4 | Complete |
 | EVAL-02 | Phase 4 | Complete |
 | L4-01 | Phase 5 | Complete |
-| L4-02 | Phase 6 | Pending |
+| L4-02 | Phase 6 | Complete |
 
 **Coverage:**
 - v1 requirements: 13 total
@@ -93,4 +93,4 @@
 
 ---
 *Requirements defined: 2026-04-01*
-*Last updated: 2026-04-02 after Phase 5 verified multi-route prior induction and candidate review outputs*
+*Last updated: 2026-04-02 after Phase 6 plan 01 established audited DecisionEpisode export assembly and explicit leakage-safe export boundaries*
