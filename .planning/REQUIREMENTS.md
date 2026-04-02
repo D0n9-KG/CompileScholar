@@ -9,9 +9,9 @@ Requirements for milestone `v1.1`. These define what must be true before the nex
 
 ### Corpus Sampling
 
-- [ ] **SAMPLE-01**: Operator can define one fixed regression paper set and one random exploration paper set from the shared corpus for each iteration cycle.
-- [ ] **SAMPLE-02**: Each sampling run records selected paper ids, source paths, and sampling mode so the exact batch can be reproduced.
-- [ ] **SAMPLE-03**: Sampling reports missing or broken corpus paths separately from model-quality failures.
+- [x] **SAMPLE-01**: Operator can define one fixed regression paper set and one random exploration paper set from the shared corpus for each iteration cycle.
+- [x] **SAMPLE-02**: Each sampling run records selected paper ids, source paths, and sampling mode so the exact batch can be reproduced.
+- [x] **SAMPLE-03**: Sampling reports missing or broken corpus paths separately from model-quality failures.
 
 ### Single-Paper Extraction Iteration
 
@@ -60,9 +60,9 @@ Explicitly excluded from `v1.1`.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| `SAMPLE-01` | Phase `7` | Pending |
-| `SAMPLE-02` | Phase `7` | Pending |
-| `SAMPLE-03` | Phase `7` | Pending |
+| `SAMPLE-01` | Phase `7` | Complete |
+| `SAMPLE-02` | Phase `7` | Complete |
+| `SAMPLE-03` | Phase `7` | Complete |
 | `L2Q-01` | Phase `8` | Pending |
 | `L2Q-02` | Phase `8` | Pending |
 | `PACK-01` | Phase `9` | Pending |
@@ -78,4 +78,4 @@ Explicitly excluded from `v1.1`.
 
 ---
 *Requirements defined: 2026-04-03*
-*Last updated: 2026-04-03 after milestone strategy refinement*
+*Last updated: 2026-04-03 after Phase 7 execution and verification*

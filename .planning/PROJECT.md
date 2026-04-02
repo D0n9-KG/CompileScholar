@@ -14,6 +14,8 @@ Produce auditable, replayable, trainable scientific-reasoning artifacts rather t
 
 - Shipped milestone: `v1.0` on `2026-04-02`
 - Active planning milestone: `v1.1 Corpus-Driven Iterative Quality Hardening`
+- Phase `7` completed on `2026-04-03` with a committed ten-paper fixed regression set and a real seed-`7` random exploration batch of five papers
+- The first real Phase `7` corpus baseline recorded `1756` inventory entries, `1755` eligible entries, and `1505` corpus-health failures
 - Stable bounded pilot: `jamming transition in frictionless sphere packings near point J` with `cutoff_year = 2010`
 - End-to-end Phase 03 -> 06 artifact flow is verified on real local bundles
 - Reviewed anti-pattern carryover now works across route variants through stable `route_family_id`
@@ -40,10 +42,10 @@ Produce auditable, replayable, trainable scientific-reasoning artifacts rather t
 - [x] `RouteState / WhyNowCase / RouteComparisonCase` now compile from real multi-paper replay packages in `v1.0`.
 - [x] Replay failure taxonomy and bounded `L2` repair loops now exist in `v1.0`.
 - [x] `DecisionPriorCard / AntiPatternCard` review workflow and audited `DecisionEpisode` export both shipped in `v1.0`.
+- [x] Phase `7` now provides a filesystem-first corpus sampling workflow with one committed fixed regression set, one reproducible random exploration batch, and explicit corpus-health reporting.
 
 ### Active
 
-- [ ] Build a sampling workflow over the large shared corpus that supports both fixed regression papers and random exploration papers.
 - [ ] Repeatedly run sampled single-paper extraction and evaluation so `L2` quality issues can be measured instead of guessed.
 - [ ] Assemble bounded multi-paper packets from the larger corpus so `L3/L4` can be validated on structured topic slices rather than arbitrary random mixes.
 - [ ] Use evidence from sampled-paper runs and bounded packet runs to choose the next optimization cycle.
@@ -74,7 +76,8 @@ Produce auditable, replayable, trainable scientific-reasoning artifacts rather t
 | Keep export bundles separate from replay and review bundles | Audit-grade packaging should not mutate runtime artifacts | `Good` |
 | Prefer conservative audit truth over optimistic promotion stories | Honest bounded outputs are more useful than overclaiming generalized readiness | `Good` |
 | Use stable `route_family_id` for reviewed anti-pattern carryover | The real mismatch was between route variants in the same family, not unrelated route ids | `Good` |
-| Use a fixed regression set plus random exploration samples in `v1.1` | Fixed papers catch regressions while random samples keep the system from overfitting to a tiny benchmark | `Pending` |
+| Use a fixed regression set plus random exploration samples in `v1.1` | Fixed papers catch regressions while random samples keep the system from overfitting to a tiny benchmark | `Good` |
+| Use filesystem inventory as the Phase 7 sampling gate and Neo4j only as enrichment | The real corpus is broader and messier than current graph coverage, so eligibility must reflect what is actually present on disk | `Good` |
 | Use topic-bounded multi-paper packets rather than unconstrained random mixes for `L3/L4` | `L3/L4` need structured `support / alternative / held_out` evidence, not arbitrary co-occurrence | `Pending` |
 
 ## Evolution
@@ -95,4 +98,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-03 after refining the v1.1 milestone strategy*
+*Last updated: 2026-04-03 after Phase 7 execution and verification*

@@ -28,6 +28,7 @@ The milestone first establishes a fixed regression set plus random exploration s
 **Goal:** Turn the shared corpus into a usable evaluation source with one fixed regression set, one random exploration strategy, reproducible sampling metadata, and explicit corpus-health reporting.
 **Depends on:** `v1.0` archived baseline
 **Requirements:** `SAMPLE-01`, `SAMPLE-02`, `SAMPLE-03`
+**Status:** Complete on `2026-04-03`
 
 **Success criteria:**
 1. The project defines a fixed regression paper set and a random exploration sampling method over the shared corpus.
@@ -101,15 +102,16 @@ The milestone first establishes a fixed regression set plus random exploration s
 - `v1.1` does not try to process the full corpus in one pass; it uses the corpus as a large candidate pool for repeated sampling and bounded packet construction.
 - The jamming slice remains the reference baseline, but it is no longer the only intended source of optimization evidence.
 - Shared-corpus path instability is part of the quality loop because bad corpus hygiene can otherwise masquerade as extraction failure.
+- Phase `7` completed on `2026-04-03` with a committed ten-paper fixed regression set, a real seed-`7` random exploration batch of five papers, and `1505` recorded corpus-health failures in `tmp/phase7_corpus_sampling_baseline/`.
 
 ## Next Up
 
-**Phase 7: Corpus Sampling And Regression Baseline** - Define the fixed regression set, random exploration sampling, and corpus-health reporting loop.
+**Phase 8: Sampled Single-Paper L2 Regression** - Repeatedly run sampled single-paper extraction on the fixed and random Phase 7 batches and compare failures across iterations.
 
-`$gsd-discuss-phase 7`
+`$gsd-discuss-phase 8`
 
-Also available: `$gsd-plan-phase 7`
+Also available: `$gsd-plan-phase 8`
 
 ---
 *Roadmap created: 2026-04-03*
-*Last updated: 2026-04-03 after milestone strategy refinement*
+*Last updated: 2026-04-03 after Phase 7 execution and verification*
