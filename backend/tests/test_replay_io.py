@@ -10,6 +10,9 @@ import pytest
 from app.paper_logic_trace.derived_views import build_derived_views
 from app.paper_logic_trace.models import CanonicalCore, MentionValue, PaperLogicTrace, PaperMetadata, ResearchMove, SlotProvenance
 from app.research_logic import (
+    build_decision_episode_audit_export,
+    build_decision_episode_export_inspection,
+    build_decision_episode_export_summary,
     build_prior_candidate_registry,
     compile_historical_replay,
     ensure_packet_trace_coverage,
@@ -17,9 +20,11 @@ from app.research_logic import (
     load_paper_logic_traces,
     load_route_packet,
     load_route_states,
+    write_decision_episode_export_bundle,
     write_prior_candidate_review_bundle,
     write_replay_bundle,
 )
+from app.research_logic.models import AntiPatternCard
 
 
 def _mention(surface: str, normalized: str, anchor_id: str, *, mention_type: str | None = None) -> MentionValue:
@@ -232,6 +237,85 @@ def _l1_snapshot(*, cutoff_year: int, snapshot_id: str = 'imagenet_2011_snapshot
 def _write_json(path: Path, payload: object) -> Path:
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     return path
+
+
+def _anti_pattern_card(*, anti_pattern_id: str, route_state_ids: list[str]) -> AntiPatternCard:
+    return AntiPatternCard(
+        anti_pattern_id=anti_pattern_id,
+        built_at='2026-04-02T03:20:00Z',
+        anti_pattern_text='Repeated blocker pressure should trigger caution.',
+        warning_signal_pattern={
+            'signals': [
+                {
+                    'label': 'anisotropic packing',
+                    'signal_type': 'bottleneck',
+                    'severity': 'high',
+                }
+            ],
+            'trigger_logic': 'all',
+        },
+        failure_examples={
+            'route_state_ids': route_state_ids,
+            'decision_episode_ids': [],
+            'notes': 'Synthetic replay-io export test.',
+        },
+        corrective_checklist=['Reduce blocker pressure before reuse.'],
+        counterexamples={
+            'route_state_ids': ['route-alt'],
+            'notes': 'Synthetic counterexample.',
+        },
+        review={
+            'review_status': 'reviewed',
+            'reviewer_notes': 'Reviewed for export IO tests.',
+            'reviewer_ids': ['reviewer-1'],
+        },
+        quality={
+            'quality_tier': 'green',
+            'quality_flags': [],
+            'audit_status': 'reviewed',
+        },
+    )
+
+
+def _decision_episode_audit_export(tmp_path: Path):
+    traces = [_trace('paper-a', 2011, 'pa')]
+    route_packet = load_route_packet(_write_json(tmp_path / 'route_packet.json', _packet(traces, cutoff_year=2011)))
+    compilation = compile_historical_replay(route_packet, traces, built_at='2026-04-02T04:00:00Z')
+    anti_pattern = _anti_pattern_card(
+        anti_pattern_id='anti:route-main:matching',
+        route_state_ids=[compilation.primary_route_state.route_state_id],
+    )
+    return build_decision_episode_audit_export(
+        route_packet=route_packet,
+        route_state=compilation.primary_route_state,
+        why_now_case=compilation.why_now_case,
+        anti_pattern_cards=[anti_pattern],
+        accepted_prior_ids=[],
+        accepted_anti_pattern_ids=[anti_pattern.anti_pattern_id],
+        route_state_ref='outputs/primary_route_state.json',
+        source_replay_bundle_refs={
+            'bundle_ref': 'tmp/source-replay',
+            'manifest_ref': 'tmp/source-replay/bundle_manifest.json',
+            'files': {
+                'route_packet': 'inputs/route_packet.json',
+                'decision_episode': 'outputs/decision_episode.json',
+            },
+        },
+        source_review_bundle_refs={
+            'bundle_ref': 'tmp/source-review',
+            'manifest_ref': 'tmp/source-review/bundle_manifest.json',
+            'files': {
+                'anti_pattern_candidates': 'anti_pattern_candidates.json',
+                'candidate_review_summary': 'candidate_review_summary.json',
+            },
+        },
+        hindsight_outcome={
+            'outcome_label': 'success',
+            'later_evidence_refs': ['future-ref-1'],
+            'input_visible': False,
+        },
+        built_at='2026-04-02T04:05:00Z',
+    )
 
 
 def test_load_route_packet_and_trace_dir_round_trip(tmp_path: Path) -> None:
@@ -454,3 +538,48 @@ def test_write_prior_candidate_review_bundle_writes_expected_files(tmp_path: Pat
     assert summary_payload['package_id'] == 'test-package'
     assert 'cluster_ids' in summary_payload
     assert 'accepted_prior_ids' in summary_payload
+
+
+def test_build_decision_episode_export_summary_and_inspection_expose_visibility_buckets(tmp_path: Path) -> None:
+    export = _decision_episode_audit_export(tmp_path)
+
+    summary_payload = build_decision_episode_export_summary(export=export)
+    inspection_payload = build_decision_episode_export_inspection(export=export)
+
+    assert summary_payload['accepted_prior_ids'] == []
+    assert summary_payload['accepted_anti_pattern_count'] == 1
+    assert summary_payload['visibility_bucket_counts']['label_eval_only_refs'] == 1
+    assert inspection_payload['source_bundles']['replay_bundle']['manifest_ref'] == 'tmp/source-replay/bundle_manifest.json'
+    assert inspection_payload['anti_pattern_selection']['selected_antipattern_ids'] == ['anti:route-main:matching']
+    assert inspection_payload['visibility_buckets']['visible_input_refs']
+    assert inspection_payload['visibility_buckets']['label_eval_only_refs'] == ['hindsight_evidence:future-ref-1']
+
+
+def test_write_decision_episode_export_bundle_writes_expected_files(tmp_path: Path) -> None:
+    export = _decision_episode_audit_export(tmp_path)
+
+    written_files = write_decision_episode_export_bundle(
+        tmp_path / 'export-bundle',
+        export=export,
+        metadata={'runner': 'pytest'},
+    )
+
+    assert {'bundle_manifest', 'decision_episode', 'export_inspection', 'export_summary'} == set(written_files)
+    assert written_files['bundle_manifest'].is_file()
+    assert written_files['export_summary'].is_file()
+    assert written_files['export_inspection'].is_file()
+    assert written_files['decision_episode'].is_file()
+    assert all(str(path).startswith(str((tmp_path / 'export-bundle').resolve())) for path in written_files.values())
+
+    manifest_payload = json.loads(written_files['bundle_manifest'].read_text(encoding='utf-8'))
+    summary_payload = json.loads(written_files['export_summary'].read_text(encoding='utf-8'))
+    inspection_payload = json.loads(written_files['export_inspection'].read_text(encoding='utf-8'))
+
+    assert manifest_payload['files']['decision_episode'] == 'outputs/decision_episode.json'
+    assert manifest_payload['source_replay_bundle_refs']['manifest_ref'] == 'tmp/source-replay/bundle_manifest.json'
+    assert manifest_payload['accepted_prior_ids'] == []
+    assert manifest_payload['accepted_anti_pattern_ids'] == ['anti:route-main:matching']
+    assert summary_payload['audit_posture'] == 'audit_grade_pilot'
+    assert summary_payload['visibility_bucket_counts']['visible_input_refs'] == len(export.visible_input_refs)
+    assert inspection_payload['visibility_buckets']['audit_only_refs']
+    assert inspection_payload['visibility_buckets']['label_eval_only_refs'] == ['hindsight_evidence:future-ref-1']

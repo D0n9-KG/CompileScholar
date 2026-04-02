@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, Sequence
 
 from app.paper_logic_trace.models import PaperLogicTrace
 
+from .decision_episode_export import DecisionEpisodeAuditExport
 from .historical_environment import HistoricalEnvironmentSnapshot
 from .historical_replay_compiler import HistoricalReplayCompilation
 from .models import RoutePacket, RouteState
@@ -335,6 +336,86 @@ def build_prior_candidate_review_summary(
     }
 
 
+def build_decision_episode_export_summary(
+    *,
+    export: DecisionEpisodeAuditExport,
+) -> dict[str, Any]:
+    decision_episode = export.decision_episode
+    return {
+        'built_at': export.built_at,
+        'episode_id': decision_episode.episode_id,
+        'route_packet_id': decision_episode.observation_evidence_pack.route_packet_id,
+        'route_state_id': decision_episode.route_state.route_state_id,
+        'historical_cutoff_time': decision_episode.historical_cutoff_time,
+        'audit_posture': 'audit_grade_pilot',
+        'accepted_prior_ids': list(export.accepted_prior_ids),
+        'accepted_anti_pattern_ids': list(export.accepted_anti_pattern_ids),
+        'selected_prior_ids': list(decision_episode.relevant_priors.selected_prior_ids),
+        'selected_antipattern_ids': list(decision_episode.relevant_priors.selected_antipattern_ids),
+        'accepted_prior_count': len(export.accepted_prior_ids),
+        'accepted_anti_pattern_count': len(export.accepted_anti_pattern_ids),
+        'selected_prior_count': len(decision_episode.relevant_priors.selected_prior_ids),
+        'selected_antipattern_count': len(decision_episode.relevant_priors.selected_antipattern_ids),
+        'visibility_bucket_counts': {
+            'visible_input_refs': len(export.visible_input_refs),
+            'audit_only_refs': len(export.audit_only_refs),
+            'label_eval_only_refs': len(export.label_eval_only_refs),
+        },
+        'quality_tier': decision_episode.quality.quality_tier,
+        'ready_for_training': decision_episode.quality.ready_for_training,
+        'ready_for_eval': decision_episode.quality.ready_for_eval,
+        'quality_flags': list(decision_episode.quality.quality_flags),
+        'hindsight_input_visible': decision_episode.hindsight_outcome.input_visible,
+        'prior_selection_note': export.prior_selection_note,
+        'anti_pattern_selection_note': export.anti_pattern_selection_note,
+    }
+
+
+def build_decision_episode_export_inspection(
+    *,
+    export: DecisionEpisodeAuditExport,
+) -> dict[str, Any]:
+    decision_episode = export.decision_episode
+    return {
+        'built_at': export.built_at,
+        'episode_id': decision_episode.episode_id,
+        'route_state_id': decision_episode.route_state.route_state_id,
+        'source_bundles': {
+            'replay_bundle': export.source_replay_bundle_refs.model_dump(exclude_none=True),
+            'review_bundle': export.source_review_bundle_refs.model_dump(exclude_none=True),
+        },
+        'prior_selection': {
+            'accepted_prior_ids': list(export.accepted_prior_ids),
+            'selected_prior_ids': list(decision_episode.relevant_priors.selected_prior_ids),
+            'decision_episode_prior_selection_rationale': decision_episode.relevant_priors.prior_selection_rationale,
+            'audit_note': export.prior_selection_note,
+        },
+        'anti_pattern_selection': {
+            'accepted_anti_pattern_ids': list(export.accepted_anti_pattern_ids),
+            'selected_antipattern_ids': list(decision_episode.relevant_priors.selected_antipattern_ids),
+            'audit_note': export.anti_pattern_selection_note,
+        },
+        'visibility_buckets': {
+            'visible_input_refs': list(export.visible_input_refs),
+            'audit_only_refs': list(export.audit_only_refs),
+            'label_eval_only_refs': list(export.label_eval_only_refs),
+        },
+        'policy': {
+            'audit_posture': 'audit_grade_pilot',
+            'hindsight_input_visible': decision_episode.hindsight_outcome.input_visible,
+            'after_cutoff_refs_visible': any(
+                ref.startswith('after_cutoff_paper:')
+                for ref in export.visible_input_refs
+            ),
+            'label_eval_refs_visible': any(
+                ref.startswith('hindsight_evidence:')
+                for ref in export.visible_input_refs
+            ),
+        },
+        'decision_episode_quality': decision_episode.quality.model_dump(mode='json', exclude_none=True),
+    }
+
+
 def _model_payload(model: Any) -> Any:
     if hasattr(model, 'model_dump'):
         return model.model_dump(mode='json', exclude_none=True)
@@ -473,7 +554,48 @@ def write_prior_candidate_review_bundle(
     return written_files
 
 
+def write_decision_episode_export_bundle(
+    output_dir: str | Path,
+    *,
+    export: DecisionEpisodeAuditExport,
+    metadata: dict[str, Any] | None = None,
+) -> dict[str, Path]:
+    bundle_dir = _as_path(output_dir)
+    outputs_dir = bundle_dir / 'outputs'
+
+    summary_payload = build_decision_episode_export_summary(export=export)
+    inspection_payload = build_decision_episode_export_inspection(export=export)
+
+    written_files = {
+        'decision_episode': _write_json(
+            outputs_dir / 'decision_episode.json',
+            _model_payload(export.decision_episode),
+        ),
+        'export_summary': _write_json(bundle_dir / 'export_summary.json', summary_payload),
+        'export_inspection': _write_json(bundle_dir / 'export_inspection.json', inspection_payload),
+    }
+    manifest_payload = {
+        'schema_version': 'v1',
+        'built_at': export.built_at,
+        'exported_episode_id': export.decision_episode.episode_id,
+        'route_state_id': export.decision_episode.route_state.route_state_id,
+        'accepted_prior_ids': list(export.accepted_prior_ids),
+        'accepted_anti_pattern_ids': list(export.accepted_anti_pattern_ids),
+        'source_replay_bundle_refs': export.source_replay_bundle_refs.model_dump(exclude_none=True),
+        'source_review_bundle_refs': export.source_review_bundle_refs.model_dump(exclude_none=True),
+        'metadata': dict(metadata or {}),
+        'files': {
+            name: str(path.relative_to(bundle_dir)).replace('\\', '/')
+            for name, path in written_files.items()
+        },
+    }
+    written_files['bundle_manifest'] = _write_json(bundle_dir / 'bundle_manifest.json', manifest_payload)
+    return written_files
+
+
 __all__ = [
+    'build_decision_episode_export_inspection',
+    'build_decision_episode_export_summary',
     'build_prior_candidate_review_summary',
     'build_replay_summary',
     'build_replay_inspection',
@@ -484,6 +606,7 @@ __all__ = [
     'load_route_packet',
     'load_route_state',
     'load_route_states',
+    'write_decision_episode_export_bundle',
     'write_prior_candidate_review_bundle',
     'write_replay_bundle',
 ]

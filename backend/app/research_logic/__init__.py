@@ -29,6 +29,8 @@ from .historical_environment import (
     write_historical_environment_snapshot,
 )
 from .replay_io import (
+    build_decision_episode_export_inspection,
+    build_decision_episode_export_summary,
     build_prior_candidate_review_summary,
     build_replay_inspection,
     build_replay_summary,
@@ -39,6 +41,7 @@ from .replay_io import (
     load_route_packet,
     load_route_state,
     load_route_states,
+    write_decision_episode_export_bundle,
     write_prior_candidate_review_bundle,
     write_replay_bundle,
 )
@@ -105,6 +108,8 @@ __all__ = [
     'build_prior_candidate_registry',
     'build_prior_candidate_registry_from_package',
     'build_prior_candidate_review_summary',
+    'build_decision_episode_export_inspection',
+    'build_decision_episode_export_summary',
     'build_replay_inspection',
     'build_replay_summary',
     'ensure_packet_trace_coverage',
@@ -114,6 +119,7 @@ __all__ = [
     'load_route_packet',
     'load_route_state',
     'load_route_states',
+    'write_decision_episode_export_bundle',
     'write_prior_candidate_review_bundle',
     'write_replay_bundle',
     'LoadedRouteStatePackage',
