@@ -10,6 +10,11 @@ from .models import (
 from .decision_prior_builder import DecisionPriorBuilder, build_decision_prior_card
 from .anti_pattern_builder import AntiPatternBuilder, build_anti_pattern_candidates
 from .decision_episode_builder import DecisionEpisodeBuilder, build_decision_episode
+from .decision_episode_export import (
+    DecisionEpisodeAuditExport,
+    DecisionEpisodeExportSourceRefs,
+    build_decision_episode_audit_export,
+)
 from .historical_replay_compiler import HistoricalReplayCompilation, HistoricalReplayCompiler, compile_historical_replay
 from .historical_environment import (
     BenchmarkTimelineEntry,
@@ -78,6 +83,9 @@ __all__ = [
     'build_decision_prior_card',
     'DecisionEpisodeBuilder',
     'build_decision_episode',
+    'DecisionEpisodeAuditExport',
+    'DecisionEpisodeExportSourceRefs',
+    'build_decision_episode_audit_export',
     'HistoricalReplayCompilation',
     'HistoricalReplayCompiler',
     'compile_historical_replay',
