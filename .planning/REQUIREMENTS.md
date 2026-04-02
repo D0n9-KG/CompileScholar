@@ -56,25 +56,23 @@ Explicitly excluded from `v1.1`.
 
 ## Traceability
 
-Roadmap mapping is still pending.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| `CANON-01` | Pending roadmap | Pending |
-| `CANON-02` | Pending roadmap | Pending |
-| `CANON-03` | Pending roadmap | Pending |
-| `XVAL-01` | Pending roadmap | Pending |
-| `XVAL-02` | Pending roadmap | Pending |
-| `XVAL-03` | Pending roadmap | Pending |
-| `XVAL-04` | Pending roadmap | Pending |
-| `DECIDE-01` | Pending roadmap | Pending |
-| `DECIDE-02` | Pending roadmap | Pending |
+| `CANON-01` | Phase `7` | Pending |
+| `CANON-02` | Phase `8` | Pending |
+| `CANON-03` | Phase `7` | Pending |
+| `XVAL-01` | Phase `9` | Pending |
+| `XVAL-02` | Phase `9` | Pending |
+| `XVAL-03` | Phase `10` | Pending |
+| `XVAL-04` | Phase `10` | Pending |
+| `DECIDE-01` | Phase `11` | Pending |
+| `DECIDE-02` | Phase `11` | Pending |
 
 **Coverage:**
 - v1.1 requirements: `9` total
-- Mapped to phases: `0`
-- Unmapped: `9`
+- Mapped to phases: `9`
+- Unmapped: `0`
 
 ---
 *Requirements defined: 2026-04-02*
-*Last updated: 2026-04-02 after milestone requirement definition*
+*Last updated: 2026-04-02 after milestone roadmap creation*
