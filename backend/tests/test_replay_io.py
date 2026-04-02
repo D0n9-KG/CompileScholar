@@ -10,6 +10,12 @@ import pytest
 from app.paper_logic_trace.derived_views import build_derived_views
 from app.paper_logic_trace.models import CanonicalCore, MentionValue, PaperLogicTrace, PaperMetadata, ResearchMove, SlotProvenance
 from app.research_logic import (
+    CorpusHealthIssue,
+    CorpusInventoryEntry,
+    CorpusSamplingBatch,
+    CorpusSamplingBundle,
+    build_corpus_sampling_inspection,
+    build_corpus_sampling_summary,
     build_decision_episode_audit_export,
     build_decision_episode_export_inspection,
     build_decision_episode_export_summary,
@@ -20,6 +26,7 @@ from app.research_logic import (
     load_paper_logic_traces,
     load_route_packet,
     load_route_states,
+    write_corpus_sampling_bundle,
     write_decision_episode_export_bundle,
     write_prior_candidate_review_bundle,
     write_replay_bundle,
@@ -318,6 +325,84 @@ def _decision_episode_audit_export(tmp_path: Path):
     )
 
 
+def _corpus_sampling_bundle() -> CorpusSamplingBundle:
+    fixed_entry = CorpusInventoryEntry(
+        corpus_paper_id='1001',
+        display_title='Alpha Paper',
+        corpus_relative_ref='1001_Alpha_Paper/1001_Alpha_Paper.md',
+        md_path='C:/corpus/1001_Alpha_Paper/1001_Alpha_Paper.md',
+        txt_path='C:/corpus/txt/1001_Alpha_Paper.txt',
+        preferred_source_path='C:/corpus/1001_Alpha_Paper/1001_Alpha_Paper.md',
+        preferred_source_kind='md',
+        eligibility_status='eligible',
+        neo4j_paper_id='paper:1001',
+        neo4j_ingested=True,
+    )
+    fixed_partner = CorpusInventoryEntry(
+        corpus_paper_id='1002',
+        display_title='Beta Result',
+        corpus_relative_ref='1002_Beta_Result/1002_Beta_Result.md',
+        md_path='C:/corpus/1002_Beta_Result/1002_Beta_Result.md',
+        preferred_source_path='C:/corpus/1002_Beta_Result/1002_Beta_Result.md',
+        preferred_source_kind='md',
+        eligibility_status='eligible',
+        neo4j_paper_id='paper:1002',
+        neo4j_ingested=True,
+    )
+    random_entry = CorpusInventoryEntry(
+        corpus_paper_id='1003',
+        display_title='Gamma Scan',
+        corpus_relative_ref='txt/1003_Gamma_Scan.txt',
+        txt_path='C:/corpus/txt/1003_Gamma_Scan.txt',
+        preferred_source_path='C:/corpus/txt/1003_Gamma_Scan.txt',
+        preferred_source_kind='txt',
+        eligibility_status='eligible',
+    )
+    ineligible_entry = CorpusInventoryEntry(
+        corpus_paper_id='1004',
+        display_title='Broken Delta',
+        corpus_relative_ref='txt/1004_Broken_Delta.txt',
+        txt_path='C:/corpus/txt/1004_Broken_Delta.txt',
+        eligibility_status='corpus_health_failure',
+    )
+    return CorpusSamplingBundle(
+        built_at='2026-04-03T01:00:00Z',
+        corpus_root='\\\\server\\share\\output',
+        inventory_entries=[fixed_entry, fixed_partner, random_entry, ineligible_entry],
+        corpus_health_failures=[
+            CorpusHealthIssue(
+                issue_type='unreadable_file',
+                source_path='C:/corpus/txt/1004_Broken_Delta.txt',
+                corpus_relative_ref='txt/1004_Broken_Delta.txt',
+                detail='permission denied',
+                exception_type='PermissionError',
+            )
+        ],
+        fixed_regression_batch=CorpusSamplingBatch(
+            batch_id='phase7-fixed-regression',
+            sampling_mode='fixed_regression',
+            built_at='2026-04-03T01:00:00Z',
+            requested_count=2,
+            selected=[fixed_entry, fixed_partner],
+            selected_ids=['1001', '1002'],
+            fixed_manifest_ref='docs/replay/corpus_sampling/phase7-fixed-regression-set.json',
+        ),
+        random_exploration_batch=CorpusSamplingBatch(
+            batch_id='phase7-random-exploration',
+            sampling_mode='random_exploration',
+            built_at='2026-04-03T01:00:00Z',
+            requested_count=1,
+            selected=[random_entry],
+            selected_ids=['1003'],
+            seed=13,
+            exclusions=[{'corpus_paper_id': '1001', 'reason': 'fixed_regression_exclusion'}],
+        ),
+        fixed_manifest_ref='docs/replay/corpus_sampling/phase7-fixed-regression-set.json',
+        seed=13,
+        neo4j_lookup_status='unavailable',
+    )
+
+
 def test_load_route_packet_and_trace_dir_round_trip(tmp_path: Path) -> None:
     traces = [_trace('paper-a', 2011, 'pa')]
     trace_dir = tmp_path / 'traces'
@@ -583,3 +668,39 @@ def test_write_decision_episode_export_bundle_writes_expected_files(tmp_path: Pa
     assert summary_payload['visibility_bucket_counts']['visible_input_refs'] == len(export.visible_input_refs)
     assert inspection_payload['visibility_buckets']['audit_only_refs']
     assert inspection_payload['visibility_buckets']['label_eval_only_refs'] == ['hindsight_evidence:future-ref-1']
+
+
+def test_write_corpus_sampling_bundle_writes_expected_files_and_separates_buckets(tmp_path: Path) -> None:
+    bundle = _corpus_sampling_bundle()
+
+    summary_payload = build_corpus_sampling_summary(bundle=bundle)
+    inspection_payload = build_corpus_sampling_inspection(bundle=bundle)
+    written_files = write_corpus_sampling_bundle(
+        tmp_path / 'sampling-bundle',
+        bundle=bundle,
+        metadata={'runner': 'pytest'},
+    )
+
+    assert summary_payload['inventory_entry_count'] == 4
+    assert summary_payload['eligible_entry_count'] == 3
+    assert summary_payload['selected_with_neo4j_metadata_count'] == 2
+    assert summary_payload['selected_without_neo4j_metadata_count'] == 1
+    assert inspection_payload['fixed_regression_ids'] == ['1001', '1002']
+    assert inspection_payload['random_exploration_ids'] == ['1003']
+    assert inspection_payload['corpus_health_failures'][0]['issue_type'] == 'unreadable_file'
+    assert inspection_payload['selected_but_downstream_unavailable'][0]['reason'] == 'neo4j_lookup_unavailable'
+
+    assert {
+        'bundle_manifest',
+        'sampling_summary',
+        'sampling_inspection',
+        'fixed_regression_batch',
+        'random_exploration_batch',
+        'corpus_health_failures',
+    } == set(written_files)
+
+    manifest_payload = json.loads(written_files['bundle_manifest'].read_text(encoding='utf-8'))
+    assert manifest_payload['seed'] == 13
+    assert manifest_payload['fixed_manifest_ref'] == 'docs/replay/corpus_sampling/phase7-fixed-regression-set.json'
+    assert manifest_payload['neo4j_lookup_status'] == 'unavailable'
+    assert manifest_payload['files']['fixed_regression_batch'] == 'outputs/fixed_regression_batch.json'

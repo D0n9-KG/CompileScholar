@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, Sequence
 
 from app.paper_logic_trace.models import PaperLogicTrace
 
+from .corpus_sampling import CorpusSamplingBundle
 from .decision_episode_export import DecisionEpisodeAuditExport
 from .historical_environment import HistoricalEnvironmentSnapshot
 from .historical_replay_compiler import HistoricalReplayCompilation
@@ -416,6 +417,96 @@ def build_decision_episode_export_inspection(
     }
 
 
+def build_corpus_sampling_summary(
+    *,
+    bundle: CorpusSamplingBundle,
+) -> dict[str, Any]:
+    selected_entries = list(bundle.fixed_regression_batch.selected if bundle.fixed_regression_batch else [])
+    if bundle.random_exploration_batch is not None:
+        selected_entries.extend(bundle.random_exploration_batch.selected)
+
+    selected_with_neo4j_metadata_count = sum(
+        1
+        for entry in selected_entries
+        if str(entry.neo4j_paper_id or '').strip() and entry.neo4j_ingested is not None
+    )
+    return {
+        'schema_version': bundle.schema_version,
+        'corpus_root': bundle.corpus_root,
+        'inventory_entry_count': len(bundle.inventory_entries),
+        'eligible_entry_count': sum(1 for entry in bundle.inventory_entries if entry.eligibility_status == 'eligible'),
+        'fixed_selected_count': len(bundle.fixed_regression_batch.selected if bundle.fixed_regression_batch else []),
+        'random_selected_count': len(bundle.random_exploration_batch.selected if bundle.random_exploration_batch else []),
+        'corpus_health_failure_count': len(bundle.corpus_health_failures),
+        'selected_with_neo4j_metadata_count': selected_with_neo4j_metadata_count,
+        'selected_without_neo4j_metadata_count': len(selected_entries) - selected_with_neo4j_metadata_count,
+        'neo4j_lookup_status': bundle.neo4j_lookup_status,
+        'seed': bundle.seed,
+        'fixed_manifest_ref': bundle.fixed_manifest_ref,
+    }
+
+
+def build_corpus_sampling_inspection(
+    *,
+    bundle: CorpusSamplingBundle,
+) -> dict[str, Any]:
+    fixed_batch = bundle.fixed_regression_batch
+    random_batch = bundle.random_exploration_batch
+    selected_entries = list(fixed_batch.selected if fixed_batch else [])
+    if random_batch is not None:
+        selected_entries.extend(random_batch.selected)
+
+    selected_but_downstream_unavailable = []
+    for entry in selected_entries:
+        if str(entry.neo4j_paper_id or '').strip() and entry.neo4j_ingested is not None:
+            continue
+        selected_but_downstream_unavailable.append(
+            {
+                'corpus_paper_id': entry.corpus_paper_id,
+                'display_title': entry.display_title,
+                'corpus_relative_ref': entry.corpus_relative_ref,
+                'reason': (
+                    f'neo4j_lookup_{bundle.neo4j_lookup_status}'
+                    if bundle.neo4j_lookup_status in {'skipped', 'unavailable'}
+                    else 'neo4j_metadata_missing'
+                ),
+            }
+        )
+
+    return {
+        'schema_version': bundle.schema_version,
+        'corpus_root': bundle.corpus_root,
+        'fixed_regression_ids': list(fixed_batch.selected_ids if fixed_batch else []),
+        'random_exploration_ids': list(random_batch.selected_ids if random_batch else []),
+        'seed': bundle.seed,
+        'eligible_selected': {
+            'fixed_regression': [
+                entry.model_dump(mode='json', exclude_none=True)
+                for entry in fixed_batch.selected
+            ] if fixed_batch is not None else [],
+            'random_exploration': [
+                entry.model_dump(mode='json', exclude_none=True)
+                for entry in random_batch.selected
+            ] if random_batch is not None else [],
+        },
+        'selection_exclusions': {
+            'fixed_regression': [
+                exclusion.model_dump(mode='json', exclude_none=True)
+                for exclusion in fixed_batch.exclusions
+            ] if fixed_batch is not None else [],
+            'random_exploration': [
+                exclusion.model_dump(mode='json', exclude_none=True)
+                for exclusion in random_batch.exclusions
+            ] if random_batch is not None else [],
+        },
+        'corpus_health_failures': [
+            issue.model_dump(mode='json', exclude_none=True)
+            for issue in bundle.corpus_health_failures
+        ],
+        'selected_but_downstream_unavailable': selected_but_downstream_unavailable,
+    }
+
+
 def _model_payload(model: Any) -> Any:
     if hasattr(model, 'model_dump'):
         return model.model_dump(mode='json', exclude_none=True)
@@ -593,7 +684,56 @@ def write_decision_episode_export_bundle(
     return written_files
 
 
+def write_corpus_sampling_bundle(
+    output_dir: str | Path,
+    *,
+    bundle: CorpusSamplingBundle,
+    metadata: dict[str, Any] | None = None,
+) -> dict[str, Path]:
+    bundle_dir = _as_path(output_dir)
+    outputs_dir = bundle_dir / 'outputs'
+
+    summary_payload = build_corpus_sampling_summary(bundle=bundle)
+    inspection_payload = build_corpus_sampling_inspection(bundle=bundle)
+    written_files = {
+        'sampling_summary': _write_json(bundle_dir / 'sampling_summary.json', summary_payload),
+        'sampling_inspection': _write_json(bundle_dir / 'sampling_inspection.json', inspection_payload),
+        'fixed_regression_batch': _write_json(
+            outputs_dir / 'fixed_regression_batch.json',
+            _model_payload(bundle.fixed_regression_batch),
+        ),
+        'random_exploration_batch': _write_json(
+            outputs_dir / 'random_exploration_batch.json',
+            _model_payload(bundle.random_exploration_batch),
+        ),
+        'corpus_health_failures': _write_json(
+            outputs_dir / 'corpus_health_failures.json',
+            [_model_payload(issue) for issue in bundle.corpus_health_failures],
+        ),
+    }
+    manifest_payload = {
+        'schema_version': bundle.schema_version,
+        'built_at': bundle.built_at,
+        'corpus_root': bundle.corpus_root,
+        'fixed_selected_count': len(bundle.fixed_regression_batch.selected if bundle.fixed_regression_batch else []),
+        'random_selected_count': len(bundle.random_exploration_batch.selected if bundle.random_exploration_batch else []),
+        'seed': bundle.seed,
+        'fixed_manifest_ref': bundle.fixed_manifest_ref,
+        'neo4j_lookup_status': bundle.neo4j_lookup_status,
+        'neo4j_lookup_error': bundle.neo4j_lookup_error,
+        'metadata': dict(metadata or {}),
+        'files': {
+            name: str(path.relative_to(bundle_dir)).replace('\\', '/')
+            for name, path in written_files.items()
+        },
+    }
+    written_files['bundle_manifest'] = _write_json(bundle_dir / 'bundle_manifest.json', manifest_payload)
+    return written_files
+
+
 __all__ = [
+    'build_corpus_sampling_inspection',
+    'build_corpus_sampling_summary',
     'build_decision_episode_export_inspection',
     'build_decision_episode_export_summary',
     'build_prior_candidate_review_summary',
@@ -606,6 +746,7 @@ __all__ = [
     'load_route_packet',
     'load_route_state',
     'load_route_states',
+    'write_corpus_sampling_bundle',
     'write_decision_episode_export_bundle',
     'write_prior_candidate_review_bundle',
     'write_replay_bundle',
