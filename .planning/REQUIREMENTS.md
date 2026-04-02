@@ -1,47 +1,49 @@
 # Requirements: LogicKG
 
-**Defined:** 2026-04-02
+**Defined:** 2026-04-03
 **Core Value:** Produce auditable, replayable, trainable scientific-reasoning artifacts rather than paper-like summaries or one-off knowledge graphs.
 
 ## v1.1 Requirements
 
-Requirements for milestone `v1.1`. These define what must be true before the next major direction is chosen.
+Requirements for milestone `v1.1`. These define what must be true before the next optimization cycle can be chosen confidently.
 
-### Canonical Assets
+### Corpus Sampling
 
-- [ ] **CANON-01**: Maintainer can locate committed canonical manifests or READMEs for the bounded jamming packet, subset packets, replay package, review bundle, and export bundle boundaries without depending on `tmp/` directory names alone.
-- [ ] **CANON-02**: Maintainer can rebuild the bounded jamming replay, package, review, and export flow from committed manifests plus machine-local trace inputs without hardcoding local paths in the repository.
-- [ ] **CANON-03**: Audit documentation clearly distinguishes committed canonical artifacts from local-only runtime outputs and records provenance between them.
+- [ ] **SAMPLE-01**: Operator can define one fixed regression paper set and one random exploration paper set from the shared corpus for each iteration cycle.
+- [ ] **SAMPLE-02**: Each sampling run records selected paper ids, source paths, and sampling mode so the exact batch can be reproduced.
+- [ ] **SAMPLE-03**: Sampling reports missing or broken corpus paths separately from model-quality failures.
 
-### Cross-Topic Validation
+### Single-Paper Extraction Iteration
 
-- [ ] **XVAL-01**: Maintainer can define one second bounded topic and cutoff with packet selection notes, local trace input expectations, and explicit inclusion or exclusion rationale.
-- [ ] **XVAL-02**: The second-topic flow can compile a route-state package and replay bundle with inspectable validation and quality-summary artifacts.
-- [ ] **XVAL-03**: The second-topic flow can produce prior-review and audited `DecisionEpisode` export artifacts with explicit accepted ids and leakage-safe references.
-- [ ] **XVAL-04**: The project can compare jamming and second-topic results in one report that separates reusable compiler behavior from topic-specific blockers.
+- [ ] **L2Q-01**: Operator can run sampled single-paper extraction and evaluation and collect per-paper trace, schema, and evidence-slot quality results.
+- [ ] **L2Q-02**: Team can compare sampled single-paper results across iterations to identify recurring failures, regressions, and newly surfaced edge cases.
 
-### Next-Milestone Decision
+### Bounded Multi-Paper Packet Validation
 
-- [ ] **DECIDE-01**: Team can inspect a milestone summary of canonical asset maturity, cross-topic validation results, and remaining technical debt in one place.
-- [ ] **DECIDE-02**: Team can choose the following milestone direction between ops/productization work and question-discovery work using explicit evidence from `v1.1`.
+- [ ] **PACK-01**: Operator can assemble one bounded topic packet from the larger corpus with explicit `support`, `alternative`, and `held_out` role assignments plus exclusion notes.
+- [ ] **PACK-02**: The bounded packet can compile replay and package-validation artifacts that make `L3` quality gaps inspectable.
+- [ ] **AGGR-01**: The same bounded packet can produce `L4` prior/review/export artifacts or explicit blockers explaining why multi-paper aggregation failed.
+
+### Iteration Prioritization
+
+- [ ] **LOOP-01**: Team can inspect one summary that connects sampled single-paper failures with bounded multi-paper packet outcomes.
+- [ ] **LOOP-02**: Team can choose the next optimization cycle based on explicit evidence about whether the highest-leverage work is in `L2` extraction, packet construction, or `L4` aggregation.
 
 ## v2 Requirements
 
-Deferred to a later milestone after `v1.1` settles the direction choice.
+Deferred until the corpus-driven iteration loop is stable.
+
+### Scale
+
+- **SCALE-01**: Team can generate and compare multiple bounded topic packets from the large corpus in one batch without hand-assembling every packet.
 
 ### Productization
 
-- **OPS-01**: Operator can manage route-packet, replay, review, and export runs from dedicated workflow surfaces instead of manual file-system orchestration.
-- **OPS-02**: Team can run and compare bounded replay, review, and export workflows across multiple topics and cutoffs without hand-assembling every bundle.
+- **OPS-01**: Operator can manage packet, replay, review, and export workflows from dedicated product surfaces instead of manual file-system orchestration.
 
 ### Question Discovery
 
 - **GEN-01**: System can generate constrained scientific question candidates from stable reviewed `DecisionEpisode` artifacts with audit-visible evidence.
-- **GEN-02**: System can explore bounded hypothesis generation only after priors and anti-patterns are stable enough to keep the search auditable.
-
-### Quality Hardening
-
-- **QUAL-01**: Support density and trace completeness are high enough that reviewed prior acceptance is no longer blocked by intentionally sparse evidence slices.
 
 ## Out of Scope
 
@@ -49,30 +51,31 @@ Explicitly excluded from `v1.1`.
 
 | Feature | Reason |
 |---------|--------|
-| Open-ended question discovery or hypothesis generation | Wait until one second topic proves the reviewed `DecisionEpisode` flow generalizes. |
-| Full UI productization of packet, replay, review, and export operations | `v1.1` is focused on canonicalization and validation rather than complete operator polish. |
-| Full-corpus automatic packet discovery | Scaling before canonical bounded assets are stable would amplify noise and provenance ambiguity. |
-| Wholesale `L2` redesign | Cross-topic evidence should identify precise owners before any large rewrite is justified. |
+| Run every candidate paper end to end in one milestone sweep | `v1.1` is about iterative sampling and feedback loops, not full-corpus throughput. |
+| Let `L3/L4` consume arbitrary random paper mixes | Multi-paper aggregation needs bounded topics and explicit roles to stay meaningful. |
+| Full UI productization of packet, replay, review, and export operations | The current milestone is focused on compiler quality, not operator polish. |
+| Open-ended question discovery or hypothesis generation | The compiler loop should stabilize first. |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| `CANON-01` | Phase `7` | Pending |
-| `CANON-02` | Phase `8` | Pending |
-| `CANON-03` | Phase `7` | Pending |
-| `XVAL-01` | Phase `9` | Pending |
-| `XVAL-02` | Phase `9` | Pending |
-| `XVAL-03` | Phase `10` | Pending |
-| `XVAL-04` | Phase `10` | Pending |
-| `DECIDE-01` | Phase `11` | Pending |
-| `DECIDE-02` | Phase `11` | Pending |
+| `SAMPLE-01` | Phase `7` | Pending |
+| `SAMPLE-02` | Phase `7` | Pending |
+| `SAMPLE-03` | Phase `7` | Pending |
+| `L2Q-01` | Phase `8` | Pending |
+| `L2Q-02` | Phase `8` | Pending |
+| `PACK-01` | Phase `9` | Pending |
+| `PACK-02` | Phase `10` | Pending |
+| `AGGR-01` | Phase `10` | Pending |
+| `LOOP-01` | Phase `11` | Pending |
+| `LOOP-02` | Phase `11` | Pending |
 
 **Coverage:**
-- v1.1 requirements: `9` total
-- Mapped to phases: `9`
+- v1.1 requirements: `10` total
+- Mapped to phases: `10`
 - Unmapped: `0`
 
 ---
-*Requirements defined: 2026-04-02*
-*Last updated: 2026-04-02 after milestone roadmap creation*
+*Requirements defined: 2026-04-03*
+*Last updated: 2026-04-03 after milestone strategy refinement*

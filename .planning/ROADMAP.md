@@ -1,113 +1,115 @@
-# Milestone v1.1: Canonical Asset Promotion And Cross-Topic Validation
+# Milestone v1.1: Corpus-Driven Iterative Quality Hardening
 
-**Status:** ACTIVE 2026-04-02
+**Status:** ACTIVE 2026-04-03
 **Phases:** 7-11
-**Requirements:** 9 mapped
+**Requirements:** 10 mapped
 **Numbering Mode:** Continue from `v1.0`
 
 ## Overview
 
-`v1.1` turns the bounded jamming pilot from a one-off success story into a reusable baseline.
+`v1.1` uses the large shared paper corpus to turn compiler improvement into an explicit loop instead of an ad hoc patch sequence.
 
-The milestone first promotes the jamming packet/package/review/export flow into canonical surfaces with clear provenance rules, then proves the same Phase 03 -> 06 flow on one second bounded topic, and finally closes with an evidence-backed recommendation for the next major roadmap direction.
+The milestone first establishes a fixed regression set plus random exploration sampling, then hardens sampled single-paper extraction for `L2`, then assembles one bounded multi-paper packet for `L3/L4`, and finally uses the combined evidence to decide the next optimization cycle.
 
 ## Phase Summary
 
 | Phase | Name | Goal | Requirements | Success Criteria |
 |-------|------|------|--------------|------------------|
-| 7 | Canonical Pilot Asset Promotion | Promote the bounded jamming Phase 03 -> 06 artifact surfaces into canonical committed or reproducible locations with explicit provenance boundaries. | `CANON-01`, `CANON-03` | 3 |
-| 8 | Reproducible Replay Operations | Make the canonical jamming flow rebuildable from committed manifests plus machine-local trace inputs. | `CANON-02` | 3 |
-| 9 | Second-Topic Packet And Package Validation | Choose one second bounded topic and reach a replay-ready package baseline outside the jamming slice. | `XVAL-01`, `XVAL-02` | 3 |
-| 10 | Cross-Topic Review And Export Comparison | Run the second topic through review/export and compare it directly with the jamming baseline. | `XVAL-03`, `XVAL-04` | 3 |
-| 11 | Next-Milestone Decision Package | Turn `v1.1` evidence into a decision-ready recommendation for the following milestone. | `DECIDE-01`, `DECIDE-02` | 3 |
+| 7 | Corpus Sampling And Regression Baseline | Turn the shared corpus into a usable source for fixed regression papers, random exploration papers, and corpus-health reporting. | `SAMPLE-01`, `SAMPLE-02`, `SAMPLE-03` | 3 |
+| 8 | Sampled Single-Paper L2 Regression | Repeatedly run sampled single-paper extraction and compare results across iterations. | `L2Q-01`, `L2Q-02` | 3 |
+| 9 | Bounded Packet Construction From Corpus | Build one bounded topic packet from the larger corpus with explicit multi-paper role assignment. | `PACK-01` | 3 |
+| 10 | Multi-Paper L3 And L4 Validation | Compile replay/package/review/export artifacts for the bounded packet and inspect multi-paper failures directly. | `PACK-02`, `AGGR-01` | 3 |
+| 11 | Iteration Prioritization And Next Cycle Plan | Turn sampled-paper and multi-paper evidence into the next optimization queue. | `LOOP-01`, `LOOP-02` | 3 |
 
 ## Phase Details
 
-### Phase 7: Canonical Pilot Asset Promotion
+### Phase 7: Corpus Sampling And Regression Baseline
 
-**Goal:** Promote the bounded jamming packet, subset packet, package, review, and export surfaces into canonical repo-readable manifests and docs while keeping machine-local runtime data out of the repository.
+**Goal:** Turn the shared corpus into a usable evaluation source with one fixed regression set, one random exploration strategy, reproducible sampling metadata, and explicit corpus-health reporting.
 **Depends on:** `v1.0` archived baseline
-**Requirements:** `CANON-01`, `CANON-03`
+**Requirements:** `SAMPLE-01`, `SAMPLE-02`, `SAMPLE-03`
 
 **Success criteria:**
-1. Canonical locations exist for the bounded jamming pilot surfaces beyond the already committed top-level packet docs, and each artifact family states whether it is committed or local-only.
-2. Every canonical manifest or README points to the correct runtime bundle provenance without hardcoding machine-specific trace paths.
-3. Project docs no longer rely on `tmp/` directory memory alone to explain where core Phase 03 -> 06 pilot artifacts come from.
+1. The project defines a fixed regression paper set and a random exploration sampling method over the shared corpus.
+2. Each sampling run records selected paper ids, source references, and sampling mode so failures can be replayed.
+3. Missing or broken corpus paths are reported as corpus-health issues instead of being mixed into model-quality failure counts.
 
-### Phase 8: Reproducible Replay Operations
+### Phase 8: Sampled Single-Paper L2 Regression
 
-**Goal:** Make the canonical jamming flow rebuildable from committed manifests plus local trace inputs so another maintainer can rerun the same bounded flow.
+**Goal:** Repeatedly run sampled single-paper extraction and evaluation so `L2` quality can be measured on both stable and novel papers.
 **Depends on:** Phase `7`
-**Requirements:** `CANON-02`
+**Requirements:** `L2Q-01`, `L2Q-02`
 
 **Success criteria:**
-1. A maintainer can follow a documented command path to rebuild the bounded jamming packet/package/review/export outputs locally from canonical inputs and local trace roots.
-2. The rerun path emits stable manifest or summary outputs for each stage without embedding machine-local paths in committed artifacts.
-3. Local prerequisites and likely failure modes are documented well enough to distinguish environment gaps from compiler regressions.
+1. Sampled single-paper runs emit per-paper trace, schema, and evidence-slot quality outputs.
+2. Regression summaries distinguish recurring failures, newly introduced regressions, and new random-sample edge cases.
+3. The project can identify a concrete short list of `L2` owners from sampled-paper evidence instead of vague quality impressions.
 
-### Phase 9: Second-Topic Packet And Package Validation
+### Phase 9: Bounded Packet Construction From Corpus
 
-**Goal:** Choose one second bounded topic and prove the compiler can reach a package/replay-ready baseline outside the original jamming slice.
+**Goal:** Build one bounded topic packet from the larger corpus so `L3/L4` can be tested on structured multi-paper evidence instead of arbitrary random mixes.
 **Depends on:** Phase `8`
-**Requirements:** `XVAL-01`, `XVAL-02`
+**Requirements:** `PACK-01`
 
 **Success criteria:**
-1. One second topic and cutoff are chosen with packet selection notes, local trace expectations, and explicit inclusion/exclusion rationale.
-2. The second-topic route-state package and replay bundle compile with validation and inspection artifacts that can be reviewed alongside the jamming baseline.
-3. Missing trace coverage, support-density issues, or package blockers are recorded explicitly instead of hidden behind fallback-only success claims.
+1. One bounded topic and cutoff are selected from the larger corpus with explicit packet inclusion and exclusion notes.
+2. The packet defines `support`, `alternative`, and `held_out` roles clearly enough for downstream replay and review.
+3. Packet assembly gaps such as missing traces, weak support density, or role imbalance are recorded explicitly before `L3/L4` runs.
 
-### Phase 10: Cross-Topic Review And Export Comparison
+### Phase 10: Multi-Paper L3 And L4 Validation
 
-**Goal:** Run the second topic through prior review and audited export, then compare the result directly with the jamming baseline.
+**Goal:** Compile replay/package/review/export artifacts for the bounded packet and inspect the true multi-paper failure surface.
 **Depends on:** Phase `9`
-**Requirements:** `XVAL-03`, `XVAL-04`
+**Requirements:** `PACK-02`, `AGGR-01`
 
 **Success criteria:**
-1. The second-topic flow yields prior-review and audited `DecisionEpisode` export artifacts with explicit accepted ids and leakage-safe references.
-2. A comparison report summarizes what carried over cleanly from the jamming baseline and what remained topic-specific.
-3. The comparison distinguishes compiler-contract stability from upstream corpus or trace limitations.
+1. The bounded packet produces replay and package-validation artifacts that make `L3` quality gaps inspectable.
+2. The same packet produces `L4` prior/review/export artifacts, or explicit blockers that explain why multi-paper aggregation failed.
+3. The result can be compared against the existing jamming baseline to separate reusable compiler behavior from topic-specific limitations.
 
-### Phase 11: Next-Milestone Decision Package
+### Phase 11: Iteration Prioritization And Next Cycle Plan
 
-**Goal:** Turn `v1.1` findings into a decision-ready recommendation for the following milestone.
+**Goal:** Convert the evidence from sampled single-paper runs and bounded multi-paper runs into the next optimization cycle.
 **Depends on:** Phase `10`
-**Requirements:** `DECIDE-01`, `DECIDE-02`
+**Requirements:** `LOOP-01`, `LOOP-02`
 
 **Success criteria:**
-1. A single milestone summary captures canonical asset maturity, cross-topic results, unresolved debt, and readiness limits.
-2. The summary includes an explicit recommendation for either ops/productization or question-discovery as the next milestone focus.
-3. The recommendation is backed by concrete evidence links to `v1.1` artifacts rather than abstract preference.
+1. A single summary links single-paper `L2` failures with bounded multi-paper `L3/L4` outcomes.
+2. The summary prioritizes which owners should be tackled next instead of leaving the iteration open-ended.
+3. The team can choose whether the next cycle should emphasize `L2` extraction, packet construction, or `L4` aggregation based on explicit evidence.
 
 ## Coverage
 
 | Requirement | Phase |
 |-------------|-------|
-| `CANON-01` | Phase `7` |
-| `CANON-02` | Phase `8` |
-| `CANON-03` | Phase `7` |
-| `XVAL-01` | Phase `9` |
-| `XVAL-02` | Phase `9` |
-| `XVAL-03` | Phase `10` |
-| `XVAL-04` | Phase `10` |
-| `DECIDE-01` | Phase `11` |
-| `DECIDE-02` | Phase `11` |
+| `SAMPLE-01` | Phase `7` |
+| `SAMPLE-02` | Phase `7` |
+| `SAMPLE-03` | Phase `7` |
+| `L2Q-01` | Phase `8` |
+| `L2Q-02` | Phase `8` |
+| `PACK-01` | Phase `9` |
+| `PACK-02` | Phase `10` |
+| `AGGR-01` | Phase `10` |
+| `LOOP-01` | Phase `11` |
+| `LOOP-02` | Phase `11` |
 
-**Coverage status:** `9/9` requirements mapped
+**Coverage status:** `10/10` requirements mapped
 
 ## Notes
 
 - This roadmap deliberately continues numbering from `v1.0` because `.planning/phases/01-*` through `06-*` are still present.
-- Optional external research was skipped for milestone setup because the next work is project-specific follow-through on already-known artifact and validation gaps.
-- `v1.1` is successful only if the second-topic evidence actually clarifies the next direction. Finishing the asset promotion work without that decision package is not enough.
+- `v1.1` does not try to process the full corpus in one pass; it uses the corpus as a large candidate pool for repeated sampling and bounded packet construction.
+- The jamming slice remains the reference baseline, but it is no longer the only intended source of optimization evidence.
+- Shared-corpus path instability is part of the quality loop because bad corpus hygiene can otherwise masquerade as extraction failure.
 
 ## Next Up
 
-**Phase 7: Canonical Pilot Asset Promotion** - Promote the bounded jamming asset surfaces into canonical, provenance-safe planning targets.
+**Phase 7: Corpus Sampling And Regression Baseline** - Define the fixed regression set, random exploration sampling, and corpus-health reporting loop.
 
 `$gsd-discuss-phase 7`
 
 Also available: `$gsd-plan-phase 7`
 
 ---
-*Roadmap created: 2026-04-02*
-*Last updated: 2026-04-02 after milestone initialization*
+*Roadmap created: 2026-04-03*
+*Last updated: 2026-04-03 after milestone strategy refinement*
