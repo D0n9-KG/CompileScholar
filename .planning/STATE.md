@@ -4,15 +4,15 @@ milestone: v1.1
 milestone_name: corpus-driven-iterative-quality-hardening
 current_phase: 7
 current_phase_name: corpus-sampling-and-regression-baseline
-current_plan: null
-status: roadmap_revised
-stopped_at: Milestone v1.1 was refocused around corpus-driven iterative quality hardening; Phase 7 is ready for discussion or planning
-last_updated: "2026-04-02T16:07:16.1584826Z"
+current_plan: 07-01
+status: planned
+stopped_at: Phase 7 plans created; ready for execution
+last_updated: "2026-04-02T16:59:16.7768176Z"
 last_activity: 2026-04-03
 progress:
   total_phases: 5
   completed_phases: 0
-  total_plans: 0
+  total_plans: 2
   completed_plans: 0
   percent: 0
 ---
@@ -24,24 +24,24 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-04-03)
 
 **Core value:** Produce auditable, replayable, trainable scientific-reasoning artifacts rather than paper-like summaries or one-off knowledge graphs.
-**Current focus:** Milestone `v1.1` roadmap is revised; Phase `7` is next
+**Current focus:** Phase `7` is planned and ready for execution
 
 ## Current Position
 
-Milestone: `v1.1` - ROADMAP REVISED
+Milestone: `v1.1` - PHASE 7 PLANNED
 
-- Active phase: none yet
-- Next phase: `07 corpus-sampling-and-regression-baseline`
-- Status: ready for discussion or direct phase planning
-- Last activity: `2026-04-03` - refined milestone `v1.1` around corpus-driven iteration
+- Active phase: `07 corpus-sampling-and-regression-baseline`
+- Current plan: `07-01` and `07-02`
+- Status: ready for execution
+- Last activity: `2026-04-03` - created Phase `7` research, validation, and execution plans
 
 ## Milestone Snapshot
 
 - `v1.1` continues numbering after `v1.0`, so the active roadmap starts at Phase `7`.
-- The milestone now uses a large shared corpus as the candidate pool for fixed regression papers and random exploration papers.
+- The milestone uses a large shared corpus as the candidate pool for fixed regression papers and random exploration papers.
 - `L2` is iterated on sampled single papers, while `L3/L4` are validated on bounded topic packets rather than arbitrary random mixes.
 - `10/10` milestone requirements are mapped across five planned phases.
-- Corpus scans already surfaced broken or missing paths, so corpus-health reporting is part of the evaluation loop.
+- Corpus-health reporting is part of the evaluation loop because shared-corpus scans already surfaced broken or missing paths.
 
 ## Decisions Carried Forward
 
@@ -68,10 +68,10 @@ Milestone: `v1.1` - ROADMAP REVISED
 
 ## Pending Follow-Ups
 
-- Define the fixed regression paper set and random exploration sampling loop over the shared corpus.
-- Build sampled single-paper evaluation summaries that can reveal recurring `L2` failure owners.
-- Assemble one bounded topic packet from the larger corpus for `L3/L4` validation.
-- End the first corpus-driven cycle with an explicit next-iteration priority list.
+- Execute `07-01` to build the typed corpus inventory and sampling bundle contract.
+- Execute `07-02` to ship the CLI, freeze the ten-paper fixed set, and run the first real corpus baseline.
+- Build sampled single-paper evaluation summaries in Phase `8`.
+- Assemble one bounded topic packet from the larger corpus for `L3/L4` validation in Phase `9`.
 
 ## Blockers
 
@@ -82,5 +82,5 @@ Milestone: `v1.1` - ROADMAP REVISED
 ## Session
 
 **Last Date:** 2026-04-03
-**Stopped At:** Refined milestone `v1.1` and prepared the revised roadmap
-**Resume File:** Start with `.planning/ROADMAP.md`, `.planning/REQUIREMENTS.md`, and `$gsd-discuss-phase 7`
+**Stopped At:** Phase 7 plans created; ready for execution
+**Resume File:** `.planning/phases/07-corpus-sampling-and-regression-baseline/07-01-PLAN.md`
