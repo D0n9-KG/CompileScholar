@@ -93,4 +93,4 @@
 
 ---
 *Requirements defined: 2026-04-01*
-*Last updated: 2026-04-02 after Phase 6 plan 01 established audited DecisionEpisode export assembly and explicit leakage-safe export boundaries*
+*Last updated: 2026-04-02 after Phase 6 plan 02 verified the audited DecisionEpisode export pilot against real Phase 5 replay/review bundles and published the bounded audit report*

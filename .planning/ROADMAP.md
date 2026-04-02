@@ -15,7 +15,7 @@
 - [ ] **Phase 3: Grounded Route Replay Compilation** - 把 `RouteState / WhyNow / RouteComparison` 从“原型 builder”推进到真实多论文 replay 产物。
 - [ ] **Phase 4: Replay Failure Taxonomy And L2 Surgical Loop** - 用 replay 失败样本反向驱动 `L2` 外科式修补与评测闭环。
 - [x] **Phase 5: Multi-Route Prior Induction** - 从多个 `RouteState` 归纳 `DecisionPriorCard / AntiPatternCard` 并加上 held-out / review 约束。
-- [ ] **Phase 6: Decision Episode Audit Export** - 把 `DecisionEpisode` 做成可训练、可评估、可审计的导出资产。
+- [x] **Phase 6: Decision Episode Audit Export** - 把 `DecisionEpisode` 做成可训练、可评估、可审计的导出资产。
 
 ## Phase Details
 
@@ -105,7 +105,7 @@ Plans:
 
 Plans:
 - [x] 06-01: Define the audited export format and leakage-safe assembly path for `DecisionEpisode`
-- [ ] 06-02: Produce and inspect a first batch of training / eval-ready decision samples
+- [x] 06-02: Produce and inspect a first batch of training / eval-ready decision samples
 
 ## Progress
 
@@ -119,8 +119,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 3. Grounded Route Replay Compilation | 3/3 | Completed | 2026-04-02 |
 | 4. Replay Failure Taxonomy And L2 Surgical Loop | 3/3 | Complete | 2026-04-02 |
 | 5. Multi-Route Prior Induction | 2/2 | Complete | 2026-04-02 |
-| 6. Decision Episode Audit Export | 1/2 | In Progress | - |
+| 6. Decision Episode Audit Export | 2/2 | Complete | 2026-04-02 |
 
 ---
 *Roadmap defined: 2026-04-01*
-*Last updated: 2026-04-02 after Phase 6 plan 01 added audited DecisionEpisode export assembly and dedicated export bundle writers*
+*Last updated: 2026-04-02 after Phase 6 plan 02 proved the audited export pilot against real Phase 5 replay/review bundles and published the bounded pilot report*
