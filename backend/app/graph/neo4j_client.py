@@ -868,6 +868,22 @@ LIMIT $limit
         with self._driver.session() as session:
             return [dict(r) for r in session.run(cypher, paper_ids=ids, limit=limit)]
 
+    def list_paper_ingestion_rows_by_source_md_paths(self, source_md_paths: list[str]) -> list[dict]:
+        normalized_paths = sorted({str(path or '').strip() for path in source_md_paths if str(path or '').strip()})
+        if not normalized_paths:
+            return []
+        cypher = """
+MATCH (p:Paper)
+WHERE p.source_md_path IN $source_md_paths
+RETURN p.source_md_path AS source_md_path,
+       p.paper_id AS paper_id,
+       p.paper_source AS paper_source,
+       coalesce(p.ingested, false) AS ingested
+ORDER BY p.source_md_path ASC
+"""
+        with self._driver.session() as session:
+            return [dict(row) for row in session.run(cypher, source_md_paths=normalized_paths)]
+
     def _sample_author_hop_papers(
         self,
         *,
