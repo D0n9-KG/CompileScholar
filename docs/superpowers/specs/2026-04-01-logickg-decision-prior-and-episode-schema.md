@@ -302,11 +302,12 @@ WarningSignal
 ```text
 failure_examples
 - route_state_ids: str[]
+- route_family_ids: str[]
 - decision_episode_ids: str[]
 - notes: str | null
 ```
 
-The examples should include real failures or retrospectively poor choices under historical replay.
+The examples should include real failures or retrospectively poor choices under historical replay. `route_state_ids` remain the exact audit trail, while `route_family_ids` allow reviewed anti-patterns to carry across support/core/context and runtime-subset variants of the same route family.
 
 ### 8.6 `corrective_checklist`
 
@@ -325,6 +326,7 @@ This should contain concrete checks like:
 ```text
 counterexamples
 - route_state_ids: str[]
+- route_family_ids: str[]
 - notes: str | null
 ```
 
@@ -445,6 +447,7 @@ This field should avoid copying whole traces into the final object; references a
 ```text
 route_state
 - route_state_id: str
+- route_family_id: str | null
 - route_state_ref: str | null
 ```
 
@@ -458,6 +461,8 @@ relevant_priors
 ```
 
 This is the bridge between `L3` and `L4`.
+
+Selection should prefer exact `route_state_id` matches when available, but may also carry reviewed anti-patterns through shared `route_family_id` when the exported replay route is a bounded variant of the same family rather than the identical route instance.
 
 ### 10.8 Candidate question layer
 

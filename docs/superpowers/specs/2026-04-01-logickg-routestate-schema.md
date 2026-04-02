@@ -141,6 +141,7 @@ The `L1` side does not need to be fully complete yet, but `RouteState` should be
 ```text
 RouteState
 - route_state_id
+- route_family_id
 - schema_version
 - built_at
 - topic_scope
@@ -163,6 +164,7 @@ RouteState
 
 ```text
 route_state_id: str
+route_family_id: str | null
 schema_version: str
 built_at: str
 topic_scope: str
@@ -174,6 +176,7 @@ Rules:
 1. `topic_scope` must be resolved to a single canonical scope string.
 2. `cutoff_year` must be explicit and non-optional.
 3. `route_state_id` should be deterministic from `topic_scope + cutoff_year + packet_id + schema_version`.
+4. `route_family_id` should be stable across support/core/context and runtime-subset variants that represent the same bounded route family under the same cutoff.
 
 ### 8.2 `source_packet`
 

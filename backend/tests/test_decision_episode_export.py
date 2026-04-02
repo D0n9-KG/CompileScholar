@@ -26,9 +26,11 @@ def _route_state_payload(
     positive_signal_confidence: float,
     scope: str = 'large-scale image recognition',
     cutoff_year: int = 2011,
+    route_family_id: str | None = None,
 ) -> dict:
     return {
         'route_state_id': route_state_id,
+        'route_family_id': route_family_id,
         'built_at': '2026-04-02T00:00:00Z',
         'topic_scope': scope,
         'cutoff_year': cutoff_year,
@@ -246,6 +248,7 @@ def _route_state(
     bottleneck_type: str = 'compute',
     bottleneck_severity: str = 'high',
     positive_signal_confidence: float = 0.8,
+    route_family_id: str | None = None,
 ) -> RouteState:
     return RouteState(
         **_route_state_payload(
@@ -263,6 +266,7 @@ def _route_state(
             bottleneck_type=bottleneck_type,
             bottleneck_severity=bottleneck_severity,
             positive_signal_confidence=positive_signal_confidence,
+            route_family_id=route_family_id,
         )
     )
 
@@ -359,7 +363,13 @@ def _green_prior(route_main: RouteState, route_peer_1: RouteState, route_peer_2:
     )
 
 
-def _anti_pattern_card(*, anti_pattern_id: str, route_state_ids: list[str]) -> AntiPatternCard:
+def _anti_pattern_card(
+    *,
+    anti_pattern_id: str,
+    route_state_ids: list[str],
+    route_family_ids: list[str] | None = None,
+    counterexample_route_family_ids: list[str] | None = None,
+) -> AntiPatternCard:
     return AntiPatternCard(
         anti_pattern_id=anti_pattern_id,
         built_at='2026-04-02T03:20:00Z',
@@ -376,12 +386,14 @@ def _anti_pattern_card(*, anti_pattern_id: str, route_state_ids: list[str]) -> A
         },
         failure_examples={
             'route_state_ids': route_state_ids,
+            'route_family_ids': route_family_ids or [],
             'decision_episode_ids': [],
             'notes': 'Synthetic export anti-pattern test.',
         },
         corrective_checklist=['Reduce blocker pressure before reuse.'],
         counterexamples={
             'route_state_ids': ['route-alt'],
+            'route_family_ids': counterexample_route_family_ids or [],
             'notes': 'Synthetic counterexample.',
         },
         review={
@@ -492,9 +504,10 @@ def test_build_decision_episode_audit_export_preserves_empty_accepted_prior_trut
     )
 
 
-def test_build_decision_episode_audit_export_carries_only_route_matching_accepted_antipatterns() -> None:
+def test_build_decision_episode_audit_export_carries_route_family_matching_accepted_antipatterns() -> None:
     route_main = _route_state(
-        route_state_id='route-main',
+        route_state_id='route-main-runtime-subset',
+        route_family_id='route_family:image-recognition:2011:cnn',
         support_ids=['m-e1', 'm-e2'],
         challenge_ids=['m-c1'],
         method_score=0.78,
@@ -506,15 +519,19 @@ def test_build_decision_episode_audit_export_carries_only_route_matching_accepte
     )
     matching_anti_pattern = _anti_pattern_card(
         anti_pattern_id='anti:route-main:matching',
-        route_state_ids=['route-main', 'route-peer-1'],
+        route_state_ids=['route-support-context', 'route-peer-1'],
+        route_family_ids=['route_family:image-recognition:2011:cnn'],
+        counterexample_route_family_ids=['route_family:image-recognition:2011:feature-engineering'],
     )
     other_route_anti_pattern = _anti_pattern_card(
         anti_pattern_id='anti:route-main:other-route',
         route_state_ids=['route-other'],
+        route_family_ids=['route_family:image-recognition:2011:other'],
     )
     unaccepted_matching = _anti_pattern_card(
         anti_pattern_id='anti:route-main:unaccepted',
-        route_state_ids=['route-main'],
+        route_state_ids=['route-unaccepted-support'],
+        route_family_ids=['route_family:image-recognition:2011:cnn'],
     )
 
     export = build_decision_episode_audit_export(
@@ -530,9 +547,10 @@ def test_build_decision_episode_audit_export_carries_only_route_matching_accepte
         built_at='2026-04-02T03:25:00Z',
     )
 
+    assert export.decision_episode.route_state.route_family_id == 'route_family:image-recognition:2011:cnn'
     assert export.decision_episode.relevant_priors.selected_antipattern_ids == ['anti:route-main:matching']
     assert export.anti_pattern_selection_note == (
-        'Carried 1 reviewed accepted anti-pattern id(s) because their failure examples match route_state route-main.'
+        'Carried 1 reviewed accepted anti-pattern id(s) because their failure examples match route_state route-main-runtime-subset or route_family_id route_family:image-recognition:2011:cnn.'
     )
 
 

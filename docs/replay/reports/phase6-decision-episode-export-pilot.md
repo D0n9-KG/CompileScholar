@@ -38,17 +38,22 @@ The replay bundle still carried one replay-time selected prior:
 The Phase 6 export did not copy that replay-time prior through. It rebuilt the episode from the review allowlists and truthfully produced:
 
 - exported `selected_prior_ids`: `[]`
-- exported `selected_antipattern_ids`: `[]`
+- exported `selected_antipattern_ids`: `5`
 
 This means the pilot preserved the most important Phase 6 truth boundary:
 
 - empty reviewed prior acceptance stayed empty in the export, even though the live replay episode had a selected prior
 
-The export also preserved the accepted anti-pattern inventory as audit state:
+The export also preserved and selected the accepted anti-pattern inventory:
 
 - exported `accepted_anti_pattern_ids` contains the same five accepted review ids
+- exported `selected_antipattern_ids` now contains the same five reviewed anti-pattern ids
 
-But none of those accepted anti-patterns route-matched into `selected_antipattern_ids`. Their `failure_examples.route_state_ids` point to the support-route ids from package review, while the exported replay route is the runtime-subset primary route id. Under the current direct route-id matching rule, the result is correctly conservative rather than silently broadening anti-pattern carryover.
+This now works through stable route-family matching rather than exact route-id equality alone. The support-route examples and the runtime-subset replay route share:
+
+- `route_family:jamming_transition_in_frictionless_sphere_packings_near_point_j:2010:point_j`
+
+So the export keeps the reviewed anti-pattern carryover auditable without requiring the support-route ids to equal the runtime-subset replay route id.
 
 ## Leakage Boundary
 
@@ -76,9 +81,7 @@ The most important findings are:
 - the exported episode kept `ready_for_eval = true` but dropped to `ready_for_training = false`
 - export quality is `yellow` with `quality_flags = ["weak_prior_support"]`
 - the export preserved reviewed acceptance truth instead of copying the replay-time prior
-- the export preserved accepted anti-pattern ids as audit-visible carryover, but no ids were selected into the episode because the current support-route ids do not equal the runtime-subset route id
-
-That last point is the main follow-up signal from this pilot. Phase 6 now proves the leakage-safe export contract works, but it also exposes a real policy question for later work: whether accepted anti-pattern carryover should stay on strict route-id equality or grow a reviewed mapping between support-route examples and replay-time runtime-subset routes.
+- the export carried all five reviewed anti-pattern ids into the episode through shared `route_family_id`, while still keeping the underlying support-route ids visible in the review bundle for audit traceability
 
 ## Pilot Limits
 
@@ -94,7 +97,7 @@ What this pilot does not show:
 
 - broad training-dataset readiness
 - cross-topic stability
-- a finished anti-pattern mapping policy across package support routes and replay runtime-subset routes
+- cross-topic stability of the new `route_family_id` carryover rule beyond the bounded jamming slice
 - canonical committed source corpora beyond the current `tmp/` runtime artifacts
 
-The right interpretation is that Phase 6 now has a reproducible, inspectable, leakage-safe export pilot for downstream eval or training research, while still remaining conservative about maturity and about what the current jamming slice can claim.
+The right interpretation is that Phase 6 now has a reproducible, inspectable, leakage-safe export pilot for downstream eval or training research, including reviewed anti-pattern carryover across support/core/context and runtime-subset variants of the same route family, while still remaining conservative about maturity and about what the current jamming slice can claim.

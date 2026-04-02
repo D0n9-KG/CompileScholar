@@ -344,6 +344,7 @@ def test_route_state_synthesizer_compiles_green_route_state_from_packetized_trac
     route_state = synthesize_route_state(_packet(traces, cutoff_year=2011), traces, built_at='2026-04-01T21:10:00Z')
 
     assert route_state.topic_scope == 'large-scale image recognition with deep neural networks'
+    assert route_state.route_family_id
     assert route_state.quality.quality_tier == 'green'
     assert route_state.source_packet.included_trace_ids == [trace.trace_id for trace in traces]
     assert route_state.route_landscape.dominant_methods[0].label == 'graph neural network'
@@ -355,6 +356,19 @@ def test_route_state_synthesizer_compiles_green_route_state_from_packetized_trac
     assert route_state.evidence_bundle.supporting_evidence_ids
     assert route_state.evidence_bundle.challenging_evidence_ids
     assert route_state.compiler_metadata.trace_versions == {trace.trace_id: 'v2' for trace in traces}
+
+
+def test_route_state_synthesizer_derives_route_family_id_independent_of_packet_id() -> None:
+    traces = [_trace('paper-a', 2011, 'pa'), _trace('paper-b', 2011, 'pb')]
+    primary_packet = _packet(traces, cutoff_year=2011)
+    runtime_subset_packet = _packet(traces, cutoff_year=2011)
+    runtime_subset_packet['packet_id'] = 'packet-2011-runtime-subset'
+
+    primary_route_state = synthesize_route_state(primary_packet, traces, built_at='2026-04-01T21:12:00Z')
+    runtime_subset_route_state = synthesize_route_state(runtime_subset_packet, traces, built_at='2026-04-01T21:13:00Z')
+
+    assert primary_route_state.route_state_id != runtime_subset_route_state.route_state_id
+    assert primary_route_state.route_family_id == runtime_subset_route_state.route_family_id
 
 
 def test_route_state_synthesizer_raises_when_packet_trace_is_missing() -> None:

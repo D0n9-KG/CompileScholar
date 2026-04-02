@@ -153,15 +153,20 @@ def _anti_pattern_selection_note(
 ) -> str:
     accepted_anti_pattern_ids = _normalize_ids(accepted_anti_pattern_ids)
     selected_antipattern_ids = _normalize_ids(selected_antipattern_ids)
+    route_match_target = f'route_state {route_state.route_state_id}'
+    if str(route_state.route_family_id or '').strip():
+        route_match_target = (
+            f'route_state {route_state.route_state_id} or route_family_id {route_state.route_family_id}'
+        )
     if not accepted_anti_pattern_ids:
         return 'Review bundle accepted no anti-pattern ids, so the audited export carried no anti-pattern ids.'
     if selected_antipattern_ids:
         return (
             f'Carried {len(selected_antipattern_ids)} reviewed accepted anti-pattern id(s) because their failure '
-            f'examples match route_state {route_state.route_state_id}.'
+            f'examples match {route_match_target}.'
         )
     return (
-        f'Review bundle accepted anti-pattern ids, but none match route_state {route_state.route_state_id}; '
+        f'Review bundle accepted anti-pattern ids, but none match {route_match_target}; '
         'selected_antipattern_ids stayed empty.'
     )
 

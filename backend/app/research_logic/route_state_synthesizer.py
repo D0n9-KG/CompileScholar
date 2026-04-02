@@ -57,6 +57,22 @@ def _slug(value: str) -> str:
     return slug.strip('_') or 'route'
 
 
+def _build_route_family_id(
+    scope_label: str,
+    cutoff_year: int,
+    dominant_methods: list[MethodState],
+    *,
+    preferred_method_labels: Iterable[str] | None = None,
+) -> str:
+    primary_method_label = _first_non_empty(
+        next((str(label).strip() for label in preferred_method_labels or [] if str(label).strip()), None),
+        dominant_methods[0].label if dominant_methods else None,
+        dominant_methods[0].family if dominant_methods else None,
+    )
+    primary_method_key = _slug(primary_method_label or 'route')
+    return f'route_family:{_slug(scope_label)}:{cutoff_year}:{primary_method_key}'
+
+
 def _bounded_score(count: int, max_count: int) -> float | None:
     if count <= 0:
         return None
@@ -1417,10 +1433,17 @@ class RouteStateSynthesizer:
 
         built_at_value = built_at or _utc_now_iso()
         accepted_scope = scope_resolution.accepted_scope_label
+        route_family_id_value = _build_route_family_id(
+            accepted_scope,
+            packet_model.cutoff_year,
+            landscape.dominant_methods,
+            preferred_method_labels=packet_model.compiler_hints.preferred_method_labels,
+        )
         route_state_id_value = route_state_id or f'{_slug(accepted_scope)}_{packet_model.cutoff_year}_{_slug(packet_model.packet_id)}_{packet_model.schema_version}'
 
         return RouteState(
             route_state_id=route_state_id_value,
+            route_family_id=route_family_id_value,
             built_at=built_at_value,
             topic_scope=accepted_scope,
             cutoff_year=packet_model.cutoff_year,

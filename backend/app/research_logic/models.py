@@ -342,6 +342,7 @@ class RouteStateQuality(ContractModel):
 
 class RouteState(ContractModel):
     route_state_id: str
+    route_family_id: str | None = None
     schema_version: str = 'v1'
     built_at: str
     topic_scope: str
@@ -628,12 +629,14 @@ class WarningSignalPattern(ContractModel):
 
 class FailureExamples(ContractModel):
     route_state_ids: list[str] = Field(default_factory=list)
+    route_family_ids: list[str] = Field(default_factory=list)
     decision_episode_ids: list[str] = Field(default_factory=list)
     notes: str | None = None
 
 
 class CounterexampleSet(ContractModel):
     route_state_ids: list[str] = Field(default_factory=list)
+    route_family_ids: list[str] = Field(default_factory=list)
     notes: str | None = None
 
 
@@ -691,6 +694,7 @@ class PaperLogicTraceRefs(ContractModel):
 
 class RouteStateRef(ContractModel):
     route_state_id: str
+    route_family_id: str | None = None
     route_state_ref: str | None = None
 
 

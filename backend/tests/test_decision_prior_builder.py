@@ -27,9 +27,11 @@ def _route_state_payload(
     positive_signal_confidence: float,
     scope: str = 'large-scale image recognition',
     cutoff_year: int = 2011,
+    route_family_id: str | None = None,
 ) -> dict:
     return {
         'route_state_id': route_state_id,
+        'route_family_id': route_family_id,
         'built_at': '2026-04-01T23:30:00Z',
         'topic_scope': scope,
         'cutoff_year': cutoff_year,
@@ -256,6 +258,7 @@ def _route_state(
     bottleneck_type: str = 'compute',
     bottleneck_severity: str = 'high',
     positive_signal_confidence: float = 0.8,
+    route_family_id: str | None = None,
 ) -> RouteState:
     return RouteState(
         **_route_state_payload(
@@ -273,6 +276,7 @@ def _route_state(
             bottleneck_type=bottleneck_type,
             bottleneck_severity=bottleneck_severity,
             positive_signal_confidence=positive_signal_confidence,
+            route_family_id=route_family_id,
         )
     )
 
@@ -409,6 +413,7 @@ def test_prior_candidate_registry_emits_multiple_clusters_and_anti_patterns() ->
     support_cluster_a = [
         _route_state(
             route_state_id='route-a1',
+            route_family_id='route_family:image-recognition:2011:cluster-a',
             support_ids=['a1-e1', 'a1-e2'],
             challenge_ids=['a1-c1'],
             method_score=0.76,
@@ -423,6 +428,7 @@ def test_prior_candidate_registry_emits_multiple_clusters_and_anti_patterns() ->
         ),
         _route_state(
             route_state_id='route-a2',
+            route_family_id='route_family:image-recognition:2011:cluster-a',
             support_ids=['a2-e1', 'a2-e2'],
             challenge_ids=['a2-c1'],
             method_score=0.77,
@@ -439,6 +445,7 @@ def test_prior_candidate_registry_emits_multiple_clusters_and_anti_patterns() ->
     support_cluster_b = [
         _route_state(
             route_state_id='route-b1',
+            route_family_id='route_family:image-recognition:2011:cluster-b',
             method_label='probabilistic graphical model',
             support_ids=['b1-e1', 'b1-e2'],
             challenge_ids=['b1-c1'],
@@ -454,6 +461,7 @@ def test_prior_candidate_registry_emits_multiple_clusters_and_anti_patterns() ->
         ),
         _route_state(
             route_state_id='route-b2',
+            route_family_id='route_family:image-recognition:2011:cluster-b',
             method_label='probabilistic graphical model',
             support_ids=['b2-e1', 'b2-e2'],
             challenge_ids=['b2-c1'],
@@ -470,6 +478,7 @@ def test_prior_candidate_registry_emits_multiple_clusters_and_anti_patterns() ->
     ]
     alternative_route = _route_state(
         route_state_id='route-alt',
+        route_family_id='route_family:image-recognition:2011:feature-engineering',
         method_label='feature-engineering pipeline',
         support_ids=['alt-e1', 'alt-e2'],
         challenge_ids=['alt-c1'],
@@ -497,3 +506,4 @@ def test_prior_candidate_registry_emits_multiple_clusters_and_anti_patterns() ->
     assert registry.anti_pattern_candidates
     assert registry.anti_pattern_candidates[0].warning_signal_pattern.signals
     assert registry.anti_pattern_candidates[0].failure_examples.route_state_ids
+    assert registry.anti_pattern_candidates[0].failure_examples.route_family_ids

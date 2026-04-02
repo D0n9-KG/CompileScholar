@@ -164,6 +164,11 @@ class AntiPatternBuilder:
             return []
 
         alternative_route_states = list(alternative_route_states or [])
+        route_family_by_route_id = {
+            route_state.route_state_id: str(route_state.route_family_id or '').strip()
+            for route_state in [*support_route_states, *alternative_route_states]
+            if str(route_state.route_state_id or '').strip()
+        }
         reviewer_ids = _unique(list(reviewer_ids or []))
         support_route_ids = {route_state.route_state_id for route_state in support_route_states}
         scope_label = (
@@ -226,6 +231,14 @@ class AntiPatternBuilder:
                 continue
 
             candidate_counterexamples = _unique(counterexample_route_ids.get((source_field, label), []))
+            failure_route_family_ids = _unique(
+                route_family_by_route_id.get(route_state_id, '')
+                for route_state_id in failure_route_ids
+            )
+            counterexample_route_family_ids = _unique(
+                route_family_by_route_id.get(route_state_id, '')
+                for route_state_id in candidate_counterexamples
+            )
             comparison_linked = source_field == 'comparison' or bool(comparison_cases)
             quality_tier = _quality_tier(
                 reviewer_ids=reviewer_ids,
@@ -258,12 +271,14 @@ class AntiPatternBuilder:
                     ),
                     failure_examples=FailureExamples(
                         route_state_ids=failure_route_ids,
+                        route_family_ids=failure_route_family_ids,
                         decision_episode_ids=[],
                         notes=f'Repeated {source_field.replace("_", " ")} signal across the support cluster.',
                     ),
                     corrective_checklist=_corrective_checklist(source_field),
                     counterexamples=CounterexampleSet(
                         route_state_ids=candidate_counterexamples,
+                        route_family_ids=counterexample_route_family_ids,
                         notes=(
                             'Routes without the recurring signal can remain counterexamples for review.'
                             if candidate_counterexamples

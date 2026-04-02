@@ -76,10 +76,14 @@ def _selected_prior_cards(route_state: RouteState, prior_cards: list[DecisionPri
 def _selected_antipattern_cards(route_state: RouteState, anti_pattern_cards: list[AntiPatternCard] | None) -> list[AntiPatternCard]:
     if not anti_pattern_cards:
         return []
+    route_family_id = str(route_state.route_family_id or '').strip()
     return [
         anti_pattern
         for anti_pattern in anti_pattern_cards
-        if route_state.route_state_id in anti_pattern.failure_examples.route_state_ids
+        if (
+            route_state.route_state_id in anti_pattern.failure_examples.route_state_ids
+            or (route_family_id and route_family_id in anti_pattern.failure_examples.route_family_ids)
+        )
     ]
 
 
@@ -505,6 +509,7 @@ class DecisionEpisodeBuilder:
             ),
             route_state=RouteStateRef(
                 route_state_id=route_state.route_state_id,
+                route_family_id=route_state.route_family_id,
                 route_state_ref=route_state_ref,
             ),
             relevant_priors=RelevantPriors(

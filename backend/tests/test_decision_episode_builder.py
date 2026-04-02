@@ -4,7 +4,7 @@ import pytest
 
 from app.research_logic.decision_episode_builder import DecisionEpisodeBuilder, build_decision_episode
 from app.research_logic.decision_prior_builder import build_decision_prior_card
-from app.research_logic.models import RouteState
+from app.research_logic.models import AntiPatternCard, RouteState
 from app.research_logic.route_comparison_builder import build_route_comparison_case
 from app.research_logic.why_now_builder import build_why_now_case
 
@@ -27,9 +27,11 @@ def _route_state_payload(
     positive_signal_confidence: float,
     scope: str = 'large-scale image recognition',
     cutoff_year: int = 2011,
+    route_family_id: str | None = None,
 ) -> dict:
     return {
         'route_state_id': route_state_id,
+        'route_family_id': route_family_id,
         'built_at': '2026-04-02T00:00:00Z',
         'topic_scope': scope,
         'cutoff_year': cutoff_year,
@@ -256,6 +258,7 @@ def _route_state(
     bottleneck_type: str = 'compute',
     bottleneck_severity: str = 'high',
     positive_signal_confidence: float = 0.8,
+    route_family_id: str | None = None,
 ) -> RouteState:
     return RouteState(
         **_route_state_payload(
@@ -273,6 +276,7 @@ def _route_state(
             bottleneck_type=bottleneck_type,
             bottleneck_severity=bottleneck_severity,
             positive_signal_confidence=positive_signal_confidence,
+            route_family_id=route_family_id,
         )
     )
 
@@ -445,6 +449,102 @@ def test_decision_episode_builder_emits_green_historical_replay_sample() -> None
     assert episode.relevant_priors.selected_prior_ids == [prior_card.prior_id]
     assert episode.observation_evidence_pack.excluded_after_cutoff_ids == ['future-paper']
     assert episode.paper_logic_traces.trace_ids == route_main.source_packet.included_trace_ids
+
+
+def test_decision_episode_builder_selects_antipatterns_by_route_family_id() -> None:
+    route_main = _route_state(
+        route_state_id='route-runtime-subset',
+        route_family_id='route_family:image-recognition:2011:cnn',
+        support_ids=['m-e1', 'm-e2'],
+        challenge_ids=['m-c1'],
+        method_score=0.78,
+        measurement_score=0.81,
+        data_resource_score=0.9,
+        infrastructure_score=0.61,
+        cost_cycle_score=0.49,
+        overall_score=0.7,
+    )
+    matching_anti_pattern = AntiPatternCard(
+        anti_pattern_id='anti:route-main:family-match',
+        built_at='2026-04-02T00:25:00Z',
+        anti_pattern_text='Repeated blocker pressure should trigger caution.',
+        warning_signal_pattern={
+            'signals': [
+                {
+                    'label': 'anisotropic packing',
+                    'signal_type': 'bottleneck',
+                    'severity': 'high',
+                }
+            ],
+            'trigger_logic': 'all',
+        },
+        failure_examples={
+            'route_state_ids': ['route-support-context'],
+            'route_family_ids': ['route_family:image-recognition:2011:cnn'],
+            'decision_episode_ids': [],
+            'notes': 'Synthetic family-matching anti-pattern test.',
+        },
+        corrective_checklist=['Reduce blocker pressure before reuse.'],
+        counterexamples={
+            'route_state_ids': ['route-alt'],
+            'route_family_ids': ['route_family:image-recognition:2011:feature-engineering'],
+            'notes': 'Synthetic counterexample.',
+        },
+        review={
+            'review_status': 'reviewed',
+            'reviewer_notes': 'Reviewed for route family selection tests.',
+            'reviewer_ids': ['reviewer-1'],
+        },
+        quality={
+            'quality_tier': 'green',
+            'quality_flags': [],
+            'audit_status': 'reviewed',
+        },
+    )
+    other_anti_pattern = AntiPatternCard(
+        anti_pattern_id='anti:route-main:other-family',
+        built_at='2026-04-02T00:26:00Z',
+        anti_pattern_text='Other route family should not match.',
+        warning_signal_pattern={
+            'signals': [
+                {
+                    'label': 'other blocker',
+                    'signal_type': 'bottleneck',
+                    'severity': 'high',
+                }
+            ],
+            'trigger_logic': 'all',
+        },
+        failure_examples={
+            'route_state_ids': ['route-other'],
+            'route_family_ids': ['route_family:image-recognition:2011:other'],
+            'decision_episode_ids': [],
+            'notes': 'Should not match.',
+        },
+        corrective_checklist=['Ignore for this route.'],
+        counterexamples={'route_state_ids': [], 'route_family_ids': [], 'notes': None},
+        review={
+            'review_status': 'reviewed',
+            'reviewer_notes': 'Reviewed for route family selection tests.',
+            'reviewer_ids': ['reviewer-1'],
+        },
+        quality={
+            'quality_tier': 'green',
+            'quality_flags': [],
+            'audit_status': 'reviewed',
+        },
+    )
+
+    episode = build_decision_episode(
+        route_main,
+        route_packet=_route_packet(route_main),
+        why_now_case=build_why_now_case(route_main),
+        anti_pattern_cards=[matching_anti_pattern, other_anti_pattern],
+        built_at='2026-04-02T00:30:00Z',
+    )
+
+    assert episode.route_state.route_family_id == 'route_family:image-recognition:2011:cnn'
+    assert episode.relevant_priors.selected_antipattern_ids == ['anti:route-main:family-match']
 
 
 def test_decision_episode_builder_marks_underconstrained_episode_yellow() -> None:
