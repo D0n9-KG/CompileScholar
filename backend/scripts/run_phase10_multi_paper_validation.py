@@ -13,6 +13,8 @@ from app.research_logic.phase10_multi_paper_validation import (  # noqa: E402
     run_phase10_package_and_replay,
 )
 
+REPO_ROOT = Path(__file__).resolve().parents[2]
+
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -44,9 +46,32 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _flag_present(raw_args: list[str], flag: str) -> bool:
+    return any(token == flag or token.startswith(f'{flag}=') for token in raw_args)
+
+
+def _resolve_cli_path(path_value: str) -> str:
+    return str(Path(path_value).expanduser().resolve())
+
+
 def main(argv: list[str] | None = None) -> int:
+    raw_args = list(argv) if argv is not None else sys.argv[1:]
     parser = build_parser()
-    args = parser.parse_args(argv)
+    args = parser.parse_args(raw_args)
+
+    # Required CLI paths should honor the caller's current working directory,
+    # while omitted optional paths should continue using repo-relative defaults.
+    args.packet = _resolve_cli_path(args.packet)
+    args.assembly_manifest = _resolve_cli_path(args.assembly_manifest)
+    args.l1_snapshot_output = _resolve_cli_path(args.l1_snapshot_output)
+    args.output_dir = _resolve_cli_path(args.output_dir)
+    if args.report_md is not None and _flag_present(raw_args, '--report-md'):
+        args.report_md = _resolve_cli_path(args.report_md)
+    if _flag_present(raw_args, '--baseline-replay-bundle'):
+        args.baseline_replay_bundle = _resolve_cli_path(args.baseline_replay_bundle)
+    if _flag_present(raw_args, '--baseline-export-bundle'):
+        args.baseline_export_bundle = _resolve_cli_path(args.baseline_export_bundle)
+
     try:
         result = run_phase10_package_and_replay(
             packet_path=args.packet,
@@ -57,6 +82,7 @@ def main(argv: list[str] | None = None) -> int:
             baseline_export_bundle=args.baseline_export_bundle,
             report_md=args.report_md,
             built_at=args.built_at,
+            repo_root=REPO_ROOT,
         )
     except Exception as exc:  # noqa: BLE001
         print(json.dumps({'error': str(exc)}, ensure_ascii=False, indent=2), file=sys.stderr)

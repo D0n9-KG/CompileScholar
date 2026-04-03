@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -93,3 +94,49 @@ def test_phase10_cli_writes_comparison_summary_and_report(tmp_path: Path) -> Non
     assert report_path.is_file()
     assert '# Phase 10 Multi-Paper Validation Report' in report_text
     assert '## Blocker Queue' in report_text
+
+
+def test_phase10_cli_accepts_backend_relative_paths(tmp_path: Path) -> None:
+    _assert_baseline_bundles_exist()
+    output_dir = tmp_path / 'phase10-cli-relative-run'
+    report_path = tmp_path / 'phase10-relative-report.md'
+    l1_snapshot_output = tmp_path / 'phase10-relative-l1-snapshot.json'
+
+    def rel(path: Path) -> str:
+        return os.path.relpath(path, BACKEND_DIR)
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT_PATH),
+            '--packet',
+            rel(PHASE9_PACKET_PATH),
+            '--assembly-manifest',
+            rel(PHASE9_ASSEMBLY_MANIFEST_PATH),
+            '--l1-snapshot-output',
+            rel(l1_snapshot_output),
+            '--output-dir',
+            rel(output_dir),
+            '--baseline-replay-bundle',
+            rel(BASELINE_REPLAY_BUNDLE),
+            '--baseline-export-bundle',
+            rel(BASELINE_EXPORT_BUNDLE),
+            '--report-md',
+            rel(report_path),
+            '--built-at',
+            '2026-04-03T14:25:00Z',
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+        cwd=str(BACKEND_DIR),
+    )
+
+    assert result.returncode == 0, result.stderr
+
+    summary_payload = json.loads(result.stdout)
+
+    assert summary_payload['route_state_package_bundle_manifest'] == str((output_dir / 'route_state_package' / 'bundle_manifest.json').resolve())
+    assert summary_payload['replay_summary_path'] == str((output_dir / 'replay_bundle' / 'replay_summary.json').resolve())
+    assert summary_payload['comparison_summary_path'] == str((output_dir / 'comparison_summary.json').resolve())
+    assert summary_payload['report_markdown_path'] == str(report_path.resolve())
