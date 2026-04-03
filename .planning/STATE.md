@@ -29,8 +29,8 @@ Milestone: `v1.1` - Phase `10` complete, Phase `11` in progress
 
 - Completed phase: `10 multi-paper-l3-and-l4-validation`
 - Planned phase: `11 iteration-prioritization-and-next-cycle-plan`
-- Status: Plan `11-01` completed with typed prioritization loaders, packet-first ranking, and manifest-backed Phase `11` bundle outputs
-- Last activity: `2026-04-03` - completed Plan `11-01`, verified the Phase `11` backend prioritization contract, and advanced to Plan `11-02`
+- Status: Plan `11-02` completed with an operator-facing CLI, summary-driven markdown reporting, and visible fallback provenance for Phase `11`
+- Last activity: `2026-04-03` - completed Plan `11-02`, verified the Phase `11` CLI/report flow, and advanced to Plan `11-03`
 
 ## Milestone Snapshot
 
@@ -91,7 +91,7 @@ Milestone: `v1.1` - Phase `10` complete, Phase `11` in progress
 
 ## Pending Follow-Ups
 
-- Render the new Phase `11` prioritization summary into the committed report / CLI flow for the current evidence chain.
+- Run the real Phase `11` CLI against the current evidence chain and check in the generated report plus verification note.
 - Carry the packet-first recommendation forward into the next plan while keeping `l4_aggregation` and `l2_extraction` as explicit ranked follow-ups.
 - Preserve `tmp/phase8_sampled_single_paper_l2/baseline-cycle-01/` as the comparison source for the next sampled-paper cycle.
 
@@ -111,9 +111,10 @@ Milestone: `v1.1` - Phase `10` complete, Phase `11` in progress
 - `10-planning`: duration `~35m`, artifacts `5`, plans `3`
 - `10-02`: duration `19 min`, tasks `2`, files `4`
 - `11-01`: duration `6 min`, tasks `2`, files `5`
+- `11-02`: duration `17 min`, tasks `2`, files `3`
 
 ## Session
 
 **Last Date:** 2026-04-03T13:32:20.114Z
 **Stopped At:** Completed 11-02-PLAN.md
-**Resume File:** None
+**Resume File:** .planning/phases/11-iteration-prioritization-and-next-cycle-plan/11-03-PLAN.md

@@ -109,10 +109,11 @@ The milestone first establishes a fixed regression set plus random exploration s
 - Phase `8` completed on `2026-04-03` with a real `15/15` sampled-paper baseline run, `7` recurring fixed failures, `2` random edge cases, and an owner queue led by `relation_assembly` and `slot_recovery`.
 - Phase `9` completed on `2026-04-03` with a committed `2017-2021` computational-mechanics packet, explicit `support / alternative / held_out` mapping, and a runtime-backed audit report that keeps Phase `10` blockers visible.
 - Plan `11-01` completed on `2026-04-03` with typed prioritization loaders, a packet-first ranking contract, and manifest-backed Phase `11` bundle outputs over the committed Phase `8` and Phase `10` evidence chain.
+- Plan `11-02` completed on `2026-04-03` with an operator-facing Phase `11` CLI, report rendering from summary/inspection payloads, and explicit Phase `10` fallback disclosure in the markdown output.
 
 ## Next Up
 
-**Phase 11 Plan 02: Iteration Prioritization And Next Cycle Plan** - Render the committed Phase `11` prioritization contract into the report / CLI flow for the current evidence chain.
+**Phase 11 Plan 03: Iteration Prioritization And Next Cycle Plan** - Run the real Phase `11` prioritization workflow, commit the generated report, and record the final verification note for downstream planning.
 
 `$gsd-discuss-phase 11`
 
@@ -120,4 +121,4 @@ Also available: `$gsd-plan-phase 11`
 
 ---
 *Roadmap created: 2026-04-03*
-*Last updated: 2026-04-03 after Phase 11 Plan 01 execution and verification*
+*Last updated: 2026-04-03 after Phase 11 Plan 02 execution and verification*

@@ -69,7 +69,7 @@ Explicitly excluded from `v1.1`.
 | `PACK-02` | Phase `10` | Complete |
 | `AGGR-01` | Phase `10` | Complete |
 | `LOOP-01` | Phase `11` | Complete |
-| `LOOP-02` | Phase `11` | Pending |
+| `LOOP-02` | Phase `11` | Complete |
 
 **Coverage:**
 - v1.1 requirements: `10` total
@@ -78,4 +78,4 @@ Explicitly excluded from `v1.1`.
 
 ---
 *Requirements defined: 2026-04-03*
-*Last updated: 2026-04-03 after Phase 11 Plan 01 execution and verification*
+*Last updated: 2026-04-03 after Phase 11 Plan 02 execution and verification*
