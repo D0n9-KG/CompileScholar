@@ -15,36 +15,37 @@ Inside one milestone, the team repeatedly runs: generate real outputs -> manuall
 
 | Phase | Name | Goal | Requirements | Success Criteria |
 |-------|------|------|--------------|------------------|
-| 12 | Cycle Runtime Foundation | Make one reproducible full-cycle runner and cycle bundle output. | `LOOPR-01`, `LOOPR-02` | 3 |
-| 13 | Cycle 1 Execution And Review | Execute first full cycle, manually review outputs, and define optimization backlog from real defects. | `LOOPR-03`, `REVIEW-01` | 4 |
+| 12 | Baseline Data Cycle 1 (Direct Fix) | Use Phase 10/11 existing artifacts directly, apply focused fixes, rerun, and review output quality. | `LOOPR-01`, `LOOPR-02` | 4 |
+| 13 | Baseline Data Cycle 2 (Refine) | Continue fix-rerun-review on the same baseline data until quality improves without overfitting. | `LOOPR-03`, `REVIEW-01` | 4 |
 | 14 | Cycle 2 Optimization And Review | Apply fixes from cycle 1, rerun, and re-review outputs with explicit defect deltas. | `REVIEW-02`, `REVIEW-03` | 4 |
 | 15 | Cycle 3 Consolidation | Continue optimize/rerun to reach repeated high-quality output under manual review. | `STAB-01` | 3 |
 | 16 | Stability Verification And Handoff | Verify consecutive-cycle stability and publish final verification with residual risk notes. | `STAB-02`, `STAB-03` | 3 |
 
 ## Phase Details
 
-### Phase 12: Cycle Runtime Foundation
+### Phase 12: Baseline Data Cycle 1 (Direct Fix)
 
-**Goal:** Provide a reproducible runner and standardized cycle bundle for each iteration.
+**Goal:** Start immediately from Phase 10/11 artifacts, apply targeted fixes, rerun, and review real outputs without building a new runtime foundation first.
 **Depends on:** Phase `11`
 **Requirements:** `LOOPR-01`, `LOOPR-02`
 
 **Success criteria:**
-1. One entrypoint runs packet -> replay -> prior/review -> export for a bounded slice.
-2. Each run writes a cycle bundle with artifacts, metadata, and summary.
-3. Inputs/outputs are explicit and reproducible for subsequent cycles.
+1. Existing commands and artifacts from Phase 10/11 are reused to run the first fix-rerun cycle.
+2. Real output review notes identify concrete defects in generated reasoning artifacts.
+3. Fixes are linked to observed defects and rerun results in the same cycle.
+4. Review explicitly checks that fixes improve overall quality, not only one-paper behavior.
 
-### Phase 13: Cycle 1 Execution And Review
+### Phase 13: Baseline Data Cycle 2 (Refine)
 
-**Goal:** Run the first cycle and perform direct manual quality review on generated reasoning outputs.
+**Goal:** Run another cycle on the same baseline data to verify improvements are repeatable and not overfit to single-paper artifacts.
 **Depends on:** Phase `12`
 **Requirements:** `LOOPR-03`, `REVIEW-01`
 
 **Success criteria:**
-1. First cycle executes end-to-end with generated outputs committed as evidence.
-2. Manual review notes are written against real outputs (not metric-only interpretation).
-3. Review identifies concrete defects and maps them to optimization actions.
-4. Rerun path is fast enough to start the next cycle without manual stitching.
+1. Second cycle reruns after targeted fixes from phase 12 review findings.
+2. Manual review compares cycle-2 outputs against cycle-1 defects and confirms real quality movement.
+3. Fix impact is evaluated at packet/replay/prior/export levels, not only single-document patterns.
+4. Remaining defects are prioritized for the next optimization cycle.
 
 ### Phase 14: Cycle 2 Optimization And Review
 
@@ -99,12 +100,14 @@ Inside one milestone, the team repeatedly runs: generate real outputs -> manuall
 ## Notes
 
 - This roadmap keeps phase numbering continuity from v1.1.
+- v1.2 starts directly from existing Phase 10/11 data and commands instead of building a separate foundation layer first.
 - v1.2 progress is judged by real generated output quality and cycle-to-cycle stability, not metric-only improvements.
 - Manual review findings are first-class evidence and must directly steer optimization work.
+- Overfitting guardrail: do not generalize single-paper tricks to pipeline-wide logic unless multi-stage quality actually improves.
 
 ## Next Up
 
-**Phase 12: Cycle Runtime Foundation** - build reproducible cycle runner and cycle bundle outputs.
+**Phase 12: Baseline Data Cycle 1 (Direct Fix)** - fix using existing Phase 10/11 data, rerun, and manually review output quality.
 
 `$gsd-discuss-phase 12`
 

@@ -7,11 +7,11 @@
 
 Requirements for milestone `v1.2`. This milestone uses repeated in-milestone cycles: generate outputs, manually review output quality, optimize the pipeline, and rerun until quality is stable.
 
-### Iteration Loop Capability
+### Iteration Loop Capability (Direct From Existing Data)
 
-- [ ] **LOOPR-01**: Operators can run a full generation cycle (`packet -> replay -> prior/review -> export`) with reproducible inputs and outputs.
-- [ ] **LOOPR-02**: Each cycle emits a cycle bundle that includes generated artifacts, runtime metadata, and a compact cycle summary.
-- [ ] **LOOPR-03**: The workflow supports rapid reruns so fixes can be validated in the next cycle without manual file stitching.
+- [ ] **LOOPR-01**: Operators can run a full generation cycle (`packet -> replay -> prior/review -> export`) directly from existing Phase 10/11 artifacts and commands.
+- [ ] **LOOPR-02**: Each cycle records comparable evidence outputs and review notes so cycle-to-cycle quality movement is auditable.
+- [ ] **LOOPR-03**: The workflow supports rapid fix -> rerun loops on the same baseline data without introducing a separate foundation refactor first.
 
 ### Manual Output Quality Review
 

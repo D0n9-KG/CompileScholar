@@ -19,7 +19,7 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-04-03)
 
 **Core value:** Produce auditable, replayable, trainable scientific-reasoning artifacts rather than paper-like summaries or one-off knowledge graphs.
-**Current focus:** Milestone v1.2 iterative cycle setup
+**Current focus:** Milestone v1.2 baseline-data direct iteration
 
 ## Current Position
 
@@ -58,8 +58,8 @@ Milestone: `v1.2` - Fast Iteration Research Logic Quality
 ## Pending Follow-Ups
 
 - Discuss and plan Phase 12 implementation details.
-- Implement cycle runtime foundation for repeated generate -> review -> optimize loops.
-- Start Cycle 1 manual output review in Phase 13.
+- Start direct fix-rerun cycle on existing Phase 10/11 data.
+- Perform manual output review after each cycle and prioritize next fixes.
 
 ## Blockers
 
