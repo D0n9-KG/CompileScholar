@@ -575,7 +575,7 @@ def _aggregate_infrastructure_states(
     for label, bucket in sorted(buckets.items(), key=lambda item: (-len(item[1]['paper_ids']), item[0])):
         paper_count = len(bucket['paper_ids'])
         availability: AvailabilityLevel = 'abundant' if paper_count >= 3 else 'usable' if paper_count >= 1 else 'unknown'
-        infra_type = sorted(bucket['resource_types'])[0] if bucket['resource_types'] else 'unknown'
+        infra_type = _resource_infra_type(bucket['resource_types'])
         states.append(
             InfrastructureState(
                 label=label,

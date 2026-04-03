@@ -13,9 +13,24 @@ from .bounded_packet_audit import (
     load_bounded_packet_assembly_manifest,
 )
 from .historical_environment import HistoricalEnvironmentSnapshot, build_historical_environment_snapshot, build_l1_snapshot_ref, write_historical_environment_snapshot
+from .historical_replay_compiler import compile_historical_replay
 from .models import RoutePacket
-from .replay_io import ensure_packet_trace_coverage, load_paper_logic_traces, load_route_packet
-from .route_state_package import RouteStatePackageEntry, RouteStatePackageManifest
+from .replay_io import (
+    build_replay_summary,
+    ensure_packet_trace_coverage,
+    load_paper_logic_trace,
+    load_paper_logic_traces,
+    load_route_packet,
+    write_replay_bundle,
+)
+from .route_state_package import (
+    RouteStatePackageEntry,
+    RouteStatePackageManifest,
+    build_route_state_package_summary,
+    compile_route_state_package,
+    load_route_state_package_bundle,
+    write_route_state_package_bundle,
+)
 
 Phase10Role = Literal['support', 'alternative', 'held_out']
 
@@ -39,6 +54,8 @@ class Phase10CanonicalInputs:
 class Phase10TraceSource:
     role: Phase10Role
     paper_id: str
+    trace_id: str
+    runtime_paper_id: str
     trace_ref: str
     resolved_path: Path
 
@@ -73,6 +90,16 @@ class Phase10RuntimeBridge:
     package_manifest: RouteStatePackageManifest
     package_manifest_path: Path
     role_packets: dict[Phase10Role, Phase10RolePacketArtifact]
+
+
+@dataclass(frozen=True)
+class Phase10ValidationRun:
+    bridge: Phase10RuntimeBridge
+    route_state_package_output_dir: Path
+    route_state_package_bundle_files: dict[str, Path]
+    replay_output_dir: Path
+    replay_bundle_files: dict[str, Path]
+    summary: dict[str, object]
 
 
 def _repo_root(repo_root: str | Path | None = None) -> Path:
@@ -153,6 +180,7 @@ def load_phase10_canonical_inputs(
 def collect_phase10_trace_sources(canonical_inputs: Phase10CanonicalInputs) -> tuple[Phase10TraceSource, ...]:
     collected: list[Phase10TraceSource] = []
     seen_paper_ids: set[str] = set()
+    packet_items_by_paper_id = {item.paper_id: item for item in canonical_inputs.route_packet.included_items}
 
     for role, group in canonical_inputs.assembly_manifest.role_groups().items():
         for member in group.members:
@@ -171,11 +199,34 @@ def collect_phase10_trace_sources(canonical_inputs: Phase10CanonicalInputs) -> t
             if member.paper_id in seen_paper_ids:
                 raise ValueError(f'Phase 10 assembly paper_id reused across role groups: {member.paper_id}')
 
+            packet_item = packet_items_by_paper_id.get(member.paper_id)
+            if packet_item is None:
+                raise ValueError(f'Phase 10 assembly paper_id missing from canonical packet: {member.paper_id}')
+
+            trace = load_paper_logic_trace(resolved_trace_path)
+            trace_id = str(trace.trace_id or '').strip()
+            if not trace_id:
+                raise ValueError(f'Phase 10 trace_ref missing trace_id for paper {member.paper_id}: {resolved_trace_path}')
+
+            packet_trace_id = str(packet_item.trace_id or '').strip()
+            if packet_trace_id and packet_trace_id != trace_id:
+                raise ValueError(
+                    f'Phase 10 trace_ref trace_id mismatch for paper {member.paper_id}: expected {packet_trace_id}, got {trace_id}'
+                )
+
+            runtime_paper_id = str(trace.paper_metadata.paper_id or '').strip()
+            if not runtime_paper_id:
+                raise ValueError(
+                    f'Phase 10 trace_ref missing paper_metadata.paper_id for paper {member.paper_id}: {resolved_trace_path}'
+                )
+
             seen_paper_ids.add(member.paper_id)
             collected.append(
                 Phase10TraceSource(
                     role=role,
                     paper_id=member.paper_id,
+                    trace_id=trace_id,
+                    runtime_paper_id=runtime_paper_id,
                     trace_ref=trace_ref,
                     resolved_path=resolved_trace_path,
                 )
@@ -227,11 +278,32 @@ def _subset_packet_quality_flags(route_packet: RoutePacket, *, role: Phase10Role
     return deduped
 
 
+def _runtime_paper_id_map(trace_sources: tuple[Phase10TraceSource, ...]) -> dict[str, str]:
+    return {source.paper_id: source.runtime_paper_id for source in trace_sources}
+
+
+def _runtime_packet_items_payload(
+    items: list[object],
+    *,
+    runtime_paper_ids: dict[str, str],
+) -> list[dict[str, object]]:
+    packet_items_payload: list[dict[str, object]] = []
+    for item in items:
+        item_payload = item.model_dump(mode='json', exclude_none=True)
+        runtime_paper_id = runtime_paper_ids.get(item.paper_id)
+        if not runtime_paper_id:
+            raise ValueError(f'Phase 10 runtime subset missing trace-native paper_id for canonical paper {item.paper_id}')
+        item_payload['paper_id'] = runtime_paper_id
+        packet_items_payload.append(item_payload)
+    return packet_items_payload
+
+
 def _build_role_subset_packet(
     canonical_inputs: Phase10CanonicalInputs,
     *,
     role: Phase10Role,
     paper_ids: list[str],
+    runtime_paper_ids: dict[str, str],
     built_at: str,
     snapshot: HistoricalEnvironmentSnapshot,
 ) -> RoutePacket:
@@ -242,12 +314,13 @@ def _build_role_subset_packet(
 
     subset_items = [included_lookup[paper_id] for paper_id in paper_ids]
     subset_role_counts = _subset_role_counts(canonical_inputs.route_packet, paper_ids=set(paper_ids))
+    packet_items_payload = _runtime_packet_items_payload(subset_items, runtime_paper_ids=runtime_paper_ids)
 
     subset_payload = canonical_inputs.route_packet.model_dump(mode='json', exclude_none=True)
     subset_payload['packet_id'] = f'phase10-{_role_slug(role)}-{canonical_inputs.route_packet.packet_id}'
     subset_payload['built_at'] = built_at
     subset_payload['l1_snapshot_ref'] = build_l1_snapshot_ref(snapshot).model_dump(mode='json', exclude_none=True)
-    subset_payload['included_items'] = [item.model_dump(mode='json', exclude_none=True) for item in subset_items]
+    subset_payload['included_items'] = packet_items_payload
     subset_payload['packet_composition'] = {
         'target_size': len(subset_items),
         'actual_size': len(subset_items),
@@ -265,13 +338,47 @@ def _build_role_subset_packet(
     subset_payload['compiler_hints'] = {
         **canonical_inputs.route_packet.compiler_hints.model_dump(mode='json', exclude_none=True),
         'notes_for_route_state_compiler': (
-            f'{notes} Runtime subset generated from the committed Phase 9 assembly manifest for the {role} role.'
+            f'{notes} Runtime subset generated from the committed Phase 9 assembly manifest for the {role} role. '
+            f'Canonical Phase 9 paper_ids: {", ".join(paper_ids)}. Runtime packet paper_ids are trace-native for synthesis compatibility.'
             if notes
-            else f'Runtime subset generated from the committed Phase 9 assembly manifest for the {role} role.'
+            else (
+                f'Runtime subset generated from the committed Phase 9 assembly manifest for the {role} role. '
+                f'Canonical Phase 9 paper_ids: {", ".join(paper_ids)}. Runtime packet paper_ids are trace-native for synthesis compatibility.'
+            )
         ),
     }
 
     return RoutePacket.model_validate(subset_payload)
+
+
+def _build_replay_runtime_packet(
+    canonical_inputs: Phase10CanonicalInputs,
+    *,
+    trace_sources: tuple[Phase10TraceSource, ...],
+    built_at: str,
+    snapshot: HistoricalEnvironmentSnapshot,
+) -> RoutePacket:
+    packet_payload = canonical_inputs.route_packet.model_dump(mode='json', exclude_none=True)
+    packet_payload['built_at'] = built_at
+    packet_payload['l1_snapshot_ref'] = build_l1_snapshot_ref(snapshot).model_dump(mode='json', exclude_none=True)
+    packet_payload['included_items'] = _runtime_packet_items_payload(
+        list(canonical_inputs.route_packet.included_items),
+        runtime_paper_ids=_runtime_paper_id_map(trace_sources),
+    )
+    notes = str(canonical_inputs.route_packet.compiler_hints.notes_for_route_state_compiler or '').strip()
+    packet_payload['compiler_hints'] = {
+        **canonical_inputs.route_packet.compiler_hints.model_dump(mode='json', exclude_none=True),
+        'notes_for_route_state_compiler': (
+            f'{notes} Runtime replay packet preserves the committed Phase 9 boundary while translating included paper_ids '
+            'to trace-native ids for synthesis compatibility.'
+            if notes
+            else (
+                'Runtime replay packet preserves the committed Phase 9 boundary while translating included paper_ids '
+                'to trace-native ids for synthesis compatibility.'
+            )
+        ),
+    }
+    return RoutePacket.model_validate(packet_payload)
 
 
 def _write_phase10_role_packets(
@@ -284,6 +391,7 @@ def _write_phase10_role_packets(
 ) -> dict[Phase10Role, Phase10RolePacketArtifact]:
     trace_lookup = {source.paper_id: source for source in trace_sources}
     role_packets: dict[Phase10Role, Phase10RolePacketArtifact] = {}
+    runtime_paper_ids = _runtime_paper_id_map(trace_sources)
 
     for role, group in canonical_inputs.assembly_manifest.role_groups().items():
         paper_ids = tuple(group.paper_ids())
@@ -292,6 +400,7 @@ def _write_phase10_role_packets(
             canonical_inputs,
             role=role,
             paper_ids=list(paper_ids),
+            runtime_paper_ids=runtime_paper_ids,
             built_at=built_at,
             snapshot=snapshot,
         )
@@ -395,6 +504,122 @@ def prepare_phase10_runtime_bridge(
     )
 
 
+def run_phase10_package_and_replay(
+    *,
+    packet_path: str | Path = DEFAULT_PHASE10_PACKET_PATH,
+    assembly_manifest_path: str | Path = DEFAULT_PHASE10_ASSEMBLY_MANIFEST_PATH,
+    l1_snapshot_output_path: str | Path = DEFAULT_PHASE10_L1_SNAPSHOT_PATH,
+    output_dir: str | Path,
+    built_at: str | None = None,
+    repo_root: str | Path | None = None,
+) -> Phase10ValidationRun:
+    bridge = prepare_phase10_runtime_bridge(
+        packet_path=packet_path,
+        assembly_manifest_path=assembly_manifest_path,
+        l1_snapshot_output_path=l1_snapshot_output_path,
+        built_at=built_at,
+        repo_root=repo_root,
+    )
+    resolved_output_dir = _resolve_repo_path(output_dir, repo_root=bridge.canonical_inputs.repo_root)
+    route_state_package_output_dir = resolved_output_dir / 'route_state_package'
+    replay_output_dir = resolved_output_dir / 'replay_bundle'
+
+    route_state_package_compilation = compile_route_state_package(
+        bridge.package_manifest,
+        manifest_base_dir=bridge.package_manifest_path.parent,
+    )
+    route_state_package_bundle_files = write_route_state_package_bundle(
+        route_state_package_output_dir,
+        compilation=route_state_package_compilation,
+        metadata={
+            'runner': 'backend/scripts/run_phase10_multi_paper_validation.py',
+            'manifest_path': str(bridge.package_manifest_path.resolve()),
+            'packet_path': str(bridge.canonical_inputs.packet_path.resolve()),
+            'assembly_manifest_path': str(bridge.canonical_inputs.assembly_manifest_path.resolve()),
+        },
+    )
+    loaded_route_state_package = load_route_state_package_bundle(route_state_package_output_dir)
+    traces = load_paper_logic_traces(trace_files=[source.resolved_path for source in bridge.trace_sources])
+    ensure_packet_trace_coverage(bridge.canonical_inputs.route_packet, traces)
+    runtime_replay_packet = _build_replay_runtime_packet(
+        bridge.canonical_inputs,
+        trace_sources=bridge.trace_sources,
+        built_at=built_at or bridge.l1_snapshot.built_at,
+        snapshot=bridge.l1_snapshot,
+    )
+
+    replay_compilation = compile_historical_replay(
+        runtime_replay_packet,
+        traces,
+        l1_snapshot=bridge.l1_snapshot,
+        support_route_states=loaded_route_state_package.support_route_states,
+        alternative_route_states=loaded_route_state_package.alternative_route_states,
+        held_out_route_states=loaded_route_state_package.held_out_route_states,
+        built_at=built_at,
+    )
+    replay_bundle_files = write_replay_bundle(
+        replay_output_dir,
+        route_packet=bridge.canonical_inputs.route_packet,
+        traces=traces,
+        compilation=replay_compilation,
+        historical_environment_snapshot=bridge.l1_snapshot,
+        support_route_states=loaded_route_state_package.support_route_states,
+        alternative_route_states=loaded_route_state_package.alternative_route_states,
+        held_out_route_states=loaded_route_state_package.held_out_route_states,
+        metadata={
+            'runner': 'backend/scripts/run_phase10_multi_paper_validation.py',
+            'l1_snapshot_id': bridge.l1_snapshot.snapshot_id,
+            'route_state_package_id': loaded_route_state_package.manifest.package_id,
+            'generated_manifest_path': str(bridge.package_manifest_path.resolve()),
+        },
+        route_state_package_validation=loaded_route_state_package.validation,
+    )
+
+    route_state_package_summary = build_route_state_package_summary(
+        route_state_package_compilation,
+        output_dir=route_state_package_output_dir,
+        bundle_manifest=route_state_package_bundle_files['bundle_manifest'],
+    )
+    replay_summary = build_replay_summary(
+        route_packet=bridge.canonical_inputs.route_packet,
+        traces=traces,
+        compilation=replay_compilation,
+        historical_environment_snapshot=bridge.l1_snapshot,
+        support_route_states=loaded_route_state_package.support_route_states,
+        alternative_route_states=loaded_route_state_package.alternative_route_states,
+        held_out_route_states=loaded_route_state_package.held_out_route_states,
+    )
+
+    summary = {
+        'packet_id': bridge.canonical_inputs.route_packet.packet_id,
+        'cutoff_year': bridge.canonical_inputs.route_packet.cutoff_year,
+        'l1_snapshot_output': str(bridge.l1_snapshot_path.resolve()),
+        'generated_package_manifest': str(bridge.package_manifest_path.resolve()),
+        'route_state_package_output_dir': str(route_state_package_output_dir.resolve()),
+        'route_state_package_bundle_manifest': str(route_state_package_bundle_files['bundle_manifest'].resolve()),
+        'route_state_package_validation_quality_tier': route_state_package_summary['validation_quality_tier'],
+        'route_state_package_validation_flags': list(route_state_package_summary['validation_quality_flags']),
+        'replay_output_dir': str(replay_output_dir.resolve()),
+        'replay_bundle_manifest': str(replay_bundle_files['bundle_manifest'].resolve()),
+        'replay_summary_path': str(replay_bundle_files['replay_summary'].resolve()),
+        'replay_inspection_path': str(replay_bundle_files['replay_inspection'].resolve()),
+        'replay_quality_tier': replay_summary['replay_quality_tier'],
+        'replay_quality_flags': list(replay_summary['quality_flags']),
+        'ready_for_pilot': replay_summary['ready_for_pilot'],
+        'support_route_state_count': replay_summary['support_route_state_count'],
+        'alternative_route_state_count': replay_summary['alternative_route_state_count'],
+        'held_out_route_state_count': replay_summary['held_out_route_state_count'],
+    }
+    return Phase10ValidationRun(
+        bridge=bridge,
+        route_state_package_output_dir=route_state_package_output_dir,
+        route_state_package_bundle_files=route_state_package_bundle_files,
+        replay_output_dir=replay_output_dir,
+        replay_bundle_files=replay_bundle_files,
+        summary=summary,
+    )
+
+
 __all__ = [
     'DEFAULT_PHASE10_ASSEMBLY_MANIFEST_PATH',
     'DEFAULT_PHASE10_L1_SNAPSHOT_PATH',
@@ -406,9 +631,11 @@ __all__ = [
     'Phase10RuntimeBridge',
     'Phase10RuntimePaths',
     'Phase10TraceSource',
+    'Phase10ValidationRun',
     'build_phase10_l1_snapshot',
     'collect_phase10_trace_sources',
     'load_phase10_canonical_inputs',
     'prepare_phase10_runtime_bridge',
     'resolve_phase10_runtime_paths',
+    'run_phase10_package_and_replay',
 ]

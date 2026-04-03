@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import shutil
+import subprocess
+import sys
 
 import pytest
 
@@ -10,6 +12,7 @@ from app.research_logic import (
     DEFAULT_PHASE10_L1_SNAPSHOT_PATH,
     DEFAULT_PHASE10_PACKAGE_MANIFEST_PATH,
     load_historical_environment_snapshot,
+    load_paper_logic_trace,
     load_phase10_canonical_inputs,
     load_route_packet,
     prepare_phase10_runtime_bridge,
@@ -55,12 +58,24 @@ def test_phase10_bridge_manifest_preserves_phase9_role_membership(tmp_path: Path
     alternative_packet = load_route_packet(generated_dir / Path(alternative_entry.packet_path))
     held_out_packet = load_route_packet(generated_dir / Path(held_out_entry.packet_path))
 
-    assert [item.paper_id for item in support_packet.included_items] == ['1000', '1001', '1002', '1005', '1017']
-    assert [item.paper_id for item in alternative_packet.included_items] == ['1007']
-    assert [item.paper_id for item in held_out_packet.included_items] == ['1023']
+    assert list(bridge.role_packets['support'].paper_ids) == ['1000', '1001', '1002', '1005', '1017']
+    assert list(bridge.role_packets['alternative'].paper_ids) == ['1007']
+    assert list(bridge.role_packets['held_out'].paper_ids) == ['1023']
+    assert [item.paper_id for item in support_packet.included_items] == [
+        load_paper_logic_trace(path).paper_metadata.paper_id for path in bridge.role_packets['support'].trace_files
+    ]
+    assert [item.paper_id for item in alternative_packet.included_items] == [
+        load_paper_logic_trace(path).paper_metadata.paper_id for path in bridge.role_packets['alternative'].trace_files
+    ]
+    assert [item.paper_id for item in held_out_packet.included_items] == [
+        load_paper_logic_trace(path).paper_metadata.paper_id for path in bridge.role_packets['held_out'].trace_files
+    ]
     assert support_packet.cutoff_year == 2021
     assert alternative_packet.cutoff_year == 2021
     assert held_out_packet.cutoff_year == 2021
+    assert 'Canonical Phase 9 paper_ids: 1000, 1001, 1002, 1005, 1017' in (
+        support_packet.compiler_hints.notes_for_route_state_compiler or ''
+    )
 
 
 def test_phase10_bridge_snapshot_writes_expected_default_path_and_cutoff() -> None:
@@ -100,3 +115,69 @@ def test_phase10_bridge_rejects_cutoff_mismatch(tmp_path: Path) -> None:
             assembly_manifest_path=PHASE9_ASSEMBLY_MANIFEST_PATH,
             repo_root=REPO_ROOT,
         )
+
+
+def test_phase10_cli_help_lists_required_arguments() -> None:
+    script_path = REPO_ROOT / 'backend' / 'scripts' / 'run_phase10_multi_paper_validation.py'
+    result = subprocess.run(
+        [sys.executable, str(script_path), '--help'],
+        capture_output=True,
+        text=True,
+        check=False,
+        cwd=str(REPO_ROOT / 'backend'),
+    )
+
+    assert result.returncode == 0
+    assert '--packet' in result.stdout
+    assert '--assembly-manifest' in result.stdout
+    assert '--l1-snapshot-output' in result.stdout
+    assert '--output-dir' in result.stdout
+
+
+def test_phase10_cli_writes_package_and_replay_bundles(tmp_path: Path) -> None:
+    runtime_paths = resolve_phase10_runtime_paths(repo_root=REPO_ROOT)
+    shutil.rmtree(runtime_paths.output_root, ignore_errors=True)
+
+    try:
+        script_path = REPO_ROOT / 'backend' / 'scripts' / 'run_phase10_multi_paper_validation.py'
+        l1_snapshot_output_path = tmp_path / 'phase9-comp-mech-l1-snapshot.json'
+        output_dir = tmp_path / 'phase10-cli-run'
+
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(script_path),
+                '--packet',
+                str(PHASE9_PACKET_PATH),
+                '--assembly-manifest',
+                str(PHASE9_ASSEMBLY_MANIFEST_PATH),
+                '--l1-snapshot-output',
+                str(l1_snapshot_output_path),
+                '--output-dir',
+                str(output_dir),
+                '--built-at',
+                '2026-04-03T13:15:00Z',
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+            cwd=str(REPO_ROOT / 'backend'),
+        )
+
+        assert result.returncode == 0, result.stderr
+        summary_payload = json.loads(result.stdout)
+        replay_inspection_payload = json.loads((output_dir / 'replay_bundle' / 'replay_inspection.json').read_text(encoding='utf-8'))
+
+        assert summary_payload['generated_package_manifest'] == str(runtime_paths.package_manifest_path.resolve())
+        assert summary_payload['l1_snapshot_output'] == str(l1_snapshot_output_path.resolve())
+        assert (output_dir / 'route_state_package' / 'bundle_manifest.json').is_file()
+        assert (output_dir / 'route_state_package' / 'validation.json').is_file()
+        assert (output_dir / 'replay_bundle' / 'replay_summary.json').is_file()
+        assert (output_dir / 'replay_bundle' / 'replay_inspection.json').is_file()
+        assert replay_inspection_payload['route_state_package_validation'] is not None
+        assert replay_inspection_payload['route_state_package_validation']['quality_tier'] == summary_payload[
+            'route_state_package_validation_quality_tier'
+        ]
+        assert 'route_state_package_validation' in replay_inspection_payload
+    finally:
+        shutil.rmtree(runtime_paths.output_root, ignore_errors=True)
