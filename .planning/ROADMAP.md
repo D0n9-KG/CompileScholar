@@ -19,7 +19,7 @@ The milestone first establishes a fixed regression set plus random exploration s
 | 8 | Sampled Single-Paper L2 Regression | Repeatedly run sampled single-paper extraction and compare results across iterations. | `L2Q-01`, `L2Q-02` | 3 |
 | 9 | Bounded Packet Construction From Corpus | Build one bounded topic packet from the larger corpus with explicit multi-paper role assignment. | `PACK-01` | 3 |
 | 10 | Multi-Paper L3 And L4 Validation | 3/3 | Complete    | 2026-04-03 |
-| 11 | Iteration Prioritization And Next Cycle Plan | 3/3 | Complete   | 2026-04-03 |
+| 11 | Iteration Prioritization And Next Cycle Plan | 3/3 | Complete    | 2026-04-03 |
 
 ## Phase Details
 
