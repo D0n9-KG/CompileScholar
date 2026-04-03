@@ -40,6 +40,7 @@ The milestone first establishes a fixed regression set plus random exploration s
 **Goal:** Repeatedly run sampled single-paper extraction and evaluation so `L2` quality can be measured on both stable and novel papers.
 **Depends on:** Phase `7`
 **Requirements:** `L2Q-01`, `L2Q-02`
+**Status:** Complete on `2026-04-03`
 
 **Success criteria:**
 1. Sampled single-paper runs emit per-paper trace, schema, and evidence-slot quality outputs.
@@ -103,15 +104,16 @@ The milestone first establishes a fixed regression set plus random exploration s
 - The jamming slice remains the reference baseline, but it is no longer the only intended source of optimization evidence.
 - Shared-corpus path instability is part of the quality loop because bad corpus hygiene can otherwise masquerade as extraction failure.
 - Phase `7` completed on `2026-04-03` with a committed ten-paper fixed regression set, a real seed-`7` random exploration batch of five papers, and `1505` recorded corpus-health failures in `tmp/phase7_corpus_sampling_baseline/`.
+- Phase `8` completed on `2026-04-03` with a real `15/15` sampled-paper baseline run, `7` recurring fixed failures, `2` random edge cases, and an owner queue led by `relation_assembly` and `slot_recovery`.
 
 ## Next Up
 
-**Phase 8: Sampled Single-Paper L2 Regression** - Repeatedly run sampled single-paper extraction on the fixed and random Phase 7 batches and compare failures across iterations.
+**Phase 9: Bounded Packet Construction From Corpus** - Turn the Phase `8` owner queue into one bounded topic packet with explicit `support`, `alternative`, and `held_out` roles.
 
-`$gsd-discuss-phase 8`
+`$gsd-discuss-phase 9`
 
-Also available: `$gsd-plan-phase 8`
+Also available: `$gsd-plan-phase 9`
 
 ---
 *Roadmap created: 2026-04-03*
-*Last updated: 2026-04-03 after Phase 7 execution and verification*
+*Last updated: 2026-04-03 after Phase 8 execution and verification*

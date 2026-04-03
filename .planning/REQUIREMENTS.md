@@ -15,8 +15,8 @@ Requirements for milestone `v1.1`. These define what must be true before the nex
 
 ### Single-Paper Extraction Iteration
 
-- [ ] **L2Q-01**: Operator can run sampled single-paper extraction and evaluation and collect per-paper trace, schema, and evidence-slot quality results.
-- [ ] **L2Q-02**: Team can compare sampled single-paper results across iterations to identify recurring failures, regressions, and newly surfaced edge cases.
+- [x] **L2Q-01**: Operator can run sampled single-paper extraction and evaluation and collect per-paper trace, schema, and evidence-slot quality results.
+- [x] **L2Q-02**: Team can compare sampled single-paper results across iterations to identify recurring failures, regressions, and newly surfaced edge cases.
 
 ### Bounded Multi-Paper Packet Validation
 
@@ -63,8 +63,8 @@ Explicitly excluded from `v1.1`.
 | `SAMPLE-01` | Phase `7` | Complete |
 | `SAMPLE-02` | Phase `7` | Complete |
 | `SAMPLE-03` | Phase `7` | Complete |
-| `L2Q-01` | Phase `8` | Pending |
-| `L2Q-02` | Phase `8` | Pending |
+| `L2Q-01` | Phase `8` | Complete |
+| `L2Q-02` | Phase `8` | Complete |
 | `PACK-01` | Phase `9` | Pending |
 | `PACK-02` | Phase `10` | Pending |
 | `AGGR-01` | Phase `10` | Pending |
@@ -78,4 +78,4 @@ Explicitly excluded from `v1.1`.
 
 ---
 *Requirements defined: 2026-04-03*
-*Last updated: 2026-04-03 after Phase 7 execution and verification*
+*Last updated: 2026-04-03 after Phase 8 execution and verification*
