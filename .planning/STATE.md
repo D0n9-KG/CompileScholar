@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
-status: Ready to execute
-stopped_at: Completed 09-01-PLAN.md
-last_updated: "2026-04-03T07:51:09.831Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 09-02-PLAN.md
+last_updated: "2026-04-03T08:15:27.421Z"
 progress:
   total_phases: 5
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 6
-  completed_plans: 5
+  completed_plans: 6
 ---
 
 # Project State
@@ -67,6 +67,9 @@ Milestone: `v1.1` - Phase `8` complete, Phase `9` planned
 - [Phase 09]: Keep RoutePacket canonical and layer support / alternative / held_out mapping in a companion manifest.
 - [Phase 09]: Treat packet/manifest misalignment as CLI-failing validation errors while preserving packet quality blockers as explicit summary flags.
 - [Phase 09]: Reuse replay_io bundle conventions so Phase 9 audit runtime artifacts stay consistent with earlier summary/inspection patterns.
+- [Phase 09]: Freeze the first corpus packet at the 2017-2021 data-driven constitutive and multiscale computational-mechanics slice.
+- [Phase 09]: Keep RoutePacket canonical and layer support / alternative / held_out mapping in a companion manifest.
+- [Phase 09]: Treat ready_for_phase10 as structural handoff readiness while keeping replay blockers explicit in the audit report.
 
 ## Active Requirements
 
@@ -95,6 +98,6 @@ Milestone: `v1.1` - Phase `8` complete, Phase `9` planned
 
 ## Session
 
-**Last Date:** 2026-04-03T07:50:09.748Z
-**Stopped At:** Completed 09-01-PLAN.md
+**Last Date:** 2026-04-03T08:15:27.418Z
+**Stopped At:** Completed 09-02-PLAN.md
 **Resume File:** None
