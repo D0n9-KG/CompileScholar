@@ -1,124 +1,114 @@
-# Milestone v1.1: Corpus-Driven Iterative Quality Hardening
+# Milestone v1.2: Fast Iteration Research Logic Quality
 
 **Status:** ACTIVE 2026-04-03
-**Phases:** 7-11
-**Requirements:** 10 mapped
-**Numbering Mode:** Continue from `v1.0`
+**Phases:** 12-16
+**Requirements:** 9 mapped
+**Numbering Mode:** Continue from `v1.1`
 
 ## Overview
 
-`v1.1` uses the large shared paper corpus to turn compiler improvement into an explicit loop instead of an ad hoc patch sequence.
+`v1.2` turns the packet-first recommendation from Phase 11 into a high-speed optimization loop.
 
-The milestone first establishes a fixed regression set plus random exploration sampling, then hardens sampled single-paper extraction for `L2`, then assembles one bounded multi-paper packet for `L3/L4`, and finally uses the combined evidence to decide the next optimization cycle.
+The milestone focuses on reducing cycle latency while improving actual reasoning quality on real artifacts. Success is measured by both rule-level quality gates and explicit review of generated reasoning outputs.
 
 ## Phase Summary
 
 | Phase | Name | Goal | Requirements | Success Criteria |
 |-------|------|------|--------------|------------------|
-| 7 | Corpus Sampling And Regression Baseline | Turn the shared corpus into a usable source for fixed regression papers, random exploration papers, and corpus-health reporting. | `SAMPLE-01`, `SAMPLE-02`, `SAMPLE-03` | 3 |
-| 8 | Sampled Single-Paper L2 Regression | Repeatedly run sampled single-paper extraction and compare results across iterations. | `L2Q-01`, `L2Q-02` | 3 |
-| 9 | Bounded Packet Construction From Corpus | Build one bounded topic packet from the larger corpus with explicit multi-paper role assignment. | `PACK-01` | 3 |
-| 10 | Multi-Paper L3 And L4 Validation | 3/3 | Complete    | 2026-04-03 |
-| 11 | Iteration Prioritization And Next Cycle Plan | 3/3 | Complete    | 2026-04-03 |
+| 12 | Unified Iteration Runner And Telemetry | Build a reproducible single-entry optimization run with stage-level timing and artifact lineage. | `ITER-01`, `ITER-02` | 3 |
+| 13 | Packet Blocker Recovery Loop | Resolve current packet-quality blockers with auditable role-balance evidence and reduced manual handoff steps. | `ITER-03`, `PACK-03`, `PACK-04` | 4 |
+| 14 | L4 Recovery Revalidation | Re-run replay/prior surfaces on repaired packets and compare against committed baseline artifacts. | `AGGR-02`, `AGGR-03` | 3 |
+| 15 | Real-Outcome Quality Gate | Enforce pass/fail gates that combine rule thresholds with explicit review of real reasoning outputs. | `QUAL-01` | 3 |
+| 16 | Next-Cycle Prioritization Refresh | Produce the next ranked recommendation from fresh evidence and close the iteration loop. | `QUAL-02` | 3 |
 
 ## Phase Details
 
-### Phase 7: Corpus Sampling And Regression Baseline
+### Phase 12: Unified Iteration Runner And Telemetry
 
-**Goal:** Turn the shared corpus into a usable evaluation source with one fixed regression set, one random exploration strategy, reproducible sampling metadata, and explicit corpus-health reporting.
-**Depends on:** `v1.0` archived baseline
-**Requirements:** `SAMPLE-01`, `SAMPLE-02`, `SAMPLE-03`
-**Status:** Complete on `2026-04-03`
-
-**Success criteria:**
-1. The project defines a fixed regression paper set and a random exploration sampling method over the shared corpus.
-2. Each sampling run records selected paper ids, source references, and sampling mode so failures can be replayed.
-3. Missing or broken corpus paths are reported as corpus-health issues instead of being mixed into model-quality failure counts.
-
-### Phase 8: Sampled Single-Paper L2 Regression
-
-**Goal:** Repeatedly run sampled single-paper extraction and evaluation so `L2` quality can be measured on both stable and novel papers.
-**Depends on:** Phase `7`
-**Requirements:** `L2Q-01`, `L2Q-02`
-**Status:** Complete on `2026-04-03`
+**Goal:** Provide a single reproducible execution path for one full optimization cycle and capture timing/bottleneck telemetry.
+**Depends on:** Phase `11`
+**Requirements:** `ITER-01`, `ITER-02`
 
 **Success criteria:**
-1. Sampled single-paper runs emit per-paper trace, schema, and evidence-slot quality outputs.
-2. Regression summaries distinguish recurring failures, newly introduced regressions, and new random-sample edge cases.
-3. The project can identify a concrete short list of `L2` owners from sampled-paper evidence instead of vague quality impressions.
+1. One entrypoint can run packet -> replay -> report generation with explicit input/output roots.
+2. Stage timings and bottleneck stage are recorded in machine-readable outputs.
+3. Artifact lineage lists exactly which sources and generated files were used for the run.
 
-### Phase 9: Bounded Packet Construction From Corpus
+### Phase 13: Packet Blocker Recovery Loop
 
-**Goal:** Build one bounded topic packet from the larger corpus so `L3/L4` can be tested on structured multi-paper evidence instead of arbitrary random mixes.
-**Depends on:** Phase `8`
-**Requirements:** `PACK-01`
-**Status:** Complete on `2026-04-03`
-
-**Success criteria:**
-1. One bounded topic and cutoff are selected from the larger corpus with explicit packet inclusion and exclusion notes.
-2. The packet defines `support`, `alternative`, and `held_out` roles clearly enough for downstream replay and review.
-3. Packet assembly gaps such as missing traces, weak support density, or role imbalance are recorded explicitly before `L3/L4` runs.
-
-### Phase 10: Multi-Paper L3 And L4 Validation
-
-**Goal:** Compile replay/package/review/export artifacts for the bounded packet and inspect the true multi-paper failure surface.
-**Depends on:** Phase `9`
-**Requirements:** `PACK-02`, `AGGR-01`
-**Status:** Complete on `2026-04-03`
+**Goal:** Implement a focused fix cycle for current packet blockers while preserving auditable role balance and minimizing manual glue work.
+**Depends on:** Phase `12`
+**Requirements:** `ITER-03`, `PACK-03`, `PACK-04`
 
 **Success criteria:**
-1. The bounded packet produces replay and package-validation artifacts that make `L3` quality gaps inspectable.
-2. The same packet produces `L4` prior/review/export artifacts, or explicit blockers that explain why multi-paper aggregation failed.
-3. The result can be compared against the existing jamming baseline to separate reusable compiler behavior from topic-specific limitations.
+1. Current package blockers are either resolved or emitted as explicit unresolved blockers with evidence.
+2. Role-balance evidence (`support`/`alternative`/`held_out`) is exported in machine-readable form per cycle.
+3. Operators can rerun packet fix workflows without manual artifact stitching.
+4. Updated packet outputs remain comparable to the committed baseline.
 
-### Phase 11: Iteration Prioritization And Next Cycle Plan
+### Phase 14: L4 Recovery Revalidation
 
-**Goal:** Convert the evidence from sampled single-paper runs and bounded multi-paper runs into the next optimization cycle.
-**Depends on:** Phase `10`
-**Requirements:** `LOOP-01`, `LOOP-02`
+**Goal:** Verify whether packet fixes recover downstream `L4` and prior-review quality relative to baseline.
+**Depends on:** Phase `13`
+**Requirements:** `AGGR-02`, `AGGR-03`
 
 **Success criteria:**
-1. A single summary links single-paper `L2` failures with bounded multi-paper `L3/L4` outcomes.
-2. The summary prioritizes which owners should be tackled next instead of leaving the iteration open-ended.
-3. The team can choose whether the next cycle should emphasize `L2` extraction, packet construction, or `L4` aggregation based on explicit evidence.
+1. Repaired packet outputs are rerun through replay/prior surfaces with baseline comparison.
+2. Reports explicitly show prior candidate counts, accepted prior ids, and anti-pattern carryover deltas.
+3. The run identifies whether remaining issues are still packet-first or have shifted to `L4`/`L2`.
+
+### Phase 15: Real-Outcome Quality Gate
+
+**Goal:** Make promotion contingent on real artifact quality, not only aggregate metric movement.
+**Depends on:** Phase `14`
+**Requirements:** `QUAL-01`
+
+**Success criteria:**
+1. Quality gate evaluates both rule thresholds and real reasoning artifact review checks.
+2. Any metric-only improvement without real-outcome quality gain is rejected.
+3. Verification outputs clearly state pass/fail reasons and blocking evidence.
+
+### Phase 16: Next-Cycle Prioritization Refresh
+
+**Goal:** Close the loop with a refreshed recommendation queue grounded in the latest repaired-cycle evidence.
+**Depends on:** Phase `15`
+**Requirements:** `QUAL-02`
+
+**Success criteria:**
+1. A new ranked recommendation queue is generated from current cycle artifacts.
+2. Recommendation includes explicit rationale and provenance for top choice.
+3. The milestone ends with a clear next-cycle focus and audit-ready verification note.
 
 ## Coverage
 
 | Requirement | Phase |
 |-------------|-------|
-| `SAMPLE-01` | Phase `7` |
-| `SAMPLE-02` | Phase `7` |
-| `SAMPLE-03` | Phase `7` |
-| `L2Q-01` | Phase `8` |
-| `L2Q-02` | Phase `8` |
-| `PACK-01` | Phase `9` |
-| `PACK-02` | Phase `10` |
-| `AGGR-01` | Phase `10` |
-| `LOOP-01` | Phase `11` |
-| `LOOP-02` | Phase `11` |
+| `ITER-01` | Phase `12` |
+| `ITER-02` | Phase `12` |
+| `ITER-03` | Phase `13` |
+| `PACK-03` | Phase `13` |
+| `PACK-04` | Phase `13` |
+| `AGGR-02` | Phase `14` |
+| `AGGR-03` | Phase `14` |
+| `QUAL-01` | Phase `15` |
+| `QUAL-02` | Phase `16` |
 
-**Coverage status:** `10/10` requirements mapped
+**Coverage status:** `9/9` requirements mapped
 
 ## Notes
 
-- This roadmap deliberately continues numbering from `v1.0` because `.planning/phases/01-*` through `06-*` are still present.
-- `v1.1` does not try to process the full corpus in one pass; it uses the corpus as a large candidate pool for repeated sampling and bounded packet construction.
-- The jamming slice remains the reference baseline, but it is no longer the only intended source of optimization evidence.
-- Shared-corpus path instability is part of the quality loop because bad corpus hygiene can otherwise masquerade as extraction failure.
-- Phase `7` completed on `2026-04-03` with a committed ten-paper fixed regression set, a real seed-`7` random exploration batch of five papers, and `1505` recorded corpus-health failures in `tmp/phase7_corpus_sampling_baseline/`.
-- Phase `8` completed on `2026-04-03` with a real `15/15` sampled-paper baseline run, `7` recurring fixed failures, `2` random edge cases, and an owner queue led by `relation_assembly` and `slot_recovery`.
-- Phase `9` completed on `2026-04-03` with a committed `2017-2021` computational-mechanics packet, explicit `support / alternative / held_out` mapping, and a runtime-backed audit report that keeps Phase `10` blockers visible.
-- Plan `11-01` completed on `2026-04-03` with typed prioritization loaders, a packet-first ranking contract, and manifest-backed Phase `11` bundle outputs over the committed Phase `8` and Phase `10` evidence chain.
-- Plan `11-02` completed on `2026-04-03` with an operator-facing Phase `11` CLI, report rendering from summary/inspection payloads, and explicit Phase `10` fallback disclosure in the markdown output.
+- This roadmap continues numbering from `v1.1`; no phase renumber reset is used.
+- v1.2 quality decisions must be grounded in real reasoning outputs, not only numeric deltas.
+- The committed Phase 10/11 artifacts remain the baseline comparison anchor for this milestone.
 
 ## Next Up
 
-**Phase 11 Plan 03: Iteration Prioritization And Next Cycle Plan** - Run the real Phase `11` prioritization workflow, commit the generated report, and record the final verification note for downstream planning.
+**Phase 12: Unified Iteration Runner And Telemetry** - build the single-entry cycle runner and timing/lineage outputs.
 
-`$gsd-discuss-phase 11`
+`$gsd-discuss-phase 12`
 
-Also available: `$gsd-plan-phase 11`
+Also available: `$gsd-plan-phase 12`
 
 ---
 *Roadmap created: 2026-04-03*
-*Last updated: 2026-04-03 after Phase 11 Plan 02 execution and verification*
+*Last updated: 2026-04-03 for milestone v1.2 initialization*
