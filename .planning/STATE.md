@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: fast-iteration-research-logic-quality
-status: Ready to plan
-stopped_at: Phase 12 context gathered (assumptions mode)
-last_updated: "2026-04-03T17:41:38.645Z"
+status: Ready to execute
+stopped_at: Phase 12 planned
+last_updated: "2026-04-04T02:10:37.1435990+08:00"
 progress:
   total_phases: 5
   completed_phases: 0
-  total_plans: 0
+  total_plans: 2
   completed_plans: 0
 ---
 
@@ -19,17 +19,17 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-04-03)
 
 **Core value:** Produce auditable, replayable, trainable scientific-reasoning artifacts rather than paper-like summaries or one-off knowledge graphs.
-**Current focus:** Milestone v1.2 baseline-data direct iteration
+**Current focus:** Phase 12 packet-first direct-fix cycle on the bounded Phase 9 computational-mechanics slice
 
 ## Current Position
 
 Phase: 12
-Plan: Not started
+Plan: 1 of 2 in current phase
 Milestone: `v1.2` - Fast Iteration Research Logic Quality
 
 - Completed milestone: `v1.1` corpus-driven iterative quality hardening
-- Status: Requirements and roadmap aligned to continuous generate -> review -> optimize cycles for milestone `v1.2`
-- Last activity: `2026-04-03` - realigned v1.2 to manual output-quality review across repeated cycles
+- Status: Ready to execute the first direct-fix cycle for milestone `v1.2`
+- Last activity: `2026-04-04` - planned packet-first runtime fixes plus the full cycle-1 rerun and review audit
 
 ## Milestone Snapshot
 
@@ -53,13 +53,13 @@ Milestone: `v1.2` - Fast Iteration Research Logic Quality
 
 ## Active Requirements
 
-- Phase `12`: `ITER-01`, `ITER-02`
+- Phase `12`: `LOOPR-01`, `LOOPR-02`
 
 ## Pending Follow-Ups
 
-- Discuss and plan Phase 12 implementation details.
-- Start direct fix-rerun cycle on existing Phase 10/11 data.
-- Perform manual output review after each cycle and prioritize next fixes.
+- Execute `12-01` to repair the Phase 10 runtime bridge and clear the lead packet-construction blockers on a dev-check rerun.
+- Execute `12-02` to run the full cycle-1 rerun, write the direct-fix report, and capture the verification verdict.
+- Reprioritize next-cycle work only after the new cycle artifacts exist and the manual review is complete.
 
 ## Blockers
 
@@ -68,6 +68,6 @@ Milestone: `v1.2` - Fast Iteration Research Logic Quality
 
 ## Session
 
-**Last Date:** 2026-04-03T17:41:38.642Z
-**Stopped At:** Phase 12 context gathered (assumptions mode)
-**Resume File:** .planning/phases/12-baseline-data-cycle-1-direct-fix/12-CONTEXT.md
+**Last Date:** 2026-04-04T02:10:37.1435990+08:00
+**Stopped At:** Phase 12 planned
+**Resume File:** .planning/phases/12-baseline-data-cycle-1-direct-fix/12-01-PLAN.md
