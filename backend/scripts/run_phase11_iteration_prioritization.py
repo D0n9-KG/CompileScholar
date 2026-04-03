@@ -11,11 +11,14 @@ from app.research_logic import (  # noqa: E402
     IterationPriorityPreflightError,
     build_iteration_priority_inspection,
     build_iteration_priority_summary,
+    build_iteration_priority_inspection_payload,
+    build_iteration_priority_summary_payload,
     load_phase8_comparison_inspection,
     load_phase8_comparison_summary,
     load_phase10_evidence,
     write_iteration_priority_bundle,
 )
+from app.research_logic.iteration_prioritization import render_iteration_priority_report  # noqa: E402
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -121,6 +124,8 @@ def run_phase11_iteration_prioritization(args: argparse.Namespace) -> dict[str, 
         phase8_inspection=phase8_inspection,
         phase10_surface=phase10_surface,
     )
+    summary_payload = build_iteration_priority_summary_payload(summary=summary)
+    inspection_payload = build_iteration_priority_inspection_payload(inspection=inspection)
 
     written_files = write_iteration_priority_bundle(
         output_dir,
@@ -134,20 +139,7 @@ def run_phase11_iteration_prioritization(args: argparse.Namespace) -> dict[str, 
 
     report_md.parent.mkdir(parents=True, exist_ok=True)
     report_md.write_text(
-        '\n'.join(
-            [
-                '# Phase 11 Iteration Prioritization Report',
-                '',
-                f"- Primary recommendation: `{summary.primary_recommendation_id or 'none'}`",
-                f"- Fallback used: `{str(summary.source_refs.fallback_used).lower()}`",
-                f"- Phase 8 summary: `{summary.source_refs.phase8_summary_path or 'missing'}`",
-                f"- Phase 8 inspection: `{summary.source_refs.phase8_inspection_path or 'missing'}`",
-                f"- Phase 10 summary: `{summary.source_refs.phase10_summary_path or 'not provided'}`",
-                f"- Phase 10 verification: `{summary.source_refs.phase10_verification_path or 'not provided'}`",
-                f"- Phase 10 report: `{summary.source_refs.phase10_report_path or 'not provided'}`",
-                '',
-            ]
-        ),
+        render_iteration_priority_report(summary_payload, inspection_payload),
         encoding='utf-8',
     )
 

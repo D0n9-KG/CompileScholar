@@ -348,6 +348,18 @@ class IterationPriorityInspection(ContractModel):
     recommendations: list[IterationPriorityRecommendation] = Field(default_factory=list)
 
 
+def _summary_model(value: IterationPrioritySummary | dict[str, Any]) -> IterationPrioritySummary:
+    if isinstance(value, IterationPrioritySummary):
+        return value
+    return IterationPrioritySummary.model_validate(value)
+
+
+def _inspection_model(value: IterationPriorityInspection | dict[str, Any]) -> IterationPriorityInspection:
+    if isinstance(value, IterationPriorityInspection):
+        return value
+    return IterationPriorityInspection.model_validate(value)
+
+
 def _load_owner_buckets(raw_buckets: object) -> list[IterationPriorityOwnerBucket]:
     if not isinstance(raw_buckets, list):
         return []
@@ -856,6 +868,116 @@ def build_iteration_priority_inspection(
     )
 
 
+def render_iteration_priority_report(
+    summary: IterationPrioritySummary | dict[str, Any],
+    inspection: IterationPriorityInspection | dict[str, Any],
+) -> str:
+    summary_model = _summary_model(summary)
+    inspection_model = _inspection_model(inspection)
+    source_refs = summary_model.source_refs
+    recommendations = sorted(summary_model.recommendations, key=lambda item: (item.rank or 999, item.id))
+
+    supporting_buckets = summary_model.supporting_l2_evidence or summary_model.phase8_owner_buckets[:2]
+    supporting_bucket_lines = [
+        (
+            f"- `{bucket.bucket}`: fixed={bucket.fixed_count}, random={bucket.random_count}, "
+            f"total={bucket.total_count or bucket.fixed_count + bucket.random_count}"
+        )
+        for bucket in supporting_buckets
+    ]
+    if not supporting_bucket_lines:
+        supporting_bucket_lines = ['- No Phase 8 owner buckets were preserved in the summary payload.']
+
+    recommendation_lines: list[str] = []
+    for recommendation in recommendations:
+        evidence_text = '; '.join(recommendation.evidence) if recommendation.evidence else 'No supporting evidence recorded.'
+        blocker_text = ', '.join(recommendation.supporting_blocker_stages) or 'none'
+        owner_text = ', '.join(recommendation.supporting_owner_buckets) or 'none'
+        recommendation_lines.extend(
+            [
+                (
+                    f"{recommendation.rank}. `{recommendation.id}` - {recommendation.title} "
+                    f"(score={recommendation.score})"
+                ),
+                f"   Why now: {recommendation.why_now}",
+                f"   Supporting blocker stages: {blocker_text}",
+                f"   Supporting owner buckets: {owner_text}",
+                f"   Evidence: {evidence_text}",
+            ]
+        )
+    if not recommendation_lines:
+        recommendation_lines = ['1. No recommendations were preserved in the Phase 11 summary payload.']
+
+    ranking_signals = inspection_model.ranking_signals
+    fallback_lines = [f"- Phase 10 JSON unavailable: `{'yes' if source_refs.fallback_used else 'no'}`"]
+    if source_refs.fallback_used:
+        fallback_lines.extend(
+            [
+                f"- Phase 10 verification fallback: `{source_refs.phase10_verification_path or 'missing'}`",
+                f"- Phase 10 report fallback: `{source_refs.phase10_report_path or 'missing'}`",
+            ]
+        )
+    else:
+        fallback_lines.append('- Fallback file paths: not used.')
+        if source_refs.phase10_verification_path:
+            fallback_lines.append(
+                f"- Supplemental Phase 10 verification provenance: `{source_refs.phase10_verification_path}`"
+            )
+        if source_refs.phase10_report_path:
+            fallback_lines.append(f"- Supplemental Phase 10 report provenance: `{source_refs.phase10_report_path}`")
+
+    source_of_truth_lines = [
+        '- This markdown was rendered from the Phase 11 summary and inspection payloads, not from ad-hoc ranking logic.',
+        f"- Primary recommendation in summary payload: `{summary_model.primary_recommendation_id or 'none'}`",
+        f"- Phase 8 summary source: `{source_refs.phase8_summary_path or 'missing'}`",
+        f"- Phase 8 inspection source: `{source_refs.phase8_inspection_path or 'missing'}`",
+        f"- Phase 10 summary JSON source: `{source_refs.phase10_summary_path or 'not provided'}`",
+        f"- Phase 10 evidence mode: `{source_refs.phase10_mode}`",
+        f"- Inspection replay L2 delta: `{ranking_signals.get('replay_l2_delta', 'n/a')}`",
+        f"- Inspection replay L3/L4 delta: `{ranking_signals.get('replay_l3_l4_delta', 'n/a')}`",
+    ]
+
+    lines = [
+        '# Phase 11 Iteration Prioritization Report',
+        '',
+        '## Input Evidence',
+        '',
+        f"- Phase 8 summary JSON: `{source_refs.phase8_summary_path or 'missing'}`",
+        f"- Phase 8 inspection JSON: `{source_refs.phase8_inspection_path or 'missing'}`",
+        f"- Phase 10 summary JSON: `{source_refs.phase10_summary_path or 'not provided'}`",
+        f"- Phase 10 verification note: `{source_refs.phase10_verification_path or 'not provided'}`",
+        f"- Phase 10 report markdown: `{source_refs.phase10_report_path or 'not provided'}`",
+        f"- Phase 8 iteration label: `{summary_model.phase8_iteration_label or 'unknown'}`",
+        f"- Packet id: `{summary_model.packet_id or 'unknown'}`",
+        '',
+        '## Recommendation Queue',
+        '',
+        *recommendation_lines,
+        '',
+        '## Supporting Evidence',
+        '',
+        *supporting_bucket_lines,
+        (
+            f"- Ranking signals: replay_l2_delta={ranking_signals.get('replay_l2_delta', 'n/a')}, "
+            f"replay_l3_l4_delta={ranking_signals.get('replay_l3_l4_delta', 'n/a')}"
+        ),
+        (
+            f"- Phase 10 current recommendation carried forward: "
+            f"`{summary_model.current_recommendation or 'not stated'}`"
+        ),
+        '',
+        '## Missing Or Fallback Evidence',
+        '',
+        *fallback_lines,
+        *(f"- Note: {note}" for note in summary_model.notes),
+        '',
+        '## Source Of Truth',
+        '',
+        *source_of_truth_lines,
+    ]
+    return '\n'.join(lines) + '\n'
+
+
 __all__ = [
     'build_iteration_priority_inspection',
     'build_iteration_priority_summary',
@@ -874,5 +996,6 @@ __all__ = [
     'load_phase8_comparison_summary',
     'load_phase10_comparison_summary',
     'load_phase10_evidence',
+    'render_iteration_priority_report',
     'rank_iteration_recommendations',
 ]

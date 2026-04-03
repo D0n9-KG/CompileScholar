@@ -153,3 +153,48 @@ def test_phase11_cli_output_records_supplemental_phase10_provenance_when_json_is
     assert payload['source_refs']['phase10_summary_path'] == str(phase10_summary_path.resolve())
     assert payload['source_refs']['phase10_verification_path'] == str(PHASE10_VERIFICATION_PATH.resolve())
     assert payload['source_refs']['phase10_report_path'] == str(PHASE10_REPORT_PATH.resolve())
+
+
+def test_phase11_cli_report_md_writes_required_headings_and_ranked_queue(tmp_path: Path) -> None:
+    output_dir = tmp_path / 'phase11-output'
+    report_md = tmp_path / 'docs' / 'phase11-report.md'
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT_PATH),
+            '--phase8-summary',
+            str(PHASE8_SUMMARY_PATH),
+            '--phase8-inspection',
+            str(PHASE8_INSPECTION_PATH),
+            '--phase10-verification',
+            str(PHASE10_VERIFICATION_PATH),
+            '--phase10-report',
+            str(PHASE10_REPORT_PATH),
+            '--output-dir',
+            str(output_dir),
+            '--report-md',
+            str(report_md),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+        cwd=str(REPO_ROOT / 'backend'),
+    )
+
+    assert result.returncode == 0, result.stderr
+    report_text = report_md.read_text(encoding='utf-8')
+
+    assert '# Phase 11 Iteration Prioritization Report' in report_text
+    assert '## Input Evidence' in report_text
+    assert '## Recommendation Queue' in report_text
+    assert '## Supporting Evidence' in report_text
+    assert '## Missing Or Fallback Evidence' in report_text
+    assert '## Source Of Truth' in report_text
+    assert 'relation_assembly' in report_text
+    assert 'slot_recovery' in report_text
+    assert 'Phase 10 JSON unavailable: `yes`' in report_text
+    assert str(PHASE10_VERIFICATION_PATH.resolve()) in report_text
+    assert str(PHASE10_REPORT_PATH.resolve()) in report_text
+    assert report_text.index('`packet_construction`') < report_text.index('`l4_aggregation`')
+    assert report_text.index('`l4_aggregation`') < report_text.index('`l2_extraction`')
