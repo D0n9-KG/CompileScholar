@@ -8,6 +8,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from app.research_logic.phase10_multi_paper_validation import (  # noqa: E402
+    DEFAULT_PHASE10_BASELINE_EXPORT_BUNDLE,
+    DEFAULT_PHASE10_BASELINE_REPLAY_BUNDLE,
     run_phase10_package_and_replay,
 )
 
@@ -24,6 +26,20 @@ def build_parser() -> argparse.ArgumentParser:
         required=True,
         help='Directory where the Phase 10 route_state_package/, replay_bundle/, prior_review_bundle/, and export_bundle/ folders will be written.',
     )
+    parser.add_argument(
+        '--baseline-replay-bundle',
+        default=str(DEFAULT_PHASE10_BASELINE_REPLAY_BUNDLE),
+        help='Path to the baseline replay bundle directory or bundle_manifest.json used for comparison.',
+    )
+    parser.add_argument(
+        '--baseline-export-bundle',
+        default=str(DEFAULT_PHASE10_BASELINE_EXPORT_BUNDLE),
+        help='Path to the baseline export bundle directory or bundle_manifest.json used for comparison.',
+    )
+    parser.add_argument(
+        '--report-md',
+        help='Optional markdown report path rendered from comparison_summary.json.',
+    )
     parser.add_argument('--built-at', help='Override the build timestamp used for generated Phase 10 artifacts.')
     return parser
 
@@ -37,6 +53,9 @@ def main(argv: list[str] | None = None) -> int:
             assembly_manifest_path=args.assembly_manifest,
             l1_snapshot_output_path=args.l1_snapshot_output,
             output_dir=args.output_dir,
+            baseline_replay_bundle=args.baseline_replay_bundle,
+            baseline_export_bundle=args.baseline_export_bundle,
+            report_md=args.report_md,
             built_at=args.built_at,
         )
     except Exception as exc:  # noqa: BLE001

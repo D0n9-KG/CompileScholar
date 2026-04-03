@@ -46,6 +46,8 @@ DEFAULT_PHASE10_ASSEMBLY_MANIFEST_PATH = Path('docs/replay/pilot_packets/phase9-
 DEFAULT_PHASE10_OUTPUT_ROOT = Path('tmp/phase10_multi_paper_validation')
 DEFAULT_PHASE10_PACKAGE_MANIFEST_PATH = DEFAULT_PHASE10_OUTPUT_ROOT / 'generated' / 'phase10-route-state-package-manifest.json'
 DEFAULT_PHASE10_L1_SNAPSHOT_PATH = DEFAULT_PHASE10_OUTPUT_ROOT / 'shared' / 'phase9-comp-mech-l1-snapshot.json'
+DEFAULT_PHASE10_BASELINE_REPLAY_BUNDLE = Path('tmp/phase3_route_state_package/replay_with_package')
+DEFAULT_PHASE10_BASELINE_EXPORT_BUNDLE = Path('tmp/phase6_decision_episode_audit_export')
 
 
 @dataclass(frozen=True)
@@ -110,6 +112,8 @@ class Phase10ValidationRun:
     prior_review_bundle_files: dict[str, Path]
     export_output_dir: Path
     export_bundle_files: dict[str, Path]
+    comparison_summary_path: Path
+    report_markdown_path: Path | None
     summary: dict[str, object]
 
 
@@ -126,6 +130,12 @@ def _resolve_repo_path(path_like: str | Path, *, repo_root: Path) -> Path:
 def _write_json(path: Path, payload: object) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    return path
+
+
+def _write_text(path: Path, content: str) -> Path:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding='utf-8')
     return path
 
 
@@ -164,6 +174,12 @@ def _load_models(path: Path, model_type: type[ModelT]) -> list[ModelT]:
     return [model_type.model_validate(item) for item in payload]
 
 
+def _json_object(payload: Any, *, label: str) -> dict[str, object]:
+    if not isinstance(payload, dict):
+        raise ValueError(f'{label} must decode to a JSON object')
+    return payload
+
+
 def _bundle_string_list(manifest_payload: dict[str, object], *, key: str, label: str) -> list[str]:
     value = manifest_payload.get(key)
     if not isinstance(value, list):
@@ -186,6 +202,601 @@ def _bundle_source_refs(bundle_manifest_path: Path, manifest_payload: dict[str, 
             if isinstance(key, str) and isinstance(relative_path, str) and str(relative_path).strip()
         },
     }
+
+
+def _string_list(values: object) -> list[str]:
+    if not isinstance(values, list):
+        return []
+    normalized: list[str] = []
+    seen: set[str] = set()
+    for value in values:
+        text = str(value or '').strip()
+        if not text or text in seen:
+            continue
+        seen.add(text)
+        normalized.append(text)
+    return normalized
+
+
+def _int_map(values: object) -> dict[str, int]:
+    if not isinstance(values, dict):
+        return {}
+    normalized: dict[str, int] = {}
+    for key, value in values.items():
+        try:
+            normalized[str(key)] = int(value)
+        except (TypeError, ValueError):
+            continue
+    return normalized
+
+
+def _count_delta(current: object, baseline: object) -> int | None:
+    try:
+        return int(current) - int(baseline)
+    except (TypeError, ValueError):
+        return None
+
+
+def _count_delta_map(current: object, baseline: object) -> dict[str, int]:
+    current_map = _int_map(current)
+    baseline_map = _int_map(baseline)
+    return {
+        key: current_map.get(key, 0) - baseline_map.get(key, 0)
+        for key in sorted(set(current_map) | set(baseline_map))
+    }
+
+
+def _quality_trend(current: object, baseline: object) -> str:
+    ranks = {'red': 0, 'yellow': 1, 'green': 2}
+    current_rank = ranks.get(str(current or '').strip(), -1)
+    baseline_rank = ranks.get(str(baseline or '').strip(), -1)
+    if current_rank > baseline_rank:
+        return 'improved'
+    if current_rank < baseline_rank:
+        return 'regressed'
+    return 'unchanged'
+
+
+def _flag_delta(current: object, baseline: object) -> dict[str, list[str]]:
+    current_flags = set(_string_list(current))
+    baseline_flags = set(_string_list(baseline))
+    return {
+        'added': sorted(current_flags - baseline_flags),
+        'removed': sorted(baseline_flags - current_flags),
+    }
+
+
+def _count_trend(current: int, baseline: int) -> str:
+    if current > baseline:
+        return 'higher'
+    if current < baseline:
+        return 'lower'
+    return 'unchanged'
+
+
+def _resolve_bundle_dir(path_like: str | Path, *, repo_root: Path) -> Path:
+    path = _resolve_repo_path(path_like, repo_root=repo_root)
+    return path.parent if path.name == 'bundle_manifest.json' else path
+
+
+def _comparison_stage_summary(
+    *,
+    quality_tier: object,
+    baseline_quality_tier: object,
+    quality_flags: object,
+    baseline_quality_flags: object,
+    extra_delta: dict[str, object] | None = None,
+) -> dict[str, object]:
+    delta: dict[str, object] = {
+        'quality_tier_trend': _quality_trend(quality_tier, baseline_quality_tier),
+        'quality_flag_delta': _flag_delta(quality_flags, baseline_quality_flags),
+    }
+    if extra_delta:
+        delta.update(extra_delta)
+    return delta
+
+
+def _blocker_entry(
+    *,
+    code: str,
+    message: str,
+    current: object,
+    baseline: object | None = None,
+    vs_baseline: str | None = None,
+) -> dict[str, object]:
+    entry: dict[str, object] = {
+        'code': code,
+        'message': message,
+        'current': current,
+    }
+    if baseline is not None:
+        entry['baseline'] = baseline
+    if vs_baseline is not None:
+        entry['vs_baseline'] = vs_baseline
+    return entry
+
+
+def build_phase10_comparison_summary(
+    *,
+    route_state_package_bundle: str | Path,
+    replay_bundle: str | Path,
+    prior_review_bundle: str | Path,
+    export_bundle: str | Path,
+    baseline_replay_bundle: str | Path = DEFAULT_PHASE10_BASELINE_REPLAY_BUNDLE,
+    baseline_export_bundle: str | Path = DEFAULT_PHASE10_BASELINE_EXPORT_BUNDLE,
+    repo_root: str | Path | None = None,
+) -> dict[str, object]:
+    resolved_repo_root = _repo_root(repo_root)
+    route_state_package_dir = _resolve_bundle_dir(route_state_package_bundle, repo_root=resolved_repo_root)
+    replay_bundle_dir = _resolve_bundle_dir(replay_bundle, repo_root=resolved_repo_root)
+    prior_review_bundle_dir = _resolve_bundle_dir(prior_review_bundle, repo_root=resolved_repo_root)
+    export_bundle_dir = _resolve_bundle_dir(export_bundle, repo_root=resolved_repo_root)
+    baseline_replay_bundle_dir = _resolve_bundle_dir(baseline_replay_bundle, repo_root=resolved_repo_root)
+    baseline_export_bundle_dir = _resolve_bundle_dir(baseline_export_bundle, repo_root=resolved_repo_root)
+
+    package_validation = _json_object(
+        _load_json(route_state_package_dir / 'validation.json'),
+        label='Phase 10 route-state package validation',
+    )
+    replay_summary = _json_object(
+        _load_json(replay_bundle_dir / 'replay_summary.json'),
+        label='Phase 10 replay summary',
+    )
+    replay_inspection = _json_object(
+        _load_json(replay_bundle_dir / 'replay_inspection.json'),
+        label='Phase 10 replay inspection',
+    )
+    prior_review_summary = _json_object(
+        _load_json(prior_review_bundle_dir / 'candidate_review_summary.json'),
+        label='Phase 10 prior review summary',
+    )
+    prior_review_manifest = _json_object(
+        _load_json(prior_review_bundle_dir / 'bundle_manifest.json'),
+        label='Phase 10 prior review bundle manifest',
+    )
+    export_summary = _json_object(
+        _load_json(export_bundle_dir / 'export_summary.json'),
+        label='Phase 10 export summary',
+    )
+    export_inspection = _json_object(
+        _load_json(export_bundle_dir / 'export_inspection.json'),
+        label='Phase 10 export inspection',
+    )
+    baseline_replay_summary = _json_object(
+        _load_json(baseline_replay_bundle_dir / 'replay_summary.json'),
+        label='Baseline replay summary',
+    )
+    baseline_replay_inspection = _json_object(
+        _load_json(baseline_replay_bundle_dir / 'replay_inspection.json'),
+        label='Baseline replay inspection',
+    )
+    baseline_export_summary = _json_object(
+        _load_json(baseline_export_bundle_dir / 'export_summary.json'),
+        label='Baseline export summary',
+    )
+    baseline_export_inspection = _json_object(
+        _load_json(baseline_export_bundle_dir / 'export_inspection.json'),
+        label='Baseline export inspection',
+    )
+
+    baseline_package_validation = _json_object(
+        baseline_replay_inspection.get('route_state_package_validation') or {},
+        label='Baseline route-state package validation',
+    )
+
+    package = {
+        'current': {
+            'quality_tier': package_validation.get('quality_tier'),
+            'ready_for_replay': package_validation.get('ready_for_replay'),
+            'quality_flags': _string_list(package_validation.get('quality_flags')),
+            'role_counts': _int_map(package_validation.get('role_counts')),
+            'bundle_manifest': str((route_state_package_dir / 'bundle_manifest.json').resolve()),
+        },
+        'baseline': {
+            'quality_tier': baseline_package_validation.get('quality_tier'),
+            'ready_for_replay': baseline_package_validation.get('ready_for_replay'),
+            'quality_flags': _string_list(baseline_package_validation.get('quality_flags')),
+            'role_counts': _int_map(
+                baseline_package_validation.get('role_counts')
+                or {
+                    'support': baseline_replay_summary.get('support_route_state_count', 0),
+                    'alternative': baseline_replay_summary.get('alternative_route_state_count', 0),
+                    'held_out': baseline_replay_summary.get('held_out_route_state_count', 0),
+                }
+            ),
+            'bundle_manifest': str((baseline_replay_bundle_dir / 'bundle_manifest.json').resolve()),
+        },
+    }
+    package['delta'] = _comparison_stage_summary(
+        quality_tier=package['current']['quality_tier'],
+        baseline_quality_tier=package['baseline']['quality_tier'],
+        quality_flags=package['current']['quality_flags'],
+        baseline_quality_flags=package['baseline']['quality_flags'],
+        extra_delta={
+            'ready_for_replay_changed': package['current']['ready_for_replay'] != package['baseline']['ready_for_replay'],
+            'role_count_delta': _count_delta_map(package['current']['role_counts'], package['baseline']['role_counts']),
+        },
+    )
+
+    replay = {
+        'current': {
+            'quality_tier': replay_summary.get('replay_quality_tier'),
+            'ready_for_pilot': replay_summary.get('ready_for_pilot'),
+            'quality_flags': _string_list(replay_summary.get('quality_flags')),
+            'failure_record_count': int(replay_summary.get('failure_record_count') or 0),
+            'failure_counts_by_stage': _int_map(replay_summary.get('failure_counts_by_stage')),
+            'failure_counts_by_layer': _int_map(replay_summary.get('failure_counts_by_layer')),
+            'failure_counts_by_blocking': _int_map(replay_summary.get('failure_counts_by_blocking')),
+            'bundle_manifest': str((replay_bundle_dir / 'bundle_manifest.json').resolve()),
+            'selected_comparison_case_id': replay_summary.get('selected_comparison_case_id'),
+        },
+        'baseline': {
+            'quality_tier': baseline_replay_summary.get('replay_quality_tier'),
+            'ready_for_pilot': baseline_replay_summary.get('ready_for_pilot'),
+            'quality_flags': _string_list(baseline_replay_summary.get('quality_flags')),
+            'failure_record_count': int(baseline_replay_summary.get('failure_record_count') or 0),
+            'failure_counts_by_stage': _int_map(baseline_replay_summary.get('failure_counts_by_stage')),
+            'failure_counts_by_layer': _int_map(baseline_replay_summary.get('failure_counts_by_layer')),
+            'failure_counts_by_blocking': _int_map(baseline_replay_summary.get('failure_counts_by_blocking')),
+            'bundle_manifest': str((baseline_replay_bundle_dir / 'bundle_manifest.json').resolve()),
+            'selected_comparison_case_id': baseline_replay_summary.get('selected_comparison_case_id'),
+        },
+    }
+    replay['delta'] = _comparison_stage_summary(
+        quality_tier=replay['current']['quality_tier'],
+        baseline_quality_tier=replay['baseline']['quality_tier'],
+        quality_flags=replay['current']['quality_flags'],
+        baseline_quality_flags=replay['baseline']['quality_flags'],
+        extra_delta={
+            'ready_for_pilot_changed': replay['current']['ready_for_pilot'] != replay['baseline']['ready_for_pilot'],
+            'failure_record_count_delta': _count_delta(
+                replay['current']['failure_record_count'],
+                replay['baseline']['failure_record_count'],
+            ),
+            'failure_counts_by_stage_delta': _count_delta_map(
+                replay['current']['failure_counts_by_stage'],
+                replay['baseline']['failure_counts_by_stage'],
+            ),
+            'failure_counts_by_layer_delta': _count_delta_map(
+                replay['current']['failure_counts_by_layer'],
+                replay['baseline']['failure_counts_by_layer'],
+            ),
+        },
+    )
+
+    prior_review = {
+        'current': {
+            'cluster_count': int(prior_review_summary.get('cluster_count') or 0),
+            'prior_candidate_count': int(prior_review_summary.get('prior_candidate_count') or 0),
+            'anti_pattern_candidate_count': int(prior_review_summary.get('anti_pattern_candidate_count') or 0),
+            'accepted_prior_ids': _bundle_string_list(
+                prior_review_manifest,
+                key='accepted_prior_ids',
+                label='Phase 10 prior review bundle',
+            ),
+            'accepted_anti_pattern_ids': _bundle_string_list(
+                prior_review_manifest,
+                key='accepted_anti_pattern_ids',
+                label='Phase 10 prior review bundle',
+            ),
+            'quality_flag_counts': _int_map(prior_review_summary.get('quality_flag_counts')),
+            'bundle_manifest': str((prior_review_bundle_dir / 'bundle_manifest.json').resolve()),
+        },
+        'baseline': {
+            'accepted_prior_count': int(baseline_export_summary.get('accepted_prior_count') or 0),
+            'accepted_anti_pattern_count': int(baseline_export_summary.get('accepted_anti_pattern_count') or 0),
+            'selected_prior_count': int(baseline_export_summary.get('selected_prior_count') or 0),
+            'selected_antipattern_count': int(baseline_export_summary.get('selected_antipattern_count') or 0),
+            'source': str((baseline_export_bundle_dir / 'export_summary.json').resolve()),
+        },
+    }
+    prior_review['delta'] = {
+        'accepted_prior_count_delta': _count_delta(
+            len(prior_review['current']['accepted_prior_ids']),
+            prior_review['baseline']['accepted_prior_count'],
+        ),
+        'accepted_anti_pattern_count_delta': _count_delta(
+            len(prior_review['current']['accepted_anti_pattern_ids']),
+            prior_review['baseline']['accepted_anti_pattern_count'],
+        ),
+        'prior_candidate_count_vs_baseline_selected_prior_count': _count_delta(
+            prior_review['current']['prior_candidate_count'],
+            prior_review['baseline']['selected_prior_count'],
+        ),
+        'anti_pattern_candidate_count_vs_baseline_selected_antipattern_count': _count_delta(
+            prior_review['current']['anti_pattern_candidate_count'],
+            prior_review['baseline']['selected_antipattern_count'],
+        ),
+    }
+
+    export = {
+        'current': {
+            'quality_tier': export_summary.get('quality_tier'),
+            'ready_for_training': export_summary.get('ready_for_training'),
+            'ready_for_eval': export_summary.get('ready_for_eval'),
+            'quality_flags': _string_list(export_summary.get('quality_flags')),
+            'accepted_prior_count': int(export_summary.get('accepted_prior_count') or 0),
+            'accepted_anti_pattern_count': int(export_summary.get('accepted_anti_pattern_count') or 0),
+            'selected_prior_count': int(export_summary.get('selected_prior_count') or 0),
+            'selected_antipattern_count': int(export_summary.get('selected_antipattern_count') or 0),
+            'visibility_bucket_counts': _int_map(export_summary.get('visibility_bucket_counts')),
+            'bundle_manifest': str((export_bundle_dir / 'bundle_manifest.json').resolve()),
+        },
+        'baseline': {
+            'quality_tier': baseline_export_summary.get('quality_tier'),
+            'ready_for_training': baseline_export_summary.get('ready_for_training'),
+            'ready_for_eval': baseline_export_summary.get('ready_for_eval'),
+            'quality_flags': _string_list(baseline_export_summary.get('quality_flags')),
+            'accepted_prior_count': int(baseline_export_summary.get('accepted_prior_count') or 0),
+            'accepted_anti_pattern_count': int(baseline_export_summary.get('accepted_anti_pattern_count') or 0),
+            'selected_prior_count': int(baseline_export_summary.get('selected_prior_count') or 0),
+            'selected_antipattern_count': int(baseline_export_summary.get('selected_antipattern_count') or 0),
+            'visibility_bucket_counts': _int_map(baseline_export_summary.get('visibility_bucket_counts')),
+            'bundle_manifest': str((baseline_export_bundle_dir / 'bundle_manifest.json').resolve()),
+        },
+    }
+    export['delta'] = _comparison_stage_summary(
+        quality_tier=export['current']['quality_tier'],
+        baseline_quality_tier=export['baseline']['quality_tier'],
+        quality_flags=export['current']['quality_flags'],
+        baseline_quality_flags=export['baseline']['quality_flags'],
+        extra_delta={
+            'ready_for_training_changed': export['current']['ready_for_training'] != export['baseline']['ready_for_training'],
+            'ready_for_eval_changed': export['current']['ready_for_eval'] != export['baseline']['ready_for_eval'],
+            'accepted_prior_count_delta': _count_delta(
+                export['current']['accepted_prior_count'],
+                export['baseline']['accepted_prior_count'],
+            ),
+            'accepted_anti_pattern_count_delta': _count_delta(
+                export['current']['accepted_anti_pattern_count'],
+                export['baseline']['accepted_anti_pattern_count'],
+            ),
+            'selected_prior_count_delta': _count_delta(
+                export['current']['selected_prior_count'],
+                export['baseline']['selected_prior_count'],
+            ),
+            'selected_antipattern_count_delta': _count_delta(
+                export['current']['selected_antipattern_count'],
+                export['baseline']['selected_antipattern_count'],
+            ),
+            'visibility_bucket_count_delta': _count_delta_map(
+                export['current']['visibility_bucket_counts'],
+                export['baseline']['visibility_bucket_counts'],
+            ),
+        },
+    )
+
+    package_blockers = [
+        _blocker_entry(
+            code=flag,
+            message=f'Package validation reports `{flag}`.',
+            current=True,
+            baseline=flag in set(package['baseline']['quality_flags']),
+            vs_baseline='new' if flag not in set(package['baseline']['quality_flags']) else 'carried_forward',
+        )
+        for flag in package['current']['quality_flags']
+    ]
+    if not package['current']['ready_for_replay'] and not package_blockers:
+        package_blockers.append(
+            _blocker_entry(
+                code='ready_for_replay_false',
+                message='Package validation did not mark the bundle ready for replay.',
+                current=package['current']['ready_for_replay'],
+                baseline=package['baseline']['ready_for_replay'],
+                vs_baseline='regressed'
+                if package['baseline']['ready_for_replay'] and not package['current']['ready_for_replay']
+                else 'unchanged',
+            )
+        )
+
+    replay_blockers = [
+        _blocker_entry(
+            code=flag,
+            message=f'Replay summary reports `{flag}`.',
+            current=True,
+            baseline=flag in set(replay['baseline']['quality_flags']),
+            vs_baseline='new' if flag not in set(replay['baseline']['quality_flags']) else 'carried_forward',
+        )
+        for flag in replay['current']['quality_flags']
+    ]
+    for stage_name, count in replay['current']['failure_counts_by_stage'].items():
+        if count <= 0:
+            continue
+        baseline_count = replay['baseline']['failure_counts_by_stage'].get(stage_name, 0)
+        replay_blockers.append(
+            _blocker_entry(
+                code=f'failure_stage:{stage_name}',
+                message=f'Replay recorded {count} failure record(s) at the `{stage_name}` stage.',
+                current=count,
+                baseline=baseline_count,
+                vs_baseline=_count_trend(count, baseline_count),
+            )
+        )
+
+    prior_blockers: list[dict[str, object]] = []
+    if prior_review['current']['prior_candidate_count'] == 0:
+        prior_blockers.append(
+            _blocker_entry(
+                code='no_prior_candidates',
+                message='Prior induction produced no DecisionPriorCard candidates for review.',
+                current=0,
+                baseline=prior_review['baseline']['selected_prior_count'],
+                vs_baseline=_count_trend(0, prior_review['baseline']['selected_prior_count']),
+            )
+        )
+    if not prior_review['current']['accepted_prior_ids']:
+        prior_blockers.append(
+            _blocker_entry(
+                code='accepted_prior_ids_empty',
+                message='Prior review accepted no prior ids, so export must keep selected_prior_ids empty.',
+                current=0,
+                baseline=prior_review['baseline']['accepted_prior_count'],
+                vs_baseline=_count_trend(0, prior_review['baseline']['accepted_prior_count']),
+            )
+        )
+    for flag, count in prior_review['current']['quality_flag_counts'].items():
+        if count <= 0:
+            continue
+        prior_blockers.append(
+            _blocker_entry(
+                code=f'quality_flag:{flag}',
+                message=f'Prior induction candidates carry `{flag}` on {count} card(s).',
+                current=count,
+            )
+        )
+
+    export_blockers = [
+        _blocker_entry(
+            code=flag,
+            message=f'Export summary reports `{flag}`.',
+            current=True,
+            baseline=flag in set(export['baseline']['quality_flags']),
+            vs_baseline='new' if flag not in set(export['baseline']['quality_flags']) else 'carried_forward',
+        )
+        for flag in export['current']['quality_flags']
+    ]
+    if not export['current']['ready_for_training']:
+        export_blockers.append(
+            _blocker_entry(
+                code='not_ready_for_training',
+                message='Export remains unavailable for training.',
+                current=export['current']['ready_for_training'],
+                baseline=export['baseline']['ready_for_training'],
+                vs_baseline='regressed'
+                if export['baseline']['ready_for_training'] and not export['current']['ready_for_training']
+                else 'unchanged',
+            )
+        )
+    if not export['current']['ready_for_eval']:
+        export_blockers.append(
+            _blocker_entry(
+                code='not_ready_for_eval',
+                message='Export is not ready for evaluation.',
+                current=export['current']['ready_for_eval'],
+                baseline=export['baseline']['ready_for_eval'],
+                vs_baseline='regressed'
+                if export['baseline']['ready_for_eval'] and not export['current']['ready_for_eval']
+                else 'unchanged',
+            )
+        )
+
+    return {
+        'packet_id': replay_summary.get('packet_id'),
+        'cutoff_year': replay_summary.get('cutoff_year'),
+        'baseline_replay_bundle': str(baseline_replay_bundle_dir.resolve()),
+        'baseline_export_bundle': str(baseline_export_bundle_dir.resolve()),
+        'package': package,
+        'replay': replay,
+        'prior_review': prior_review,
+        'export': export,
+        'blocker_queue': {
+            'package_validation': package_blockers,
+            'replay': replay_blockers,
+            'prior_induction': prior_blockers,
+            'export': export_blockers,
+        },
+        'source_artifacts': {
+            'route_state_package_bundle': str(route_state_package_dir.resolve()),
+            'replay_bundle': str(replay_bundle_dir.resolve()),
+            'prior_review_bundle': str(prior_review_bundle_dir.resolve()),
+            'export_bundle': str(export_bundle_dir.resolve()),
+            'baseline_replay_inspection': str((baseline_replay_bundle_dir / 'replay_inspection.json').resolve()),
+            'baseline_export_inspection': str((baseline_export_bundle_dir / 'export_inspection.json').resolve()),
+            'current_export_inspection': str((export_bundle_dir / 'export_inspection.json').resolve()),
+            'current_replay_inspection': str((replay_bundle_dir / 'replay_inspection.json').resolve()),
+            'current_prior_review_summary': str((prior_review_bundle_dir / 'candidate_review_summary.json').resolve()),
+        },
+        'notes': {
+            'export_visibility_policy': export_inspection.get('policy'),
+            'baseline_visibility_policy': baseline_export_inspection.get('policy'),
+            'route_state_package_validation': replay_inspection.get('route_state_package_validation'),
+        },
+    }
+
+
+def render_phase10_validation_report(comparison_summary: dict[str, object]) -> str:
+    package = _json_object(comparison_summary.get('package') or {}, label='Phase 10 comparison package')
+    replay = _json_object(comparison_summary.get('replay') or {}, label='Phase 10 comparison replay')
+    prior_review = _json_object(comparison_summary.get('prior_review') or {}, label='Phase 10 comparison prior review')
+    export = _json_object(comparison_summary.get('export') or {}, label='Phase 10 comparison export')
+    blocker_queue = _json_object(comparison_summary.get('blocker_queue') or {}, label='Phase 10 blocker queue')
+
+    package_current = _json_object(package.get('current') or {}, label='Phase 10 package current')
+    package_baseline = _json_object(package.get('baseline') or {}, label='Phase 10 package baseline')
+    replay_current = _json_object(replay.get('current') or {}, label='Phase 10 replay current')
+    replay_baseline = _json_object(replay.get('baseline') or {}, label='Phase 10 replay baseline')
+    prior_current = _json_object(prior_review.get('current') or {}, label='Phase 10 prior current')
+    prior_baseline = _json_object(prior_review.get('baseline') or {}, label='Phase 10 prior baseline')
+    export_current = _json_object(export.get('current') or {}, label='Phase 10 export current')
+    export_baseline = _json_object(export.get('baseline') or {}, label='Phase 10 export baseline')
+
+    lines = [
+        '# Phase 10 Multi-Paper Validation Report',
+        '',
+        f"- Packet id: `{comparison_summary.get('packet_id')}`",
+        f"- Cutoff year: `{comparison_summary.get('cutoff_year')}`",
+        f"- Baseline replay bundle: `{comparison_summary.get('baseline_replay_bundle')}`",
+        f"- Baseline export bundle: `{comparison_summary.get('baseline_export_bundle')}`",
+        '',
+        '## Stage Comparison',
+        '',
+        '### Package',
+        f"- Current quality: `{package_current.get('quality_tier')}` vs baseline `{package_baseline.get('quality_tier')}`",
+        f"- Ready for replay: `{package_current.get('ready_for_replay')}` vs baseline `{package_baseline.get('ready_for_replay')}`",
+        f"- Quality flags: `{', '.join(_string_list(package_current.get('quality_flags'))) or 'none'}`",
+        f"- Role counts: `{package_current.get('role_counts')}`",
+        '',
+        '### Replay',
+        f"- Current quality: `{replay_current.get('quality_tier')}` vs baseline `{replay_baseline.get('quality_tier')}`",
+        f"- Ready for pilot: `{replay_current.get('ready_for_pilot')}` vs baseline `{replay_baseline.get('ready_for_pilot')}`",
+        f"- Failure record count: `{replay_current.get('failure_record_count')}` vs baseline `{replay_baseline.get('failure_record_count')}`",
+        f"- Failure counts by stage: `{replay_current.get('failure_counts_by_stage')}`",
+        f"- Quality flags: `{', '.join(_string_list(replay_current.get('quality_flags'))) or 'none'}`",
+        '',
+        '### Prior Review',
+        f"- Prior candidates: `{prior_current.get('prior_candidate_count')}`",
+        f"- Anti-pattern candidates: `{prior_current.get('anti_pattern_candidate_count')}`",
+        f"- Accepted prior ids: `{len(_string_list(prior_current.get('accepted_prior_ids')))}` vs baseline accepted prior count `{prior_baseline.get('accepted_prior_count')}`",
+        f"- Accepted anti-pattern ids: `{len(_string_list(prior_current.get('accepted_anti_pattern_ids')))}` vs baseline accepted anti-pattern count `{prior_baseline.get('accepted_anti_pattern_count')}`",
+        f"- Quality flag counts: `{prior_current.get('quality_flag_counts')}`",
+        '',
+        '### Export',
+        f"- Current quality: `{export_current.get('quality_tier')}` vs baseline `{export_baseline.get('quality_tier')}`",
+        f"- Ready for training: `{export_current.get('ready_for_training')}` vs baseline `{export_baseline.get('ready_for_training')}`",
+        f"- Ready for eval: `{export_current.get('ready_for_eval')}` vs baseline `{export_baseline.get('ready_for_eval')}`",
+        f"- Selected prior count: `{export_current.get('selected_prior_count')}` vs baseline `{export_baseline.get('selected_prior_count')}`",
+        f"- Selected anti-pattern count: `{export_current.get('selected_antipattern_count')}` vs baseline `{export_baseline.get('selected_antipattern_count')}`",
+        f"- Visibility buckets: `{export_current.get('visibility_bucket_counts')}`",
+        f"- Quality flags: `{', '.join(_string_list(export_current.get('quality_flags'))) or 'none'}`",
+        '',
+        '## Blocker Queue',
+        '',
+    ]
+
+    for stage_name in ('package_validation', 'replay', 'prior_induction', 'export'):
+        lines.append(f'### {stage_name.replace("_", " ").title()}')
+        blockers = blocker_queue.get(stage_name)
+        if not isinstance(blockers, list) or not blockers:
+            lines.append('- None.')
+            lines.append('')
+            continue
+        for blocker in blockers:
+            if not isinstance(blocker, dict):
+                continue
+            lines.append(
+                f"- `{blocker.get('code')}`: {blocker.get('message')} "
+                f"(current=`{blocker.get('current')}`, baseline=`{blocker.get('baseline', 'n/a')}`, vs_baseline=`{blocker.get('vs_baseline', 'n/a')}`)"
+            )
+        lines.append('')
+
+    lines.extend(
+        [
+            '## Source Of Truth',
+            '',
+            '- This report is rendered from `comparison_summary.json`, not from bundle prose.',
+        ]
+    )
+    return '\n'.join(lines) + '\n'
 
 
 def _write_phase10_export_bundle(
@@ -645,6 +1256,9 @@ def run_phase10_package_and_replay(
     assembly_manifest_path: str | Path = DEFAULT_PHASE10_ASSEMBLY_MANIFEST_PATH,
     l1_snapshot_output_path: str | Path = DEFAULT_PHASE10_L1_SNAPSHOT_PATH,
     output_dir: str | Path,
+    baseline_replay_bundle: str | Path = DEFAULT_PHASE10_BASELINE_REPLAY_BUNDLE,
+    baseline_export_bundle: str | Path = DEFAULT_PHASE10_BASELINE_EXPORT_BUNDLE,
+    report_md: str | Path | None = None,
     built_at: str | None = None,
     repo_root: str | Path | None = None,
 ) -> Phase10ValidationRun:
@@ -660,6 +1274,7 @@ def run_phase10_package_and_replay(
     replay_output_dir = resolved_output_dir / 'replay_bundle'
     prior_review_output_dir = resolved_output_dir / 'prior_review_bundle'
     export_output_dir = resolved_output_dir / 'export_bundle'
+    comparison_summary_path = resolved_output_dir / 'comparison_summary.json'
 
     route_state_package_compilation = compile_route_state_package(
         bridge.package_manifest,
@@ -729,6 +1344,24 @@ def run_phase10_package_and_replay(
         output_dir=export_output_dir,
         built_at=built_at,
     )
+    comparison_summary = build_phase10_comparison_summary(
+        route_state_package_bundle=route_state_package_output_dir,
+        replay_bundle=replay_output_dir,
+        prior_review_bundle=prior_review_output_dir,
+        export_bundle=export_output_dir,
+        baseline_replay_bundle=baseline_replay_bundle,
+        baseline_export_bundle=baseline_export_bundle,
+        repo_root=bridge.canonical_inputs.repo_root,
+    )
+    comparison_summary_path = _write_json(comparison_summary_path, comparison_summary)
+    report_markdown_path = (
+        _write_text(
+            _resolve_repo_path(report_md, repo_root=bridge.canonical_inputs.repo_root),
+            render_phase10_validation_report(comparison_summary),
+        )
+        if report_md is not None
+        else None
+    )
 
     route_state_package_summary = build_route_state_package_summary(
         route_state_package_compilation,
@@ -789,6 +1422,10 @@ def run_phase10_package_and_replay(
         'selected_prior_ids': list(export_summary_payload['selected_prior_ids']),
         'selected_antipattern_ids': list(export_summary_payload['selected_antipattern_ids']),
         'visibility_bucket_counts': dict(export_summary_payload['visibility_bucket_counts']),
+        'baseline_replay_bundle': str(_resolve_bundle_dir(baseline_replay_bundle, repo_root=bridge.canonical_inputs.repo_root).resolve()),
+        'baseline_export_bundle': str(_resolve_bundle_dir(baseline_export_bundle, repo_root=bridge.canonical_inputs.repo_root).resolve()),
+        'comparison_summary_path': str(comparison_summary_path.resolve()),
+        'report_markdown_path': str(report_markdown_path.resolve()) if report_markdown_path is not None else None,
     }
     return Phase10ValidationRun(
         bridge=bridge,
@@ -800,12 +1437,16 @@ def run_phase10_package_and_replay(
         prior_review_bundle_files=prior_review_bundle_files,
         export_output_dir=export_output_dir,
         export_bundle_files=export_bundle_files,
+        comparison_summary_path=comparison_summary_path,
+        report_markdown_path=report_markdown_path,
         summary=summary,
     )
 
 
 __all__ = [
     'DEFAULT_PHASE10_ASSEMBLY_MANIFEST_PATH',
+    'DEFAULT_PHASE10_BASELINE_EXPORT_BUNDLE',
+    'DEFAULT_PHASE10_BASELINE_REPLAY_BUNDLE',
     'DEFAULT_PHASE10_L1_SNAPSHOT_PATH',
     'DEFAULT_PHASE10_OUTPUT_ROOT',
     'DEFAULT_PHASE10_PACKAGE_MANIFEST_PATH',
@@ -816,10 +1457,12 @@ __all__ = [
     'Phase10RuntimePaths',
     'Phase10TraceSource',
     'Phase10ValidationRun',
+    'build_phase10_comparison_summary',
     'build_phase10_l1_snapshot',
     'collect_phase10_trace_sources',
     'load_phase10_canonical_inputs',
     'prepare_phase10_runtime_bridge',
+    'render_phase10_validation_report',
     'resolve_phase10_runtime_paths',
     'run_phase10_package_and_replay',
 ]
