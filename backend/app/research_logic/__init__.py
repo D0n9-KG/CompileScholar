@@ -9,6 +9,7 @@ from .models import (
 )
 from .bounded_packet_audit import (
     BoundedPacketAssemblyManifest,
+    BoundedPacketAuditBundleManifest,
     BoundedPacketAuditResult,
     BoundedPacketAuditRoleCounts,
     BoundedPacketExclusionNote,
@@ -16,6 +17,7 @@ from .bounded_packet_audit import (
     BoundedPacketRoleMember,
     audit_bounded_packet_assembly,
     load_bounded_packet_assembly_manifest,
+    render_bounded_packet_audit_report,
     validate_bounded_packet_assembly,
 )
 from .decision_prior_builder import DecisionPriorBuilder, build_decision_prior_card
@@ -52,6 +54,8 @@ from .historical_environment import (
     write_historical_environment_snapshot,
 )
 from .replay_io import (
+    build_bounded_packet_audit_inspection,
+    build_bounded_packet_audit_summary,
     build_corpus_sampling_inspection,
     build_corpus_sampling_summary,
     build_decision_episode_export_inspection,
@@ -70,6 +74,7 @@ from .replay_io import (
     load_route_packet,
     load_route_state,
     load_route_states,
+    write_bounded_packet_audit_bundle,
     write_corpus_sampling_bundle,
     write_decision_episode_export_bundle,
     write_prior_candidate_review_bundle,
@@ -135,6 +140,7 @@ __all__ = [
     'AntiPatternCard',
     'DecisionEpisode',
     'BoundedPacketAssemblyManifest',
+    'BoundedPacketAuditBundleManifest',
     'BoundedPacketAuditResult',
     'BoundedPacketAuditRoleCounts',
     'BoundedPacketExclusionNote',
@@ -142,6 +148,7 @@ __all__ = [
     'BoundedPacketRoleMember',
     'audit_bounded_packet_assembly',
     'load_bounded_packet_assembly_manifest',
+    'render_bounded_packet_audit_report',
     'validate_bounded_packet_assembly',
     'AntiPatternBuilder',
     'build_anti_pattern_candidates',
@@ -181,6 +188,8 @@ __all__ = [
     'build_prior_candidate_registry',
     'build_prior_candidate_registry_from_package',
     'build_prior_candidate_review_summary',
+    'build_bounded_packet_audit_inspection',
+    'build_bounded_packet_audit_summary',
     'build_corpus_sampling_inspection',
     'build_corpus_sampling_summary',
     'build_decision_episode_export_inspection',
@@ -198,6 +207,7 @@ __all__ = [
     'load_route_packet',
     'load_route_state',
     'load_route_states',
+    'write_bounded_packet_audit_bundle',
     'FixedComparisonVerdict',
     'FixedRegressionSampledPaperResult',
     'FixedSampledL2ComparisonRow',

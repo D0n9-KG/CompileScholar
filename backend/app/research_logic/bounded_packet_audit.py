@@ -199,6 +199,19 @@ class BoundedPacketAuditResult(ContractModel):
     known_gap_notes: list[str] = Field(default_factory=list)
 
 
+class BoundedPacketAuditBundleManifest(ContractModel):
+    built_at: str
+    packet_id: str
+    topic_scope: str
+    cutoff_year: int
+    route_packet_file: str
+    assembly_manifest_file: str
+    audit_summary_file: str
+    audit_inspection_file: str
+    audit_report_file: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
 def _add_flag(flags: list[str], flag: str) -> None:
     if flag not in flags:
         flags.append(flag)
@@ -374,9 +387,70 @@ def validate_bounded_packet_assembly(
     return audit
 
 
+def render_bounded_packet_audit_report(
+    packet: RoutePacket | dict[str, Any],
+    manifest: BoundedPacketAssemblyManifest | dict[str, Any],
+    audit: BoundedPacketAuditResult | None = None,
+) -> str:
+    packet_model = packet if isinstance(packet, RoutePacket) else RoutePacket.model_validate(packet)
+    manifest_model = (
+        manifest if isinstance(manifest, BoundedPacketAssemblyManifest) else BoundedPacketAssemblyManifest.model_validate(manifest)
+    )
+    audit_result = audit or audit_bounded_packet_assembly(packet_model, manifest_model)
+
+    lines = [
+        f'# Bounded Packet Audit: {packet_model.packet_id}',
+        '',
+        f'- Topic scope: `{packet_model.topic_scope_candidate}`',
+        f'- Cutoff year: `{packet_model.cutoff_year}`',
+        f'- Quality tier: `{audit_result.quality_tier}`',
+        f'- Ready for Phase 10: `{str(audit_result.ready_for_phase10).lower()}`',
+        f'- Role counts: support=`{audit_result.role_counts.support}`, alternative=`{audit_result.role_counts.alternative}`, held_out=`{audit_result.role_counts.held_out}`',
+        '',
+        '## Quality Flags',
+    ]
+
+    if audit_result.quality_flags:
+        lines.extend(f'- `{flag}`' for flag in audit_result.quality_flags)
+    else:
+        lines.append('- None')
+
+    lines.extend(
+        [
+            '',
+            '## Role Mapping',
+            f'- Support: {", ".join(audit_result.support_paper_ids) if audit_result.support_paper_ids else "None"}',
+            f'- Alternative: {", ".join(audit_result.alternative_paper_ids) if audit_result.alternative_paper_ids else "None"}',
+            f'- Held-out: {", ".join(audit_result.held_out_paper_ids) if audit_result.held_out_paper_ids else "None"}',
+            '',
+            '## Exclusion Notes',
+        ]
+    )
+
+    for note in manifest_model.exclusion_notes:
+        note_text = f'- `{note.paper_id}`: `{note.exclusion_reason}` - {note.note}'
+        if note.paper_year is not None:
+            note_text += f' (`{note.paper_year}`)'
+        lines.append(note_text)
+
+    lines.extend(
+        [
+            '',
+            '## Known Gaps',
+        ]
+    )
+    if audit_result.known_gap_notes:
+        lines.extend(f'- {note}' for note in audit_result.known_gap_notes)
+    else:
+        lines.append('- None')
+
+    return '\n'.join(lines) + '\n'
+
+
 __all__ = [
     'AssemblyRole',
     'BoundedPacketAssemblyManifest',
+    'BoundedPacketAuditBundleManifest',
     'BoundedPacketAuditResult',
     'BoundedPacketAuditRoleCounts',
     'BoundedPacketExclusionNote',
@@ -385,5 +459,6 @@ __all__ = [
     'QualityTier',
     'audit_bounded_packet_assembly',
     'load_bounded_packet_assembly_manifest',
+    'render_bounded_packet_audit_report',
     'validate_bounded_packet_assembly',
 ]

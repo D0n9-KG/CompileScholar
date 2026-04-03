@@ -2,14 +2,19 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import subprocess
+import sys
 
 import pytest
 
 from app.research_logic import (
+    BoundedPacketAssemblyManifest,
     RoutePacket,
     audit_bounded_packet_assembly,
+    build_bounded_packet_audit_summary,
     load_bounded_packet_assembly_manifest,
     validate_bounded_packet_assembly,
+    write_bounded_packet_audit_bundle,
 )
 
 
@@ -19,6 +24,12 @@ def _member(paper_id: str, *, trace_ref: str | None = 'traces/default.json', rea
         'reason': reason or f'{paper_id} supports the bounded packet role assignment.',
         'trace_ref': trace_ref,
     }
+
+
+def _write_json(path: Path, payload: object) -> Path:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    return path
 
 
 def _packet(
@@ -215,3 +226,137 @@ def test_audit_bounded_packet_assembly_flags_missing_trace_refs_and_indistinct_a
     assert audit.missing_trace_ref_paper_ids == ['paper-3']
     assert audit.packet_items_missing_trace_id == ['paper-4']
     assert audit.indistinct_alternative_paper_ids == ['paper-3']
+
+
+def test_write_bounded_packet_audit_bundle_uses_expected_filenames(tmp_path: Path) -> None:
+    packet = _packet(
+        alternative_item_role='core_method',
+        missing_trace_id_paper_ids={'paper-4'},
+    )
+    manifest = BoundedPacketAssemblyManifest.model_validate(
+        _manifest_payload(
+            alternative=[_member('paper-3', trace_ref=None)],
+            alternative_distinctness_rationale=None,
+        )
+    )
+    audit = audit_bounded_packet_assembly(packet, manifest)
+    output_dir = tmp_path / 'phase9_bounded_packet_audit' / 'bundle-01'
+
+    written_files = write_bounded_packet_audit_bundle(
+        output_dir,
+        route_packet=packet,
+        assembly_manifest=manifest,
+        audit=audit,
+    )
+
+    assert written_files['audit_summary'].name == 'audit_summary.json'
+    assert written_files['audit_inspection'].name == 'audit_inspection.json'
+    assert (output_dir / 'audit_summary.json').is_file()
+    assert (output_dir / 'audit_inspection.json').is_file()
+    assert (output_dir / 'inputs' / 'route_packet.json').is_file()
+    assert (output_dir / 'inputs' / 'assembly_manifest.json').is_file()
+    assert (output_dir / 'bundle_manifest.json').is_file()
+
+
+def test_build_bounded_packet_audit_summary_keeps_quality_flags_explicit() -> None:
+    packet = _packet(
+        alternative_item_role='core_method',
+        missing_trace_id_paper_ids={'paper-4'},
+    )
+    manifest = BoundedPacketAssemblyManifest.model_validate(
+        _manifest_payload(
+            alternative=[_member('paper-3', trace_ref=None)],
+            alternative_distinctness_rationale=None,
+        )
+    )
+    audit = audit_bounded_packet_assembly(packet, manifest)
+
+    summary = build_bounded_packet_audit_summary(
+        route_packet=packet,
+        assembly_manifest=manifest,
+        audit=audit,
+    )
+
+    assert summary['quality_tier'] == 'red'
+    assert 'missing_trace_refs' in summary['quality_flags']
+    assert 'alternative_scope_not_distinct' in summary['quality_flags']
+    assert summary['missing_trace_ref_paper_ids'] == ['paper-3']
+    assert summary['packet_items_missing_trace_id'] == ['paper-4']
+
+
+def test_run_bounded_packet_audit_cli_surfaces_quality_flags_in_summary(tmp_path: Path) -> None:
+    packet_path = _write_json(tmp_path / 'packet.json', _packet(
+        alternative_item_role='core_method',
+        missing_trace_id_paper_ids={'paper-4'},
+    ).model_dump(mode='json', exclude_none=True))
+    manifest_path = _write_json(
+        tmp_path / 'bounded_packet_assembly_manifest.json',
+        _manifest_payload(
+            alternative=[_member('paper-3', trace_ref=None)],
+            alternative_distinctness_rationale=None,
+        ),
+    )
+    output_dir = tmp_path / 'phase9_bounded_packet_audit' / 'cli-run'
+    script_path = Path(__file__).resolve().parents[1] / 'scripts' / 'run_bounded_packet_audit.py'
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(script_path),
+            '--packet',
+            str(packet_path),
+            '--assembly-manifest',
+            str(manifest_path),
+            '--output-dir',
+            str(output_dir),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+        cwd=str(Path(__file__).resolve().parents[1]),
+    )
+
+    assert result.returncode == 0, result.stderr
+    summary = json.loads(result.stdout)
+
+    assert 'missing_trace_refs' in summary['quality_flags']
+    assert 'alternative_scope_not_distinct' in summary['quality_flags']
+    assert summary['structural_errors'] == []
+    assert summary['audit_summary_file'].endswith('audit_summary.json')
+    assert summary['audit_inspection_file'].endswith('audit_inspection.json')
+
+
+def test_run_bounded_packet_audit_cli_exits_nonzero_on_invalid_alignment(tmp_path: Path) -> None:
+    packet_path = _write_json(
+        tmp_path / 'packet.json',
+        _packet().model_dump(mode='json', exclude_none=True),
+    )
+    manifest_path = _write_json(
+        tmp_path / 'bounded_packet_assembly_manifest.json',
+        _manifest_payload(
+            support=[_member('paper-1'), _member('paper-404')],
+        ),
+    )
+    output_dir = tmp_path / 'phase9_bounded_packet_audit' / 'invalid-run'
+    script_path = Path(__file__).resolve().parents[1] / 'scripts' / 'run_bounded_packet_audit.py'
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(script_path),
+            '--packet',
+            str(packet_path),
+            '--assembly-manifest',
+            str(manifest_path),
+            '--output-dir',
+            str(output_dir),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+        cwd=str(Path(__file__).resolve().parents[1]),
+    )
+
+    assert result.returncode == 1
+    error_payload = json.loads(result.stderr)
+    assert 'support members missing from RoutePacket.included_items: paper-404' in error_payload['error']

@@ -7,6 +7,12 @@ from typing import TYPE_CHECKING, Any, Sequence
 
 from app.paper_logic_trace.models import PaperLogicTrace
 
+from .bounded_packet_audit import (
+    BoundedPacketAssemblyManifest,
+    BoundedPacketAuditBundleManifest,
+    BoundedPacketAuditResult,
+    audit_bounded_packet_assembly,
+)
 from .corpus_sampling import CorpusSamplingBundle
 from .decision_episode_export import DecisionEpisodeAuditExport
 from .historical_environment import HistoricalEnvironmentSnapshot
@@ -50,6 +56,13 @@ def _write_json(path_like: str | Path, payload: Any) -> Path:
         json.dumps(payload, ensure_ascii=False, indent=2) + '\n',
         encoding='utf-8',
     )
+    return path
+
+
+def _write_text(path_like: str | Path, content: str) -> Path:
+    path = _as_path(path_like)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding='utf-8')
     return path
 
 
@@ -191,6 +204,120 @@ def ensure_packet_trace_coverage(packet: RoutePacket, traces: Sequence[PaperLogi
     ]
     if missing_trace_ids:
         raise ValueError(f'missing traces for packet items: {", ".join(missing_trace_ids)}')
+
+
+def build_bounded_packet_audit_summary(
+    *,
+    route_packet: RoutePacket,
+    assembly_manifest: BoundedPacketAssemblyManifest,
+    audit: BoundedPacketAuditResult | None = None,
+) -> dict[str, Any]:
+    audit_result = audit or audit_bounded_packet_assembly(route_packet, assembly_manifest)
+    return {
+        'packet_id': route_packet.packet_id,
+        'topic_scope_candidate': route_packet.topic_scope_candidate,
+        'cutoff_year': route_packet.cutoff_year,
+        'packet_included_item_count': len(route_packet.included_items),
+        'packet_excluded_item_count': len(route_packet.excluded_items),
+        'support_count': audit_result.role_counts.support,
+        'alternative_count': audit_result.role_counts.alternative,
+        'held_out_count': audit_result.role_counts.held_out,
+        'quality_tier': audit_result.quality_tier,
+        'ready_for_phase10': audit_result.ready_for_phase10,
+        'quality_flags': list(audit_result.quality_flags),
+        'structural_errors': list(audit_result.structural_errors),
+        'missing_trace_ref_paper_ids': list(audit_result.missing_trace_ref_paper_ids),
+        'packet_items_missing_trace_id': list(audit_result.packet_items_missing_trace_id),
+        'indistinct_alternative_paper_ids': list(audit_result.indistinct_alternative_paper_ids),
+        'support_held_out_overlap_paper_ids': list(audit_result.support_held_out_overlap_paper_ids),
+        'missing_exclusion_note_paper_ids': list(audit_result.missing_exclusion_note_paper_ids),
+        'known_gap_note_count': len(audit_result.known_gap_notes),
+        'exclusion_note_count': audit_result.exclusion_note_count,
+    }
+
+
+def build_bounded_packet_audit_inspection(
+    *,
+    route_packet: RoutePacket,
+    assembly_manifest: BoundedPacketAssemblyManifest,
+    audit: BoundedPacketAuditResult | None = None,
+) -> dict[str, Any]:
+    audit_result = audit or audit_bounded_packet_assembly(route_packet, assembly_manifest)
+    return {
+        'route_packet': route_packet.model_dump(mode='json', exclude_none=True),
+        'assembly_manifest': assembly_manifest.model_dump(mode='json', exclude_none=True),
+        'audit': audit_result.model_dump(mode='json', exclude_none=True),
+    }
+
+
+def write_bounded_packet_audit_bundle(
+    output_dir: str | Path,
+    *,
+    route_packet: RoutePacket,
+    assembly_manifest: BoundedPacketAssemblyManifest,
+    audit: BoundedPacketAuditResult | None = None,
+    metadata: dict[str, Any] | None = None,
+    report_markdown: str | None = None,
+) -> dict[str, Path]:
+    bundle_dir = _as_path(output_dir)
+    inputs_dir = bundle_dir / 'inputs'
+    audit_result = audit or audit_bounded_packet_assembly(route_packet, assembly_manifest)
+
+    summary_payload = build_bounded_packet_audit_summary(
+        route_packet=route_packet,
+        assembly_manifest=assembly_manifest,
+        audit=audit_result,
+    )
+    inspection_payload = build_bounded_packet_audit_inspection(
+        route_packet=route_packet,
+        assembly_manifest=assembly_manifest,
+        audit=audit_result,
+    )
+
+    written_files: dict[str, Path] = {}
+    written_files['route_packet'] = _write_json(
+        inputs_dir / 'route_packet.json',
+        route_packet.model_dump(mode='json', exclude_none=True),
+    )
+    written_files['assembly_manifest'] = _write_json(
+        inputs_dir / 'assembly_manifest.json',
+        assembly_manifest.model_dump(mode='json', exclude_none=True),
+    )
+    written_files['audit_summary'] = _write_json(
+        bundle_dir / 'audit_summary.json',
+        summary_payload,
+    )
+    written_files['audit_inspection'] = _write_json(
+        bundle_dir / 'audit_inspection.json',
+        inspection_payload,
+    )
+    if report_markdown is not None:
+        written_files['audit_report'] = _write_text(
+            bundle_dir / 'audit_report.md',
+            report_markdown,
+        )
+
+    bundle_manifest = BoundedPacketAuditBundleManifest(
+        built_at=_utc_now_iso(),
+        packet_id=route_packet.packet_id,
+        topic_scope=route_packet.topic_scope_candidate,
+        cutoff_year=route_packet.cutoff_year,
+        route_packet_file=str(written_files['route_packet'].relative_to(bundle_dir)).replace('\\', '/'),
+        assembly_manifest_file=str(written_files['assembly_manifest'].relative_to(bundle_dir)).replace('\\', '/'),
+        audit_summary_file=str(written_files['audit_summary'].relative_to(bundle_dir)).replace('\\', '/'),
+        audit_inspection_file=str(written_files['audit_inspection'].relative_to(bundle_dir)).replace('\\', '/'),
+        audit_report_file=(
+            str(written_files['audit_report'].relative_to(bundle_dir)).replace('\\', '/')
+            if 'audit_report' in written_files
+            else None
+        ),
+        metadata=dict(metadata or {}),
+    )
+    written_files['bundle_manifest'] = _write_json(
+        bundle_dir / 'bundle_manifest.json',
+        bundle_manifest.model_dump(mode='json', exclude_none=True),
+    )
+    return written_files
 
 
 def build_replay_summary(
