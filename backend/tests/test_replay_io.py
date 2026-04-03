@@ -15,6 +15,10 @@ from app.research_logic import (
     CorpusSamplingBatch,
     CorpusSamplingBundle,
     FixedRegressionSampledPaperResult,
+    IterationPriorityInspection,
+    IterationPriorityRecommendation,
+    IterationPrioritySourceRefs,
+    IterationPrioritySummary,
     RandomExplorationSampledPaperResult,
     SampledL2ComparisonResult,
     SampledPaperAvailabilityIssue,
@@ -24,6 +28,8 @@ from app.research_logic import (
     build_decision_episode_audit_export,
     build_decision_episode_export_inspection,
     build_decision_episode_export_summary,
+    build_iteration_priority_inspection_payload,
+    build_iteration_priority_summary_payload,
     build_prior_candidate_registry,
     compile_historical_replay,
     compare_sampled_l2_iterations,
@@ -38,6 +44,7 @@ from app.research_logic import (
     build_sampled_l2_iteration_summary,
     write_corpus_sampling_bundle,
     write_decision_episode_export_bundle,
+    write_iteration_priority_bundle,
     write_prior_candidate_review_bundle,
     write_replay_bundle,
     write_sampled_l2_comparison_bundle,
@@ -876,3 +883,102 @@ def test_write_sampled_l2_comparison_bundle_writes_expected_counts_and_owner_buc
 
     assert comparison_summary_payload['fixed_verdict_counts']['recurring_failure'] == 1
     assert comparison_inspection_payload['random_comparisons'][1]['verdict'] == 'availability_only'
+
+
+def _iteration_priority_bundle_models() -> tuple[IterationPrioritySummary, IterationPriorityInspection]:
+    source_refs = IterationPrioritySourceRefs(
+        phase8_summary_path='tmp/phase8/comparison_summary.json',
+        phase8_inspection_path='tmp/phase8/comparison_inspection.json',
+        phase10_verification_path='.planning/phases/10/10-VERIFICATION.md',
+        phase10_report_path='docs/replay/reports/phase10.md',
+        phase10_mode='fallback',
+        fallback_used=True,
+    )
+    recommendations = [
+        IterationPriorityRecommendation(
+            id='packet_construction',
+            rank=1,
+            title='Deepen bounded packet construction',
+            why_now='New package blockers appear before any new L2 regression.',
+            score=180,
+            supporting_owner_buckets=['relation_assembly', 'slot_recovery'],
+            supporting_blocker_stages=['package_validation', 'replay'],
+            evidence=['package blockers: support_cluster_too_small', 'replay l2 delta: 0'],
+        ),
+        IterationPriorityRecommendation(
+            id='l4_aggregation',
+            rank=2,
+            title='Tune downstream L4 aggregation',
+            why_now='Decision-prior failures remain downstream follow-up work.',
+            score=110,
+            supporting_owner_buckets=['relation_assembly', 'slot_recovery'],
+            supporting_blocker_stages=['replay', 'prior_induction'],
+            evidence=['replay l3_l4 delta: 2'],
+        ),
+        IterationPriorityRecommendation(
+            id='l2_extraction',
+            rank=3,
+            title='Run a targeted L2 extraction pass',
+            why_now='Phase 8 still exposes recurring owner buckets.',
+            score=72,
+            supporting_owner_buckets=['relation_assembly', 'slot_recovery'],
+            supporting_blocker_stages=['phase8_owner_queue'],
+            evidence=['phase8 lead owners: relation_assembly, slot_recovery'],
+        ),
+    ]
+    summary = IterationPrioritySummary(
+        source_refs=source_refs,
+        phase8_iteration_label='baseline-cycle-01',
+        baseline_only=True,
+        packet_id='phase9_comp_mech_2021_packet_01',
+        cutoff_year=2021,
+        current_recommendation='packet_construction',
+        primary_recommendation_id='packet_construction',
+        phase8_fixed_verdict_counts={'recurring_failure': 7, 'stable_pass': 3},
+        phase8_random_verdict_counts={'new_edge_case': 2, 'stable_random_pass': 3},
+        phase10_stage_surfaces={
+            'package': {'current': {'quality_tier': 'red'}},
+            'replay': {'delta': {'failure_counts_by_layer_delta': {'l2': 0, 'l3_l4': 2}}},
+        },
+        recommendations=recommendations,
+        notes=['fallback used'],
+    )
+    inspection = IterationPriorityInspection(
+        source_refs=source_refs,
+        phase8_summary={'iteration_label': 'baseline-cycle-01'},
+        phase8_inspection={'owner_buckets': ['relation_assembly', 'slot_recovery']},
+        phase10_surface={'current_recommendation': 'packet_construction'},
+        ranking_signals={
+            'replay_l2_delta': 0,
+            'replay_l3_l4_delta': 2,
+            'supporting_owner_buckets': ['relation_assembly', 'slot_recovery'],
+        },
+        recommendations=recommendations,
+    )
+    return summary, inspection
+
+
+def test_write_iteration_priority_bundle_writes_expected_manifest_refs(tmp_path: Path) -> None:
+    summary, inspection = _iteration_priority_bundle_models()
+
+    summary_payload = build_iteration_priority_summary_payload(summary=summary)
+    inspection_payload = build_iteration_priority_inspection_payload(inspection=inspection)
+    written_files = write_iteration_priority_bundle(
+        tmp_path / 'iteration-priority',
+        summary=summary,
+        inspection=inspection,
+        metadata={'phase': '11'},
+    )
+
+    assert summary_payload['primary_recommendation_id'] == 'packet_construction'
+    assert inspection_payload['ranking_signals']['replay_l2_delta'] == 0
+    assert set(written_files) == {'prioritization_summary', 'prioritization_inspection', 'bundle_manifest'}
+    assert written_files['prioritization_summary'].is_file()
+    assert written_files['prioritization_inspection'].is_file()
+    assert written_files['bundle_manifest'].is_file()
+
+    manifest_payload = json.loads(written_files['bundle_manifest'].read_text(encoding='utf-8'))
+
+    assert manifest_payload['files']['prioritization_summary'] == 'outputs/prioritization_summary.json'
+    assert manifest_payload['files']['prioritization_inspection'] == 'outputs/prioritization_inspection.json'
+    assert manifest_payload['source_refs']['phase10_mode'] == 'fallback'

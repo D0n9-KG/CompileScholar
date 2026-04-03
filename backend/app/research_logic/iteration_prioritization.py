@@ -615,7 +615,250 @@ def load_phase10_evidence(
     )
 
 
+def _recommendation_title(recommendation_id: str) -> str:
+    titles = {
+        'packet_construction': 'Deepen bounded packet construction',
+        'l4_aggregation': 'Tune downstream L4 aggregation',
+        'l2_extraction': 'Run a targeted L2 extraction pass',
+    }
+    return titles.get(recommendation_id, recommendation_id.replace('_', ' ').title())
+
+
+def _nested_int(mapping: dict[str, Any], *keys: str) -> int:
+    current: object = mapping
+    for key in keys:
+        if not isinstance(current, dict):
+            return 0
+        current = current.get(key)
+    try:
+        return int(current)
+    except (TypeError, ValueError):
+        return 0
+
+
+def _new_or_higher_blockers(blockers: list[IterationPriorityBlocker]) -> list[IterationPriorityBlocker]:
+    return [blocker for blocker in blockers if blocker.vs_baseline in {'new', 'higher', 'regressed'}]
+
+
+def _blocker_codes(blockers: list[IterationPriorityBlocker], *, limit: int = 3) -> list[str]:
+    return [blocker.code for blocker in blockers[:limit]]
+
+
+def _supporting_owner_buckets(phase8_summary: LoadedPhase8ComparisonSummary) -> list[IterationPriorityOwnerBucket]:
+    buckets = [bucket for bucket in phase8_summary.owner_buckets if bucket.total_count > 0]
+    return buckets[:2]
+
+
+def _recommendation(
+    *,
+    recommendation_id: str,
+    score: int,
+    why_now: str,
+    supporting_owner_buckets: list[str],
+    supporting_blocker_stages: list[str],
+    evidence: list[str],
+) -> IterationPriorityRecommendation:
+    return IterationPriorityRecommendation(
+        id=recommendation_id,
+        title=_recommendation_title(recommendation_id),
+        why_now=why_now,
+        score=score,
+        supporting_owner_buckets=supporting_owner_buckets,
+        supporting_blocker_stages=supporting_blocker_stages,
+        evidence=evidence,
+    )
+
+
+def rank_iteration_recommendations(
+    *,
+    phase8_summary: LoadedPhase8ComparisonSummary,
+    phase10_surface: LoadedPhase10ComparisonSurface,
+) -> list[IterationPriorityRecommendation]:
+    supporting_owner_buckets = _supporting_owner_buckets(phase8_summary)
+    supporting_owner_bucket_names = [bucket.bucket for bucket in supporting_owner_buckets]
+
+    package_blockers = phase10_surface.blocker_queue.get('package_validation', [])
+    replay_blockers = phase10_surface.blocker_queue.get('replay', [])
+    prior_blockers = phase10_surface.blocker_queue.get('prior_induction', [])
+
+    replay_l2_delta = _nested_int(phase10_surface.replay, 'delta', 'failure_counts_by_layer_delta', 'l2')
+    replay_l3_l4_delta = _nested_int(phase10_surface.replay, 'delta', 'failure_counts_by_layer_delta', 'l3_l4')
+    decision_prior_regressions = [
+        blocker for blocker in replay_blockers
+        if blocker.code == 'failure_stage:decision_prior_card' and blocker.vs_baseline in {'higher', 'new'}
+    ]
+
+    new_package_blockers = _new_or_higher_blockers(package_blockers)
+    packet_score = 100
+    if new_package_blockers:
+        packet_score += 50
+    if replay_l2_delta == 0:
+        packet_score += 20
+    packet_score += len(package_blockers) * 3
+    if phase10_surface.current_recommendation == 'packet_construction':
+        packet_score += 10
+
+    l4_score = 70
+    if replay_l3_l4_delta > 0:
+        l4_score += 25
+    if decision_prior_regressions:
+        l4_score += 20
+    if new_package_blockers:
+        l4_score -= 10
+    if phase10_surface.current_recommendation == 'l4_aggregation':
+        l4_score += 10
+
+    l2_score = 60 + sum(bucket.total_count for bucket in supporting_owner_buckets)
+    if replay_l2_delta > 0:
+        l2_score += 25
+    if replay_l2_delta == 0:
+        l2_score -= 10
+    if phase10_surface.current_recommendation == 'l2_extraction':
+        l2_score += 10
+
+    recommendations = [
+        _recommendation(
+            recommendation_id='packet_construction',
+            score=packet_score,
+            why_now='New package-validation blockers are the first fresh regressions while replay L2 delta stays flat.',
+            supporting_owner_buckets=supporting_owner_bucket_names,
+            supporting_blocker_stages=['package_validation', 'replay'],
+            evidence=[
+                f'package blockers: {", ".join(_blocker_codes(package_blockers)) or "none"}',
+                f'replay l2 delta: {replay_l2_delta}',
+                f'phase10 recommendation: {phase10_surface.current_recommendation or "not stated"}',
+            ],
+        ),
+        _recommendation(
+            recommendation_id='l4_aggregation',
+            score=l4_score,
+            why_now='L4 follow-up stays next because replay-level decision_prior_card failures and L3/L4 delta still rise downstream of packet issues.',
+            supporting_owner_buckets=supporting_owner_bucket_names,
+            supporting_blocker_stages=['replay', 'prior_induction'],
+            evidence=[
+                f'replay l3_l4 delta: {replay_l3_l4_delta}',
+                f'decision_prior_card regressions: {len(decision_prior_regressions)}',
+                f'prior blockers: {", ".join(_blocker_codes(prior_blockers)) or "none"}',
+            ],
+        ),
+        _recommendation(
+            recommendation_id='l2_extraction',
+            score=l2_score,
+            why_now='Phase 8 still shows recurring L2 work, but it is supporting evidence behind the newer packet-first regression surface.',
+            supporting_owner_buckets=supporting_owner_bucket_names,
+            supporting_blocker_stages=['phase8_owner_queue'],
+            evidence=[
+                f'phase8 lead owners: {", ".join(supporting_owner_bucket_names) or "none"}',
+                f'fixed recurring failures: {phase8_summary.fixed_verdict_counts.get("recurring_failure", 0)}',
+                f'replay l2 delta: {replay_l2_delta}',
+            ],
+        ),
+    ]
+
+    ranked = sorted(recommendations, key=lambda recommendation: recommendation.score, reverse=True)
+    for index, recommendation in enumerate(ranked, start=1):
+        recommendation.rank = index
+    return ranked
+
+
+def _combine_source_refs(
+    phase8_summary: LoadedPhase8ComparisonSummary,
+    phase8_inspection: LoadedPhase8ComparisonInspection,
+    phase10_surface: LoadedPhase10ComparisonSurface,
+) -> IterationPrioritySourceRefs:
+    return IterationPrioritySourceRefs(
+        phase8_summary_path=phase8_summary.source_ref,
+        phase8_inspection_path=phase8_inspection.source_ref,
+        phase10_summary_path=phase10_surface.source_refs.phase10_summary_path,
+        phase10_verification_path=phase10_surface.source_refs.phase10_verification_path,
+        phase10_report_path=phase10_surface.source_refs.phase10_report_path,
+        phase10_mode=phase10_surface.source_refs.phase10_mode,
+        fallback_used=phase10_surface.source_refs.fallback_used,
+    )
+
+
+def _ranking_signals(
+    *,
+    phase8_summary: LoadedPhase8ComparisonSummary,
+    phase10_surface: LoadedPhase10ComparisonSurface,
+) -> dict[str, Any]:
+    supporting_owner_buckets = [bucket.bucket for bucket in _supporting_owner_buckets(phase8_summary)]
+    return {
+        'phase10_current_recommendation': phase10_surface.current_recommendation,
+        'package_validation_new_blockers': _blocker_codes(
+            _new_or_higher_blockers(phase10_surface.blocker_queue.get('package_validation', []))
+        ),
+        'replay_l2_delta': _nested_int(phase10_surface.replay, 'delta', 'failure_counts_by_layer_delta', 'l2'),
+        'replay_l3_l4_delta': _nested_int(phase10_surface.replay, 'delta', 'failure_counts_by_layer_delta', 'l3_l4'),
+        'supporting_owner_buckets': supporting_owner_buckets,
+    }
+
+
+def build_iteration_priority_summary(
+    *,
+    phase8_summary: LoadedPhase8ComparisonSummary,
+    phase8_inspection: LoadedPhase8ComparisonInspection,
+    phase10_surface: LoadedPhase10ComparisonSurface,
+) -> IterationPrioritySummary:
+    recommendations = rank_iteration_recommendations(
+        phase8_summary=phase8_summary,
+        phase10_surface=phase10_surface,
+    )
+    supporting_l2 = _supporting_owner_buckets(phase8_summary) or phase8_inspection.owner_buckets[:2]
+    notes: list[str] = []
+    if phase10_surface.source_refs.fallback_used:
+        notes.append('Phase 10 comparison summary JSON was unavailable, so prioritization used the verification and report markdown fallback.')
+    if phase10_surface.current_recommendation:
+        notes.append(f'Phase 10 already pointed to {phase10_surface.current_recommendation} as the current next-cycle lead.')
+
+    return IterationPrioritySummary(
+        source_refs=_combine_source_refs(phase8_summary, phase8_inspection, phase10_surface),
+        phase8_iteration_label=phase8_summary.iteration_label,
+        previous_iteration_label=phase8_summary.previous_iteration_label,
+        baseline_only=phase8_summary.baseline_only,
+        packet_id=phase10_surface.packet_id,
+        cutoff_year=phase10_surface.cutoff_year,
+        current_recommendation=phase10_surface.current_recommendation,
+        primary_recommendation_id=recommendations[0].id if recommendations else None,
+        phase8_fixed_verdict_counts=phase8_summary.fixed_verdict_counts,
+        phase8_random_verdict_counts=phase8_summary.random_verdict_counts,
+        phase8_owner_buckets=phase8_summary.owner_buckets,
+        supporting_l2_evidence=supporting_l2,
+        phase10_stage_surfaces={
+            'package': phase10_surface.package,
+            'replay': phase10_surface.replay,
+            'prior_review': phase10_surface.prior_review,
+            'export': phase10_surface.export,
+        },
+        phase10_blocker_queue=phase10_surface.blocker_queue,
+        recommendations=recommendations,
+        notes=notes,
+    )
+
+
+def build_iteration_priority_inspection(
+    *,
+    phase8_summary: LoadedPhase8ComparisonSummary,
+    phase8_inspection: LoadedPhase8ComparisonInspection,
+    phase10_surface: LoadedPhase10ComparisonSurface,
+) -> IterationPriorityInspection:
+    recommendations = rank_iteration_recommendations(
+        phase8_summary=phase8_summary,
+        phase10_surface=phase10_surface,
+    )
+    return IterationPriorityInspection(
+        source_refs=_combine_source_refs(phase8_summary, phase8_inspection, phase10_surface),
+        phase8_summary=phase8_summary.model_dump(mode='json', exclude_none=True),
+        phase8_inspection=phase8_inspection.model_dump(mode='json', exclude_none=True),
+        phase10_surface=phase10_surface.model_dump(mode='json', exclude_none=True),
+        ranking_signals=_ranking_signals(phase8_summary=phase8_summary, phase10_surface=phase10_surface),
+        recommendations=recommendations,
+    )
+
+
 __all__ = [
+    'build_iteration_priority_inspection',
+    'build_iteration_priority_summary',
     'IterationPriorityBlocker',
     'IterationPriorityInspection',
     'IterationPriorityOwnerBucket',
@@ -631,4 +874,5 @@ __all__ = [
     'load_phase8_comparison_summary',
     'load_phase10_comparison_summary',
     'load_phase10_evidence',
+    'rank_iteration_recommendations',
 ]

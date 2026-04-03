@@ -7,11 +7,14 @@ import pytest
 
 from app.research_logic import (
     IterationPriorityPreflightError,
+    build_iteration_priority_inspection,
+    build_iteration_priority_summary,
     build_phase10_fallback_surface,
     load_phase8_comparison_inspection,
     load_phase8_comparison_summary,
     load_phase10_comparison_summary,
     load_phase10_evidence,
+    rank_iteration_recommendations,
 )
 
 
@@ -100,3 +103,43 @@ def test_load_phase10_evidence_raises_preflight_error_when_sources_missing(tmp_p
             verification_path=tmp_path / 'missing-verification.md',
             report_path=tmp_path / 'missing-report.md',
         )
+
+
+def test_rank_iteration_recommendations_orders_packet_construction_first_for_current_evidence() -> None:
+    phase8_summary = load_phase8_comparison_summary(PHASE8_SUMMARY_PATH)
+    phase10_surface = build_phase10_fallback_surface(PHASE10_VERIFICATION_PATH, PHASE10_REPORT_PATH)
+
+    recommendations = rank_iteration_recommendations(
+        phase8_summary=phase8_summary,
+        phase10_surface=phase10_surface,
+    )
+
+    assert [recommendation.id for recommendation in recommendations[:3]] == [
+        'packet_construction',
+        'l4_aggregation',
+        'l2_extraction',
+    ]
+    assert recommendations[0].supporting_blocker_stages == ['package_validation', 'replay']
+    assert recommendations[2].supporting_owner_buckets[:2] == ['relation_assembly', 'slot_recovery']
+
+
+def test_build_iteration_priority_summary_keeps_supporting_l2_evidence_visible_on_current_baseline() -> None:
+    phase8_summary = load_phase8_comparison_summary(PHASE8_SUMMARY_PATH)
+    phase8_inspection = load_phase8_comparison_inspection(PHASE8_INSPECTION_PATH)
+    phase10_surface = build_phase10_fallback_surface(PHASE10_VERIFICATION_PATH, PHASE10_REPORT_PATH)
+
+    summary = build_iteration_priority_summary(
+        phase8_summary=phase8_summary,
+        phase8_inspection=phase8_inspection,
+        phase10_surface=phase10_surface,
+    )
+    inspection = build_iteration_priority_inspection(
+        phase8_summary=phase8_summary,
+        phase8_inspection=phase8_inspection,
+        phase10_surface=phase10_surface,
+    )
+
+    assert summary.primary_recommendation_id == 'packet_construction'
+    assert [bucket.bucket for bucket in summary.supporting_l2_evidence[:2]] == ['relation_assembly', 'slot_recovery']
+    assert summary.phase10_blocker_queue['package_validation'][0].code == 'support_cluster_too_small'
+    assert inspection.ranking_signals['replay_l2_delta'] == 0

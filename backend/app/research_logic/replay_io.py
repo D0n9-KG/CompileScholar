@@ -17,6 +17,7 @@ from .corpus_sampling import CorpusSamplingBundle
 from .decision_episode_export import DecisionEpisodeAuditExport
 from .historical_environment import HistoricalEnvironmentSnapshot
 from .historical_replay_compiler import HistoricalReplayCompilation
+from .iteration_prioritization import IterationPriorityInspection, IterationPrioritySummary
 from .models import RoutePacket, RouteState
 from .sampled_single_paper import (
     FixedSampledL2ComparisonRow,
@@ -1037,11 +1038,62 @@ def write_sampled_l2_comparison_bundle(
     return written_files
 
 
+def build_iteration_priority_summary_payload(
+    *,
+    summary: IterationPrioritySummary,
+) -> dict[str, Any]:
+    return summary.model_dump(mode='json', exclude_none=True)
+
+
+def build_iteration_priority_inspection_payload(
+    *,
+    inspection: IterationPriorityInspection,
+) -> dict[str, Any]:
+    return inspection.model_dump(mode='json', exclude_none=True)
+
+
+def write_iteration_priority_bundle(
+    output_dir: str | Path,
+    *,
+    summary: IterationPrioritySummary,
+    inspection: IterationPriorityInspection,
+    metadata: dict[str, Any] | None = None,
+) -> dict[str, Path]:
+    bundle_dir = _as_path(output_dir)
+    outputs_dir = bundle_dir / 'outputs'
+    summary_payload = build_iteration_priority_summary_payload(summary=summary)
+    inspection_payload = build_iteration_priority_inspection_payload(inspection=inspection)
+
+    written_files = {
+        'prioritization_summary': _write_json(outputs_dir / 'prioritization_summary.json', summary_payload),
+        'prioritization_inspection': _write_json(outputs_dir / 'prioritization_inspection.json', inspection_payload),
+    }
+    written_files['bundle_manifest'] = _write_json(
+        bundle_dir / 'bundle_manifest.json',
+        {
+            'schema_version': summary.schema_version,
+            'built_at': summary.built_at,
+            'packet_id': summary.packet_id,
+            'cutoff_year': summary.cutoff_year,
+            'primary_recommendation_id': summary.primary_recommendation_id,
+            'source_refs': summary.source_refs.model_dump(mode='json', exclude_none=True),
+            'metadata': dict(metadata or {}),
+            'files': {
+                name: str(path.relative_to(bundle_dir)).replace('\\', '/')
+                for name, path in written_files.items()
+            },
+        },
+    )
+    return written_files
+
+
 __all__ = [
     'build_corpus_sampling_inspection',
     'build_corpus_sampling_summary',
     'build_decision_episode_export_inspection',
     'build_decision_episode_export_summary',
+    'build_iteration_priority_inspection_payload',
+    'build_iteration_priority_summary_payload',
     'build_prior_candidate_review_summary',
     'build_replay_summary',
     'build_replay_inspection',
@@ -1058,6 +1110,7 @@ __all__ = [
     'load_route_states',
     'write_corpus_sampling_bundle',
     'write_decision_episode_export_bundle',
+    'write_iteration_priority_bundle',
     'write_prior_candidate_review_bundle',
     'write_replay_bundle',
     'write_sampled_l2_comparison_bundle',
