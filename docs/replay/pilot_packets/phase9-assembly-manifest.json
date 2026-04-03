@@ -1,0 +1,99 @@
+{
+  "packet_id": "phase9_comp_mech_2021_packet_01",
+  "packet_manifest_ref": "docs/replay/pilot_packets/phase9-route-packet.json",
+  "schema_version": "v1",
+  "built_at": "2026-04-03T11:05:00Z",
+  "topic_scope": "data-driven constitutive and multiscale computational mechanics",
+  "cutoff_year": 2021,
+  "support": {
+    "group_reason": "Support keeps the constitutive and clustering route family intact while carrying the packet's data-conditioning and boundary-framing context into Phase 10.",
+    "members": [
+      {
+        "paper_id": "1000",
+        "reason": "Primary constitutive-route anchor from the Phase 8 relation_assembly bucket.",
+        "trace_ref": "tmp/phase8_sampled_single_paper_l2/baseline-cycle-01/paper_artifacts/fixed_regression/1000/paper_logic_trace.json"
+      },
+      {
+        "paper_id": "1001",
+        "reason": "Second support anchor that keeps the no-constitutive-equation stress-field route inside the main cluster.",
+        "trace_ref": "tmp/phase8_sampled_single_paper_l2/baseline-cycle-01/paper_artifacts/fixed_regression/1001/paper_logic_trace.json"
+      },
+      {
+        "paper_id": "1002",
+        "reason": "Data-conditioning and noisy-database context needed so replay does not treat resource quality as invisible background.",
+        "trace_ref": "tmp/phase8_sampled_single_paper_l2/baseline-cycle-01/paper_artifacts/fixed_regression/1002/paper_logic_trace.json",
+        "note": "Support member by context, not by dominant method role."
+      },
+      {
+        "paper_id": "1005",
+        "reason": "Boundary-framing multiscale mechanics paper that keeps the packet coherent at the topic level.",
+        "trace_ref": "tmp/phase8_sampled_single_paper_l2/baseline-cycle-01/paper_artifacts/fixed_regression/1005/paper_logic_trace.json",
+        "note": "Survey-style support context rather than a separate alternative route."
+      },
+      {
+        "paper_id": "1017",
+        "reason": "Clustering-analysis anchor that keeps the support cluster tied to the same multiscale route family under the 2021 cutoff.",
+        "trace_ref": "tmp/phase8_sampled_single_paper_l2/baseline-cycle-01/paper_artifacts/fixed_regression/1017/paper_logic_trace.json"
+      }
+    ]
+  },
+  "alternative": {
+    "group_reason": "Alternative keeps one learned route in the same packet without collapsing it back into the constitutive and clustering support cluster.",
+    "distinctness_rationale": "Paper 1007 uses a deep material network route rather than the packet's main constitutive and virtual-clustering support family.",
+    "members": [
+      {
+        "paper_id": "1007",
+        "reason": "Single learned multiscale alternative for later route comparison work.",
+        "trace_ref": "tmp/phase8_sampled_single_paper_l2/baseline-cycle-01/paper_artifacts/fixed_regression/1007/paper_logic_trace.json",
+        "note": "Alternative coverage is explicit but still only one-paper deep."
+      }
+    ]
+  },
+  "held_out": {
+    "group_reason": "Held-out reserves the main sensitivity paper for later consistency checks instead of letting the support cluster absorb every near-cutoff caveat.",
+    "members": [
+      {
+        "paper_id": "1023",
+        "reason": "Reference-stiffness sensitivity check held back from support so Phase 10 can test whether the route overfits to one late-cutoff stability paper.",
+        "trace_ref": "tmp/phase8_sampled_single_paper_l2/baseline-cycle-01/paper_artifacts/fixed_regression/1023/paper_logic_trace.json"
+      }
+    ]
+  },
+  "exclusion_notes": [
+    {
+      "paper_id": "1004",
+      "exclusion_reason": "after_cutoff",
+      "note": "2023 viscoelastic neural-ODE paper stays audit-only because the packet freezes a 2021 cutoff.",
+      "paper_year": 2023,
+      "relative_ref": "txt/1004_Data-driven_anisotropic_finite_viscoelasticity_using_neural_ordinary_differential_equations.txt"
+    },
+    {
+      "paper_id": "1010",
+      "exclusion_reason": "off_topic",
+      "note": "Reinforcement-learning traction-separation route would broaden the packet toward a different fracture-law subproblem.",
+      "paper_year": 2018,
+      "relative_ref": "txt/1010_Meta-modeling_game_for_deriving_theory-consistent__microstructure-based_traction_separation_laws_via_deep_reinforcement_learning.txt"
+    },
+    {
+      "paper_id": "1012",
+      "exclusion_reason": "duplicate_signal",
+      "note": "Same-slice geometric deep-learning paper is plausible follow-on material, but it does not fill a missing role in the first bounded packet.",
+      "paper_year": 2020,
+      "relative_ref": "txt/1012_Geometric_deep_learning_for_computational_mechanics_Part_I__anisotropic_hyperelasticity.txt"
+    },
+    {
+      "paper_id": "1107",
+      "exclusion_reason": "off_topic",
+      "note": "Phase 8 random-exploration explosive-materials edge case remains outside the computational-mechanics topic slice.",
+      "paper_year": 2019,
+      "relative_ref": "txt/1107_Preparation_and_thermal_properties_study_of_HNIW_FOX-7_based_high_energy_polymer_bonded_explosive__PBX__with_low_vulnerability_to_thermal_stimulations.txt"
+    }
+  ],
+  "known_gap_notes": [
+    "Support density is still thin for a multi-paper packet: five support members span context and methods, but only three are direct core-method anchors.",
+    "Alternative coverage is only one paper deep, so distinct-route comparison remains underspecified even though the role is explicit.",
+    "Held-out coverage is only one paper deep, so consistency checks will be narrow until a second same-slice held-out paper is curated.",
+    "The packet still points at a placeholder L1 snapshot ref, so Phase 10 must attach a real historical environment snapshot before claiming replay readiness.",
+    "Several packet members came through txt fallback or broken-markdown recovery upstream, so the source mix remains portable but not fully normalized."
+  ]
+}

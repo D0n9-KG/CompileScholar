@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
 
-from app.research_logic import load_route_packet
+from app.research_logic import load_bounded_packet_assembly_manifest, load_route_packet, validate_bounded_packet_assembly
 
 
 def test_phase9_route_packet_manifest_contract() -> None:
@@ -71,3 +72,81 @@ def test_phase9_route_packet_manifest_contract() -> None:
 
     assert not re.search(r'[A-Za-z]:\\\\', raw)
     assert not re.search(r'\\\\[A-Za-z0-9._-]+\\', raw)
+
+
+def test_phase9_assembly_manifest_and_audit_report_align_with_packet() -> None:
+    repo_root = Path(__file__).resolve().parents[2]
+    packet_path = repo_root / 'docs' / 'replay' / 'pilot_packets' / 'phase9-route-packet.json'
+    assembly_manifest_path = repo_root / 'docs' / 'replay' / 'pilot_packets' / 'phase9-assembly-manifest.json'
+    audit_summary_path = repo_root / 'tmp' / 'phase9_bounded_packet_audit' / 'baseline' / 'audit_summary.json'
+    report_path = repo_root / 'docs' / 'replay' / 'reports' / 'phase9-bounded-packet-audit.md'
+
+    packet = load_route_packet(packet_path)
+    manifest = load_bounded_packet_assembly_manifest(assembly_manifest_path)
+    audit = validate_bounded_packet_assembly(packet, manifest)
+    audit_summary = json.loads(audit_summary_path.read_text(encoding='utf-8'))
+    report = report_path.read_text(encoding='utf-8').lower()
+
+    assert manifest.packet_id == packet.packet_id
+    assert manifest.topic_scope == packet.topic_scope_candidate
+    assert manifest.cutoff_year == packet.cutoff_year
+    assert manifest.packet_manifest_ref == 'docs/replay/pilot_packets/phase9-route-packet.json'
+
+    support_ids = [member.paper_id for member in manifest.support.members]
+    alternative_ids = [member.paper_id for member in manifest.alternative.members]
+    held_out_ids = [member.paper_id for member in manifest.held_out.members]
+    assert support_ids == ['1000', '1001', '1002', '1005', '1017']
+    assert alternative_ids == ['1007']
+    assert held_out_ids == ['1023']
+    assert not (set(support_ids) & set(held_out_ids))
+    assert all(member.trace_ref and not Path(member.trace_ref).is_absolute() for member in manifest.support.members)
+    assert all(member.trace_ref and not Path(member.trace_ref).is_absolute() for member in manifest.alternative.members)
+    assert all(member.trace_ref and not Path(member.trace_ref).is_absolute() for member in manifest.held_out.members)
+
+    assert audit.quality_tier == 'green'
+    assert audit.ready_for_phase10 is True
+    assert audit.role_counts.support == 5
+    assert audit.role_counts.alternative == 1
+    assert audit.role_counts.held_out == 1
+    assert audit.quality_flags == []
+    assert audit.structural_errors == []
+    assert audit.missing_trace_ref_paper_ids == []
+    assert audit.support_paper_ids == support_ids
+    assert audit.alternative_paper_ids == alternative_ids
+    assert audit.held_out_paper_ids == held_out_ids
+    assert len(audit.known_gap_notes) == 5
+
+    assert audit_summary == {
+        'packet_id': 'phase9_comp_mech_2021_packet_01',
+        'topic_scope_candidate': 'data-driven constitutive and multiscale computational mechanics',
+        'cutoff_year': 2021,
+        'packet_included_item_count': 7,
+        'packet_excluded_item_count': 4,
+        'support_count': 5,
+        'alternative_count': 1,
+        'held_out_count': 1,
+        'quality_tier': 'green',
+        'ready_for_phase10': True,
+        'quality_flags': [],
+        'structural_errors': [],
+        'missing_trace_ref_paper_ids': [],
+        'packet_items_missing_trace_id': [],
+        'indistinct_alternative_paper_ids': [],
+        'support_held_out_overlap_paper_ids': [],
+        'missing_exclusion_note_paper_ids': [],
+        'known_gap_note_count': 5,
+        'exclusion_note_count': 4,
+    }
+
+    assert 'derived from runtime bundle' in report
+    assert 'support members: `5`' in report
+    assert 'alternative members: `1`' in report
+    assert 'held-out members: `1`' in report
+    assert 'quality tier: `green`' in report
+    assert 'ready for phase 10 handoff: `true`' in report
+    assert 'structural handoff is ready' in report
+    assert 'support density is still thin' in report
+    assert 'alternative coverage is only one paper deep' in report
+    assert 'held-out coverage is only one paper deep' in report
+    assert 'placeholder l1 snapshot ref' in report
+    assert 'portable but not fully normalized' in report
