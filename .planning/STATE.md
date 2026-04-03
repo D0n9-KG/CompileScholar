@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
-status: Ready for Phase 09 planning
-stopped_at: Phase 9 context gathered (assumptions mode)
-last_updated: "2026-04-03T06:42:18.775Z"
+status: Ready for Phase 09 execution
+stopped_at: Phase 9 plans created; ready for execution
+last_updated: "2026-04-03T07:03:00.3343074Z"
 progress:
   total_phases: 5
   completed_phases: 2
-  total_plans: 4
+  total_plans: 6
   completed_plans: 4
 ---
 
@@ -19,18 +19,18 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-04-03)
 
 **Core value:** Produce auditable, replayable, trainable scientific-reasoning artifacts rather than paper-like summaries or one-off knowledge graphs.
-**Current focus:** Phase 09 - bounded-packet-construction-from-corpus
+**Current focus:** Phase `09` is planned and ready for execution
 
 ## Current Position
 
-Phase: 08 (sampled-single-paper-l2-regression) - COMPLETE
-Plan: 2 of 2
-Milestone: `v1.1` - Phase `8` complete, Phase `9` next
+Phase: `09` (`bounded-packet-construction-from-corpus`) - PLANNED
+Plan: `09-01` and `09-02`
+Milestone: `v1.1` - Phase `8` complete, Phase `9` planned
 
 - Completed phase: `08 sampled-single-paper-l2-regression`
-- Completed plans: `08-01` and `08-02`
-- Status: Phase `8` completed and verified on `2026-04-03`
-- Last activity: `2026-04-03` - completed the real Phase `8` sampled-paper baseline run, published the first report, and closed `L2Q-01` plus `L2Q-02`
+- Planned phase: `09 bounded-packet-construction-from-corpus`
+- Status: Phase `9` researched, validated, and split into `09-01` and `09-02`
+- Last activity: `2026-04-03` - created the Phase `9` research, validation strategy, and execution plans
 
 ## Milestone Snapshot
 
@@ -59,6 +59,7 @@ Milestone: `v1.1` - Phase `8` complete, Phase `9` next
 - The first real Phase `8` baseline executed all `15/15` sampled papers with `0` availability-only issues.
 - The real Phase `8` comparison surface recorded `7` recurring fixed failures, `3` fixed stable passes, `2` random edge cases, and `3` stable random passes.
 - The current `L2` owner queue is led by `relation_assembly` and `slot_recovery`, with smaller random-only follow-ups in `metadata_repair` and `reference_recovery`.
+- The recommended Phase `9` topic boundary is a `2017-2021` data-driven / multiscale computational-mechanics slice seeded by ids `1000`, `1001`, `1005`, `1017`, and `1023`.
 - The jamming slice remains the current baseline reference for replay, review, and export behavior.
 - The Phase `6` `route_family_id` carryover fix is part of the baseline that `v1.1` must preserve while it broadens beyond the original pilot.
 
@@ -71,7 +72,8 @@ Milestone: `v1.1` - Phase `8` complete, Phase `9` next
 ## Pending Follow-Ups
 
 - Use the Phase `8` owner queue to guide the bounded packet topic choice and role assignment work in Phase `9`.
-- Assemble one bounded topic packet from the larger corpus for `L3/L4` validation in Phase `9`.
+- Execute `09-01` to add the bounded-packet audit contract and CLI.
+- Execute `09-02` to commit the first bounded packet, companion role-mapping manifest, and audit report.
 - Preserve `tmp/phase8_sampled_single_paper_l2/baseline-cycle-01/` as the comparison source for the next sampled-paper cycle.
 
 ## Blockers
@@ -84,9 +86,10 @@ Milestone: `v1.1` - Phase `8` complete, Phase `9` next
 ## Performance Metrics
 
 - `08-02`: duration `2h 2m`, tasks `2`, files `9`
+- `09-planning`: duration `~20m`, artifacts `4`, plans `2`
 
 ## Session
 
-**Last Date:** 2026-04-03T06:42:18.772Z
-**Stopped At:** Phase 9 context gathered (assumptions mode)
-**Resume File:** .planning/phases/09-bounded-packet-construction-from-corpus/09-CONTEXT.md
+**Last Date:** 2026-04-03T07:03:00.3343074Z
+**Stopped At:** Phase 9 plans created; ready for execution
+**Resume File:** `.planning/phases/09-bounded-packet-construction-from-corpus/09-01-PLAN.md`
