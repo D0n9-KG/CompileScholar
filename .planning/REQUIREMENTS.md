@@ -27,7 +27,7 @@ Requirements for milestone `v1.1`. These define what must be true before the nex
 ### Iteration Prioritization
 
 - [x] **LOOP-01**: Team can inspect one summary that connects sampled single-paper failures with bounded multi-paper packet outcomes.
-- [ ] **LOOP-02**: Team can choose the next optimization cycle based on explicit evidence about whether the highest-leverage work is in `L2` extraction, packet construction, or `L4` aggregation.
+- [x] **LOOP-02**: Team can choose the next optimization cycle based on explicit evidence about whether the highest-leverage work is in `L2` extraction, packet construction, or `L4` aggregation.
 
 ## v2 Requirements
 
