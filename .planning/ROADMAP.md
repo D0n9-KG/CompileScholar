@@ -19,7 +19,7 @@ The milestone first establishes a fixed regression set plus random exploration s
 | 8 | Sampled Single-Paper L2 Regression | Repeatedly run sampled single-paper extraction and compare results across iterations. | `L2Q-01`, `L2Q-02` | 3 |
 | 9 | Bounded Packet Construction From Corpus | Build one bounded topic packet from the larger corpus with explicit multi-paper role assignment. | `PACK-01` | 3 |
 | 10 | Multi-Paper L3 And L4 Validation | 3/3 | Complete    | 2026-04-03 |
-| 11 | Iteration Prioritization And Next Cycle Plan | Turn sampled-paper and multi-paper evidence into the next optimization queue. | `LOOP-01`, `LOOP-02` | 3 |
+| 11 | Iteration Prioritization And Next Cycle Plan | 1/3 | In Progress|  |
 
 ## Phase Details
 
@@ -108,10 +108,11 @@ The milestone first establishes a fixed regression set plus random exploration s
 - Phase `7` completed on `2026-04-03` with a committed ten-paper fixed regression set, a real seed-`7` random exploration batch of five papers, and `1505` recorded corpus-health failures in `tmp/phase7_corpus_sampling_baseline/`.
 - Phase `8` completed on `2026-04-03` with a real `15/15` sampled-paper baseline run, `7` recurring fixed failures, `2` random edge cases, and an owner queue led by `relation_assembly` and `slot_recovery`.
 - Phase `9` completed on `2026-04-03` with a committed `2017-2021` computational-mechanics packet, explicit `support / alternative / held_out` mapping, and a runtime-backed audit report that keeps Phase `10` blockers visible.
+- Plan `11-01` completed on `2026-04-03` with typed prioritization loaders, a packet-first ranking contract, and manifest-backed Phase `11` bundle outputs over the committed Phase `8` and Phase `10` evidence chain.
 
 ## Next Up
 
-**Phase 11: Iteration Prioritization And Next Cycle Plan** - Turn the sampled-paper and bounded multi-paper evidence into the next optimization queue.
+**Phase 11 Plan 02: Iteration Prioritization And Next Cycle Plan** - Render the committed Phase `11` prioritization contract into the report / CLI flow for the current evidence chain.
 
 `$gsd-discuss-phase 11`
 
@@ -119,4 +120,4 @@ Also available: `$gsd-plan-phase 11`
 
 ---
 *Roadmap created: 2026-04-03*
-*Last updated: 2026-04-03 after Phase 10 execution and verification*
+*Last updated: 2026-04-03 after Phase 11 Plan 01 execution and verification*

@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
-status: Ready to plan
-stopped_at: Phase 11 planned
-last_updated: "2026-04-03T12:34:56.993Z"
+status: Ready to execute
+stopped_at: Completed 11-01-PLAN.md
+last_updated: "2026-04-03T13:13:17.527Z"
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 12
-  completed_plans: 9
+  completed_plans: 10
 ---
 
 # Project State
@@ -23,14 +23,14 @@ See: `.planning/PROJECT.md` (updated 2026-04-03)
 
 ## Current Position
 
-Phase: 11
-Plan: Not started
-Milestone: `v1.1` - Phase `10` complete, Phase `11` ready to plan
+Phase: 11 (iteration-prioritization-and-next-cycle-plan) — EXECUTING
+Plan: 2 of 3
+Milestone: `v1.1` - Phase `10` complete, Phase `11` in progress
 
 - Completed phase: `10 multi-paper-l3-and-l4-validation`
 - Planned phase: `11 iteration-prioritization-and-next-cycle-plan`
-- Status: Phase `10` completed with a real bounded validation slice and committed next-cycle evidence
-- Last activity: `2026-04-03` - completed Phase `10`, verified the bounded packet run, and advanced the roadmap to Phase `11`
+- Status: Plan `11-01` completed with typed prioritization loaders, packet-first ranking, and manifest-backed Phase `11` bundle outputs
+- Last activity: `2026-04-03` - completed Plan `11-01`, verified the Phase `11` backend prioritization contract, and advanced to Plan `11-02`
 
 ## Milestone Snapshot
 
@@ -65,6 +65,9 @@ Milestone: `v1.1` - Phase `10` complete, Phase `11` ready to plan
 - [Phase 10]: Compare the computational-mechanics packet against the jamming baseline through replay/export bundle summaries and inspections, with blocker queues grouped by stage.
 - [Phase 10]: Use tmp/phase10_multi_paper_validation/baseline/comparison_summary.json and companion bundle summaries as the source of truth for the committed report and verification note.
 - [Phase 10]: Treat packet construction, not L2, as the next highest-leverage optimization target because new regressions appear first in package validation while replay L2 deltas stay flat against the jamming baseline.
+- [Phase 11]: Allow explicit Phase 10 JSON input but fall back to verification/report markdown with recorded provenance.
+- [Phase 11]: Rank packet construction ahead of L4 and L2 when package blockers are new and replay L2 delta stays flat.
+- [Phase 11]: Write Phase 11 prioritization outputs as manifest-backed summary and inspection bundle files under outputs/.
 
 ## Accumulated Context
 
@@ -86,8 +89,8 @@ Milestone: `v1.1` - Phase `10` complete, Phase `11` ready to plan
 
 ## Pending Follow-Ups
 
-- Use the sampled-paper evidence from Phase `8` plus the bounded multi-paper blocker queue from Phase `10` to prioritize the next optimization cycle.
-- Decide whether Phase `11` should lean first into packet construction, `L4` aggregation follow-up, or another targeted `L2` repair pass.
+- Render the new Phase `11` prioritization summary into the committed report / CLI flow for the current evidence chain.
+- Carry the packet-first recommendation forward into the next plan while keeping `l4_aggregation` and `l2_extraction` as explicit ranked follow-ups.
 - Preserve `tmp/phase8_sampled_single_paper_l2/baseline-cycle-01/` as the comparison source for the next sampled-paper cycle.
 
 ## Blockers
@@ -105,9 +108,10 @@ Milestone: `v1.1` - Phase `10` complete, Phase `11` ready to plan
 - `09-02`: duration `7 min`, tasks `2`, files `5`
 - `10-planning`: duration `~35m`, artifacts `5`, plans `3`
 - `10-02`: duration `19 min`, tasks `2`, files `4`
+- `11-01`: duration `6 min`, tasks `2`, files `5`
 
 ## Session
 
-**Last Date:** 2026-04-03T12:34:56.987Z
-**Stopped At:** Phase 11 planned
-**Resume File:** .planning/phases/11-iteration-prioritization-and-next-cycle-plan/11-01-PLAN.md
+**Last Date:** 2026-04-03T13:13:17.522Z
+**Stopped At:** Completed 11-01-PLAN.md
+**Resume File:** .planning/phases/11-iteration-prioritization-and-next-cycle-plan/11-02-PLAN.md
