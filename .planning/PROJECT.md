@@ -17,6 +17,7 @@ Produce auditable, replayable, trainable scientific-reasoning artifacts rather t
 - Phase `7` completed on `2026-04-03` with a committed ten-paper fixed regression set and a real seed-`7` random exploration batch of five papers
 - Phase `9` completed on `2026-04-03` with a committed `2017-2021` computational-mechanics packet, explicit `support / alternative / held_out` mapping, and a runtime-backed audit report
 - Phase `10` completed on `2026-04-03` with a real bounded computational-mechanics validation run, committed report/verification artifacts, and a packet-construction-first next-cycle recommendation
+- Phase `11` completed on `2026-04-03` with a runtime-backed iteration prioritization bundle, committed report/verification artifacts, and a packet-construction-first next-cycle queue
 - The first real Phase `7` corpus baseline recorded `1756` inventory entries, `1755` eligible entries, and `1505` corpus-health failures
 - Stable bounded pilot: `jamming transition in frictionless sphere packings near point J` with `cutoff_year = 2010`
 - End-to-end Phase 03 -> 06 artifact flow is verified on real local bundles
@@ -47,11 +48,12 @@ Produce auditable, replayable, trainable scientific-reasoning artifacts rather t
 - [x] Phase `7` now provides a filesystem-first corpus sampling workflow with one committed fixed regression set, one reproducible random exploration batch, and explicit corpus-health reporting.
 - [x] Phase `9` now provides one bounded corpus packet with explicit inclusion / exclusion notes plus `support / alternative / held_out` role mapping for downstream multi-paper work.
 - [x] Phase `10` now compiles replay/package/review/export artifacts for the committed bounded packet, compares them against the jamming baseline, and keeps remaining multi-paper blockers explicit for the next cycle.
+- [x] Repeated sampled single-paper evidence plus bounded packet validation now feed one auditable prioritization summary for next-cycle decisions. (Validated in Phase `11`)
+- [x] The next optimization cycle can now be selected from explicit evidence (`packet_construction`, `l4_aggregation`, `l2_extraction`) instead of open-ended debate. (Validated in Phase `11`)
 
 ### Active
 
 - [ ] Repeatedly run sampled single-paper extraction and evaluation so `L2` quality issues can be measured instead of guessed.
-- [ ] Use evidence from sampled-paper runs and bounded packet runs to choose the next optimization cycle.
 
 ### Out of Scope
 
@@ -101,4 +103,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-03 after Phase 10 execution and verification*
+*Last updated: 2026-04-03 after Phase 11 execution and verification*
