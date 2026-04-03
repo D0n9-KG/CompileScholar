@@ -52,6 +52,7 @@ The milestone first establishes a fixed regression set plus random exploration s
 **Goal:** Build one bounded topic packet from the larger corpus so `L3/L4` can be tested on structured multi-paper evidence instead of arbitrary random mixes.
 **Depends on:** Phase `8`
 **Requirements:** `PACK-01`
+**Status:** Complete on `2026-04-03`
 
 **Success criteria:**
 1. One bounded topic and cutoff are selected from the larger corpus with explicit packet inclusion and exclusion notes.
@@ -105,15 +106,16 @@ The milestone first establishes a fixed regression set plus random exploration s
 - Shared-corpus path instability is part of the quality loop because bad corpus hygiene can otherwise masquerade as extraction failure.
 - Phase `7` completed on `2026-04-03` with a committed ten-paper fixed regression set, a real seed-`7` random exploration batch of five papers, and `1505` recorded corpus-health failures in `tmp/phase7_corpus_sampling_baseline/`.
 - Phase `8` completed on `2026-04-03` with a real `15/15` sampled-paper baseline run, `7` recurring fixed failures, `2` random edge cases, and an owner queue led by `relation_assembly` and `slot_recovery`.
+- Phase `9` completed on `2026-04-03` with a committed `2017-2021` computational-mechanics packet, explicit `support / alternative / held_out` mapping, and a runtime-backed audit report that keeps Phase `10` blockers visible.
 
 ## Next Up
 
-**Phase 9: Bounded Packet Construction From Corpus** - Turn the Phase `8` owner queue into one bounded topic packet with explicit `support`, `alternative`, and `held_out` roles.
+**Phase 10: Multi-Paper L3 And L4 Validation** - Compile replay/package/review/export artifacts for the committed Phase `9` packet and inspect the real multi-paper failure surface.
 
-`$gsd-discuss-phase 9`
+`$gsd-discuss-phase 10`
 
-Also available: `$gsd-plan-phase 9`
+Also available: `$gsd-plan-phase 10`
 
 ---
 *Roadmap created: 2026-04-03*
-*Last updated: 2026-04-03 after Phase 8 execution and verification*
+*Last updated: 2026-04-03 after Phase 9 execution and verification*
