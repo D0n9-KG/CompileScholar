@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
-status: Ready for Phase 09 execution
-stopped_at: Phase 9 plans created; ready for execution
-last_updated: "2026-04-03T07:03:00.3343074Z"
+status: Ready to execute
+stopped_at: Completed 09-01-PLAN.md
+last_updated: "2026-04-03T07:51:09.831Z"
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 6
-  completed_plans: 4
+  completed_plans: 5
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-04-03)
 
 **Core value:** Produce auditable, replayable, trainable scientific-reasoning artifacts rather than paper-like summaries or one-off knowledge graphs.
-**Current focus:** Phase `09` is planned and ready for execution
+**Current focus:** Phase 09 — bounded-packet-construction-from-corpus
 
 ## Current Position
 
-Phase: `09` (`bounded-packet-construction-from-corpus`) - PLANNED
-Plan: `09-01` and `09-02`
+Phase: 09 (bounded-packet-construction-from-corpus) — EXECUTING
+Plan: 2 of 2
 Milestone: `v1.1` - Phase `8` complete, Phase `9` planned
 
 - Completed phase: `08 sampled-single-paper-l2-regression`
@@ -50,6 +50,8 @@ Milestone: `v1.1` - Phase `8` complete, Phase `9` planned
 - Treat sampled-paper runs without a previous Phase `8` bundle as baseline-only while preserving the comparison artifact contract.
 - Prioritize `L2` owner queues by fixed-regression failures before random-only discoveries.
 
+## Decisions
+
 ## Accumulated Context
 
 - The user-provided shared corpus root currently exposes roughly `1756` `.txt` papers and `945` `.md` derivatives.
@@ -62,6 +64,9 @@ Milestone: `v1.1` - Phase `8` complete, Phase `9` planned
 - The recommended Phase `9` topic boundary is a `2017-2021` data-driven / multiscale computational-mechanics slice seeded by ids `1000`, `1001`, `1005`, `1017`, and `1023`.
 - The jamming slice remains the current baseline reference for replay, review, and export behavior.
 - The Phase `6` `route_family_id` carryover fix is part of the baseline that `v1.1` must preserve while it broadens beyond the original pilot.
+- [Phase 09]: Keep RoutePacket canonical and layer support / alternative / held_out mapping in a companion manifest.
+- [Phase 09]: Treat packet/manifest misalignment as CLI-failing validation errors while preserving packet quality blockers as explicit summary flags.
+- [Phase 09]: Reuse replay_io bundle conventions so Phase 9 audit runtime artifacts stay consistent with earlier summary/inspection patterns.
 
 ## Active Requirements
 
@@ -90,6 +95,6 @@ Milestone: `v1.1` - Phase `8` complete, Phase `9` planned
 
 ## Session
 
-**Last Date:** 2026-04-03T07:03:00.3343074Z
-**Stopped At:** Phase 9 plans created; ready for execution
-**Resume File:** `.planning/phases/09-bounded-packet-construction-from-corpus/09-01-PLAN.md`
+**Last Date:** 2026-04-03T07:50:09.748Z
+**Stopped At:** Completed 09-01-PLAN.md
+**Resume File:** None

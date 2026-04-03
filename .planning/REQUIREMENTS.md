@@ -20,7 +20,7 @@ Requirements for milestone `v1.1`. These define what must be true before the nex
 
 ### Bounded Multi-Paper Packet Validation
 
-- [ ] **PACK-01**: Operator can assemble one bounded topic packet from the larger corpus with explicit `support`, `alternative`, and `held_out` role assignments plus exclusion notes.
+- [x] **PACK-01**: Operator can assemble one bounded topic packet from the larger corpus with explicit `support`, `alternative`, and `held_out` role assignments plus exclusion notes.
 - [ ] **PACK-02**: The bounded packet can compile replay and package-validation artifacts that make `L3` quality gaps inspectable.
 - [ ] **AGGR-01**: The same bounded packet can produce `L4` prior/review/export artifacts or explicit blockers explaining why multi-paper aggregation failed.
 
