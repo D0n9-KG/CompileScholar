@@ -1,0 +1,215 @@
+{
+  "packet_id": "phase9_comp_mech_2021_packet_01",
+  "schema_version": "v1",
+  "built_at": "2026-04-03T10:15:00Z",
+  "topic_scope_candidate": "data-driven constitutive and multiscale computational mechanics",
+  "cutoff_year": 2021,
+  "packet_status": "reviewed",
+  "packet_composition": {
+    "target_size": 7,
+    "actual_size": 7,
+    "role_counts": {
+      "core_method": 3,
+      "resource_or_benchmark": 1,
+      "limitation_or_critique": 1,
+      "survey_or_review": 1,
+      "alternative_route": 1
+    },
+    "coverage_ok": true,
+    "missing_roles": []
+  },
+  "l1_snapshot_ref": {
+    "snapshot_id": "phase9_comp_mech_2021_snapshot",
+    "resource_registry_ref": "l1:phase9:comp-mech:resource-registry:2021",
+    "resource_timeline_ref": "l1:phase9:comp-mech:resource-timeline:2021",
+    "benchmark_timeline_ref": "l1:phase9:comp-mech:benchmark-timeline:2021",
+    "toolchain_timeline_ref": "l1:phase9:comp-mech:toolchain-timeline:2021",
+    "protocol_registry_ref": "l1:phase9:comp-mech:protocol-registry:2021"
+  },
+  "inclusion_rules": {
+    "scope_definition": "Compile one bounded 2017-2021 packet around data-driven constitutive and multiscale computational mechanics, keeping clustering-based modeling and one learned alternative visible without broadening into random cross-domain papers.",
+    "scope_aliases": [
+      "data-driven mechanics",
+      "multiscale computational mechanics",
+      "virtual clustering analysis"
+    ],
+    "accepted_year_range": {
+      "min_year": 2017,
+      "max_year": 2021
+    },
+    "hard_exclusion_rules": [
+      "exclude papers published after 2021 from packet inputs",
+      "exclude random exploration papers that do not stay inside the computational-mechanics slice",
+      "exclude same-slice expansions when they enlarge the packet without improving role coverage for the first bounded handoff"
+    ],
+    "role_assignment_rules": [
+      "core_method papers must anchor the constitutive or clustering route family under the cutoff",
+      "resource_or_benchmark papers must keep data or database-conditioning constraints visible for downstream replay",
+      "limitation_or_critique papers must preserve sensitivity or stability caveats inside the same slice",
+      "survey_or_review papers may frame the packet boundary but cannot replace direct route evidence",
+      "alternative_route papers must stay inside the same slice while remaining meaningfully distinct from the main support cluster"
+    ],
+    "leakage_policy": "No papers after the 2021 cutoff may enter packet input. Later syntheses and broader deep-learning retrospectives are audit only. Hindsight labels and post-cutoff judgments must stay out of packet compilation."
+  },
+  "included_items": [
+    {
+      "paper_id": "1000",
+      "trace_id": "6ad25fab89f58936693ead0c7a61e2c8c71882bd91ac16556f8b50ca18709d83:paper_logic_trace",
+      "paper_year": 2017,
+      "item_role": "core_method",
+      "inclusion_reason": "Anchor paper for the data-driven constitutive route and one of the top Phase 8 relation_assembly exemplars.",
+      "source_selector": "manual",
+      "evidence_for_inclusion": [
+        "phase7_fixed_regression_set",
+        "phase8_owner_bucket:relation_assembly",
+        "route_role:core_method"
+      ],
+      "title": "Data based derivation of material response"
+    },
+    {
+      "paper_id": "1001",
+      "trace_id": "6611ab0d5ad0d1760ef2f536efb5e65a2e2529b03b093cfc67c60dff3a044485:paper_logic_trace",
+      "paper_year": 2019,
+      "item_role": "core_method",
+      "inclusion_reason": "Keeps the no-constitutive-equation stress-field route in the main support cluster instead of leaving the Phase 8 owner signal as a singleton.",
+      "source_selector": "manual",
+      "evidence_for_inclusion": [
+        "phase7_fixed_regression_set",
+        "phase8_owner_bucket:relation_assembly",
+        "phase8_owner_bucket:slot_recovery",
+        "route_role:core_method"
+      ],
+      "title": "Measuring stress field without constitutive equation"
+    },
+    {
+      "paper_id": "1002",
+      "trace_id": "6da042a16e023f8624b6e061c81863eeaceaca7433bbf7a971d89095476ba24a:paper_logic_trace",
+      "paper_year": 2020,
+      "item_role": "resource_or_benchmark",
+      "inclusion_reason": "Provides the packet's explicit noisy-database and data-conditioning reference point so downstream replay does not treat data quality as invisible background.",
+      "source_selector": "manual",
+      "evidence_for_inclusion": [
+        "phase7_fixed_regression_set",
+        "same_slice_expansion",
+        "route_role:resource_or_benchmark"
+      ],
+      "title": "A physics constrained data driven approach based on locally convex reconstruction for noisy database"
+    },
+    {
+      "paper_id": "1005",
+      "trace_id": "760f1bfce7f44dc0d6bad2d29472400b2eb4e34a4c4857de9d8745c009585d8e:paper_logic_trace",
+      "paper_year": 2020,
+      "item_role": "survey_or_review",
+      "inclusion_reason": "Frames the packet boundary at the multiscale-mechanics level and keeps the data-driven slice legible as one bounded topic rather than a list of isolated methods.",
+      "source_selector": "manual",
+      "evidence_for_inclusion": [
+        "phase7_fixed_regression_set",
+        "phase8_owner_bucket:relation_assembly",
+        "route_role:survey_or_review"
+      ],
+      "title": "Data Driven multiscale modeling in mechanics"
+    },
+    {
+      "paper_id": "1007",
+      "trace_id": "bd0e3a60b0ce4ec3384721692f34a7812f024d3bf337147572d16d568cdc967f:paper_logic_trace",
+      "paper_year": 2018,
+      "item_role": "alternative_route",
+      "inclusion_reason": "Deep material networks keep one learned multiscale alternative visible without forcing the packet into a second, much broader machine-learning topic family.",
+      "source_selector": "manual",
+      "evidence_for_inclusion": [
+        "phase7_fixed_regression_set",
+        "same_slice_expansion",
+        "route_role:alternative_route"
+      ],
+      "title": "A deep material network for multiscale topology learning and accelerated nonlinear modeling of heterogeneous materials"
+    },
+    {
+      "paper_id": "1017",
+      "trace_id": "88c0b8681524c9dae85e5bd3258e62c7a6b1c0700e42cd29aa27da0f2d956bca:paper_logic_trace",
+      "paper_year": 2019,
+      "item_role": "core_method",
+      "inclusion_reason": "Clustering analysis at finite strains is a third core route anchor and keeps the packet tied to the Phase 8 multiscale owner queue instead of only constitutive-response titles.",
+      "source_selector": "manual",
+      "evidence_for_inclusion": [
+        "phase7_fixed_regression_set",
+        "phase8_owner_bucket:relation_assembly",
+        "phase8_owner_bucket:slot_recovery",
+        "route_role:core_method"
+      ],
+      "title": "Self consistent clustering analysis for multiscale modeling at finite strains"
+    },
+    {
+      "paper_id": "1023",
+      "trace_id": "7c87c088aaf59233bc1f25b9884d54a50328700cc65f437b0865502c5ea27979:paper_logic_trace",
+      "paper_year": 2021,
+      "item_role": "limitation_or_critique",
+      "inclusion_reason": "Reference-stiffness selection keeps sensitivity inside the packet and serves as the main stability check near the frozen 2021 cutoff.",
+      "source_selector": "manual",
+      "evidence_for_inclusion": [
+        "phase7_fixed_regression_set",
+        "phase8_owner_bucket:relation_assembly",
+        "phase8_owner_bucket:slot_recovery",
+        "route_role:limitation_or_critique"
+      ],
+      "title": "Adaptive selection of reference stiffness in virtual clustering analysis"
+    }
+  ],
+  "excluded_items": [
+    {
+      "paper_id": "1004",
+      "paper_year": 2023,
+      "exclusion_reason": "after_cutoff",
+      "notes": "Neural-ODE viscoelasticity paper is in the neighborhood, but it is post-cutoff and therefore audit-only for the first bounded packet."
+    },
+    {
+      "paper_id": "1010",
+      "paper_year": 2018,
+      "exclusion_reason": "off_topic",
+      "notes": "Reinforcement-learning traction-separation route broadens the packet toward a different microstructure and fracture-law subproblem."
+    },
+    {
+      "paper_id": "1012",
+      "paper_year": 2020,
+      "exclusion_reason": "duplicate_signal",
+      "notes": "Geometric deep learning for hyperelasticity stays same-slice, but the first packet already has one learned alternative and keeping this paper would enlarge the packet without filling a missing role."
+    },
+    {
+      "paper_id": "1107",
+      "paper_year": 2019,
+      "exclusion_reason": "off_topic",
+      "notes": "Random exploration explosive-materials paper is out-of-slice for the computational-mechanics packet and remains a separate Phase 8 edge case."
+    }
+  ],
+  "packet_quality": {
+    "quality_tier": "yellow",
+    "ready_for_route_state": false,
+    "quality_flags": [
+      "l1_snapshot_placeholder",
+      "support_cluster_still_small",
+      "txt_fallback_sources_present"
+    ],
+    "topic_boundary_confidence": 0.82,
+    "leakage_risk": "low",
+    "manual_review_status": "completed"
+  },
+  "compiler_hints": {
+    "preferred_scope_label": "data-driven constitutive and multiscale computational mechanics",
+    "preferred_method_labels": [
+      "data-driven constitutive modeling",
+      "virtual clustering analysis",
+      "multiscale mechanics"
+    ],
+    "preferred_benchmark_labels": [
+      "noisy database conditioning"
+    ],
+    "preferred_bottleneck_labels": [
+      "reference stiffness sensitivity",
+      "support density across same-slice traces"
+    ],
+    "expected_alternative_routes": [
+      "deep material network route",
+      "geometric deep learning follow-on packet"
+    ],
+    "notes_for_route_state_compiler": "Keep support centered on the constitutive and clustering papers, reserve the learned route for alternative comparisons, and do not expand beyond the frozen 2021 slice during Phase 10 replay preparation."
+  }
+}
