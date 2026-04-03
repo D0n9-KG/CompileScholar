@@ -7,6 +7,17 @@ from .models import (
     RouteState,
     WhyNowCase,
 )
+from .bounded_packet_audit import (
+    BoundedPacketAssemblyManifest,
+    BoundedPacketAuditResult,
+    BoundedPacketAuditRoleCounts,
+    BoundedPacketExclusionNote,
+    BoundedPacketRoleGroup,
+    BoundedPacketRoleMember,
+    audit_bounded_packet_assembly,
+    load_bounded_packet_assembly_manifest,
+    validate_bounded_packet_assembly,
+)
 from .decision_prior_builder import DecisionPriorBuilder, build_decision_prior_card
 from .anti_pattern_builder import AntiPatternBuilder, build_anti_pattern_candidates
 from .decision_episode_builder import DecisionEpisodeBuilder, build_decision_episode
@@ -123,6 +134,15 @@ __all__ = [
     'DecisionPriorCard',
     'AntiPatternCard',
     'DecisionEpisode',
+    'BoundedPacketAssemblyManifest',
+    'BoundedPacketAuditResult',
+    'BoundedPacketAuditRoleCounts',
+    'BoundedPacketExclusionNote',
+    'BoundedPacketRoleGroup',
+    'BoundedPacketRoleMember',
+    'audit_bounded_packet_assembly',
+    'load_bounded_packet_assembly_manifest',
+    'validate_bounded_packet_assembly',
     'AntiPatternBuilder',
     'build_anti_pattern_candidates',
     'DecisionPriorBuilder',
