@@ -18,7 +18,7 @@ The milestone first establishes a fixed regression set plus random exploration s
 | 7 | Corpus Sampling And Regression Baseline | Turn the shared corpus into a usable source for fixed regression papers, random exploration papers, and corpus-health reporting. | `SAMPLE-01`, `SAMPLE-02`, `SAMPLE-03` | 3 |
 | 8 | Sampled Single-Paper L2 Regression | Repeatedly run sampled single-paper extraction and compare results across iterations. | `L2Q-01`, `L2Q-02` | 3 |
 | 9 | Bounded Packet Construction From Corpus | Build one bounded topic packet from the larger corpus with explicit multi-paper role assignment. | `PACK-01` | 3 |
-| 10 | Multi-Paper L3 And L4 Validation | Compile replay/package/review/export artifacts for the bounded packet and inspect multi-paper failures directly. | `PACK-02`, `AGGR-01` | 3 |
+| 10 | Multi-Paper L3 And L4 Validation | 1/3 | In Progress|  |
 | 11 | Iteration Prioritization And Next Cycle Plan | Turn sampled-paper and multi-paper evidence into the next optimization queue. | `LOOP-01`, `LOOP-02` | 3 |
 
 ## Phase Details
