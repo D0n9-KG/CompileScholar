@@ -19,7 +19,7 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-04-03)
 
 **Core value:** Produce auditable, replayable, trainable scientific-reasoning artifacts rather than paper-like summaries or one-off knowledge graphs.
-**Current focus:** Milestone v1.2 planning
+**Current focus:** Milestone v1.2 iterative cycle setup
 
 ## Current Position
 
@@ -28,14 +28,14 @@ Plan: Not started
 Milestone: `v1.2` - Fast Iteration Research Logic Quality
 
 - Completed milestone: `v1.1` corpus-driven iterative quality hardening
-- Status: Requirements and roadmap initialized for milestone `v1.2`
-- Last activity: `2026-04-03` - created v1.2 requirements and roadmap from Phase 11 packet-first recommendation
+- Status: Requirements and roadmap aligned to continuous generate -> review -> optimize cycles for milestone `v1.2`
+- Last activity: `2026-04-03` - realigned v1.2 to manual output-quality review across repeated cycles
 
 ## Milestone Snapshot
 
 - v1.2 continues phase numbering from v1.1 (starts at Phase 12).
 - This milestone optimizes for both cycle speed and true reasoning-output quality.
-- Promotion criteria now require both rule-threshold pass and real artifact quality review.
+- Success requires consecutive high-quality cycles verified through manual output review, not metric-only wins.
 
 ## Decisions Carried Forward
 
@@ -58,8 +58,8 @@ Milestone: `v1.2` - Fast Iteration Research Logic Quality
 ## Pending Follow-Ups
 
 - Discuss and plan Phase 12 implementation details.
-- Implement unified iteration runner and telemetry outputs.
-- Start packet blocker recovery loop in Phase 13.
+- Implement cycle runtime foundation for repeated generate -> review -> optimize loops.
+- Start Cycle 1 manual output review in Phase 13.
 
 ## Blockers
 

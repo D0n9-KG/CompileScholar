@@ -27,14 +27,14 @@ Produce auditable, replayable, trainable scientific-reasoning artifacts rather t
 
 ## Current Milestone: v1.2 Fast Iteration Research Logic Quality
 
-**Goal:** Build a fast, evidence-driven optimization loop that improves the full research reasoning production line (`packet -> replay -> prior/review -> export`) until quality is genuinely production-worthy in real outputs, not only better on rule metrics.
+**Goal:** Run a continuous in-milestone optimization loop: generate real outputs, manually review output quality, optimize the pipeline, and repeat until high-quality results are stable across consecutive cycles.
 
 **Target features:**
 - a packet-quality repair loop that explicitly resolves current `package_validation` blockers and records provenance for each fix
 - a fast rerun workflow that compares repaired packet outcomes against the existing baseline with minimal manual steps
 - an `L4` recovery check that tracks prior-candidate and anti-pattern carryover readiness after packet fixes
 - a rolling prioritization summary that keeps each cycle focused and avoids slow one-by-one unstructured patching
-- a result-level quality gate that inspects real reasoning artifacts and rejects metric-only gains that do not improve actual scientific reasoning outcomes
+- a cycle-by-cycle manual review workflow where output quality is judged directly from real reasoning artifacts before deciding next optimizations
 ## Requirements
 
 ### Validated
@@ -53,10 +53,9 @@ Produce auditable, replayable, trainable scientific-reasoning artifacts rather t
 
 ### Active
 
-- [ ] Packet construction blockers from the current bounded slice can be resolved with explicit role-balance and support-density evidence.
-- [ ] Repaired packet runs can demonstrate whether `L4` prior/review surfaces recover relative to the committed baseline.
-- [ ] The next optimization cycle can be re-prioritized from a new summary grounded in the repaired packet evidence chain.
-- [ ] Quality promotion requires both rule-threshold pass and explicit review of real reasoning outputs; metric-only improvement is not sufficient.
+- [ ] The team can run repeated generate -> review -> optimize cycles inside the same milestone without reopening milestone scope each cycle.
+- [ ] Every cycle includes an explicit manual quality review of real reasoning outputs, and review conclusions drive the next optimization step.
+- [ ] Quality is considered stable only after consecutive cycles produce high-quality outputs under manual review, not just improved metrics.
 
 ### Out of Scope
 
