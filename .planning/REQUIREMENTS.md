@@ -3,35 +3,34 @@
 **Defined:** 2026-04-03
 **Core Value:** Produce auditable, replayable, trainable scientific-reasoning artifacts rather than paper-like summaries or one-off knowledge graphs.
 
-## v1.1 Requirements
+## v1.2 Requirements
 
-Requirements for milestone `v1.1`. These define what must be true before the next optimization cycle can be chosen confidently.
+Requirements for milestone `v1.2`. This milestone optimizes for both iteration speed and real outcome quality on the full reasoning production line.
 
-### Corpus Sampling
+### Iteration Throughput
 
-- [x] **SAMPLE-01**: Operator can define one fixed regression paper set and one random exploration paper set from the shared corpus for each iteration cycle.
-- [x] **SAMPLE-02**: Each sampling run records selected paper ids, source paths, and sampling mode so the exact batch can be reproduced.
-- [x] **SAMPLE-03**: Sampling reports missing or broken corpus paths separately from model-quality failures.
+- [ ] **ITER-01**: Operators can run one full packet-to-report optimization cycle with a single command entrypoint and reproducible inputs.
+- [ ] **ITER-02**: Each cycle records timing, bottleneck stage, and changed artifacts so cycle-to-cycle speed can be compared.
+- [ ] **ITER-03**: The team can run at least one automated rerun path that avoids manual file stitching between packet, replay, and verification stages.
 
-### Single-Paper Extraction Iteration
+### Packet Quality Recovery
 
-- [x] **L2Q-01**: Operator can run sampled single-paper extraction and evaluation and collect per-paper trace, schema, and evidence-slot quality results.
-- [x] **L2Q-02**: Team can compare sampled single-paper results across iterations to identify recurring failures, regressions, and newly surfaced edge cases.
+- [ ] **PACK-03**: Packet-construction fixes can explicitly resolve current package blockers (`support_cluster_too_small`, `alternative_scope_not_distinct`, `yellow_route_state_present`) or produce explicit unresolved blockers.
+- [ ] **PACK-04**: Packet role balance (`support` / `alternative` / `held_out`) remains auditable after each fix cycle with machine-readable evidence.
 
-### Bounded Multi-Paper Packet Validation
+### L4 And Prior Surface Recovery
 
-- [x] **PACK-01**: Operator can assemble one bounded topic packet from the larger corpus with explicit `support`, `alternative`, and `held_out` role assignments plus exclusion notes.
-- [x] **PACK-02**: The bounded packet can compile replay and package-validation artifacts that make `L3` quality gaps inspectable.
-- [x] **AGGR-01**: The same bounded packet can produce `L4` prior/review/export artifacts or explicit blockers explaining why multi-paper aggregation failed.
+- [ ] **AGGR-02**: After packet fixes, replay/prior surfaces are rerun and compared against the committed Phase 10/11 baseline to determine whether `L4` quality recovered.
+- [ ] **AGGR-03**: Prior-review output must explicitly report candidate availability, accepted prior ids, and anti-pattern carryover deltas.
 
-### Iteration Prioritization
+### Real-Outcome Quality Gate
 
-- [x] **LOOP-01**: Team can inspect one summary that connects sampled single-paper failures with bounded multi-paper packet outcomes.
-- [x] **LOOP-02**: Team can choose the next optimization cycle based on explicit evidence about whether the highest-leverage work is in `L2` extraction, packet construction, or `L4` aggregation.
+- [ ] **QUAL-01**: Promotion decisions require both rule-threshold checks and explicit review of real reasoning artifacts; metric-only gains cannot pass.
+- [ ] **QUAL-02**: Each cycle ends with a ranked next-step recommendation (`packet_construction`, `l4_aggregation`, `l2_extraction`) grounded in generated evidence artifacts.
 
 ## v2 Requirements
 
-Deferred until the corpus-driven iteration loop is stable.
+Deferred until v1.2 reaches stable cycle quality and throughput.
 
 ### Scale
 
@@ -47,35 +46,33 @@ Deferred until the corpus-driven iteration loop is stable.
 
 ## Out of Scope
 
-Explicitly excluded from `v1.1`.
+Explicitly excluded from `v1.2`.
 
 | Feature | Reason |
 |---------|--------|
-| Run every candidate paper end to end in one milestone sweep | `v1.1` is about iterative sampling and feedback loops, not full-corpus throughput. |
-| Let `L3/L4` consume arbitrary random paper mixes | Multi-paper aggregation needs bounded topics and explicit roles to stay meaningful. |
-| Full UI productization of packet, replay, review, and export operations | The current milestone is focused on compiler quality, not operator polish. |
-| Open-ended question discovery or hypothesis generation | The compiler loop should stabilize first. |
+| Full-corpus end-to-end processing in a single cycle | v1.2 focuses on bounded slices with fast feedback loops and quality control. |
+| UI productization of every operator workflow | v1.2 prioritizes pipeline correctness, throughput, and evidence quality. |
+| Open-ended hypothesis generation as primary goal | v1.2 must first stabilize reasoning quality on concrete bounded runs. |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| `SAMPLE-01` | Phase `7` | Complete |
-| `SAMPLE-02` | Phase `7` | Complete |
-| `SAMPLE-03` | Phase `7` | Complete |
-| `L2Q-01` | Phase `8` | Complete |
-| `L2Q-02` | Phase `8` | Complete |
-| `PACK-01` | Phase `9` | Pending |
-| `PACK-02` | Phase `10` | Complete |
-| `AGGR-01` | Phase `10` | Complete |
-| `LOOP-01` | Phase `11` | Complete |
-| `LOOP-02` | Phase `11` | Complete |
+| `ITER-01` | Phase `12` | Pending |
+| `ITER-02` | Phase `12` | Pending |
+| `ITER-03` | Phase `13` | Pending |
+| `PACK-03` | Phase `13` | Pending |
+| `PACK-04` | Phase `13` | Pending |
+| `AGGR-02` | Phase `14` | Pending |
+| `AGGR-03` | Phase `14` | Pending |
+| `QUAL-01` | Phase `15` | Pending |
+| `QUAL-02` | Phase `16` | Pending |
 
 **Coverage:**
-- v1.1 requirements: `10` total
-- Mapped to phases: `10`
+- v1.2 requirements: `9` total
+- Mapped to phases: `9`
 - Unmapped: `0`
 
 ---
 *Requirements defined: 2026-04-03*
-*Last updated: 2026-04-03 after Phase 11 Plan 02 execution and verification*
+*Last updated: 2026-04-03 for milestone v1.2 initialization*
