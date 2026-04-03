@@ -1,0 +1,102 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+import pytest
+
+from app.research_logic import (
+    IterationPriorityPreflightError,
+    build_phase10_fallback_surface,
+    load_phase8_comparison_inspection,
+    load_phase8_comparison_summary,
+    load_phase10_comparison_summary,
+    load_phase10_evidence,
+)
+
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+PHASE8_SUMMARY_PATH = REPO_ROOT / 'tmp/phase8_sampled_single_paper_l2/baseline-cycle-01/comparison_summary.json'
+PHASE8_INSPECTION_PATH = REPO_ROOT / 'tmp/phase8_sampled_single_paper_l2/baseline-cycle-01/comparison_inspection.json'
+PHASE10_VERIFICATION_PATH = REPO_ROOT / '.planning/phases/10-multi-paper-l3-and-l4-validation/10-VERIFICATION.md'
+PHASE10_REPORT_PATH = REPO_ROOT / 'docs/replay/reports/phase10-multi-paper-l3-l4-validation.md'
+
+
+def test_load_phase8_comparison_summary_preserves_owner_buckets() -> None:
+    summary = load_phase8_comparison_summary(PHASE8_SUMMARY_PATH)
+
+    assert summary.iteration_label == 'baseline-cycle-01'
+    assert [bucket.bucket for bucket in summary.owner_buckets[:2]] == ['relation_assembly', 'slot_recovery']
+    assert summary.owner_buckets[0].fixed_count == 7
+    assert summary.owner_buckets[0].random_count == 2
+    assert summary.owner_buckets[1].fixed_count == 6
+
+
+def test_load_phase8_comparison_inspection_preserves_owner_buckets() -> None:
+    inspection = load_phase8_comparison_inspection(PHASE8_INSPECTION_PATH)
+
+    assert inspection.baseline_only is True
+    assert [bucket.bucket for bucket in inspection.owner_buckets[:2]] == ['relation_assembly', 'slot_recovery']
+    assert inspection.owner_buckets[0].verdict_counts == {
+        'recurring_failure': 7,
+        'new_edge_case': 2,
+    }
+
+
+def test_load_phase10_comparison_summary_reads_explicit_json_path(tmp_path: Path) -> None:
+    summary_path = tmp_path / 'comparison_summary.json'
+    summary_path.write_text(
+        json.dumps(
+            {
+                'packet_id': 'packet-1',
+                'cutoff_year': 2021,
+                'package': {'current': {'quality_tier': 'red'}},
+                'replay': {'current': {'quality_tier': 'yellow'}},
+                'prior_review': {'current': {'prior_candidate_count': 0}},
+                'export': {'current': {'quality_tier': 'yellow'}},
+                'blocker_queue': {
+                    'package_validation': [
+                        {
+                            'code': 'support_cluster_too_small',
+                            'message': 'Package validation reports `support_cluster_too_small`.',
+                            'current': True,
+                            'baseline': False,
+                            'vs_baseline': 'new',
+                        }
+                    ]
+                },
+                'source_artifacts': {'current_replay_inspection': 'tmp/replay/replay_inspection.json'},
+                'notes': {'source': 'fixture'},
+            },
+            indent=2,
+        ),
+        encoding='utf-8',
+    )
+
+    surface = load_phase10_comparison_summary(summary_path)
+
+    assert surface.packet_id == 'packet-1'
+    assert surface.source_refs.phase10_summary_path == str(summary_path.resolve())
+    assert surface.source_refs.fallback_used is False
+    assert surface.blocker_queue['package_validation'][0].code == 'support_cluster_too_small'
+
+
+def test_build_phase10_fallback_surface_uses_report_and_verification_when_json_absent() -> None:
+    fallback_surface = build_phase10_fallback_surface(PHASE10_VERIFICATION_PATH, PHASE10_REPORT_PATH)
+
+    assert fallback_surface.source_refs.fallback_used is True
+    assert fallback_surface.source_refs.phase10_verification_path == str(PHASE10_VERIFICATION_PATH.resolve())
+    assert fallback_surface.source_refs.phase10_report_path == str(PHASE10_REPORT_PATH.resolve())
+    assert fallback_surface.current_recommendation == 'packet_construction'
+    assert fallback_surface.package['current']['quality_tier'] == 'red'
+    assert fallback_surface.replay['delta']['failure_counts_by_layer_delta']['l2'] == 0
+    assert fallback_surface.blocker_queue['package_validation'][0].code == 'support_cluster_too_small'
+
+
+def test_load_phase10_evidence_raises_preflight_error_when_sources_missing(tmp_path: Path) -> None:
+    with pytest.raises(IterationPriorityPreflightError, match='Phase 10 evidence unavailable'):
+        load_phase10_evidence(
+            summary_path=tmp_path / 'missing-comparison-summary.json',
+            verification_path=tmp_path / 'missing-verification.md',
+            report_path=tmp_path / 'missing-report.md',
+        )
