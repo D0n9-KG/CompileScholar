@@ -12,6 +12,7 @@ from .decision_episode_export import DecisionEpisodeAuditExport
 from .historical_environment import HistoricalEnvironmentSnapshot
 from .historical_replay_compiler import HistoricalReplayCompilation
 from .models import RoutePacket, RouteState
+from .sampled_single_paper import SampledPaperRunResult, SampledSinglePaperIterationResult
 
 if TYPE_CHECKING:
     from .prior_induction import PriorCandidateRegistry
@@ -507,6 +508,64 @@ def build_corpus_sampling_inspection(
     }
 
 
+def _sampled_l2_quality_tier(result: SampledPaperRunResult) -> str:
+    quality_report = dict(result.quality_report or {})
+    trace_quality = dict(result.trace_quality or {})
+    return str(quality_report.get('quality_tier') or trace_quality.get('quality_tier') or '').strip().lower()
+
+
+def _sampled_l2_quality_count(results: Sequence[SampledPaperRunResult], tier: str) -> int:
+    return sum(1 for result in results if _sampled_l2_quality_tier(result) == tier)
+
+
+def build_sampled_l2_iteration_summary(
+    *,
+    iteration: SampledSinglePaperIterationResult,
+) -> dict[str, Any]:
+    return {
+        'schema_version': iteration.schema_version,
+        'built_at': iteration.built_at,
+        'iteration_label': iteration.iteration_label,
+        'sampling_bundle_dir': iteration.sampling_bundle_dir,
+        'sampling_bundle_manifest_ref': iteration.sampling_bundle_manifest_ref,
+        'fixed_manifest_ref': iteration.fixed_manifest_ref,
+        'seed': iteration.seed,
+        'neo4j_lookup_status': iteration.neo4j_lookup_status,
+        'fixed_selected_count': iteration.fixed_selected_count,
+        'random_selected_count': iteration.random_selected_count,
+        'executed_count': len(iteration.fixed_results) + len(iteration.random_results),
+        'availability_issue_count': len(iteration.availability_issues),
+        'fixed_green_count': _sampled_l2_quality_count(iteration.fixed_results, 'green'),
+        'fixed_yellow_count': _sampled_l2_quality_count(iteration.fixed_results, 'yellow'),
+        'fixed_red_count': _sampled_l2_quality_count(iteration.fixed_results, 'red'),
+        'random_green_count': _sampled_l2_quality_count(iteration.random_results, 'green'),
+        'random_yellow_count': _sampled_l2_quality_count(iteration.random_results, 'yellow'),
+        'random_red_count': _sampled_l2_quality_count(iteration.random_results, 'red'),
+    }
+
+
+def build_sampled_l2_iteration_inspection(
+    *,
+    iteration: SampledSinglePaperIterationResult,
+) -> dict[str, Any]:
+    return {
+        'schema_version': iteration.schema_version,
+        'built_at': iteration.built_at,
+        'iteration_label': iteration.iteration_label,
+        'sampling_bundle_dir': iteration.sampling_bundle_dir,
+        'sampling_bundle_manifest_ref': iteration.sampling_bundle_manifest_ref,
+        'fixed_manifest_ref': iteration.fixed_manifest_ref,
+        'seed': iteration.seed,
+        'neo4j_lookup_status': iteration.neo4j_lookup_status,
+        'neo4j_lookup_error': iteration.neo4j_lookup_error,
+        'fixed_selected_count': iteration.fixed_selected_count,
+        'random_selected_count': iteration.random_selected_count,
+        'fixed_regression_results': [result.model_dump(mode='json', exclude_none=True) for result in iteration.fixed_results],
+        'random_exploration_results': [result.model_dump(mode='json', exclude_none=True) for result in iteration.random_results],
+        'availability_issues': [issue.model_dump(mode='json', exclude_none=True) for issue in iteration.availability_issues],
+    }
+
+
 def _model_payload(model: Any) -> Any:
     if hasattr(model, 'model_dump'):
         return model.model_dump(mode='json', exclude_none=True)
@@ -731,6 +790,50 @@ def write_corpus_sampling_bundle(
     return written_files
 
 
+def write_sampled_l2_iteration_bundle(
+    output_dir: str | Path,
+    *,
+    iteration: SampledSinglePaperIterationResult,
+    metadata: dict[str, Any] | None = None,
+) -> dict[str, Path]:
+    bundle_dir = _as_path(output_dir)
+    outputs_dir = bundle_dir / 'outputs'
+
+    summary_payload = build_sampled_l2_iteration_summary(iteration=iteration)
+    inspection_payload = build_sampled_l2_iteration_inspection(iteration=iteration)
+    written_files = {
+        'iteration_summary': _write_json(bundle_dir / 'iteration_summary.json', summary_payload),
+        'iteration_inspection': _write_json(bundle_dir / 'iteration_inspection.json', inspection_payload),
+        'fixed_regression_results': _write_json(
+            outputs_dir / 'fixed_regression_results.json',
+            [result.model_dump(mode='json', exclude_none=True) for result in iteration.fixed_results],
+        ),
+        'random_exploration_results': _write_json(
+            outputs_dir / 'random_exploration_results.json',
+            [result.model_dump(mode='json', exclude_none=True) for result in iteration.random_results],
+        ),
+        'availability_issues': _write_json(
+            outputs_dir / 'availability_issues.json',
+            [issue.model_dump(mode='json', exclude_none=True) for issue in iteration.availability_issues],
+        ),
+    }
+    manifest_payload = {
+        'schema_version': iteration.schema_version,
+        'built_at': iteration.built_at,
+        'iteration_label': iteration.iteration_label,
+        'sampling_bundle_manifest_ref': iteration.sampling_bundle_manifest_ref,
+        'fixed_selected_count': iteration.fixed_selected_count,
+        'random_selected_count': iteration.random_selected_count,
+        'metadata': dict(metadata or {}),
+        'files': {
+            name: str(path.relative_to(bundle_dir)).replace('\\', '/')
+            for name, path in written_files.items()
+        },
+    }
+    written_files['bundle_manifest'] = _write_json(bundle_dir / 'bundle_manifest.json', manifest_payload)
+    return written_files
+
+
 __all__ = [
     'build_corpus_sampling_inspection',
     'build_corpus_sampling_summary',
@@ -739,6 +842,8 @@ __all__ = [
     'build_prior_candidate_review_summary',
     'build_replay_summary',
     'build_replay_inspection',
+    'build_sampled_l2_iteration_inspection',
+    'build_sampled_l2_iteration_summary',
     'ensure_packet_trace_coverage',
     'load_historical_environment_snapshot',
     'load_paper_logic_trace',
@@ -750,4 +855,5 @@ __all__ = [
     'write_decision_episode_export_bundle',
     'write_prior_candidate_review_bundle',
     'write_replay_bundle',
+    'write_sampled_l2_iteration_bundle',
 ]

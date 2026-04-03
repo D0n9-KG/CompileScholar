@@ -14,6 +14,10 @@ from app.research_logic import (
     CorpusInventoryEntry,
     CorpusSamplingBatch,
     CorpusSamplingBundle,
+    FixedRegressionSampledPaperResult,
+    RandomExplorationSampledPaperResult,
+    SampledPaperAvailabilityIssue,
+    SampledSinglePaperIterationResult,
     build_corpus_sampling_inspection,
     build_corpus_sampling_summary,
     build_decision_episode_audit_export,
@@ -26,10 +30,13 @@ from app.research_logic import (
     load_paper_logic_traces,
     load_route_packet,
     load_route_states,
+    build_sampled_l2_iteration_inspection,
+    build_sampled_l2_iteration_summary,
     write_corpus_sampling_bundle,
     write_decision_episode_export_bundle,
     write_prior_candidate_review_bundle,
     write_replay_bundle,
+    write_sampled_l2_iteration_bundle,
 )
 from app.research_logic.models import AntiPatternCard
 
@@ -403,6 +410,91 @@ def _corpus_sampling_bundle() -> CorpusSamplingBundle:
     )
 
 
+def _sampled_iteration() -> SampledSinglePaperIterationResult:
+    return SampledSinglePaperIterationResult(
+        built_at='2026-04-03T05:00:00Z',
+        iteration_label='baseline-cycle-01',
+        sampling_bundle_dir='tmp/phase7_corpus_sampling_baseline',
+        sampling_bundle_manifest_ref='tmp/phase7_corpus_sampling_baseline/bundle_manifest.json',
+        fixed_manifest_ref='docs/replay/corpus_sampling/phase7-fixed-regression-set.json',
+        seed=7,
+        neo4j_lookup_status='unavailable',
+        fixed_selected_count=2,
+        random_selected_count=1,
+        fixed_results=[
+            FixedRegressionSampledPaperResult(
+                corpus_paper_id='1001',
+                display_title='Alpha',
+                corpus_relative_ref='txt/1001_alpha.txt',
+                preferred_source_path='C:/corpus/1001_alpha.txt',
+                preferred_source_kind='txt',
+                iteration_label='baseline-cycle-01',
+                paper_id='doi:10.1000/alpha',
+                trace_id='trace:alpha',
+                source_path='C:/corpus/1001_alpha.txt',
+                source_kind='txt',
+                quality_report={'quality_tier': 'green', 'gate_passed': True},
+                trace_quality={'quality_tier': 'green', 'audit_status': 'reviewed'},
+                artifact_refs={'paper_logic_trace': 'tmp/phase8/paper_artifacts/fixed/1001/paper_logic_trace.json'},
+                citations={'refs': 1, 'cites_resolved': 1, 'cites_unresolved': 0},
+                llm={'purposes': 1, 'moves': 1, 'gate_passed': True, 'quality_tier': 'green'},
+            ),
+            FixedRegressionSampledPaperResult(
+                corpus_paper_id='1002',
+                display_title='Beta',
+                corpus_relative_ref='txt/1002_beta.txt',
+                preferred_source_path='C:/corpus/1002_beta.txt',
+                preferred_source_kind='txt',
+                iteration_label='baseline-cycle-01',
+                paper_id='doi:10.1000/beta',
+                trace_id='trace:beta',
+                source_path='C:/corpus/1002_beta.txt',
+                source_kind='txt',
+                quality_report={'quality_tier': 'red', 'gate_passed': False},
+                trace_quality={'quality_tier': 'red', 'audit_status': 'eligible'},
+                artifact_refs={'paper_logic_trace': 'tmp/phase8/paper_artifacts/fixed/1002/paper_logic_trace.json'},
+                citations={'refs': 1, 'cites_resolved': 1, 'cites_unresolved': 0},
+                llm={'purposes': 1, 'moves': 1, 'gate_passed': False, 'quality_tier': 'red'},
+                skipped_canonical_write=True,
+            ),
+        ],
+        random_results=[
+            RandomExplorationSampledPaperResult(
+                corpus_paper_id='2001',
+                display_title='Gamma',
+                corpus_relative_ref='txt/2001_gamma.txt',
+                preferred_source_path='C:/corpus/2001_gamma.txt',
+                preferred_source_kind='txt',
+                iteration_label='baseline-cycle-01',
+                paper_id='doi:10.1000/gamma',
+                trace_id='trace:gamma',
+                source_path='C:/corpus/2001_gamma.txt',
+                source_kind='txt',
+                quality_report={'quality_tier': 'yellow', 'gate_passed': True},
+                trace_quality={'quality_tier': 'yellow', 'audit_status': 'eligible'},
+                artifact_refs={'paper_logic_trace': 'tmp/phase8/paper_artifacts/random/2001/paper_logic_trace.json'},
+                citations={'refs': 1, 'cites_resolved': 1, 'cites_unresolved': 0},
+                llm={'purposes': 1, 'moves': 1, 'gate_passed': True, 'quality_tier': 'yellow'},
+            )
+        ],
+        availability_issues=[
+            SampledPaperAvailabilityIssue(
+                corpus_paper_id='2002',
+                display_title='Delta',
+                cohort='random_exploration',
+                selection_mode='random_exploration',
+                corpus_relative_ref='txt/2002_delta.txt',
+                preferred_source_path='C:/corpus/2002_delta.txt',
+                preferred_source_kind='txt',
+                iteration_label='baseline-cycle-01',
+                execution_status='source_missing',
+                error_message='missing source',
+                error_type='FileNotFoundError',
+            )
+        ],
+    )
+
+
 def test_load_route_packet_and_trace_dir_round_trip(tmp_path: Path) -> None:
     traces = [_trace('paper-a', 2011, 'pa')]
     trace_dir = tmp_path / 'traces'
@@ -704,3 +796,44 @@ def test_write_corpus_sampling_bundle_writes_expected_files_and_separates_bucket
     assert manifest_payload['fixed_manifest_ref'] == 'docs/replay/corpus_sampling/phase7-fixed-regression-set.json'
     assert manifest_payload['neo4j_lookup_status'] == 'unavailable'
     assert manifest_payload['files']['fixed_regression_batch'] == 'outputs/fixed_regression_batch.json'
+
+
+def test_write_sampled_l2_iteration_bundle_writes_expected_files_and_separates_availability_issues(tmp_path: Path) -> None:
+    iteration = _sampled_iteration()
+
+    summary_payload = build_sampled_l2_iteration_summary(iteration=iteration)
+    inspection_payload = build_sampled_l2_iteration_inspection(iteration=iteration)
+    written_files = write_sampled_l2_iteration_bundle(
+        tmp_path / 'sampled-l2-bundle',
+        iteration=iteration,
+        metadata={'runner': 'pytest'},
+    )
+
+    assert summary_payload['fixed_selected_count'] == 2
+    assert summary_payload['random_selected_count'] == 1
+    assert summary_payload['executed_count'] == 3
+    assert summary_payload['availability_issue_count'] == 1
+    assert summary_payload['fixed_green_count'] == 1
+    assert summary_payload['fixed_red_count'] == 1
+    assert summary_payload['random_yellow_count'] == 1
+    assert inspection_payload['availability_issues'][0]['execution_status'] == 'source_missing'
+
+    assert {
+        'bundle_manifest',
+        'iteration_summary',
+        'iteration_inspection',
+        'fixed_regression_results',
+        'random_exploration_results',
+        'availability_issues',
+    } == set(written_files)
+
+    manifest_payload = json.loads(written_files['bundle_manifest'].read_text(encoding='utf-8'))
+    fixed_results_payload = json.loads(written_files['fixed_regression_results'].read_text(encoding='utf-8'))
+    random_results_payload = json.loads(written_files['random_exploration_results'].read_text(encoding='utf-8'))
+    availability_payload = json.loads(written_files['availability_issues'].read_text(encoding='utf-8'))
+
+    assert manifest_payload['files']['fixed_regression_results'] == 'outputs/fixed_regression_results.json'
+    assert manifest_payload['files']['availability_issues'] == 'outputs/availability_issues.json'
+    assert [row['corpus_paper_id'] for row in fixed_results_payload] == ['1001', '1002']
+    assert [row['corpus_paper_id'] for row in random_results_payload] == ['2001']
+    assert [row['corpus_paper_id'] for row in availability_payload] == ['2002']

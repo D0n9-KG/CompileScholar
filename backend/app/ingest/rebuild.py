@@ -127,10 +127,15 @@ def _persist_rebuild_artifacts(
     purposes: list[dict[str, Any]] | None,
     citation_acts: list[dict[str, Any]],
     citation_mentions: list[dict[str, Any]],
+    output_dir: Path | None = None,
 ) -> dict[str, Any]:
-    out_dir = _storage_dir() / "derived" / "papers" / _safe_id(paper_id)
+    out_dir = output_dir or (_storage_dir() / "derived" / "papers" / _safe_id(paper_id))
     out_dir.mkdir(parents=True, exist_ok=True)
-    (out_dir / "document_ir.json").write_text(
+    document_ir_path = out_dir / "document_ir.json"
+    citations_path = out_dir / "citations.json"
+    trace_path = out_dir / "paper_logic_trace.json"
+    purposes_path = out_dir / "llm_citation_purposes.json"
+    document_ir_path.write_text(
         json.dumps(
             {
                 "paper": doc.paper.__dict__,
@@ -143,9 +148,9 @@ def _persist_rebuild_artifacts(
         ),
         encoding="utf-8",
     )
-    (out_dir / "citations.json").write_text(json.dumps(cite_rec or {}, ensure_ascii=False, indent=2), encoding="utf-8")
-    (out_dir / "paper_logic_trace.json").write_text(json.dumps(trace_payload, ensure_ascii=False, indent=2), encoding="utf-8")
-    (out_dir / "llm_citation_purposes.json").write_text(
+    citations_path.write_text(json.dumps(cite_rec or {}, ensure_ascii=False, indent=2), encoding="utf-8")
+    trace_path.write_text(json.dumps(trace_payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    purposes_path.write_text(
         json.dumps(list(purposes or []), ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
@@ -156,8 +161,345 @@ def _persist_rebuild_artifacts(
     )
     return {
         "artifacts_dir": str(out_dir),
+        "artifact_refs": {
+            "document_ir": str(document_ir_path),
+            "citations": str(citations_path),
+            "paper_logic_trace": str(trace_path),
+            "llm_citation_purposes": str(purposes_path),
+            "citation_acts": str(out_dir / "citation_acts.json"),
+            "citation_mentions": str(out_dir / "citation_mentions.json"),
+        },
         "citation_semantic": citation_semantic,
     }
+
+
+def evaluate_sampled_paper_from_source(
+    *,
+    corpus_paper_id: str,
+    cohort: str,
+    corpus_relative_ref: str,
+    preferred_source_path: str | None,
+    preferred_source_kind: str | None,
+    iteration_label: str,
+    artifacts_dir: str | Path,
+    allow_graph_write: bool = False,
+    progress: ProgressFn | None = None,
+    log: LogFn | None = None,
+) -> dict[str, Any]:
+    def notify(stage: str, p: float, msg: str | None = None) -> None:
+        if progress:
+            progress(stage, p, msg)
+
+    def write_log(line: str) -> None:
+        if log:
+            log(line)
+
+    base_result = {
+        "corpus_paper_id": corpus_paper_id,
+        "cohort": cohort,
+        "selection_mode": cohort,
+        "corpus_relative_ref": corpus_relative_ref,
+        "preferred_source_path": str(preferred_source_path or "").strip() or None,
+        "preferred_source_kind": str(preferred_source_kind or "").strip() or None,
+        "iteration_label": iteration_label,
+        "execution_status": "runtime_error",
+        "paper_id": None,
+        "trace_id": None,
+        "source_path": None,
+        "source_kind": str(preferred_source_kind or "").strip() or None,
+        "quality_report": None,
+        "trace_quality": None,
+        "reference_recovery": None,
+        "citation_event_recovery": None,
+        "artifacts_dir": None,
+        "artifact_refs": {},
+        "citations": {
+            "refs": 0,
+            "cites_resolved": 0,
+            "cites_unresolved": 0,
+        },
+        "llm": {
+            "purposes": 0,
+            "moves": 0,
+            "gate_passed": False,
+            "quality_tier": "",
+            "quality_report": None,
+        },
+        "skipped_canonical_write": not allow_graph_write,
+        "graph_write_performed": False,
+        "error_message": None,
+        "error_type": None,
+    }
+
+    source_path = Path(str(preferred_source_path or "").strip()) if str(preferred_source_path or "").strip() else None
+    if source_path is None or not source_path.exists():
+        missing_message = f"preferred source not found: {preferred_source_path}" if preferred_source_path else "preferred source not provided"
+        return {
+            **base_result,
+            "execution_status": "source_missing",
+            "error_message": missing_message,
+            "error_type": "FileNotFoundError",
+        }
+
+    try:
+        notify("sampled:parse", 0.10, "Parsing sampled paper source")
+        doc = parse_mineru_markdown(str(source_path))
+        schema_for_recovery = _schema_for_md(doc.paper.md_path)
+        notify("sampled:reference_recovery", 0.20, "Recovering references via fallback agent")
+        doc, reference_recovery = recover_references_with_agent(
+            doc,
+            prompt_overrides=schema_for_recovery.get("prompts"),
+            rules=schema_for_recovery.get("rules"),
+        )
+        notify("sampled:citation_event_recovery", 0.28, "Recovering citation events from references when needed")
+        doc, citation_event_recovery = recover_citation_events_from_references(
+            doc,
+            rules=schema_for_recovery.get("rules"),
+        )
+        paper_id = paper_id_for_md_path(doc.paper.md_path, doi=doc.paper.doi)
+        citation_event_recovery["paper_source"] = doc.paper.paper_source
+        citation_event_recovery["paper_id"] = paper_id
+        citation_event_recovery["schema_version"] = int(schema_for_recovery.get("version") or 1)
+        citation_event_recovery["schema_paper_type"] = str(schema_for_recovery.get("paper_type") or "research")
+
+        notify("sampled:crossref", 0.38, "Resolving references via Crossref")
+        crossref = CrossrefClient()
+        try:
+            meta = load_canonical_meta(doc.paper.md_path)
+            paper_type = normalize_paper_type(meta.get("paper_type"))
+            schema_for_crossref = load_active(paper_type)  # type: ignore[arg-type]
+            raw_threshold = (schema_for_crossref.get("rules") or {}).get("crossref_confidence_threshold", 0.55)
+            try:
+                crossref_confidence_threshold = float(raw_threshold)
+            except Exception:  # noqa: BLE001
+                crossref_confidence_threshold = 0.55
+            crossref_confidence_threshold = max(0.0, min(1.0, crossref_confidence_threshold))
+        except Exception:  # noqa: BLE001
+            crossref_confidence_threshold = 0.55
+        cite_rec = build_reference_and_cite_records(
+            doc,
+            crossref=crossref,
+            crossref_confidence_threshold=crossref_confidence_threshold,
+        )
+
+        notify("sampled:phase1", 0.52, "Running PaperLogicTrace compilation")
+        schema = _schema_for_md(doc.paper.md_path)
+        artifact_root = Path(artifacts_dir)
+        phase1 = run_phase1_paper_logic_trace(
+            doc=doc,
+            paper_id=paper_id,
+            cite_rec=cite_rec,
+            schema=schema,
+            artifacts_dir=artifact_root / "raw_pool",
+            allow_weak=bool(getattr(settings, "phase1_gate_allow_weak", False)),
+        )
+        quality_report = phase1.get("quality_report") or {}
+        trace = phase1.get("paper_logic_trace")
+        trace_payload = trace.model_dump(mode="json") if hasattr(trace, "model_dump") else dict(trace or {})
+        trace_quality = dict(trace_payload.get("quality") or {})
+        trace_gate_report = dict(trace_quality.get("hot_path_gate_report") or {})
+        gate_passed = bool(trace_gate_report.get("passed")) if trace_gate_report else bool(quality_report.get("gate_passed"))
+
+        purposes: list[dict[str, Any]] = []
+        chunk_by_id = {chunk.chunk_id: chunk for chunk in doc.chunks}
+        citing_title = doc.paper.title or doc.paper.title_alt or doc.paper.paper_source
+        batch_in: list[dict[str, Any]] = []
+        for cite_row in cite_rec.get("cites_resolved") or []:
+            cited_paper_id = cite_row.get("cited_paper_id")
+            cited_doi = None
+            if cited_paper_id and str(cited_paper_id).startswith("doi:"):
+                cited_doi = str(cited_paper_id)[4:]
+            cited_title = None
+            for cited_paper in cite_rec.get("cited_papers") or []:
+                if cited_paper.get("paper_id") == cited_paper_id:
+                    cited_title = cited_paper.get("title")
+                    break
+            contexts: list[str] = []
+            for chunk_id in cite_row.get("evidence_chunk_ids") or []:
+                chunk = chunk_by_id.get(chunk_id)
+                if chunk and chunk.text:
+                    contexts.append(chunk.text)
+            batch_in.append(
+                {
+                    "cited_paper_id": cited_paper_id,
+                    "cited_title": cited_title,
+                    "cited_doi": cited_doi,
+                    "contexts": contexts,
+                }
+            )
+
+        batch_out = classify_citation_purposes_batch(
+            citing_title=citing_title,
+            cites=batch_in,
+            prompt_overrides=schema.get("prompts"),
+            rules=schema.get("rules"),
+        )
+        by_id = batch_out.get("by_id") or {}
+        for cite_row in cite_rec.get("cites_resolved") or []:
+            cited_paper_id = cite_row.get("cited_paper_id")
+            if not cited_paper_id:
+                continue
+            purpose_row = by_id.get(str(cited_paper_id)) or {"labels": ["Unknown"], "scores": [0.0]}
+            purposes.append(
+                {
+                    "cited_paper_id": cited_paper_id,
+                    "labels": purpose_row["labels"],
+                    "scores": purpose_row["scores"],
+                }
+            )
+        citation_acts, citation_mentions = _build_citation_semantic_payload(
+            doc=doc,
+            paper_id=paper_id,
+            cite_rec=cite_rec,
+            purposes=purposes,
+        )
+
+        graph_write_performed = False
+        if allow_graph_write:
+            notify("sampled:graph_write", 0.74, "Writing sampled-paper outputs to Neo4j")
+            with Neo4jClient(settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password) as client:
+                client.ensure_schema()
+                client.upsert_paper_and_chunks(doc)
+                try:
+                    meta = load_canonical_meta(doc.paper.md_path)
+                    paper_type = normalize_paper_type(meta.get("paper_type"))
+                    graph_schema = load_active(paper_type)  # type: ignore[arg-type]
+                    client.update_paper_props(
+                        paper_id,
+                        {
+                            "paper_type": paper_type,
+                            "schema_paper_type": paper_type,
+                            "schema_version": int(graph_schema.get("version") or 1),
+                            "sampled_corpus_paper_id": corpus_paper_id,
+                            "sampled_iteration_label": iteration_label,
+                            "sampled_cohort": cohort,
+                        },
+                    )
+                except Exception:
+                    pass
+                try:
+                    figs = extract_figures_from_markdown(paper_id=paper_id, md_path=doc.paper.md_path)
+                    client.upsert_figures(
+                        paper_id,
+                        [
+                            {
+                                "figure_id": figure.figure_id,
+                                "paper_id": paper_id,
+                                "md_path": figure.md_path,
+                                "rel_path": figure.rel_path,
+                                "filename": figure.filename,
+                                "img_line": figure.img_line,
+                                "caption_text": figure.caption_text,
+                                "caption_start_line": figure.caption_start_line,
+                                "caption_end_line": figure.caption_end_line,
+                            }
+                            for figure in figs
+                        ],
+                    )
+                except Exception:
+                    pass
+                if cite_rec.get("paper_id"):
+                    client.upsert_references_and_citations(
+                        paper_id=cite_rec["paper_id"],
+                        refs=cite_rec["refs"],
+                        cited_papers=cite_rec["cited_papers"],
+                        cites_resolved=cite_rec["cites_resolved"],
+                        cites_unresolved=cite_rec["cites_unresolved"],
+                    )
+                if gate_passed:
+                    client.upsert_paper_logic_trace(paper_id=paper_id, trace_payload=trace_payload)
+                    for purpose in purposes:
+                        if not purpose.get("cited_paper_id"):
+                            continue
+                        client.update_cites_purposes(
+                            citing_paper_id=paper_id,
+                            cited_paper_id=purpose["cited_paper_id"],
+                            labels=purpose["labels"],
+                            scores=purpose["scores"],
+                        )
+                    try:
+                        client.update_paper_props(
+                            paper_id,
+                            {
+                                "paper_rebuild_status": "ready",
+                                "paper_rebuild_finished_at": datetime.now(tz=timezone.utc).isoformat(),
+                                "phase1_quality_json": json.dumps(quality_report, ensure_ascii=False),
+                                "phase1_gate_passed": bool(quality_report.get("gate_passed")),
+                                "phase1_quality_tier": str(quality_report.get("quality_tier") or ""),
+                                "phase1_quality_tier_score": float(quality_report.get("quality_tier_score") or 0.0),
+                                "paper_logic_trace_quality_tier": str(trace_quality.get("quality_tier") or ""),
+                                "paper_logic_trace_audit_status": str(trace_quality.get("audit_status") or ""),
+                            },
+                        )
+                    except Exception:
+                        pass
+                else:
+                    try:
+                        client.update_paper_props(
+                            paper_id,
+                            {
+                                "paper_rebuild_status": "gate_failed",
+                                "phase1_gate_passed": False,
+                                "phase1_quality_tier": str(quality_report.get("quality_tier") or ""),
+                                "phase1_quality_tier_score": float(quality_report.get("quality_tier_score") or 0.0),
+                                "phase1_quality_json": json.dumps(quality_report, ensure_ascii=False),
+                                "paper_logic_trace_quality_tier": str(trace_quality.get("quality_tier") or ""),
+                                "paper_logic_trace_audit_status": str(trace_quality.get("audit_status") or ""),
+                            },
+                        )
+                    except Exception:
+                        pass
+            graph_write_performed = True
+
+        notify("sampled:artifacts", 0.88, "Writing sampled-paper artifacts to disk")
+        artifact_payload = _persist_rebuild_artifacts(
+            paper_id=paper_id,
+            doc=doc,
+            cite_rec=cite_rec,
+            trace_payload=trace_payload,
+            purposes=purposes,
+            citation_acts=citation_acts,
+            citation_mentions=citation_mentions,
+            output_dir=artifact_root,
+        )
+        write_log(f"sampled-paper artifacts in {artifact_payload['artifacts_dir']}")
+
+        return {
+            **base_result,
+            "execution_status": "executed",
+            "paper_id": paper_id,
+            "trace_id": str(trace_payload.get("trace_id") or "").strip() or None,
+            "source_path": str(source_path.resolve()),
+            "quality_report": quality_report,
+            "trace_quality": trace_quality,
+            "reference_recovery": reference_recovery,
+            "citation_event_recovery": citation_event_recovery,
+            "artifacts_dir": artifact_payload["artifacts_dir"],
+            "artifact_refs": artifact_payload.get("artifact_refs") or {},
+            "citations": {
+                "refs": len(cite_rec.get("refs") or []),
+                "cites_resolved": len(cite_rec.get("cites_resolved") or []),
+                "cites_unresolved": len(cite_rec.get("cites_unresolved") or []),
+            },
+            "llm": {
+                "purposes": len(purposes),
+                "moves": len(((trace_payload.get("canonical_core") or {}).get("moves") or [])),
+                "gate_passed": gate_passed,
+                "quality_tier": str(quality_report.get("quality_tier") or ""),
+                "quality_report": quality_report,
+            },
+            "skipped_canonical_write": not gate_passed or not allow_graph_write,
+            "graph_write_performed": graph_write_performed,
+        }
+    except Exception as exc:  # noqa: BLE001 - Phase 8 needs structured runtime failures
+        write_log(f"sampled-paper runtime_error: corpus_paper_id={corpus_paper_id} error={exc}")
+        return {
+            **base_result,
+            "source_path": str(source_path.resolve()) if source_path else None,
+            "execution_status": "runtime_error",
+            "error_message": str(exc),
+            "error_type": type(exc).__name__,
+        }
 
 
 def _legacy_discovery_policy_paths() -> list[Path]:
