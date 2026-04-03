@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
-status: Ready to plan Phase 10
-stopped_at: Phase 10 context gathered (assumptions mode)
-last_updated: "2026-04-03T09:05:30.823Z"
+status: Ready for Phase 10 execution
+stopped_at: Phase 10 plans created; ready for execution
+last_updated: "2026-04-03T09:42:06.8790254Z"
 progress:
   total_phases: 5
   completed_phases: 3
-  total_plans: 6
+  total_plans: 9
   completed_plans: 6
 ---
 
@@ -19,18 +19,18 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-04-03)
 
 **Core value:** Produce auditable, replayable, trainable scientific-reasoning artifacts rather than paper-like summaries or one-off knowledge graphs.
-**Current focus:** Phase `10` planning for multi-paper `L3/L4` validation on the committed Phase `9` packet
+**Current focus:** Phase `10` is planned and ready for execution on the committed Phase `9` packet
 
 ## Current Position
 
-Phase: `10` (`multi-paper-l3-and-l4-validation`) - READY TO PLAN
-Plan: Not started
-Milestone: `v1.1` - Phase `9` complete, Phase `10` next
+Phase: `10` (`multi-paper-l3-and-l4-validation`) - PLANNED
+Plan: `10-01`, `10-02`, and `10-03`
+Milestone: `v1.1` - Phase `9` complete, Phase `10` planned
 
 - Completed phase: `09 bounded-packet-construction-from-corpus`
 - Planned phase: `10 multi-paper-l3-and-l4-validation`
-- Status: Phase `9` executed and verified with a committed bounded packet, companion role manifest, and audit report
-- Last activity: `2026-04-03` - verified Phase `9` and advanced the roadmap to Phase `10`
+- Status: Phase `10` researched, validated, and split into `10-01`, `10-02`, and `10-03`
+- Last activity: `2026-04-03` - created the Phase `10` research, validation strategy, and execution plans
 
 ## Milestone Snapshot
 
@@ -57,6 +57,9 @@ Milestone: `v1.1` - Phase `9` complete, Phase `10` next
 - [Phase 09]: Reuse `replay_io` bundle conventions so Phase `9` audit runtime artifacts stay consistent with earlier summary/inspection patterns.
 - [Phase 09]: Freeze the first corpus packet at the `2017-2021` data-driven constitutive and multiscale computational-mechanics slice.
 - [Phase 09]: Treat `ready_for_phase10` as structural handoff readiness while keeping replay blockers explicit in the audit report.
+- [Phase 10]: Keep the committed Phase `9` packet and assembly manifest immutable and bridge them into package-ready runtime inputs instead of rewriting packet scope.
+- [Phase 10]: Require a real cutoff-matched `L1` snapshot before treating multi-paper replay output as meaningful `L3` evidence.
+- [Phase 10]: Preserve package, replay, prior-review, and audited export as separate bundle stages and compare them against the jamming baseline through machine-readable summaries.
 
 ## Accumulated Context
 
@@ -80,7 +83,9 @@ Milestone: `v1.1` - Phase `9` complete, Phase `10` next
 ## Pending Follow-Ups
 
 - Use the committed Phase `9` packet and assembly manifest as the fixed multi-paper boundary for Phase `10`.
-- Plan Phase `10` replay/package/review/export validation around the explicit known gaps carried forward from the Phase `9` audit.
+- Execute `10-01` to build the Phase `10` packet bridge, real `L1` snapshot seam, and package/replay runner.
+- Execute `10-02` to extend the workflow through prior review, audited export, and structured baseline comparison/reporting.
+- Execute `10-03` to run the real computational-mechanics packet and commit the Phase `10` report plus verification note.
 - Preserve `tmp/phase8_sampled_single_paper_l2/baseline-cycle-01/` as the comparison source for the next sampled-paper cycle.
 
 ## Blockers
@@ -96,9 +101,10 @@ Milestone: `v1.1` - Phase `9` complete, Phase `10` next
 - `09-planning`: duration `~20m`, artifacts `4`, plans `2`
 - `09-01`: duration `13 min`, tasks `2`, files `5`
 - `09-02`: duration `7 min`, tasks `2`, files `5`
+- `10-planning`: duration `~35m`, artifacts `5`, plans `3`
 
 ## Session
 
-**Last Date:** 2026-04-03T09:05:30.819Z
-**Stopped At:** Phase 10 context gathered (assumptions mode)
-**Resume File:** .planning/phases/10-multi-paper-l3-and-l4-validation/10-CONTEXT.md
+**Last Date:** 2026-04-03T09:42:06.8790254Z
+**Stopped At:** Phase 10 plans created; ready for execution
+**Resume File:** `.planning/phases/10-multi-paper-l3-and-l4-validation/10-01-PLAN.md`
