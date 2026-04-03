@@ -218,6 +218,10 @@ def evaluate_sampled_paper_from_source(
             "cites_resolved": 0,
             "cites_unresolved": 0,
         },
+        "citation_semantic": {
+            "citation_acts": 0,
+            "citation_mentions": 0,
+        },
         "llm": {
             "purposes": 0,
             "moves": 0,
@@ -481,6 +485,7 @@ def evaluate_sampled_paper_from_source(
                 "cites_resolved": len(cite_rec.get("cites_resolved") or []),
                 "cites_unresolved": len(cite_rec.get("cites_unresolved") or []),
             },
+            "citation_semantic": dict(artifact_payload.get("citation_semantic") or {}),
             "llm": {
                 "purposes": len(purposes),
                 "moves": len(((trace_payload.get("canonical_core") or {}).get("moves") or [])),

@@ -9,6 +9,11 @@ from app.research_logic import (
     CorpusInventoryEntry,
     CorpusSamplingBatch,
     CorpusSamplingBundle,
+    FixedRegressionSampledPaperResult,
+    RandomExplorationSampledPaperResult,
+    SampledPaperAvailabilityIssue,
+    SampledSinglePaperIterationResult,
+    compare_sampled_l2_iterations,
     run_sampled_single_paper_iteration,
     write_corpus_sampling_bundle,
 )
@@ -75,6 +80,53 @@ def _fixture_sampling_bundle(bundle_dir: Path) -> Path:
     )
     write_corpus_sampling_bundle(bundle_dir, bundle=bundle, metadata={'runner': 'pytest'})
     return bundle_dir
+
+
+def _executed_result(
+    *,
+    cohort: str,
+    corpus_paper_id: str,
+    display_title: str,
+    quality_tier: str,
+    quality_flags: list[str] | None = None,
+    completeness_audit: dict | None = None,
+    reference_status: str = 'recovered',
+    citation_event_status: str = 'recovered',
+    purposes: int = 1,
+    citation_acts: int = 1,
+    citation_mentions: int = 1,
+):
+    payload = {
+        'corpus_paper_id': corpus_paper_id,
+        'display_title': display_title,
+        'corpus_relative_ref': f'txt/{corpus_paper_id}.txt',
+        'preferred_source_path': f'C:/corpus/{corpus_paper_id}.txt',
+        'preferred_source_kind': 'txt',
+        'iteration_label': 'cycle-01',
+        'paper_id': f'doi:10.1000/{corpus_paper_id}',
+        'trace_id': f'trace:{corpus_paper_id}',
+        'source_path': f'C:/corpus/{corpus_paper_id}.txt',
+        'source_kind': 'txt',
+        'quality_report': {
+            'quality_tier': quality_tier,
+            'gate_passed': quality_tier != 'red',
+            'quality_flags': list(quality_flags or []),
+            'l2_completeness_audit': dict(completeness_audit or {}),
+            'hot_path_gate_report': {
+                'relation_coverage_ratio': (completeness_audit or {}).get('relation_coverage_ratio', 1.0),
+            },
+        },
+        'trace_quality': {'quality_tier': quality_tier, 'audit_status': 'eligible'},
+        'reference_recovery': {'status': reference_status},
+        'citation_event_recovery': {'status': citation_event_status},
+        'artifact_refs': {'paper_logic_trace': f'tmp/{corpus_paper_id}/paper_logic_trace.json'},
+        'citations': {'refs': 1, 'cites_resolved': 1, 'cites_unresolved': 0},
+        'citation_semantic': {'citation_acts': citation_acts, 'citation_mentions': citation_mentions},
+        'llm': {'purposes': purposes, 'moves': 1, 'gate_passed': quality_tier != 'red', 'quality_tier': quality_tier},
+    }
+    if cohort == 'fixed_regression':
+        return FixedRegressionSampledPaperResult(**payload)
+    return RandomExplorationSampledPaperResult(**payload)
 
 
 def test_evaluate_sampled_paper_from_source_returns_source_missing_for_unreachable_path(tmp_path: Path) -> None:
@@ -282,3 +334,133 @@ def test_run_sampled_single_paper_iteration_separates_availability_issues_from_e
     assert iteration.availability_issues[0].execution_status == 'source_missing'
     assert all(result.corpus_paper_id != '2001' for result in iteration.fixed_results)
     assert calls[0][1].endswith(str(Path('paper_artifacts') / 'fixed_regression' / '1001'))
+
+
+def test_compare_sampled_l2_iterations_classifies_fixed_random_and_availability_rows() -> None:
+    previous = SampledSinglePaperIterationResult(
+        iteration_label='cycle-00',
+        sampling_bundle_dir='tmp/phase7',
+        sampling_bundle_manifest_ref='tmp/phase7/bundle_manifest.json',
+        fixed_selected_count=4,
+        random_selected_count=4,
+        fixed_results=[
+            _executed_result(cohort='fixed_regression', corpus_paper_id='1001', display_title='Fixed One', quality_tier='green'),
+            _executed_result(cohort='fixed_regression', corpus_paper_id='1002', display_title='Fixed Two', quality_tier='red'),
+            _executed_result(cohort='fixed_regression', corpus_paper_id='1003', display_title='Fixed Three', quality_tier='green'),
+            _executed_result(cohort='fixed_regression', corpus_paper_id='1004', display_title='Fixed Four', quality_tier='yellow'),
+        ],
+        random_results=[
+            _executed_result(cohort='random_exploration', corpus_paper_id='2001', display_title='Random One', quality_tier='green'),
+            _executed_result(cohort='random_exploration', corpus_paper_id='2003', display_title='Random Three', quality_tier='red'),
+            _executed_result(cohort='random_exploration', corpus_paper_id='2004', display_title='Random Four', quality_tier='yellow'),
+            _executed_result(cohort='random_exploration', corpus_paper_id='2005', display_title='Random Five', quality_tier='green'),
+        ],
+    )
+    current = SampledSinglePaperIterationResult(
+        iteration_label='cycle-01',
+        sampling_bundle_dir='tmp/phase7',
+        sampling_bundle_manifest_ref='tmp/phase7/bundle_manifest.json',
+        fixed_selected_count=4,
+        random_selected_count=5,
+        fixed_results=[
+            _executed_result(cohort='fixed_regression', corpus_paper_id='1001', display_title='Fixed One', quality_tier='red'),
+            _executed_result(cohort='fixed_regression', corpus_paper_id='1002', display_title='Fixed Two', quality_tier='green'),
+            _executed_result(cohort='fixed_regression', corpus_paper_id='1003', display_title='Fixed Three', quality_tier='green'),
+            _executed_result(cohort='fixed_regression', corpus_paper_id='1004', display_title='Fixed Four', quality_tier='yellow'),
+        ],
+        random_results=[
+            _executed_result(cohort='random_exploration', corpus_paper_id='2001', display_title='Random One', quality_tier='yellow'),
+            _executed_result(cohort='random_exploration', corpus_paper_id='2003', display_title='Random Three', quality_tier='red'),
+            _executed_result(cohort='random_exploration', corpus_paper_id='2004', display_title='Random Four', quality_tier='green'),
+            _executed_result(cohort='random_exploration', corpus_paper_id='2005', display_title='Random Five', quality_tier='green'),
+        ],
+        availability_issues=[
+            SampledPaperAvailabilityIssue(
+                corpus_paper_id='2002',
+                display_title='Random Missing',
+                cohort='random_exploration',
+                selection_mode='random_exploration',
+                corpus_relative_ref='txt/2002.txt',
+                preferred_source_path='C:/corpus/2002.txt',
+                preferred_source_kind='txt',
+                iteration_label='cycle-01',
+                execution_status='source_missing',
+                error_message='missing',
+                error_type='FileNotFoundError',
+            )
+        ],
+    )
+
+    comparison = compare_sampled_l2_iterations(current, previous)
+
+    fixed_verdicts = {row.corpus_paper_id: row.verdict for row in comparison.fixed_comparisons}
+    random_verdicts = {row.corpus_paper_id: row.verdict for row in comparison.random_comparisons}
+
+    assert fixed_verdicts == {
+        '1001': 'new_regression',
+        '1002': 'improved',
+        '1003': 'stable_pass',
+        '1004': 'recurring_failure',
+    }
+    assert random_verdicts == {
+        '2001': 'new_edge_case',
+        '2002': 'availability_only',
+        '2003': 'repeated_random_failure',
+        '2004': 'random_improved',
+        '2005': 'stable_random_pass',
+    }
+
+
+def test_compare_sampled_l2_iterations_builds_all_owner_buckets_and_prioritizes_fixed_failures() -> None:
+    current = SampledSinglePaperIterationResult(
+        iteration_label='cycle-01',
+        sampling_bundle_dir='tmp/phase7',
+        sampling_bundle_manifest_ref='tmp/phase7/bundle_manifest.json',
+        fixed_selected_count=1,
+        random_selected_count=1,
+        fixed_results=[
+            _executed_result(
+                cohort='fixed_regression',
+                corpus_paper_id='1001',
+                display_title='Fixed Owner Case',
+                quality_tier='red',
+                quality_flags=['metadata_summary_mismatch', 'route_state_seed_thin', 'residual_noise_moves'],
+                completeness_audit={
+                    'missing_expected_roles': ['result'],
+                    'missing_expected_slot_fields': ['methods'],
+                    'sparse_expected_slot_fields': ['effects'],
+                    'relation_coverage_ratio': 0.9,
+                    'noise_move_ids': ['noise-1'],
+                },
+                reference_status='recovered_heuristic_after_agent_error',
+                citation_event_status='empty_result',
+                purposes=0,
+                citation_acts=0,
+                citation_mentions=0,
+            )
+        ],
+        random_results=[
+            _executed_result(
+                cohort='random_exploration',
+                corpus_paper_id='2001',
+                display_title='Random Relation Case',
+                quality_tier='yellow',
+                quality_flags=['weak_relation_stitching'],
+                completeness_audit={'relation_coverage_ratio': 0.2},
+            )
+        ],
+    )
+
+    comparison = compare_sampled_l2_iterations(current, None)
+    bucket_names = [bucket.bucket for bucket in comparison.owner_buckets]
+
+    assert {
+        'slot_recovery',
+        'relation_assembly',
+        'route_seed_richness',
+        'metadata_repair',
+        'noise_cleanup',
+        'reference_recovery',
+        'citation_semantics',
+    }.issubset(set(bucket_names))
+    assert comparison.owner_buckets[0].bucket != 'relation_assembly'

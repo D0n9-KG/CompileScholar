@@ -12,7 +12,13 @@ from .decision_episode_export import DecisionEpisodeAuditExport
 from .historical_environment import HistoricalEnvironmentSnapshot
 from .historical_replay_compiler import HistoricalReplayCompilation
 from .models import RoutePacket, RouteState
-from .sampled_single_paper import SampledPaperRunResult, SampledSinglePaperIterationResult
+from .sampled_single_paper import (
+    FixedSampledL2ComparisonRow,
+    RandomSampledL2ComparisonRow,
+    SampledL2ComparisonResult,
+    SampledPaperRunResult,
+    SampledSinglePaperIterationResult,
+)
 
 if TYPE_CHECKING:
     from .prior_induction import PriorCandidateRegistry
@@ -566,6 +572,57 @@ def build_sampled_l2_iteration_inspection(
     }
 
 
+def _comparison_verdict_counts(
+    rows: Sequence[FixedSampledL2ComparisonRow] | Sequence[RandomSampledL2ComparisonRow],
+    *,
+    verdicts: Sequence[str],
+) -> dict[str, int]:
+    counts = {verdict: 0 for verdict in verdicts}
+    for row in rows:
+        verdict = str(row.verdict)
+        if verdict in counts:
+            counts[verdict] += 1
+    return counts
+
+
+def build_sampled_l2_comparison_summary(
+    *,
+    comparison: SampledL2ComparisonResult,
+) -> dict[str, Any]:
+    return {
+        'schema_version': comparison.schema_version,
+        'built_at': comparison.built_at,
+        'iteration_label': comparison.iteration_label,
+        'previous_iteration_label': comparison.previous_iteration_label,
+        'baseline_only': comparison.baseline_only,
+        'fixed_verdict_counts': _comparison_verdict_counts(
+            comparison.fixed_comparisons,
+            verdicts=['stable_pass', 'recurring_failure', 'new_regression', 'improved', 'availability_only'],
+        ),
+        'random_verdict_counts': _comparison_verdict_counts(
+            comparison.random_comparisons,
+            verdicts=['new_edge_case', 'repeated_random_failure', 'random_improved', 'stable_random_pass', 'availability_only'],
+        ),
+        'owner_buckets': [bucket.model_dump(mode='json', exclude_none=True) for bucket in comparison.owner_buckets],
+    }
+
+
+def build_sampled_l2_comparison_inspection(
+    *,
+    comparison: SampledL2ComparisonResult,
+) -> dict[str, Any]:
+    return {
+        'schema_version': comparison.schema_version,
+        'built_at': comparison.built_at,
+        'iteration_label': comparison.iteration_label,
+        'previous_iteration_label': comparison.previous_iteration_label,
+        'baseline_only': comparison.baseline_only,
+        'fixed_comparisons': [row.model_dump(mode='json', exclude_none=True) for row in comparison.fixed_comparisons],
+        'random_comparisons': [row.model_dump(mode='json', exclude_none=True) for row in comparison.random_comparisons],
+        'owner_buckets': [bucket.model_dump(mode='json', exclude_none=True) for bucket in comparison.owner_buckets],
+    }
+
+
 def _model_payload(model: Any) -> Any:
     if hasattr(model, 'model_dump'):
         return model.model_dump(mode='json', exclude_none=True)
@@ -834,6 +891,25 @@ def write_sampled_l2_iteration_bundle(
     return written_files
 
 
+def write_sampled_l2_comparison_bundle(
+    output_dir: str | Path,
+    *,
+    comparison: SampledL2ComparisonResult,
+) -> dict[str, Path]:
+    bundle_dir = _as_path(output_dir)
+    written_files = {
+        'comparison_summary': _write_json(
+            bundle_dir / 'comparison_summary.json',
+            build_sampled_l2_comparison_summary(comparison=comparison),
+        ),
+        'comparison_inspection': _write_json(
+            bundle_dir / 'comparison_inspection.json',
+            build_sampled_l2_comparison_inspection(comparison=comparison),
+        ),
+    }
+    return written_files
+
+
 __all__ = [
     'build_corpus_sampling_inspection',
     'build_corpus_sampling_summary',
@@ -842,6 +918,8 @@ __all__ = [
     'build_prior_candidate_review_summary',
     'build_replay_summary',
     'build_replay_inspection',
+    'build_sampled_l2_comparison_inspection',
+    'build_sampled_l2_comparison_summary',
     'build_sampled_l2_iteration_inspection',
     'build_sampled_l2_iteration_summary',
     'ensure_packet_trace_coverage',
@@ -855,5 +933,6 @@ __all__ = [
     'write_decision_episode_export_bundle',
     'write_prior_candidate_review_bundle',
     'write_replay_bundle',
+    'write_sampled_l2_comparison_bundle',
     'write_sampled_l2_iteration_bundle',
 ]

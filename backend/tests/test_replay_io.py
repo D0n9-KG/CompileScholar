@@ -16,6 +16,7 @@ from app.research_logic import (
     CorpusSamplingBundle,
     FixedRegressionSampledPaperResult,
     RandomExplorationSampledPaperResult,
+    SampledL2ComparisonResult,
     SampledPaperAvailabilityIssue,
     SampledSinglePaperIterationResult,
     build_corpus_sampling_inspection,
@@ -25,17 +26,21 @@ from app.research_logic import (
     build_decision_episode_export_summary,
     build_prior_candidate_registry,
     compile_historical_replay,
+    compare_sampled_l2_iterations,
     ensure_packet_trace_coverage,
     load_historical_environment_snapshot,
     load_paper_logic_traces,
     load_route_packet,
     load_route_states,
+    build_sampled_l2_comparison_inspection,
+    build_sampled_l2_comparison_summary,
     build_sampled_l2_iteration_inspection,
     build_sampled_l2_iteration_summary,
     write_corpus_sampling_bundle,
     write_decision_episode_export_bundle,
     write_prior_candidate_review_bundle,
     write_replay_bundle,
+    write_sampled_l2_comparison_bundle,
     write_sampled_l2_iteration_bundle,
 )
 from app.research_logic.models import AntiPatternCard
@@ -837,3 +842,37 @@ def test_write_sampled_l2_iteration_bundle_writes_expected_files_and_separates_a
     assert [row['corpus_paper_id'] for row in fixed_results_payload] == ['1001', '1002']
     assert [row['corpus_paper_id'] for row in random_results_payload] == ['2001']
     assert [row['corpus_paper_id'] for row in availability_payload] == ['2002']
+
+
+def test_write_sampled_l2_comparison_bundle_writes_expected_counts_and_owner_buckets(tmp_path: Path) -> None:
+    comparison = compare_sampled_l2_iterations(_sampled_iteration(), None)
+
+    summary_payload = build_sampled_l2_comparison_summary(comparison=comparison)
+    inspection_payload = build_sampled_l2_comparison_inspection(comparison=comparison)
+    written_files = write_sampled_l2_comparison_bundle(
+        tmp_path / 'sampled-l2-bundle',
+        comparison=comparison,
+    )
+
+    assert summary_payload['baseline_only'] is True
+    assert summary_payload['fixed_verdict_counts'] == {
+        'stable_pass': 1,
+        'recurring_failure': 1,
+        'new_regression': 0,
+        'improved': 0,
+        'availability_only': 0,
+    }
+    assert summary_payload['random_verdict_counts'] == {
+        'new_edge_case': 1,
+        'repeated_random_failure': 0,
+        'random_improved': 0,
+        'stable_random_pass': 0,
+        'availability_only': 1,
+    }
+    assert inspection_payload['fixed_comparisons'][0]['verdict'] == 'stable_pass'
+
+    comparison_summary_payload = json.loads(written_files['comparison_summary'].read_text(encoding='utf-8'))
+    comparison_inspection_payload = json.loads(written_files['comparison_inspection'].read_text(encoding='utf-8'))
+
+    assert comparison_summary_payload['fixed_verdict_counts']['recurring_failure'] == 1
+    assert comparison_inspection_payload['random_comparisons'][1]['verdict'] == 'availability_only'
