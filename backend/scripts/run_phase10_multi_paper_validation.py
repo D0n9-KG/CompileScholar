@@ -14,12 +14,16 @@ from app.research_logic.phase10_multi_paper_validation import (  # noqa: E402
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description='Bridge the committed Phase 9 packet into a route-state package and replay bundle.'
+        description='Bridge the committed Phase 9 packet into package, replay, prior-review, and audited export bundles.'
     )
     parser.add_argument('--packet', required=True, help='Path to the canonical Phase 9 route packet JSON file.')
     parser.add_argument('--assembly-manifest', required=True, help='Path to the committed Phase 9 assembly manifest JSON file.')
     parser.add_argument('--l1-snapshot-output', required=True, help='Path where the generated HistoricalEnvironmentSnapshot JSON will be written.')
-    parser.add_argument('--output-dir', required=True, help='Directory where the Phase 10 route_state_package/ and replay_bundle/ folders will be written.')
+    parser.add_argument(
+        '--output-dir',
+        required=True,
+        help='Directory where the Phase 10 route_state_package/, replay_bundle/, prior_review_bundle/, and export_bundle/ folders will be written.',
+    )
     parser.add_argument('--built-at', help='Override the build timestamp used for generated Phase 10 artifacts.')
     return parser
 

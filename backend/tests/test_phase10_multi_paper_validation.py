@@ -18,6 +18,7 @@ from app.research_logic import (
     prepare_phase10_runtime_bridge,
     resolve_phase10_runtime_paths,
 )
+from app.research_logic.phase10_multi_paper_validation import run_phase10_package_and_replay
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -117,6 +118,40 @@ def test_phase10_bridge_rejects_cutoff_mismatch(tmp_path: Path) -> None:
         )
 
 
+def test_phase10_workflow_writes_prior_review_and_export_bundles(tmp_path: Path) -> None:
+    runtime_paths = resolve_phase10_runtime_paths(repo_root=REPO_ROOT)
+    shutil.rmtree(runtime_paths.output_root, ignore_errors=True)
+
+    try:
+        l1_snapshot_output_path = tmp_path / 'phase9-comp-mech-l1-snapshot.json'
+        output_dir = tmp_path / 'phase10-workflow-run'
+        result = run_phase10_package_and_replay(
+            packet_path=PHASE9_PACKET_PATH,
+            assembly_manifest_path=PHASE9_ASSEMBLY_MANIFEST_PATH,
+            l1_snapshot_output_path=l1_snapshot_output_path,
+            output_dir=output_dir,
+            built_at='2026-04-03T13:00:00Z',
+            repo_root=REPO_ROOT,
+        )
+
+        review_manifest_payload = json.loads((output_dir / 'prior_review_bundle' / 'bundle_manifest.json').read_text(encoding='utf-8'))
+        export_summary_payload = json.loads((output_dir / 'export_bundle' / 'export_summary.json').read_text(encoding='utf-8'))
+        export_inspection_payload = json.loads((output_dir / 'export_bundle' / 'export_inspection.json').read_text(encoding='utf-8'))
+        decision_episode_payload = json.loads((output_dir / 'export_bundle' / 'outputs' / 'decision_episode.json').read_text(encoding='utf-8'))
+
+        assert result.summary['prior_review_bundle_manifest'] == str((output_dir / 'prior_review_bundle' / 'bundle_manifest.json').resolve())
+        assert result.summary['export_summary_path'] == str((output_dir / 'export_bundle' / 'export_summary.json').resolve())
+        assert result.summary['export_inspection_path'] == str((output_dir / 'export_bundle' / 'export_inspection.json').resolve())
+        assert set(export_summary_payload['selected_prior_ids']).issubset(set(review_manifest_payload['accepted_prior_ids']))
+        assert decision_episode_payload['relevant_priors']['selected_prior_ids'] == export_summary_payload['selected_prior_ids']
+        assert 'visible_input_refs' in export_inspection_payload['visibility_buckets']
+        assert 'audit_only_refs' in export_inspection_payload['visibility_buckets']
+        assert 'label_eval_only_refs' in export_inspection_payload['visibility_buckets']
+        assert export_summary_payload['visibility_bucket_counts']['visible_input_refs'] >= 1
+    finally:
+        shutil.rmtree(runtime_paths.output_root, ignore_errors=True)
+
+
 def test_phase10_cli_help_lists_required_arguments() -> None:
     script_path = REPO_ROOT / 'backend' / 'scripts' / 'run_phase10_multi_paper_validation.py'
     result = subprocess.run(
@@ -174,10 +209,15 @@ def test_phase10_cli_writes_package_and_replay_bundles(tmp_path: Path) -> None:
         assert (output_dir / 'route_state_package' / 'validation.json').is_file()
         assert (output_dir / 'replay_bundle' / 'replay_summary.json').is_file()
         assert (output_dir / 'replay_bundle' / 'replay_inspection.json').is_file()
+        assert (output_dir / 'prior_review_bundle' / 'bundle_manifest.json').is_file()
+        assert (output_dir / 'export_bundle' / 'export_summary.json').is_file()
+        assert (output_dir / 'export_bundle' / 'export_inspection.json').is_file()
         assert replay_inspection_payload['route_state_package_validation'] is not None
         assert replay_inspection_payload['route_state_package_validation']['quality_tier'] == summary_payload[
             'route_state_package_validation_quality_tier'
         ]
         assert 'route_state_package_validation' in replay_inspection_payload
+        assert set(summary_payload['selected_prior_ids']).issubset(set(summary_payload['accepted_prior_ids']))
+        assert 'visibility_bucket_counts' in summary_payload
     finally:
         shutil.rmtree(runtime_paths.output_root, ignore_errors=True)

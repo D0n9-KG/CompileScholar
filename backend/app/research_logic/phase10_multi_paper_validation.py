@@ -5,22 +5,27 @@ from dataclasses import dataclass
 import json
 import os
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal, TypeVar
+
+from pydantic import BaseModel
 
 from .bounded_packet_audit import (
     BoundedPacketAssemblyManifest,
     audit_bounded_packet_assembly,
     load_bounded_packet_assembly_manifest,
 )
+from .decision_episode_export import build_decision_episode_audit_export
 from .historical_environment import HistoricalEnvironmentSnapshot, build_historical_environment_snapshot, build_l1_snapshot_ref, write_historical_environment_snapshot
 from .historical_replay_compiler import compile_historical_replay
-from .models import RoutePacket
+from .models import AntiPatternCard, DecisionEpisode, DecisionPriorCard, RouteComparisonCase, RoutePacket, RouteState, WhyNowCase
 from .replay_io import (
     build_replay_summary,
     ensure_packet_trace_coverage,
     load_paper_logic_trace,
     load_paper_logic_traces,
     load_route_packet,
+    write_decision_episode_export_bundle,
+    write_prior_candidate_review_bundle,
     write_replay_bundle,
 )
 from .route_state_package import (
@@ -31,8 +36,10 @@ from .route_state_package import (
     load_route_state_package_bundle,
     write_route_state_package_bundle,
 )
+from .prior_induction import build_prior_candidate_registry_from_package
 
 Phase10Role = Literal['support', 'alternative', 'held_out']
+ModelT = TypeVar('ModelT', bound=BaseModel)
 
 DEFAULT_PHASE10_PACKET_PATH = Path('docs/replay/pilot_packets/phase9-route-packet.json')
 DEFAULT_PHASE10_ASSEMBLY_MANIFEST_PATH = Path('docs/replay/pilot_packets/phase9-assembly-manifest.json')
@@ -99,6 +106,10 @@ class Phase10ValidationRun:
     route_state_package_bundle_files: dict[str, Path]
     replay_output_dir: Path
     replay_bundle_files: dict[str, Path]
+    prior_review_output_dir: Path
+    prior_review_bundle_files: dict[str, Path]
+    export_output_dir: Path
+    export_bundle_files: dict[str, Path]
     summary: dict[str, object]
 
 
@@ -118,6 +129,15 @@ def _write_json(path: Path, payload: object) -> Path:
     return path
 
 
+def _load_json(path: Path) -> Any:
+    try:
+        return json.loads(path.read_text(encoding='utf-8'))
+    except FileNotFoundError as exc:
+        raise FileNotFoundError(f'Phase 10 artifact not found: {path}') from exc
+    except json.JSONDecodeError as exc:
+        raise ValueError(f'Invalid JSON in Phase 10 artifact: {path}') from exc
+
+
 def _relative_manifest_path(target: Path, *, base_dir: Path) -> str:
     try:
         return os.path.relpath(target, base_dir).replace('\\', '/')
@@ -131,6 +151,121 @@ def _role_slug(role: Phase10Role) -> str:
 
 def _package_built_at(route_packet: RoutePacket, assembly_manifest: BoundedPacketAssemblyManifest, built_at: str | None) -> str:
     return built_at or assembly_manifest.built_at or route_packet.built_at
+
+
+def _load_model(path: Path, model_type: type[ModelT]) -> ModelT:
+    return model_type.model_validate(_load_json(path))
+
+
+def _load_models(path: Path, model_type: type[ModelT]) -> list[ModelT]:
+    payload = _load_json(path)
+    if not isinstance(payload, list):
+        raise ValueError(f'Phase 10 artifact must decode to a JSON list: {path}')
+    return [model_type.model_validate(item) for item in payload]
+
+
+def _bundle_string_list(manifest_payload: dict[str, object], *, key: str, label: str) -> list[str]:
+    value = manifest_payload.get(key)
+    if not isinstance(value, list):
+        raise ValueError(f'{label} manifest missing {key} list')
+    return [str(item).strip() for item in value if str(item).strip()]
+
+
+def _bundle_source_refs(bundle_manifest_path: Path, manifest_payload: dict[str, object]) -> dict[str, object]:
+    files = manifest_payload.get('files')
+    if not isinstance(files, dict):
+        raise ValueError(f'Phase 10 bundle manifest missing files map: {bundle_manifest_path}')
+
+    bundle_dir = bundle_manifest_path.parent.resolve()
+    return {
+        'bundle_ref': str(bundle_dir),
+        'manifest_ref': str(bundle_manifest_path.resolve()),
+        'files': {
+            key: str((bundle_dir / relative_path).resolve())
+            for key, relative_path in files.items()
+            if isinstance(key, str) and isinstance(relative_path, str) and str(relative_path).strip()
+        },
+    }
+
+
+def _write_phase10_export_bundle(
+    *,
+    replay_bundle_files: dict[str, Path],
+    prior_review_bundle_files: dict[str, Path],
+    output_dir: Path,
+    built_at: str | None = None,
+) -> tuple[dict[str, Path], dict[str, object]]:
+    replay_manifest_path = replay_bundle_files['bundle_manifest']
+    review_manifest_path = prior_review_bundle_files['bundle_manifest']
+    replay_manifest_payload = _load_json(replay_manifest_path)
+    review_manifest_payload = _load_json(review_manifest_path)
+    if not isinstance(replay_manifest_payload, dict):
+        raise ValueError(f'Phase 10 replay bundle manifest must decode to a JSON object: {replay_manifest_path}')
+    if not isinstance(review_manifest_payload, dict):
+        raise ValueError(f'Phase 10 prior review bundle manifest must decode to a JSON object: {review_manifest_path}')
+
+    replay_summary_payload = _load_json(replay_bundle_files['replay_summary'])
+    if not isinstance(replay_summary_payload, dict):
+        raise ValueError(f'Phase 10 replay summary must decode to a JSON object: {replay_bundle_files["replay_summary"]}')
+
+    route_packet = load_route_packet(replay_bundle_files['route_packet'])
+    route_state = _load_model(replay_bundle_files['primary_route_state'], RouteState)
+    why_now_case = _load_model(replay_bundle_files['why_now_case'], WhyNowCase)
+    replay_episode = _load_model(replay_bundle_files['decision_episode'], DecisionEpisode)
+    comparison_cases = _load_models(replay_bundle_files['route_comparison_cases'], RouteComparisonCase)
+    prior_candidates = _load_models(prior_review_bundle_files['prior_candidates'], DecisionPriorCard)
+    anti_pattern_candidates = _load_models(prior_review_bundle_files['anti_pattern_candidates'], AntiPatternCard)
+    accepted_prior_ids = _bundle_string_list(
+        review_manifest_payload,
+        key='accepted_prior_ids',
+        label='Phase 10 prior review bundle',
+    )
+    accepted_anti_pattern_ids = _bundle_string_list(
+        review_manifest_payload,
+        key='accepted_anti_pattern_ids',
+        label='Phase 10 prior review bundle',
+    )
+
+    selected_comparison_case_id = str(replay_summary_payload.get('selected_comparison_case_id') or '').strip()
+    comparison_case = next(
+        (
+            case
+            for case in comparison_cases
+            if case.route_comparison_case_id == selected_comparison_case_id
+        ),
+        None,
+    )
+
+    export = build_decision_episode_audit_export(
+        route_packet=route_packet,
+        route_state=route_state,
+        why_now_case=why_now_case,
+        comparison_case=comparison_case,
+        hindsight_outcome=replay_episode.hindsight_outcome,
+        prior_cards=prior_candidates,
+        anti_pattern_cards=anti_pattern_candidates,
+        accepted_prior_ids=accepted_prior_ids,
+        accepted_anti_pattern_ids=accepted_anti_pattern_ids,
+        route_state_ref=str(replay_bundle_files['primary_route_state'].resolve()),
+        source_replay_bundle_refs=_bundle_source_refs(replay_manifest_path, replay_manifest_payload),
+        source_review_bundle_refs=_bundle_source_refs(review_manifest_path, review_manifest_payload),
+        built_at=built_at,
+        episode_id=replay_episode.episode_id,
+    )
+
+    written_files = write_decision_episode_export_bundle(
+        output_dir,
+        export=export,
+        metadata={
+            'runner': 'backend/scripts/run_phase10_multi_paper_validation.py',
+            'source_replay_bundle': str(replay_manifest_path.parent.resolve()),
+            'source_prior_review_bundle': str(review_manifest_path.parent.resolve()),
+        },
+    )
+    export_summary_payload = _load_json(written_files['export_summary'])
+    if not isinstance(export_summary_payload, dict):
+        raise ValueError(f'Phase 10 export summary must decode to a JSON object: {written_files["export_summary"]}')
+    return written_files, export_summary_payload
 
 
 def resolve_phase10_runtime_paths(
@@ -523,6 +658,8 @@ def run_phase10_package_and_replay(
     resolved_output_dir = _resolve_repo_path(output_dir, repo_root=bridge.canonical_inputs.repo_root)
     route_state_package_output_dir = resolved_output_dir / 'route_state_package'
     replay_output_dir = resolved_output_dir / 'replay_bundle'
+    prior_review_output_dir = resolved_output_dir / 'prior_review_bundle'
+    export_output_dir = resolved_output_dir / 'export_bundle'
 
     route_state_package_compilation = compile_route_state_package(
         bridge.package_manifest,
@@ -574,6 +711,24 @@ def run_phase10_package_and_replay(
         },
         route_state_package_validation=loaded_route_state_package.validation,
     )
+    prior_candidate_registry = build_prior_candidate_registry_from_package(
+        loaded_route_state_package,
+        built_at=built_at,
+    )
+    prior_review_bundle_files = write_prior_candidate_review_bundle(
+        prior_review_output_dir,
+        registry=prior_candidate_registry,
+        metadata={
+            'runner': 'backend/scripts/run_phase10_multi_paper_validation.py',
+            'route_state_package_id': loaded_route_state_package.manifest.package_id,
+        },
+    )
+    export_bundle_files, export_summary_payload = _write_phase10_export_bundle(
+        replay_bundle_files=replay_bundle_files,
+        prior_review_bundle_files=prior_review_bundle_files,
+        output_dir=export_output_dir,
+        built_at=built_at,
+    )
 
     route_state_package_summary = build_route_state_package_summary(
         route_state_package_compilation,
@@ -589,6 +744,11 @@ def run_phase10_package_and_replay(
         alternative_route_states=loaded_route_state_package.alternative_route_states,
         held_out_route_states=loaded_route_state_package.held_out_route_states,
     )
+    prior_review_manifest_payload = _load_json(prior_review_bundle_files['bundle_manifest'])
+    if not isinstance(prior_review_manifest_payload, dict):
+        raise ValueError(
+            f'Phase 10 prior review bundle manifest must decode to a JSON object: {prior_review_bundle_files["bundle_manifest"]}'
+        )
 
     summary = {
         'packet_id': bridge.canonical_inputs.route_packet.packet_id,
@@ -609,6 +769,26 @@ def run_phase10_package_and_replay(
         'support_route_state_count': replay_summary['support_route_state_count'],
         'alternative_route_state_count': replay_summary['alternative_route_state_count'],
         'held_out_route_state_count': replay_summary['held_out_route_state_count'],
+        'prior_review_output_dir': str(prior_review_output_dir.resolve()),
+        'prior_review_bundle_manifest': str(prior_review_bundle_files['bundle_manifest'].resolve()),
+        'prior_review_summary_path': str(prior_review_bundle_files['candidate_review_summary'].resolve()),
+        'accepted_prior_ids': _bundle_string_list(
+            prior_review_manifest_payload,
+            key='accepted_prior_ids',
+            label='Phase 10 prior review bundle',
+        ),
+        'accepted_anti_pattern_ids': _bundle_string_list(
+            prior_review_manifest_payload,
+            key='accepted_anti_pattern_ids',
+            label='Phase 10 prior review bundle',
+        ),
+        'export_output_dir': str(export_output_dir.resolve()),
+        'export_bundle_manifest': str(export_bundle_files['bundle_manifest'].resolve()),
+        'export_summary_path': str(export_bundle_files['export_summary'].resolve()),
+        'export_inspection_path': str(export_bundle_files['export_inspection'].resolve()),
+        'selected_prior_ids': list(export_summary_payload['selected_prior_ids']),
+        'selected_antipattern_ids': list(export_summary_payload['selected_antipattern_ids']),
+        'visibility_bucket_counts': dict(export_summary_payload['visibility_bucket_counts']),
     }
     return Phase10ValidationRun(
         bridge=bridge,
@@ -616,6 +796,10 @@ def run_phase10_package_and_replay(
         route_state_package_bundle_files=route_state_package_bundle_files,
         replay_output_dir=replay_output_dir,
         replay_bundle_files=replay_bundle_files,
+        prior_review_output_dir=prior_review_output_dir,
+        prior_review_bundle_files=prior_review_bundle_files,
+        export_output_dir=export_output_dir,
+        export_bundle_files=export_bundle_files,
         summary=summary,
     )
 
