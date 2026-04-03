@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: Ready to execute
-stopped_at: Phase 10 plans created; ready for execution
-last_updated: "2026-04-03T10:21:31.586Z"
+stopped_at: Completed 10-02-PLAN.md
+last_updated: "2026-04-03T10:47:51.361Z"
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 9
-  completed_plans: 7
+  completed_plans: 8
 ---
 
 # Project State
@@ -24,13 +24,13 @@ See: `.planning/PROJECT.md` (updated 2026-04-03)
 ## Current Position
 
 Phase: 10 (multi-paper-l3-and-l4-validation) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Milestone: `v1.1` - Phase `9` complete, Phase `10` planned
 
 - Completed phase: `09 bounded-packet-construction-from-corpus`
 - Planned phase: `10 multi-paper-l3-and-l4-validation`
 - Status: Phase `10` researched, validated, and split into `10-01`, `10-02`, and `10-03`
-- Last activity: `2026-04-03` - created the Phase `10` research, validation strategy, and execution plans
+- Last activity: `2026-04-03` - completed `10-02` and left Phase `10` ready for the final real-data closeout run
 
 ## Milestone Snapshot
 
@@ -61,6 +61,8 @@ Milestone: `v1.1` - Phase `9` complete, Phase `10` planned
 - [Phase 10]: Require a real cutoff-matched `L1` snapshot before treating multi-paper replay output as meaningful `L3` evidence.
 - [Phase 10]: Preserve package, replay, prior-review, and audited export as separate bundle stages and compare them against the jamming baseline through machine-readable summaries.
 - [Phase 10]: Keep the committed Phase 9 packet and assembly manifest immutable, and generate disposable runtime packets under tmp/ for package and replay compilation.
+- [Phase 10]: Keep the Phase 10 CLI machine-readable first: always write comparison_summary.json and render markdown from that file instead of recomputing report prose.
+- [Phase 10]: Compare the computational-mechanics packet against the jamming baseline through replay/export bundle summaries and inspections, with blocker queues grouped by stage.
 
 ## Accumulated Context
 
@@ -83,9 +85,6 @@ Milestone: `v1.1` - Phase `9` complete, Phase `10` planned
 
 ## Pending Follow-Ups
 
-- Use the committed Phase `9` packet and assembly manifest as the fixed multi-paper boundary for Phase `10`.
-- Execute `10-01` to build the Phase `10` packet bridge, real `L1` snapshot seam, and package/replay runner.
-- Execute `10-02` to extend the workflow through prior review, audited export, and structured baseline comparison/reporting.
 - Execute `10-03` to run the real computational-mechanics packet and commit the Phase `10` report plus verification note.
 - Preserve `tmp/phase8_sampled_single_paper_l2/baseline-cycle-01/` as the comparison source for the next sampled-paper cycle.
 
@@ -103,9 +102,10 @@ Milestone: `v1.1` - Phase `9` complete, Phase `10` planned
 - `09-01`: duration `13 min`, tasks `2`, files `5`
 - `09-02`: duration `7 min`, tasks `2`, files `5`
 - `10-planning`: duration `~35m`, artifacts `5`, plans `3`
+- `10-02`: duration `19 min`, tasks `2`, files `4`
 
 ## Session
 
-**Last Date:** 2026-04-03T09:42:06.8790254Z
-**Stopped At:** Phase 10 plans created; ready for execution
-**Resume File:** `.planning/phases/10-multi-paper-l3-and-l4-validation/10-01-PLAN.md`
+**Last Date:** 2026-04-03T10:47:51.354Z
+**Stopped At:** Completed 10-02-PLAN.md
+**Resume File:** None

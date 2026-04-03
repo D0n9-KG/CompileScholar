@@ -21,8 +21,8 @@ Requirements for milestone `v1.1`. These define what must be true before the nex
 ### Bounded Multi-Paper Packet Validation
 
 - [x] **PACK-01**: Operator can assemble one bounded topic packet from the larger corpus with explicit `support`, `alternative`, and `held_out` role assignments plus exclusion notes.
-- [ ] **PACK-02**: The bounded packet can compile replay and package-validation artifacts that make `L3` quality gaps inspectable.
-- [ ] **AGGR-01**: The same bounded packet can produce `L4` prior/review/export artifacts or explicit blockers explaining why multi-paper aggregation failed.
+- [x] **PACK-02**: The bounded packet can compile replay and package-validation artifacts that make `L3` quality gaps inspectable.
+- [x] **AGGR-01**: The same bounded packet can produce `L4` prior/review/export artifacts or explicit blockers explaining why multi-paper aggregation failed.
 
 ### Iteration Prioritization
 
@@ -66,8 +66,8 @@ Explicitly excluded from `v1.1`.
 | `L2Q-01` | Phase `8` | Complete |
 | `L2Q-02` | Phase `8` | Complete |
 | `PACK-01` | Phase `9` | Pending |
-| `PACK-02` | Phase `10` | Pending |
-| `AGGR-01` | Phase `10` | Pending |
+| `PACK-02` | Phase `10` | Complete |
+| `AGGR-01` | Phase `10` | Complete |
 | `LOOP-01` | Phase `11` | Pending |
 | `LOOP-02` | Phase `11` | Pending |
 
