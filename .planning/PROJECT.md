@@ -1,10 +1,10 @@
-# LogicKG
+﻿# LogicKG
 
 ## What This Is
 
 LogicKG is a scientific-reasoning compiler workbench built on top of the existing paper and textbook platform.
 
-`v1.0` proved a bounded end-to-end `RoutePacket -> replay -> review -> DecisionEpisode` export flow on a real jamming slice. `v1.1` now focuses on using a large shared paper corpus to iteratively harden single-paper extraction quality and then validate bounded multi-paper packet compilation for `L3/L4`.
+`v1.0` proved a bounded end-to-end `RoutePacket -> replay -> review -> DecisionEpisode` export flow on a real jamming slice. `v1.1` established corpus-driven iteration and explicit next-cycle prioritization. `v1.2` now focuses on packet-first quality recovery for bounded multi-paper compilation and downstream `L4` signal restoration.
 
 ## Core Value
 
@@ -13,7 +13,7 @@ Produce auditable, replayable, trainable scientific-reasoning artifacts rather t
 ## Current State
 
 - Shipped milestone: `v1.0` on `2026-04-02`
-- Active planning milestone: `v1.1 Corpus-Driven Iterative Quality Hardening`
+- Active planning milestone: `v1.2 Fast Iteration Research Logic Quality`
 - Phase `7` completed on `2026-04-03` with a committed ten-paper fixed regression set and a real seed-`7` random exploration batch of five papers
 - Phase `9` completed on `2026-04-03` with a committed `2017-2021` computational-mechanics packet, explicit `support / alternative / held_out` mapping, and a runtime-backed audit report
 - Phase `10` completed on `2026-04-03` with a real bounded computational-mechanics validation run, committed report/verification artifacts, and a packet-construction-first next-cycle recommendation
@@ -25,16 +25,16 @@ Produce auditable, replayable, trainable scientific-reasoning artifacts rather t
 - A user-provided shared corpus root now provides roughly `1756` `.txt` papers and `945` `.md` derivatives for iterative sampling
 - Recursive corpus scans already surfaced broken or missing subpaths, so corpus-health tolerance is part of the next optimization loop rather than a separate cleanup task
 
-## Current Milestone: v1.1 Corpus-Driven Iterative Quality Hardening
+## Current Milestone: v1.2 Fast Iteration Research Logic Quality
 
-**Goal:** Use the large shared corpus to create a repeatable optimization loop that combines fixed regression papers, random exploration papers, and bounded multi-paper packets so `L2`, `L3`, and `L4` can be improved with evidence instead of guesswork.
+**Goal:** Build a fast, evidence-driven optimization loop that improves the full research reasoning production line (`packet -> replay -> prior/review -> export`) until quality is genuinely production-worthy in real outputs, not only better on rule metrics.
 
 **Target features:**
-- a corpus sampling workflow with one fixed regression set and one random exploration set per iteration cycle
-- repeatable sampled single-paper evaluation that exposes `L2` trace, schema, and evidence-slot weaknesses
-- bounded multi-paper packet construction from the larger corpus with explicit `support / alternative / held_out` roles for `L3/L4`
-- an iteration summary that turns sampled-paper failures and multi-paper packet outcomes into a prioritized optimization queue
-
+- a packet-quality repair loop that explicitly resolves current `package_validation` blockers and records provenance for each fix
+- a fast rerun workflow that compares repaired packet outcomes against the existing baseline with minimal manual steps
+- an `L4` recovery check that tracks prior-candidate and anti-pattern carryover readiness after packet fixes
+- a rolling prioritization summary that keeps each cycle focused and avoids slow one-by-one unstructured patching
+- a result-level quality gate that inspects real reasoning artifacts and rejects metric-only gains that do not improve actual scientific reasoning outcomes
 ## Requirements
 
 ### Validated
@@ -53,11 +53,14 @@ Produce auditable, replayable, trainable scientific-reasoning artifacts rather t
 
 ### Active
 
-- [ ] Repeatedly run sampled single-paper extraction and evaluation so `L2` quality issues can be measured instead of guessed.
+- [ ] Packet construction blockers from the current bounded slice can be resolved with explicit role-balance and support-density evidence.
+- [ ] Repaired packet runs can demonstrate whether `L4` prior/review surfaces recover relative to the committed baseline.
+- [ ] The next optimization cycle can be re-prioritized from a new summary grounded in the repaired packet evidence chain.
+- [ ] Quality promotion requires both rule-threshold pass and explicit review of real reasoning outputs; metric-only improvement is not sufficient.
 
 ### Out of Scope
 
-- Running all `1000+` candidate papers end to end in one `v1.1` sweep.
+- Running all `1000+` candidate papers end to end in one `v1.2` sweep.
 - Letting `L3/L4` consume arbitrary random paper mixes without topic boundaries or explicit role assignment.
 - Full UI productization of packet/replay/review/export operations during the same milestone.
 - Open-ended question discovery or hypothesis generation before iterative compiler quality is stable on more than one bounded slice.
@@ -103,4 +106,6 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-03 after Phase 11 execution and verification*
+*Last updated: 2026-04-03 after starting milestone v1.2*
+
+
