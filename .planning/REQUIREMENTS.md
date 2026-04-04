@@ -55,8 +55,8 @@ Explicitly excluded from `v1.2`.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| `LOOPR-01` | Phase `12` | Pending |
-| `LOOPR-02` | Phase `12` | Pending |
+| `LOOPR-01` | Phase `12` | Complete |
+| `LOOPR-02` | Phase `12` | Complete |
 | `LOOPR-03` | Phase `13` | Pending |
 | `REVIEW-01` | Phase `13` | Pending |
 | `REVIEW-02` | Phase `14` | Pending |
@@ -72,4 +72,4 @@ Explicitly excluded from `v1.2`.
 
 ---
 *Requirements defined: 2026-04-03*
-*Last updated: 2026-04-03 after aligning v1.2 to iterative manual-review loop*
+*Last updated: 2026-04-04 after completing Phase 12*

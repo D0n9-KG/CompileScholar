@@ -1,35 +1,35 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.2
-milestone_name: fast-iteration-research-logic-quality
-status: Ready to execute
-stopped_at: Phase 12 planned
-last_updated: "2026-04-04T02:10:37.1435990+08:00"
+milestone_name: milestone
+status: Ready to plan
+stopped_at: Phase 13 ready to discuss
+last_updated: "2026-04-04T09:08:15.1314705+08:00"
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 0
+  completed_plans: 2
 ---
 
 # Project State
 
 ## Project Reference
 
-See: `.planning/PROJECT.md` (updated 2026-04-03)
+See: `.planning/PROJECT.md` (updated 2026-04-04)
 
 **Core value:** Produce auditable, replayable, trainable scientific-reasoning artifacts rather than paper-like summaries or one-off knowledge graphs.
-**Current focus:** Phase 12 packet-first direct-fix cycle on the bounded Phase 9 computational-mechanics slice
+**Current focus:** Phase 13 cycle-2 refinement using the new Phase 12 cycle-1 output root
 
 ## Current Position
 
-Phase: 12
-Plan: 1 of 2 in current phase
+Phase: 13
+Plan: Not started
 Milestone: `v1.2` - Fast Iteration Research Logic Quality
 
 - Completed milestone: `v1.1` corpus-driven iterative quality hardening
-- Status: Ready to execute the first direct-fix cycle for milestone `v1.2`
-- Last activity: `2026-04-04` - planned packet-first runtime fixes plus the full cycle-1 rerun and review audit
+- Status: Phase `12` complete; ready to discuss and plan Phase `13`
+- Last activity: `2026-04-04` - completed the first direct-fix cycle, repaired the packet/runtime bridge, and recorded the downstream-blocker verification verdict
 
 ## Milestone Snapshot
 
@@ -49,17 +49,18 @@ Milestone: `v1.2` - Fast Iteration Research Logic Quality
 - Shared corpus currently exposes roughly `1756` `.txt` papers and `945` `.md` derivatives.
 - The real Phase 7 scan found `1755` eligible entries and `1505` corpus-health failures.
 - Phase 9 committed a bounded seven-paper packet with explicit `support / alternative / held_out` mapping.
-- Phase 10 and Phase 11 evidence indicate packet-quality blockers are the current highest-leverage bottleneck.
+- Phase 12 produced a fresh cycle-1 output root under `tmp/phase12_direct_fix_cycle/cycle1/` with `support_cluster_too_small` and `alternative_scope_not_distinct` removed from the bounded packet surface.
+- Phase 12 verification shows the dominant blockers now sit downstream in replay, prior-review, and export rather than in packet construction.
 
 ## Active Requirements
 
-- Phase `12`: `LOOPR-01`, `LOOPR-02`
+- Phase `13`: `LOOPR-03`, `REVIEW-01`
 
 ## Pending Follow-Ups
 
-- Execute `12-01` to repair the Phase 10 runtime bridge and clear the lead packet-construction blockers on a dev-check rerun.
-- Execute `12-02` to run the full cycle-1 rerun, write the direct-fix report, and capture the verification verdict.
-- Reprioritize next-cycle work only after the new cycle artifacts exist and the manual review is complete.
+- Discuss Phase `13` against the fresh cycle-1 artifacts and decide how to attack `reviewer_missing`, the remaining `decision_prior_card` failure, and the empty prior-review surface.
+- Plan a second bounded rerun that preserves the repaired packet bridge while targeting the newly exposed downstream blockers.
+- Keep cycle-to-cycle comparison anchored to `tmp/phase12_direct_fix_cycle/cycle1/` rather than falling back to the older Phase 10 / Phase 11 evidence chain.
 
 ## Blockers
 
@@ -68,6 +69,6 @@ Milestone: `v1.2` - Fast Iteration Research Logic Quality
 
 ## Session
 
-**Last Date:** 2026-04-04T02:10:37.1435990+08:00
-**Stopped At:** Phase 12 planned
-**Resume File:** .planning/phases/12-baseline-data-cycle-1-direct-fix/12-01-PLAN.md
+**Last Date:** 2026-04-04T09:10:04.5673940+08:00
+**Stopped At:** Phase 13 ready to discuss
+**Resume File:** .planning/ROADMAP.md

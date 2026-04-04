@@ -15,7 +15,7 @@ Inside one milestone, the team repeatedly runs: generate real outputs -> manuall
 
 | Phase | Name | Goal | Requirements | Success Criteria |
 |-------|------|------|--------------|------------------|
-| 12 | Baseline Data Cycle 1 (Direct Fix) | Use Phase 10/11 existing artifacts directly, apply focused fixes, rerun, and review output quality. | `LOOPR-01`, `LOOPR-02` | 4 |
+| 12 | Baseline Data Cycle 1 (Direct Fix) | Use Phase 10/11 existing artifacts directly, apply focused fixes, rerun, and review output quality. | `LOOPR-01`, `LOOPR-02` | Complete (`2026-04-04`) |
 | 13 | Baseline Data Cycle 2 (Refine) | Continue fix-rerun-review on the same baseline data until quality improves without overfitting. | `LOOPR-03`, `REVIEW-01` | 4 |
 | 14 | Cycle 2 Optimization And Review | Apply fixes from cycle 1, rerun, and re-review outputs with explicit defect deltas. | `REVIEW-02`, `REVIEW-03` | 4 |
 | 15 | Cycle 3 Consolidation | Continue optimize/rerun to reach repeated high-quality output under manual review. | `STAB-01` | 3 |
@@ -107,12 +107,12 @@ Inside one milestone, the team repeatedly runs: generate real outputs -> manuall
 
 ## Next Up
 
-**Phase 12: Baseline Data Cycle 1 (Direct Fix)** - fix using existing Phase 10/11 data, rerun, and manually review output quality.
+**Phase 13: Baseline Data Cycle 2 (Refine)** - use the new Phase 12 cycle-1 artifacts to target the downstream blockers that remained after packet repair.
 
-`$gsd-discuss-phase 12`
+`$gsd-discuss-phase 13`
 
-Also available: `$gsd-plan-phase 12`
+Also available: `$gsd-plan-phase 13`
 
 ---
 *Roadmap created: 2026-04-03*
-*Last updated: 2026-04-03 after aligning v1.2 to iterative manual-review loop*
+*Last updated: 2026-04-04 after completing Phase 12*
