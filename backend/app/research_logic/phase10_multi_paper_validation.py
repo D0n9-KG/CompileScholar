@@ -556,7 +556,9 @@ def build_phase10_comparison_summary(
 
     prior_review = {
         'current': {
+            'cluster_strategy': str(prior_review_summary.get('cluster_strategy') or 'default'),
             'cluster_count': int(prior_review_summary.get('cluster_count') or 0),
+            'fallback_reason': prior_review_summary.get('fallback_reason'),
             'prior_candidate_count': int(prior_review_summary.get('prior_candidate_count') or 0),
             'anti_pattern_candidate_count': int(prior_review_summary.get('anti_pattern_candidate_count') or 0),
             'accepted_prior_ids': _bundle_string_list(
@@ -571,6 +573,7 @@ def build_phase10_comparison_summary(
             ),
             'quality_flag_counts': _int_map(prior_review_summary.get('quality_flag_counts')),
             'bundle_manifest': str((prior_review_bundle_dir / 'bundle_manifest.json').resolve()),
+            'prior_review_summary_path': str((prior_review_bundle_dir / 'candidate_review_summary.json').resolve()),
         },
         'baseline': {
             'accepted_prior_count': int(baseline_export_summary.get('accepted_prior_count') or 0),
@@ -1597,7 +1600,9 @@ def run_phase10_package_and_replay(
         'prior_review_bundle_manifest': str(prior_review_bundle_files['bundle_manifest'].resolve()),
         'prior_review_summary_path': str(prior_review_bundle_files['candidate_review_summary'].resolve()),
         'prior_review_cluster_strategy': prior_candidate_registry.cluster_strategy,
+        'prior_review_cluster_count': len(prior_candidate_registry.clusters),
         'prior_review_fallback_reason': prior_candidate_registry.fallback_reason,
+        'prior_candidate_count': len(prior_candidate_registry.prior_candidates),
         'accepted_prior_ids': _bundle_string_list(
             prior_review_manifest_payload,
             key='accepted_prior_ids',

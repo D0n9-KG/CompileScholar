@@ -162,6 +162,9 @@ def test_phase10_workflow_writes_prior_review_and_export_bundles(tmp_path: Path)
         )
 
         review_manifest_payload = json.loads((output_dir / 'prior_review_bundle' / 'bundle_manifest.json').read_text(encoding='utf-8'))
+        prior_review_summary_payload = json.loads(
+            (output_dir / 'prior_review_bundle' / 'candidate_review_summary.json').read_text(encoding='utf-8')
+        )
         comparison_summary_payload = json.loads((output_dir / 'comparison_summary.json').read_text(encoding='utf-8'))
         export_summary_payload = json.loads((output_dir / 'export_bundle' / 'export_summary.json').read_text(encoding='utf-8'))
         export_inspection_payload = json.loads((output_dir / 'export_bundle' / 'export_inspection.json').read_text(encoding='utf-8'))
@@ -171,6 +174,12 @@ def test_phase10_workflow_writes_prior_review_and_export_bundles(tmp_path: Path)
         route_validation = comparison_summary_payload['notes']['route_state_package_validation']
 
         assert result.summary['prior_review_bundle_manifest'] == str((output_dir / 'prior_review_bundle' / 'bundle_manifest.json').resolve())
+        assert result.summary['prior_review_summary_path'] == str((output_dir / 'prior_review_bundle' / 'candidate_review_summary.json').resolve())
+        assert result.summary['allow_scope_fallback_merge'] is False
+        assert result.summary['prior_review_cluster_strategy'] == 'default'
+        assert result.summary['prior_review_fallback_reason'] is None
+        assert result.summary['prior_review_cluster_count'] == prior_review_summary_payload['cluster_count']
+        assert result.summary['prior_candidate_count'] == prior_review_summary_payload['prior_candidate_count']
         assert result.summary['export_summary_path'] == str((output_dir / 'export_bundle' / 'export_summary.json').resolve())
         assert result.summary['export_inspection_path'] == str((output_dir / 'export_bundle' / 'export_inspection.json').resolve())
         assert result.summary['training_view_path'] == str((output_dir / 'export_bundle' / 'outputs' / 'training_view.json').resolve())
@@ -201,6 +210,11 @@ def test_phase10_workflow_writes_prior_review_and_export_bundles(tmp_path: Path)
         assert best_cycle_selection_payload['recommendation_evidence_refs']
         assert comparison_summary_payload['best_cycle_selection']['selected_iteration_label'] == 'phase10-workflow-run'
         assert comparison_summary_payload['source_artifacts']['current_training_view'].endswith('training_view.json')
+        assert comparison_summary_payload['prior_review']['current']['cluster_strategy'] == 'default'
+        assert comparison_summary_payload['prior_review']['current']['fallback_reason'] is None
+        assert comparison_summary_payload['prior_review']['current']['prior_review_summary_path'] == (
+            str((output_dir / 'prior_review_bundle' / 'candidate_review_summary.json').resolve())
+        )
         assert route_validation is not None
         assert 'support_route_state_ids' in route_validation
         assert 'alternative_route_state_ids' in route_validation
@@ -275,6 +289,11 @@ def test_phase10_workflow_supports_scope_fallback_merge_for_phase13_runs(tmp_pat
     assert result.summary['allow_scope_fallback_merge'] is True
     assert result.summary['prior_review_cluster_strategy'] == 'fallback_scope_merge'
     assert result.summary['prior_review_fallback_reason'] == 'singleton_support_clusters'
+    assert result.summary['prior_review_cluster_count'] == prior_review_summary_payload['cluster_count']
+    assert result.summary['prior_candidate_count'] == prior_review_summary_payload['prior_candidate_count']
+    assert result.summary['prior_review_summary_path'] == str(
+        (output_dir / 'prior_review_bundle' / 'candidate_review_summary.json').resolve()
+    )
     assert prior_review_summary_payload['cluster_strategy'] == 'fallback_scope_merge'
     assert prior_review_summary_payload['fallback_reason'] == 'singleton_support_clusters'
     assert prior_review_summary_payload['prior_candidate_count'] >= 1

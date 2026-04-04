@@ -77,7 +77,52 @@ def test_phase13_cli_smoke_run_writes_iteration_scoped_outputs(tmp_path: Path) -
     assert summary_payload['output_dir'] == str(iteration_dir.resolve())
     assert summary_payload['baseline_replay_bundle'].endswith('tmp\\phase12_direct_fix_cycle\\cycle1\\replay_bundle')
     assert summary_payload['baseline_export_bundle'].endswith('tmp\\phase12_direct_fix_cycle\\cycle1\\export_bundle')
+    assert summary_payload['allow_scope_fallback_merge'] is False
+    assert summary_payload['prior_review_cluster_strategy'] == 'default'
+    assert summary_payload['prior_review_fallback_reason'] is None
+    assert summary_payload['prior_review_cluster_count'] >= 1
+    assert summary_payload['prior_candidate_count'] == 0
+    assert summary_payload['prior_review_summary_path'].endswith('candidate_review_summary.json')
+    assert Path(summary_payload['prior_review_summary_path']).is_file()
     assert 'comparison_summary_path' in summary_payload
     assert 'report_markdown_path' in summary_payload
     assert (iteration_dir / 'comparison_summary.json').is_file()
     assert (iteration_dir / 'replay_bundle' / 'replay_summary.json').is_file()
+
+
+def test_phase13_cli_smoke_run_surfaces_fallback_prior_summary_keys(tmp_path: Path) -> None:
+    output_root = tmp_path / 'phase13-runs'
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT_PATH),
+            '--iteration-label',
+            'fallback-check',
+            '--output-root',
+            str(output_root),
+            '--allow-scope-fallback-merge',
+            '--built-at',
+            '2026-04-04T04:20:00Z',
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+        cwd=str(BACKEND_DIR),
+    )
+
+    assert result.returncode == 0, result.stderr
+
+    summary_payload = json.loads(result.stdout)
+    iteration_dir = output_root / 'fallback-check'
+
+    assert summary_payload['iteration_label'] == 'fallback-check'
+    assert summary_payload['output_dir'] == str(iteration_dir.resolve())
+    assert summary_payload['allow_scope_fallback_merge'] is True
+    assert summary_payload['prior_review_cluster_strategy'] == 'fallback_scope_merge'
+    assert summary_payload['prior_review_fallback_reason'] == 'singleton_support_clusters'
+    assert summary_payload['prior_review_cluster_count'] >= 1
+    assert summary_payload['prior_candidate_count'] >= 1
+    assert summary_payload['prior_review_summary_path'].endswith('candidate_review_summary.json')
+    assert Path(summary_payload['prior_review_summary_path']).is_file()
+    assert (iteration_dir / 'comparison_summary.json').is_file()
