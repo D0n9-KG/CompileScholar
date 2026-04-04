@@ -288,6 +288,22 @@ def _dimension_rationale(
     return f'{route_label} leads on {dimension} ({route_a_score:.2f} vs {route_b_score:.2f}).'
 
 
+def _advantage_summary(
+    *,
+    recommended_route_state_id: str | None,
+    decisive_dimensions: list[str],
+    decisive_evidence_ids: list[str],
+) -> str | None:
+    if not recommended_route_state_id or not decisive_dimensions or not decisive_evidence_ids:
+        return None
+    dimension_text = ', '.join(decisive_dimensions[:3])
+    evidence_text = ', '.join(decisive_evidence_ids[:3])
+    return (
+        f'{recommended_route_state_id} leads on {dimension_text}; strongest supporting evidence refs: '
+        f'{evidence_text}.'
+    )
+
+
 def _method_overlap(route_a: RouteState, route_b: RouteState) -> float:
     methods_a = {_normalize(method.label) for method in route_a.route_landscape.dominant_methods if _normalize(method.label)}
     methods_b = {_normalize(method.label) for method in route_b.route_landscape.dominant_methods if _normalize(method.label)}
@@ -425,6 +441,22 @@ class RouteComparisonBuilder:
                 ]
             ),
         )
+        recommended_route_state_id: str | None = None
+        route_advantage_summary: str | None = None
+        if preference_label == 'prefer_a' and why_a_not_b.decisive_dimensions and why_a_not_b.decisive_evidence_ids:
+            recommended_route_state_id = route_a.route_state_id
+            route_advantage_summary = _advantage_summary(
+                recommended_route_state_id=recommended_route_state_id,
+                decisive_dimensions=why_a_not_b.decisive_dimensions,
+                decisive_evidence_ids=why_a_not_b.decisive_evidence_ids,
+            )
+        elif preference_label == 'prefer_b' and why_b_not_a.decisive_dimensions and why_b_not_a.decisive_evidence_ids:
+            recommended_route_state_id = route_b.route_state_id
+            route_advantage_summary = _advantage_summary(
+                recommended_route_state_id=recommended_route_state_id,
+                decisive_dimensions=why_b_not_a.decisive_dimensions,
+                decisive_evidence_ids=why_b_not_a.decisive_evidence_ids,
+            )
 
         comparable_dimensions = [
             score.dimension
@@ -476,6 +508,8 @@ class RouteComparisonBuilder:
             cutoff_year=route_a.cutoff_year,
             route_a_state_id=route_a.route_state_id,
             route_b_state_id=route_b.route_state_id,
+            recommended_route_state_id=recommended_route_state_id,
+            route_advantage_summary=route_advantage_summary,
             comparison_dimension_scores=comparison_scores,
             preference_label=preference_label,
             why_a_not_b=why_a_not_b,

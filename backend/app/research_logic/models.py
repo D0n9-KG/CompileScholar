@@ -452,6 +452,8 @@ class WhyNowCase(ContractModel):
     built_at: str
     route_state_id: str
     why_now_label: WhyNowLabel
+    because_now: str | None = None
+    why_not_before: str | None = None
     unlocking_factors: list[WhyNowFactor] = Field(default_factory=list)
     blocking_factors: list[WhyNowFactor] = Field(default_factory=list)
     evidence_chain: WhyNowEvidenceChain = Field(default_factory=WhyNowEvidenceChain)
@@ -515,6 +517,8 @@ class RouteComparisonCase(ContractModel):
     cutoff_year: int
     route_a_state_id: str
     route_b_state_id: str
+    recommended_route_state_id: str | None = None
+    route_advantage_summary: str | None = None
     comparison_dimension_scores: list[ComparisonDimensionScore] = Field(default_factory=list)
     preference_label: PreferenceLabel = 'unclear'
     why_a_not_b: RoutePreferenceExplanation

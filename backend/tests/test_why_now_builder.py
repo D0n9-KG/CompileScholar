@@ -180,6 +180,8 @@ def test_why_now_builder_emits_almost_now_for_green_route_state() -> None:
     assert why_now_case.why_now_label == 'almost_now'
     assert why_now_case.quality.quality_tier == 'green'
     assert why_now_case.quality.ready_for_training is True
+    assert why_now_case.because_now is not None
+    assert why_now_case.why_not_before is not None
     assert why_now_case.unlocking_factors
     assert why_now_case.blocking_factors
     assert why_now_case.evidence_chain.supporting_evidence_ids == ['e1', 'e2']
@@ -193,4 +195,6 @@ def test_why_now_builder_marks_missing_blockers_as_yellow() -> None:
     assert why_now_case.why_now_label == 'now'
     assert why_now_case.quality.quality_tier == 'yellow'
     assert why_now_case.quality.ready_for_training is False
+    assert why_now_case.because_now is not None
+    assert why_now_case.why_not_before is not None
     assert 'blocking_factors_missing' in why_now_case.quality.quality_flags

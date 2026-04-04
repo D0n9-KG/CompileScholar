@@ -284,6 +284,9 @@ def test_route_comparison_builder_prefers_route_a_with_grounded_dimensions() -> 
     assert comparison_case.preference_label == 'prefer_a'
     assert comparison_case.quality.quality_tier == 'green'
     assert comparison_case.quality.ready_for_training is True
+    assert comparison_case.recommended_route_state_id == 'route-a'
+    assert comparison_case.route_advantage_summary is not None
+    assert 'data_resource' in comparison_case.route_advantage_summary
     assert 'data_resource' in comparison_case.why_a_not_b.decisive_dimensions
     assert 'strategic_value' in comparison_case.why_a_not_b.decisive_dimensions
     assert 'bottleneck' in comparison_case.why_b_not_a.decisive_dimensions
@@ -383,3 +386,5 @@ def test_route_comparison_builder_flags_same_route_disguised_as_two() -> None:
     assert 'same_route_disguised_as_two' in comparison_case.quality.quality_flags
     assert 'alternative_route_not_real' in comparison_case.quality.quality_flags
     assert comparison_case.quality.ready_for_training is False
+    assert comparison_case.recommended_route_state_id is None
+    assert comparison_case.route_advantage_summary is None

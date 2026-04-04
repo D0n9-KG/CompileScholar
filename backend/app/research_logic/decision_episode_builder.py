@@ -63,6 +63,24 @@ def _comparison_role(route_state: RouteState, comparison_case: RouteComparisonCa
     return None
 
 
+def _confidence_cap(
+    confidence: float | None,
+    *,
+    selected_prior_cards: list[DecisionPriorCard],
+    comparison_case: RouteComparisonCase | None,
+) -> float | None:
+    if confidence is None:
+        return None
+    has_grounded_support = bool(selected_prior_cards) or (
+        comparison_case is not None
+        and str(comparison_case.recommended_route_state_id or '').strip()
+        and str(comparison_case.route_advantage_summary or '').strip()
+    )
+    if has_grounded_support:
+        return confidence
+    return min(confidence, 0.85)
+
+
 def _selected_prior_cards(route_state: RouteState, prior_cards: list[DecisionPriorCard] | None) -> list[DecisionPriorCard]:
     if not prior_cards:
         return []
@@ -358,16 +376,26 @@ def _final_choice(
             or (comparison_role == 'b' and comparison_case.preference_label == 'prefer_b')
         )
         if route_preferred:
+            confidence = _confidence_cap(
+                min(round((route_state.readiness_scores.overall or 0.65) + 0.08, 2), 0.95),
+                selected_prior_cards=selected_prior_cards,
+                comparison_case=comparison_case,
+            )
             return (
                 'primary',
                 'Prioritize the primary route, but keep the scope historically bounded and comparison-aware.',
-                min(round((route_state.readiness_scores.overall or 0.65) + 0.08, 2), 0.95),
+                confidence,
             )
         if comparison_case.preference_label in {'prefer_a', 'prefer_b'}:
+            confidence = _confidence_cap(
+                min(round((route_state.readiness_scores.overall or 0.55), 2), 0.9),
+                selected_prior_cards=selected_prior_cards,
+                comparison_case=comparison_case,
+            )
             return (
                 'alternative_1',
                 'Prefer the alternative route for now because the comparison evidence is stronger at this cutoff.',
-                min(round((route_state.readiness_scores.overall or 0.55), 2), 0.9),
+                confidence,
             )
     if why_now_case and why_now_case.why_now_label in {'now', 'almost_now'} and selected_prior_cards:
         return (

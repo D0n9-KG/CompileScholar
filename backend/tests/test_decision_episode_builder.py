@@ -688,3 +688,48 @@ def test_decision_episode_builder_distinguishes_green_and_non_green_prior_suppor
     assert 'weak_prior_support' not in green_episode.quality.quality_flags
     assert yellow_episode.relevant_priors.selected_prior_ids == ['prior:yellow-support']
     assert 'weak_prior_support' in yellow_episode.quality.quality_flags
+
+
+def test_decision_episode_builder_caps_confidence_without_grounded_route_or_prior_support() -> None:
+    route_main = _route_state(
+        route_state_id='route-main-thin-support',
+        support_ids=['m-e1', 'm-e2'],
+        challenge_ids=['m-c1'],
+        method_score=0.7,
+        measurement_score=0.71,
+        data_resource_score=0.72,
+        infrastructure_score=0.69,
+        cost_cycle_score=0.65,
+        overall_score=0.8,
+    )
+    route_alt = _route_state(
+        route_state_id='route-alt-thin-support',
+        method_label='feature-engineering pipeline',
+        support_ids=['a-e1', 'a-e2'],
+        challenge_ids=['a-c1'],
+        method_score=0.67,
+        measurement_score=0.68,
+        data_resource_score=0.69,
+        infrastructure_score=0.67,
+        cost_cycle_score=0.67,
+        overall_score=0.74,
+        bottleneck_label='manual tuning remains brittle',
+        bottleneck_type='engineering',
+        bottleneck_severity='high',
+        positive_signal_confidence=0.7,
+    )
+    comparison_case = build_route_comparison_case(route_main, route_alt)
+
+    episode = build_decision_episode(
+        route_main,
+        route_packet=_route_packet(route_main),
+        why_now_case=build_why_now_case(route_main),
+        comparison_case=comparison_case,
+        built_at='2026-04-02T03:20:00Z',
+    )
+
+    assert comparison_case.preference_label == 'prefer_a'
+    assert comparison_case.recommended_route_state_id is None
+    assert comparison_case.route_advantage_summary is None
+    assert episode.decision_output.final_choice == 'primary'
+    assert episode.decision_output.confidence == 0.85

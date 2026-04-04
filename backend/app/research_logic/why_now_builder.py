@@ -42,6 +42,37 @@ def _map_strength(confidence: float | None) -> str:
     return 'low'
 
 
+def _render_factor_labels(labels: list[str]) -> str:
+    cleaned = [str(label or '').strip() for label in labels if str(label or '').strip()]
+    if not cleaned:
+        return 'the currently visible evidence'
+    if len(cleaned) == 1:
+        return cleaned[0]
+    if len(cleaned) == 2:
+        return f'{cleaned[0]} and {cleaned[1]}'
+    return f'{", ".join(cleaned[:-1])}, and {cleaned[-1]}'
+
+
+def _because_now(route_state: RouteState, unlocking_factors: list[WhyNowFactor], *, label: str) -> str | None:
+    if label not in {'now', 'almost_now'}:
+        return None
+    unlocking_labels = _render_factor_labels([factor.label for factor in unlocking_factors[:3]])
+    return (
+        f'Now is plausible because {unlocking_labels} are visible at the cutoff and the route now looks actionable '
+        f'for {route_state.topic_scope}.'
+    )
+
+
+def _why_not_before(route_state: RouteState, blocking_factors: list[WhyNowFactor], *, label: str) -> str | None:
+    if label not in {'now', 'almost_now'}:
+        return None
+    blocking_labels = _render_factor_labels([factor.label for factor in blocking_factors[:2]])
+    return (
+        f'Not before now because {blocking_labels} still constrained the route, so the earlier evidence was not '
+        f'strong enough to justify committing to {route_state.topic_scope}.'
+    )
+
+
 def _to_why_now_factor(feature: RouteFeature, *, source_field: str) -> WhyNowFactor:
     return WhyNowFactor(
         label=feature.label,
@@ -112,6 +143,8 @@ class WhyNowCaseBuilder:
             representative_route_fields.append('readiness_scores')
         if label in {'now', 'almost_now'} and not representative_route_fields:
             quality_flags.append('label_not_grounded')
+        because_now = _because_now(route_state, unlocking_factors, label=label)
+        why_not_before = _why_not_before(route_state, blocking_factors, label=label)
 
         quality_tier = 'green' if route_state.quality.quality_tier == 'green' and not quality_flags else 'yellow' if route_state.quality.quality_tier != 'red' else 'red'
 
@@ -120,6 +153,8 @@ class WhyNowCaseBuilder:
             built_at=built_at or _utc_now_iso(),
             route_state_id=route_state.route_state_id,
             why_now_label=label,
+            because_now=because_now,
+            why_not_before=why_not_before,
             unlocking_factors=unlocking_factors,
             blocking_factors=blocking_factors,
             evidence_chain=WhyNowEvidenceChain(
