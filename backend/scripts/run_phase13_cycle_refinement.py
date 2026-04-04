@@ -68,6 +68,12 @@ def build_parser() -> argparse.ArgumentParser:
         '--report-md',
         help='Optional markdown report path. Defaults to <iteration-dir>\\phase13-cycle-report.md.',
     )
+    parser.add_argument(
+        '--reviewer',
+        action='append',
+        default=[],
+        help='Reviewer id to attach to replay and prior-review generation. Repeat for multiple reviewers.',
+    )
     parser.add_argument('--built-at', help='Override the build timestamp used for generated Phase 13 artifacts.')
     return parser
 
@@ -152,6 +158,7 @@ def main(argv: list[str] | None = None) -> int:
             output_dir=resolved_paths.output_dir,
             baseline_replay_bundle=resolved_paths.baseline_replay_bundle,
             baseline_export_bundle=resolved_paths.baseline_export_bundle,
+            reviewer_ids=args.reviewer,
             report_md=resolved_paths.report_md,
             built_at=args.built_at,
             repo_root=REPO_ROOT,
@@ -166,6 +173,7 @@ def main(argv: list[str] | None = None) -> int:
         'output_dir': str(resolved_paths.output_dir.resolve()),
         'baseline_replay_bundle': str(resolved_paths.baseline_replay_bundle.resolve()),
         'baseline_export_bundle': str(resolved_paths.baseline_export_bundle.resolve()),
+        'reviewer_ids': [reviewer_id for reviewer_id in args.reviewer if str(reviewer_id).strip()],
         'comparison_summary_path': str(result.comparison_summary_path.resolve()),
         'report_markdown_path': str(resolved_paths.report_md.resolve()),
     }

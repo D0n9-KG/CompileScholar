@@ -34,6 +34,7 @@ def test_phase10_cli_help_lists_comparison_arguments() -> None:
     assert '--baseline-replay-bundle' in result.stdout
     assert '--baseline-export-bundle' in result.stdout
     assert '--report-md' in result.stdout
+    assert '--reviewer' in result.stdout
 
 
 def test_phase10_cli_writes_comparison_summary_and_report(tmp_path: Path) -> None:
@@ -140,3 +141,45 @@ def test_phase10_cli_accepts_backend_relative_paths(tmp_path: Path) -> None:
     assert summary_payload['replay_summary_path'] == str((output_dir / 'replay_bundle' / 'replay_summary.json').resolve())
     assert summary_payload['comparison_summary_path'] == str((output_dir / 'comparison_summary.json').resolve())
     assert summary_payload['report_markdown_path'] == str(report_path.resolve())
+
+
+def test_phase10_cli_threads_reviewer_ids_into_replay_summary(tmp_path: Path) -> None:
+    _assert_baseline_bundles_exist()
+    output_dir = tmp_path / 'phase10-cli-reviewer-run'
+    l1_snapshot_output = tmp_path / 'phase10-cli-reviewer-l1-snapshot.json'
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT_PATH),
+            '--packet',
+            str(PHASE9_PACKET_PATH),
+            '--assembly-manifest',
+            str(PHASE9_ASSEMBLY_MANIFEST_PATH),
+            '--l1-snapshot-output',
+            str(l1_snapshot_output),
+            '--output-dir',
+            str(output_dir),
+            '--baseline-replay-bundle',
+            str(BASELINE_REPLAY_BUNDLE),
+            '--baseline-export-bundle',
+            str(BASELINE_EXPORT_BUNDLE),
+            '--reviewer',
+            'reviewer-1',
+            '--built-at',
+            '2026-04-04T04:35:00Z',
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+        cwd=str(BACKEND_DIR),
+    )
+
+    assert result.returncode == 0, result.stderr
+
+    summary_payload = json.loads(result.stdout)
+    replay_summary_payload = json.loads((output_dir / 'replay_bundle' / 'replay_summary.json').read_text(encoding='utf-8'))
+
+    assert summary_payload['reviewer_ids'] == ['reviewer-1']
+    assert replay_summary_payload['reviewer_ids'] == ['reviewer-1']
+    assert 'reviewer_missing' not in replay_summary_payload['quality_flags']

@@ -186,6 +186,30 @@ def test_phase10_workflow_writes_prior_review_and_export_bundles(tmp_path: Path)
         shutil.rmtree(runtime_paths.output_root, ignore_errors=True)
 
 
+def test_phase10_workflow_threads_reviewer_ids_into_replay_and_prior_review(tmp_path: Path) -> None:
+    output_dir = tmp_path / 'phase10-reviewer-run'
+    l1_snapshot_output_path = tmp_path / 'phase10-reviewer-l1-snapshot.json'
+
+    result = run_phase10_package_and_replay(
+        packet_path=PHASE9_PACKET_PATH,
+        assembly_manifest_path=PHASE9_ASSEMBLY_MANIFEST_PATH,
+        l1_snapshot_output_path=l1_snapshot_output_path,
+        output_dir=output_dir,
+        reviewer_ids=['reviewer-1'],
+        built_at='2026-04-04T04:25:00Z',
+        repo_root=REPO_ROOT,
+    )
+
+    replay_summary_payload = json.loads((output_dir / 'replay_bundle' / 'replay_summary.json').read_text(encoding='utf-8'))
+    prior_review_summary_payload = json.loads((output_dir / 'prior_review_bundle' / 'candidate_review_summary.json').read_text(encoding='utf-8'))
+
+    assert result.summary['reviewer_ids'] == ['reviewer-1']
+    assert replay_summary_payload['reviewer_ids'] == ['reviewer-1']
+    assert 'reviewer_missing' not in replay_summary_payload['quality_flags']
+    assert prior_review_summary_payload['prior_review_status_counts'].get('candidate', 0) == 0
+    assert prior_review_summary_payload['anti_pattern_review_status_counts'].get('reviewed', 0) >= 0
+
+
 def test_phase10_cli_help_lists_required_arguments() -> None:
     script_path = REPO_ROOT / 'backend' / 'scripts' / 'run_phase10_multi_paper_validation.py'
     result = subprocess.run(
@@ -201,6 +225,7 @@ def test_phase10_cli_help_lists_required_arguments() -> None:
     assert '--assembly-manifest' in result.stdout
     assert '--l1-snapshot-output' in result.stdout
     assert '--output-dir' in result.stdout
+    assert '--reviewer' in result.stdout
 
 
 def test_phase10_cli_writes_package_and_replay_bundles(tmp_path: Path) -> None:

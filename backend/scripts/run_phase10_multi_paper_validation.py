@@ -42,6 +42,12 @@ def build_parser() -> argparse.ArgumentParser:
         '--report-md',
         help='Optional markdown report path rendered from comparison_summary.json.',
     )
+    parser.add_argument(
+        '--reviewer',
+        action='append',
+        default=[],
+        help='Reviewer id to attach to replay and prior-review generation. Repeat for multiple reviewers.',
+    )
     parser.add_argument('--built-at', help='Override the build timestamp used for generated Phase 10 artifacts.')
     return parser
 
@@ -80,6 +86,7 @@ def main(argv: list[str] | None = None) -> int:
             output_dir=args.output_dir,
             baseline_replay_bundle=args.baseline_replay_bundle,
             baseline_export_bundle=args.baseline_export_bundle,
+            reviewer_ids=args.reviewer,
             report_md=args.report_md,
             built_at=args.built_at,
             repo_root=REPO_ROOT,

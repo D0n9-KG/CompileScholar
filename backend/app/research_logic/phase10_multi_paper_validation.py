@@ -1351,6 +1351,7 @@ def run_phase10_package_and_replay(
     output_dir: str | Path,
     baseline_replay_bundle: str | Path = DEFAULT_PHASE10_BASELINE_REPLAY_BUNDLE,
     baseline_export_bundle: str | Path = DEFAULT_PHASE10_BASELINE_EXPORT_BUNDLE,
+    reviewer_ids: list[str] | None = None,
     report_md: str | Path | None = None,
     built_at: str | None = None,
     repo_root: str | Path | None = None,
@@ -1400,6 +1401,7 @@ def run_phase10_package_and_replay(
         support_route_states=loaded_route_state_package.support_route_states,
         alternative_route_states=loaded_route_state_package.alternative_route_states,
         held_out_route_states=loaded_route_state_package.held_out_route_states,
+        reviewer_ids=reviewer_ids,
         built_at=built_at,
     )
     replay_bundle_files = write_replay_bundle(
@@ -1411,6 +1413,7 @@ def run_phase10_package_and_replay(
         support_route_states=loaded_route_state_package.support_route_states,
         alternative_route_states=loaded_route_state_package.alternative_route_states,
         held_out_route_states=loaded_route_state_package.held_out_route_states,
+        reviewer_ids=reviewer_ids,
         metadata={
             'runner': 'backend/scripts/run_phase10_multi_paper_validation.py',
             'l1_snapshot_id': bridge.l1_snapshot.snapshot_id,
@@ -1421,6 +1424,7 @@ def run_phase10_package_and_replay(
     )
     prior_candidate_registry = build_prior_candidate_registry_from_package(
         loaded_route_state_package,
+        reviewer_ids=reviewer_ids,
         built_at=built_at,
     )
     prior_review_bundle_files = write_prior_candidate_review_bundle(
@@ -1469,6 +1473,7 @@ def run_phase10_package_and_replay(
         support_route_states=loaded_route_state_package.support_route_states,
         alternative_route_states=loaded_route_state_package.alternative_route_states,
         held_out_route_states=loaded_route_state_package.held_out_route_states,
+        reviewer_ids=reviewer_ids,
     )
     prior_review_manifest_payload = _load_json(prior_review_bundle_files['bundle_manifest'])
     if not isinstance(prior_review_manifest_payload, dict):
@@ -1495,6 +1500,7 @@ def run_phase10_package_and_replay(
         'support_route_state_count': replay_summary['support_route_state_count'],
         'alternative_route_state_count': replay_summary['alternative_route_state_count'],
         'held_out_route_state_count': replay_summary['held_out_route_state_count'],
+        'reviewer_ids': list(replay_summary['reviewer_ids']),
         'prior_review_output_dir': str(prior_review_output_dir.resolve()),
         'prior_review_bundle_manifest': str(prior_review_bundle_files['bundle_manifest'].resolve()),
         'prior_review_summary_path': str(prior_review_bundle_files['candidate_review_summary'].resolve()),
