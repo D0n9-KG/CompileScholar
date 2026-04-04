@@ -74,6 +74,11 @@ def build_parser() -> argparse.ArgumentParser:
         default=[],
         help='Reviewer id to attach to replay and prior-review generation. Repeat for multiple reviewers.',
     )
+    parser.add_argument(
+        '--allow-scope-fallback-merge',
+        action='store_true',
+        help='Merge same-scope singleton support clusters into one bounded fallback cluster for Phase 13 reruns.',
+    )
     parser.add_argument('--built-at', help='Override the build timestamp used for generated Phase 13 artifacts.')
     return parser
 
@@ -159,6 +164,7 @@ def main(argv: list[str] | None = None) -> int:
             baseline_replay_bundle=resolved_paths.baseline_replay_bundle,
             baseline_export_bundle=resolved_paths.baseline_export_bundle,
             reviewer_ids=args.reviewer,
+            allow_scope_fallback_merge=args.allow_scope_fallback_merge,
             report_md=resolved_paths.report_md,
             built_at=args.built_at,
             repo_root=REPO_ROOT,
@@ -174,6 +180,7 @@ def main(argv: list[str] | None = None) -> int:
         'baseline_replay_bundle': str(resolved_paths.baseline_replay_bundle.resolve()),
         'baseline_export_bundle': str(resolved_paths.baseline_export_bundle.resolve()),
         'reviewer_ids': [reviewer_id for reviewer_id in args.reviewer if str(reviewer_id).strip()],
+        'allow_scope_fallback_merge': args.allow_scope_fallback_merge,
         'comparison_summary_path': str(result.comparison_summary_path.resolve()),
         'report_markdown_path': str(resolved_paths.report_md.resolve()),
     }

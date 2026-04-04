@@ -1352,6 +1352,7 @@ def run_phase10_package_and_replay(
     baseline_replay_bundle: str | Path = DEFAULT_PHASE10_BASELINE_REPLAY_BUNDLE,
     baseline_export_bundle: str | Path = DEFAULT_PHASE10_BASELINE_EXPORT_BUNDLE,
     reviewer_ids: list[str] | None = None,
+    allow_scope_fallback_merge: bool = False,
     report_md: str | Path | None = None,
     built_at: str | None = None,
     repo_root: str | Path | None = None,
@@ -1425,6 +1426,7 @@ def run_phase10_package_and_replay(
     prior_candidate_registry = build_prior_candidate_registry_from_package(
         loaded_route_state_package,
         reviewer_ids=reviewer_ids,
+        allow_scope_fallback_merge=allow_scope_fallback_merge,
         built_at=built_at,
     )
     prior_review_bundle_files = write_prior_candidate_review_bundle(
@@ -1504,6 +1506,8 @@ def run_phase10_package_and_replay(
         'prior_review_output_dir': str(prior_review_output_dir.resolve()),
         'prior_review_bundle_manifest': str(prior_review_bundle_files['bundle_manifest'].resolve()),
         'prior_review_summary_path': str(prior_review_bundle_files['candidate_review_summary'].resolve()),
+        'prior_review_cluster_strategy': prior_candidate_registry.cluster_strategy,
+        'prior_review_fallback_reason': prior_candidate_registry.fallback_reason,
         'accepted_prior_ids': _bundle_string_list(
             prior_review_manifest_payload,
             key='accepted_prior_ids',
@@ -1523,6 +1527,7 @@ def run_phase10_package_and_replay(
         'visibility_bucket_counts': dict(export_summary_payload['visibility_bucket_counts']),
         'baseline_replay_bundle': str(_resolve_bundle_dir(baseline_replay_bundle, repo_root=bridge.canonical_inputs.repo_root).resolve()),
         'baseline_export_bundle': str(_resolve_bundle_dir(baseline_export_bundle, repo_root=bridge.canonical_inputs.repo_root).resolve()),
+        'allow_scope_fallback_merge': allow_scope_fallback_merge,
         'comparison_summary_path': str(comparison_summary_path.resolve()),
         'report_markdown_path': str(report_markdown_path.resolve()) if report_markdown_path is not None else None,
     }

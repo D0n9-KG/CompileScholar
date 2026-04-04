@@ -179,6 +179,45 @@ def _quality_flag_counts(prior_candidates: list[DecisionPriorCard], anti_pattern
     return dict(sorted(counts.items()))
 
 
+def _fallback_scope_label(route_states: list[RouteState]) -> str | None:
+    scope_labels = _unique(
+        [
+            route_state.scope_resolution.accepted_scope_label or route_state.topic_scope
+            for route_state in route_states
+            if (route_state.scope_resolution.accepted_scope_label or route_state.topic_scope)
+        ]
+    )
+    if len(scope_labels) != 1:
+        return None
+    return scope_labels[0]
+
+
+def _fallback_cluster(
+    *,
+    route_states: list[RouteState],
+    scope_label: str,
+) -> tuple['PriorSupportCluster', list[RouteState]]:
+    return (
+        PriorSupportCluster(
+            cluster_id=f'{_slug(scope_label)}_scope_fallback_cluster',
+            scope_label=scope_label,
+            dominant_method_labels=sorted(
+                _unique([label for route_state in route_states for label in _method_labels(route_state)])
+            ),
+            dominant_method_families=sorted(
+                _unique([family for route_state in route_states for family in _method_families(route_state)])
+            ),
+            bottleneck_types=sorted(
+                _unique([bottleneck for route_state in route_states for bottleneck in _bottleneck_types(route_state)])
+            ),
+            readiness_bucket='scope_fallback_cluster',
+            support_route_state_ids=[route_state.route_state_id for route_state in route_states],
+            support_count=len(route_states),
+        ),
+        route_states,
+    )
+
+
 class PriorSupportCluster(ContractModel):
     cluster_id: str
     scope_label: str
@@ -195,6 +234,8 @@ class PriorCandidateRegistry(ContractModel):
 
     built_at: str
     package_id: str | None = None
+    cluster_strategy: str = 'default'
+    fallback_reason: str | None = None
     clusters: list[PriorSupportCluster] = Field(default_factory=list)
     prior_candidates: list[DecisionPriorCard] = Field(default_factory=list)
     anti_pattern_candidates: list[AntiPatternCard] = Field(default_factory=list)
@@ -229,6 +270,7 @@ class PriorInductionEngine:
         held_out_route_states: list[RouteState] | None = None,
         comparison_cases: list[RouteComparisonCase] | None = None,
         reviewer_ids: list[str] | None = None,
+        allow_scope_fallback_merge: bool = False,
         built_at: str | None = None,
         package_id: str | None = None,
     ) -> PriorCandidateRegistry:
@@ -239,6 +281,23 @@ class PriorInductionEngine:
         built_at_value = built_at or _utc_now_iso()
 
         clusters_with_routes = _group_route_states(support_route_states)
+        cluster_strategy = 'default'
+        fallback_reason: str | None = None
+        fallback_scope_label = _fallback_scope_label(support_route_states)
+        if (
+            allow_scope_fallback_merge
+            and len(clusters_with_routes) > 1
+            and all(cluster.support_count == 1 for cluster, _ in clusters_with_routes)
+            and fallback_scope_label is not None
+        ):
+            clusters_with_routes = [
+                _fallback_cluster(
+                    route_states=support_route_states,
+                    scope_label=fallback_scope_label,
+                )
+            ]
+            cluster_strategy = 'fallback_scope_merge'
+            fallback_reason = 'singleton_support_clusters'
         clusters = [cluster for cluster, _ in clusters_with_routes]
         prior_candidates: list[DecisionPriorCard] = []
         anti_pattern_candidates: list[AntiPatternCard] = []
@@ -274,6 +333,8 @@ class PriorInductionEngine:
         return PriorCandidateRegistry(
             built_at=built_at_value,
             package_id=package_id,
+            cluster_strategy=cluster_strategy,
+            fallback_reason=fallback_reason,
             clusters=clusters,
             prior_candidates=prior_candidates,
             anti_pattern_candidates=anti_pattern_candidates,
@@ -292,6 +353,7 @@ def build_prior_candidate_registry(
     held_out_route_states: list[RouteState] | None = None,
     comparison_cases: list[RouteComparisonCase] | None = None,
     reviewer_ids: list[str] | None = None,
+    allow_scope_fallback_merge: bool = False,
     built_at: str | None = None,
     package_id: str | None = None,
     prior_builder_version: str = 'decision_prior_builder_v1',
@@ -307,6 +369,7 @@ def build_prior_candidate_registry(
         held_out_route_states=held_out_route_states,
         comparison_cases=comparison_cases,
         reviewer_ids=reviewer_ids,
+        allow_scope_fallback_merge=allow_scope_fallback_merge,
         built_at=built_at,
         package_id=package_id,
     )
@@ -324,6 +387,7 @@ def build_prior_candidate_registry_from_package(
     package: LoadedRouteStatePackage | RouteStatePackageCompilation,
     *,
     reviewer_ids: list[str] | None = None,
+    allow_scope_fallback_merge: bool = False,
     built_at: str | None = None,
 ) -> PriorCandidateRegistry:
     package_id, grouped_inputs = _package_induction_inputs(package)
@@ -332,6 +396,7 @@ def build_prior_candidate_registry_from_package(
         alternative_route_states=grouped_inputs['alternative_route_states'],
         held_out_route_states=grouped_inputs['held_out_route_states'],
         reviewer_ids=reviewer_ids,
+        allow_scope_fallback_merge=allow_scope_fallback_merge,
         built_at=built_at,
         package_id=package_id,
     )

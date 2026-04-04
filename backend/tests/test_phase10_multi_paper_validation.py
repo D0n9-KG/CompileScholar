@@ -210,6 +210,31 @@ def test_phase10_workflow_threads_reviewer_ids_into_replay_and_prior_review(tmp_
     assert prior_review_summary_payload['anti_pattern_review_status_counts'].get('reviewed', 0) >= 0
 
 
+def test_phase10_workflow_supports_scope_fallback_merge_for_phase13_runs(tmp_path: Path) -> None:
+    output_dir = tmp_path / 'phase10-fallback-run'
+    l1_snapshot_output_path = tmp_path / 'phase10-fallback-l1-snapshot.json'
+
+    result = run_phase10_package_and_replay(
+        packet_path=PHASE9_PACKET_PATH,
+        assembly_manifest_path=PHASE9_ASSEMBLY_MANIFEST_PATH,
+        l1_snapshot_output_path=l1_snapshot_output_path,
+        output_dir=output_dir,
+        reviewer_ids=['reviewer-1'],
+        allow_scope_fallback_merge=True,
+        built_at='2026-04-04T04:45:00Z',
+        repo_root=REPO_ROOT,
+    )
+
+    prior_review_summary_payload = json.loads((output_dir / 'prior_review_bundle' / 'candidate_review_summary.json').read_text(encoding='utf-8'))
+
+    assert result.summary['allow_scope_fallback_merge'] is True
+    assert result.summary['prior_review_cluster_strategy'] == 'fallback_scope_merge'
+    assert result.summary['prior_review_fallback_reason'] == 'singleton_support_clusters'
+    assert prior_review_summary_payload['cluster_strategy'] == 'fallback_scope_merge'
+    assert prior_review_summary_payload['fallback_reason'] == 'singleton_support_clusters'
+    assert prior_review_summary_payload['prior_candidate_count'] >= 1
+
+
 def test_phase10_cli_help_lists_required_arguments() -> None:
     script_path = REPO_ROOT / 'backend' / 'scripts' / 'run_phase10_multi_paper_validation.py'
     result = subprocess.run(

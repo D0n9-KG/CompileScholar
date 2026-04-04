@@ -432,6 +432,8 @@ def build_prior_candidate_review_summary(
     return {
         'package_id': registry.package_id,
         'built_at': registry.built_at,
+        'cluster_strategy': registry.cluster_strategy,
+        'fallback_reason': registry.fallback_reason,
         'cluster_count': len(registry.clusters),
         'cluster_ids': [cluster.cluster_id for cluster in registry.clusters],
         'cluster_support_counts': {
