@@ -15,7 +15,7 @@ Requirements for milestone `v1.2`. This milestone uses repeated in-milestone cyc
 
 ### Manual Output Quality Review
 
-- [ ] **REVIEW-01**: Each cycle includes explicit manual review notes on real reasoning outputs (not only metric deltas).
+- [x] **REVIEW-01**: Each cycle includes explicit manual review notes on real reasoning outputs (not only metric deltas).
 - [ ] **REVIEW-02**: Review notes must identify concrete output-level defects and map each defect to a pipeline stage to optimize next.
 - [ ] **REVIEW-03**: Cycle recommendations (`packet_construction`, `l4_aggregation`, `l2_extraction`) must be justified by reviewed output evidence.
 
@@ -57,8 +57,8 @@ Explicitly excluded from `v1.2`.
 |-------------|-------|--------|
 | `LOOPR-01` | Phase `12` | Complete |
 | `LOOPR-02` | Phase `12` | Complete |
-| `LOOPR-03` | Phase `13` | Pending |
-| `REVIEW-01` | Phase `13` | Pending |
+| `LOOPR-03` | Phase `13` | Complete |
+| `REVIEW-01` | Phase `13` | Complete |
 | `REVIEW-02` | Phase `14` | Pending |
 | `REVIEW-03` | Phase `14` | Pending |
 | `STAB-01` | Phase `15` | Pending |
