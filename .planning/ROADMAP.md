@@ -2,24 +2,24 @@
 
 **Status:** ACTIVE 2026-04-03
 **Phases:** 12-16
-**Requirements:** 9 mapped
+**Requirements:** 16 mapped
 **Numbering Mode:** Continue from `v1.1`
 
 ## Overview
 
 `v1.2` is a continuous optimization milestone.
 
-Inside one milestone, the team repeatedly runs: generate real outputs -> manually review output quality -> optimize pipeline -> rerun. Milestone completion depends on stable high-quality outputs across consecutive cycles, not a single good run.
+Inside one milestone, the team repeatedly runs: generate real outputs -> manually review output quality -> optimize pipeline -> rerun. Milestone completion depends on stable high-quality outputs across consecutive cycles, judged by directly reading the generated reasoning artifacts and deciding whether they are actually suitable as scientific-thinking training data, not by metrics alone or by a single good run. The later phases also optimize the exported data shape itself so the final artifacts become self-contained, evidence-grounded, and training-friendly rather than only audit-friendly. Every major section of the final training artifact stays in optimization scope, and the milestone aims to end with a bounded but genuinely usable scientific-thinking dataset rather than one-off exports.
 
 ## Phase Summary
 
 | Phase | Name | Goal | Requirements | Success Criteria |
 |-------|------|------|--------------|------------------|
 | 12 | Baseline Data Cycle 1 (Direct Fix) | Use Phase 10/11 existing artifacts directly, apply focused fixes, rerun, and review output quality. | `LOOPR-01`, `LOOPR-02` | Complete (`2026-04-04`) |
-| 13 | Baseline Data Cycle 2 (Refine) | 3/3 | Complete    | 2026-04-04 |
-| 14 | Cycle 2 Optimization And Review | Apply fixes from cycle 1, rerun, and re-review outputs with explicit defect deltas. | `REVIEW-02`, `REVIEW-03` | 4 |
-| 15 | Cycle 3 Consolidation | Continue optimize/rerun to reach repeated high-quality output under manual review. | `STAB-01` | 3 |
-| 16 | Stability Verification And Handoff | Verify consecutive-cycle stability and publish final verification with residual risk notes. | `STAB-02`, `STAB-03` | 3 |
+| 13 | Baseline Data Cycle 2 (Refine) | Run a second bounded rerun on the fixed cycle-1 baseline, recover replay quality, and leave an explicit defect-delta handoff. | `LOOPR-03`, `REVIEW-01` | Complete (`2026-04-04`) |
+| 14 | Cycle 2 Optimization And Review | Add self-contained training-facing exports, review two bounded candidate cycles, and confirm the next-cycle recommendation from reviewed evidence. | `REVIEW-02`, `REVIEW-03`, `TRAIN-01`, `TRAIN-02`, `TRAIN-03`, `TRAIN-06` | Complete (`2026-04-04`) |
+| 15 | Cycle 3 Consolidation | Continue bounded optimize/rerun cycles after the Phase 14 export-structure improvements until one cycle is manually judged genuinely useful as training data and reviewed prior/anti-pattern knowledge begins closing into the final export surface. | `STAB-01`, `TRAIN-04` | 5 |
+| 16 | Stability Verification And Handoff | Verify that consecutive high-quality cycles stay manually convincing as training data and publish the final stability, schema, dataset, and residual-risk handoff. | `STAB-02`, `STAB-03`, `TRAIN-05`, `TRAIN-07` | 5 |
 
 ## Phase Details
 
@@ -49,37 +49,44 @@ Inside one milestone, the team repeatedly runs: generate real outputs -> manuall
 
 ### Phase 14: Cycle 2 Optimization And Review
 
-**Goal:** Optimize based on cycle 1 review findings, rerun, and compare output-level quality changes.
+**Goal:** Keep optimizing the bounded slice from the Phase 13 defect review until at least one rerun produces reasoning artifacts that manual review judges genuinely usable as scientific-thinking training data.
 **Depends on:** Phase `13`
-**Requirements:** `REVIEW-02`, `REVIEW-03`
+**Requirements:** `REVIEW-02`, `REVIEW-03`, `TRAIN-01`, `TRAIN-02`, `TRAIN-03`, `TRAIN-06`
 
 **Success criteria:**
-1. Pipeline fixes are implemented from explicit cycle 1 defects.
-2. Cycle 2 outputs are manually reviewed with defect delta comparisons.
-3. Recommendation priority is justified by reviewed output evidence.
-4. Remaining defects are prioritized for next iteration.
+1. Pipeline fixes are implemented from explicit Phase 13 defect findings rather than from metric-only guesses.
+2. Phase 14 may run multiple bounded optimize -> rerun loops inside the phase until one cycle is manually judged "good enough" on the generated reasoning content itself.
+3. Manual review explicitly reads real package / replay / prior / export outputs and judges whether they would help train a model to perform scientific reasoning, not merely satisfy stage flags.
+4. The chosen best cycle publishes a self-contained training-facing export view that keeps key evidence snippets, comparison reasoning, and final decision content together without requiring cross-file reconstruction.
+5. Final artifacts preserve canonical labels alongside raw source phrases for route features, bottlenecks, and conditions, and they record structured human review / training-acceptance fields inside the machine-readable export.
+6. Every major content section of the final training artifact, including evidence pack, route synthesis, why-now, route comparison, priors / anti-patterns, minimal attack path, final decision, and review labels, is explicitly reviewed and left inside the optimization scope rather than treated as frozen background.
+7. Recommendation priority and remaining defects are justified by reviewed output evidence from the chosen best cycle.
 
 ### Phase 15: Cycle 3 Consolidation
 
-**Goal:** Continue optimize/rerun until high-quality outputs become repeatable under manual review.
+**Goal:** Continue bounded optimization after the Phase 14 export-structure improvements until the first cycle is actually judged high quality by direct manual review, while also tightening how reviewed prior / anti-pattern knowledge closes into the final export.
 **Depends on:** Phase `14`
-**Requirements:** `STAB-01`
+**Requirements:** `STAB-01`, `TRAIN-04`
 
 **Success criteria:**
-1. Another full cycle runs with additional targeted fixes.
-2. Manual review judges output quality as high for this cycle.
-3. Consecutive high-quality-cycle evidence is recorded.
+1. Another full bounded cycle runs with targeted fixes linked to the remaining reviewed defects from Phase 14's best-cycle review.
+2. Manual review judges the generated reasoning artifacts high quality based on direct reading, not just metrics or readiness flags.
+3. Reviewed accepted prior / anti-pattern knowledge either flows into the final selected export fields when it truly matches the route or carries explicit structured exclusion rationale when it does not.
+4. The new good cycle is compared directly against the completed Phase 14 best-cycle review so the quality jump is explicit.
+5. The resulting outputs look genuinely useful as scientific-thinking training data rather than remaining structurally valid but substantively weak.
 
 ### Phase 16: Stability Verification And Handoff
 
-**Goal:** Confirm stable quality across consecutive cycles and close milestone with a clear next-cycle handoff.
+**Goal:** Confirm that consecutive good cycles are truly stable under direct manual review and close the milestone with a clear dataset-readiness and residual-risk handoff.
 **Depends on:** Phase `15`
-**Requirements:** `STAB-02`, `STAB-03`
+**Requirements:** `STAB-02`, `STAB-03`, `TRAIN-05`, `TRAIN-07`
 
 **Success criteria:**
-1. Consecutive-cycle evidence demonstrates reproducible high-quality outputs.
-2. Final verification explains why quality is stable and where residual risk remains.
-3. A clear next optimization focus is documented for the following milestone.
+1. Consecutive-cycle evidence demonstrates reproducible high-quality outputs under direct manual review of the generated reasoning artifacts.
+2. Final verification explains why the outputs are considered stably useful for scientific-thinking training data and where residual risk remains.
+3. The final handoff publishes the stable training-data schema and multiple task-specific training views for route synthesis, why-now judgment, route comparison, prior / anti-pattern learning, and final decision episodes.
+4. The milestone closes with a bounded but genuinely training-usable dataset bundle assembled from the validated later-cycle artifacts rather than only isolated one-off exports.
+5. A clear next optimization focus is documented for the following milestone.
 
 ## Coverage
 
@@ -91,11 +98,18 @@ Inside one milestone, the team repeatedly runs: generate real outputs -> manuall
 | `REVIEW-01` | Phase `13` |
 | `REVIEW-02` | Phase `14` |
 | `REVIEW-03` | Phase `14` |
+| `TRAIN-01` | Phase `14` |
+| `TRAIN-02` | Phase `14` |
+| `TRAIN-03` | Phase `14` |
+| `TRAIN-06` | Phase `14` |
 | `STAB-01` | Phase `15` |
+| `TRAIN-04` | Phase `15` |
 | `STAB-02` | Phase `16` |
 | `STAB-03` | Phase `16` |
+| `TRAIN-05` | Phase `16` |
+| `TRAIN-07` | Phase `16` |
 
-**Coverage status:** `9/9` requirements mapped
+**Coverage status:** `16/16` requirements mapped
 
 ## Notes
 
@@ -103,16 +117,19 @@ Inside one milestone, the team repeatedly runs: generate real outputs -> manuall
 - v1.2 starts directly from existing Phase 10/11 data and commands instead of building a separate foundation layer first.
 - v1.2 progress is judged by real generated output quality and cycle-to-cycle stability, not metric-only improvements.
 - Manual review findings are first-class evidence and must directly steer optimization work.
+- A cycle counts as "good" only when direct human review says the generated content itself would be useful for training scientific reasoning, not when the pipeline merely turns more flags green.
+- Later phases must optimize the exported training-data shape itself, including self-contained evidence views, canonicalized concept labels, structured human review fields, and usable multi-view training artifacts.
+- Later phases must also optimize every major content section of the final training artifact and aim to ship a bounded but genuinely usable scientific-thinking dataset bundle by milestone close.
 - Overfitting guardrail: do not generalize single-paper tricks to pipeline-wide logic unless multi-stage quality actually improves.
 
 ## Next Up
 
-**Phase 14: Cycle 2 Optimization And Review** - use the completed Phase 13 cycle report and prioritization handoff to target the remaining packet-quality and export-readiness blockers.
+**Phase 15: Cycle 3 Consolidation** - use the completed Phase 14 best-cycle review and prioritization handoff to attack the remaining packet-quality, route-comparison, and prior-selection blockers until one bounded cycle is manually judged genuinely useful as scientific-thinking training data.
 
-`$gsd-discuss-phase 14`
+`$gsd-discuss-phase 15`
 
-Also available: `$gsd-plan-phase 14`
+Also available: `$gsd-plan-phase 15`
 
 ---
 *Roadmap created: 2026-04-03*
-*Last updated: 2026-04-04 after completing Phase 13*
+*Last updated: 2026-04-04 after completing Phase 14*

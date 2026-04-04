@@ -20,6 +20,7 @@ Produce auditable, replayable, trainable scientific-reasoning artifacts rather t
 - Phase `11` completed on `2026-04-03` with a runtime-backed iteration prioritization bundle, committed report/verification artifacts, and a packet-construction-first next-cycle queue
 - Phase `12` completed on `2026-04-04` with a repaired Phase 10 runtime packet bridge, a fresh bounded cycle-1 rerun, and a verification verdict that packet blockers moved but downstream replay/prior/export blockers still remain
 - Phase `13` completed on `2026-04-04` with two bounded reruns on the fixed cycle-1 baseline, replay recovery to `green`, one accepted fallback-cluster prior, and a generated next-cycle recommendation that still ranks `packet_construction` first
+- Phase `14` completed on `2026-04-04` with additive `training_view` / `best_cycle_selection` export artifacts, two bounded candidate-cycle reviews, and a final verdict that the new export surface is structurally stronger but still needs revision before it is truly useful as scientific-thinking training data
 - The first real Phase `7` corpus baseline recorded `1756` inventory entries, `1755` eligible entries, and `1505` corpus-health failures
 - Stable bounded pilot: `jamming transition in frictionless sphere packings near point J` with `cutoff_year = 2010`
 - End-to-end Phase 03 -> 06 artifact flow is verified on real local bundles
@@ -29,7 +30,7 @@ Produce auditable, replayable, trainable scientific-reasoning artifacts rather t
 
 ## Current Milestone: v1.2 Fast Iteration Research Logic Quality
 
-**Goal:** Run a continuous in-milestone optimization loop: generate real outputs, manually review output quality, optimize the pipeline, and repeat until high-quality results are stable across consecutive cycles.
+**Goal:** Run a continuous in-milestone optimization loop: generate real outputs, manually review the generated reasoning content itself, optimize the pipeline, and repeat until the outputs look genuinely useful as scientific-thinking training data, every major section of the final training artifact has been iteratively improved, the exported artifacts are self-contained enough for training use, and that quality stays stable across consecutive cycles so the milestone ends with a bounded but genuinely usable dataset bundle.
 
 **Target features:**
 - a packet-quality repair loop that explicitly resolves current `package_validation` blockers and records provenance for each fix
@@ -37,6 +38,13 @@ Produce auditable, replayable, trainable scientific-reasoning artifacts rather t
 - an `L4` recovery check that tracks prior-candidate and anti-pattern carryover readiness after packet fixes
 - a rolling prioritization summary that keeps each cycle focused and avoids slow one-by-one unstructured patching
 - a cycle-by-cycle manual review workflow where output quality is judged directly from real reasoning artifacts before deciding next optimizations
+- a self-contained training-facing export view that keeps the key evidence, comparison rationale, and decision fields together without cross-file reconstruction
+- canonical concept labels that preserve raw source phrases for route features, bottlenecks, conditions, and capabilities
+- structured machine-readable human review fields that say whether an artifact is truly usable as scientific-thinking training data
+- export closure where accepted prior / anti-pattern knowledge either enters the final selected fields or records explicit structured exclusion reasons
+- multiple task-specific training views rather than only one monolithic final decision artifact
+- iteration pressure on every major training-data section, not only the sections that already have obvious failing flags
+- a bounded final dataset bundle composed of later-cycle artifacts that are genuinely usable for training scientific-thinking behavior
 ## Requirements
 
 ### Validated
@@ -59,7 +67,15 @@ Produce auditable, replayable, trainable scientific-reasoning artifacts rather t
 
 ### Active
 
-- [ ] Quality is considered stable only after consecutive cycles produce high-quality outputs under manual review, not just improved metrics.
+- [ ] A cycle only counts as high quality when direct manual review of the generated reasoning artifacts says they would be useful as training data for scientific-thinking behavior, not merely when more pipeline metrics or flags improve.
+- [ ] The exported training-facing artifact must become self-contained enough that the key evidence, route comparison, why-now logic, and final decision can be consumed without stitching together multiple bundle files by hand.
+- [ ] Route features, bottlenecks, conditions, and capabilities need canonical labels plus raw source phrases so training signals stay stable without losing audit provenance.
+- [ ] Structured human review and training-acceptance judgments must live inside machine-readable artifacts, not only in markdown review reports.
+- [ ] Reviewed prior / anti-pattern knowledge must close into final export selection logic or record explicit machine-readable reasons for exclusion.
+- [ ] The milestone should end with multiple task-specific training views, not only one final decision-episode export.
+- [ ] Every major section of the final training artifact should stay inside the iterative optimization scope instead of being treated as fixed background.
+- [ ] The milestone should close with a bounded but genuinely usable scientific-thinking dataset bundle, not only isolated one-off export examples.
+- [ ] Quality is considered stable only after consecutive cycles reproduce that manually judged standard, not just improved metrics.
 
 ### Out of Scope
 
@@ -111,6 +127,6 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-04 after completing Phase 13*
+*Last updated: 2026-04-04 after completing Phase 14*
 
 

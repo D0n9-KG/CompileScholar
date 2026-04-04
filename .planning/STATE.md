@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: milestone
 status: Ready to plan
-stopped_at: Phase 14 context gathered (assumptions mode)
-last_updated: "2026-04-04T06:07:26.286Z"
+stopped_at: Phase 14 execution complete; Phase 15 planning next
+last_updated: "2026-04-04T07:56:40.872Z"
 progress:
   total_phases: 5
-  completed_phases: 2
-  total_plans: 5
-  completed_plans: 5
+  completed_phases: 3
+  total_plans: 8
+  completed_plans: 8
 ---
 
 # Project State
@@ -19,17 +19,17 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-04-04)
 
 **Core value:** Produce auditable, replayable, trainable scientific-reasoning artifacts rather than paper-like summaries or one-off knowledge graphs.
-**Current focus:** Prepare Phase 14 planning from the completed Phase 13 cycle-2 reports and prioritization handoff, with the goal of iterating until a human-reviewed cycle produces reasoning artifacts that are genuinely usable as scientific-thinking training data, exported in a self-contained training-facing form, and improved across every major section of the final dataset artifact
+**Current focus:** Prepare Phase 15 planning from the completed Phase 14 best-cycle review and prioritization handoff
 
 ## Current Position
 
-Phase: 14
+Phase: 15
 Plan: Not started
 Milestone: `v1.2` - Fast Iteration Research Logic Quality
 
 - Completed milestone: `v1.1` corpus-driven iterative quality hardening
-- Status: Phase `13` is complete; Phase `14` is next and ready for planning
-- Last activity: `2026-04-04` - completed Phase 13 with two bounded iterations, a final defect-delta report, and a generated next-cycle prioritization handoff
+- Status: Phase `14` is complete; Phase `15` is next and ready for planning
+- Last activity: `2026-04-04` - completed Phase 14 with additive training-facing export bundles, two bounded candidate-cycle reviews, and a confirmed next-cycle prioritization handoff
 
 ## Milestone Snapshot
 
@@ -56,17 +56,18 @@ Milestone: `v1.2` - Fast Iteration Research Logic Quality
 - Phase 12 verification shows the dominant blockers now sit downstream in replay, prior-review, and export rather than in packet construction.
 - Phase 13 Plan 01 added `backend/scripts/run_phase13_cycle_refinement.py` so repeated bounded reruns now default to the Phase 12 cycle-1 replay/export bundles and write auditable outputs under `tmp/phase13_cycle2_refine/<iteration-label>/`.
 - Phase 13 Plan 02 now threads `reviewer_ids` through replay and prior-review generation, and it can opt into a deterministic `scope_fallback_cluster` when same-scope support states would otherwise remain three singleton clusters.
-- Phase 13 closeout shows real downstream movement: replay is now `green`, prior review can accept one fallback-cluster prior, but export still carries `weak_prior_support` and the formal next-cycle recommendation remains `packet_construction`.
+- Phase 14 added additive `training_view.json` and `best_cycle_selection.json` export artifacts, explicit machine-readable review fields, and canonicalized concept provenance fields.
+- Phase 14 closeout shows stronger export structure and reviewability, but the chosen best cycle still carries `weak_prior_support`, no accepted priors on the default rerun path, and a next-cycle recommendation that remains `packet_construction`.
 
 ## Active Requirements
 
-- Phase `14`: `REVIEW-02`, `REVIEW-03`, `TRAIN-01`, `TRAIN-02`, `TRAIN-03`, `TRAIN-06`
+- Phase `15`: `STAB-01`, `TRAIN-04`
 
 ## Pending Follow-Ups
 
-- Discuss and plan Phase `14` using `docs/replay/reports/phase13-cycle2-refine.md` and `docs/replay/reports/phase13-next-cycle-prioritization.md`.
-- Turn the Phase 13 export / review artifacts into a self-contained training view with explicit human-acceptance fields and canonicalized concept labels.
-- Keep every major section of the final training artifact in optimization scope and aim the later cycles at a bounded but genuinely usable dataset bundle.
+- Discuss and plan Phase `15` using `docs/replay/reports/phase14-cycle2-optimization-best.md` and `docs/replay/reports/phase14-next-cycle-prioritization.md`.
+- Turn the new Phase 14 training-facing export surface into a first genuinely high-quality bounded cycle by improving packet quality, route comparison clarity, and prior selection closure.
+- Keep the later cycles focused on producing a bounded but genuinely usable scientific-thinking dataset bundle, not only structurally richer exports.
 
 ## Blockers
 
@@ -75,6 +76,6 @@ Milestone: `v1.2` - Fast Iteration Research Logic Quality
 
 ## Session
 
-**Last Date:** 2026-04-04T06:07:26.283Z
-**Stopped At:** Phase 14 context gathered (assumptions mode)
-**Resume File:** .planning/phases/14-cycle-2-optimization-and-review/14-CONTEXT.md
+**Last Date:** 2026-04-04T07:56:40.872Z
+**Stopped At:** Phase 14 execution complete; Phase 15 planning next
+**Resume File:** .planning/phases/14-cycle-2-optimization-and-review/14-VERIFICATION.md
