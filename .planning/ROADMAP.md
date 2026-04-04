@@ -1,6 +1,6 @@
 ﻿# Milestone v1.2: Fast Iteration Research Logic Quality
 
-**Status:** ACTIVE 2026-04-03
+**Status:** COMPLETE 2026-04-04
 **Phases:** 12-16
 **Requirements:** 16 mapped
 **Numbering Mode:** Continue from `v1.1`
@@ -19,7 +19,7 @@ Inside one milestone, the team repeatedly runs: generate real outputs -> manuall
 | 13 | Baseline Data Cycle 2 (Refine) | Run a second bounded rerun on the fixed cycle-1 baseline, recover replay quality, and leave an explicit defect-delta handoff. | `LOOPR-03`, `REVIEW-01` | Complete (`2026-04-04`) |
 | 14 | Cycle 2 Optimization And Review | Add self-contained training-facing exports, review two bounded candidate cycles, and confirm the next-cycle recommendation from reviewed evidence. | `REVIEW-02`, `REVIEW-03`, `TRAIN-01`, `TRAIN-02`, `TRAIN-03`, `TRAIN-06` | Complete (`2026-04-04`) |
 | 15 | Cycle 3 Consolidation | Continue bounded optimize/rerun cycles after the Phase 14 export-structure improvements until one cycle is manually judged genuinely useful as training data and reviewed prior/anti-pattern knowledge begins closing into the final export surface. | `STAB-01`, `TRAIN-04` | Complete (`2026-04-04`) |
-| 16 | Stability Verification And Handoff | Verify that consecutive high-quality cycles stay manually convincing as training data and publish the final stability, schema, dataset, and residual-risk handoff. | `STAB-02`, `STAB-03`, `TRAIN-05`, `TRAIN-07` | In Progress (`2026-04-04`; 2/3 plans complete) |
+| 16 | Stability Verification And Handoff | Verify that consecutive high-quality cycles stay manually convincing as training data and publish the final stability, schema, dataset, and residual-risk handoff. | `STAB-02`, `STAB-03`, `TRAIN-05`, `TRAIN-07` | Complete (`2026-04-04`) |
 
 ## Phase Details
 
@@ -124,12 +124,10 @@ Inside one milestone, the team repeatedly runs: generate real outputs -> manuall
 
 ## Next Up
 
-**Phase 16: Stability Verification And Handoff** - run the repeated accepted-cycle check against Phase 15 `cycle3-best`, then publish the final dataset bundle, stability verdict, and next-milestone handoff.
+**Milestone `v1.2` complete** - the bounded dataset bundle and stability handoff are now published, and the next milestone should start from `packet_construction` with `relation_assembly` and `slot_recovery` as the leading owner buckets.
 
-`$gsd-discuss-phase 16`
-
-Also available: `$gsd-plan-phase 16`
+Also available: `$gsd-complete-milestone`
 
 ---
 *Roadmap created: 2026-04-03*
-*Last updated: 2026-04-04 after completing Phase 16 Plan 02*
+*Last updated: 2026-04-04 after completing Phase 16*
