@@ -51,31 +51,58 @@ def test_phase10_bridge_manifest_preserves_phase9_role_membership(tmp_path: Path
 
     assert bridge.package_manifest_path == (output_root / 'generated' / 'phase10-route-state-package-manifest.json')
     assert bridge.package_manifest.cutoff_year == 2021
-    assert [entry.role for entry in bridge.package_manifest.entries] == ['support', 'alternative', 'held_out']
+    assert [entry.entry_id for entry in bridge.package_manifest.entries] == [
+        'phase10-support-core',
+        'phase10-support-context',
+        'phase10-support-clustering',
+        'phase10-alternative',
+        'phase10-held-out',
+    ]
+    assert [entry.role for entry in bridge.package_manifest.entries] == [
+        'support',
+        'support',
+        'support',
+        'alternative',
+        'held_out',
+    ]
 
     generated_dir = bridge.package_manifest_path.parent
-    support_entry, alternative_entry, held_out_entry = bridge.package_manifest.entries
-    support_packet = load_route_packet(generated_dir / Path(support_entry.packet_path))
-    alternative_packet = load_route_packet(generated_dir / Path(alternative_entry.packet_path))
-    held_out_packet = load_route_packet(generated_dir / Path(held_out_entry.packet_path))
+    support_artifacts = bridge.role_packets['support']
+    alternative_artifact = bridge.role_packets['alternative'][0]
+    held_out_artifact = bridge.role_packets['held_out'][0]
+    support_packets = [
+        load_route_packet(generated_dir / Path(entry.packet_path))
+        for entry in bridge.package_manifest.entries
+        if entry.role == 'support'
+    ]
+    alternative_packet = load_route_packet(generated_dir / Path(bridge.package_manifest.entries[3].packet_path))
+    held_out_packet = load_route_packet(generated_dir / Path(bridge.package_manifest.entries[4].packet_path))
 
-    assert list(bridge.role_packets['support'].paper_ids) == ['1000', '1001', '1002', '1005', '1017']
-    assert list(bridge.role_packets['alternative'].paper_ids) == ['1007']
-    assert list(bridge.role_packets['held_out'].paper_ids) == ['1023']
-    assert [item.paper_id for item in support_packet.included_items] == [
-        load_paper_logic_trace(path).paper_metadata.paper_id for path in bridge.role_packets['support'].trace_files
+    assert [list(artifact.paper_ids) for artifact in support_artifacts] == [
+        ['1000', '1001'],
+        ['1002', '1005'],
+        ['1017'],
+    ]
+    assert list(alternative_artifact.paper_ids) == ['1007']
+    assert list(held_out_artifact.paper_ids) == ['1023']
+    assert [[item.paper_id for item in packet.included_items] for packet in support_packets] == [
+        [load_paper_logic_trace(path).paper_metadata.paper_id for path in artifact.trace_files]
+        for artifact in support_artifacts
     ]
     assert [item.paper_id for item in alternative_packet.included_items] == [
-        load_paper_logic_trace(path).paper_metadata.paper_id for path in bridge.role_packets['alternative'].trace_files
+        load_paper_logic_trace(path).paper_metadata.paper_id for path in alternative_artifact.trace_files
     ]
     assert [item.paper_id for item in held_out_packet.included_items] == [
-        load_paper_logic_trace(path).paper_metadata.paper_id for path in bridge.role_packets['held_out'].trace_files
+        load_paper_logic_trace(path).paper_metadata.paper_id for path in held_out_artifact.trace_files
     ]
-    assert support_packet.cutoff_year == 2021
+    assert all(packet.cutoff_year == 2021 for packet in support_packets)
     assert alternative_packet.cutoff_year == 2021
     assert held_out_packet.cutoff_year == 2021
-    assert 'Canonical Phase 9 paper_ids: 1000, 1001, 1002, 1005, 1017' in (
-        support_packet.compiler_hints.notes_for_route_state_compiler or ''
+    assert 'Canonical Phase 9 paper_ids: 1000, 1001' in (support_packets[0].compiler_hints.notes_for_route_state_compiler or '')
+    assert 'Canonical Phase 9 paper_ids: 1002, 1005' in (support_packets[1].compiler_hints.notes_for_route_state_compiler or '')
+    assert 'Canonical Phase 9 paper_ids: 1017' in (support_packets[2].compiler_hints.notes_for_route_state_compiler or '')
+    assert bridge.package_manifest.entries[3].distinctness_rationale == (
+        'Paper 1007 uses a deep material network route rather than the packet\'s main constitutive and virtual-clustering support family.'
     )
 
 
@@ -146,6 +173,9 @@ def test_phase10_workflow_writes_prior_review_and_export_bundles(tmp_path: Path)
         assert result.summary['comparison_summary_path'] == str((output_dir / 'comparison_summary.json').resolve())
         assert Path(comparison_summary_payload['baseline_replay_bundle']).name == 'replay_with_package'
         assert Path(comparison_summary_payload['baseline_export_bundle']).name == 'phase6_decision_episode_audit_export'
+        assert comparison_summary_payload['package']['current']['role_counts']['support'] == 3
+        assert 'support_cluster_too_small' not in comparison_summary_payload['package']['current']['quality_flags']
+        assert 'alternative_scope_not_distinct' not in comparison_summary_payload['package']['current']['quality_flags']
         assert set(export_summary_payload['selected_prior_ids']).issubset(set(review_manifest_payload['accepted_prior_ids']))
         assert decision_episode_payload['relevant_priors']['selected_prior_ids'] == export_summary_payload['selected_prior_ids']
         assert 'visible_input_refs' in export_inspection_payload['visibility_buckets']
@@ -222,6 +252,9 @@ def test_phase10_cli_writes_package_and_replay_bundles(tmp_path: Path) -> None:
             'route_state_package_validation_quality_tier'
         ]
         assert 'route_state_package_validation' in replay_inspection_payload
+        assert summary_payload['support_route_state_count'] == 3
+        assert 'support_cluster_too_small' not in summary_payload['route_state_package_validation_flags']
+        assert 'alternative_scope_not_distinct' not in summary_payload['route_state_package_validation_flags']
         assert set(summary_payload['selected_prior_ids']).issubset(set(summary_payload['accepted_prior_ids']))
         assert 'visibility_bucket_counts' in summary_payload
         assert summary_payload['comparison_summary_path'] == str((output_dir / 'comparison_summary.json').resolve())

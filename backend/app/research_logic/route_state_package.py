@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from .models import RouteState
 from .replay_io import (
@@ -92,6 +92,13 @@ class RouteStatePackageEntry(ContractModel):
     route_state_id: str | None = None
     built_at: str | None = None
     notes: str | None = None
+    distinctness_rationale: str | None = None
+
+    @field_validator('notes', 'distinctness_rationale')
+    @classmethod
+    def validate_optional_text(cls, value: str | None) -> str | None:
+        normalized = str(value or '').strip()
+        return normalized or None
 
     @model_validator(mode='after')
     def validate_trace_source(self) -> 'RouteStatePackageEntry':
@@ -134,6 +141,7 @@ class RouteStatePackageArtifact(ContractModel):
     trace_sources: list[str] = Field(default_factory=list)
     l1_snapshot_path: str | None = None
     notes: str | None = None
+    distinctness_rationale: str | None = None
     route_state: RouteState
 
 
@@ -177,6 +185,7 @@ class RouteStatePackageBundleEntryRef(ContractModel):
     packet_id: str
     route_state_id: str
     file: str
+    distinctness_rationale: str | None = None
 
 
 class RouteStatePackageBundleManifest(ContractModel):
@@ -285,6 +294,7 @@ def compile_route_state_package(
                 trace_sources=[str(path) for path in ([trace_dir] if trace_dir is not None else []) + trace_files],
                 l1_snapshot_path=str(resolved_snapshot_path) if resolved_snapshot_path is not None else None,
                 notes=entry.notes,
+                distinctness_rationale=entry.distinctness_rationale,
                 route_state=route_state,
             )
         )
@@ -350,6 +360,7 @@ def write_route_state_package_bundle(
                 packet_id=artifact.packet_id,
                 route_state_id=artifact.route_state.route_state_id,
                 file=str(entry_path.relative_to(bundle_dir)).replace('\\', '/'),
+                distinctness_rationale=artifact.distinctness_rationale,
             )
         )
 
@@ -447,7 +458,8 @@ def validate_route_state_package(compilation: RouteStatePackageCompilation) -> R
             if _scope_similarity(artifact.route_state.topic_scope, compilation.topic_scope) < 0.5:
                 scope_mismatch_entry_ids.append(artifact.entry_id)
         elif artifact.role == 'alternative':
-            if _scope_similarity(artifact.route_state.topic_scope, compilation.topic_scope) >= 0.8:
+            has_distinctness_rationale = bool(str(artifact.distinctness_rationale or '').strip())
+            if _scope_similarity(artifact.route_state.topic_scope, compilation.topic_scope) >= 0.8 and not has_distinctness_rationale:
                 indistinct_alternative_entry_ids.append(artifact.entry_id)
 
     if scope_mismatch_entry_ids:

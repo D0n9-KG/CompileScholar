@@ -620,6 +620,64 @@ def test_validate_route_state_package_flags_missing_roles(tmp_path: Path) -> Non
     assert 'held_out_route_states_missing' in validation.quality_flags
 
 
+def test_validate_route_state_package_preserves_distinctness_rationale_for_overlapping_alternative_scope(
+    tmp_path: Path,
+) -> None:
+    _build_fixture_paths(tmp_path)
+    manifest_path = _write_json(
+        tmp_path / 'route_state_package_manifest_distinct_alternative.json',
+        {
+            'package_id': 'distinct-route-state-package',
+            'built_at': '2026-04-02T10:00:00Z',
+            'topic_scope': 'large-scale image recognition with deep neural networks',
+            'cutoff_year': 2011,
+            'entries': [
+                {
+                    'entry_id': 'support-01',
+                    'role': 'support',
+                    'packet_path': 'packets/support-1.json',
+                    'trace_files': ['traces/paper-a.json', 'traces/paper-c.json'],
+                    'l1_snapshot_path': 'l1/support-1.json',
+                },
+                {
+                    'entry_id': 'support-02',
+                    'role': 'support',
+                    'packet_path': 'packets/support-2.json',
+                    'trace_files': ['traces/paper-b.json', 'traces/paper-d.json'],
+                    'l1_snapshot_path': 'l1/support-2.json',
+                },
+                {
+                    'entry_id': 'alternative-01',
+                    'role': 'alternative',
+                    'packet_path': 'packets/support-1.json',
+                    'trace_files': ['traces/paper-a.json', 'traces/paper-c.json'],
+                    'l1_snapshot_path': 'l1/support-1.json',
+                    'route_state_id': 'alternative-01-route-state',
+                    'distinctness_rationale': 'Alternative route stays because the learned synthesis path differs from the packet mainline even when topical overlap is high.',
+                },
+                {
+                    'entry_id': 'held-out-01',
+                    'role': 'held_out',
+                    'packet_path': 'packets/held-out-1.json',
+                    'trace_files': ['traces/paper-f.json', 'traces/paper-g.json'],
+                    'l1_snapshot_path': 'l1/held-out-1.json',
+                },
+            ],
+        },
+    )
+
+    manifest = load_route_state_package_manifest(manifest_path)
+    compilation = compile_route_state_package(manifest, manifest_base_dir=manifest_path.parent)
+    validation = validate_route_state_package(compilation)
+    alternative_artifact = next(artifact for artifact in compilation.entries if artifact.role == 'alternative')
+
+    assert alternative_artifact.distinctness_rationale == (
+        'Alternative route stays because the learned synthesis path differs from the packet mainline even when topical overlap is high.'
+    )
+    assert 'alternative_scope_not_distinct' not in validation.quality_flags
+    assert validation.indistinct_alternative_entry_ids == []
+
+
 def test_route_state_package_bundle_feeds_prior_induction_without_reserialization(tmp_path: Path) -> None:
     _build_fixture_paths(tmp_path)
     manifest_path = _write_json(

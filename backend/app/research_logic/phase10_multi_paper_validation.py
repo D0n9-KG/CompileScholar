@@ -82,11 +82,24 @@ class Phase10RuntimePaths:
 
 @dataclass(frozen=True)
 class Phase10RolePacketArtifact:
+    entry_id: str
     role: Phase10Role
     packet_path: Path
     route_state_id: str
     paper_ids: tuple[str, ...]
     trace_files: tuple[Path, ...]
+    notes: str | None = None
+    distinctness_rationale: str | None = None
+
+
+@dataclass(frozen=True)
+class Phase10RuntimeRolePacketSpec:
+    entry_id: str
+    role: Phase10Role
+    route_state_id: str
+    paper_ids: tuple[str, ...]
+    notes: str | None = None
+    distinctness_rationale: str | None = None
 
 
 @dataclass(frozen=True)
@@ -98,7 +111,7 @@ class Phase10RuntimeBridge:
     l1_snapshot_path: Path
     package_manifest: RouteStatePackageManifest
     package_manifest_path: Path
-    role_packets: dict[Phase10Role, Phase10RolePacketArtifact]
+    role_packets: dict[Phase10Role, tuple[Phase10RolePacketArtifact, ...]]
 
 
 @dataclass(frozen=True)
@@ -157,6 +170,71 @@ def _relative_manifest_path(target: Path, *, base_dir: Path) -> str:
 
 def _role_slug(role: Phase10Role) -> str:
     return role.replace('_', '-')
+
+
+def _phase10_runtime_role_packets(
+    canonical_inputs: Phase10CanonicalInputs,
+) -> tuple[Phase10RuntimeRolePacketSpec, ...]:
+    role_groups = canonical_inputs.assembly_manifest.role_groups()
+    runtime_packets = (
+        Phase10RuntimeRolePacketSpec(
+            entry_id='phase10-support-core',
+            role='support',
+            route_state_id='phase10-support-core-route-state',
+            paper_ids=('1000', '1001'),
+            notes='Runtime support-core subgroup for the constitutive-route anchors from the committed Phase 9 support role.',
+        ),
+        Phase10RuntimeRolePacketSpec(
+            entry_id='phase10-support-context',
+            role='support',
+            route_state_id='phase10-support-context-route-state',
+            paper_ids=('1002', '1005'),
+            notes='Runtime support-context subgroup for the Phase 9 support papers that carry data-conditioning and boundary-framing context.',
+        ),
+        Phase10RuntimeRolePacketSpec(
+            entry_id='phase10-support-clustering',
+            role='support',
+            route_state_id='phase10-support-clustering-route-state',
+            paper_ids=('1017',),
+            notes='Runtime support-clustering subgroup for the clustering-analysis anchor inside the committed Phase 9 support role.',
+        ),
+        Phase10RuntimeRolePacketSpec(
+            entry_id='phase10-alternative',
+            role='alternative',
+            route_state_id='phase10-alternative-route-state',
+            paper_ids=('1007',),
+            notes=role_groups['alternative'].group_reason,
+            distinctness_rationale=role_groups['alternative'].distinctness_rationale,
+        ),
+        Phase10RuntimeRolePacketSpec(
+            entry_id='phase10-held-out',
+            role='held_out',
+            route_state_id='phase10-held-out-route-state',
+            paper_ids=('1023',),
+            notes=role_groups['held_out'].group_reason,
+        ),
+    )
+
+    expected_by_role = {
+        role: sorted(group.paper_ids())
+        for role, group in role_groups.items()
+    }
+    actual_by_role = {
+        role: sorted(
+            paper_id
+            for artifact in runtime_packets
+            if artifact.role == role
+            for paper_id in artifact.paper_ids
+        )
+        for role in expected_by_role
+    }
+    for role, expected_paper_ids in expected_by_role.items():
+        if actual_by_role[role] != expected_paper_ids:
+            raise ValueError(
+                f'Phase 10 runtime bridge paper_ids for {role} must preserve the committed assembly manifest membership'
+            )
+
+    return runtime_packets
 
 
 def _package_built_at(route_packet: RoutePacket, assembly_manifest: BoundedPacketAssemblyManifest, built_at: str | None) -> str:
@@ -1134,33 +1212,45 @@ def _write_phase10_role_packets(
     runtime_paths: Phase10RuntimePaths,
     snapshot: HistoricalEnvironmentSnapshot,
     built_at: str,
-) -> dict[Phase10Role, Phase10RolePacketArtifact]:
+) -> dict[Phase10Role, tuple[Phase10RolePacketArtifact, ...]]:
     trace_lookup = {source.paper_id: source for source in trace_sources}
-    role_packets: dict[Phase10Role, Phase10RolePacketArtifact] = {}
+    role_packets: dict[Phase10Role, list[Phase10RolePacketArtifact]] = {
+        'support': [],
+        'alternative': [],
+        'held_out': [],
+    }
     runtime_paper_ids = _runtime_paper_id_map(trace_sources)
 
-    for role, group in canonical_inputs.assembly_manifest.role_groups().items():
-        paper_ids = tuple(group.paper_ids())
-        trace_files = tuple(trace_lookup[paper_id].resolved_path for paper_id in paper_ids)
+    for spec in _phase10_runtime_role_packets(canonical_inputs):
+        trace_files = tuple(trace_lookup[paper_id].resolved_path for paper_id in spec.paper_ids)
         role_packet = _build_role_subset_packet(
             canonical_inputs,
-            role=role,
-            paper_ids=list(paper_ids),
+            role=spec.role,
+            paper_ids=list(spec.paper_ids),
             runtime_paper_ids=runtime_paper_ids,
             built_at=built_at,
             snapshot=snapshot,
         )
-        packet_path = runtime_paths.generated_packets_dir / f'phase10-{_role_slug(role)}-route-packet.json'
+        packet_slug = spec.entry_id.removeprefix('phase10-')
+        packet_path = runtime_paths.generated_packets_dir / f'phase10-{packet_slug}-route-packet.json'
         _write_json(packet_path, role_packet.model_dump(mode='json', exclude_none=True))
-        role_packets[role] = Phase10RolePacketArtifact(
-            role=role,
-            packet_path=packet_path,
-            route_state_id=f'phase10-{_role_slug(role)}-route-state',
-            paper_ids=paper_ids,
-            trace_files=trace_files,
+        role_packets[spec.role].append(
+            Phase10RolePacketArtifact(
+                entry_id=spec.entry_id,
+                role=spec.role,
+                packet_path=packet_path,
+                route_state_id=spec.route_state_id,
+                paper_ids=spec.paper_ids,
+                trace_files=trace_files,
+                notes=spec.notes,
+                distinctness_rationale=spec.distinctness_rationale,
+            )
         )
 
-    return role_packets
+    return {
+        role: tuple(artifacts)
+        for role, artifacts in role_packets.items()
+    }
 
 
 def _build_phase10_package_manifest(
@@ -1168,26 +1258,29 @@ def _build_phase10_package_manifest(
     *,
     runtime_paths: Phase10RuntimePaths,
     snapshot_path: Path,
-    role_packets: dict[Phase10Role, Phase10RolePacketArtifact],
+    role_packets: dict[Phase10Role, tuple[Phase10RolePacketArtifact, ...]],
     built_at: str,
 ) -> RouteStatePackageManifest:
     role_groups = canonical_inputs.assembly_manifest.role_groups()
-    entries = [
-        RouteStatePackageEntry(
-            entry_id=f'phase10-{_role_slug(role)}',
-            role=role,
-            packet_path=_relative_manifest_path(role_packets[role].packet_path, base_dir=runtime_paths.generated_dir),
-            trace_files=[
-                _relative_manifest_path(trace_path, base_dir=runtime_paths.generated_dir)
-                for trace_path in role_packets[role].trace_files
-            ],
-            l1_snapshot_path=_relative_manifest_path(snapshot_path, base_dir=runtime_paths.generated_dir),
-            route_state_id=role_packets[role].route_state_id,
-            built_at=built_at,
-            notes=role_groups[role].group_reason,
-        )
-        for role in ('support', 'alternative', 'held_out')
-    ]
+    entries: list[RouteStatePackageEntry] = []
+    for role in ('support', 'alternative', 'held_out'):
+        for artifact in role_packets[role]:
+            entries.append(
+                RouteStatePackageEntry(
+                    entry_id=artifact.entry_id,
+                    role=role,
+                    packet_path=_relative_manifest_path(artifact.packet_path, base_dir=runtime_paths.generated_dir),
+                    trace_files=[
+                        _relative_manifest_path(trace_path, base_dir=runtime_paths.generated_dir)
+                        for trace_path in artifact.trace_files
+                    ],
+                    l1_snapshot_path=_relative_manifest_path(snapshot_path, base_dir=runtime_paths.generated_dir),
+                    route_state_id=artifact.route_state_id,
+                    built_at=built_at,
+                    notes=artifact.notes or role_groups[role].group_reason,
+                    distinctness_rationale=artifact.distinctness_rationale,
+                )
+            )
     return RouteStatePackageManifest(
         package_id=f'phase10-{canonical_inputs.route_packet.packet_id}-route-state-package',
         built_at=built_at,
