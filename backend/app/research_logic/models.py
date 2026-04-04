@@ -425,6 +425,7 @@ class TrainingQuality(ContractModel):
 
 TrainingReviewStatus = Literal['not_started', 'in_review', 'reviewed']
 TrainingAcceptanceVerdict = Literal['pending', 'candidate', 'accepted', 'needs_revision', 'rejected']
+StabilityStatus = Literal['not_started', 'candidate', 'stable', 'needs_revision']
 TrainingSectionKey = Literal[
     'evidence_pack',
     'route_synthesis',
@@ -444,6 +445,21 @@ class TrainingSectionReview(ContractModel):
     reviewed_at: str | None = None
     rationale: str | None = None
     residual_defects: list[str] = Field(default_factory=list)
+
+
+class ReviewedStabilityHandoff(ContractModel):
+    stability_status: StabilityStatus = 'not_started'
+    accepted_cycle_streak: int = 0
+    baseline_cycle_label: str | None = None
+    repeated_cycle_label: str | None = None
+    primary_cycle_label: str | None = None
+    training_acceptance_verdict: TrainingAcceptanceVerdict = 'pending'
+    review_status: TrainingReviewStatus = 'not_started'
+    residual_risks: list[str] = Field(default_factory=list)
+    schema_refs: dict[str, str] = Field(default_factory=dict)
+    dataset_manifest_ref: str | None = None
+    primary_recommendation_id: str | None = None
+    recommendation_evidence_refs: list[str] = Field(default_factory=list)
 
 
 class WhyNowCase(ContractModel):
@@ -831,6 +847,7 @@ __all__ = [
     'AntiPatternCard',
     'DecisionEpisode',
     'DecisionPriorCard',
+    'ReviewedStabilityHandoff',
     'RouteComparisonCase',
     'RoutePacket',
     'RouteState',

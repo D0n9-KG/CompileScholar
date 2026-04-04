@@ -23,7 +23,7 @@ from .iteration_prioritization import (
     IterationPriorityRecommendation,
     IterationPrioritySummary,
 )
-from .models import RoutePacket, RouteState
+from .models import ReviewedStabilityHandoff, RoutePacket, RouteState
 from .sampled_single_paper import (
     FixedSampledL2ComparisonRow,
     RandomSampledL2ComparisonRow,
@@ -146,6 +146,17 @@ def _normalize_ref_payload(
             if str(key).strip() and str(value).strip()
         }
     return [_bundle_relative_ref(bundle_dir, value) for value in refs or [] if str(value).strip()]
+
+
+def _stability_handoff_model(
+    value: ReviewedStabilityHandoff | Mapping[str, Any],
+    *,
+    dataset_manifest_ref: str,
+) -> ReviewedStabilityHandoff:
+    handoff = value if isinstance(value, ReviewedStabilityHandoff) else ReviewedStabilityHandoff.model_validate(value)
+    if not handoff.dataset_manifest_ref:
+        handoff = handoff.model_copy(update={'dataset_manifest_ref': dataset_manifest_ref})
+    return handoff
 
 
 def load_route_packet(path_like: str | Path) -> RoutePacket:
@@ -1351,7 +1362,7 @@ def write_final_training_dataset_bundle(
     recommendation_evidence_refs: Sequence[str] | None = None,
     residual_risk_source: str | Path | None = None,
     metadata: Mapping[str, Any] | None = None,
-    stability_handoff_payload: Mapping[str, Any] | None = None,
+    stability_handoff: ReviewedStabilityHandoff | Mapping[str, Any] | None = None,
 ) -> dict[str, Path]:
     bundle_dir = _as_path(output_dir)
     outputs_dir = bundle_dir / 'outputs'
@@ -1401,10 +1412,14 @@ def write_final_training_dataset_bundle(
         'dataset_summary': _write_json(bundle_dir / 'dataset_summary.json', dataset_summary_payload),
         'training_views_index': _write_json(outputs_dir / 'training_views_index.json', training_views_index),
     }
-    if stability_handoff_payload is not None:
+    if stability_handoff is not None:
+        stability_handoff_model = _stability_handoff_model(
+            stability_handoff,
+            dataset_manifest_ref='dataset_manifest.json',
+        )
         written_files['stability_handoff'] = _write_json(
             bundle_dir / 'stability_handoff.json',
-            dict(stability_handoff_payload),
+            _model_payload(stability_handoff_model),
         )
     bundle_manifest_payload = {
         'schema_version': 'v1',

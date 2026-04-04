@@ -51,7 +51,7 @@ from app.research_logic import (
     write_sampled_l2_comparison_bundle,
     write_sampled_l2_iteration_bundle,
 )
-from app.research_logic.models import AntiPatternCard
+from app.research_logic.models import AntiPatternCard, ReviewedStabilityHandoff
 
 
 def _mention(surface: str, normalized: str, anchor_id: str, *, mention_type: str | None = None) -> MentionValue:
@@ -980,6 +980,61 @@ def test_write_final_training_dataset_bundle_writes_expected_scaffold(tmp_path: 
     assert bundle_manifest_payload['files']['dataset_manifest'] == 'dataset_manifest.json'
     assert bundle_manifest_payload['files']['dataset_summary'] == 'dataset_summary.json'
     assert bundle_manifest_payload['files']['training_views_index'] == 'outputs/training_views_index.json'
+
+
+def test_write_final_training_dataset_bundle_writes_reviewed_stability_handoff_without_mutating_runtime_export_defaults(
+    tmp_path: Path,
+) -> None:
+    export = _decision_episode_audit_export(tmp_path)
+    export_bundle_files = write_decision_episode_export_bundle(
+        tmp_path / 'cycle4-stable' / 'export_bundle',
+        export=export,
+        metadata={'runner': 'pytest'},
+        selected_iteration_label='cycle4-stable',
+    )
+
+    written_files = write_final_training_dataset_bundle(
+        tmp_path / 'final-dataset',
+        primary_cycle_label='cycle4-stable',
+        task_training_views={
+            'training_view': export_bundle_files['training_view'],
+            'route_synthesis_view': export_bundle_files['route_synthesis_view'],
+            'why_now_view': export_bundle_files['why_now_view'],
+            'route_comparison_view': export_bundle_files['route_comparison_view'],
+            'prior_antipattern_view': export_bundle_files['prior_antipattern_view'],
+            'final_decision_view': export_bundle_files['final_decision_view'],
+        },
+        schema_refs={'phase16_contract': Path('docs/replay/reports/phase16-cycle4-stable.md')},
+        primary_recommendation_id='packet_construction',
+        recommendation_evidence_refs=['report:docs/replay/reports/phase16-cycle4-stable.md'],
+        residual_risk_source=export_bundle_files['best_cycle_selection'],
+        stability_handoff=ReviewedStabilityHandoff(
+            stability_status='stable',
+            accepted_cycle_streak=2,
+            baseline_cycle_label='cycle3-best',
+            repeated_cycle_label='phase16-repeat-01',
+            primary_cycle_label='cycle4-stable',
+            training_acceptance_verdict='accepted',
+            review_status='reviewed',
+            residual_risks=['weak_prior_support'],
+            schema_refs={'phase16_contract': 'docs/replay/reports/phase16-cycle4-stable.md'},
+            primary_recommendation_id='packet_construction',
+            recommendation_evidence_refs=['report:docs/replay/reports/phase16-cycle4-stable.md'],
+        ),
+    )
+
+    export_summary_payload = json.loads((tmp_path / 'cycle4-stable' / 'export_bundle' / 'export_summary.json').read_text(encoding='utf-8'))
+    stability_handoff_payload = json.loads(written_files['stability_handoff'].read_text(encoding='utf-8'))
+    bundle_manifest_payload = json.loads(written_files['bundle_manifest'].read_text(encoding='utf-8'))
+
+    assert written_files['stability_handoff'].is_file()
+    assert bundle_manifest_payload['files']['stability_handoff'] == 'stability_handoff.json'
+    assert stability_handoff_payload['accepted_cycle_streak'] == 2
+    assert stability_handoff_payload['residual_risks'] == ['weak_prior_support']
+    assert stability_handoff_payload['dataset_manifest_ref'] == 'dataset_manifest.json'
+    assert stability_handoff_payload['primary_recommendation_id'] == 'packet_construction'
+    assert export_summary_payload['review_status'] == 'not_started'
+    assert export_summary_payload['training_acceptance_verdict'] == 'pending'
 
 
 def test_write_corpus_sampling_bundle_writes_expected_files_and_separates_buckets(tmp_path: Path) -> None:
