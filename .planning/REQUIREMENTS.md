@@ -11,7 +11,7 @@ Requirements for milestone `v1.2`. This milestone uses repeated in-milestone cyc
 
 - [ ] **LOOPR-01**: Operators can run a full generation cycle (`packet -> replay -> prior/review -> export`) directly from existing Phase 10/11 artifacts and commands.
 - [ ] **LOOPR-02**: Each cycle records comparable evidence outputs and review notes so cycle-to-cycle quality movement is auditable.
-- [ ] **LOOPR-03**: The workflow supports rapid fix -> rerun loops on the same baseline data without introducing a separate foundation refactor first.
+- [x] **LOOPR-03**: The workflow supports rapid fix -> rerun loops on the same baseline data without introducing a separate foundation refactor first.
 
 ### Manual Output Quality Review
 

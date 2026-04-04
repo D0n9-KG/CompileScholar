@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: milestone
-status: Ready to execute
-stopped_at: Phase 13 planned
-last_updated: "2026-04-04T03:41:46.9940935Z"
+status: Executing Phase 13
+stopped_at: Completed 13-01-PLAN.md
+last_updated: "2026-04-04T03:54:01.459Z"
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 5
-  completed_plans: 2
+  completed_plans: 3
 ---
 
 # Project State
@@ -19,17 +19,17 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-04-04)
 
 **Core value:** Produce auditable, replayable, trainable scientific-reasoning artifacts rather than paper-like summaries or one-off knowledge graphs.
-**Current focus:** Execute the Phase 13 multi-iteration cycle-2 refinement loop against the fixed Phase 12 cycle-1 baseline
+**Current focus:** Execute Plan 13-02 to thread reviewer metadata and bounded fallback clustering through the Phase 13 rerun path
 
 ## Current Position
 
-Phase: 13
-Plan: 01-03 planned
+Phase: 13 (baseline-data-cycle-2-refine) — EXECUTING
+Plan: 2 of 3
 Milestone: `v1.2` - Fast Iteration Research Logic Quality
 
 - Completed milestone: `v1.1` corpus-driven iterative quality hardening
-- Status: Phase `13` planned; ready to execute the bounded multi-iteration refinement loop
-- Last activity: `2026-04-04` - created Phase 13 research, validation, and three execution plans for repeated bounded reruns on the Phase 12 cycle-1 baseline
+- Status: Phase `13` is executing on the fixed Phase 12 cycle-1 baseline
+- Last activity: `2026-04-04` - completed Plan 13-01 with a dedicated Phase 13 iteration wrapper and regression coverage
 
 ## Milestone Snapshot
 
@@ -51,6 +51,7 @@ Milestone: `v1.2` - Fast Iteration Research Logic Quality
 - Phase 9 committed a bounded seven-paper packet with explicit `support / alternative / held_out` mapping.
 - Phase 12 produced a fresh cycle-1 output root under `tmp/phase12_direct_fix_cycle/cycle1/` with `support_cluster_too_small` and `alternative_scope_not_distinct` removed from the bounded packet surface.
 - Phase 12 verification shows the dominant blockers now sit downstream in replay, prior-review, and export rather than in packet construction.
+- Phase 13 Plan 01 added `backend/scripts/run_phase13_cycle_refinement.py` so repeated bounded reruns now default to the Phase 12 cycle-1 replay/export bundles and write auditable outputs under `tmp/phase13_cycle2_refine/<iteration-label>/`.
 
 ## Active Requirements
 
@@ -58,7 +59,6 @@ Milestone: `v1.2` - Fast Iteration Research Logic Quality
 
 ## Pending Follow-Ups
 
-- Execute Plan `13-01` to add the Phase 13 iteration harness and lock the cycle-1 baseline / iteration output contract.
 - Execute Plan `13-02` to wire reviewer metadata through the rerun path and add the bounded scope-fallback cluster option.
 - Execute Plan `13-03` to run multiple bounded iterations, publish the final defect-delta review, and generate the next-cycle prioritization handoff.
 
@@ -69,6 +69,6 @@ Milestone: `v1.2` - Fast Iteration Research Logic Quality
 
 ## Session
 
-**Last Date:** 2026-04-04T03:41:46.9940935Z
-**Stopped At:** Phase 13 planned
-**Resume File:** .planning/phases/13-baseline-data-cycle-2-refine/13-01-PLAN.md
+**Last Date:** 2026-04-04T03:54:01.440Z
+**Stopped At:** Completed 13-01-PLAN.md
+**Resume File:** .planning/phases/13-baseline-data-cycle-2-refine/13-02-PLAN.md

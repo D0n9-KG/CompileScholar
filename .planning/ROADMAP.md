@@ -16,7 +16,7 @@ Inside one milestone, the team repeatedly runs: generate real outputs -> manuall
 | Phase | Name | Goal | Requirements | Success Criteria |
 |-------|------|------|--------------|------------------|
 | 12 | Baseline Data Cycle 1 (Direct Fix) | Use Phase 10/11 existing artifacts directly, apply focused fixes, rerun, and review output quality. | `LOOPR-01`, `LOOPR-02` | Complete (`2026-04-04`) |
-| 13 | Baseline Data Cycle 2 (Refine) | Continue fix-rerun-review on the same baseline data until quality improves without overfitting. | `LOOPR-03`, `REVIEW-01` | 4 |
+| 13 | Baseline Data Cycle 2 (Refine) | 1/3 | In Progress|  |
 | 14 | Cycle 2 Optimization And Review | Apply fixes from cycle 1, rerun, and re-review outputs with explicit defect deltas. | `REVIEW-02`, `REVIEW-03` | 4 |
 | 15 | Cycle 3 Consolidation | Continue optimize/rerun to reach repeated high-quality output under manual review. | `STAB-01` | 3 |
 | 16 | Stability Verification And Handoff | Verify consecutive-cycle stability and publish final verification with residual risk notes. | `STAB-02`, `STAB-03` | 3 |
