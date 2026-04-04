@@ -52,6 +52,43 @@ def _unique(values: Iterable[str]) -> list[str]:
     return ordered
 
 
+def _anchor_id_set(values: Iterable[str] | None) -> set[str]:
+    return {str(value).strip() for value in values or [] if str(value).strip()}
+
+
+def _matching_raw_source_phrases(
+    trace: PaperLogicTrace,
+    *,
+    fields: Iterable[str],
+    label: str | None = None,
+    anchor_ids: Iterable[str] | None = None,
+    mention_type: str | None = None,
+    fallback_values: Iterable[str] | None = None,
+) -> list[str]:
+    normalized_label = _normalized_label(label)
+    normalized_type = _normalized_label(mention_type)
+    anchor_set = _anchor_id_set(anchor_ids)
+    phrases: list[str] = []
+    for move in trace.canonical_core.moves:
+        move_anchor_ids = _anchor_id_set(getattr(move, 'anchor_ids', []))
+        if anchor_set and not (move_anchor_ids & anchor_set):
+            continue
+        for field in fields:
+            for mention in list(getattr(move, field, []) or []):
+                if normalized_type and _normalized_label(getattr(mention, 'type', None)) != normalized_type:
+                    continue
+                phrase = _first_non_empty(getattr(mention, 'surface', None), getattr(mention, 'normalized', None))
+                if not phrase:
+                    continue
+                normalized_phrase = _normalized_label(getattr(mention, 'normalized', None) or phrase)
+                if normalized_label and normalized_phrase != normalized_label:
+                    continue
+                phrases.append(phrase)
+    if phrases:
+        return _unique(phrases)
+    return _unique(str(value).strip() for value in fallback_values or [] if str(value).strip())
+
+
 def _slug(value: str) -> str:
     slug = re.sub(r'[^a-z0-9]+', '_', str(value or '').strip().lower())
     return slug.strip('_') or 'route'
@@ -209,6 +246,7 @@ def _merge_route_features(features: list[RouteFeature]) -> list[RouteFeature]:
             continue
         merged[key] = existing.model_copy(
             update={
+                'raw_source_phrases': _unique([*existing.raw_source_phrases, *feature.raw_source_phrases]),
                 'source_paper_ids': _unique([*existing.source_paper_ids, *feature.source_paper_ids]),
                 'evidence_ids': _unique([*existing.evidence_ids, *feature.evidence_ids]),
                 'l1_refs': _unique([*existing.l1_refs, *feature.l1_refs]),
@@ -239,6 +277,7 @@ def _merge_benchmark_states(
             continue
         l1_state = BenchmarkState(
             label=entry.label,
+            raw_source_phrases=[entry.label],
             benchmark_type=entry.benchmark_type if entry.benchmark_type in {'dataset', 'benchmark', 'task_suite'} else 'unknown',
             adoption_level=_benchmark_adoption_from_l1(entry.status, len(entry.source_paper_ids)),
             source_paper_ids=list(entry.source_paper_ids),
@@ -250,6 +289,7 @@ def _merge_benchmark_states(
             continue
         merged[key] = existing.model_copy(
             update={
+                'raw_source_phrases': _unique([*existing.raw_source_phrases, *l1_state.raw_source_phrases]),
                 'benchmark_type': existing.benchmark_type if existing.benchmark_type != 'unknown' else l1_state.benchmark_type,
                 'adoption_level': existing.adoption_level
                 if adoption_rank.get(existing.adoption_level, 0) >= adoption_rank.get(l1_state.adoption_level, 0)
@@ -276,6 +316,7 @@ def _merge_protocol_states(
             continue
         l1_state = ProtocolState(
             label=entry.label,
+            raw_source_phrases=[entry.label],
             protocol_type='measurement',
             maturity_score=_l1_confidence(entry, 0.7 if _status_label(entry.status) == 'available' else 0.55),
             source_paper_ids=list(entry.source_paper_ids),
@@ -287,6 +328,7 @@ def _merge_protocol_states(
             continue
         merged[key] = existing.model_copy(
             update={
+                'raw_source_phrases': _unique([*existing.raw_source_phrases, *l1_state.raw_source_phrases]),
                 'protocol_type': existing.protocol_type if existing.protocol_type != 'unknown' else l1_state.protocol_type,
                 'maturity_score': max(
                     score
@@ -330,6 +372,7 @@ def _merge_infrastructure_states(
             continue
         l1_state = InfrastructureState(
             label=label,
+            raw_source_phrases=[label],
             infra_type=_resource_infra_type(resource_types),
             availability_level=_availability_from_l1(status, len(source_paper_ids)),
             source_paper_ids=source_paper_ids,
@@ -341,6 +384,7 @@ def _merge_infrastructure_states(
             continue
         merged[key] = existing.model_copy(
             update={
+                'raw_source_phrases': _unique([*existing.raw_source_phrases, *l1_state.raw_source_phrases]),
                 'infra_type': existing.infra_type if existing.infra_type != 'unknown' else l1_state.infra_type,
                 'availability_level': existing.availability_level
                 if availability_rank.get(existing.availability_level, 0) >= availability_rank.get(l1_state.availability_level, 0)
@@ -368,6 +412,7 @@ def _merge_condition_states(
             continue
         l1_state = ConditionState(
             label=entry.label,
+            raw_source_phrases=[entry.label],
             condition_type=_resource_condition_type(entry.resource_types),
             status=_condition_status_from_l1(entry.status),
             source_paper_ids=list(entry.source_paper_ids),
@@ -379,6 +424,7 @@ def _merge_condition_states(
             continue
         merged[key] = existing.model_copy(
             update={
+                'raw_source_phrases': _unique([*existing.raw_source_phrases, *l1_state.raw_source_phrases]),
                 'condition_type': existing.condition_type if existing.condition_type != 'unknown' else l1_state.condition_type,
                 'status': existing.status
                 if status_rank.get(existing.status, 0) >= status_rank.get(l1_state.status, 0)
@@ -442,11 +488,20 @@ def _aggregate_method_states(
                     'paper_ids': set(),
                     'move_ids': set(),
                     'evidence_ids': set(),
+                    'raw_source_phrases': set(),
                 },
             )
             bucket['paper_ids'].add(trace.paper_metadata.paper_id)
             bucket['move_ids'].update(str(move_id).strip() for move_id in list(seed.get('source_move_ids') or []) if str(move_id).strip())
             bucket['evidence_ids'].update(str(anchor_id).strip() for anchor_id in list(seed.get('supporting_evidence_ids') or []) if str(anchor_id).strip())
+            bucket['raw_source_phrases'].update(
+                _matching_raw_source_phrases(
+                    trace,
+                    fields=('methods',),
+                    label=normalized,
+                    fallback_values=[label],
+                )
+            )
 
     states: list[MethodState] = []
     for label, bucket in sorted(
@@ -468,6 +523,7 @@ def _aggregate_method_states(
         states.append(
             MethodState(
                 label=label,
+                raw_source_phrases=sorted(bucket['raw_source_phrases']),
                 family=None,
                 maturity_score=_bounded_score(paper_count, 3),
                 adoption_level=adoption,
@@ -483,15 +539,24 @@ def _aggregate_benchmark_states(
     traces: list[PaperLogicTrace],
     seeds: list[dict[str, Any]],
 ) -> list[BenchmarkState]:
-    buckets: dict[str, dict[str, set[str]]] = {}
+    buckets: dict[str, dict[str, Any]] = {}
     for trace, seed in zip(traces, seeds):
         for label in list(seed.get('active_benchmark_candidates') or []):
             normalized = str(label or '').strip().lower()
             if not normalized:
                 continue
-            bucket = buckets.setdefault(normalized, {'paper_ids': set(), 'evidence_ids': set()})
+            bucket = buckets.setdefault(normalized, {'paper_ids': set(), 'evidence_ids': set(), 'raw_source_phrases': set()})
             bucket['paper_ids'].add(trace.paper_metadata.paper_id)
             bucket['evidence_ids'].update(str(anchor_id).strip() for anchor_id in list(seed.get('supporting_evidence_ids') or []) if str(anchor_id).strip())
+            bucket['raw_source_phrases'].update(
+                _matching_raw_source_phrases(
+                    trace,
+                    fields=('resource_mentions',),
+                    label=normalized,
+                    mention_type='benchmark',
+                    fallback_values=[label],
+                )
+            )
 
     states: list[BenchmarkState] = []
     for label, bucket in sorted(buckets.items(), key=lambda item: (-len(item[1]['paper_ids']), item[0])):
@@ -505,6 +570,7 @@ def _aggregate_benchmark_states(
         states.append(
             BenchmarkState(
                 label=label,
+                raw_source_phrases=sorted(bucket['raw_source_phrases']),
                 benchmark_type='benchmark',
                 adoption_level=adoption,
                 source_paper_ids=sorted(bucket['paper_ids']),
@@ -518,7 +584,7 @@ def _aggregate_protocol_states(
     traces: list[PaperLogicTrace],
     seeds: list[dict[str, Any]],
 ) -> list[ProtocolState]:
-    buckets: dict[str, dict[str, set[str]]] = {}
+    buckets: dict[str, dict[str, Any]] = {}
     for trace, seed in zip(traces, seeds):
         comparison_evidence_ids = _unique(
             str(anchor_id).strip()
@@ -534,14 +600,26 @@ def _aggregate_protocol_states(
             normalized = str(label or '').strip().lower()
             if not normalized:
                 continue
-            bucket = buckets.setdefault(normalized, {'paper_ids': set(), 'evidence_ids': set()})
+            bucket = buckets.setdefault(normalized, {'paper_ids': set(), 'evidence_ids': set(), 'raw_source_phrases': set()})
             bucket['paper_ids'].add(trace.paper_metadata.paper_id)
             bucket['evidence_ids'].update(str(anchor_id).strip() for anchor_id in list(entry.get('anchor_ids') or []) if str(anchor_id).strip())
             bucket['evidence_ids'].update(comparison_evidence_ids)
+            bucket['raw_source_phrases'].update(
+                _matching_raw_source_phrases(
+                    trace,
+                    fields=('metrics', 'comparators', 'conditions'),
+                    anchor_ids=list(entry.get('anchor_ids') or []),
+                    fallback_values=[
+                        *[str(token).strip() for token in list(entry.get('metric_tokens') or []) if str(token).strip()],
+                        *[str(token).strip() for token in list(entry.get('condition_tokens') or []) if str(token).strip()],
+                    ],
+                )
+            )
 
     return [
         ProtocolState(
             label=label,
+            raw_source_phrases=sorted(bucket['raw_source_phrases']),
             protocol_type='measurement',
             maturity_score=_bounded_score(len(bucket['paper_ids']), 2),
             source_paper_ids=sorted(bucket['paper_ids']),
@@ -565,11 +643,19 @@ def _aggregate_infrastructure_states(
                     continue
                 bucket = buckets.setdefault(
                     label,
-                    {'paper_ids': set(), 'evidence_ids': set(), 'resource_types': set()},
+                    {'paper_ids': set(), 'evidence_ids': set(), 'resource_types': set(), 'raw_source_phrases': set()},
                 )
                 bucket['paper_ids'].add(trace.paper_metadata.paper_id)
                 bucket['evidence_ids'].update(str(anchor_id).strip() for anchor_id in list(entry.get('anchor_ids') or []) if str(anchor_id).strip())
                 bucket['resource_types'].update(resource_types)
+                bucket['raw_source_phrases'].update(
+                    _matching_raw_source_phrases(
+                        trace,
+                        fields=('resource_mentions',),
+                        label=label,
+                        fallback_values=[token],
+                    )
+                )
 
     states: list[InfrastructureState] = []
     for label, bucket in sorted(buckets.items(), key=lambda item: (-len(item[1]['paper_ids']), item[0])):
@@ -579,6 +665,7 @@ def _aggregate_infrastructure_states(
         states.append(
             InfrastructureState(
                 label=label,
+                raw_source_phrases=sorted(bucket['raw_source_phrases']),
                 infra_type=infra_type,
                 availability_level=availability,
                 source_paper_ids=sorted(bucket['paper_ids']),
@@ -614,6 +701,16 @@ def _aggregate_capability_states(
             states.append(
                 CapabilityState(
                     label=normalized,
+                    raw_source_phrases=_matching_raw_source_phrases(
+                        trace,
+                        fields=('metrics', 'comparators', 'conditions'),
+                        anchor_ids=list(entry.get('anchor_ids') or []),
+                        fallback_values=[
+                            *[str(token).strip() for token in list(entry.get('metric_tokens') or []) if str(token).strip()],
+                            *[str(token).strip() for token in list(entry.get('condition_tokens') or []) if str(token).strip()],
+                            normalized,
+                        ],
+                    ),
                     capability_type='prediction',
                     status='repeatable' if entry.get('comparator_tokens') or has_comparison_support else 'tentative',
                     metric_signals=_unique(str(token).strip() for token in list(entry.get('metric_tokens') or [])),
@@ -651,15 +748,23 @@ def _aggregate_bottleneck_states(
     traces: list[PaperLogicTrace],
     seeds: list[dict[str, Any]],
 ) -> list[BottleneckState]:
-    buckets: dict[str, dict[str, set[str]]] = {}
+    buckets: dict[str, dict[str, Any]] = {}
     for trace, seed in zip(traces, seeds):
         for label in list(seed.get('known_bottleneck_candidates') or []):
             normalized = str(label or '').strip().lower()
             if not normalized:
                 continue
-            bucket = buckets.setdefault(normalized, {'paper_ids': set(), 'evidence_ids': set()})
+            bucket = buckets.setdefault(normalized, {'paper_ids': set(), 'evidence_ids': set(), 'raw_source_phrases': set()})
             bucket['paper_ids'].add(trace.paper_metadata.paper_id)
             bucket['evidence_ids'].update(str(anchor_id).strip() for anchor_id in list(seed.get('challenging_evidence_ids') or []) if str(anchor_id).strip())
+            bucket['raw_source_phrases'].update(
+                _matching_raw_source_phrases(
+                    trace,
+                    fields=('limitation_types',),
+                    label=normalized,
+                    fallback_values=[label],
+                )
+            )
 
     states: list[BottleneckState] = []
     for label, bucket in sorted(buckets.items(), key=lambda item: (-len(item[1]['paper_ids']), item[0])):
@@ -668,6 +773,7 @@ def _aggregate_bottleneck_states(
         states.append(
             BottleneckState(
                 label=label,
+                raw_source_phrases=sorted(bucket['raw_source_phrases']),
                 bottleneck_type=_infer_bottleneck_type(label),
                 severity=severity,
                 blocking_scope='route_level',
@@ -683,19 +789,28 @@ def _aggregate_condition_states(
     traces: list[PaperLogicTrace],
     seeds: list[dict[str, Any]],
 ) -> list[ConditionState]:
-    buckets: dict[str, dict[str, set[str]]] = {}
+    buckets: dict[str, dict[str, Any]] = {}
     for trace, seed in zip(traces, seeds):
         for label in list(seed.get('enabling_condition_candidates') or []):
             normalized = str(label or '').strip().lower()
             if not normalized:
                 continue
-            bucket = buckets.setdefault(normalized, {'paper_ids': set(), 'evidence_ids': set()})
+            bucket = buckets.setdefault(normalized, {'paper_ids': set(), 'evidence_ids': set(), 'raw_source_phrases': set()})
             bucket['paper_ids'].add(trace.paper_metadata.paper_id)
             bucket['evidence_ids'].update(str(anchor_id).strip() for anchor_id in list(seed.get('supporting_evidence_ids') or []) if str(anchor_id).strip())
+            bucket['raw_source_phrases'].update(
+                _matching_raw_source_phrases(
+                    trace,
+                    fields=('conditions',),
+                    label=normalized,
+                    fallback_values=[label],
+                )
+            )
 
     return [
         ConditionState(
             label=label,
+            raw_source_phrases=sorted(bucket['raw_source_phrases']),
             condition_type='resource',
             status='met',
             source_paper_ids=sorted(bucket['paper_ids']),
@@ -710,7 +825,7 @@ def _aggregate_alternative_routes(
     seeds: list[dict[str, Any]],
     packet: RoutePacket,
 ) -> list[AlternativeRouteState]:
-    buckets: dict[str, dict[str, set[str]]] = {}
+    buckets: dict[str, dict[str, Any]] = {}
 
     def _signal_label(entry: dict[str, Any]) -> str:
         derived_label = str(entry.get('derived_label') or '').strip().lower()
@@ -742,12 +857,29 @@ def _aggregate_alternative_routes(
             normalized = _signal_label(entry)
             if not normalized:
                 continue
-            bucket = buckets.setdefault(normalized, {'paper_ids': set(), 'evidence_ids': set(), 'features': set()})
+            bucket = buckets.setdefault(
+                normalized,
+                {'paper_ids': set(), 'evidence_ids': set(), 'features': set(), 'raw_source_phrases': set()},
+            )
             bucket['paper_ids'].add(trace.paper_metadata.paper_id)
             bucket['evidence_ids'].update(
                 str(anchor_id).strip()
                 for anchor_id in list(entry.get('evidence_ids') or entry.get('anchor_ids') or [])
                 if str(anchor_id).strip()
+            )
+            bucket['raw_source_phrases'].update(
+                _matching_raw_source_phrases(
+                    trace,
+                    fields=('research_objects', 'methods', 'conditions', 'resource_mentions'),
+                    anchor_ids=list(entry.get('evidence_ids') or entry.get('anchor_ids') or []),
+                    fallback_values=[
+                        *[str(token).strip() for token in list(entry.get('target_object_tokens') or []) if str(token).strip()],
+                        *[str(token).strip() for token in list(entry.get('method_tokens') or []) if str(token).strip()],
+                        *[str(token).strip() for token in list(entry.get('resource_tokens') or []) if str(token).strip()],
+                        *[str(token).strip() for token in list(entry.get('condition_tokens') or []) if str(token).strip()],
+                        normalized,
+                    ],
+                )
             )
             bucket['features'].update(
                 str(token).strip().lower()
@@ -761,18 +893,27 @@ def _aggregate_alternative_routes(
             normalized = str(label or '').strip().lower()
             if not normalized:
                 continue
-            bucket = buckets.setdefault(normalized, {'paper_ids': set(), 'evidence_ids': set(), 'features': set()})
+            bucket = buckets.setdefault(
+                normalized,
+                {'paper_ids': set(), 'evidence_ids': set(), 'features': set(), 'raw_source_phrases': set()},
+            )
             bucket['paper_ids'].add(trace.paper_metadata.paper_id)
             bucket['evidence_ids'].update(str(anchor_id).strip() for anchor_id in list(seed.get('supporting_evidence_ids') or []) if str(anchor_id).strip())
+            bucket['raw_source_phrases'].add(label)
     for label in list(packet.compiler_hints.expected_alternative_routes or []):
         normalized = str(label or '').strip().lower()
         if not normalized:
             continue
-        buckets.setdefault(normalized, {'paper_ids': set(), 'evidence_ids': set(), 'features': set()})
+        bucket = buckets.setdefault(
+            normalized,
+            {'paper_ids': set(), 'evidence_ids': set(), 'features': set(), 'raw_source_phrases': set()},
+        )
+        bucket['raw_source_phrases'].add(label)
 
     return [
         AlternativeRouteState(
             label=label,
+            raw_source_phrases=sorted(bucket['raw_source_phrases']),
             route_family=None,
             relation_to_main_route='competing',
             distinguishing_features=sorted(bucket['features'])[:6],
@@ -955,6 +1096,7 @@ def _build_why_now_features(
     unlocking_factors = [
         RouteFeature(
             label=benchmark.label,
+            raw_source_phrases=benchmark.raw_source_phrases,
             feature_type='benchmark_availability',
             direction='unlock',
             source_paper_ids=benchmark.source_paper_ids,
@@ -967,6 +1109,7 @@ def _build_why_now_features(
     unlocking_factors.extend(
         RouteFeature(
             label=condition.label,
+            raw_source_phrases=condition.raw_source_phrases,
             feature_type='new_resource',
             direction='unlock',
             source_paper_ids=condition.source_paper_ids,
@@ -979,6 +1122,7 @@ def _build_why_now_features(
     acceleration_factors = [
         RouteFeature(
             label=method.label,
+            raw_source_phrases=method.raw_source_phrases,
             feature_type='method_maturity',
             direction='accelerate',
             source_paper_ids=method.source_paper_ids,
@@ -993,6 +1137,7 @@ def _build_why_now_features(
         acceleration_factors.extend(
             RouteFeature(
                 label=infra.label,
+                raw_source_phrases=infra.raw_source_phrases,
                 feature_type='infrastructure',
                 direction='accelerate',
                 source_paper_ids=infra.source_paper_ids,
@@ -1006,6 +1151,7 @@ def _build_why_now_features(
         acceleration_factors.extend(
             RouteFeature(
                 label=protocol.label,
+                raw_source_phrases=protocol.raw_source_phrases,
                 feature_type='protocol',
                 direction='accelerate',
                 source_paper_ids=protocol.source_paper_ids,
@@ -1018,6 +1164,7 @@ def _build_why_now_features(
     positive_comparison_signals = [
         RouteFeature(
             label=alternative.label,
+            raw_source_phrases=alternative.raw_source_phrases,
             feature_type='comparative_gain',
             direction='accelerate',
             source_paper_ids=alternative.source_paper_ids,
@@ -1049,6 +1196,7 @@ def _build_not_now_features(
     blocking_factors = [
         RouteFeature(
             label=bottleneck.label,
+            raw_source_phrases=bottleneck.raw_source_phrases,
             feature_type='blocker',
             direction='block',
             source_paper_ids=bottleneck.source_paper_ids,
@@ -1064,6 +1212,7 @@ def _build_not_now_features(
         missing_prerequisites.append(
             RouteFeature(
                 label='benchmark coverage is missing',
+                raw_source_phrases=[],
                 feature_type='missing_prerequisite',
                 direction='warn',
                 source_paper_ids=[],
@@ -1076,6 +1225,7 @@ def _build_not_now_features(
         missing_prerequisites.append(
             RouteFeature(
                 label='measurement protocol evidence is missing',
+                raw_source_phrases=[],
                 feature_type='missing_prerequisite',
                 direction='warn',
                 source_paper_ids=[],
@@ -1090,6 +1240,7 @@ def _build_not_now_features(
                 missing_prerequisites.append(
                     RouteFeature(
                         label=f'benchmark {entry.label} is still missing before the cutoff',
+                        raw_source_phrases=[entry.label],
                         feature_type='missing_prerequisite',
                         direction='warn',
                         source_paper_ids=list(entry.source_paper_ids),
@@ -1102,6 +1253,7 @@ def _build_not_now_features(
                 fragility_factors.append(
                     RouteFeature(
                         label=f'benchmark availability around {entry.label} is contested',
+                        raw_source_phrases=[entry.label],
                         feature_type='fragility',
                         direction='warn',
                         source_paper_ids=list(entry.source_paper_ids),
@@ -1115,6 +1267,7 @@ def _build_not_now_features(
                 missing_prerequisites.append(
                     RouteFeature(
                         label=f'required resource {entry.label} is not yet available before the cutoff',
+                        raw_source_phrases=[entry.label],
                         feature_type='missing_prerequisite',
                         direction='warn',
                         source_paper_ids=list(entry.source_paper_ids),
@@ -1127,6 +1280,7 @@ def _build_not_now_features(
                 fragility_factors.append(
                     RouteFeature(
                         label=f'resource readiness around {entry.label} is contested',
+                        raw_source_phrases=[entry.label],
                         feature_type='fragility',
                         direction='warn',
                         source_paper_ids=list(entry.source_paper_ids),
@@ -1140,6 +1294,7 @@ def _build_not_now_features(
                 missing_prerequisites.append(
                     RouteFeature(
                         label=f'measurement protocol {entry.label} is still missing before the cutoff',
+                        raw_source_phrases=[entry.label],
                         feature_type='missing_prerequisite',
                         direction='warn',
                         source_paper_ids=list(entry.source_paper_ids),
@@ -1152,6 +1307,7 @@ def _build_not_now_features(
                 fragility_factors.append(
                     RouteFeature(
                         label=f'measurement protocol {entry.label} remains contested',
+                        raw_source_phrases=[entry.label],
                         feature_type='fragility',
                         direction='warn',
                         source_paper_ids=list(entry.source_paper_ids),

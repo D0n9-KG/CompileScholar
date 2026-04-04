@@ -506,6 +506,16 @@ def build_decision_episode_export_summary(
         'hindsight_input_visible': decision_episode.hindsight_outcome.input_visible,
         'prior_selection_note': export.prior_selection_note,
         'anti_pattern_selection_note': export.anti_pattern_selection_note,
+        'review_status': export.review_status,
+        'training_acceptance_verdict': export.training_acceptance_verdict,
+        'reviewer_ids': list(export.reviewer_ids),
+        'reviewed_at': export.reviewed_at,
+        'rationale': export.rationale,
+        'residual_defects': list(export.residual_defects),
+        'section_reviews': {
+            key: review.model_dump(mode='json', exclude_none=True)
+            for key, review in export.section_reviews.items()
+        },
     }
 
 
@@ -549,6 +559,18 @@ def build_decision_episode_export_inspection(
                 ref.startswith('hindsight_evidence:')
                 for ref in export.visible_input_refs
             ),
+        },
+        'review': {
+            'review_status': export.review_status,
+            'training_acceptance_verdict': export.training_acceptance_verdict,
+            'reviewer_ids': list(export.reviewer_ids),
+            'reviewed_at': export.reviewed_at,
+            'rationale': export.rationale,
+            'residual_defects': list(export.residual_defects),
+            'section_reviews': {
+                key: review.model_dump(mode='json', exclude_none=True)
+                for key, review in export.section_reviews.items()
+            },
         },
         'decision_episode_quality': decision_episode.quality.model_dump(mode='json', exclude_none=True),
     }
@@ -918,6 +940,10 @@ def write_decision_episode_export_bundle(
         'route_state_id': export.decision_episode.route_state.route_state_id,
         'accepted_prior_ids': list(export.accepted_prior_ids),
         'accepted_anti_pattern_ids': list(export.accepted_anti_pattern_ids),
+        'review_status': export.review_status,
+        'training_acceptance_verdict': export.training_acceptance_verdict,
+        'reviewer_ids': list(export.reviewer_ids),
+        'reviewed_at': export.reviewed_at,
         'source_replay_bundle_refs': export.source_replay_bundle_refs.model_dump(exclude_none=True),
         'source_review_bundle_refs': export.source_review_bundle_refs.model_dump(exclude_none=True),
         'metadata': dict(metadata or {}),

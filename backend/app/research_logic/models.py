@@ -191,6 +191,7 @@ class ScopeResolution(ContractModel):
 
 class MethodState(ContractModel):
     label: str
+    raw_source_phrases: list[str] = Field(default_factory=list)
     family: str | None = None
     maturity_score: float | None = None
     adoption_level: AdoptionLevel = 'unknown'
@@ -202,6 +203,7 @@ class MethodState(ContractModel):
 
 class BenchmarkState(ContractModel):
     label: str
+    raw_source_phrases: list[str] = Field(default_factory=list)
     benchmark_type: BenchmarkType = 'unknown'
     adoption_level: BenchmarkAdoptionLevel = 'unknown'
     source_paper_ids: list[str] = Field(default_factory=list)
@@ -210,6 +212,7 @@ class BenchmarkState(ContractModel):
 
 class ProtocolState(ContractModel):
     label: str
+    raw_source_phrases: list[str] = Field(default_factory=list)
     protocol_type: ProtocolType = 'unknown'
     maturity_score: float | None = None
     source_paper_ids: list[str] = Field(default_factory=list)
@@ -218,6 +221,7 @@ class ProtocolState(ContractModel):
 
 class InfrastructureState(ContractModel):
     label: str
+    raw_source_phrases: list[str] = Field(default_factory=list)
     infra_type: InfrastructureType = 'unknown'
     availability_level: AvailabilityLevel = 'unknown'
     source_paper_ids: list[str] = Field(default_factory=list)
@@ -226,6 +230,7 @@ class InfrastructureState(ContractModel):
 
 class CapabilityState(ContractModel):
     label: str
+    raw_source_phrases: list[str] = Field(default_factory=list)
     capability_type: CapabilityType = 'unknown'
     status: CapabilityStatus = 'unknown'
     metric_signals: list[str] = Field(default_factory=list)
@@ -236,6 +241,7 @@ class CapabilityState(ContractModel):
 
 class BottleneckState(ContractModel):
     label: str
+    raw_source_phrases: list[str] = Field(default_factory=list)
     bottleneck_type: BottleneckType = 'unknown'
     severity: Severity = 'unknown'
     blocking_scope: BlockingScope = 'unknown'
@@ -246,6 +252,7 @@ class BottleneckState(ContractModel):
 
 class ConditionState(ContractModel):
     label: str
+    raw_source_phrases: list[str] = Field(default_factory=list)
     condition_type: ConditionType = 'unknown'
     status: ConditionStatus = 'unknown'
     source_paper_ids: list[str] = Field(default_factory=list)
@@ -254,6 +261,7 @@ class ConditionState(ContractModel):
 
 class AlternativeRouteState(ContractModel):
     label: str
+    raw_source_phrases: list[str] = Field(default_factory=list)
     route_family: str | None = None
     relation_to_main_route: RouteRelation = 'unknown'
     distinguishing_features: list[str] = Field(default_factory=list)
@@ -286,6 +294,7 @@ class ReadinessScores(ContractModel):
 
 class RouteFeature(ContractModel):
     label: str
+    raw_source_phrases: list[str] = Field(default_factory=list)
     feature_type: FeatureType = 'unknown'
     direction: FeatureDirection
     source_paper_ids: list[str] = Field(default_factory=list)
@@ -412,6 +421,29 @@ class TrainingQuality(ContractModel):
     quality_tier: QualityTier = 'red'
     ready_for_training: bool = False
     quality_flags: list[str] = Field(default_factory=list)
+
+
+TrainingReviewStatus = Literal['not_started', 'in_review', 'reviewed']
+TrainingAcceptanceVerdict = Literal['pending', 'candidate', 'accepted', 'needs_revision', 'rejected']
+TrainingSectionKey = Literal[
+    'evidence_pack',
+    'route_synthesis',
+    'why_now',
+    'route_comparison',
+    'priors_antipatterns',
+    'minimal_attack_path',
+    'final_decision',
+    'review_labels',
+]
+
+
+class TrainingSectionReview(ContractModel):
+    review_status: TrainingReviewStatus = 'not_started'
+    training_acceptance_verdict: TrainingAcceptanceVerdict = 'pending'
+    reviewer_ids: list[str] = Field(default_factory=list)
+    reviewed_at: str | None = None
+    rationale: str | None = None
+    residual_defects: list[str] = Field(default_factory=list)
 
 
 class WhyNowCase(ContractModel):

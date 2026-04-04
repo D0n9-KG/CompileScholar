@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Any, Mapping, Sequence, TypeVar
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .decision_episode_builder import build_decision_episode
 from .models import (
@@ -14,10 +14,23 @@ from .models import (
     RouteComparisonCase,
     RoutePacket,
     RouteState,
+    TrainingAcceptanceVerdict,
+    TrainingReviewStatus,
+    TrainingSectionReview,
     WhyNowCase,
 )
 
 ModelT = TypeVar('ModelT', bound=BaseModel)
+REQUIRED_SECTION_REVIEW_KEYS = [
+    'evidence_pack',
+    'route_synthesis',
+    'why_now',
+    'route_comparison',
+    'priors_antipatterns',
+    'minimal_attack_path',
+    'final_decision',
+    'review_labels',
+]
 
 
 def _utc_now_iso() -> str:
@@ -56,6 +69,26 @@ def _models_from(values: Sequence[BaseModel | Mapping[str, Any]] | None, model_t
 
 def _normalize_ids(values: Sequence[str] | None) -> list[str]:
     return _unique([str(value or '').strip() for value in values or []])
+
+
+def _default_section_reviews() -> dict[str, TrainingSectionReview]:
+    return {key: TrainingSectionReview() for key in REQUIRED_SECTION_REVIEW_KEYS}
+
+
+def _normalize_section_reviews(
+    value: Mapping[str, TrainingSectionReview | Mapping[str, Any]] | None,
+) -> dict[str, TrainingSectionReview]:
+    normalized = _default_section_reviews()
+    for key, section_value in (value or {}).items():
+        section_key = str(key or '').strip()
+        if not section_key:
+            continue
+        normalized[section_key] = (
+            section_value
+            if isinstance(section_value, TrainingSectionReview)
+            else TrainingSectionReview.model_validate(section_value)
+        )
+    return normalized
 
 
 def _allowlisted_cards(
@@ -98,6 +131,20 @@ class DecisionEpisodeAuditExport(BaseModel):
     label_eval_only_refs: list[str] = Field(default_factory=list)
     prior_selection_note: str | None = None
     anti_pattern_selection_note: str | None = None
+    review_status: TrainingReviewStatus = 'not_started'
+    training_acceptance_verdict: TrainingAcceptanceVerdict = 'pending'
+    reviewer_ids: list[str] = Field(default_factory=list)
+    reviewed_at: str | None = None
+    rationale: str | None = None
+    residual_defects: list[str] = Field(default_factory=list)
+    section_reviews: dict[str, TrainingSectionReview] = Field(default_factory=_default_section_reviews)
+
+    @model_validator(mode='after')
+    def validate_section_reviews(self) -> 'DecisionEpisodeAuditExport':
+        missing_keys = [key for key in REQUIRED_SECTION_REVIEW_KEYS if key not in self.section_reviews]
+        if missing_keys:
+            raise ValueError(f'missing required section reviews: {", ".join(missing_keys)}')
+        return self
 
 
 def _normalize_source_refs(
@@ -242,6 +289,13 @@ def build_decision_episode_audit_export(
     route_state_ref: str | None = None,
     source_replay_bundle_refs: DecisionEpisodeExportSourceRefs | Mapping[str, Any] | None = None,
     source_review_bundle_refs: DecisionEpisodeExportSourceRefs | Mapping[str, Any] | None = None,
+    review_status: TrainingReviewStatus = 'not_started',
+    training_acceptance_verdict: TrainingAcceptanceVerdict = 'pending',
+    reviewer_ids: Sequence[str] | None = None,
+    reviewed_at: str | None = None,
+    rationale: str | None = None,
+    residual_defects: Sequence[str] | None = None,
+    section_reviews: Mapping[str, TrainingSectionReview | Mapping[str, Any]] | None = None,
     built_at: str | None = None,
     episode_id: str | None = None,
 ) -> DecisionEpisodeAuditExport:
@@ -313,6 +367,13 @@ def build_decision_episode_audit_export(
             accepted_anti_pattern_ids=accepted_anti_pattern_ids or [],
             selected_antipattern_ids=selected_antipattern_ids,
         ),
+        review_status=review_status,
+        training_acceptance_verdict=training_acceptance_verdict,
+        reviewer_ids=_normalize_ids(reviewer_ids),
+        reviewed_at=reviewed_at,
+        rationale=rationale,
+        residual_defects=_unique([str(value or '').strip() for value in residual_defects or [] if str(value or '').strip()]),
+        section_reviews=_normalize_section_reviews(section_reviews),
     )
 
 
