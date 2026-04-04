@@ -587,3 +587,69 @@ def test_build_decision_episode_audit_export_keeps_hindsight_label_only_and_out_
     assert 'hindsight_evidence:future-ref-1' not in export.visible_input_refs
     assert 'after_cutoff_paper:future-paper' in export.audit_only_refs
     assert 'replay_bundle:bundle:tmp/replay_bundle' in export.audit_only_refs
+
+
+def test_build_decision_episode_audit_export_includes_machine_readable_review_metadata() -> None:
+    route_main = _route_state(
+        route_state_id='route-main',
+        support_ids=['m-e1', 'm-e2'],
+        challenge_ids=['m-c1'],
+        method_score=0.78,
+        measurement_score=0.81,
+        data_resource_score=0.9,
+        infrastructure_score=0.61,
+        cost_cycle_score=0.49,
+        overall_score=0.7,
+    )
+
+    export = build_decision_episode_audit_export(
+        route_packet=_route_packet(route_main),
+        route_state=route_main,
+        why_now_case=build_why_now_case(route_main),
+        source_replay_bundle_refs=_source_refs('replay_bundle'),
+        source_review_bundle_refs=_source_refs('review_bundle'),
+        review_status='reviewed',
+        training_acceptance_verdict='needs_revision',
+        reviewer_ids=['reviewer-1', 'reviewer-2'],
+        reviewed_at='2026-04-02T03:35:00Z',
+        rationale='The audited export is review-backed, but the training-facing artifact still needs stronger prior grounding.',
+        residual_defects=['weak_prior_support'],
+        section_reviews={
+            'evidence_pack': {
+                'review_status': 'reviewed',
+                'training_acceptance_verdict': 'accepted',
+                'reviewer_ids': ['reviewer-1'],
+                'reviewed_at': '2026-04-02T03:35:00Z',
+                'rationale': 'Evidence pack is self-contained and auditable.',
+                'residual_defects': [],
+            },
+            'review_labels': {
+                'review_status': 'reviewed',
+                'training_acceptance_verdict': 'needs_revision',
+                'reviewer_ids': ['reviewer-1', 'reviewer-2'],
+                'reviewed_at': '2026-04-02T03:35:00Z',
+                'rationale': 'Final acceptance labels are present but still too cautious for release.',
+                'residual_defects': ['weak_prior_support'],
+            },
+        },
+        built_at='2026-04-02T03:35:00Z',
+    )
+
+    assert export.review_status == 'reviewed'
+    assert export.training_acceptance_verdict == 'needs_revision'
+    assert export.reviewer_ids == ['reviewer-1', 'reviewer-2']
+    assert export.reviewed_at == '2026-04-02T03:35:00Z'
+    assert export.residual_defects == ['weak_prior_support']
+    assert export.section_reviews['evidence_pack'].training_acceptance_verdict == 'accepted'
+    assert export.section_reviews['review_labels'].residual_defects == ['weak_prior_support']
+    assert export.section_reviews['route_comparison'].review_status == 'not_started'
+    assert set(export.section_reviews) == {
+        'evidence_pack',
+        'route_synthesis',
+        'why_now',
+        'route_comparison',
+        'priors_antipatterns',
+        'minimal_attack_path',
+        'final_decision',
+        'review_labels',
+    }

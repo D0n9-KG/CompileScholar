@@ -350,9 +350,12 @@ def test_route_state_synthesizer_compiles_green_route_state_from_packetized_trac
     assert route_state.route_landscape.dominant_methods[0].label == 'graph neural network'
     assert len(route_state.route_landscape.dominant_methods[0].source_paper_ids) == 2
     assert route_state.route_landscape.active_benchmarks[0].label == 'wn18rr'
+    assert route_state.route_landscape.active_benchmarks[0].raw_source_phrases == ['WN18RR']
     assert route_state.route_landscape.known_bottlenecks
     assert route_state.route_landscape.alternative_routes
     assert route_state.why_now_features.unlocking_factors
+    assert route_state.why_now_features.unlocking_factors[0].label == 'wn18rr'
+    assert route_state.why_now_features.unlocking_factors[0].raw_source_phrases == ['WN18RR']
     assert route_state.evidence_bundle.supporting_evidence_ids
     assert route_state.evidence_bundle.challenging_evidence_ids
     assert route_state.compiler_metadata.trace_versions == {trace.trace_id: 'v2' for trace in traces}

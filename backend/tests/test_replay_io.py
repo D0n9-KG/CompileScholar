@@ -303,7 +303,7 @@ def _anti_pattern_card(*, anti_pattern_id: str, route_state_ids: list[str]) -> A
     )
 
 
-def _decision_episode_audit_export(tmp_path: Path):
+def _decision_episode_audit_export(tmp_path: Path, **export_overrides: object):
     traces = [_trace('paper-a', 2011, 'pa')]
     route_packet = load_route_packet(_write_json(tmp_path / 'route_packet.json', _packet(traces, cutoff_year=2011)))
     compilation = compile_historical_replay(route_packet, traces, built_at='2026-04-02T04:00:00Z')
@@ -341,6 +341,7 @@ def _decision_episode_audit_export(tmp_path: Path):
             'input_visible': False,
         },
         built_at='2026-04-02T04:05:00Z',
+        **export_overrides,
     )
 
 
@@ -742,6 +743,56 @@ def test_build_decision_episode_export_summary_and_inspection_expose_visibility_
     assert inspection_payload['anti_pattern_selection']['selected_antipattern_ids'] == ['anti:route-main:matching']
     assert inspection_payload['visibility_buckets']['visible_input_refs']
     assert inspection_payload['visibility_buckets']['label_eval_only_refs'] == ['hindsight_evidence:future-ref-1']
+
+
+def test_build_decision_episode_export_summary_and_inspection_include_review_metadata(tmp_path: Path) -> None:
+    export = _decision_episode_audit_export(
+        tmp_path,
+        review_status='reviewed',
+        training_acceptance_verdict='needs_revision',
+        reviewer_ids=['reviewer-1', 'reviewer-2'],
+        reviewed_at='2026-04-02T04:06:00Z',
+        rationale='Training-facing review found residual prior grounding defects.',
+        residual_defects=['weak_prior_support'],
+        section_reviews={
+            'evidence_pack': {
+                'review_status': 'reviewed',
+                'training_acceptance_verdict': 'accepted',
+                'reviewer_ids': ['reviewer-1'],
+                'reviewed_at': '2026-04-02T04:06:00Z',
+                'rationale': 'Evidence pack is explicit.',
+                'residual_defects': [],
+            },
+            'review_labels': {
+                'review_status': 'reviewed',
+                'training_acceptance_verdict': 'needs_revision',
+                'reviewer_ids': ['reviewer-1', 'reviewer-2'],
+                'reviewed_at': '2026-04-02T04:06:00Z',
+                'rationale': 'Verdict labels are present but still conservative.',
+                'residual_defects': ['weak_prior_support'],
+            },
+        },
+    )
+
+    summary_payload = build_decision_episode_export_summary(export=export)
+    inspection_payload = build_decision_episode_export_inspection(export=export)
+
+    assert summary_payload['training_acceptance_verdict'] == 'needs_revision'
+    assert summary_payload['reviewer_ids'] == ['reviewer-1', 'reviewer-2']
+    assert summary_payload['residual_defects'] == ['weak_prior_support']
+    assert set(summary_payload['section_reviews']) == {
+        'evidence_pack',
+        'route_synthesis',
+        'why_now',
+        'route_comparison',
+        'priors_antipatterns',
+        'minimal_attack_path',
+        'final_decision',
+        'review_labels',
+    }
+    assert summary_payload['section_reviews']['evidence_pack']['training_acceptance_verdict'] == 'accepted'
+    assert inspection_payload['review']['review_status'] == 'reviewed'
+    assert inspection_payload['review']['section_reviews']['review_labels']['residual_defects'] == ['weak_prior_support']
 
 
 def test_write_decision_episode_export_bundle_writes_expected_files(tmp_path: Path) -> None:
