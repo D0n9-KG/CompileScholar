@@ -19,7 +19,7 @@ Inside one milestone, the team repeatedly runs: generate real outputs -> manuall
 | 13 | Baseline Data Cycle 2 (Refine) | Run a second bounded rerun on the fixed cycle-1 baseline, recover replay quality, and leave an explicit defect-delta handoff. | `LOOPR-03`, `REVIEW-01` | Complete (`2026-04-04`) |
 | 14 | Cycle 2 Optimization And Review | Add self-contained training-facing exports, review two bounded candidate cycles, and confirm the next-cycle recommendation from reviewed evidence. | `REVIEW-02`, `REVIEW-03`, `TRAIN-01`, `TRAIN-02`, `TRAIN-03`, `TRAIN-06` | Complete (`2026-04-04`) |
 | 15 | Cycle 3 Consolidation | Continue bounded optimize/rerun cycles after the Phase 14 export-structure improvements until one cycle is manually judged genuinely useful as training data and reviewed prior/anti-pattern knowledge begins closing into the final export surface. | `STAB-01`, `TRAIN-04` | Complete (`2026-04-04`) |
-| 16 | Stability Verification And Handoff | Verify that consecutive high-quality cycles stay manually convincing as training data and publish the final stability, schema, dataset, and residual-risk handoff. | `STAB-02`, `STAB-03`, `TRAIN-05`, `TRAIN-07` | 5 |
+| 16 | Stability Verification And Handoff | Verify that consecutive high-quality cycles stay manually convincing as training data and publish the final stability, schema, dataset, and residual-risk handoff. | `STAB-02`, `STAB-03`, `TRAIN-05`, `TRAIN-07` | In Progress (`2026-04-04`; 1/3 plans complete) |
 
 ## Phase Details
 
@@ -132,4 +132,4 @@ Also available: `$gsd-plan-phase 16`
 
 ---
 *Roadmap created: 2026-04-03*
-*Last updated: 2026-04-04 after completing Phase 15*
+*Last updated: 2026-04-04 after completing Phase 16 Plan 01*

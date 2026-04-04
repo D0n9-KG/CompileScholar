@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: milestone
-status: Ready to execute
-stopped_at: Phase 16 planned
-last_updated: "2026-04-04T12:47:36.228Z"
+status: Executing Phase 16
+stopped_at: Completed 16-01-PLAN.md
+last_updated: "2026-04-04T13:26:24.248Z"
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 14
-  completed_plans: 11
+  completed_plans: 12
 ---
 
 # Project State
@@ -19,17 +19,17 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-04-04)
 
 **Core value:** Produce auditable, replayable, trainable scientific-reasoning artifacts rather than paper-like summaries or one-off knowledge graphs.
-**Current focus:** Execute Phase 16 using the accepted Phase 15 `cycle3-best` root as the bounded baseline and the new three-wave plan set as the execution guide
+**Current focus:** Execute Phase 16 Plan 02 using the new additive task views and final dataset scaffold from Plan 01
 
 ## Current Position
 
-Phase: 16
-Plan: 01-03 planned
+Phase: 16 (stability-verification-and-handoff) - EXECUTING
+Plan: 2 of 3
 Milestone: `v1.2` - Fast Iteration Research Logic Quality
 
 - Completed milestone: `v1.1` corpus-driven iterative quality hardening
-- Status: Phase `16` is planned and ready to execute
-- Last activity: `2026-04-04` - completed Phase 16 planning with one validation strategy and three execution plans covering additive task views, reviewed closeout plumbing, and the repeated-cycle stability handoff
+- Status: Phase `16` is actively executing after completing Plan `16-01`
+- Last activity: `2026-04-04` - completed Phase 16 Plan 01 with additive task-specific training views, Phase 10 task-view refs, and a reusable final dataset scaffold
 
 ## Milestone Snapshot
 
@@ -63,6 +63,7 @@ Milestone: `v1.2` - Fast Iteration Research Logic Quality
 - Phase 15 Plan 02 completed with grounded route-comparison summaries, explicit why-now timing text, capped weak-support decision confidence, and structured accepted-but-unselected anti-pattern exclusions preserved through export and training-view outputs.
 - Phase 15 Plan 03 completed with compared default and fallback candidate reruns, a canonical reviewed `cycle3-best` root, an accepted-cycle streak of `1`, and a prioritization handoff that still points to `packet_construction`.
 - Phase 16 planning is now split into three waves: Wave 1 adds task-specific training views and final dataset scaffolding, Wave 2 adds reviewed stability-handoff plumbing without mutating runtime truth, and Wave 3 runs the repeated bounded cycle plus final dataset and recommendation handoff.
+- Phase 16 Plan 01 completed with additive task-specific training views, exact comparison-summary refs for those views, and a separate final dataset scaffold that references validated cycle artifacts through manifest files.
 
 ## Active Requirements
 
@@ -70,7 +71,6 @@ Milestone: `v1.2` - Fast Iteration Research Logic Quality
 
 ## Pending Follow-Ups
 
-- Execute Phase `16` Plan 01 to publish additive task-specific training views and a reusable final dataset scaffold.
 - Execute Phase `16` Plan 02 to add reviewed stability-handoff payloads and machine-readable closeout refs without overwriting runtime export truth.
 - Execute Phase `16` Plan 03 to reproduce the accepted Phase 15 quality bar, target `accepted_cycle_streak = 2`, and publish the final dataset and next-milestone handoff.
 
@@ -81,6 +81,6 @@ Milestone: `v1.2` - Fast Iteration Research Logic Quality
 
 ## Session
 
-**Last Date:** 2026-04-04T12:47:36.228Z
-**Stopped At:** Phase 16 planned
-**Resume File:** .planning/phases/16-stability-verification-and-handoff/16-01-PLAN.md
+**Last Date:** 2026-04-04T13:26:24.248Z
+**Stopped At:** Completed 16-01-PLAN.md
+**Resume File:** .planning/phases/16-stability-verification-and-handoff/16-02-PLAN.md
