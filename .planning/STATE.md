@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: milestone
 status: Ready to plan
-stopped_at: Completed 13-03-PLAN.md
-last_updated: "2026-04-04T04:17:47.149Z"
+stopped_at: Phase 14 context gathered (assumptions mode)
+last_updated: "2026-04-04T06:07:26.286Z"
 progress:
   total_phases: 5
   completed_phases: 2
@@ -19,7 +19,7 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-04-04)
 
 **Core value:** Produce auditable, replayable, trainable scientific-reasoning artifacts rather than paper-like summaries or one-off knowledge graphs.
-**Current focus:** Prepare Phase 14 planning from the completed Phase 13 cycle-2 reports and prioritization handoff
+**Current focus:** Prepare Phase 14 planning from the completed Phase 13 cycle-2 reports and prioritization handoff, with the goal of iterating until a human-reviewed cycle produces reasoning artifacts that are genuinely usable as scientific-thinking training data, exported in a self-contained training-facing form, and improved across every major section of the final dataset artifact
 
 ## Current Position
 
@@ -36,6 +36,9 @@ Milestone: `v1.2` - Fast Iteration Research Logic Quality
 - v1.2 continues phase numbering from v1.1 (starts at Phase 12).
 - This milestone optimizes for both cycle speed and true reasoning-output quality.
 - Success requires consecutive high-quality cycles verified through manual output review, not metric-only wins.
+- A "good" cycle must be judged by directly reading package / replay / prior / export content and deciding whether it would actually teach scientific reasoning, not by structural pass signals alone.
+- The later phases now also treat training-data structure as a first-class target: self-contained export views, canonicalized concept labels, structured human review fields, and multi-view task exports must mature alongside output quality.
+- The milestone now explicitly targets a bounded final dataset bundle, and every major section of that final training artifact remains in scope for iteration rather than only the currently failing fields.
 
 ## Decisions Carried Forward
 
@@ -57,11 +60,13 @@ Milestone: `v1.2` - Fast Iteration Research Logic Quality
 
 ## Active Requirements
 
-- Phase `14`: `REVIEW-02`, `REVIEW-03`
+- Phase `14`: `REVIEW-02`, `REVIEW-03`, `TRAIN-01`, `TRAIN-02`, `TRAIN-03`, `TRAIN-06`
 
 ## Pending Follow-Ups
 
 - Discuss and plan Phase `14` using `docs/replay/reports/phase13-cycle2-refine.md` and `docs/replay/reports/phase13-next-cycle-prioritization.md`.
+- Turn the Phase 13 export / review artifacts into a self-contained training view with explicit human-acceptance fields and canonicalized concept labels.
+- Keep every major section of the final training artifact in optimization scope and aim the later cycles at a bounded but genuinely usable dataset bundle.
 
 ## Blockers
 
@@ -70,6 +75,6 @@ Milestone: `v1.2` - Fast Iteration Research Logic Quality
 
 ## Session
 
-**Last Date:** 2026-04-04T04:17:13.278Z
-**Stopped At:** Completed 13-03-PLAN.md
-**Resume File:** None
+**Last Date:** 2026-04-04T06:07:26.283Z
+**Stopped At:** Phase 14 context gathered (assumptions mode)
+**Resume File:** .planning/phases/14-cycle-2-optimization-and-review/14-CONTEXT.md
