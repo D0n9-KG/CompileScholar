@@ -75,8 +75,8 @@ Explicitly excluded from `v1.2`.
 | `TRAIN-02` | Phase `14` | Complete |
 | `TRAIN-03` | Phase `14` | Complete |
 | `TRAIN-06` | Phase `14` | Complete |
-| `STAB-01` | Phase `15` | Pending |
-| `TRAIN-04` | Phase `15` | Pending |
+| `STAB-01` | Phase `15` | Complete |
+| `TRAIN-04` | Phase `15` | Complete |
 | `STAB-02` | Phase `16` | Pending |
 | `STAB-03` | Phase `16` | Pending |
 | `TRAIN-05` | Phase `16` | Pending |
@@ -89,4 +89,4 @@ Explicitly excluded from `v1.2`.
 
 ---
 *Requirements defined: 2026-04-03*
-*Last updated: 2026-04-04 after completing Phase 14*
+*Last updated: 2026-04-04 after completing Phase 15*

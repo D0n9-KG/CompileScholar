@@ -18,7 +18,7 @@ Inside one milestone, the team repeatedly runs: generate real outputs -> manuall
 | 12 | Baseline Data Cycle 1 (Direct Fix) | Use Phase 10/11 existing artifacts directly, apply focused fixes, rerun, and review output quality. | `LOOPR-01`, `LOOPR-02` | Complete (`2026-04-04`) |
 | 13 | Baseline Data Cycle 2 (Refine) | Run a second bounded rerun on the fixed cycle-1 baseline, recover replay quality, and leave an explicit defect-delta handoff. | `LOOPR-03`, `REVIEW-01` | Complete (`2026-04-04`) |
 | 14 | Cycle 2 Optimization And Review | Add self-contained training-facing exports, review two bounded candidate cycles, and confirm the next-cycle recommendation from reviewed evidence. | `REVIEW-02`, `REVIEW-03`, `TRAIN-01`, `TRAIN-02`, `TRAIN-03`, `TRAIN-06` | Complete (`2026-04-04`) |
-| 15 | Cycle 3 Consolidation | Continue bounded optimize/rerun cycles after the Phase 14 export-structure improvements until one cycle is manually judged genuinely useful as training data and reviewed prior/anti-pattern knowledge begins closing into the final export surface. | `STAB-01`, `TRAIN-04` | In Progress (`2026-04-04`; 2/3 plans complete) |
+| 15 | Cycle 3 Consolidation | Continue bounded optimize/rerun cycles after the Phase 14 export-structure improvements until one cycle is manually judged genuinely useful as training data and reviewed prior/anti-pattern knowledge begins closing into the final export surface. | `STAB-01`, `TRAIN-04` | Complete (`2026-04-04`) |
 | 16 | Stability Verification And Handoff | Verify that consecutive high-quality cycles stay manually convincing as training data and publish the final stability, schema, dataset, and residual-risk handoff. | `STAB-02`, `STAB-03`, `TRAIN-05`, `TRAIN-07` | 5 |
 
 ## Phase Details
@@ -124,12 +124,12 @@ Inside one milestone, the team repeatedly runs: generate real outputs -> manuall
 
 ## Next Up
 
-**Phase 15: Cycle 3 Consolidation** - run the Wave 3 bounded reruns against the completed Phase 14 best-cycle baseline using the newly grounded route-comparison, timing, and route-backed selection-closure surfaces to judge whether one cycle is finally genuinely useful as scientific-thinking training data.
+**Phase 16: Stability Verification And Handoff** - verify that the accepted Phase 15 `cycle3-best` quality bar repeats on another bounded cycle, then publish the final stability, dataset, schema, and residual-risk handoff.
 
-`$gsd-discuss-phase 15`
+`$gsd-discuss-phase 16`
 
-Also available: `$gsd-plan-phase 15`
+Also available: `$gsd-plan-phase 16`
 
 ---
 *Roadmap created: 2026-04-03*
-*Last updated: 2026-04-04 after completing Phase 15 Plan 02*
+*Last updated: 2026-04-04 after completing Phase 15*
