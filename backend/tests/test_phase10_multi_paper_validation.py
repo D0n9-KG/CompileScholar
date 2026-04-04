@@ -168,6 +168,7 @@ def test_phase10_workflow_writes_prior_review_and_export_bundles(tmp_path: Path)
         decision_episode_payload = json.loads((output_dir / 'export_bundle' / 'outputs' / 'decision_episode.json').read_text(encoding='utf-8'))
         training_view_payload = json.loads((output_dir / 'export_bundle' / 'outputs' / 'training_view.json').read_text(encoding='utf-8'))
         best_cycle_selection_payload = json.loads((output_dir / 'export_bundle' / 'best_cycle_selection.json').read_text(encoding='utf-8'))
+        route_validation = comparison_summary_payload['notes']['route_state_package_validation']
 
         assert result.summary['prior_review_bundle_manifest'] == str((output_dir / 'prior_review_bundle' / 'bundle_manifest.json').resolve())
         assert result.summary['export_summary_path'] == str((output_dir / 'export_bundle' / 'export_summary.json').resolve())
@@ -200,6 +201,32 @@ def test_phase10_workflow_writes_prior_review_and_export_bundles(tmp_path: Path)
         assert best_cycle_selection_payload['recommendation_evidence_refs']
         assert comparison_summary_payload['best_cycle_selection']['selected_iteration_label'] == 'phase10-workflow-run'
         assert comparison_summary_payload['source_artifacts']['current_training_view'].endswith('training_view.json')
+        assert route_validation is not None
+        assert 'support_route_state_ids' in route_validation
+        assert 'alternative_route_state_ids' in route_validation
+        assert 'held_out_route_state_ids' in route_validation
+        assert 'role_quality_counts' in route_validation
+        assert 'yellow_route_state_ids_by_role' in route_validation
+        assert 'red_route_state_ids_by_role' in route_validation
+        assert 'yellow_route_state_present' in route_validation['quality_flags']
+        assert set(route_validation['yellow_route_state_ids_by_role']['support']).issubset(
+            set(route_validation['support_route_state_ids'])
+        )
+        assert set(route_validation['yellow_route_state_ids_by_role']['alternative']).issubset(
+            set(route_validation['alternative_route_state_ids'])
+        )
+        assert set(route_validation['yellow_route_state_ids_by_role']['held_out']).issubset(
+            set(route_validation['held_out_route_state_ids'])
+        )
+        assert len(route_validation['yellow_route_state_ids_by_role']['support']) == (
+            route_validation['role_quality_counts']['support']['yellow']
+        )
+        assert len(route_validation['yellow_route_state_ids_by_role']['alternative']) == (
+            route_validation['role_quality_counts']['alternative']['yellow']
+        )
+        assert len(route_validation['yellow_route_state_ids_by_role']['held_out']) == (
+            route_validation['role_quality_counts']['held_out']['yellow']
+        )
     finally:
         shutil.rmtree(runtime_paths.output_root, ignore_errors=True)
 

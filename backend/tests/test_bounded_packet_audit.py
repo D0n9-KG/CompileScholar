@@ -228,6 +228,20 @@ def test_audit_bounded_packet_assembly_flags_missing_trace_refs_and_indistinct_a
     assert audit.indistinct_alternative_paper_ids == ['paper-3']
 
 
+def test_audit_bounded_packet_assembly_preserves_distinctness_rationale_for_overlapping_alternative_scope() -> None:
+    packet = _packet(alternative_item_role='core_method')
+    manifest = _manifest_payload(
+        alternative_distinctness_rationale=(
+            'Alternative route stays explicit because it preserves a nearby but still review-relevant synthesis path.'
+        ),
+    )
+
+    audit = audit_bounded_packet_assembly(packet, manifest)
+
+    assert 'alternative_scope_not_distinct' not in audit.quality_flags
+    assert audit.indistinct_alternative_paper_ids == []
+
+
 def test_write_bounded_packet_audit_bundle_uses_expected_filenames(tmp_path: Path) -> None:
     packet = _packet(
         alternative_item_role='core_method',

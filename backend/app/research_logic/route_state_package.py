@@ -213,6 +213,8 @@ class RouteStatePackageValidation(ContractModel):
     support_route_state_ids: list[str] = Field(default_factory=list)
     alternative_route_state_ids: list[str] = Field(default_factory=list)
     held_out_route_state_ids: list[str] = Field(default_factory=list)
+    yellow_route_state_ids_by_role: dict[str, list[str]] = Field(default_factory=dict)
+    red_route_state_ids_by_role: dict[str, list[str]] = Field(default_factory=dict)
     scope_mismatch_entry_ids: list[str] = Field(default_factory=list)
     indistinct_alternative_entry_ids: list[str] = Field(default_factory=list)
     reused_packet_ids_across_roles: list[str] = Field(default_factory=list)
@@ -433,6 +435,8 @@ def validate_route_state_package(compilation: RouteStatePackageCompilation) -> R
     }
 
     role_quality_counts: dict[str, dict[str, int]] = {}
+    yellow_route_state_ids_by_role: dict[str, list[str]] = {}
+    red_route_state_ids_by_role: dict[str, list[str]] = {}
     for role, route_states in grouped.items():
         counts: Counter[str] = Counter(route_state.quality.quality_tier for route_state in route_states)
         role_quality_counts[role] = {
@@ -440,6 +444,16 @@ def validate_route_state_package(compilation: RouteStatePackageCompilation) -> R
             'yellow': counts.get('yellow', 0),
             'red': counts.get('red', 0),
         }
+        yellow_route_state_ids_by_role[role] = [
+            route_state.route_state_id
+            for route_state in route_states
+            if route_state.quality.quality_tier == 'yellow'
+        ]
+        red_route_state_ids_by_role[role] = [
+            route_state.route_state_id
+            for route_state in route_states
+            if route_state.quality.quality_tier == 'red'
+        ]
 
     quality_flags: list[str] = []
     if role_counts['support'] < 2:
@@ -501,6 +515,8 @@ def validate_route_state_package(compilation: RouteStatePackageCompilation) -> R
         support_route_state_ids=[artifact.route_state.route_state_id for artifact in compilation.entries if artifact.role == 'support'],
         alternative_route_state_ids=[artifact.route_state.route_state_id for artifact in compilation.entries if artifact.role == 'alternative'],
         held_out_route_state_ids=[artifact.route_state.route_state_id for artifact in compilation.entries if artifact.role == 'held_out'],
+        yellow_route_state_ids_by_role=yellow_route_state_ids_by_role,
+        red_route_state_ids_by_role=red_route_state_ids_by_role,
         scope_mismatch_entry_ids=scope_mismatch_entry_ids,
         indistinct_alternative_entry_ids=indistinct_alternative_entry_ids,
         reused_packet_ids_across_roles=reused_packet_ids_across_roles,
