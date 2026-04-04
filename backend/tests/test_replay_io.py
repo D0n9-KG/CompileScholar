@@ -780,6 +780,7 @@ def test_build_decision_episode_export_summary_and_inspection_include_review_met
     assert summary_payload['training_acceptance_verdict'] == 'needs_revision'
     assert summary_payload['reviewer_ids'] == ['reviewer-1', 'reviewer-2']
     assert summary_payload['residual_defects'] == ['weak_prior_support']
+    assert summary_payload['accepted_but_unselected_prior_count'] == 0
     assert set(summary_payload['section_reviews']) == {
         'evidence_pack',
         'route_synthesis',
@@ -793,6 +794,8 @@ def test_build_decision_episode_export_summary_and_inspection_include_review_met
     assert summary_payload['section_reviews']['evidence_pack']['training_acceptance_verdict'] == 'accepted'
     assert inspection_payload['review']['review_status'] == 'reviewed'
     assert inspection_payload['review']['section_reviews']['review_labels']['residual_defects'] == ['weak_prior_support']
+    assert inspection_payload['training_sections']['route_synthesis']['route_state_id'] == export.route_state_snapshot.route_state_id
+    assert inspection_payload['training_sections']['why_now']['route_state_id'] == export.route_state_snapshot.route_state_id
 
 
 def test_write_decision_episode_export_bundle_writes_expected_files(tmp_path: Path) -> None:
@@ -804,25 +807,43 @@ def test_write_decision_episode_export_bundle_writes_expected_files(tmp_path: Pa
         metadata={'runner': 'pytest'},
     )
 
-    assert {'bundle_manifest', 'decision_episode', 'export_inspection', 'export_summary'} == set(written_files)
+    assert {
+        'best_cycle_selection',
+        'bundle_manifest',
+        'decision_episode',
+        'export_inspection',
+        'export_summary',
+        'training_view',
+    } == set(written_files)
     assert written_files['bundle_manifest'].is_file()
     assert written_files['export_summary'].is_file()
     assert written_files['export_inspection'].is_file()
     assert written_files['decision_episode'].is_file()
+    assert written_files['training_view'].is_file()
+    assert written_files['best_cycle_selection'].is_file()
     assert all(str(path).startswith(str((tmp_path / 'export-bundle').resolve())) for path in written_files.values())
 
     manifest_payload = json.loads(written_files['bundle_manifest'].read_text(encoding='utf-8'))
     summary_payload = json.loads(written_files['export_summary'].read_text(encoding='utf-8'))
     inspection_payload = json.loads(written_files['export_inspection'].read_text(encoding='utf-8'))
+    training_view_payload = json.loads(written_files['training_view'].read_text(encoding='utf-8'))
+    best_cycle_selection_payload = json.loads(written_files['best_cycle_selection'].read_text(encoding='utf-8'))
 
     assert manifest_payload['files']['decision_episode'] == 'outputs/decision_episode.json'
+    assert manifest_payload['files']['training_view'] == 'outputs/training_view.json'
+    assert manifest_payload['files']['best_cycle_selection'] == 'best_cycle_selection.json'
     assert manifest_payload['source_replay_bundle_refs']['manifest_ref'] == 'tmp/source-replay/bundle_manifest.json'
     assert manifest_payload['accepted_prior_ids'] == []
     assert manifest_payload['accepted_anti_pattern_ids'] == ['anti:route-main:matching']
+    assert manifest_payload['selected_iteration_label'] == 'export-bundle'
     assert summary_payload['audit_posture'] == 'audit_grade_pilot'
     assert summary_payload['visibility_bucket_counts']['visible_input_refs'] == len(export.visible_input_refs)
     assert inspection_payload['visibility_buckets']['audit_only_refs']
     assert inspection_payload['visibility_buckets']['label_eval_only_refs'] == ['hindsight_evidence:future-ref-1']
+    assert training_view_payload['sections']['route_synthesis']['route_state']['route_state_id'] == export.route_state_snapshot.route_state_id
+    assert training_view_payload['sections']['priors_antipatterns']['accepted_but_unselected_priors'] == []
+    assert best_cycle_selection_payload['selected_iteration_label'] == 'export-bundle'
+    assert best_cycle_selection_payload['recommendation_evidence_refs']
 
 
 def test_write_corpus_sampling_bundle_writes_expected_files_and_separates_buckets(tmp_path: Path) -> None:

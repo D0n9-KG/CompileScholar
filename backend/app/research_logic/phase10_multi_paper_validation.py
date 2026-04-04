@@ -440,6 +440,18 @@ def build_phase10_comparison_summary(
         _load_json(export_bundle_dir / 'export_inspection.json'),
         label='Phase 10 export inspection',
     )
+    export_manifest = _json_object(
+        _load_json(export_bundle_dir / 'bundle_manifest.json'),
+        label='Phase 10 export bundle manifest',
+    )
+    training_view = _json_object(
+        _load_json(export_bundle_dir / 'outputs' / 'training_view.json'),
+        label='Phase 10 training view',
+    )
+    best_cycle_selection = _json_object(
+        _load_json(export_bundle_dir / 'best_cycle_selection.json'),
+        label='Phase 10 best-cycle selection',
+    )
     baseline_replay_summary = _json_object(
         _load_json(baseline_replay_bundle_dir / 'replay_summary.json'),
         label='Baseline replay summary',
@@ -597,8 +609,20 @@ def build_phase10_comparison_summary(
             'accepted_anti_pattern_count': int(export_summary.get('accepted_anti_pattern_count') or 0),
             'selected_prior_count': int(export_summary.get('selected_prior_count') or 0),
             'selected_antipattern_count': int(export_summary.get('selected_antipattern_count') or 0),
+            'accepted_but_unselected_prior_count': int(export_summary.get('accepted_but_unselected_prior_count') or 0),
             'visibility_bucket_counts': _int_map(export_summary.get('visibility_bucket_counts')),
+            'review_status': export_summary.get('review_status'),
+            'training_acceptance_verdict': export_summary.get('training_acceptance_verdict'),
+            'selected_iteration_label': best_cycle_selection.get('selected_iteration_label'),
+            'primary_recommendation_id': best_cycle_selection.get('primary_recommendation_id'),
+            'recommendation_evidence_refs': _string_list(best_cycle_selection.get('recommendation_evidence_refs')),
+            'training_view_sections': sorted(
+                str(key)
+                for key in _json_object(training_view.get('sections') or {}, label='Phase 10 training view sections')
+            ),
             'bundle_manifest': str((export_bundle_dir / 'bundle_manifest.json').resolve()),
+            'training_view': str((export_bundle_dir / 'outputs' / 'training_view.json').resolve()),
+            'best_cycle_selection': str((export_bundle_dir / 'best_cycle_selection.json').resolve()),
         },
         'baseline': {
             'quality_tier': baseline_export_summary.get('quality_tier'),
@@ -609,6 +633,7 @@ def build_phase10_comparison_summary(
             'accepted_anti_pattern_count': int(baseline_export_summary.get('accepted_anti_pattern_count') or 0),
             'selected_prior_count': int(baseline_export_summary.get('selected_prior_count') or 0),
             'selected_antipattern_count': int(baseline_export_summary.get('selected_antipattern_count') or 0),
+            'accepted_but_unselected_prior_count': int(baseline_export_summary.get('accepted_but_unselected_prior_count') or 0),
             'visibility_bucket_counts': _int_map(baseline_export_summary.get('visibility_bucket_counts')),
             'bundle_manifest': str((baseline_export_bundle_dir / 'bundle_manifest.json').resolve()),
         },
@@ -636,6 +661,10 @@ def build_phase10_comparison_summary(
             'selected_antipattern_count_delta': _count_delta(
                 export['current']['selected_antipattern_count'],
                 export['baseline']['selected_antipattern_count'],
+            ),
+            'accepted_but_unselected_prior_count_delta': _count_delta(
+                export['current']['accepted_but_unselected_prior_count'],
+                export['baseline']['accepted_but_unselected_prior_count'],
             ),
             'visibility_bucket_count_delta': _count_delta_map(
                 export['current']['visibility_bucket_counts'],
@@ -757,16 +786,48 @@ def build_phase10_comparison_summary(
                 else 'unchanged',
             )
         )
+    if export['current']['accepted_but_unselected_prior_count'] > 0:
+        baseline_unselected_prior_count = int(export['baseline']['accepted_but_unselected_prior_count'] or 0)
+        export_blockers.append(
+            _blocker_entry(
+                code='accepted_priors_unselected',
+                message=(
+                    'Export preserved accepted prior ids only as explicit exclusion records because they do not support '
+                    'the exported primary route.'
+                ),
+                current=export['current']['accepted_but_unselected_prior_count'],
+                baseline=baseline_unselected_prior_count,
+                vs_baseline=_count_trend(
+                    export['current']['accepted_but_unselected_prior_count'],
+                    baseline_unselected_prior_count,
+                ),
+            )
+        )
 
     return {
         'packet_id': replay_summary.get('packet_id'),
         'cutoff_year': replay_summary.get('cutoff_year'),
         'baseline_replay_bundle': str(baseline_replay_bundle_dir.resolve()),
         'baseline_export_bundle': str(baseline_export_bundle_dir.resolve()),
+        'current_recommendation': best_cycle_selection.get('primary_recommendation_id'),
         'package': package,
         'replay': replay,
         'prior_review': prior_review,
         'export': export,
+        'best_cycle_selection': {
+            'selected_iteration_label': best_cycle_selection.get('selected_iteration_label'),
+            'review_status': best_cycle_selection.get('review_status'),
+            'training_acceptance_verdict': best_cycle_selection.get('training_acceptance_verdict'),
+            'primary_recommendation_id': best_cycle_selection.get('primary_recommendation_id'),
+            'recommendation_evidence_refs': _string_list(best_cycle_selection.get('recommendation_evidence_refs')),
+            'reviewed_candidate_cycles': (
+                list(best_cycle_selection.get('reviewed_candidate_cycles'))
+                if isinstance(best_cycle_selection.get('reviewed_candidate_cycles'), list)
+                else []
+            ),
+            'bundle_manifest': str((export_bundle_dir / 'bundle_manifest.json').resolve()),
+            'source_file': str((export_bundle_dir / 'best_cycle_selection.json').resolve()),
+        },
         'blocker_queue': {
             'package_validation': package_blockers,
             'replay': replay_blockers,
@@ -781,6 +842,9 @@ def build_phase10_comparison_summary(
             'baseline_replay_inspection': str((baseline_replay_bundle_dir / 'replay_inspection.json').resolve()),
             'baseline_export_inspection': str((baseline_export_bundle_dir / 'export_inspection.json').resolve()),
             'current_export_inspection': str((export_bundle_dir / 'export_inspection.json').resolve()),
+            'current_export_manifest': str((export_bundle_dir / 'bundle_manifest.json').resolve()),
+            'current_training_view': str((export_bundle_dir / 'outputs' / 'training_view.json').resolve()),
+            'current_best_cycle_selection': str((export_bundle_dir / 'best_cycle_selection.json').resolve()),
             'current_replay_inspection': str((replay_bundle_dir / 'replay_inspection.json').resolve()),
             'current_prior_review_summary': str((prior_review_bundle_dir / 'candidate_review_summary.json').resolve()),
         },
@@ -788,6 +852,8 @@ def build_phase10_comparison_summary(
             'export_visibility_policy': export_inspection.get('policy'),
             'baseline_visibility_policy': baseline_export_inspection.get('policy'),
             'route_state_package_validation': replay_inspection.get('route_state_package_validation'),
+            'export_manifest': export_manifest,
+            'training_view_review': training_view.get('review'),
         },
     }
 
@@ -797,6 +863,11 @@ def render_phase10_validation_report(comparison_summary: dict[str, object]) -> s
     replay = _json_object(comparison_summary.get('replay') or {}, label='Phase 10 comparison replay')
     prior_review = _json_object(comparison_summary.get('prior_review') or {}, label='Phase 10 comparison prior review')
     export = _json_object(comparison_summary.get('export') or {}, label='Phase 10 comparison export')
+    best_cycle_selection = _json_object(
+        comparison_summary.get('best_cycle_selection') or {},
+        label='Phase 10 best-cycle selection',
+    )
+    source_artifacts = _json_object(comparison_summary.get('source_artifacts') or {}, label='Phase 10 source artifacts')
     blocker_queue = _json_object(comparison_summary.get('blocker_queue') or {}, label='Phase 10 blocker queue')
 
     package_current = _json_object(package.get('current') or {}, label='Phase 10 package current')
@@ -844,7 +915,19 @@ def render_phase10_validation_report(comparison_summary: dict[str, object]) -> s
         f"- Ready for eval: `{export_current.get('ready_for_eval')}` vs baseline `{export_baseline.get('ready_for_eval')}`",
         f"- Selected prior count: `{export_current.get('selected_prior_count')}` vs baseline `{export_baseline.get('selected_prior_count')}`",
         f"- Selected anti-pattern count: `{export_current.get('selected_antipattern_count')}` vs baseline `{export_baseline.get('selected_antipattern_count')}`",
+        (
+            f"- Accepted but unselected prior count: `{export_current.get('accepted_but_unselected_prior_count')}` "
+            f"vs baseline `{export_baseline.get('accepted_but_unselected_prior_count')}`"
+        ),
         f"- Visibility buckets: `{export_current.get('visibility_bucket_counts')}`",
+        f"- Training view sections: `{export_current.get('training_view_sections')}`",
+        f"- Training view file: `{source_artifacts.get('current_training_view')}`",
+        f"- Best-cycle selection file: `{source_artifacts.get('current_best_cycle_selection')}`",
+        f"- Current recommendation: `{comparison_summary.get('current_recommendation') or 'not stated'}`",
+        (
+            f"- Recommendation evidence refs: "
+            f"`{best_cycle_selection.get('recommendation_evidence_refs') or []}`"
+        ),
         f"- Quality flags: `{', '.join(_string_list(export_current.get('quality_flags'))) or 'none'}`",
         '',
         '## Blocker Queue',
@@ -949,6 +1032,13 @@ def _write_phase10_export_bundle(
             'runner': 'backend/scripts/run_phase10_multi_paper_validation.py',
             'source_replay_bundle': str(replay_manifest_path.parent.resolve()),
             'source_prior_review_bundle': str(review_manifest_path.parent.resolve()),
+        },
+        selected_iteration_label=output_dir.parent.name,
+        selection_source_artifacts={
+            'replay_bundle': str(replay_manifest_path.parent.resolve()),
+            'prior_review_bundle': str(review_manifest_path.parent.resolve()),
+            'primary_route_state': str(replay_bundle_files['primary_route_state'].resolve()),
+            'candidate_review_summary': str(prior_review_bundle_files['candidate_review_summary'].resolve()),
         },
     )
     export_summary_payload = _load_json(written_files['export_summary'])
@@ -1522,8 +1612,11 @@ def run_phase10_package_and_replay(
         'export_bundle_manifest': str(export_bundle_files['bundle_manifest'].resolve()),
         'export_summary_path': str(export_bundle_files['export_summary'].resolve()),
         'export_inspection_path': str(export_bundle_files['export_inspection'].resolve()),
+        'training_view_path': str(export_bundle_files['training_view'].resolve()),
+        'best_cycle_selection_path': str(export_bundle_files['best_cycle_selection'].resolve()),
         'selected_prior_ids': list(export_summary_payload['selected_prior_ids']),
         'selected_antipattern_ids': list(export_summary_payload['selected_antipattern_ids']),
+        'accepted_but_unselected_prior_count': int(export_summary_payload.get('accepted_but_unselected_prior_count') or 0),
         'visibility_bucket_counts': dict(export_summary_payload['visibility_bucket_counts']),
         'baseline_replay_bundle': str(_resolve_bundle_dir(baseline_replay_bundle, repo_root=bridge.canonical_inputs.repo_root).resolve()),
         'baseline_export_bundle': str(_resolve_bundle_dir(baseline_export_bundle, repo_root=bridge.canonical_inputs.repo_root).resolve()),

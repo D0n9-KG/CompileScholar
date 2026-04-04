@@ -295,11 +295,14 @@ class LoadedPhase10ComparisonSurface(ContractModel):
     packet_id: str | None = None
     cutoff_year: int | None = None
     current_recommendation: str | None = None
+    selected_iteration_label: str | None = None
+    recommendation_evidence_refs: list[str] = Field(default_factory=list)
     source_refs: IterationPrioritySourceRefs
     package: dict[str, Any] = Field(default_factory=dict)
     replay: dict[str, Any] = Field(default_factory=dict)
     prior_review: dict[str, Any] = Field(default_factory=dict)
     export: dict[str, Any] = Field(default_factory=dict)
+    best_cycle_selection: dict[str, Any] = Field(default_factory=dict)
     blocker_queue: dict[str, list[IterationPriorityBlocker]] = Field(default_factory=dict)
     source_artifacts: dict[str, str] = Field(default_factory=dict)
     notes: dict[str, Any] = Field(default_factory=dict)
@@ -429,10 +432,22 @@ def load_phase8_comparison_inspection(path: str | Path) -> LoadedPhase8Compariso
 def load_phase10_comparison_summary(path: str | Path) -> LoadedPhase10ComparisonSurface:
     resolved_path = _as_path(path).resolve()
     payload = _load_json(resolved_path, label='Phase 10 comparison summary')
+    best_cycle_selection = _json_object(
+        payload.get('best_cycle_selection') or {},
+        label='Phase 10 best-cycle selection',
+    )
     return LoadedPhase10ComparisonSurface(
         packet_id=str(payload.get('packet_id')) if payload.get('packet_id') else None,
         cutoff_year=_maybe_int(payload.get('cutoff_year')),
-        current_recommendation=_normalize_recommendation_id(payload.get('current_recommendation')),
+        current_recommendation=_normalize_recommendation_id(
+            payload.get('current_recommendation') or best_cycle_selection.get('primary_recommendation_id')
+        ),
+        selected_iteration_label=(
+            str(best_cycle_selection.get('selected_iteration_label'))
+            if best_cycle_selection.get('selected_iteration_label')
+            else None
+        ),
+        recommendation_evidence_refs=_string_list(best_cycle_selection.get('recommendation_evidence_refs')),
         source_refs=IterationPrioritySourceRefs(
             phase10_summary_path=str(resolved_path),
             phase10_mode='json',
@@ -442,6 +457,7 @@ def load_phase10_comparison_summary(path: str | Path) -> LoadedPhase10Comparison
         replay=_json_object(payload.get('replay') or {}, label='Phase 10 replay'),
         prior_review=_json_object(payload.get('prior_review') or {}, label='Phase 10 prior review'),
         export=_json_object(payload.get('export') or {}, label='Phase 10 export'),
+        best_cycle_selection=best_cycle_selection,
         blocker_queue=_load_blocker_queue(payload.get('blocker_queue')),
         source_artifacts={str(key): str(value) for key, value in _json_object(payload.get('source_artifacts') or {}, label='Phase 10 source artifacts').items()},
         notes=_json_object(payload.get('notes') or {}, label='Phase 10 notes'),
@@ -567,6 +583,8 @@ def build_phase10_fallback_surface(
         packet_id=str(report_header['packet_id']) if report_header['packet_id'] else None,
         cutoff_year=_maybe_int(report_header['cutoff_year']),
         current_recommendation=current_recommendation,
+        selected_iteration_label=None,
+        recommendation_evidence_refs=[],
         source_refs=IterationPrioritySourceRefs(
             phase10_verification_path=str(verification_file),
             phase10_report_path=str(report_file),
@@ -577,6 +595,7 @@ def build_phase10_fallback_surface(
         replay=replay,
         prior_review=prior_review,
         export=export,
+        best_cycle_selection={},
         blocker_queue=blocker_queue,
         source_artifacts={
             'phase10_verification': str(verification_file),
@@ -688,6 +707,8 @@ def rank_iteration_recommendations(
 ) -> list[IterationPriorityRecommendation]:
     supporting_owner_buckets = _supporting_owner_buckets(phase8_summary)
     supporting_owner_bucket_names = [bucket.bucket for bucket in supporting_owner_buckets]
+    selection_evidence_text = ', '.join(phase10_surface.recommendation_evidence_refs) or 'none'
+    selected_iteration_label = phase10_surface.selected_iteration_label or 'unknown'
 
     package_blockers = phase10_surface.blocker_queue.get('package_validation', [])
     replay_blockers = phase10_surface.blocker_queue.get('replay', [])
@@ -739,6 +760,7 @@ def rank_iteration_recommendations(
                 f'package blockers: {", ".join(_blocker_codes(package_blockers)) or "none"}',
                 f'replay l2 delta: {replay_l2_delta}',
                 f'phase10 recommendation: {phase10_surface.current_recommendation or "not stated"}',
+                f'best-cycle evidence refs ({selected_iteration_label}): {selection_evidence_text}',
             ],
         ),
         _recommendation(
@@ -751,6 +773,7 @@ def rank_iteration_recommendations(
                 f'replay l3_l4 delta: {replay_l3_l4_delta}',
                 f'decision_prior_card regressions: {len(decision_prior_regressions)}',
                 f'prior blockers: {", ".join(_blocker_codes(prior_blockers)) or "none"}',
+                f'best-cycle evidence refs ({selected_iteration_label}): {selection_evidence_text}',
             ],
         ),
         _recommendation(
@@ -763,6 +786,7 @@ def rank_iteration_recommendations(
                 f'phase8 lead owners: {", ".join(supporting_owner_bucket_names) or "none"}',
                 f'fixed recurring failures: {phase8_summary.fixed_verdict_counts.get("recurring_failure", 0)}',
                 f'replay l2 delta: {replay_l2_delta}',
+                f'best-cycle evidence refs ({selected_iteration_label}): {selection_evidence_text}',
             ],
         ),
     ]
@@ -797,12 +821,14 @@ def _ranking_signals(
     supporting_owner_buckets = [bucket.bucket for bucket in _supporting_owner_buckets(phase8_summary)]
     return {
         'phase10_current_recommendation': phase10_surface.current_recommendation,
+        'phase10_selected_iteration_label': phase10_surface.selected_iteration_label,
         'package_validation_new_blockers': _blocker_codes(
             _new_or_higher_blockers(phase10_surface.blocker_queue.get('package_validation', []))
         ),
         'replay_l2_delta': _nested_int(phase10_surface.replay, 'delta', 'failure_counts_by_layer_delta', 'l2'),
         'replay_l3_l4_delta': _nested_int(phase10_surface.replay, 'delta', 'failure_counts_by_layer_delta', 'l3_l4'),
         'supporting_owner_buckets': supporting_owner_buckets,
+        'recommendation_evidence_refs': list(phase10_surface.recommendation_evidence_refs),
     }
 
 
@@ -822,6 +848,11 @@ def build_iteration_priority_summary(
         notes.append('Phase 10 comparison summary JSON was unavailable, so prioritization used the verification and report markdown fallback.')
     if phase10_surface.current_recommendation:
         notes.append(f'Phase 10 already pointed to {phase10_surface.current_recommendation} as the current next-cycle lead.')
+    if phase10_surface.recommendation_evidence_refs:
+        notes.append(
+            'Phase 10 best-cycle selection preserved recommendation evidence refs: '
+            + ', '.join(phase10_surface.recommendation_evidence_refs)
+        )
 
     return IterationPrioritySummary(
         source_refs=_combine_source_refs(phase8_summary, phase8_inspection, phase10_surface),
@@ -841,6 +872,7 @@ def build_iteration_priority_summary(
             'replay': phase10_surface.replay,
             'prior_review': phase10_surface.prior_review,
             'export': phase10_surface.export,
+            'best_cycle_selection': phase10_surface.best_cycle_selection,
         },
         phase10_blocker_queue=phase10_surface.blocker_queue,
         recommendations=recommendations,

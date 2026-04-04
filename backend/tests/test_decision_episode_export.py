@@ -504,6 +504,78 @@ def test_build_decision_episode_audit_export_preserves_empty_accepted_prior_trut
     )
 
 
+def test_build_decision_episode_audit_export_records_accepted_but_unselected_prior_exclusions() -> None:
+    route_main = _route_state(
+        route_state_id='route-main',
+        support_ids=['m-e1', 'm-e2'],
+        challenge_ids=['m-c1'],
+        method_score=0.78,
+        measurement_score=0.81,
+        data_resource_score=0.9,
+        infrastructure_score=0.61,
+        cost_cycle_score=0.49,
+        overall_score=0.7,
+    )
+    route_peer_1 = _route_state(
+        route_state_id='route-peer-1',
+        support_ids=['p1-e1', 'p1-e2'],
+        challenge_ids=['p1-c1'],
+        method_score=0.76,
+        measurement_score=0.8,
+        data_resource_score=0.87,
+        infrastructure_score=0.6,
+        cost_cycle_score=0.48,
+        overall_score=0.69,
+    )
+    route_peer_2 = _route_state(
+        route_state_id='route-peer-2',
+        support_ids=['p2-e1', 'p2-e2'],
+        challenge_ids=['p2-c1'],
+        method_score=0.75,
+        measurement_score=0.78,
+        data_resource_score=0.86,
+        infrastructure_score=0.59,
+        cost_cycle_score=0.47,
+        overall_score=0.68,
+    )
+    route_peer_3 = _route_state(
+        route_state_id='route-peer-3',
+        support_ids=['p3-e1', 'p3-e2'],
+        challenge_ids=['p3-c1'],
+        method_score=0.74,
+        measurement_score=0.77,
+        data_resource_score=0.85,
+        infrastructure_score=0.58,
+        cost_cycle_score=0.46,
+        overall_score=0.67,
+    )
+    prior_card = _green_prior(route_peer_1, route_peer_2, route_peer_3)
+
+    export = build_decision_episode_audit_export(
+        route_packet=_route_packet(route_main),
+        route_state=route_main,
+        why_now_case=build_why_now_case(route_main),
+        prior_cards=[prior_card],
+        anti_pattern_cards=[],
+        accepted_prior_ids=[prior_card.prior_id],
+        accepted_anti_pattern_ids=[],
+        source_replay_bundle_refs=_source_refs('replay_bundle'),
+        source_review_bundle_refs=_source_refs('review_bundle'),
+        built_at='2026-04-02T03:18:00Z',
+    )
+
+    assert export.decision_episode.relevant_priors.selected_prior_ids == []
+    assert len(export.accepted_but_unselected_priors) == 1
+    assert export.accepted_but_unselected_priors[0].prior_id == prior_card.prior_id
+    assert export.accepted_but_unselected_priors[0].exclusion_reason_code == 'route_state_not_supported'
+    assert export.accepted_but_unselected_priors[0].supporting_route_state_ids == [
+        'route-peer-1',
+        'route-peer-2',
+        'route-peer-3',
+    ]
+    assert export.accepted_but_unselected_priors[0].evidence_refs[0] == f'accepted_prior:{prior_card.prior_id}'
+
+
 def test_build_decision_episode_audit_export_carries_route_family_matching_accepted_antipatterns() -> None:
     route_main = _route_state(
         route_state_id='route-main-runtime-subset',
@@ -640,6 +712,8 @@ def test_build_decision_episode_audit_export_includes_machine_readable_review_me
     assert export.reviewer_ids == ['reviewer-1', 'reviewer-2']
     assert export.reviewed_at == '2026-04-02T03:35:00Z'
     assert export.residual_defects == ['weak_prior_support']
+    assert export.route_state_snapshot.route_state_id == 'route-main'
+    assert export.why_now_case is not None
     assert export.section_reviews['evidence_pack'].training_acceptance_verdict == 'accepted'
     assert export.section_reviews['review_labels'].residual_defects == ['weak_prior_support']
     assert export.section_reviews['route_comparison'].review_status == 'not_started'

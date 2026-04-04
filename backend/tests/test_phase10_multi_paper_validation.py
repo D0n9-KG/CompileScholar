@@ -166,10 +166,14 @@ def test_phase10_workflow_writes_prior_review_and_export_bundles(tmp_path: Path)
         export_summary_payload = json.loads((output_dir / 'export_bundle' / 'export_summary.json').read_text(encoding='utf-8'))
         export_inspection_payload = json.loads((output_dir / 'export_bundle' / 'export_inspection.json').read_text(encoding='utf-8'))
         decision_episode_payload = json.loads((output_dir / 'export_bundle' / 'outputs' / 'decision_episode.json').read_text(encoding='utf-8'))
+        training_view_payload = json.loads((output_dir / 'export_bundle' / 'outputs' / 'training_view.json').read_text(encoding='utf-8'))
+        best_cycle_selection_payload = json.loads((output_dir / 'export_bundle' / 'best_cycle_selection.json').read_text(encoding='utf-8'))
 
         assert result.summary['prior_review_bundle_manifest'] == str((output_dir / 'prior_review_bundle' / 'bundle_manifest.json').resolve())
         assert result.summary['export_summary_path'] == str((output_dir / 'export_bundle' / 'export_summary.json').resolve())
         assert result.summary['export_inspection_path'] == str((output_dir / 'export_bundle' / 'export_inspection.json').resolve())
+        assert result.summary['training_view_path'] == str((output_dir / 'export_bundle' / 'outputs' / 'training_view.json').resolve())
+        assert result.summary['best_cycle_selection_path'] == str((output_dir / 'export_bundle' / 'best_cycle_selection.json').resolve())
         assert result.summary['comparison_summary_path'] == str((output_dir / 'comparison_summary.json').resolve())
         assert Path(comparison_summary_payload['baseline_replay_bundle']).name == 'replay_with_package'
         assert Path(comparison_summary_payload['baseline_export_bundle']).name == 'phase6_decision_episode_audit_export'
@@ -178,10 +182,24 @@ def test_phase10_workflow_writes_prior_review_and_export_bundles(tmp_path: Path)
         assert 'alternative_scope_not_distinct' not in comparison_summary_payload['package']['current']['quality_flags']
         assert set(export_summary_payload['selected_prior_ids']).issubset(set(review_manifest_payload['accepted_prior_ids']))
         assert decision_episode_payload['relevant_priors']['selected_prior_ids'] == export_summary_payload['selected_prior_ids']
+        assert (output_dir / 'export_bundle' / 'outputs' / 'training_view.json').is_file()
+        assert (output_dir / 'export_bundle' / 'best_cycle_selection.json').is_file()
         assert 'visible_input_refs' in export_inspection_payload['visibility_buckets']
         assert 'audit_only_refs' in export_inspection_payload['visibility_buckets']
         assert 'label_eval_only_refs' in export_inspection_payload['visibility_buckets']
         assert export_summary_payload['visibility_bucket_counts']['visible_input_refs'] >= 1
+        assert 'accepted_but_unselected_priors' in export_summary_payload
+        assert 'accepted_but_unselected_priors' in training_view_payload['sections']['priors_antipatterns']
+        assert len(export_summary_payload['accepted_but_unselected_priors']) == (
+            export_summary_payload['accepted_but_unselected_prior_count']
+        )
+        assert len(training_view_payload['sections']['priors_antipatterns']['accepted_but_unselected_priors']) == (
+            export_summary_payload['accepted_but_unselected_prior_count']
+        )
+        assert best_cycle_selection_payload['selected_iteration_label'] == 'phase10-workflow-run'
+        assert best_cycle_selection_payload['recommendation_evidence_refs']
+        assert comparison_summary_payload['best_cycle_selection']['selected_iteration_label'] == 'phase10-workflow-run'
+        assert comparison_summary_payload['source_artifacts']['current_training_view'].endswith('training_view.json')
     finally:
         shutil.rmtree(runtime_paths.output_root, ignore_errors=True)
 
@@ -296,6 +314,8 @@ def test_phase10_cli_writes_package_and_replay_bundles(tmp_path: Path) -> None:
         assert (output_dir / 'prior_review_bundle' / 'bundle_manifest.json').is_file()
         assert (output_dir / 'export_bundle' / 'export_summary.json').is_file()
         assert (output_dir / 'export_bundle' / 'export_inspection.json').is_file()
+        assert (output_dir / 'export_bundle' / 'outputs' / 'training_view.json').is_file()
+        assert (output_dir / 'export_bundle' / 'best_cycle_selection.json').is_file()
         assert (output_dir / 'comparison_summary.json').is_file()
         assert replay_inspection_payload['route_state_package_validation'] is not None
         assert replay_inspection_payload['route_state_package_validation']['quality_tier'] == summary_payload[
@@ -306,6 +326,8 @@ def test_phase10_cli_writes_package_and_replay_bundles(tmp_path: Path) -> None:
         assert 'support_cluster_too_small' not in summary_payload['route_state_package_validation_flags']
         assert 'alternative_scope_not_distinct' not in summary_payload['route_state_package_validation_flags']
         assert set(summary_payload['selected_prior_ids']).issubset(set(summary_payload['accepted_prior_ids']))
+        assert summary_payload['training_view_path'].endswith('training_view.json')
+        assert summary_payload['best_cycle_selection_path'].endswith('best_cycle_selection.json')
         assert 'visibility_bucket_counts' in summary_payload
         assert summary_payload['comparison_summary_path'] == str((output_dir / 'comparison_summary.json').resolve())
     finally:

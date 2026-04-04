@@ -57,6 +57,14 @@ def test_load_phase10_comparison_summary_reads_explicit_json_path(tmp_path: Path
                 'replay': {'current': {'quality_tier': 'yellow'}},
                 'prior_review': {'current': {'prior_candidate_count': 0}},
                 'export': {'current': {'quality_tier': 'yellow'}},
+                'best_cycle_selection': {
+                    'selected_iteration_label': 'phase14-candidate-01',
+                    'primary_recommendation_id': 'packet_construction',
+                    'recommendation_evidence_refs': [
+                        'training_view:C:/tmp/phase14-candidate-01/export_bundle/outputs/training_view.json',
+                        'export_summary:C:/tmp/phase14-candidate-01/export_bundle/export_summary.json',
+                    ],
+                },
                 'blocker_queue': {
                     'package_validation': [
                         {
@@ -81,6 +89,12 @@ def test_load_phase10_comparison_summary_reads_explicit_json_path(tmp_path: Path
     assert surface.packet_id == 'packet-1'
     assert surface.source_refs.phase10_summary_path == str(summary_path.resolve())
     assert surface.source_refs.fallback_used is False
+    assert surface.current_recommendation == 'packet_construction'
+    assert surface.selected_iteration_label == 'phase14-candidate-01'
+    assert surface.recommendation_evidence_refs == [
+        'training_view:C:/tmp/phase14-candidate-01/export_bundle/outputs/training_view.json',
+        'export_summary:C:/tmp/phase14-candidate-01/export_bundle/export_summary.json',
+    ]
     assert surface.blocker_queue['package_validation'][0].code == 'support_cluster_too_small'
 
 
@@ -121,6 +135,7 @@ def test_rank_iteration_recommendations_orders_packet_construction_first_for_cur
     ]
     assert recommendations[0].supporting_blocker_stages == ['package_validation', 'replay']
     assert recommendations[2].supporting_owner_buckets[:2] == ['relation_assembly', 'slot_recovery']
+    assert recommendations[0].evidence[-1] == 'best-cycle evidence refs (unknown): none'
 
 
 def test_build_iteration_priority_summary_keeps_supporting_l2_evidence_visible_on_current_baseline() -> None:
@@ -142,4 +157,6 @@ def test_build_iteration_priority_summary_keeps_supporting_l2_evidence_visible_o
     assert summary.primary_recommendation_id == 'packet_construction'
     assert [bucket.bucket for bucket in summary.supporting_l2_evidence[:2]] == ['relation_assembly', 'slot_recovery']
     assert summary.phase10_blocker_queue['package_validation'][0].code == 'support_cluster_too_small'
+    assert 'best_cycle_selection' in summary.phase10_stage_surfaces
     assert inspection.ranking_signals['replay_l2_delta'] == 0
+    assert inspection.ranking_signals['recommendation_evidence_refs'] == []

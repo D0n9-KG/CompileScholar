@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Any, Mapping, Sequence, TypeVar
+from typing import Any, Literal, Mapping, Sequence, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -21,6 +21,10 @@ from .models import (
 )
 
 ModelT = TypeVar('ModelT', bound=BaseModel)
+TrainingPriorExclusionReasonCode = Literal[
+    'route_state_not_supported',
+    'accepted_prior_candidate_missing',
+]
 REQUIRED_SECTION_REVIEW_KEYS = [
     'evidence_pack',
     'route_synthesis',
@@ -117,15 +121,35 @@ class DecisionEpisodeExportSourceRefs(BaseModel):
     files: dict[str, str] = Field(default_factory=dict)
 
 
+class AcceptedButUnselectedPrior(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    prior_id: str
+    exclusion_reason_code: TrainingPriorExclusionReasonCode
+    rationale: str
+    evidence_refs: list[str] = Field(default_factory=list)
+    supporting_route_state_ids: list[str] = Field(default_factory=list)
+    held_out_route_state_ids: list[str] = Field(default_factory=list)
+    review_status: str | None = None
+    reviewer_ids: list[str] = Field(default_factory=list)
+    reviewer_notes: str | None = None
+
+
 class DecisionEpisodeAuditExport(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
     built_at: str
     decision_episode: DecisionEpisode
+    route_state_snapshot: RouteState
+    why_now_case: WhyNowCase | None = None
+    route_comparison_case: RouteComparisonCase | None = None
     source_replay_bundle_refs: DecisionEpisodeExportSourceRefs = Field(default_factory=DecisionEpisodeExportSourceRefs)
     source_review_bundle_refs: DecisionEpisodeExportSourceRefs = Field(default_factory=DecisionEpisodeExportSourceRefs)
     accepted_prior_ids: list[str] = Field(default_factory=list)
     accepted_anti_pattern_ids: list[str] = Field(default_factory=list)
+    accepted_prior_cards: list[DecisionPriorCard] = Field(default_factory=list)
+    accepted_anti_pattern_cards: list[AntiPatternCard] = Field(default_factory=list)
+    accepted_but_unselected_priors: list[AcceptedButUnselectedPrior] = Field(default_factory=list)
     visible_input_refs: list[str] = Field(default_factory=list)
     audit_only_refs: list[str] = Field(default_factory=list)
     label_eval_only_refs: list[str] = Field(default_factory=list)
@@ -169,6 +193,101 @@ def _source_bundle_refs(prefix: str, source_refs: DecisionEpisodeExportSourceRef
         if str(value or '').strip()
     )
     return refs
+
+
+def _accepted_prior_evidence_refs(
+    prior_card: DecisionPriorCard,
+    review_refs: DecisionEpisodeExportSourceRefs,
+) -> list[str]:
+    review_summary_ref = str(review_refs.files.get('candidate_review_summary') or '').strip()
+    refs = [
+        f'accepted_prior:{prior_card.prior_id}',
+        *(f'supporting_route_state:{route_state_id}' for route_state_id in prior_card.supporting_route_state_ids),
+        *(
+            f'held_out_route_state:{route_state_id}'
+            for route_state_id in prior_card.held_out_consistency.held_out_route_state_ids
+        ),
+        *(f'counterexample:{counterexample_id}' for counterexample_id in prior_card.counterexample_ids),
+        *([f'review_bundle:candidate_review_summary:{review_summary_ref}'] if review_summary_ref else []),
+        *(
+            [f'review_bundle:manifest:{review_refs.manifest_ref}']
+            if str(review_refs.manifest_ref or '').strip()
+            else []
+        ),
+    ]
+    return _unique(refs)
+
+
+def _accepted_but_unselected_priors(
+    *,
+    route_state: RouteState,
+    accepted_prior_ids: Sequence[str],
+    selected_prior_ids: Sequence[str],
+    prior_cards: Sequence[DecisionPriorCard],
+    review_refs: DecisionEpisodeExportSourceRefs,
+) -> list[AcceptedButUnselectedPrior]:
+    selected_prior_id_set = set(_normalize_ids(selected_prior_ids))
+    prior_cards_by_id = {
+        prior_card.prior_id: prior_card
+        for prior_card in prior_cards
+        if str(prior_card.prior_id or '').strip()
+    }
+    records: list[AcceptedButUnselectedPrior] = []
+    for prior_id in _normalize_ids(accepted_prior_ids):
+        if prior_id in selected_prior_id_set:
+            continue
+
+        prior_card = prior_cards_by_id.get(prior_id)
+        if prior_card is None:
+            records.append(
+                AcceptedButUnselectedPrior(
+                    prior_id=prior_id,
+                    exclusion_reason_code='accepted_prior_candidate_missing',
+                    rationale=(
+                        f'Review bundle accepted prior {prior_id}, but its candidate payload was unavailable during '
+                        'audit export assembly, so selected_prior_ids stayed unchanged.'
+                    ),
+                    evidence_refs=_unique(
+                        [
+                            f'accepted_prior:{prior_id}',
+                            *(
+                                [f'review_bundle:manifest:{review_refs.manifest_ref}']
+                                if str(review_refs.manifest_ref or '').strip()
+                                else []
+                            ),
+                        ]
+                    ),
+                )
+            )
+            continue
+
+        route_supported = route_state.route_state_id in prior_card.supporting_route_state_ids
+        records.append(
+            AcceptedButUnselectedPrior(
+                prior_id=prior_card.prior_id,
+                exclusion_reason_code=(
+                    'route_state_not_supported' if not route_supported else 'accepted_prior_candidate_missing'
+                ),
+                rationale=(
+                    f'Accepted prior {prior_card.prior_id} remains review-backed, but it does not list exported '
+                    f'route_state {route_state.route_state_id} in supporting_route_state_ids, so selected_prior_ids '
+                    'stayed empty to keep the audited export route-backed.'
+                    if not route_supported
+                    else (
+                        f'Accepted prior {prior_card.prior_id} matched exported route_state {route_state.route_state_id}, '
+                        'but the audited export did not preserve it in selected_prior_ids; keep the mismatch explicit '
+                        'until the selection contract is resolved.'
+                    )
+                ),
+                evidence_refs=_accepted_prior_evidence_refs(prior_card, review_refs),
+                supporting_route_state_ids=list(prior_card.supporting_route_state_ids),
+                held_out_route_state_ids=list(prior_card.held_out_consistency.held_out_route_state_ids),
+                review_status=prior_card.review.review_status,
+                reviewer_ids=list(prior_card.review.reviewer_ids),
+                reviewer_notes=prior_card.review.reviewer_notes,
+            )
+        )
+    return records
 
 
 def _prior_selection_note(
@@ -340,10 +459,22 @@ def build_decision_episode_audit_export(
     return DecisionEpisodeAuditExport(
         built_at=built_at_value,
         decision_episode=decision_episode,
+        route_state_snapshot=route_state_model,
+        why_now_case=why_now_model,
+        route_comparison_case=comparison_model,
         source_replay_bundle_refs=replay_refs,
         source_review_bundle_refs=review_refs,
         accepted_prior_ids=_normalize_ids(accepted_prior_ids),
         accepted_anti_pattern_ids=_normalize_ids(accepted_anti_pattern_ids),
+        accepted_prior_cards=allowlisted_prior_cards,
+        accepted_anti_pattern_cards=allowlisted_anti_pattern_cards,
+        accepted_but_unselected_priors=_accepted_but_unselected_priors(
+            route_state=route_state_model,
+            accepted_prior_ids=accepted_prior_ids or [],
+            selected_prior_ids=selected_prior_ids,
+            prior_cards=allowlisted_prior_cards,
+            review_refs=review_refs,
+        ),
         visible_input_refs=_visible_input_refs(decision_episode),
         audit_only_refs=_audit_only_refs(
             decision_episode=decision_episode,
@@ -378,6 +509,7 @@ def build_decision_episode_audit_export(
 
 
 __all__ = [
+    'AcceptedButUnselectedPrior',
     'DecisionEpisodeAuditExport',
     'DecisionEpisodeExportSourceRefs',
     'build_decision_episode_audit_export',

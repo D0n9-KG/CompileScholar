@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 import json
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Sequence
+from typing import TYPE_CHECKING, Any, Mapping, Sequence
 
 from app.paper_logic_trace.models import PaperLogicTrace
 
@@ -17,7 +17,11 @@ from .corpus_sampling import CorpusSamplingBundle
 from .decision_episode_export import DecisionEpisodeAuditExport
 from .historical_environment import HistoricalEnvironmentSnapshot
 from .historical_replay_compiler import HistoricalReplayCompilation
-from .iteration_prioritization import IterationPriorityInspection, IterationPrioritySummary
+from .iteration_prioritization import (
+    IterationPriorityInspection,
+    IterationPriorityRecommendation,
+    IterationPrioritySummary,
+)
 from .models import RoutePacket, RouteState
 from .sampled_single_paper import (
     FixedSampledL2ComparisonRow,
@@ -101,6 +105,18 @@ def _review_status_counts(values: list[str]) -> dict[str, int]:
             continue
         counts[normalized] = counts.get(normalized, 0) + 1
     return counts
+
+
+def _unique_strings(values: Sequence[object] | None) -> list[str]:
+    seen: set[str] = set()
+    ordered: list[str] = []
+    for value in values or []:
+        normalized = str(value or '').strip()
+        if not normalized or normalized in seen:
+            continue
+        seen.add(normalized)
+        ordered.append(normalized)
+    return ordered
 
 
 def load_route_packet(path_like: str | Path) -> RoutePacket:
@@ -494,6 +510,11 @@ def build_decision_episode_export_summary(
         'accepted_anti_pattern_count': len(export.accepted_anti_pattern_ids),
         'selected_prior_count': len(decision_episode.relevant_priors.selected_prior_ids),
         'selected_antipattern_count': len(decision_episode.relevant_priors.selected_antipattern_ids),
+        'accepted_but_unselected_prior_count': len(export.accepted_but_unselected_priors),
+        'accepted_but_unselected_priors': [
+            record.model_dump(mode='json', exclude_none=True)
+            for record in export.accepted_but_unselected_priors
+        ],
         'visibility_bucket_counts': {
             'visible_input_refs': len(export.visible_input_refs),
             'audit_only_refs': len(export.audit_only_refs),
@@ -537,11 +558,23 @@ def build_decision_episode_export_inspection(
             'selected_prior_ids': list(decision_episode.relevant_priors.selected_prior_ids),
             'decision_episode_prior_selection_rationale': decision_episode.relevant_priors.prior_selection_rationale,
             'audit_note': export.prior_selection_note,
+            'accepted_prior_cards': [
+                prior_card.model_dump(mode='json', exclude_none=True)
+                for prior_card in export.accepted_prior_cards
+            ],
+            'accepted_but_unselected_priors': [
+                record.model_dump(mode='json', exclude_none=True)
+                for record in export.accepted_but_unselected_priors
+            ],
         },
         'anti_pattern_selection': {
             'accepted_anti_pattern_ids': list(export.accepted_anti_pattern_ids),
             'selected_antipattern_ids': list(decision_episode.relevant_priors.selected_antipattern_ids),
             'audit_note': export.anti_pattern_selection_note,
+            'accepted_anti_pattern_cards': [
+                anti_pattern.model_dump(mode='json', exclude_none=True)
+                for anti_pattern in export.accepted_anti_pattern_cards
+            ],
         },
         'visibility_buckets': {
             'visible_input_refs': list(export.visible_input_refs),
@@ -572,7 +605,189 @@ def build_decision_episode_export_inspection(
                 for key, review in export.section_reviews.items()
             },
         },
+        'training_sections': {
+            'evidence_pack': decision_episode.observation_evidence_pack.model_dump(mode='json', exclude_none=True),
+            'route_synthesis': export.route_state_snapshot.model_dump(mode='json', exclude_none=True),
+            'why_now': (
+                export.why_now_case.model_dump(mode='json', exclude_none=True)
+                if export.why_now_case is not None
+                else None
+            ),
+            'route_comparison': (
+                export.route_comparison_case.model_dump(mode='json', exclude_none=True)
+                if export.route_comparison_case is not None
+                else None
+            ),
+            'minimal_attack_path': decision_episode.minimal_attack_path.model_dump(mode='json', exclude_none=True),
+            'final_decision': decision_episode.decision_output.model_dump(mode='json', exclude_none=True),
+        },
         'decision_episode_quality': decision_episode.quality.model_dump(mode='json', exclude_none=True),
+    }
+
+
+def _default_selected_iteration_label(bundle_dir: Path, selected_iteration_label: str | None) -> str:
+    normalized = str(selected_iteration_label or '').strip()
+    if normalized:
+        return normalized
+    if bundle_dir.name == 'export_bundle' and bundle_dir.parent.name:
+        return bundle_dir.parent.name
+    return bundle_dir.name
+
+
+def _recommendation_payloads(
+    ranked_recommendations: Sequence[IterationPriorityRecommendation | Mapping[str, Any]] | None,
+) -> list[dict[str, Any]]:
+    payloads: list[dict[str, Any]] = []
+    for recommendation in ranked_recommendations or []:
+        if isinstance(recommendation, IterationPriorityRecommendation):
+            payloads.append(recommendation.model_dump(mode='json', exclude_none=True))
+        elif isinstance(recommendation, Mapping):
+            payloads.append(dict(recommendation))
+    return payloads
+
+
+def build_decision_episode_training_view(
+    *,
+    export: DecisionEpisodeAuditExport,
+    selected_iteration_label: str,
+    audit_episode_ref: str | None = None,
+) -> dict[str, Any]:
+    decision_episode = export.decision_episode
+    return {
+        'schema_version': 'v1',
+        'built_at': export.built_at,
+        'episode_id': decision_episode.episode_id,
+        'route_packet_id': decision_episode.observation_evidence_pack.route_packet_id,
+        'route_state_id': export.route_state_snapshot.route_state_id,
+        'selected_iteration_label': selected_iteration_label,
+        'audit_episode_ref': audit_episode_ref,
+        'review': {
+            'review_status': export.review_status,
+            'training_acceptance_verdict': export.training_acceptance_verdict,
+            'reviewer_ids': list(export.reviewer_ids),
+            'reviewed_at': export.reviewed_at,
+            'rationale': export.rationale,
+            'residual_defects': list(export.residual_defects),
+            'section_reviews': {
+                key: review.model_dump(mode='json', exclude_none=True)
+                for key, review in export.section_reviews.items()
+            },
+        },
+        'sections': {
+            'evidence_pack': decision_episode.observation_evidence_pack.model_dump(mode='json', exclude_none=True),
+            'route_synthesis': {
+                'route_state': export.route_state_snapshot.model_dump(mode='json', exclude_none=True),
+                'candidate_question': decision_episode.candidate_question.model_dump(mode='json', exclude_none=True),
+                'alternative_questions': [
+                    question.model_dump(mode='json', exclude_none=True)
+                    for question in decision_episode.alternative_questions
+                ],
+            },
+            'why_now': {
+                'why_now_case': (
+                    export.why_now_case.model_dump(mode='json', exclude_none=True)
+                    if export.why_now_case is not None
+                    else None
+                ),
+                'why_this_not_that': decision_episode.why_this_not_that.model_dump(mode='json', exclude_none=True),
+                'not_now_cases': [
+                    case.model_dump(mode='json', exclude_none=True)
+                    for case in decision_episode.not_now_cases
+                ],
+            },
+            'route_comparison': {
+                'route_comparison_case': (
+                    export.route_comparison_case.model_dump(mode='json', exclude_none=True)
+                    if export.route_comparison_case is not None
+                    else None
+                ),
+            },
+            'priors_antipatterns': {
+                'accepted_prior_ids': list(export.accepted_prior_ids),
+                'selected_prior_ids': list(decision_episode.relevant_priors.selected_prior_ids),
+                'accepted_prior_cards': [
+                    prior_card.model_dump(mode='json', exclude_none=True)
+                    for prior_card in export.accepted_prior_cards
+                ],
+                'accepted_but_unselected_priors': [
+                    record.model_dump(mode='json', exclude_none=True)
+                    for record in export.accepted_but_unselected_priors
+                ],
+                'accepted_anti_pattern_ids': list(export.accepted_anti_pattern_ids),
+                'selected_antipattern_ids': list(decision_episode.relevant_priors.selected_antipattern_ids),
+                'accepted_anti_pattern_cards': [
+                    anti_pattern.model_dump(mode='json', exclude_none=True)
+                    for anti_pattern in export.accepted_anti_pattern_cards
+                ],
+                'prior_selection_rationale': decision_episode.relevant_priors.prior_selection_rationale,
+                'prior_selection_note': export.prior_selection_note,
+                'anti_pattern_selection_note': export.anti_pattern_selection_note,
+            },
+            'minimal_attack_path': decision_episode.minimal_attack_path.model_dump(mode='json', exclude_none=True),
+            'final_decision': decision_episode.decision_output.model_dump(mode='json', exclude_none=True),
+            'review_labels': {
+                'quality_tier': decision_episode.quality.quality_tier,
+                'quality_flags': list(decision_episode.quality.quality_flags),
+                'why_now_label': export.why_now_case.why_now_label if export.why_now_case is not None else None,
+                'final_choice': decision_episode.decision_output.final_choice,
+                'training_acceptance_verdict': export.training_acceptance_verdict,
+                'review_status': export.review_status,
+            },
+        },
+        'visibility_buckets': {
+            'visible_input_refs': list(export.visible_input_refs),
+            'audit_only_refs': list(export.audit_only_refs),
+            'label_eval_only_refs': list(export.label_eval_only_refs),
+        },
+    }
+
+
+def build_best_cycle_selection_payload(
+    *,
+    export: DecisionEpisodeAuditExport,
+    selected_iteration_label: str,
+    reviewed_candidate_cycles: Sequence[Mapping[str, Any]] | None = None,
+    primary_recommendation_id: str | None = None,
+    recommendation_evidence_refs: Sequence[str] | None = None,
+    ranked_recommendations: Sequence[IterationPriorityRecommendation | Mapping[str, Any]] | None = None,
+    source_artifacts: Mapping[str, str] | None = None,
+) -> dict[str, Any]:
+    normalized_reviewed_candidate_cycles = (
+        [dict(candidate) for candidate in reviewed_candidate_cycles]
+        if reviewed_candidate_cycles
+        else [
+            {
+                'iteration_label': selected_iteration_label,
+                'review_status': export.review_status,
+                'training_acceptance_verdict': export.training_acceptance_verdict,
+                'reviewer_ids': list(export.reviewer_ids),
+                'reviewed_at': export.reviewed_at,
+                'rationale': export.rationale,
+                'residual_defects': list(export.residual_defects),
+                'section_reviews': {
+                    key: review.model_dump(mode='json', exclude_none=True)
+                    for key, review in export.section_reviews.items()
+                },
+            }
+        ]
+    )
+    return {
+        'schema_version': 'v1',
+        'built_at': export.built_at,
+        'episode_id': export.decision_episode.episode_id,
+        'route_state_id': export.route_state_snapshot.route_state_id,
+        'selected_iteration_label': selected_iteration_label,
+        'review_status': export.review_status,
+        'training_acceptance_verdict': export.training_acceptance_verdict,
+        'reviewer_ids': list(export.reviewer_ids),
+        'reviewed_at': export.reviewed_at,
+        'rationale': export.rationale,
+        'residual_defects': list(export.residual_defects),
+        'primary_recommendation_id': primary_recommendation_id,
+        'recommendation_evidence_refs': _unique_strings(recommendation_evidence_refs),
+        'ranked_recommendations': _recommendation_payloads(ranked_recommendations),
+        'reviewed_candidate_cycles': normalized_reviewed_candidate_cycles,
+        'source_artifacts': {str(key): str(value) for key, value in dict(source_artifacts or {}).items()},
     }
 
 
@@ -918,12 +1133,24 @@ def write_decision_episode_export_bundle(
     *,
     export: DecisionEpisodeAuditExport,
     metadata: dict[str, Any] | None = None,
+    selected_iteration_label: str | None = None,
+    reviewed_candidate_cycles: Sequence[Mapping[str, Any]] | None = None,
+    primary_recommendation_id: str | None = None,
+    recommendation_evidence_refs: Sequence[str] | None = None,
+    ranked_recommendations: Sequence[IterationPriorityRecommendation | Mapping[str, Any]] | None = None,
+    selection_source_artifacts: Mapping[str, str] | None = None,
 ) -> dict[str, Path]:
     bundle_dir = _as_path(output_dir)
     outputs_dir = bundle_dir / 'outputs'
+    iteration_label = _default_selected_iteration_label(bundle_dir, selected_iteration_label)
 
     summary_payload = build_decision_episode_export_summary(export=export)
     inspection_payload = build_decision_episode_export_inspection(export=export)
+    training_view_payload = build_decision_episode_training_view(
+        export=export,
+        selected_iteration_label=iteration_label,
+        audit_episode_ref='outputs/decision_episode.json',
+    )
 
     written_files = {
         'decision_episode': _write_json(
@@ -932,7 +1159,46 @@ def write_decision_episode_export_bundle(
         ),
         'export_summary': _write_json(bundle_dir / 'export_summary.json', summary_payload),
         'export_inspection': _write_json(bundle_dir / 'export_inspection.json', inspection_payload),
+        'training_view': _write_json(outputs_dir / 'training_view.json', training_view_payload),
     }
+
+    selection_evidence_refs = _unique_strings(
+        list(recommendation_evidence_refs or [])
+        + [
+            f'training_view:{written_files["training_view"].resolve()}',
+            f'export_summary:{written_files["export_summary"].resolve()}',
+            f'export_inspection:{written_files["export_inspection"].resolve()}',
+            *(
+                [
+                    (
+                        'review_bundle:candidate_review_summary:'
+                        f'{export.source_review_bundle_refs.files["candidate_review_summary"]}'
+                    )
+                ]
+                if str(export.source_review_bundle_refs.files.get('candidate_review_summary') or '').strip()
+                else []
+            ),
+        ]
+    )
+    selection_payload = build_best_cycle_selection_payload(
+        export=export,
+        selected_iteration_label=iteration_label,
+        reviewed_candidate_cycles=reviewed_candidate_cycles,
+        primary_recommendation_id=primary_recommendation_id,
+        recommendation_evidence_refs=selection_evidence_refs,
+        ranked_recommendations=ranked_recommendations,
+        source_artifacts={
+            'decision_episode': str(written_files['decision_episode'].resolve()),
+            'training_view': str(written_files['training_view'].resolve()),
+            'export_summary': str(written_files['export_summary'].resolve()),
+            'export_inspection': str(written_files['export_inspection'].resolve()),
+            **{str(key): str(value) for key, value in dict(selection_source_artifacts or {}).items()},
+        },
+    )
+    written_files['best_cycle_selection'] = _write_json(
+        bundle_dir / 'best_cycle_selection.json',
+        selection_payload,
+    )
     manifest_payload = {
         'schema_version': 'v1',
         'built_at': export.built_at,
@@ -940,10 +1206,13 @@ def write_decision_episode_export_bundle(
         'route_state_id': export.decision_episode.route_state.route_state_id,
         'accepted_prior_ids': list(export.accepted_prior_ids),
         'accepted_anti_pattern_ids': list(export.accepted_anti_pattern_ids),
+        'selected_iteration_label': iteration_label,
         'review_status': export.review_status,
         'training_acceptance_verdict': export.training_acceptance_verdict,
         'reviewer_ids': list(export.reviewer_ids),
         'reviewed_at': export.reviewed_at,
+        'primary_recommendation_id': primary_recommendation_id,
+        'recommendation_evidence_refs': selection_evidence_refs,
         'source_replay_bundle_refs': export.source_replay_bundle_refs.model_dump(exclude_none=True),
         'source_review_bundle_refs': export.source_review_bundle_refs.model_dump(exclude_none=True),
         'metadata': dict(metadata or {}),
@@ -1116,10 +1385,12 @@ def write_iteration_priority_bundle(
 
 
 __all__ = [
+    'build_best_cycle_selection_payload',
     'build_corpus_sampling_inspection',
     'build_corpus_sampling_summary',
     'build_decision_episode_export_inspection',
     'build_decision_episode_export_summary',
+    'build_decision_episode_training_view',
     'build_iteration_priority_inspection_payload',
     'build_iteration_priority_summary_payload',
     'build_prior_candidate_review_summary',
