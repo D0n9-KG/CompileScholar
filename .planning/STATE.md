@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: milestone
-status: Ready to plan
-stopped_at: Phase 15 context gathered (assumptions mode)
-last_updated: "2026-04-04T08:25:41.825Z"
+status: Ready to execute
+stopped_at: Phase 15 planned
+last_updated: "2026-04-04T16:59:44.5698257+08:00"
 progress:
   total_phases: 5
   completed_phases: 3
-  total_plans: 8
+  total_plans: 11
   completed_plans: 8
 ---
 
@@ -19,17 +19,17 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-04-04)
 
 **Core value:** Produce auditable, replayable, trainable scientific-reasoning artifacts rather than paper-like summaries or one-off knowledge graphs.
-**Current focus:** Prepare Phase 15 planning from the completed Phase 14 best-cycle review and prioritization handoff
+**Current focus:** Execute the newly planned Phase 15 cycle-3 consolidation work against the completed Phase 14 best-cycle baseline
 
 ## Current Position
 
 Phase: 15
-Plan: Not started
+Plan: 3 plans ready
 Milestone: `v1.2` - Fast Iteration Research Logic Quality
 
 - Completed milestone: `v1.1` corpus-driven iterative quality hardening
-- Status: Phase `14` is complete; Phase `15` is next and ready for planning
-- Last activity: `2026-04-04` - completed Phase 14 with additive training-facing export bundles, two bounded candidate-cycle reviews, and a confirmed next-cycle prioritization handoff
+- Status: Phase `15` is planned and ready for execution
+- Last activity: `2026-04-04` - created Phase 15 research, validation, and three execution plans from the completed Phase 14 best-cycle review and prioritization handoff
 
 ## Milestone Snapshot
 
@@ -58,6 +58,7 @@ Milestone: `v1.2` - Fast Iteration Research Logic Quality
 - Phase 13 Plan 02 now threads `reviewer_ids` through replay and prior-review generation, and it can opt into a deterministic `scope_fallback_cluster` when same-scope support states would otherwise remain three singleton clusters.
 - Phase 14 added additive `training_view.json` and `best_cycle_selection.json` export artifacts, explicit machine-readable review fields, and canonicalized concept provenance fields.
 - Phase 14 closeout shows stronger export structure and reviewability, but the chosen best cycle still carries `weak_prior_support`, no accepted priors on the default rerun path, and a next-cycle recommendation that remains `packet_construction`.
+- Phase 15 planning now splits the work into three waves: packet and prior-recovery groundwork, route-comparison plus export closure, and compared bounded reruns against the Phase 14 `cycle2-best` baseline bundles.
 
 ## Active Requirements
 
@@ -65,9 +66,9 @@ Milestone: `v1.2` - Fast Iteration Research Logic Quality
 
 ## Pending Follow-Ups
 
-- Discuss and plan Phase `15` using `docs/replay/reports/phase14-cycle2-optimization-best.md` and `docs/replay/reports/phase14-next-cycle-prioritization.md`.
-- Turn the new Phase 14 training-facing export surface into a first genuinely high-quality bounded cycle by improving packet quality, route comparison clarity, and prior selection closure.
-- Keep the later cycles focused on producing a bounded but genuinely usable scientific-thinking dataset bundle, not only structurally richer exports.
+- Execute Phase `15` using `.planning/phases/15-cycle-3-consolidation/15-01-PLAN.md`, `.planning/phases/15-cycle-3-consolidation/15-02-PLAN.md`, and `.planning/phases/15-cycle-3-consolidation/15-03-PLAN.md`.
+- Compare default and fallback-merge Phase 15 candidate cycles directly against `tmp/phase14_cycle2_optimization/cycle2-best/`.
+- Close reviewed prior / anti-pattern knowledge honestly into selected or explicitly excluded export fields and record the accepted-cycle streak without overclaiming stability.
 
 ## Blockers
 
@@ -76,6 +77,6 @@ Milestone: `v1.2` - Fast Iteration Research Logic Quality
 
 ## Session
 
-**Last Date:** 2026-04-04T08:25:41.822Z
-**Stopped At:** Phase 15 context gathered (assumptions mode)
-**Resume File:** .planning/phases/15-cycle-3-consolidation/15-CONTEXT.md
+**Last Date:** 2026-04-04T16:59:44.5698257+08:00
+**Stopped At:** Phase 15 planned
+**Resume File:** .planning/phases/15-cycle-3-consolidation/15-01-PLAN.md
