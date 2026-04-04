@@ -511,9 +511,14 @@ def build_decision_episode_export_summary(
         'selected_prior_count': len(decision_episode.relevant_priors.selected_prior_ids),
         'selected_antipattern_count': len(decision_episode.relevant_priors.selected_antipattern_ids),
         'accepted_but_unselected_prior_count': len(export.accepted_but_unselected_priors),
+        'accepted_but_unselected_antipattern_count': len(export.accepted_but_unselected_antipatterns),
         'accepted_but_unselected_priors': [
             record.model_dump(mode='json', exclude_none=True)
             for record in export.accepted_but_unselected_priors
+        ],
+        'accepted_but_unselected_antipatterns': [
+            record.model_dump(mode='json', exclude_none=True)
+            for record in export.accepted_but_unselected_antipatterns
         ],
         'visibility_bucket_counts': {
             'visible_input_refs': len(export.visible_input_refs),
@@ -574,6 +579,10 @@ def build_decision_episode_export_inspection(
             'accepted_anti_pattern_cards': [
                 anti_pattern.model_dump(mode='json', exclude_none=True)
                 for anti_pattern in export.accepted_anti_pattern_cards
+            ],
+            'accepted_but_unselected_antipatterns': [
+                record.model_dump(mode='json', exclude_none=True)
+                for record in export.accepted_but_unselected_antipatterns
             ],
         },
         'visibility_buckets': {
@@ -718,6 +727,10 @@ def build_decision_episode_training_view(
                 'accepted_anti_pattern_cards': [
                     anti_pattern.model_dump(mode='json', exclude_none=True)
                     for anti_pattern in export.accepted_anti_pattern_cards
+                ],
+                'accepted_but_unselected_antipatterns': [
+                    record.model_dump(mode='json', exclude_none=True)
+                    for record in export.accepted_but_unselected_antipatterns
                 ],
                 'prior_selection_rationale': decision_episode.relevant_priors.prior_selection_rationale,
                 'prior_selection_note': export.prior_selection_note,

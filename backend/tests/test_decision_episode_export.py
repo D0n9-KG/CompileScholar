@@ -622,8 +622,22 @@ def test_build_decision_episode_audit_export_carries_route_family_matching_accep
     assert export.decision_episode.route_state.route_family_id == 'route_family:image-recognition:2011:cnn'
     assert export.decision_episode.relevant_priors.selected_antipattern_ids == ['anti:route-main:matching']
     assert export.anti_pattern_selection_note == (
-        'Carried 1 reviewed accepted anti-pattern id(s) because their failure examples match route_state route-main-runtime-subset or route_family_id route_family:image-recognition:2011:cnn.'
+        'Carried 1 reviewed accepted anti-pattern id(s) because their failure examples match route_state '
+        'route-main-runtime-subset or route_family_id route_family:image-recognition:2011:cnn and preserved 1 '
+        'accepted_but_unselected_antipatterns record(s) for accepted anti-patterns that did not match.'
     )
+    assert len(export.accepted_but_unselected_antipatterns) == 1
+    anti_pattern_record = export.accepted_but_unselected_antipatterns[0]
+    assert set(anti_pattern_record.model_dump(mode='json', exclude_none=True)) == {
+        'anti_pattern_id',
+        'exclusion_reason_code',
+        'failure_route_state_ids',
+        'evidence_refs',
+    }
+    assert anti_pattern_record.anti_pattern_id == 'anti:route-main:other-route'
+    assert anti_pattern_record.exclusion_reason_code == 'route_state_not_supported'
+    assert anti_pattern_record.failure_route_state_ids == ['route-other']
+    assert anti_pattern_record.evidence_refs[0] == 'accepted_antipattern:anti:route-main:other-route'
 
 
 def test_build_decision_episode_audit_export_keeps_hindsight_label_only_and_out_of_visible_inputs() -> None:

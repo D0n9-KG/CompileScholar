@@ -199,12 +199,20 @@ def test_phase10_workflow_writes_prior_review_and_export_bundles(tmp_path: Path)
         assert 'label_eval_only_refs' in export_inspection_payload['visibility_buckets']
         assert export_summary_payload['visibility_bucket_counts']['visible_input_refs'] >= 1
         assert 'accepted_but_unselected_priors' in export_summary_payload
+        assert 'accepted_but_unselected_antipatterns' in export_summary_payload
         assert 'accepted_but_unselected_priors' in training_view_payload['sections']['priors_antipatterns']
+        assert 'accepted_but_unselected_antipatterns' in training_view_payload['sections']['priors_antipatterns']
         assert len(export_summary_payload['accepted_but_unselected_priors']) == (
             export_summary_payload['accepted_but_unselected_prior_count']
         )
         assert len(training_view_payload['sections']['priors_antipatterns']['accepted_but_unselected_priors']) == (
             export_summary_payload['accepted_but_unselected_prior_count']
+        )
+        assert len(export_summary_payload['accepted_but_unselected_antipatterns']) == (
+            export_summary_payload['accepted_but_unselected_antipattern_count']
+        )
+        assert len(training_view_payload['sections']['priors_antipatterns']['accepted_but_unselected_antipatterns']) == (
+            export_summary_payload['accepted_but_unselected_antipattern_count']
         )
         assert best_cycle_selection_payload['selected_iteration_label'] == 'phase10-workflow-run'
         assert best_cycle_selection_payload['recommendation_evidence_refs']
@@ -372,6 +380,7 @@ def test_phase10_cli_writes_package_and_replay_bundles(tmp_path: Path) -> None:
         assert 'support_cluster_too_small' not in summary_payload['route_state_package_validation_flags']
         assert 'alternative_scope_not_distinct' not in summary_payload['route_state_package_validation_flags']
         assert set(summary_payload['selected_prior_ids']).issubset(set(summary_payload['accepted_prior_ids']))
+        assert summary_payload['accepted_but_unselected_antipattern_count'] >= 0
         assert summary_payload['training_view_path'].endswith('training_view.json')
         assert summary_payload['best_cycle_selection_path'].endswith('best_cycle_selection.json')
         assert 'visibility_bucket_counts' in summary_payload

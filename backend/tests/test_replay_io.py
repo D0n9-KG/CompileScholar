@@ -738,9 +738,11 @@ def test_build_decision_episode_export_summary_and_inspection_expose_visibility_
 
     assert summary_payload['accepted_prior_ids'] == []
     assert summary_payload['accepted_anti_pattern_count'] == 1
+    assert summary_payload['accepted_but_unselected_antipattern_count'] == 0
     assert summary_payload['visibility_bucket_counts']['label_eval_only_refs'] == 1
     assert inspection_payload['source_bundles']['replay_bundle']['manifest_ref'] == 'tmp/source-replay/bundle_manifest.json'
     assert inspection_payload['anti_pattern_selection']['selected_antipattern_ids'] == ['anti:route-main:matching']
+    assert inspection_payload['anti_pattern_selection']['accepted_but_unselected_antipatterns'] == []
     assert inspection_payload['visibility_buckets']['visible_input_refs']
     assert inspection_payload['visibility_buckets']['label_eval_only_refs'] == ['hindsight_evidence:future-ref-1']
 
@@ -781,6 +783,7 @@ def test_build_decision_episode_export_summary_and_inspection_include_review_met
     assert summary_payload['reviewer_ids'] == ['reviewer-1', 'reviewer-2']
     assert summary_payload['residual_defects'] == ['weak_prior_support']
     assert summary_payload['accepted_but_unselected_prior_count'] == 0
+    assert summary_payload['accepted_but_unselected_antipattern_count'] == 0
     assert set(summary_payload['section_reviews']) == {
         'evidence_pack',
         'route_synthesis',
@@ -838,10 +841,12 @@ def test_write_decision_episode_export_bundle_writes_expected_files(tmp_path: Pa
     assert manifest_payload['selected_iteration_label'] == 'export-bundle'
     assert summary_payload['audit_posture'] == 'audit_grade_pilot'
     assert summary_payload['visibility_bucket_counts']['visible_input_refs'] == len(export.visible_input_refs)
+    assert summary_payload['accepted_but_unselected_antipatterns'] == []
     assert inspection_payload['visibility_buckets']['audit_only_refs']
     assert inspection_payload['visibility_buckets']['label_eval_only_refs'] == ['hindsight_evidence:future-ref-1']
     assert training_view_payload['sections']['route_synthesis']['route_state']['route_state_id'] == export.route_state_snapshot.route_state_id
     assert training_view_payload['sections']['priors_antipatterns']['accepted_but_unselected_priors'] == []
+    assert training_view_payload['sections']['priors_antipatterns']['accepted_but_unselected_antipatterns'] == []
     assert best_cycle_selection_payload['selected_iteration_label'] == 'export-bundle'
     assert best_cycle_selection_payload['recommendation_evidence_refs']
 

@@ -613,6 +613,9 @@ def build_phase10_comparison_summary(
             'selected_prior_count': int(export_summary.get('selected_prior_count') or 0),
             'selected_antipattern_count': int(export_summary.get('selected_antipattern_count') or 0),
             'accepted_but_unselected_prior_count': int(export_summary.get('accepted_but_unselected_prior_count') or 0),
+            'accepted_but_unselected_antipattern_count': int(
+                export_summary.get('accepted_but_unselected_antipattern_count') or 0
+            ),
             'visibility_bucket_counts': _int_map(export_summary.get('visibility_bucket_counts')),
             'review_status': export_summary.get('review_status'),
             'training_acceptance_verdict': export_summary.get('training_acceptance_verdict'),
@@ -637,6 +640,9 @@ def build_phase10_comparison_summary(
             'selected_prior_count': int(baseline_export_summary.get('selected_prior_count') or 0),
             'selected_antipattern_count': int(baseline_export_summary.get('selected_antipattern_count') or 0),
             'accepted_but_unselected_prior_count': int(baseline_export_summary.get('accepted_but_unselected_prior_count') or 0),
+            'accepted_but_unselected_antipattern_count': int(
+                baseline_export_summary.get('accepted_but_unselected_antipattern_count') or 0
+            ),
             'visibility_bucket_counts': _int_map(baseline_export_summary.get('visibility_bucket_counts')),
             'bundle_manifest': str((baseline_export_bundle_dir / 'bundle_manifest.json').resolve()),
         },
@@ -668,6 +674,10 @@ def build_phase10_comparison_summary(
             'accepted_but_unselected_prior_count_delta': _count_delta(
                 export['current']['accepted_but_unselected_prior_count'],
                 export['baseline']['accepted_but_unselected_prior_count'],
+            ),
+            'accepted_but_unselected_antipattern_count_delta': _count_delta(
+                export['current']['accepted_but_unselected_antipattern_count'],
+                export['baseline']['accepted_but_unselected_antipattern_count'],
             ),
             'visibility_bucket_count_delta': _count_delta_map(
                 export['current']['visibility_bucket_counts'],
@@ -806,6 +816,23 @@ def build_phase10_comparison_summary(
                 ),
             )
         )
+    if export['current']['accepted_but_unselected_antipattern_count'] > 0:
+        baseline_unselected_antipattern_count = int(export['baseline']['accepted_but_unselected_antipattern_count'] or 0)
+        export_blockers.append(
+            _blocker_entry(
+                code='accepted_antipatterns_unselected',
+                message=(
+                    'Export preserved accepted anti-pattern ids only as explicit exclusion records because they do not '
+                    'match the exported primary route.'
+                ),
+                current=export['current']['accepted_but_unselected_antipattern_count'],
+                baseline=baseline_unselected_antipattern_count,
+                vs_baseline=_count_trend(
+                    export['current']['accepted_but_unselected_antipattern_count'],
+                    baseline_unselected_antipattern_count,
+                ),
+            )
+        )
 
     return {
         'packet_id': replay_summary.get('packet_id'),
@@ -921,6 +948,10 @@ def render_phase10_validation_report(comparison_summary: dict[str, object]) -> s
         (
             f"- Accepted but unselected prior count: `{export_current.get('accepted_but_unselected_prior_count')}` "
             f"vs baseline `{export_baseline.get('accepted_but_unselected_prior_count')}`"
+        ),
+        (
+            f"- Accepted but unselected anti-pattern count: `{export_current.get('accepted_but_unselected_antipattern_count')}` "
+            f"vs baseline `{export_baseline.get('accepted_but_unselected_antipattern_count')}`"
         ),
         f"- Visibility buckets: `{export_current.get('visibility_bucket_counts')}`",
         f"- Training view sections: `{export_current.get('training_view_sections')}`",
@@ -1622,6 +1653,9 @@ def run_phase10_package_and_replay(
         'selected_prior_ids': list(export_summary_payload['selected_prior_ids']),
         'selected_antipattern_ids': list(export_summary_payload['selected_antipattern_ids']),
         'accepted_but_unselected_prior_count': int(export_summary_payload.get('accepted_but_unselected_prior_count') or 0),
+        'accepted_but_unselected_antipattern_count': int(
+            export_summary_payload.get('accepted_but_unselected_antipattern_count') or 0
+        ),
         'visibility_bucket_counts': dict(export_summary_payload['visibility_bucket_counts']),
         'baseline_replay_bundle': str(_resolve_bundle_dir(baseline_replay_bundle, repo_root=bridge.canonical_inputs.repo_root).resolve()),
         'baseline_export_bundle': str(_resolve_bundle_dir(baseline_export_bundle, repo_root=bridge.canonical_inputs.repo_root).resolve()),

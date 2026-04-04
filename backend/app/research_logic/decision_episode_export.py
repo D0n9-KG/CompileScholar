@@ -25,6 +25,10 @@ TrainingPriorExclusionReasonCode = Literal[
     'route_state_not_supported',
     'accepted_prior_candidate_missing',
 ]
+TrainingAntiPatternExclusionReasonCode = Literal[
+    'route_state_not_supported',
+    'accepted_anti_pattern_candidate_missing',
+]
 REQUIRED_SECTION_REVIEW_KEYS = [
     'evidence_pack',
     'route_synthesis',
@@ -135,6 +139,15 @@ class AcceptedButUnselectedPrior(BaseModel):
     reviewer_notes: str | None = None
 
 
+class AcceptedButUnselectedAntiPattern(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    anti_pattern_id: str
+    exclusion_reason_code: TrainingAntiPatternExclusionReasonCode
+    failure_route_state_ids: list[str] = Field(default_factory=list)
+    evidence_refs: list[str] = Field(default_factory=list)
+
+
 class DecisionEpisodeAuditExport(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -150,6 +163,7 @@ class DecisionEpisodeAuditExport(BaseModel):
     accepted_prior_cards: list[DecisionPriorCard] = Field(default_factory=list)
     accepted_anti_pattern_cards: list[AntiPatternCard] = Field(default_factory=list)
     accepted_but_unselected_priors: list[AcceptedButUnselectedPrior] = Field(default_factory=list)
+    accepted_but_unselected_antipatterns: list[AcceptedButUnselectedAntiPattern] = Field(default_factory=list)
     visible_input_refs: list[str] = Field(default_factory=list)
     audit_only_refs: list[str] = Field(default_factory=list)
     label_eval_only_refs: list[str] = Field(default_factory=list)
@@ -290,6 +304,86 @@ def _accepted_but_unselected_priors(
     return records
 
 
+def _anti_pattern_matches_route(route_state: RouteState, anti_pattern_card: AntiPatternCard) -> bool:
+    route_family_id = str(route_state.route_family_id or '').strip()
+    return route_state.route_state_id in anti_pattern_card.failure_examples.route_state_ids or (
+        route_family_id and route_family_id in anti_pattern_card.failure_examples.route_family_ids
+    )
+
+
+def _accepted_anti_pattern_evidence_refs(
+    anti_pattern_card: AntiPatternCard,
+    review_refs: DecisionEpisodeExportSourceRefs,
+) -> list[str]:
+    review_summary_ref = str(review_refs.files.get('candidate_review_summary') or '').strip()
+    refs = [
+        f'accepted_antipattern:{anti_pattern_card.anti_pattern_id}',
+        *(f'failure_route_state:{route_state_id}' for route_state_id in anti_pattern_card.failure_examples.route_state_ids),
+        *(f'failure_route_family:{route_family_id}' for route_family_id in anti_pattern_card.failure_examples.route_family_ids),
+        *([f'review_bundle:candidate_review_summary:{review_summary_ref}'] if review_summary_ref else []),
+        *(
+            [f'review_bundle:manifest:{review_refs.manifest_ref}']
+            if str(review_refs.manifest_ref or '').strip()
+            else []
+        ),
+    ]
+    return _unique(refs)
+
+
+def _accepted_but_unselected_antipatterns(
+    *,
+    route_state: RouteState,
+    accepted_anti_pattern_ids: Sequence[str],
+    selected_antipattern_ids: Sequence[str],
+    anti_pattern_cards: Sequence[AntiPatternCard],
+    review_refs: DecisionEpisodeExportSourceRefs,
+) -> list[AcceptedButUnselectedAntiPattern]:
+    selected_antipattern_id_set = set(_normalize_ids(selected_antipattern_ids))
+    anti_pattern_cards_by_id = {
+        anti_pattern_card.anti_pattern_id: anti_pattern_card
+        for anti_pattern_card in anti_pattern_cards
+        if str(anti_pattern_card.anti_pattern_id or '').strip()
+    }
+    records: list[AcceptedButUnselectedAntiPattern] = []
+    for anti_pattern_id in _normalize_ids(accepted_anti_pattern_ids):
+        if anti_pattern_id in selected_antipattern_id_set:
+            continue
+
+        anti_pattern_card = anti_pattern_cards_by_id.get(anti_pattern_id)
+        if anti_pattern_card is None:
+            records.append(
+                AcceptedButUnselectedAntiPattern(
+                    anti_pattern_id=anti_pattern_id,
+                    exclusion_reason_code='accepted_anti_pattern_candidate_missing',
+                    failure_route_state_ids=[],
+                    evidence_refs=_unique(
+                        [
+                            f'accepted_antipattern:{anti_pattern_id}',
+                            *(
+                                [f'review_bundle:manifest:{review_refs.manifest_ref}']
+                                if str(review_refs.manifest_ref or '').strip()
+                                else []
+                            ),
+                        ]
+                    ),
+                )
+            )
+            continue
+
+        route_supported = _anti_pattern_matches_route(route_state, anti_pattern_card)
+        records.append(
+            AcceptedButUnselectedAntiPattern(
+                anti_pattern_id=anti_pattern_card.anti_pattern_id,
+                exclusion_reason_code=(
+                    'route_state_not_supported' if not route_supported else 'accepted_anti_pattern_candidate_missing'
+                ),
+                failure_route_state_ids=list(anti_pattern_card.failure_examples.route_state_ids),
+                evidence_refs=_accepted_anti_pattern_evidence_refs(anti_pattern_card, review_refs),
+            )
+        )
+    return records
+
+
 def _prior_selection_note(
     *,
     route_state: RouteState,
@@ -316,9 +410,11 @@ def _anti_pattern_selection_note(
     route_state: RouteState,
     accepted_anti_pattern_ids: Sequence[str],
     selected_antipattern_ids: Sequence[str],
+    accepted_but_unselected_antipatterns: Sequence[AcceptedButUnselectedAntiPattern] | None = None,
 ) -> str:
     accepted_anti_pattern_ids = _normalize_ids(accepted_anti_pattern_ids)
     selected_antipattern_ids = _normalize_ids(selected_antipattern_ids)
+    accepted_but_unselected_antipattern_count = len(accepted_but_unselected_antipatterns or [])
     route_match_target = f'route_state {route_state.route_state_id}'
     if str(route_state.route_family_id or '').strip():
         route_match_target = (
@@ -327,13 +423,19 @@ def _anti_pattern_selection_note(
     if not accepted_anti_pattern_ids:
         return 'Review bundle accepted no anti-pattern ids, so the audited export carried no anti-pattern ids.'
     if selected_antipattern_ids:
-        return (
+        message = (
             f'Carried {len(selected_antipattern_ids)} reviewed accepted anti-pattern id(s) because their failure '
             f'examples match {route_match_target}.'
         )
+        if accepted_but_unselected_antipattern_count > 0:
+            return (
+                f'{message[:-1]} and preserved {accepted_but_unselected_antipattern_count} '
+                'accepted_but_unselected_antipatterns record(s) for accepted anti-patterns that did not match.'
+            )
+        return message
     return (
         f'Review bundle accepted anti-pattern ids, but none match {route_match_target}; '
-        'selected_antipattern_ids stayed empty.'
+        'selected_antipattern_ids stayed empty and accepted_but_unselected_antipatterns records capture the mismatch.'
     )
 
 
@@ -455,6 +557,13 @@ def build_decision_episode_audit_export(
 
     selected_prior_ids = list(decision_episode.relevant_priors.selected_prior_ids)
     selected_antipattern_ids = list(decision_episode.relevant_priors.selected_antipattern_ids)
+    accepted_but_unselected_antipatterns = _accepted_but_unselected_antipatterns(
+        route_state=route_state_model,
+        accepted_anti_pattern_ids=accepted_anti_pattern_ids or [],
+        selected_antipattern_ids=selected_antipattern_ids,
+        anti_pattern_cards=allowlisted_anti_pattern_cards,
+        review_refs=review_refs,
+    )
 
     return DecisionEpisodeAuditExport(
         built_at=built_at_value,
@@ -475,6 +584,7 @@ def build_decision_episode_audit_export(
             prior_cards=allowlisted_prior_cards,
             review_refs=review_refs,
         ),
+        accepted_but_unselected_antipatterns=accepted_but_unselected_antipatterns,
         visible_input_refs=_visible_input_refs(decision_episode),
         audit_only_refs=_audit_only_refs(
             decision_episode=decision_episode,
@@ -497,6 +607,7 @@ def build_decision_episode_audit_export(
             route_state=route_state_model,
             accepted_anti_pattern_ids=accepted_anti_pattern_ids or [],
             selected_antipattern_ids=selected_antipattern_ids,
+            accepted_but_unselected_antipatterns=accepted_but_unselected_antipatterns,
         ),
         review_status=review_status,
         training_acceptance_verdict=training_acceptance_verdict,
@@ -509,6 +620,7 @@ def build_decision_episode_audit_export(
 
 
 __all__ = [
+    'AcceptedButUnselectedAntiPattern',
     'AcceptedButUnselectedPrior',
     'DecisionEpisodeAuditExport',
     'DecisionEpisodeExportSourceRefs',
