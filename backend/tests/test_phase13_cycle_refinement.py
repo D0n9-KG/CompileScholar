@@ -84,6 +84,13 @@ def test_phase13_cli_smoke_run_writes_iteration_scoped_outputs(tmp_path: Path) -
     assert summary_payload['prior_candidate_count'] == 0
     assert summary_payload['prior_review_summary_path'].endswith('candidate_review_summary.json')
     assert Path(summary_payload['prior_review_summary_path']).is_file()
+    assert summary_payload['route_synthesis_view_path'].endswith('route_synthesis_view.json')
+    assert summary_payload['why_now_view_path'].endswith('why_now_view.json')
+    assert summary_payload['route_comparison_view_path'].endswith('route_comparison_view.json')
+    assert summary_payload['prior_antipattern_view_path'].endswith('prior_antipattern_view.json')
+    assert summary_payload['final_decision_view_path'].endswith('final_decision_view.json')
+    assert summary_payload['training_dataset_manifest_path'] is None
+    assert summary_payload['stability_handoff_path'] is None
     assert 'comparison_summary_path' in summary_payload
     assert 'report_markdown_path' in summary_payload
     assert (iteration_dir / 'comparison_summary.json').is_file()
@@ -125,4 +132,6 @@ def test_phase13_cli_smoke_run_surfaces_fallback_prior_summary_keys(tmp_path: Pa
     assert summary_payload['prior_candidate_count'] >= 1
     assert summary_payload['prior_review_summary_path'].endswith('candidate_review_summary.json')
     assert Path(summary_payload['prior_review_summary_path']).is_file()
+    assert summary_payload['training_dataset_manifest_path'] is None
+    assert summary_payload['stability_handoff_path'] is None
     assert (iteration_dir / 'comparison_summary.json').is_file()

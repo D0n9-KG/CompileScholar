@@ -183,6 +183,19 @@ def _bundle_file_ref(bundle_dir: Path, manifest_payload: dict[str, object], key:
     return str((bundle_dir / relative_ref).resolve())
 
 
+def _final_dataset_artifact_refs(output_dir: Path) -> dict[str, str]:
+    final_dataset_dir = output_dir.parent / 'final-dataset'
+    refs: dict[str, str] = {}
+    for key, filename in (
+        ('dataset_manifest', 'dataset_manifest.json'),
+        ('stability_handoff', 'stability_handoff.json'),
+    ):
+        candidate = final_dataset_dir / filename
+        if candidate.is_file():
+            refs[key] = str(candidate.resolve())
+    return refs
+
+
 def _role_slug(role: Phase10Role) -> str:
     return role.replace('_', '-')
 
@@ -468,6 +481,7 @@ def build_phase10_comparison_summary(
         for view_id in TASK_TRAINING_VIEW_IDS
         if (resolved_ref := _bundle_file_ref(export_bundle_dir, export_manifest, view_id)) is not None
     }
+    final_dataset_refs = _final_dataset_artifact_refs(export_bundle_dir.parent)
     best_cycle_selection = _json_object(
         _load_json(export_bundle_dir / 'best_cycle_selection.json'),
         label='Phase 10 best-cycle selection',
@@ -899,6 +913,7 @@ def build_phase10_comparison_summary(
             'current_replay_inspection': str((replay_bundle_dir / 'replay_inspection.json').resolve()),
             'current_prior_review_summary': str((prior_review_bundle_dir / 'candidate_review_summary.json').resolve()),
             **task_training_view_refs,
+            **final_dataset_refs,
         },
         'notes': {
             'export_visibility_policy': export_inspection.get('policy'),
@@ -1494,6 +1509,7 @@ def run_phase10_package_and_replay(
     packet_path: str | Path = DEFAULT_PHASE10_PACKET_PATH,
     assembly_manifest_path: str | Path = DEFAULT_PHASE10_ASSEMBLY_MANIFEST_PATH,
     l1_snapshot_output_path: str | Path = DEFAULT_PHASE10_L1_SNAPSHOT_PATH,
+    runtime_output_root: str | Path | None = None,
     output_dir: str | Path,
     baseline_replay_bundle: str | Path = DEFAULT_PHASE10_BASELINE_REPLAY_BUNDLE,
     baseline_export_bundle: str | Path = DEFAULT_PHASE10_BASELINE_EXPORT_BUNDLE,
@@ -1506,6 +1522,7 @@ def run_phase10_package_and_replay(
     bridge = prepare_phase10_runtime_bridge(
         packet_path=packet_path,
         assembly_manifest_path=assembly_manifest_path,
+        output_root=runtime_output_root,
         l1_snapshot_output_path=l1_snapshot_output_path,
         built_at=built_at,
         repo_root=repo_root,
@@ -1671,7 +1688,14 @@ def run_phase10_package_and_replay(
         'export_summary_path': str(export_bundle_files['export_summary'].resolve()),
         'export_inspection_path': str(export_bundle_files['export_inspection'].resolve()),
         'training_view_path': str(export_bundle_files['training_view'].resolve()),
+        'route_synthesis_view_path': str(export_bundle_files['route_synthesis_view'].resolve()),
+        'why_now_view_path': str(export_bundle_files['why_now_view'].resolve()),
+        'route_comparison_view_path': str(export_bundle_files['route_comparison_view'].resolve()),
+        'prior_antipattern_view_path': str(export_bundle_files['prior_antipattern_view'].resolve()),
+        'final_decision_view_path': str(export_bundle_files['final_decision_view'].resolve()),
         'best_cycle_selection_path': str(export_bundle_files['best_cycle_selection'].resolve()),
+        'training_dataset_manifest_path': _final_dataset_artifact_refs(export_output_dir).get('dataset_manifest'),
+        'stability_handoff_path': _final_dataset_artifact_refs(export_output_dir).get('stability_handoff'),
         'selected_prior_ids': list(export_summary_payload['selected_prior_ids']),
         'selected_antipattern_ids': list(export_summary_payload['selected_antipattern_ids']),
         'accepted_but_unselected_prior_count': int(export_summary_payload.get('accepted_but_unselected_prior_count') or 0),

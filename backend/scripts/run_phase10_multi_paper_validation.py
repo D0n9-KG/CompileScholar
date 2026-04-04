@@ -29,6 +29,10 @@ def build_parser() -> argparse.ArgumentParser:
         help='Directory where the Phase 10 route_state_package/, replay_bundle/, prior_review_bundle/, and export_bundle/ folders will be written.',
     )
     parser.add_argument(
+        '--runtime-output-root',
+        help='Optional root for the generated Phase 10 runtime bridge packets, manifest, and shared snapshot.',
+    )
+    parser.add_argument(
         '--baseline-replay-bundle',
         default=str(DEFAULT_PHASE10_BASELINE_REPLAY_BUNDLE),
         help='Path to the baseline replay bundle directory or bundle_manifest.json used for comparison.',
@@ -71,6 +75,8 @@ def main(argv: list[str] | None = None) -> int:
     args.assembly_manifest = _resolve_cli_path(args.assembly_manifest)
     args.l1_snapshot_output = _resolve_cli_path(args.l1_snapshot_output)
     args.output_dir = _resolve_cli_path(args.output_dir)
+    if args.runtime_output_root is not None and _flag_present(raw_args, '--runtime-output-root'):
+        args.runtime_output_root = _resolve_cli_path(args.runtime_output_root)
     if args.report_md is not None and _flag_present(raw_args, '--report-md'):
         args.report_md = _resolve_cli_path(args.report_md)
     if _flag_present(raw_args, '--baseline-replay-bundle'):
@@ -83,6 +89,7 @@ def main(argv: list[str] | None = None) -> int:
             packet_path=args.packet,
             assembly_manifest_path=args.assembly_manifest,
             l1_snapshot_output_path=args.l1_snapshot_output,
+            runtime_output_root=args.runtime_output_root,
             output_dir=args.output_dir,
             baseline_replay_bundle=args.baseline_replay_bundle,
             baseline_export_bundle=args.baseline_export_bundle,

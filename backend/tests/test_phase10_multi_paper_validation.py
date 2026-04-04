@@ -8,6 +8,7 @@ import sys
 
 import pytest
 
+import app.research_logic.phase10_multi_paper_validation as phase10_validation
 from app.research_logic import (
     DEFAULT_PHASE10_L1_SNAPSHOT_PATH,
     DEFAULT_PHASE10_PACKAGE_MANIFEST_PATH,
@@ -18,7 +19,7 @@ from app.research_logic import (
     prepare_phase10_runtime_bridge,
     resolve_phase10_runtime_paths,
 )
-from app.research_logic.phase10_multi_paper_validation import run_phase10_package_and_replay
+from app.research_logic.phase10_multi_paper_validation import build_phase10_comparison_summary, run_phase10_package_and_replay
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -30,6 +31,10 @@ def _write_json(path: Path, payload: object) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     return path
+
+
+def _runtime_output_root(tmp_path: Path, name: str) -> Path:
+    return tmp_path / name
 
 
 def test_phase10_runtime_paths_point_to_expected_manifest_and_snapshot_defaults() -> None:
@@ -106,7 +111,11 @@ def test_phase10_bridge_manifest_preserves_phase9_role_membership(tmp_path: Path
     )
 
 
-def test_phase10_bridge_snapshot_writes_expected_default_path_and_cutoff() -> None:
+def test_phase10_bridge_snapshot_writes_expected_default_path_and_cutoff(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(phase10_validation, 'DEFAULT_PHASE10_OUTPUT_ROOT', _runtime_output_root(tmp_path, 'phase10-default-runtime'))
     runtime_paths = resolve_phase10_runtime_paths(repo_root=REPO_ROOT)
     output_root = runtime_paths.output_root
     shutil.rmtree(output_root, ignore_errors=True)
@@ -146,128 +155,168 @@ def test_phase10_bridge_rejects_cutoff_mismatch(tmp_path: Path) -> None:
 
 
 def test_phase10_workflow_writes_prior_review_and_export_bundles(tmp_path: Path) -> None:
-    runtime_paths = resolve_phase10_runtime_paths(repo_root=REPO_ROOT)
-    shutil.rmtree(runtime_paths.output_root, ignore_errors=True)
+    l1_snapshot_output_path = tmp_path / 'phase9-comp-mech-l1-snapshot.json'
+    output_dir = tmp_path / 'phase10-workflow-run'
+    result = run_phase10_package_and_replay(
+        packet_path=PHASE9_PACKET_PATH,
+        assembly_manifest_path=PHASE9_ASSEMBLY_MANIFEST_PATH,
+        l1_snapshot_output_path=l1_snapshot_output_path,
+        runtime_output_root=_runtime_output_root(tmp_path, 'phase10-workflow-runtime'),
+        output_dir=output_dir,
+        built_at='2026-04-03T13:00:00Z',
+        repo_root=REPO_ROOT,
+    )
 
-    try:
-        l1_snapshot_output_path = tmp_path / 'phase9-comp-mech-l1-snapshot.json'
-        output_dir = tmp_path / 'phase10-workflow-run'
-        result = run_phase10_package_and_replay(
-            packet_path=PHASE9_PACKET_PATH,
-            assembly_manifest_path=PHASE9_ASSEMBLY_MANIFEST_PATH,
-            l1_snapshot_output_path=l1_snapshot_output_path,
-            output_dir=output_dir,
-            built_at='2026-04-03T13:00:00Z',
-            repo_root=REPO_ROOT,
-        )
+    review_manifest_payload = json.loads((output_dir / 'prior_review_bundle' / 'bundle_manifest.json').read_text(encoding='utf-8'))
+    prior_review_summary_payload = json.loads(
+        (output_dir / 'prior_review_bundle' / 'candidate_review_summary.json').read_text(encoding='utf-8')
+    )
+    comparison_summary_payload = json.loads((output_dir / 'comparison_summary.json').read_text(encoding='utf-8'))
+    export_summary_payload = json.loads((output_dir / 'export_bundle' / 'export_summary.json').read_text(encoding='utf-8'))
+    export_inspection_payload = json.loads((output_dir / 'export_bundle' / 'export_inspection.json').read_text(encoding='utf-8'))
+    decision_episode_payload = json.loads((output_dir / 'export_bundle' / 'outputs' / 'decision_episode.json').read_text(encoding='utf-8'))
+    training_view_payload = json.loads((output_dir / 'export_bundle' / 'outputs' / 'training_view.json').read_text(encoding='utf-8'))
+    best_cycle_selection_payload = json.loads((output_dir / 'export_bundle' / 'best_cycle_selection.json').read_text(encoding='utf-8'))
+    route_validation = comparison_summary_payload['notes']['route_state_package_validation']
 
-        review_manifest_payload = json.loads((output_dir / 'prior_review_bundle' / 'bundle_manifest.json').read_text(encoding='utf-8'))
-        prior_review_summary_payload = json.loads(
-            (output_dir / 'prior_review_bundle' / 'candidate_review_summary.json').read_text(encoding='utf-8')
-        )
-        comparison_summary_payload = json.loads((output_dir / 'comparison_summary.json').read_text(encoding='utf-8'))
-        export_summary_payload = json.loads((output_dir / 'export_bundle' / 'export_summary.json').read_text(encoding='utf-8'))
-        export_inspection_payload = json.loads((output_dir / 'export_bundle' / 'export_inspection.json').read_text(encoding='utf-8'))
-        decision_episode_payload = json.loads((output_dir / 'export_bundle' / 'outputs' / 'decision_episode.json').read_text(encoding='utf-8'))
-        training_view_payload = json.loads((output_dir / 'export_bundle' / 'outputs' / 'training_view.json').read_text(encoding='utf-8'))
-        best_cycle_selection_payload = json.loads((output_dir / 'export_bundle' / 'best_cycle_selection.json').read_text(encoding='utf-8'))
-        route_validation = comparison_summary_payload['notes']['route_state_package_validation']
+    assert result.summary['prior_review_bundle_manifest'] == str((output_dir / 'prior_review_bundle' / 'bundle_manifest.json').resolve())
+    assert result.summary['prior_review_summary_path'] == str((output_dir / 'prior_review_bundle' / 'candidate_review_summary.json').resolve())
+    assert result.summary['allow_scope_fallback_merge'] is False
+    assert result.summary['prior_review_cluster_strategy'] == 'default'
+    assert result.summary['prior_review_fallback_reason'] is None
+    assert result.summary['prior_review_cluster_count'] == prior_review_summary_payload['cluster_count']
+    assert result.summary['prior_candidate_count'] == prior_review_summary_payload['prior_candidate_count']
+    assert result.summary['export_summary_path'] == str((output_dir / 'export_bundle' / 'export_summary.json').resolve())
+    assert result.summary['export_inspection_path'] == str((output_dir / 'export_bundle' / 'export_inspection.json').resolve())
+    assert result.summary['training_view_path'] == str((output_dir / 'export_bundle' / 'outputs' / 'training_view.json').resolve())
+    assert result.summary['route_synthesis_view_path'] == str(
+        (output_dir / 'export_bundle' / 'outputs' / 'route_synthesis_view.json').resolve()
+    )
+    assert result.summary['why_now_view_path'] == str((output_dir / 'export_bundle' / 'outputs' / 'why_now_view.json').resolve())
+    assert result.summary['route_comparison_view_path'] == str(
+        (output_dir / 'export_bundle' / 'outputs' / 'route_comparison_view.json').resolve()
+    )
+    assert result.summary['prior_antipattern_view_path'] == str(
+        (output_dir / 'export_bundle' / 'outputs' / 'prior_antipattern_view.json').resolve()
+    )
+    assert result.summary['final_decision_view_path'] == str(
+        (output_dir / 'export_bundle' / 'outputs' / 'final_decision_view.json').resolve()
+    )
+    assert result.summary['best_cycle_selection_path'] == str((output_dir / 'export_bundle' / 'best_cycle_selection.json').resolve())
+    assert result.summary['training_dataset_manifest_path'] is None
+    assert result.summary['stability_handoff_path'] is None
+    assert result.summary['comparison_summary_path'] == str((output_dir / 'comparison_summary.json').resolve())
+    assert Path(comparison_summary_payload['baseline_replay_bundle']).name == 'replay_with_package'
+    assert Path(comparison_summary_payload['baseline_export_bundle']).name == 'phase6_decision_episode_audit_export'
+    assert comparison_summary_payload['package']['current']['role_counts']['support'] == 3
+    assert 'support_cluster_too_small' not in comparison_summary_payload['package']['current']['quality_flags']
+    assert 'alternative_scope_not_distinct' not in comparison_summary_payload['package']['current']['quality_flags']
+    assert set(export_summary_payload['selected_prior_ids']).issubset(set(review_manifest_payload['accepted_prior_ids']))
+    assert decision_episode_payload['relevant_priors']['selected_prior_ids'] == export_summary_payload['selected_prior_ids']
+    assert (output_dir / 'export_bundle' / 'outputs' / 'training_view.json').is_file()
+    assert (output_dir / 'export_bundle' / 'outputs' / 'route_synthesis_view.json').is_file()
+    assert (output_dir / 'export_bundle' / 'outputs' / 'why_now_view.json').is_file()
+    assert (output_dir / 'export_bundle' / 'outputs' / 'route_comparison_view.json').is_file()
+    assert (output_dir / 'export_bundle' / 'outputs' / 'prior_antipattern_view.json').is_file()
+    assert (output_dir / 'export_bundle' / 'outputs' / 'final_decision_view.json').is_file()
+    assert (output_dir / 'export_bundle' / 'best_cycle_selection.json').is_file()
+    assert 'visible_input_refs' in export_inspection_payload['visibility_buckets']
+    assert 'audit_only_refs' in export_inspection_payload['visibility_buckets']
+    assert 'label_eval_only_refs' in export_inspection_payload['visibility_buckets']
+    assert export_summary_payload['visibility_bucket_counts']['visible_input_refs'] >= 1
+    assert 'accepted_but_unselected_priors' in export_summary_payload
+    assert 'accepted_but_unselected_antipatterns' in export_summary_payload
+    assert 'accepted_but_unselected_priors' in training_view_payload['sections']['priors_antipatterns']
+    assert 'accepted_but_unselected_antipatterns' in training_view_payload['sections']['priors_antipatterns']
+    assert len(export_summary_payload['accepted_but_unselected_priors']) == (
+        export_summary_payload['accepted_but_unselected_prior_count']
+    )
+    assert len(training_view_payload['sections']['priors_antipatterns']['accepted_but_unselected_priors']) == (
+        export_summary_payload['accepted_but_unselected_prior_count']
+    )
+    assert len(export_summary_payload['accepted_but_unselected_antipatterns']) == (
+        export_summary_payload['accepted_but_unselected_antipattern_count']
+    )
+    assert len(training_view_payload['sections']['priors_antipatterns']['accepted_but_unselected_antipatterns']) == (
+        export_summary_payload['accepted_but_unselected_antipattern_count']
+    )
+    assert best_cycle_selection_payload['selected_iteration_label'] == 'phase10-workflow-run'
+    assert best_cycle_selection_payload['recommendation_evidence_refs']
+    assert comparison_summary_payload['best_cycle_selection']['selected_iteration_label'] == 'phase10-workflow-run'
+    assert comparison_summary_payload['export']['current']['task_training_view_ids'] == [
+        'final_decision_view',
+        'prior_antipattern_view',
+        'route_comparison_view',
+        'route_synthesis_view',
+        'why_now_view',
+    ]
+    assert comparison_summary_payload['source_artifacts']['current_training_view'].endswith('training_view.json')
+    assert comparison_summary_payload['source_artifacts']['route_synthesis_view'].endswith('route_synthesis_view.json')
+    assert comparison_summary_payload['source_artifacts']['why_now_view'].endswith('why_now_view.json')
+    assert comparison_summary_payload['source_artifacts']['route_comparison_view'].endswith('route_comparison_view.json')
+    assert comparison_summary_payload['source_artifacts']['prior_antipattern_view'].endswith('prior_antipattern_view.json')
+    assert comparison_summary_payload['source_artifacts']['final_decision_view'].endswith('final_decision_view.json')
+    assert comparison_summary_payload['prior_review']['current']['cluster_strategy'] == 'default'
+    assert comparison_summary_payload['prior_review']['current']['fallback_reason'] is None
+    assert comparison_summary_payload['prior_review']['current']['prior_review_summary_path'] == (
+        str((output_dir / 'prior_review_bundle' / 'candidate_review_summary.json').resolve())
+    )
+    assert route_validation is not None
+    assert 'support_route_state_ids' in route_validation
+    assert 'alternative_route_state_ids' in route_validation
+    assert 'held_out_route_state_ids' in route_validation
+    assert 'role_quality_counts' in route_validation
+    assert 'yellow_route_state_ids_by_role' in route_validation
+    assert 'red_route_state_ids_by_role' in route_validation
+    assert 'yellow_route_state_present' in route_validation['quality_flags']
+    assert set(route_validation['yellow_route_state_ids_by_role']['support']).issubset(
+        set(route_validation['support_route_state_ids'])
+    )
+    assert set(route_validation['yellow_route_state_ids_by_role']['alternative']).issubset(
+        set(route_validation['alternative_route_state_ids'])
+    )
+    assert set(route_validation['yellow_route_state_ids_by_role']['held_out']).issubset(
+        set(route_validation['held_out_route_state_ids'])
+    )
+    assert len(route_validation['yellow_route_state_ids_by_role']['support']) == (
+        route_validation['role_quality_counts']['support']['yellow']
+    )
+    assert len(route_validation['yellow_route_state_ids_by_role']['alternative']) == (
+        route_validation['role_quality_counts']['alternative']['yellow']
+    )
+    assert len(route_validation['yellow_route_state_ids_by_role']['held_out']) == (
+        route_validation['role_quality_counts']['held_out']['yellow']
+    )
 
-        assert result.summary['prior_review_bundle_manifest'] == str((output_dir / 'prior_review_bundle' / 'bundle_manifest.json').resolve())
-        assert result.summary['prior_review_summary_path'] == str((output_dir / 'prior_review_bundle' / 'candidate_review_summary.json').resolve())
-        assert result.summary['allow_scope_fallback_merge'] is False
-        assert result.summary['prior_review_cluster_strategy'] == 'default'
-        assert result.summary['prior_review_fallback_reason'] is None
-        assert result.summary['prior_review_cluster_count'] == prior_review_summary_payload['cluster_count']
-        assert result.summary['prior_candidate_count'] == prior_review_summary_payload['prior_candidate_count']
-        assert result.summary['export_summary_path'] == str((output_dir / 'export_bundle' / 'export_summary.json').resolve())
-        assert result.summary['export_inspection_path'] == str((output_dir / 'export_bundle' / 'export_inspection.json').resolve())
-        assert result.summary['training_view_path'] == str((output_dir / 'export_bundle' / 'outputs' / 'training_view.json').resolve())
-        assert result.summary['best_cycle_selection_path'] == str((output_dir / 'export_bundle' / 'best_cycle_selection.json').resolve())
-        assert result.summary['comparison_summary_path'] == str((output_dir / 'comparison_summary.json').resolve())
-        assert Path(comparison_summary_payload['baseline_replay_bundle']).name == 'replay_with_package'
-        assert Path(comparison_summary_payload['baseline_export_bundle']).name == 'phase6_decision_episode_audit_export'
-        assert comparison_summary_payload['package']['current']['role_counts']['support'] == 3
-        assert 'support_cluster_too_small' not in comparison_summary_payload['package']['current']['quality_flags']
-        assert 'alternative_scope_not_distinct' not in comparison_summary_payload['package']['current']['quality_flags']
-        assert set(export_summary_payload['selected_prior_ids']).issubset(set(review_manifest_payload['accepted_prior_ids']))
-        assert decision_episode_payload['relevant_priors']['selected_prior_ids'] == export_summary_payload['selected_prior_ids']
-        assert (output_dir / 'export_bundle' / 'outputs' / 'training_view.json').is_file()
-        assert (output_dir / 'export_bundle' / 'outputs' / 'route_synthesis_view.json').is_file()
-        assert (output_dir / 'export_bundle' / 'outputs' / 'why_now_view.json').is_file()
-        assert (output_dir / 'export_bundle' / 'outputs' / 'route_comparison_view.json').is_file()
-        assert (output_dir / 'export_bundle' / 'outputs' / 'prior_antipattern_view.json').is_file()
-        assert (output_dir / 'export_bundle' / 'outputs' / 'final_decision_view.json').is_file()
-        assert (output_dir / 'export_bundle' / 'best_cycle_selection.json').is_file()
-        assert 'visible_input_refs' in export_inspection_payload['visibility_buckets']
-        assert 'audit_only_refs' in export_inspection_payload['visibility_buckets']
-        assert 'label_eval_only_refs' in export_inspection_payload['visibility_buckets']
-        assert export_summary_payload['visibility_bucket_counts']['visible_input_refs'] >= 1
-        assert 'accepted_but_unselected_priors' in export_summary_payload
-        assert 'accepted_but_unselected_antipatterns' in export_summary_payload
-        assert 'accepted_but_unselected_priors' in training_view_payload['sections']['priors_antipatterns']
-        assert 'accepted_but_unselected_antipatterns' in training_view_payload['sections']['priors_antipatterns']
-        assert len(export_summary_payload['accepted_but_unselected_priors']) == (
-            export_summary_payload['accepted_but_unselected_prior_count']
-        )
-        assert len(training_view_payload['sections']['priors_antipatterns']['accepted_but_unselected_priors']) == (
-            export_summary_payload['accepted_but_unselected_prior_count']
-        )
-        assert len(export_summary_payload['accepted_but_unselected_antipatterns']) == (
-            export_summary_payload['accepted_but_unselected_antipattern_count']
-        )
-        assert len(training_view_payload['sections']['priors_antipatterns']['accepted_but_unselected_antipatterns']) == (
-            export_summary_payload['accepted_but_unselected_antipattern_count']
-        )
-        assert best_cycle_selection_payload['selected_iteration_label'] == 'phase10-workflow-run'
-        assert best_cycle_selection_payload['recommendation_evidence_refs']
-        assert comparison_summary_payload['best_cycle_selection']['selected_iteration_label'] == 'phase10-workflow-run'
-        assert comparison_summary_payload['export']['current']['task_training_view_ids'] == [
-            'final_decision_view',
-            'prior_antipattern_view',
-            'route_comparison_view',
-            'route_synthesis_view',
-            'why_now_view',
-        ]
-        assert comparison_summary_payload['source_artifacts']['current_training_view'].endswith('training_view.json')
-        assert comparison_summary_payload['source_artifacts']['route_synthesis_view'].endswith('route_synthesis_view.json')
-        assert comparison_summary_payload['source_artifacts']['why_now_view'].endswith('why_now_view.json')
-        assert comparison_summary_payload['source_artifacts']['route_comparison_view'].endswith('route_comparison_view.json')
-        assert comparison_summary_payload['source_artifacts']['prior_antipattern_view'].endswith('prior_antipattern_view.json')
-        assert comparison_summary_payload['source_artifacts']['final_decision_view'].endswith('final_decision_view.json')
-        assert comparison_summary_payload['prior_review']['current']['cluster_strategy'] == 'default'
-        assert comparison_summary_payload['prior_review']['current']['fallback_reason'] is None
-        assert comparison_summary_payload['prior_review']['current']['prior_review_summary_path'] == (
-            str((output_dir / 'prior_review_bundle' / 'candidate_review_summary.json').resolve())
-        )
-        assert route_validation is not None
-        assert 'support_route_state_ids' in route_validation
-        assert 'alternative_route_state_ids' in route_validation
-        assert 'held_out_route_state_ids' in route_validation
-        assert 'role_quality_counts' in route_validation
-        assert 'yellow_route_state_ids_by_role' in route_validation
-        assert 'red_route_state_ids_by_role' in route_validation
-        assert 'yellow_route_state_present' in route_validation['quality_flags']
-        assert set(route_validation['yellow_route_state_ids_by_role']['support']).issubset(
-            set(route_validation['support_route_state_ids'])
-        )
-        assert set(route_validation['yellow_route_state_ids_by_role']['alternative']).issubset(
-            set(route_validation['alternative_route_state_ids'])
-        )
-        assert set(route_validation['yellow_route_state_ids_by_role']['held_out']).issubset(
-            set(route_validation['held_out_route_state_ids'])
-        )
-        assert len(route_validation['yellow_route_state_ids_by_role']['support']) == (
-            route_validation['role_quality_counts']['support']['yellow']
-        )
-        assert len(route_validation['yellow_route_state_ids_by_role']['alternative']) == (
-            route_validation['role_quality_counts']['alternative']['yellow']
-        )
-        assert len(route_validation['yellow_route_state_ids_by_role']['held_out']) == (
-            route_validation['role_quality_counts']['held_out']['yellow']
-        )
-    finally:
-        shutil.rmtree(runtime_paths.output_root, ignore_errors=True)
+
+def test_phase10_comparison_summary_surfaces_final_dataset_refs_when_present(tmp_path: Path) -> None:
+    source_root = REPO_ROOT / 'tmp' / 'phase15_cycle3_consolidation' / 'cycle3-best'
+    output_dir = tmp_path / 'cycle3-best'
+    shutil.copytree(source_root, output_dir)
+    best_cycle_selection_path = output_dir / 'export_bundle' / 'best_cycle_selection.json'
+    best_cycle_selection_path.write_text(
+        best_cycle_selection_path.read_text(encoding='utf-8-sig'),
+        encoding='utf-8',
+    )
+    _write_json(output_dir.parent / 'final-dataset' / 'dataset_manifest.json', {'schema_version': 'v1'})
+    _write_json(output_dir.parent / 'final-dataset' / 'stability_handoff.json', {'schema_version': 'v1'})
+
+    comparison_summary_payload = build_phase10_comparison_summary(
+        route_state_package_bundle=output_dir / 'route_state_package',
+        replay_bundle=output_dir / 'replay_bundle',
+        prior_review_bundle=output_dir / 'prior_review_bundle',
+        export_bundle=output_dir / 'export_bundle',
+        baseline_replay_bundle=REPO_ROOT / 'tmp' / 'phase14_cycle2_optimization' / 'cycle2-best' / 'replay_bundle',
+        baseline_export_bundle=REPO_ROOT / 'tmp' / 'phase14_cycle2_optimization' / 'cycle2-best' / 'export_bundle',
+        repo_root=REPO_ROOT,
+    )
+
+    assert comparison_summary_payload['source_artifacts']['dataset_manifest'] == str(
+        (output_dir.parent / 'final-dataset' / 'dataset_manifest.json').resolve()
+    )
+    assert comparison_summary_payload['source_artifacts']['stability_handoff'] == str(
+        (output_dir.parent / 'final-dataset' / 'stability_handoff.json').resolve()
+    )
 
 
 def test_phase10_workflow_threads_reviewer_ids_into_replay_and_prior_review(tmp_path: Path) -> None:
@@ -278,6 +327,7 @@ def test_phase10_workflow_threads_reviewer_ids_into_replay_and_prior_review(tmp_
         packet_path=PHASE9_PACKET_PATH,
         assembly_manifest_path=PHASE9_ASSEMBLY_MANIFEST_PATH,
         l1_snapshot_output_path=l1_snapshot_output_path,
+        runtime_output_root=_runtime_output_root(tmp_path, 'phase10-reviewer-runtime'),
         output_dir=output_dir,
         reviewer_ids=['reviewer-1'],
         built_at='2026-04-04T04:25:00Z',
@@ -302,6 +352,7 @@ def test_phase10_workflow_supports_scope_fallback_merge_for_phase13_runs(tmp_pat
         packet_path=PHASE9_PACKET_PATH,
         assembly_manifest_path=PHASE9_ASSEMBLY_MANIFEST_PATH,
         l1_snapshot_output_path=l1_snapshot_output_path,
+        runtime_output_root=_runtime_output_root(tmp_path, 'phase10-fallback-runtime'),
         output_dir=output_dir,
         reviewer_ids=['reviewer-1'],
         allow_scope_fallback_merge=True,
@@ -339,68 +390,67 @@ def test_phase10_cli_help_lists_required_arguments() -> None:
     assert '--assembly-manifest' in result.stdout
     assert '--l1-snapshot-output' in result.stdout
     assert '--output-dir' in result.stdout
+    assert '--runtime-output-root' in result.stdout
     assert '--reviewer' in result.stdout
 
 
 def test_phase10_cli_writes_package_and_replay_bundles(tmp_path: Path) -> None:
-    runtime_paths = resolve_phase10_runtime_paths(repo_root=REPO_ROOT)
-    shutil.rmtree(runtime_paths.output_root, ignore_errors=True)
+    script_path = REPO_ROOT / 'backend' / 'scripts' / 'run_phase10_multi_paper_validation.py'
+    l1_snapshot_output_path = tmp_path / 'phase9-comp-mech-l1-snapshot.json'
+    output_dir = tmp_path / 'phase10-cli-run'
+    runtime_output_root = _runtime_output_root(tmp_path, 'phase10-cli-runtime')
+    runtime_paths = resolve_phase10_runtime_paths(output_root=runtime_output_root, repo_root=REPO_ROOT)
 
-    try:
-        script_path = REPO_ROOT / 'backend' / 'scripts' / 'run_phase10_multi_paper_validation.py'
-        l1_snapshot_output_path = tmp_path / 'phase9-comp-mech-l1-snapshot.json'
-        output_dir = tmp_path / 'phase10-cli-run'
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(script_path),
+            '--packet',
+            str(PHASE9_PACKET_PATH),
+            '--assembly-manifest',
+            str(PHASE9_ASSEMBLY_MANIFEST_PATH),
+            '--l1-snapshot-output',
+            str(l1_snapshot_output_path),
+            '--runtime-output-root',
+            str(runtime_output_root),
+            '--output-dir',
+            str(output_dir),
+            '--built-at',
+            '2026-04-03T13:15:00Z',
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+        cwd=str(REPO_ROOT / 'backend'),
+    )
 
-        result = subprocess.run(
-            [
-                sys.executable,
-                str(script_path),
-                '--packet',
-                str(PHASE9_PACKET_PATH),
-                '--assembly-manifest',
-                str(PHASE9_ASSEMBLY_MANIFEST_PATH),
-                '--l1-snapshot-output',
-                str(l1_snapshot_output_path),
-                '--output-dir',
-                str(output_dir),
-                '--built-at',
-                '2026-04-03T13:15:00Z',
-            ],
-            capture_output=True,
-            text=True,
-            check=False,
-            cwd=str(REPO_ROOT / 'backend'),
-        )
+    assert result.returncode == 0, result.stderr
+    summary_payload = json.loads(result.stdout)
+    replay_inspection_payload = json.loads((output_dir / 'replay_bundle' / 'replay_inspection.json').read_text(encoding='utf-8'))
 
-        assert result.returncode == 0, result.stderr
-        summary_payload = json.loads(result.stdout)
-        replay_inspection_payload = json.loads((output_dir / 'replay_bundle' / 'replay_inspection.json').read_text(encoding='utf-8'))
-
-        assert summary_payload['generated_package_manifest'] == str(runtime_paths.package_manifest_path.resolve())
-        assert summary_payload['l1_snapshot_output'] == str(l1_snapshot_output_path.resolve())
-        assert (output_dir / 'route_state_package' / 'bundle_manifest.json').is_file()
-        assert (output_dir / 'route_state_package' / 'validation.json').is_file()
-        assert (output_dir / 'replay_bundle' / 'replay_summary.json').is_file()
-        assert (output_dir / 'replay_bundle' / 'replay_inspection.json').is_file()
-        assert (output_dir / 'prior_review_bundle' / 'bundle_manifest.json').is_file()
-        assert (output_dir / 'export_bundle' / 'export_summary.json').is_file()
-        assert (output_dir / 'export_bundle' / 'export_inspection.json').is_file()
-        assert (output_dir / 'export_bundle' / 'outputs' / 'training_view.json').is_file()
-        assert (output_dir / 'export_bundle' / 'best_cycle_selection.json').is_file()
-        assert (output_dir / 'comparison_summary.json').is_file()
-        assert replay_inspection_payload['route_state_package_validation'] is not None
-        assert replay_inspection_payload['route_state_package_validation']['quality_tier'] == summary_payload[
-            'route_state_package_validation_quality_tier'
-        ]
-        assert 'route_state_package_validation' in replay_inspection_payload
-        assert summary_payload['support_route_state_count'] == 3
-        assert 'support_cluster_too_small' not in summary_payload['route_state_package_validation_flags']
-        assert 'alternative_scope_not_distinct' not in summary_payload['route_state_package_validation_flags']
-        assert set(summary_payload['selected_prior_ids']).issubset(set(summary_payload['accepted_prior_ids']))
-        assert summary_payload['accepted_but_unselected_antipattern_count'] >= 0
-        assert summary_payload['training_view_path'].endswith('training_view.json')
-        assert summary_payload['best_cycle_selection_path'].endswith('best_cycle_selection.json')
-        assert 'visibility_bucket_counts' in summary_payload
-        assert summary_payload['comparison_summary_path'] == str((output_dir / 'comparison_summary.json').resolve())
-    finally:
-        shutil.rmtree(runtime_paths.output_root, ignore_errors=True)
+    assert summary_payload['generated_package_manifest'] == str(runtime_paths.package_manifest_path.resolve())
+    assert summary_payload['l1_snapshot_output'] == str(l1_snapshot_output_path.resolve())
+    assert (output_dir / 'route_state_package' / 'bundle_manifest.json').is_file()
+    assert (output_dir / 'route_state_package' / 'validation.json').is_file()
+    assert (output_dir / 'replay_bundle' / 'replay_summary.json').is_file()
+    assert (output_dir / 'replay_bundle' / 'replay_inspection.json').is_file()
+    assert (output_dir / 'prior_review_bundle' / 'bundle_manifest.json').is_file()
+    assert (output_dir / 'export_bundle' / 'export_summary.json').is_file()
+    assert (output_dir / 'export_bundle' / 'export_inspection.json').is_file()
+    assert (output_dir / 'export_bundle' / 'outputs' / 'training_view.json').is_file()
+    assert (output_dir / 'export_bundle' / 'best_cycle_selection.json').is_file()
+    assert (output_dir / 'comparison_summary.json').is_file()
+    assert replay_inspection_payload['route_state_package_validation'] is not None
+    assert replay_inspection_payload['route_state_package_validation']['quality_tier'] == summary_payload[
+        'route_state_package_validation_quality_tier'
+    ]
+    assert 'route_state_package_validation' in replay_inspection_payload
+    assert summary_payload['support_route_state_count'] == 3
+    assert 'support_cluster_too_small' not in summary_payload['route_state_package_validation_flags']
+    assert 'alternative_scope_not_distinct' not in summary_payload['route_state_package_validation_flags']
+    assert set(summary_payload['selected_prior_ids']).issubset(set(summary_payload['accepted_prior_ids']))
+    assert summary_payload['accepted_but_unselected_antipattern_count'] >= 0
+    assert summary_payload['training_view_path'].endswith('training_view.json')
+    assert summary_payload['best_cycle_selection_path'].endswith('best_cycle_selection.json')
+    assert 'visibility_bucket_counts' in summary_payload
+    assert summary_payload['comparison_summary_path'] == str((output_dir / 'comparison_summary.json').resolve())

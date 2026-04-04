@@ -245,6 +245,8 @@ class IterationPrioritySourceRefs(ContractModel):
     phase10_summary_path: str | None = None
     phase10_verification_path: str | None = None
     phase10_report_path: str | None = None
+    training_dataset_manifest_path: str | None = None
+    stability_handoff_path: str | None = None
     phase10_mode: str = 'json'
     fallback_used: bool = False
 
@@ -808,6 +810,8 @@ def _combine_source_refs(
         phase10_summary_path=phase10_surface.source_refs.phase10_summary_path,
         phase10_verification_path=phase10_surface.source_refs.phase10_verification_path,
         phase10_report_path=phase10_surface.source_refs.phase10_report_path,
+        training_dataset_manifest_path=phase10_surface.source_artifacts.get('dataset_manifest'),
+        stability_handoff_path=phase10_surface.source_artifacts.get('stability_handoff'),
         phase10_mode=phase10_surface.source_refs.phase10_mode,
         fallback_used=phase10_surface.source_refs.fallback_used,
     )
@@ -852,6 +856,16 @@ def build_iteration_priority_summary(
         notes.append(
             'Phase 10 best-cycle selection preserved recommendation evidence refs: '
             + ', '.join(phase10_surface.recommendation_evidence_refs)
+        )
+    if phase10_surface.source_artifacts.get('dataset_manifest'):
+        notes.append(
+            'Phase 10 closeout surfaced a final dataset manifest: '
+            + str(phase10_surface.source_artifacts['dataset_manifest'])
+        )
+    if phase10_surface.source_artifacts.get('stability_handoff'):
+        notes.append(
+            'Phase 10 closeout surfaced a reviewed stability handoff: '
+            + str(phase10_surface.source_artifacts['stability_handoff'])
         )
 
     return IterationPrioritySummary(
@@ -964,6 +978,8 @@ def render_iteration_priority_report(
         f"- Phase 8 summary source: `{source_refs.phase8_summary_path or 'missing'}`",
         f"- Phase 8 inspection source: `{source_refs.phase8_inspection_path or 'missing'}`",
         f"- Phase 10 summary JSON source: `{source_refs.phase10_summary_path or 'not provided'}`",
+        f"- Final dataset manifest: `{source_refs.training_dataset_manifest_path or 'not provided'}`",
+        f"- Stability handoff: `{source_refs.stability_handoff_path or 'not provided'}`",
         f"- Phase 10 evidence mode: `{source_refs.phase10_mode}`",
         f"- Inspection replay L2 delta: `{ranking_signals.get('replay_l2_delta', 'n/a')}`",
         f"- Inspection replay L3/L4 delta: `{ranking_signals.get('replay_l3_l4_delta', 'n/a')}`",
@@ -979,6 +995,8 @@ def render_iteration_priority_report(
         f"- Phase 10 summary JSON: `{source_refs.phase10_summary_path or 'not provided'}`",
         f"- Phase 10 verification note: `{source_refs.phase10_verification_path or 'not provided'}`",
         f"- Phase 10 report markdown: `{source_refs.phase10_report_path or 'not provided'}`",
+        f"- Final dataset manifest: `{source_refs.training_dataset_manifest_path or 'not provided'}`",
+        f"- Stability handoff: `{source_refs.stability_handoff_path or 'not provided'}`",
         f"- Phase 8 iteration label: `{summary_model.phase8_iteration_label or 'unknown'}`",
         f"- Packet id: `{summary_model.packet_id or 'unknown'}`",
         '',

@@ -76,7 +76,11 @@ def test_load_phase10_comparison_summary_reads_explicit_json_path(tmp_path: Path
                         }
                     ]
                 },
-                'source_artifacts': {'current_replay_inspection': 'tmp/replay/replay_inspection.json'},
+                'source_artifacts': {
+                    'current_replay_inspection': 'tmp/replay/replay_inspection.json',
+                    'dataset_manifest': 'tmp/final-dataset/dataset_manifest.json',
+                    'stability_handoff': 'tmp/final-dataset/stability_handoff.json',
+                },
                 'notes': {'source': 'fixture'},
             },
             indent=2,
@@ -95,6 +99,8 @@ def test_load_phase10_comparison_summary_reads_explicit_json_path(tmp_path: Path
         'training_view:C:/tmp/phase14-candidate-01/export_bundle/outputs/training_view.json',
         'export_summary:C:/tmp/phase14-candidate-01/export_bundle/export_summary.json',
     ]
+    assert surface.source_artifacts['dataset_manifest'] == 'tmp/final-dataset/dataset_manifest.json'
+    assert surface.source_artifacts['stability_handoff'] == 'tmp/final-dataset/stability_handoff.json'
     assert surface.blocker_queue['package_validation'][0].code == 'support_cluster_too_small'
 
 
@@ -160,3 +166,45 @@ def test_build_iteration_priority_summary_keeps_supporting_l2_evidence_visible_o
     assert 'best_cycle_selection' in summary.phase10_stage_surfaces
     assert inspection.ranking_signals['replay_l2_delta'] == 0
     assert inspection.ranking_signals['recommendation_evidence_refs'] == []
+
+
+def test_build_iteration_priority_summary_preserves_closeout_refs_from_phase10_surface(tmp_path: Path) -> None:
+    summary_path = tmp_path / 'comparison_summary.json'
+    summary_path.write_text(
+        json.dumps(
+            {
+                'packet_id': 'packet-1',
+                'cutoff_year': 2021,
+                'package': {'current': {'quality_tier': 'red'}},
+                'replay': {'current': {'quality_tier': 'yellow'}},
+                'prior_review': {'current': {'prior_candidate_count': 0}},
+                'export': {'current': {'quality_tier': 'yellow'}},
+                'best_cycle_selection': {
+                    'selected_iteration_label': 'phase16-repeat-01',
+                    'primary_recommendation_id': 'packet_construction',
+                    'recommendation_evidence_refs': ['best_cycle_selection:C:/tmp/phase16/export_bundle/best_cycle_selection.json'],
+                },
+                'blocker_queue': {'package_validation': []},
+                'source_artifacts': {
+                    'dataset_manifest': 'tmp/final-dataset/dataset_manifest.json',
+                    'stability_handoff': 'tmp/final-dataset/stability_handoff.json',
+                },
+                'notes': {'source': 'fixture'},
+            },
+            indent=2,
+        ),
+        encoding='utf-8',
+    )
+
+    phase8_summary = load_phase8_comparison_summary(PHASE8_SUMMARY_PATH)
+    phase8_inspection = load_phase8_comparison_inspection(PHASE8_INSPECTION_PATH)
+    phase10_surface = load_phase10_comparison_summary(summary_path)
+
+    summary = build_iteration_priority_summary(
+        phase8_summary=phase8_summary,
+        phase8_inspection=phase8_inspection,
+        phase10_surface=phase10_surface,
+    )
+
+    assert summary.source_refs.training_dataset_manifest_path == 'tmp/final-dataset/dataset_manifest.json'
+    assert summary.source_refs.stability_handoff_path == 'tmp/final-dataset/stability_handoff.json'

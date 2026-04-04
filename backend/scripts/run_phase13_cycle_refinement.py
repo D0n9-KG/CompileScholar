@@ -160,6 +160,7 @@ def main(argv: list[str] | None = None) -> int:
             packet_path=resolved_paths.packet_path,
             assembly_manifest_path=resolved_paths.assembly_manifest_path,
             l1_snapshot_output_path=resolved_paths.l1_snapshot_output_path,
+            runtime_output_root=resolved_paths.output_dir / 'phase10-runtime',
             output_dir=resolved_paths.output_dir,
             baseline_replay_bundle=resolved_paths.baseline_replay_bundle,
             baseline_export_bundle=resolved_paths.baseline_export_bundle,
