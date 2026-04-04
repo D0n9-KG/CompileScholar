@@ -19,6 +19,7 @@ Produce auditable, replayable, trainable scientific-reasoning artifacts rather t
 - Phase `10` completed on `2026-04-03` with a real bounded computational-mechanics validation run, committed report/verification artifacts, and a packet-construction-first next-cycle recommendation
 - Phase `11` completed on `2026-04-03` with a runtime-backed iteration prioritization bundle, committed report/verification artifacts, and a packet-construction-first next-cycle queue
 - Phase `12` completed on `2026-04-04` with a repaired Phase 10 runtime packet bridge, a fresh bounded cycle-1 rerun, and a verification verdict that packet blockers moved but downstream replay/prior/export blockers still remain
+- Phase `13` completed on `2026-04-04` with two bounded reruns on the fixed cycle-1 baseline, replay recovery to `green`, one accepted fallback-cluster prior, and a generated next-cycle recommendation that still ranks `packet_construction` first
 - The first real Phase `7` corpus baseline recorded `1756` inventory entries, `1755` eligible entries, and `1505` corpus-health failures
 - Stable bounded pilot: `jamming transition in frictionless sphere packings near point J` with `cutoff_year = 2010`
 - End-to-end Phase 03 -> 06 artifact flow is verified on real local bundles
@@ -53,6 +54,8 @@ Produce auditable, replayable, trainable scientific-reasoning artifacts rather t
 - [x] The next optimization cycle can now be selected from explicit evidence (`packet_construction`, `l4_aggregation`, `l2_extraction`) instead of open-ended debate. (Validated in Phase `11`)
 - [x] The team can run a full generate -> review -> optimize cycle directly from the existing Phase 10 / 11 data and commands on the bounded computational-mechanics slice. (Validated in Phase `12`)
 - [x] Each direct-fix cycle now leaves behind comparable machine-readable outputs plus committed manual review notes on real reasoning artifacts. (Validated in Phase `12`)
+- [x] The workflow now supports repeated bounded reruns on the same baseline data with reviewer-aware replay and auditable iteration roots. (Validated in Phase `13`)
+- [x] Each cycle now includes an explicit manual defect-delta report on real reasoning outputs plus a structured next-cycle prioritization handoff. (Validated in Phase `13`)
 
 ### Active
 
@@ -108,6 +111,6 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-04 after completing Phase 12*
+*Last updated: 2026-04-04 after completing Phase 13*
 
 
