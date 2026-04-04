@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: milestone
 status: Executing Phase 15
-stopped_at: Completed 15-01-PLAN.md
-last_updated: "2026-04-04T10:41:48.070Z"
+stopped_at: Completed 15-02-PLAN.md
+last_updated: "2026-04-04T11:21:18.698Z"
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 11
-  completed_plans: 9
+  completed_plans: 10
 ---
 
 # Project State
@@ -19,17 +19,17 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-04-04)
 
 **Core value:** Produce auditable, replayable, trainable scientific-reasoning artifacts rather than paper-like summaries or one-off knowledge graphs.
-**Current focus:** Execute Phase 15 Plan 02 using the new packet-validation and prior-recovery comparison surface from Plan 01
+**Current focus:** Execute Phase 15 Plan 03 using the grounded comparison, timing, and route-backed export-closure surface from Plan 02
 
 ## Current Position
 
 Phase: 15 (cycle-3-consolidation) - EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Milestone: `v1.2` - Fast Iteration Research Logic Quality
 
 - Completed milestone: `v1.1` corpus-driven iterative quality hardening
-- Status: Phase `15` is actively executing after completing Plan `15-01`
-- Last activity: `2026-04-04` - completed Phase 15 Plan 01 with per-role packet weakness tracing and explicit prior-recovery comparison metadata
+- Status: Phase `15` is ready for Plan `15-03` after completing Plans `15-01` and `15-02`
+- Last activity: `2026-04-04` - completed Phase 15 Plan 02 with grounded route comparison, explicit why-now timing text, confidence caps, and structured prior / anti-pattern exclusion records
 
 ## Milestone Snapshot
 
@@ -60,6 +60,7 @@ Milestone: `v1.2` - Fast Iteration Research Logic Quality
 - Phase 14 closeout shows stronger export structure and reviewability, but the chosen best cycle still carries `weak_prior_support`, no accepted priors on the default rerun path, and a next-cycle recommendation that remains `packet_construction`.
 - Phase 15 planning now splits the work into three waves: packet and prior-recovery groundwork, route-comparison plus export closure, and compared bounded reruns against the Phase 14 `cycle2-best` baseline bundles.
 - Phase 15 Plan 01 completed with per-role weak route-state tracing in packet validation and explicit default-versus-fallback prior-recovery metadata in comparison surfaces, leaving the phase ready for route-comparison and export-closure work.
+- Phase 15 Plan 02 completed with grounded route-comparison summaries, explicit why-now timing text, capped weak-support decision confidence, and structured accepted-but-unselected anti-pattern exclusions preserved through export and training-view outputs.
 
 ## Active Requirements
 
@@ -67,7 +68,7 @@ Milestone: `v1.2` - Fast Iteration Research Logic Quality
 
 ## Pending Follow-Ups
 
-- Continue Phase `15` with `.planning/phases/15-cycle-3-consolidation/15-02-PLAN.md` and `.planning/phases/15-cycle-3-consolidation/15-03-PLAN.md`.
+- Continue Phase `15` with `.planning/phases/15-cycle-3-consolidation/15-03-PLAN.md`.
 - Compare default and fallback-merge Phase 15 candidate cycles directly against `tmp/phase14_cycle2_optimization/cycle2-best/`.
 - Close reviewed prior / anti-pattern knowledge honestly into selected or explicitly excluded export fields and record the accepted-cycle streak without overclaiming stability.
 
@@ -78,6 +79,6 @@ Milestone: `v1.2` - Fast Iteration Research Logic Quality
 
 ## Session
 
-**Last Date:** 2026-04-04T10:41:48.063Z
-**Stopped At:** Completed 15-01-PLAN.md
-**Resume File:** .planning/phases/15-cycle-3-consolidation/15-02-PLAN.md
+**Last Date:** 2026-04-04T11:21:18.693Z
+**Stopped At:** Completed 15-02-PLAN.md
+**Resume File:** .planning/phases/15-cycle-3-consolidation/15-03-PLAN.md
