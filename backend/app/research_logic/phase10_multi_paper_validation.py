@@ -48,6 +48,13 @@ DEFAULT_PHASE10_PACKAGE_MANIFEST_PATH = DEFAULT_PHASE10_OUTPUT_ROOT / 'generated
 DEFAULT_PHASE10_L1_SNAPSHOT_PATH = DEFAULT_PHASE10_OUTPUT_ROOT / 'shared' / 'phase9-comp-mech-l1-snapshot.json'
 DEFAULT_PHASE10_BASELINE_REPLAY_BUNDLE = Path('tmp/phase3_route_state_package/replay_with_package')
 DEFAULT_PHASE10_BASELINE_EXPORT_BUNDLE = Path('tmp/phase6_decision_episode_audit_export')
+TASK_TRAINING_VIEW_IDS = (
+    'route_synthesis_view',
+    'why_now_view',
+    'route_comparison_view',
+    'prior_antipattern_view',
+    'final_decision_view',
+)
 
 
 @dataclass(frozen=True)
@@ -166,6 +173,14 @@ def _relative_manifest_path(target: Path, *, base_dir: Path) -> str:
         return os.path.relpath(target, base_dir).replace('\\', '/')
     except ValueError:
         return str(target)
+
+
+def _bundle_file_ref(bundle_dir: Path, manifest_payload: dict[str, object], key: str) -> str | None:
+    files = _json_object(manifest_payload.get('files') or {}, label='Phase 10 bundle manifest files')
+    relative_ref = str(files.get(key) or '').strip()
+    if not relative_ref:
+        return None
+    return str((bundle_dir / relative_ref).resolve())
 
 
 def _role_slug(role: Phase10Role) -> str:
@@ -448,6 +463,11 @@ def build_phase10_comparison_summary(
         _load_json(export_bundle_dir / 'outputs' / 'training_view.json'),
         label='Phase 10 training view',
     )
+    task_training_view_refs = {
+        view_id: resolved_ref
+        for view_id in TASK_TRAINING_VIEW_IDS
+        if (resolved_ref := _bundle_file_ref(export_bundle_dir, export_manifest, view_id)) is not None
+    }
     best_cycle_selection = _json_object(
         _load_json(export_bundle_dir / 'best_cycle_selection.json'),
         label='Phase 10 best-cycle selection',
@@ -626,6 +646,7 @@ def build_phase10_comparison_summary(
                 str(key)
                 for key in _json_object(training_view.get('sections') or {}, label='Phase 10 training view sections')
             ),
+            'task_training_view_ids': sorted(task_training_view_refs),
             'bundle_manifest': str((export_bundle_dir / 'bundle_manifest.json').resolve()),
             'training_view': str((export_bundle_dir / 'outputs' / 'training_view.json').resolve()),
             'best_cycle_selection': str((export_bundle_dir / 'best_cycle_selection.json').resolve()),
@@ -877,6 +898,7 @@ def build_phase10_comparison_summary(
             'current_best_cycle_selection': str((export_bundle_dir / 'best_cycle_selection.json').resolve()),
             'current_replay_inspection': str((replay_bundle_dir / 'replay_inspection.json').resolve()),
             'current_prior_review_summary': str((prior_review_bundle_dir / 'candidate_review_summary.json').resolve()),
+            **task_training_view_refs,
         },
         'notes': {
             'export_visibility_policy': export_inspection.get('policy'),

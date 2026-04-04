@@ -816,13 +816,23 @@ def test_write_decision_episode_export_bundle_writes_expected_files(tmp_path: Pa
         'decision_episode',
         'export_inspection',
         'export_summary',
+        'final_decision_view',
+        'prior_antipattern_view',
+        'route_comparison_view',
+        'route_synthesis_view',
         'training_view',
+        'why_now_view',
     } == set(written_files)
     assert written_files['bundle_manifest'].is_file()
     assert written_files['export_summary'].is_file()
     assert written_files['export_inspection'].is_file()
     assert written_files['decision_episode'].is_file()
     assert written_files['training_view'].is_file()
+    assert written_files['route_synthesis_view'].is_file()
+    assert written_files['why_now_view'].is_file()
+    assert written_files['route_comparison_view'].is_file()
+    assert written_files['prior_antipattern_view'].is_file()
+    assert written_files['final_decision_view'].is_file()
     assert written_files['best_cycle_selection'].is_file()
     assert all(str(path).startswith(str((tmp_path / 'export-bundle').resolve())) for path in written_files.values())
 
@@ -830,10 +840,20 @@ def test_write_decision_episode_export_bundle_writes_expected_files(tmp_path: Pa
     summary_payload = json.loads(written_files['export_summary'].read_text(encoding='utf-8'))
     inspection_payload = json.loads(written_files['export_inspection'].read_text(encoding='utf-8'))
     training_view_payload = json.loads(written_files['training_view'].read_text(encoding='utf-8'))
+    route_synthesis_view_payload = json.loads(written_files['route_synthesis_view'].read_text(encoding='utf-8'))
+    why_now_view_payload = json.loads(written_files['why_now_view'].read_text(encoding='utf-8'))
+    route_comparison_view_payload = json.loads(written_files['route_comparison_view'].read_text(encoding='utf-8'))
+    prior_antipattern_view_payload = json.loads(written_files['prior_antipattern_view'].read_text(encoding='utf-8'))
+    final_decision_view_payload = json.loads(written_files['final_decision_view'].read_text(encoding='utf-8'))
     best_cycle_selection_payload = json.loads(written_files['best_cycle_selection'].read_text(encoding='utf-8'))
 
     assert manifest_payload['files']['decision_episode'] == 'outputs/decision_episode.json'
     assert manifest_payload['files']['training_view'] == 'outputs/training_view.json'
+    assert manifest_payload['files']['route_synthesis_view'] == 'outputs/route_synthesis_view.json'
+    assert manifest_payload['files']['why_now_view'] == 'outputs/why_now_view.json'
+    assert manifest_payload['files']['route_comparison_view'] == 'outputs/route_comparison_view.json'
+    assert manifest_payload['files']['prior_antipattern_view'] == 'outputs/prior_antipattern_view.json'
+    assert manifest_payload['files']['final_decision_view'] == 'outputs/final_decision_view.json'
     assert manifest_payload['files']['best_cycle_selection'] == 'best_cycle_selection.json'
     assert manifest_payload['source_replay_bundle_refs']['manifest_ref'] == 'tmp/source-replay/bundle_manifest.json'
     assert manifest_payload['accepted_prior_ids'] == []
@@ -847,10 +867,35 @@ def test_write_decision_episode_export_bundle_writes_expected_files(tmp_path: Pa
     assert training_view_payload['sections']['route_synthesis']['route_state']['route_state_id'] == export.route_state_snapshot.route_state_id
     assert training_view_payload['sections']['priors_antipatterns']['accepted_but_unselected_priors'] == []
     assert training_view_payload['sections']['priors_antipatterns']['accepted_but_unselected_antipatterns'] == []
+    assert route_synthesis_view_payload['sections'] == {
+        'route_synthesis': training_view_payload['sections']['route_synthesis']
+    }
+    assert why_now_view_payload['sections'] == {'why_now': training_view_payload['sections']['why_now']}
+    assert route_comparison_view_payload['sections'] == {
+        'route_comparison': training_view_payload['sections']['route_comparison']
+    }
+    assert prior_antipattern_view_payload['sections'] == {
+        'priors_antipatterns': training_view_payload['sections']['priors_antipatterns']
+    }
+    assert final_decision_view_payload['sections'] == {
+        'final_decision': training_view_payload['sections']['final_decision']
+    }
+    for task_view_payload in (
+        route_synthesis_view_payload,
+        why_now_view_payload,
+        route_comparison_view_payload,
+        prior_antipattern_view_payload,
+        final_decision_view_payload,
+    ):
+        assert task_view_payload['visibility_buckets'] == training_view_payload['visibility_buckets']
+        assert task_view_payload['selected_iteration_label'] == training_view_payload['selected_iteration_label']
+        assert task_view_payload['review']['review_status'] == training_view_payload['review']['review_status']
+        assert task_view_payload['review']['training_acceptance_verdict'] == training_view_payload['review'][
+            'training_acceptance_verdict'
+        ]
+        assert task_view_payload['source_bundle_refs'] == training_view_payload['source_bundle_refs']
     assert best_cycle_selection_payload['selected_iteration_label'] == 'export-bundle'
     assert best_cycle_selection_payload['recommendation_evidence_refs']
-
-
 def test_write_corpus_sampling_bundle_writes_expected_files_and_separates_buckets(tmp_path: Path) -> None:
     bundle = _corpus_sampling_bundle()
 

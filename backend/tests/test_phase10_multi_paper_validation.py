@@ -193,6 +193,11 @@ def test_phase10_workflow_writes_prior_review_and_export_bundles(tmp_path: Path)
         assert set(export_summary_payload['selected_prior_ids']).issubset(set(review_manifest_payload['accepted_prior_ids']))
         assert decision_episode_payload['relevant_priors']['selected_prior_ids'] == export_summary_payload['selected_prior_ids']
         assert (output_dir / 'export_bundle' / 'outputs' / 'training_view.json').is_file()
+        assert (output_dir / 'export_bundle' / 'outputs' / 'route_synthesis_view.json').is_file()
+        assert (output_dir / 'export_bundle' / 'outputs' / 'why_now_view.json').is_file()
+        assert (output_dir / 'export_bundle' / 'outputs' / 'route_comparison_view.json').is_file()
+        assert (output_dir / 'export_bundle' / 'outputs' / 'prior_antipattern_view.json').is_file()
+        assert (output_dir / 'export_bundle' / 'outputs' / 'final_decision_view.json').is_file()
         assert (output_dir / 'export_bundle' / 'best_cycle_selection.json').is_file()
         assert 'visible_input_refs' in export_inspection_payload['visibility_buckets']
         assert 'audit_only_refs' in export_inspection_payload['visibility_buckets']
@@ -217,7 +222,19 @@ def test_phase10_workflow_writes_prior_review_and_export_bundles(tmp_path: Path)
         assert best_cycle_selection_payload['selected_iteration_label'] == 'phase10-workflow-run'
         assert best_cycle_selection_payload['recommendation_evidence_refs']
         assert comparison_summary_payload['best_cycle_selection']['selected_iteration_label'] == 'phase10-workflow-run'
+        assert comparison_summary_payload['export']['current']['task_training_view_ids'] == [
+            'final_decision_view',
+            'prior_antipattern_view',
+            'route_comparison_view',
+            'route_synthesis_view',
+            'why_now_view',
+        ]
         assert comparison_summary_payload['source_artifacts']['current_training_view'].endswith('training_view.json')
+        assert comparison_summary_payload['source_artifacts']['route_synthesis_view'].endswith('route_synthesis_view.json')
+        assert comparison_summary_payload['source_artifacts']['why_now_view'].endswith('why_now_view.json')
+        assert comparison_summary_payload['source_artifacts']['route_comparison_view'].endswith('route_comparison_view.json')
+        assert comparison_summary_payload['source_artifacts']['prior_antipattern_view'].endswith('prior_antipattern_view.json')
+        assert comparison_summary_payload['source_artifacts']['final_decision_view'].endswith('final_decision_view.json')
         assert comparison_summary_payload['prior_review']['current']['cluster_strategy'] == 'default'
         assert comparison_summary_payload['prior_review']['current']['fallback_reason'] is None
         assert comparison_summary_payload['prior_review']['current']['prior_review_summary_path'] == (

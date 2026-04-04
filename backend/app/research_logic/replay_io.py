@@ -119,6 +119,15 @@ def _unique_strings(values: Sequence[object] | None) -> list[str]:
     return ordered
 
 
+TASK_SPECIFIC_TRAINING_VIEW_SECTIONS: dict[str, tuple[str, ...]] = {
+    'route_synthesis_view': ('route_synthesis',),
+    'why_now_view': ('why_now',),
+    'route_comparison_view': ('route_comparison',),
+    'prior_antipattern_view': ('priors_antipatterns',),
+    'final_decision_view': ('final_decision',),
+}
+
+
 def load_route_packet(path_like: str | Path) -> RoutePacket:
     return RoutePacket.model_validate(_read_json(path_like))
 
@@ -670,6 +679,10 @@ def build_decision_episode_training_view(
         'route_state_id': export.route_state_snapshot.route_state_id,
         'selected_iteration_label': selected_iteration_label,
         'audit_episode_ref': audit_episode_ref,
+        'source_bundle_refs': {
+            'replay_bundle': export.source_replay_bundle_refs.model_dump(mode='json', exclude_none=True),
+            'review_bundle': export.source_review_bundle_refs.model_dump(mode='json', exclude_none=True),
+        },
         'review': {
             'review_status': export.review_status,
             'training_acceptance_verdict': export.training_acceptance_verdict,
@@ -753,6 +766,58 @@ def build_decision_episode_training_view(
             'label_eval_only_refs': list(export.label_eval_only_refs),
         },
     }
+
+
+def build_decision_episode_task_training_views(
+    *,
+    export: DecisionEpisodeAuditExport,
+    selected_iteration_label: str,
+    audit_episode_ref: str | None = None,
+) -> dict[str, dict[str, Any]]:
+    training_view_payload = build_decision_episode_training_view(
+        export=export,
+        selected_iteration_label=selected_iteration_label,
+        audit_episode_ref=audit_episode_ref,
+    )
+    review_payload = dict(training_view_payload['review'])
+    section_reviews = {
+        str(key): value
+        for key, value in dict(review_payload.get('section_reviews') or {}).items()
+    }
+    view_payloads: dict[str, dict[str, Any]] = {}
+
+    for view_id, section_names in TASK_SPECIFIC_TRAINING_VIEW_SECTIONS.items():
+        view_payloads[view_id] = {
+            'schema_version': training_view_payload['schema_version'],
+            'task_view_id': view_id,
+            'built_at': training_view_payload['built_at'],
+            'episode_id': training_view_payload['episode_id'],
+            'route_packet_id': training_view_payload['route_packet_id'],
+            'route_state_id': training_view_payload['route_state_id'],
+            'selected_iteration_label': training_view_payload['selected_iteration_label'],
+            'audit_episode_ref': training_view_payload['audit_episode_ref'],
+            'source_training_view_ref': 'outputs/training_view.json',
+            'source_bundle_refs': dict(training_view_payload['source_bundle_refs']),
+            'review': {
+                **{key: value for key, value in review_payload.items() if key != 'section_reviews'},
+                'section_reviews': {
+                    section_name: section_reviews[section_name]
+                    for section_name in section_names
+                    if section_name in section_reviews
+                },
+            },
+            'sections': {
+                section_name: training_view_payload['sections'][section_name]
+                for section_name in section_names
+                if section_name in training_view_payload['sections']
+            },
+            'visibility_buckets': {
+                'visible_input_refs': list(training_view_payload['visibility_buckets']['visible_input_refs']),
+                'audit_only_refs': list(training_view_payload['visibility_buckets']['audit_only_refs']),
+                'label_eval_only_refs': list(training_view_payload['visibility_buckets']['label_eval_only_refs']),
+            },
+        }
+    return view_payloads
 
 
 def build_best_cycle_selection_payload(
@@ -1164,6 +1229,11 @@ def write_decision_episode_export_bundle(
         selected_iteration_label=iteration_label,
         audit_episode_ref='outputs/decision_episode.json',
     )
+    task_training_view_payloads = build_decision_episode_task_training_views(
+        export=export,
+        selected_iteration_label=iteration_label,
+        audit_episode_ref='outputs/decision_episode.json',
+    )
 
     written_files = {
         'decision_episode': _write_json(
@@ -1174,6 +1244,8 @@ def write_decision_episode_export_bundle(
         'export_inspection': _write_json(bundle_dir / 'export_inspection.json', inspection_payload),
         'training_view': _write_json(outputs_dir / 'training_view.json', training_view_payload),
     }
+    for view_id, payload in task_training_view_payloads.items():
+        written_files[view_id] = _write_json(outputs_dir / f'{view_id}.json', payload)
 
     selection_evidence_refs = _unique_strings(
         list(recommendation_evidence_refs or [])
@@ -1181,6 +1253,10 @@ def write_decision_episode_export_bundle(
             f'training_view:{written_files["training_view"].resolve()}',
             f'export_summary:{written_files["export_summary"].resolve()}',
             f'export_inspection:{written_files["export_inspection"].resolve()}',
+            *[
+                f'{view_id}:{written_files[view_id].resolve()}'
+                for view_id in TASK_SPECIFIC_TRAINING_VIEW_SECTIONS
+            ],
             *(
                 [
                     (
@@ -1205,6 +1281,10 @@ def write_decision_episode_export_bundle(
             'training_view': str(written_files['training_view'].resolve()),
             'export_summary': str(written_files['export_summary'].resolve()),
             'export_inspection': str(written_files['export_inspection'].resolve()),
+            **{
+                view_id: str(written_files[view_id].resolve())
+                for view_id in TASK_SPECIFIC_TRAINING_VIEW_SECTIONS
+            },
             **{str(key): str(value) for key, value in dict(selection_source_artifacts or {}).items()},
         },
     )
@@ -1236,8 +1316,6 @@ def write_decision_episode_export_bundle(
     }
     written_files['bundle_manifest'] = _write_json(bundle_dir / 'bundle_manifest.json', manifest_payload)
     return written_files
-
-
 def write_corpus_sampling_bundle(
     output_dir: str | Path,
     *,
@@ -1403,6 +1481,7 @@ __all__ = [
     'build_corpus_sampling_summary',
     'build_decision_episode_export_inspection',
     'build_decision_episode_export_summary',
+    'build_decision_episode_task_training_views',
     'build_decision_episode_training_view',
     'build_iteration_priority_inspection_payload',
     'build_iteration_priority_summary_payload',
