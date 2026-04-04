@@ -44,6 +44,7 @@ from app.research_logic import (
     build_sampled_l2_iteration_summary,
     write_corpus_sampling_bundle,
     write_decision_episode_export_bundle,
+    write_final_training_dataset_bundle,
     write_iteration_priority_bundle,
     write_prior_candidate_review_bundle,
     write_replay_bundle,
@@ -896,6 +897,91 @@ def test_write_decision_episode_export_bundle_writes_expected_files(tmp_path: Pa
         assert task_view_payload['source_bundle_refs'] == training_view_payload['source_bundle_refs']
     assert best_cycle_selection_payload['selected_iteration_label'] == 'export-bundle'
     assert best_cycle_selection_payload['recommendation_evidence_refs']
+
+
+def test_write_final_training_dataset_bundle_writes_expected_scaffold(tmp_path: Path) -> None:
+    export = _decision_episode_audit_export(tmp_path)
+    export_bundle_files = write_decision_episode_export_bundle(
+        tmp_path / 'cycle4-stable' / 'export_bundle',
+        export=export,
+        metadata={'runner': 'pytest'},
+        selected_iteration_label='cycle4-stable',
+    )
+    primary_cycle_root = tmp_path / 'cycle4-stable'
+    supporting_cycle_root = tmp_path / 'cycle3-best'
+    supporting_cycle_root.mkdir(parents=True)
+
+    written_files = write_final_training_dataset_bundle(
+        tmp_path / 'final-dataset',
+        primary_cycle_label='cycle4-stable',
+        supporting_cycle_labels=['cycle3-best'],
+        source_cycle_roots={
+            'cycle4-stable': primary_cycle_root,
+            'cycle3-best': supporting_cycle_root,
+        },
+        source_export_bundles={
+            'cycle4-stable': primary_cycle_root / 'export_bundle',
+        },
+        task_training_views={
+            'training_view': export_bundle_files['training_view'],
+            'route_synthesis_view': export_bundle_files['route_synthesis_view'],
+            'why_now_view': export_bundle_files['why_now_view'],
+            'route_comparison_view': export_bundle_files['route_comparison_view'],
+            'prior_antipattern_view': export_bundle_files['prior_antipattern_view'],
+            'final_decision_view': export_bundle_files['final_decision_view'],
+        },
+        schema_refs={
+            'decision_episode_schema': Path('docs/superpowers/specs/2026-04-01-logickg-decision-prior-and-episode-schema.md'),
+            'route_comparison_schema': Path('docs/superpowers/specs/2026-04-01-logickg-why-now-and-route-comparison-schema.md'),
+        },
+        primary_recommendation_id='packet_construction',
+        recommendation_evidence_refs=['comparison_summary:C:/tmp/phase16/comparison_summary.json'],
+        residual_risk_source=export_bundle_files['best_cycle_selection'],
+        metadata={'runner': 'pytest'},
+    )
+
+    assert {
+        'bundle_manifest',
+        'dataset_manifest',
+        'dataset_summary',
+        'training_views_index',
+    } == set(written_files)
+
+    dataset_manifest_payload = json.loads(written_files['dataset_manifest'].read_text(encoding='utf-8'))
+    dataset_summary_payload = json.loads(written_files['dataset_summary'].read_text(encoding='utf-8'))
+    training_views_index_payload = json.loads(written_files['training_views_index'].read_text(encoding='utf-8'))
+    bundle_manifest_payload = json.loads(written_files['bundle_manifest'].read_text(encoding='utf-8'))
+
+    assert written_files['dataset_manifest'].is_file()
+    assert written_files['dataset_summary'].is_file()
+    assert written_files['training_views_index'].is_file()
+    assert written_files['bundle_manifest'].is_file()
+    assert dataset_manifest_payload['primary_cycle_label'] == 'cycle4-stable'
+    assert dataset_manifest_payload['supporting_cycle_labels'] == ['cycle3-best']
+    assert dataset_manifest_payload['primary_recommendation_id'] == 'packet_construction'
+    assert dataset_manifest_payload['source_cycle_roots']['cycle4-stable'] == '../cycle4-stable'
+    assert dataset_manifest_payload['source_export_bundles']['cycle4-stable'] == '../cycle4-stable/export_bundle'
+    assert dataset_manifest_payload['schema_refs']['decision_episode_schema'].endswith(
+        'docs/superpowers/specs/2026-04-01-logickg-decision-prior-and-episode-schema.md'
+    )
+    assert dataset_manifest_payload['residual_risk_source'] == '../cycle4-stable/export_bundle/best_cycle_selection.json'
+    assert set(training_views_index_payload) == {
+        'training_view',
+        'route_synthesis_view',
+        'why_now_view',
+        'route_comparison_view',
+        'prior_antipattern_view',
+        'final_decision_view',
+    }
+    assert training_views_index_payload['training_view'] == '../cycle4-stable/export_bundle/outputs/training_view.json'
+    assert dataset_manifest_payload['task_training_views'] == training_views_index_payload
+    assert dataset_summary_payload['task_training_view_count'] == 6
+    assert dataset_summary_payload['training_views_index_ref'] == 'outputs/training_views_index.json'
+    assert bundle_manifest_payload['files']['dataset_manifest'] == 'dataset_manifest.json'
+    assert bundle_manifest_payload['files']['dataset_summary'] == 'dataset_summary.json'
+    assert bundle_manifest_payload['files']['training_views_index'] == 'outputs/training_views_index.json'
+
+
 def test_write_corpus_sampling_bundle_writes_expected_files_and_separates_buckets(tmp_path: Path) -> None:
     bundle = _corpus_sampling_bundle()
 

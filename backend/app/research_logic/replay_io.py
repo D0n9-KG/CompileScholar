@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 import json
+import os
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Mapping, Sequence
 
@@ -126,6 +127,25 @@ TASK_SPECIFIC_TRAINING_VIEW_SECTIONS: dict[str, tuple[str, ...]] = {
     'prior_antipattern_view': ('priors_antipatterns',),
     'final_decision_view': ('final_decision',),
 }
+
+ALL_TRAINING_VIEW_IDS: tuple[str, ...] = ('training_view', *TASK_SPECIFIC_TRAINING_VIEW_SECTIONS.keys())
+
+
+def _bundle_relative_ref(bundle_dir: Path, target_path: str | Path) -> str:
+    return os.path.relpath(_as_path(target_path).resolve(), bundle_dir.resolve()).replace('\\', '/')
+
+
+def _normalize_ref_payload(
+    bundle_dir: Path,
+    refs: Mapping[str, str | Path] | Sequence[str | Path] | None,
+) -> dict[str, str] | list[str]:
+    if isinstance(refs, Mapping):
+        return {
+            str(key): _bundle_relative_ref(bundle_dir, value)
+            for key, value in refs.items()
+            if str(key).strip() and str(value).strip()
+        }
+    return [_bundle_relative_ref(bundle_dir, value) for value in refs or [] if str(value).strip()]
 
 
 def load_route_packet(path_like: str | Path) -> RoutePacket:
@@ -1316,6 +1336,94 @@ def write_decision_episode_export_bundle(
     }
     written_files['bundle_manifest'] = _write_json(bundle_dir / 'bundle_manifest.json', manifest_payload)
     return written_files
+
+
+def write_final_training_dataset_bundle(
+    output_dir: str | Path,
+    *,
+    primary_cycle_label: str,
+    supporting_cycle_labels: Sequence[str] | None = None,
+    source_cycle_roots: Mapping[str, str | Path] | None = None,
+    source_export_bundles: Mapping[str, str | Path] | None = None,
+    task_training_views: Mapping[str, str | Path],
+    schema_refs: Mapping[str, str | Path] | Sequence[str | Path] | None = None,
+    primary_recommendation_id: str | None = None,
+    recommendation_evidence_refs: Sequence[str] | None = None,
+    residual_risk_source: str | Path | None = None,
+    metadata: Mapping[str, Any] | None = None,
+    stability_handoff_payload: Mapping[str, Any] | None = None,
+) -> dict[str, Path]:
+    bundle_dir = _as_path(output_dir)
+    outputs_dir = bundle_dir / 'outputs'
+    built_at = _utc_now_iso()
+
+    missing_view_ids = [view_id for view_id in ALL_TRAINING_VIEW_IDS if view_id not in task_training_views]
+    if missing_view_ids:
+        raise ValueError(f'missing required training views: {", ".join(missing_view_ids)}')
+
+    training_views_index = {
+        view_id: _bundle_relative_ref(bundle_dir, view_path)
+        for view_id, view_path in task_training_views.items()
+        if view_id in ALL_TRAINING_VIEW_IDS
+    }
+    supporting_labels = _unique_strings(supporting_cycle_labels or [])
+    dataset_manifest_payload = {
+        'schema_version': 'v1',
+        'built_at': built_at,
+        'primary_cycle_label': primary_cycle_label,
+        'supporting_cycle_labels': supporting_labels,
+        'source_cycle_roots': _normalize_ref_payload(bundle_dir, source_cycle_roots),
+        'source_export_bundles': _normalize_ref_payload(bundle_dir, source_export_bundles),
+        'task_training_views': training_views_index,
+        'schema_refs': _normalize_ref_payload(bundle_dir, schema_refs),
+        'primary_recommendation_id': primary_recommendation_id,
+        'recommendation_evidence_refs': _unique_strings(recommendation_evidence_refs),
+        'residual_risk_source': (
+            _bundle_relative_ref(bundle_dir, residual_risk_source) if residual_risk_source is not None else None
+        ),
+    }
+    dataset_summary_payload = {
+        'schema_version': 'v1',
+        'built_at': built_at,
+        'primary_cycle_label': primary_cycle_label,
+        'supporting_cycle_count': len(supporting_labels),
+        'source_cycle_count': len(dataset_manifest_payload['source_cycle_roots']),
+        'source_export_bundle_count': len(dataset_manifest_payload['source_export_bundles']),
+        'task_training_view_count': len(training_views_index),
+        'task_training_view_ids': list(training_views_index),
+        'primary_recommendation_id': primary_recommendation_id,
+        'dataset_manifest_ref': 'dataset_manifest.json',
+        'training_views_index_ref': 'outputs/training_views_index.json',
+        'residual_risk_source': dataset_manifest_payload['residual_risk_source'],
+    }
+    written_files = {
+        'dataset_manifest': _write_json(bundle_dir / 'dataset_manifest.json', dataset_manifest_payload),
+        'dataset_summary': _write_json(bundle_dir / 'dataset_summary.json', dataset_summary_payload),
+        'training_views_index': _write_json(outputs_dir / 'training_views_index.json', training_views_index),
+    }
+    if stability_handoff_payload is not None:
+        written_files['stability_handoff'] = _write_json(
+            bundle_dir / 'stability_handoff.json',
+            dict(stability_handoff_payload),
+        )
+    bundle_manifest_payload = {
+        'schema_version': 'v1',
+        'built_at': built_at,
+        'primary_cycle_label': primary_cycle_label,
+        'supporting_cycle_labels': supporting_labels,
+        'source_cycle_roots': dataset_manifest_payload['source_cycle_roots'],
+        'source_export_bundles': dataset_manifest_payload['source_export_bundles'],
+        'task_training_views': training_views_index,
+        'metadata': dict(metadata or {}),
+        'files': {
+            name: str(path.relative_to(bundle_dir)).replace('\\', '/')
+            for name, path in written_files.items()
+        },
+    }
+    written_files['bundle_manifest'] = _write_json(bundle_dir / 'bundle_manifest.json', bundle_manifest_payload)
+    return written_files
+
+
 def write_corpus_sampling_bundle(
     output_dir: str | Path,
     *,
@@ -1501,6 +1609,7 @@ __all__ = [
     'load_route_states',
     'write_corpus_sampling_bundle',
     'write_decision_episode_export_bundle',
+    'write_final_training_dataset_bundle',
     'write_iteration_priority_bundle',
     'write_prior_candidate_review_bundle',
     'write_replay_bundle',
