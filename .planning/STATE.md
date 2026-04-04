@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: milestone
-status: Ready to plan
-stopped_at: Phase 16 context gathered (assumptions mode)
-last_updated: "2026-04-04T12:12:13.416Z"
+status: Ready to execute
+stopped_at: Phase 16 planned
+last_updated: "2026-04-04T12:47:36.228Z"
 progress:
   total_phases: 5
   completed_phases: 4
-  total_plans: 11
+  total_plans: 14
   completed_plans: 11
 ---
 
@@ -19,17 +19,17 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-04-04)
 
 **Core value:** Produce auditable, replayable, trainable scientific-reasoning artifacts rather than paper-like summaries or one-off knowledge graphs.
-**Current focus:** Discuss and plan Phase 16 using the accepted Phase 15 `cycle3-best` root, verification note, and prioritization handoff as the baseline
+**Current focus:** Execute Phase 16 using the accepted Phase 15 `cycle3-best` root as the bounded baseline and the new three-wave plan set as the execution guide
 
 ## Current Position
 
 Phase: 16
-Plan: Not started
+Plan: 01-03 planned
 Milestone: `v1.2` - Fast Iteration Research Logic Quality
 
 - Completed milestone: `v1.1` corpus-driven iterative quality hardening
-- Status: Phase `15` is complete and the project is ready to discuss and plan Phase `16`
-- Last activity: `2026-04-04` - completed Phase 15 with an accepted `cycle3-best` review verdict, `accepted_cycle_streak = 1`, and `packet_construction` confirmed as the next recommendation
+- Status: Phase `16` is planned and ready to execute
+- Last activity: `2026-04-04` - completed Phase 16 planning with one validation strategy and three execution plans covering additive task views, reviewed closeout plumbing, and the repeated-cycle stability handoff
 
 ## Milestone Snapshot
 
@@ -62,6 +62,7 @@ Milestone: `v1.2` - Fast Iteration Research Logic Quality
 - Phase 15 Plan 01 completed with per-role weak route-state tracing in packet validation and explicit default-versus-fallback prior-recovery metadata in comparison surfaces, leaving the phase ready for route-comparison and export-closure work.
 - Phase 15 Plan 02 completed with grounded route-comparison summaries, explicit why-now timing text, capped weak-support decision confidence, and structured accepted-but-unselected anti-pattern exclusions preserved through export and training-view outputs.
 - Phase 15 Plan 03 completed with compared default and fallback candidate reruns, a canonical reviewed `cycle3-best` root, an accepted-cycle streak of `1`, and a prioritization handoff that still points to `packet_construction`.
+- Phase 16 planning is now split into three waves: Wave 1 adds task-specific training views and final dataset scaffolding, Wave 2 adds reviewed stability-handoff plumbing without mutating runtime truth, and Wave 3 runs the repeated bounded cycle plus final dataset and recommendation handoff.
 
 ## Active Requirements
 
@@ -69,9 +70,9 @@ Milestone: `v1.2` - Fast Iteration Research Logic Quality
 
 ## Pending Follow-Ups
 
-- Discuss and plan Phase `16` using `docs/replay/reports/phase15-cycle3-best.md` and `.planning/phases/15-cycle-3-consolidation/15-VERIFICATION.md`.
-- Reproduce the accepted Phase 15 quality bar on a second bounded cycle and record whether `accepted_cycle_streak` reaches `2`.
-- Publish the final stability, training-view, schema, dataset, and residual-risk handoff once the accepted-cycle streak is verified.
+- Execute Phase `16` Plan 01 to publish additive task-specific training views and a reusable final dataset scaffold.
+- Execute Phase `16` Plan 02 to add reviewed stability-handoff payloads and machine-readable closeout refs without overwriting runtime export truth.
+- Execute Phase `16` Plan 03 to reproduce the accepted Phase 15 quality bar, target `accepted_cycle_streak = 2`, and publish the final dataset and next-milestone handoff.
 
 ## Blockers
 
@@ -80,6 +81,6 @@ Milestone: `v1.2` - Fast Iteration Research Logic Quality
 
 ## Session
 
-**Last Date:** 2026-04-04T12:12:13.413Z
-**Stopped At:** Phase 16 context gathered (assumptions mode)
-**Resume File:** .planning/phases/16-stability-verification-and-handoff/16-CONTEXT.md
+**Last Date:** 2026-04-04T12:47:36.228Z
+**Stopped At:** Phase 16 planned
+**Resume File:** .planning/phases/16-stability-verification-and-handoff/16-01-PLAN.md
