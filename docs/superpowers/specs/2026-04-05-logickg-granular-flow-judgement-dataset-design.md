@@ -130,6 +130,21 @@ To make this boundary explicit, the environment layer is defined as:
 1. `LiteratureVisibleEnvironmentSnapshot` in v1
 2. `ExtendedEnvironmentSnapshot` reserved for future non-paper sources
 
+### 5.1 Temporal boundary rule
+
+Historical replay in v1 is governed by a canonical `cutoff_date`, not only a coarse year bucket.
+
+Rules:
+
+1. every replay object keeps `cutoff_year` for reporting and grouping
+2. every replay build also computes an internal `cutoff_date`
+3. a paper or event is visible only if `publication_date <= cutoff_date`
+4. if exact publication date is unknown and only year is known, the system uses a conservative fallback date of `YYYY-12-31` and marks the record as `time_precision=year`
+5. same-year papers are therefore only visible automatically when their effective publication date does not exceed the canonical cutoff date
+6. if time precision is too weak to support a stable replay decision, the sample may be downgraded to `underspecified`
+
+This decision is mandatory because leakage control cannot rely on `cutoff_year` alone.
+
 ## 6. Canonical Storage Decision
 
 The source of truth should be file-based canonical assets, not Neo4j.
@@ -148,6 +163,7 @@ Recommended canonical asset families:
 papers.parquet
 statements.jsonl
 anchors.jsonl
+slot_mentions.jsonl
 statement_edges.jsonl
 citation_mentions.jsonl
 citation_acts.parquet
@@ -268,6 +284,16 @@ confidence
 
 The first version should use conservative linking. False merges are more harmful than missed merges.
 
+For `Resource`, the canonical schema must also keep a subtype:
+
+1. `dataset`
+2. `benchmark`
+3. `software`
+4. `hardware`
+5. `instrument`
+6. `protocol`
+7. `other`
+
 ## 9. Edge Schema
 
 Edges represent stable semantic relations, not context-rich events.
@@ -371,6 +397,8 @@ Design rule:
 The hard target for v1 is `citing_statement -> cited_paper`.  
 `cited_statement_candidates` are supported but not required for compiler correctness.
 
+`confidence` fields in all v1 event schemas are normalized to `[0, 1]` and should be interpreted as compiler confidence, not model probability.
+
 ### 10.3 `EvaluationEvent`
 
 This records measurable performance or comparison facts.
@@ -440,6 +468,7 @@ Compiled objects are not canonical facts. They are replay-ready syntheses.
 
 Required compiled objects in v1:
 
+1. `TopicScope`
 1. `LiteratureVisibleEnvironmentSnapshot`
 2. `SupportConflictCluster`
 3. `RouteFamily`
@@ -450,7 +479,31 @@ Required compiled objects in v1:
 8. `EvidencePack`
 9. `HistoricalOutcomeTrace`
 
-## 12. `LiteratureVisibleEnvironmentSnapshot`
+For all compiled objects in v1:
+
+1. `confidence` fields are normalized to `[0, 1]`
+2. they represent compiler confidence from evidence sufficiency and agreement, not calibrated model probability
+
+## 12. `TopicScope`
+
+This object freezes the bounded topic under which replay happens.
+
+Minimum fields:
+
+```text
+topic_scope_id
+canonical_label
+aliases
+seed_statement_ids
+seed_citation_act_ids
+inclusion_notes
+exclusion_notes
+confidence
+```
+
+`TopicScope` is compiled from paper-level topic signals and then treated as a stable replay boundary.
+
+## 13. `LiteratureVisibleEnvironmentSnapshot`
 
 This is the v1 environment object. It is intentionally paper-grounded.
 
@@ -471,7 +524,15 @@ quality_flags
 
 This object is allowed to be incomplete relative to true real-world conditions. It must not imply full external grounding.
 
-## 13. `SupportConflictCluster`
+Reference semantics:
+
+1. `visible_benchmark_ids` are `Resource.canonical_id` values with subtype `benchmark` or `dataset`
+2. `visible_protocol_ids` are `Resource.canonical_id` values with subtype `protocol`
+3. `resource_usage_refs` are `ResourceUsageEvent.resource_usage_event_id` values
+4. `protocol_signal_refs` are `Statement.statement_id` or `EvaluationEvent.evaluation_event_id` values that justify protocol visibility
+5. `cost_proxy_refs` are `Statement.statement_id` or `ResourceUsageEvent.resource_usage_event_id` values carrying literature-visible cost or cycle proxies
+
+## 14. `SupportConflictCluster`
 
 This object captures multi-paper support and critique patterns around a target statement family, method family, route family, or question candidate.
 
@@ -485,12 +546,22 @@ target_type
 target_ids
 support_statement_ids
 challenge_statement_ids
-citation_support_chain_ids
-citation_critique_chain_ids
+citation_support_act_ids
+citation_critique_act_ids
 confidence
 ```
 
-## 14. `RouteFamily`
+Allowed `target_type` values:
+
+1. `statement_family`
+2. `method_family`
+3. `route_family`
+4. `question_candidate`
+5. `bottleneck_cluster`
+
+`citation_support_act_ids` and `citation_critique_act_ids` are ordered `CitationActEvent.citation_act_id` lists. v1 does not require a separate `CitationChain` object.
+
+## 15. `RouteFamily`
 
 Routes are compiled, not extracted directly.
 
@@ -509,7 +580,12 @@ environment_snapshot_refs
 confidence
 ```
 
-## 15. `BottleneckCluster`
+Reference semantics:
+
+1. `competing_route_ids` may reference `AlternativeRouteCandidate.alternative_route_candidate_id` values in early synthesis, or stable `RouteFamily.route_family_id` values after route consolidation
+2. `environment_snapshot_refs` are `LiteratureVisibleEnvironmentSnapshot.snapshot_id` values
+
+## 16. `BottleneckCluster`
 
 Minimum fields:
 
@@ -521,11 +597,19 @@ bottleneck_type_ids
 source_statement_ids
 source_citation_act_ids
 affected_route_family_ids
-severity_summary
+primary_severity
+severity_evidence_count
 confidence
 ```
 
-## 16. `QuestionCandidate`
+Allowed `primary_severity` values:
+
+1. `low`
+2. `medium`
+3. `high`
+4. `blocking`
+
+## 17. `QuestionCandidate`
 
 This object must be semi-structured. The text is only one view.
 
@@ -589,7 +673,64 @@ Rule:
 
 `canonical_frame` is task-shaped, not universally dense. Fields may be null when the `candidate_action_type` does not require them, but every candidate must keep enough structured fields to support deduplication and replay auditing.
 
-## 17. `ResearchDecisionUnit`
+`dedup_signature` is a deterministic normalized hash over:
+
+1. `topic_scope_id`
+2. `candidate_action_type`
+3. populated `canonical_frame` fields
+4. normalized route or bottleneck references when present
+
+## 18. `AlternativeRouteCandidate`
+
+This object makes route competition explicit even when no final route family has yet stabilized.
+
+Minimum fields:
+
+```text
+alternative_route_candidate_id
+topic_scope_id
+cutoff_year
+candidate_route_label
+supporting_method_ids
+supporting_statement_ids
+supporting_citation_act_ids
+distinguishing_features
+related_route_family_ids
+status
+retirement_reason
+confidence
+```
+
+This object is produced by `AlternativeRouteCompiler` from route-competition signals, comparison statements, and citation transfer / critique patterns.
+
+Allowed `status` values:
+
+1. `emerging`
+2. `candidate`
+3. `consolidated`
+4. `expired`
+
+Lifecycle rules:
+
+1. create as `emerging` when cross-paper evidence suggests a distinct route shape but support is still thin
+2. promote to `candidate` when the route has:
+   - at least 2 supporting papers or statements
+   - at least 1 distinguishing method or comparison signal
+   - at least 1 citation-based competition, transfer, or critique link
+3. promote to `consolidated` when the route is stable enough to be materialized as a `RouteFamily`, meaning:
+   - multi-paper support remains consistent
+   - distinguishing features remain non-trivial after deduplication
+   - the route can be separated from the main route and other alternatives without ambiguity
+4. mark `expired` when:
+   - the candidate collapses into an existing route family
+   - the evidence is too weak after replay slicing
+   - or the route is no longer meaningfully distinct
+
+Handoff rule:
+
+`AlternativeRouteCompiler` owns creation and early-state updates. `RouteFamilyCompiler` may only promote a candidate into a stable `RouteFamily` when the `consolidated` gate passes.
+
+## 19. `ResearchDecisionUnit`
 
 This is the unified replay task object that keeps judgement, route choice, bottleneck diagnosis, and feasibility probe tasks in one contract.
 
@@ -617,7 +758,14 @@ Allowed `unit_type` values:
 3. `bottleneck_diagnosis`
 4. `feasibility_probe`
 
-## 18. `EvidencePack`
+Allowed `quality_status` values:
+
+1. `draft`
+2. `eligible`
+3. `reviewed`
+4. `rejected`
+
+## 20. `EvidencePack`
 
 This object makes sample composition auditable and enforceable.
 
@@ -630,13 +778,13 @@ cutoff_year
 focal_statement_ids
 support_statement_ids
 challenge_statement_ids
-citation_support_chain_ids
-citation_critique_chain_ids
+citation_support_act_ids
+citation_critique_act_ids
 resource_usage_event_ids
 evaluation_event_ids
 problem_signal_event_ids
-route_competition_refs
-bottleneck_refs
+alternative_route_candidate_ids
+bottleneck_cluster_ids
 environment_snapshot_refs
 excluded_post_cutoff_refs
 pack_quality
@@ -665,7 +813,33 @@ Unit-type-specific gates:
 
 If these minimums are not met, the default label path should allow `underspecified`.
 
-## 19. `HistoricalOutcomeTrace`
+`pack_quality` must include:
+
+```text
+paper_count
+support_statement_count
+challenge_statement_count
+citation_support_count
+citation_critique_count
+environment_signal_count
+alternative_signal_count
+status
+quality_flags
+```
+
+Allowed `status` values:
+
+1. `draft`
+2. `eligible`
+3. `insufficient`
+
+Reference semantics:
+
+1. `alternative_route_candidate_ids` are `AlternativeRouteCandidate.alternative_route_candidate_id` values
+2. `bottleneck_cluster_ids` are `BottleneckCluster.bottleneck_cluster_id` values
+3. `environment_snapshot_refs` are `LiteratureVisibleEnvironmentSnapshot.snapshot_id` values
+
+## 21. `HistoricalOutcomeTrace`
 
 This object stores how replay labels were derived from post-cutoff literature evolution.
 
@@ -687,7 +861,12 @@ visibility
 
 `target_decision_refs` may point to question candidates, route families, bottleneck clusters, or full decision units depending on the replay task type.
 
-## 20. `LabelPolicy`
+Allowed `visibility` values:
+
+1. `eval_only`
+2. `audit_only`
+
+## 22. `LabelPolicy`
 
 Main labels in v1 must be rule-driven, not LLM-driven.
 
@@ -727,33 +906,55 @@ Rule intent:
 
 LLMs may help phrase rationales. They must not assign the primary gold label by themselves.
 
-## 21. Extraction Pipeline
+For `route_choice`, the primary labels are:
 
-### 21.1 Step 1: markdown to `DocumentIR`
+1. `prefer_primary`
+2. `prefer_alternative`
+3. `tie`
+4. `underspecified`
+
+For `bottleneck_diagnosis`, `LabelPolicy` should define:
+
+1. the gold primary bottleneck cluster
+2. optional secondary bottleneck clusters
+3. the expected first-fix action type
+
+For `feasibility_probe`, the primary labels are:
+
+1. `feasible_now`
+2. `feasible_if_narrowed`
+3. `not_feasible_now`
+4. `underspecified`
+
+`decision_rules` must be executable against canonical refs and compiler outputs. Free-text-only policies are not sufficient.
+
+## 23. Extraction Pipeline
+
+### 23.1 Step 1: markdown to `DocumentIR`
 
 Normalize the markdown paper into a stable document representation.
 
-### 21.2 Step 2: `DocumentIR` to statement graph
+### 23.2 Step 2: `DocumentIR` to statement graph
 
 For each paper, extract:
 
 1. `Paper`
 2. `EvidenceAnchor`
 3. `Statement`
-4. statement slot values
+4. `SlotMentionEvent`
 5. statement-to-statement relations
 
 This stage is responsible for producing a stable single-paper `Statement graph`.
 
-### 21.3 Step 3: citation mention extraction
+### 23.3 Step 3: citation mention extraction
 
 Detect all in-text citation mentions and emit `CitationMentionEvent`.
 
-### 21.4 Step 4: citation act classification
+### 23.4 Step 4: citation act classification
 
 Aggregate mentions into `CitationActEvent`.
 
-### 21.5 Step 5: lightweight entity linking
+### 23.5 Step 5: lightweight entity linking
 
 Normalize methods, metrics, resources, bottlenecks, and topic concepts using:
 
@@ -761,25 +962,51 @@ Normalize methods, metrics, resources, bottlenecks, and topic concepts using:
 2. embedding similarity
 3. LLM disambiguation only for uncertain cases
 
-### 21.6 Step 6: event builders
+v1 linking policy:
+
+1. auto-merge on exact normalized match plus identical entity type
+2. auto-merge on known alias-table match
+3. candidate merge only when embedding similarity is high and no explicit type or scope conflict exists
+4. no-merge when resource subtype conflicts, metric semantics conflict, or route-family semantics conflict
+5. uncertain cases remain split and are flagged for review rather than merged aggressively
+
+### 23.6 Step 6: event builders
 
 Emit:
 
-1. `EvaluationEvent`
-2. `ResourceUsageEvent`
-3. `ProblemSignalEvent`
+1. `SlotMentionEvent`
+2. `EvaluationEvent`
+3. `ResourceUsageEvent`
+4. `ProblemSignalEvent`
 
-### 21.7 Step 7: cross-paper synthesis
+`SlotMentionEvent` is the raw mention-level bridge between `Statement` and normalized concept nodes.
+
+Minimum fields:
+
+```text
+slot_mention_event_id
+paper_id
+statement_id
+anchor_ids
+slot_type
+surface
+normalized_candidate
+confidence
+```
+
+### 23.7 Step 7: cross-paper synthesis
 
 Run exactly these compilers in v1:
 
-1. `SupportConflictCompiler`
-2. `RouteFamilyCompiler`
-3. `BottleneckCompiler`
-4. `QuestionCandidateCompiler`
-5. `EnvironmentSnapshotCompiler`
+1. `TopicScopeCompiler`
+2. `SupportConflictCompiler`
+3. `RouteFamilyCompiler`
+4. `AlternativeRouteCompiler`
+5. `BottleneckCompiler`
+6. `QuestionCandidateCompiler`
+7. `EnvironmentSnapshotCompiler`
 
-### 21.8 Step 8: historical replay labeling
+### 23.8 Step 8: historical replay labeling
 
 For each topic scope and cutoff:
 
@@ -789,7 +1016,7 @@ For each topic scope and cutoff:
 4. assign the gold label using `LabelPolicy`
 5. generate rationale text after the label is fixed
 
-### 21.9 Step 9: dataset view export
+### 23.9 Step 9: dataset view export
 
 Export:
 
@@ -797,9 +1024,9 @@ Export:
 2. `preference_pairs.jsonl`
 3. `reward_records.jsonl`
 
-## 22. Training Views
+## 24. Training Views
 
-### 22.1 `judgement_sft.jsonl`
+### 24.1 `judgement_sft.jsonl`
 
 Main task export.
 
@@ -817,7 +1044,7 @@ Output:
 3. key bottlenecks
 4. next attack path
 
-### 22.2 `preference_pairs.jsonl`
+### 24.2 `preference_pairs.jsonl`
 
 Input:
 
@@ -829,7 +1056,7 @@ Output:
 2. `rejected`
 3. `why_this_not_that`
 
-### 22.3 `reward_records.jsonl`
+### 24.3 `reward_records.jsonl`
 
 Reserved for later reward modeling or RL.
 
@@ -841,7 +1068,7 @@ Reward decomposition:
 4. novelty proxy
 5. uncertainty penalty
 
-## 23. Dataset Quality Gates
+## 25. Dataset Quality Gates
 
 A sample is high quality only if it passes all five dimensions below:
 
@@ -858,7 +1085,13 @@ A sample is high quality only if it passes all five dimensions below:
 
 If a sample fails any required gate, it must not enter the main training export.
 
-## 24. Evaluation Boundary for the First Paper
+Operational acceptance criteria for v1:
+
+1. `Cross-paper grounding` requires at least one support and one challenge path, unless the unit is explicitly marked `underspecified`
+2. `Decision sufficiency` requires all base evidence-pack gates to pass
+3. `Expert acceptability` means at least two domain reviewers agree the sample is acceptable, or one reviewer approves and no reviewer rejects in the pilot phase
+
+## 26. Evaluation Boundary for the First Paper
 
 The first paper should evaluate only judgement-centric tasks:
 
@@ -869,9 +1102,18 @@ The first paper should evaluate only judgement-centric tasks:
 
 The first paper should not rely on open-ended hypothesis generation as the main result.
 
-## 25. Relationship to Current Repository
+The first implementation plan should target the minimum shippable slice:
 
-### 25.1 Keep and upgrade
+1. `question_judgement`
+2. `judgement_sft.jsonl`
+3. replay labeling for the four question-judgement labels
+4. enough citation-aware synthesis to support those samples well
+
+`route_choice`, `bottleneck_diagnosis`, and `feasibility_probe` remain first-paper tasks, but they are second-wave implementation targets after the question-judgement path is stable.
+
+## 27. Relationship to Current Repository
+
+### 27.1 Keep and upgrade
 
 These parts are directionally useful and should be retained as foundations:
 
@@ -881,7 +1123,7 @@ These parts are directionally useful and should be retained as foundations:
 4. `backend/app/citations/models.py`
 5. `backend/app/llm/citation_purpose.py`
 
-### 25.2 Downgrade to legacy experimental downstream objects
+### 27.2 Downgrade to legacy experimental downstream objects
 
 These current research-layer objects should no longer define canonical truth:
 
@@ -890,7 +1132,7 @@ These current research-layer objects should no longer define canonical truth:
 
 They may remain as later compiled exports or regression references.
 
-### 25.3 New package boundary
+### 27.3 New package boundary
 
 Create a new primary package for the redesign:
 
@@ -907,39 +1149,39 @@ backend/app/research_kg/eval/
 
 This package should own the new canonical contracts.
 
-## 26. Risks and Controls
+## 28. Risks and Controls
 
-### 26.1 Risk: over-compression into route-only objects
+### 28.1 Risk: over-compression into route-only objects
 
 Control:
 
 Keep `QuestionCandidate`, `ResearchDecisionUnit`, and `EvidencePack` as explicit objects.
 
-### 26.2 Risk: citation extracted but not consumed
+### 28.2 Risk: citation extracted but not consumed
 
 Control:
 
 Require citation support and critique chains in eligible evidence packs.
 
-### 26.3 Risk: paper-only environment overclaim
+### 28.3 Risk: paper-only environment overclaim
 
 Control:
 
 Name the environment object `LiteratureVisibleEnvironmentSnapshot` and reserve a future `ExtendedEnvironmentSnapshot`.
 
-### 26.4 Risk: label drift from weak replay rules
+### 28.4 Risk: label drift from weak replay rules
 
 Control:
 
 Bind every label to `LabelPolicy` and `HistoricalOutcomeTrace`.
 
-### 26.5 Risk: beautiful schema, weak training signal
+### 28.5 Risk: beautiful schema, weak training signal
 
 Control:
 
 Require expert spot-checks and explicit sample-quality gates before main export.
 
-## 27. Implementation Sequence
+## 29. Implementation Sequence
 
 The recommended implementation order is:
 
@@ -947,14 +1189,14 @@ The recommended implementation order is:
 2. implement single-paper statement graph export
 3. implement citation mention and citation act pipeline
 4. implement lightweight entity linking
-5. implement the five cross-paper compilers
+5. implement the seven cross-paper compilers
 6. implement replay labeling
 7. implement the three dataset views
 8. iterate with the pilot granular-flow paper set
 
 This order favors dataset quality over raw build speed.
 
-## 28. Decision
+## 30. Decision
 
 The project should proceed as a paper-grounded historical scientific judgement data engine for granular flow, built on top of a canonical argumentative temporal research KG.
 
