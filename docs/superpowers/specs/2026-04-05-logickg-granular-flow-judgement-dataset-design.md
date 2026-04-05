@@ -145,6 +145,23 @@ Rules:
 
 This decision is mandatory because leakage control cannot rely on `cutoff_year` alone.
 
+### 5.2 Publication date source-of-truth rule
+
+When multiple publication timestamps exist for one paper, v1 uses the earliest public research exposure that can be independently verified.
+
+Priority order:
+
+1. first publicly accessible preprint date
+2. online-first journal or proceedings publication date
+3. official journal issue or conference publication date
+4. year-only fallback with `time_precision=year`
+
+Version rule:
+
+1. if a preprint is visible before the cutoff and the formal publication is after the cutoff, only preprint-visible content is allowed into replay inputs
+2. later revised text, supplementary files, or formal-publication additions after the cutoff are audit-only
+3. `future_work` or open-problem statements that appear in cutoff-visible papers are valid replay inputs, even if later papers eventually pursue them
+
 ## 6. Canonical Storage Decision
 
 The source of truth should be file-based canonical assets, not Neo4j.
@@ -179,6 +196,32 @@ evidence_packs.jsonl
 historical_outcome_traces.jsonl
 dataset_views/*.jsonl
 ```
+
+### 6.1 Versioning and freeze policy
+
+The first paper must be built from a frozen corpus and a frozen rule set.
+
+Rules:
+
+1. every official dataset release binds:
+   - corpus manifest version
+   - compiler version set
+   - label-policy version set
+   - topic-scope manifest
+   - cutoff manifest
+2. the first paper uses full rebuilds from frozen inputs, not ad hoc incremental mutation
+3. newly ingested papers may only enter later dataset versions, never an already frozen release
+4. audit metadata should record the exact replay build version for every exported sample
+
+### 6.2 Partitioning strategy
+
+Canonical compiled assets should be partitioned by:
+
+1. `topic_scope_id`
+2. `cutoff_year`
+3. dataset release version when relevant
+
+This is required for replay reproducibility and sample traceability.
 
 ## 7. Canonical Object Taxonomy
 
@@ -215,12 +258,29 @@ Minimum fields:
 paper_id
 title
 year
+publication_date
+publication_version
+time_precision
 authors
 venue
 doi
 paper_type
 source_path
 ```
+
+Allowed `publication_version` values:
+
+1. `preprint`
+2. `online_first`
+3. `official_publication`
+4. `unknown`
+
+Allowed `time_precision` values:
+
+1. `day`
+2. `month`
+3. `year`
+4. `unknown`
 
 ### 8.3 `Statement`
 
@@ -232,6 +292,7 @@ Minimum fields:
 statement_id
 paper_id
 statement_type
+secondary_tags
 summary
 anchor_ids
 confidence
@@ -246,6 +307,12 @@ Allowed `statement_type` values:
 5. `limitation`
 6. `future_work`
 7. `background`
+
+Design rule:
+
+1. each `Statement` has exactly one primary `statement_type`
+2. `EvidenceAnchor` objects may ground multiple statements when one passage contains mixed functions
+3. `secondary_tags` may record additional semantic hints such as `interpretive`, `comparative`, or `negative_result`, but they do not replace the primary type
 
 ### 8.4 `EvidenceAnchor`
 
@@ -293,6 +360,41 @@ For `Resource`, the canonical schema must also keep a subtype:
 5. `instrument`
 6. `protocol`
 7. `other`
+
+### 8.6 Granular-flow pilot lexicon
+
+The first implementation plan should include a controlled pilot lexicon for granular flow so extraction and linking stay domain-precise.
+
+Minimum curated families:
+
+1. `Method`
+   - `DEM`
+   - `CFD-DEM`
+   - `LBM`
+   - `Eulerian-Eulerian`
+   - `PTV / PIV`
+   - `tomography-based reconstruction`
+2. `ResearchObject`
+   - particle phase
+   - fluid phase
+   - packed bed
+   - fluidized bed
+   - hopper / silo flow
+   - slurry or suspension system
+3. `Metric`
+   - pressure drop
+   - packing fraction
+   - velocity field
+   - mixing index
+   - drag correlation error
+4. `BottleneckType`
+   - contact-model fidelity
+   - turbulence coupling uncertainty
+   - multiscale compute cost
+   - measurement resolution
+   - wall-effect uncertainty
+
+The lexicon should be versioned and extendable, but v1 should not attempt a domain-agnostic ontology from the start.
 
 ## 9. Edge Schema
 
@@ -398,6 +500,12 @@ The hard target for v1 is `citing_statement -> cited_paper`.
 `cited_statement_candidates` are supported but not required for compiler correctness.
 
 `confidence` fields in all v1 event schemas are normalized to `[0, 1]` and should be interpreted as compiler confidence, not model probability.
+
+Escalation rule:
+
+1. for `background` and broad `data_or_tool_use`, paper-level targets are acceptable
+2. for `support_claim` and `critique_or_limit`, the system should attempt statement-level candidate resolution
+3. if statement-level candidates cannot be resolved for these high-value intents, the event remains usable but should carry a downgrade flag and lower confidence
 
 ### 10.3 `EvaluationEvent`
 
@@ -906,6 +1014,16 @@ Rule intent:
 
 LLMs may help phrase rationales. They must not assign the primary gold label by themselves.
 
+Minimum executable rule shape for `question_judgement`:
+
+1. label assignment must combine:
+   - post-cutoff follow-through evidence
+   - alternative-route competitiveness evidence
+   - prerequisite visibility evidence at the cutoff
+   - critique versus support balance
+2. bibliometric signals such as citation count may be used only as weak supporting signals, never as the sole gold-label rule
+3. the first paper should publish the exact threshold table used for the frozen release
+
 For `route_choice`, the primary labels are:
 
 1. `prefer_primary`
@@ -1006,6 +1124,26 @@ Run exactly these compilers in v1:
 6. `QuestionCandidateCompiler`
 7. `EnvironmentSnapshotCompiler`
 
+Compiler dependency order for v1:
+
+```text
+TopicScopeCompiler
+    -> EnvironmentSnapshotCompiler
+    -> SupportConflictCompiler
+    -> AlternativeRouteCompiler
+    -> RouteFamilyCompiler
+    -> BottleneckCompiler
+    -> QuestionCandidateCompiler
+```
+
+Failure downgrade rules:
+
+1. if `TopicScopeCompiler` confidence is below the release threshold, stop and keep the sample `draft`
+2. if `EnvironmentSnapshotCompiler` fails, downstream replay may continue only for samples that can still be labeled `underspecified`
+3. if `AlternativeRouteCompiler` yields no valid alternatives, `route_choice` units are skipped but `question_judgement` may continue
+4. if `RouteFamilyCompiler` cannot consolidate a route cleanly, retain `AlternativeRouteCandidate` objects and block route-choice exports for that slice
+5. if `QuestionCandidateCompiler` cannot produce a stable deduplicated candidate, no `question_judgement` unit is exported for that slice
+
 ### 23.8 Step 8: historical replay labeling
 
 For each topic scope and cutoff:
@@ -1090,6 +1228,10 @@ Operational acceptance criteria for v1:
 1. `Cross-paper grounding` requires at least one support and one challenge path, unless the unit is explicitly marked `underspecified`
 2. `Decision sufficiency` requires all base evidence-pack gates to pass
 3. `Expert acceptability` means at least two domain reviewers agree the sample is acceptable, or one reviewer approves and no reviewer rejects in the pilot phase
+4. eligible non-underspecified judgement samples should typically include:
+   - at least 10 evidence-carrying statements
+   - at least 4 statement-function categories across problem, method, result, limitation, future-work, or interpretation
+   - at least 3 distinct papers
 
 ## 26. Evaluation Boundary for the First Paper
 
@@ -1111,9 +1253,32 @@ The first implementation plan should target the minimum shippable slice:
 
 `route_choice`, `bottleneck_diagnosis`, and `feasibility_probe` remain first-paper tasks, but they are second-wave implementation targets after the question-judgement path is stable.
 
-## 27. Relationship to Current Repository
+Recommended first-paper evaluation bundle:
 
-### 27.1 Keep and upgrade
+1. baselines
+   - a strong general-purpose frontier model
+   - a strong open model without domain fine-tuning
+   - a retrieval-augmented baseline using the same paper set
+   - the paper's trained judgement model
+2. metrics
+   - classification: accuracy and macro-F1
+   - pairwise preference: win rate and rank correlation
+   - bottleneck diagnosis: hit@k or mAP against expert references
+   - groundedness: expert-scored evidence support
+3. split policy
+   - split by topic scope and replay slice
+   - keep the test split frozen and excluded from compiler-rule tuning
+
+## 27. First-Paper Positioning
+
+The first paper should differentiate itself from generic scholarly KG or scientific QA work in three ways:
+
+1. it treats citation as a first-order argumentative signal rather than a side relation
+2. it builds labels through historical replay under strict cutoff constraints rather than retrospective free-form annotation
+3. it targets scientific judgement tasks directly: worth-doing-now, route choice, bottleneck diagnosis, and feasibility
+## 28. Relationship to Current Repository
+
+### 28.1 Keep and upgrade
 
 These parts are directionally useful and should be retained as foundations:
 
@@ -1123,7 +1288,7 @@ These parts are directionally useful and should be retained as foundations:
 4. `backend/app/citations/models.py`
 5. `backend/app/llm/citation_purpose.py`
 
-### 27.2 Downgrade to legacy experimental downstream objects
+### 28.2 Downgrade to legacy experimental downstream objects
 
 These current research-layer objects should no longer define canonical truth:
 
@@ -1132,7 +1297,7 @@ These current research-layer objects should no longer define canonical truth:
 
 They may remain as later compiled exports or regression references.
 
-### 27.3 New package boundary
+### 28.3 New package boundary
 
 Create a new primary package for the redesign:
 
@@ -1149,39 +1314,39 @@ backend/app/research_kg/eval/
 
 This package should own the new canonical contracts.
 
-## 28. Risks and Controls
+## 29. Risks and Controls
 
-### 28.1 Risk: over-compression into route-only objects
+### 29.1 Risk: over-compression into route-only objects
 
 Control:
 
 Keep `QuestionCandidate`, `ResearchDecisionUnit`, and `EvidencePack` as explicit objects.
 
-### 28.2 Risk: citation extracted but not consumed
+### 29.2 Risk: citation extracted but not consumed
 
 Control:
 
 Require citation support and critique chains in eligible evidence packs.
 
-### 28.3 Risk: paper-only environment overclaim
+### 29.3 Risk: paper-only environment overclaim
 
 Control:
 
 Name the environment object `LiteratureVisibleEnvironmentSnapshot` and reserve a future `ExtendedEnvironmentSnapshot`.
 
-### 28.4 Risk: label drift from weak replay rules
+### 29.4 Risk: label drift from weak replay rules
 
 Control:
 
 Bind every label to `LabelPolicy` and `HistoricalOutcomeTrace`.
 
-### 28.5 Risk: beautiful schema, weak training signal
+### 29.5 Risk: beautiful schema, weak training signal
 
 Control:
 
 Require expert spot-checks and explicit sample-quality gates before main export.
 
-## 29. Implementation Sequence
+## 30. Implementation Sequence
 
 The recommended implementation order is:
 
@@ -1196,7 +1361,7 @@ The recommended implementation order is:
 
 This order favors dataset quality over raw build speed.
 
-## 30. Decision
+## 31. Decision
 
 The project should proceed as a paper-grounded historical scientific judgement data engine for granular flow, built on top of a canonical argumentative temporal research KG.
 
