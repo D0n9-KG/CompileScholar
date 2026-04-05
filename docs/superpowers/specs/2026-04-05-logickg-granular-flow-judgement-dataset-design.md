@@ -162,6 +162,11 @@ Version rule:
 2. later revised text, supplementary files, or formal-publication additions after the cutoff are audit-only
 3. `future_work` or open-problem statements that appear in cutoff-visible papers are valid replay inputs, even if later papers eventually pursue them
 
+Source-lineage rule:
+
+1. every replay-visible `Paper`, `EvidenceAnchor`, and derived `Statement` must be traceable to a single `source_version_id`
+2. if replay safety requires distinguishing preprint-visible from later-visible content and the source lineage cannot be proven, the affected sample is ineligible for non-underspecified export
+
 ## 6. Canonical Storage Decision
 
 The source of truth should be file-based canonical assets, not Neo4j.
@@ -234,6 +239,20 @@ The knowledge layer must be separated into four object classes:
 
 This is a hard design rule. No downstream training view should redefine this taxonomy ad hoc.
 
+### 7.1 Typed reference rule
+
+Whenever a field may refer to more than one object family, v1 must use a typed-reference wrapper instead of a raw ID list.
+
+Canonical typed-ref shape:
+
+```text
+TypedRef
+- ref_type
+- ref_id
+```
+
+Allowed `ref_type` values are constrained per field and must be documented where the field appears.
+
 ## 8. Node Schema
 
 ### 8.1 Required nodes
@@ -260,6 +279,7 @@ title
 year
 publication_date
 publication_version
+source_version_id
 time_precision
 authors
 venue
@@ -281,6 +301,33 @@ Allowed `time_precision` values:
 2. `month`
 3. `year`
 4. `unknown`
+
+`source_version_id` identifies the exact document version from which replay-visible extraction is derived.
+
+### 8.2.1 `SourceVersion`
+
+Every replay-safe paper source should be represented explicitly.
+
+Minimum fields:
+
+```text
+source_version_id
+paper_id
+version_type
+source_path
+publication_date
+time_precision
+is_cutoff_visible
+parent_version_id | null
+```
+
+Allowed `version_type` values:
+
+1. `preprint`
+2. `online_first`
+3. `official_publication`
+4. `revised_preprint`
+5. `unknown`
 
 ### 8.3 `Statement`
 
@@ -321,6 +368,7 @@ Minimum fields:
 ```text
 anchor_id
 paper_id
+source_version_id
 modality
 section_path
 span_start
@@ -335,6 +383,8 @@ Allowed `modality` values:
 2. `figure`
 3. `table`
 4. `caption`
+
+`source_version_id` must point to the same cutoff-visible source version used for the parent paper record.
 
 ### 8.5 Canonical concept nodes
 
@@ -637,8 +687,12 @@ Reference semantics:
 1. `visible_benchmark_ids` are `Resource.canonical_id` values with subtype `benchmark` or `dataset`
 2. `visible_protocol_ids` are `Resource.canonical_id` values with subtype `protocol`
 3. `resource_usage_refs` are `ResourceUsageEvent.resource_usage_event_id` values
-4. `protocol_signal_refs` are `Statement.statement_id` or `EvaluationEvent.evaluation_event_id` values that justify protocol visibility
-5. `cost_proxy_refs` are `Statement.statement_id` or `ResourceUsageEvent.resource_usage_event_id` values carrying literature-visible cost or cycle proxies
+4. `protocol_signal_refs` use `TypedRef`, with allowed targets:
+   - `Statement.statement_id`
+   - `EvaluationEvent.evaluation_event_id`
+5. `cost_proxy_refs` use `TypedRef`, with allowed targets:
+   - `Statement.statement_id`
+   - `ResourceUsageEvent.resource_usage_event_id`
 
 ## 14. `SupportConflictCluster`
 
@@ -682,7 +736,7 @@ cutoff_year
 core_method_ids
 supporting_statement_ids
 supporting_citation_act_ids
-competing_route_ids
+competing_route_refs
 bottleneck_cluster_ids
 environment_snapshot_refs
 confidence
@@ -690,7 +744,9 @@ confidence
 
 Reference semantics:
 
-1. `competing_route_ids` may reference `AlternativeRouteCandidate.alternative_route_candidate_id` values in early synthesis, or stable `RouteFamily.route_family_id` values after route consolidation
+1. `competing_route_refs` use `TypedRef`, with allowed targets:
+   - `AlternativeRouteCandidate.alternative_route_candidate_id`
+   - `RouteFamily.route_family_id`
 2. `environment_snapshot_refs` are `LiteratureVisibleEnvironmentSnapshot.snapshot_id` values
 
 ## 16. `BottleneckCluster`
@@ -873,6 +929,12 @@ Allowed `quality_status` values:
 3. `reviewed`
 4. `rejected`
 
+Ownership rule:
+
+1. compilers may move a unit from `draft` to `eligible`
+2. reviewers may move a unit from `eligible` to `reviewed` or `rejected`
+3. only `reviewed` units may enter the frozen high-quality export when reviewer gating is enabled for that split
+
 ## 20. `EvidencePack`
 
 This object makes sample composition auditable and enforceable.
@@ -967,7 +1029,12 @@ visibility
 
 `visibility` must default to `eval_only`.
 
-`target_decision_refs` may point to question candidates, route families, bottleneck clusters, or full decision units depending on the replay task type.
+`target_decision_refs` use `TypedRef`, with allowed targets:
+
+1. `QuestionCandidate.candidate_id`
+2. `RouteFamily.route_family_id`
+3. `BottleneckCluster.bottleneck_cluster_id`
+4. `ResearchDecisionUnit.decision_unit_id`
 
 Allowed `visibility` values:
 
@@ -1045,6 +1112,12 @@ For `feasibility_probe`, the primary labels are:
 4. `underspecified`
 
 `decision_rules` must be executable against canonical refs and compiler outputs. Free-text-only policies are not sufficient.
+
+Training-visible text rule:
+
+1. any training-visible `rationale`, `why_this_not_that`, or `next attack path` text must be generated only from cutoff-visible evidence
+2. `HistoricalOutcomeTrace` is never allowed as a source for training-visible explanations
+3. hindsight data may supervise labels, rewards, and evaluation, but not replay-visible rationale text
 
 ## 23. Extraction Pipeline
 
@@ -1350,14 +1423,40 @@ Require expert spot-checks and explicit sample-quality gates before main export.
 
 The recommended implementation order is:
 
-1. freeze canonical schema
+### 30.1 Minimum shippable slice
+
+1. freeze canonical schema for:
+   - `Paper`
+   - `SourceVersion`
+   - `EvidenceAnchor`
+   - `Statement`
+   - `CitationMentionEvent`
+   - `CitationActEvent`
+   - `QuestionCandidate`
+   - `ResearchDecisionUnit`
+   - `EvidencePack`
+   - `HistoricalOutcomeTrace`
 2. implement single-paper statement graph export
 3. implement citation mention and citation act pipeline
-4. implement lightweight entity linking
-5. implement the seven cross-paper compilers
-6. implement replay labeling
-7. implement the three dataset views
+4. implement lightweight entity linking for the granular-flow pilot lexicon
+5. implement only these cross-paper compilers:
+   - `TopicScopeCompiler`
+   - `SupportConflictCompiler`
+   - `QuestionCandidateCompiler`
+   - `EnvironmentSnapshotCompiler`
+6. implement replay labeling for `question_judgement`
+7. implement only `judgement_sft.jsonl`
 8. iterate with the pilot granular-flow paper set
+
+### 30.2 Second-wave implementation
+
+After the minimum shippable slice is stable:
+
+1. add `AlternativeRouteCompiler`
+2. add `RouteFamilyCompiler`
+3. add `BottleneckCompiler`
+4. add `preference_pairs.jsonl`
+5. add `reward_records.jsonl`
 
 This order favors dataset quality over raw build speed.
 
