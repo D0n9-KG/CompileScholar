@@ -1090,6 +1090,7 @@ Minimum executable rule shape for `question_judgement`:
    - critique versus support balance
 2. bibliometric signals such as citation count may be used only as weak supporting signals, never as the sole gold-label rule
 3. the first paper should publish the exact threshold table used for the frozen release
+4. the frozen release must ship with an auditable rule appendix like Appendix A below
 
 For `route_choice`, the primary labels are:
 
@@ -1472,3 +1473,82 @@ The first paper should be framed as:
 4. a model-training result showing improved scientific judgement
 
 That scope is ambitious enough for a strong paper while still narrow enough to execute rigorously.
+
+## Appendix A. Frozen Label Threshold Table
+
+The exact thresholds may be tuned during pilot construction, but the released dataset must freeze one explicit table and publish it with the dataset version.
+
+Suggested v1 default table for `question_judgement`:
+
+| Label | Minimum replay rule shape |
+|---|---|
+| `worth_doing_now` | Within 3 post-cutoff years, at least 3 follow-through papers appear in the bounded domain slice; no alternative route has a clearly dominant advantage on the frozen competitiveness score; required prerequisites are visible at the cutoff. |
+| `promising_but_premature` | The direction later receives meaningful follow-through, but at least 1 critical prerequisite at the cutoff remains missing or unstable, such as protocol, benchmark, or resource visibility. |
+| `not_competitive` | Follow-through remains weak relative to alternatives, or an alternative route clearly dominates on the frozen competitiveness score derived from support, critique, comparison, and benchmark signals. |
+| `underspecified` | Evidence-pack base gates fail, or time/source lineage uncertainty makes the replay decision unsafe. |
+
+Rules for the frozen competitiveness score:
+
+1. it must combine multiple signals, not only citation count
+2. citation or venue counts may contribute only as weak support terms
+3. the final released table must list every component and weight used for the frozen version
+
+## Appendix B. Multi-Version Paper Cleaning Rule
+
+To prevent replay leakage and duplicate evidence inflation:
+
+1. if the same research work appears as multiple paper versions, the replay-visible corpus keeps only the earliest cutoff-visible `SourceVersion` as the training-visible source
+2. later versions are marked `redundant` or `audit_only` for that replay slice
+3. later-version anchors and statements must not contribute to:
+   - visible evidence packs
+   - statement counts
+   - citation support or critique chains
+4. later versions may remain in audit metadata to explain why a duplicate source was suppressed
+
+## Appendix C. Entity Linking Acceptance Target
+
+Entity linking in v1 is intentionally conservative.
+
+Pilot acceptance targets:
+
+1. precision target: at least `0.95`
+2. recall target: at least `0.80`
+3. unresolved ambiguous links must remain split and be logged for review
+4. the release checklist should include a manually reviewed pilot lexicon evaluation set
+
+These are release-quality targets, not a requirement to begin implementation.
+
+## Appendix D. Neo4j Projection Rules
+
+Neo4j is a read-only projection layer in v1.
+
+Hard rules:
+
+1. JSONL and Parquet remain the only canonical source of truth
+2. Neo4j must never be hand-edited to repair data
+3. graph projection jobs should be reproducible rebuilds from canonical files
+4. audit, replay, and dataset export logic must read canonical files, not graph-side mutations
+
+## Appendix E. Dataset Split and Freeze Rules
+
+The first paper must publish a frozen split policy.
+
+Rules:
+
+1. target split ratio is `7:1:2` for train, validation, and test when the corpus supports it
+2. splitting should prioritize stratification by `topic_scope_id` and replay slice
+3. the frozen test split must not be used for:
+   - compiler rule tuning
+   - prompt tuning
+   - threshold tuning
+   - error-driven schema changes
+4. if the pilot corpus is too small for a strict ratio, the release notes must document the actual split and the reason
+
+## Appendix F. TypedRef Consistency Requirement
+
+Before any release, run a schema consistency audit to ensure:
+
+1. every polymorphic reference field uses `TypedRef`
+2. every `ref_type` is validated against an allowlist
+3. no raw mixed-ID field remains in canonical compiled objects
+4. exported dataset views keep enough typed reference lineage to support later auditing
