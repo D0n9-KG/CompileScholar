@@ -697,6 +697,55 @@ def _token_clusters(texts: list[str], threshold: float) -> list[list[int]]:
     return list(groups.values())
 
 
+def _dependency_context_clusters(edges: list[Hyperedge], instance: InstanceHypergraph,
+                                  meta: MetaHypergraph) -> list[list[int]] | None:
+    """Cluster a pattern's instance edges by their DEPENDENCY CONTEXT (REDESIGN
+    v2 step 5 — the new split dimension). The context of an edge = the SET of
+    OTHER pattern families whose edges share at least one node with this edge.
+
+    Two edges in the same cluster reference entities that co-occur with the
+    same family mix — e.g. a measure edge whose node also appears in a
+    constitutive_law edge vs one whose node appears in a claim edge. This
+    catches an over-wide pattern that BEHAVES DIFFERENTLY in different relational
+    contexts (the design's split-by-dependency-context case), which qualifier /
+    embedding clustering miss when the edge text is similar but the surrounding
+    graph structure differs.
+
+    Deterministic + structural (graph reachability, no LLM). Returns None when
+    every edge has the same (often empty) context — no split signal — so the
+    caller falls through to embedding. Cluster sizes are gated downstream by
+    MIN_CLUSTER (same as other tiers)."""
+    # build nid -> set of families (across the WHOLE instance, so cross-pattern
+    # context is captured, not just within this pattern's edges)
+    node_fams: dict[str, set[str]] = {}
+    for he in instance.hyperedges.values():
+        pat = meta.patterns.get(he.pattern_type)
+        fam = pat.family if pat else ""
+        if not fam:
+            continue
+        for nid in he.node_ids:
+            node_fams.setdefault(nid, set()).add(fam)
+    # context per edge = union of families on its nodes, MINUS its own family
+    own_fam = ""
+    own_pat = meta.patterns.get(edges[0].pattern_type if edges else "")
+    if own_pat:
+        own_fam = own_pat.family
+    contexts: list[frozenset] = []
+    for he in edges:
+        ctx: set[str] = set()
+        for nid in he.node_ids:
+            ctx |= node_fams.get(nid, set())
+        ctx.discard(own_fam)  # exclude own family (every edge has it — not discriminating)
+        contexts.append(frozenset(ctx))
+    # if all edges share the same context, there's no split signal here
+    if len(set(contexts)) <= 1:
+        return None
+    groups: dict[frozenset, list[int]] = {}
+    for i, ctx in enumerate(contexts):
+        groups.setdefault(ctx, []).append(i)
+    return list(groups.values())
+
+
 def _qualifier_is_discrete(edges: list[Hyperedge], max_ratio: float = 0.6) -> tuple[bool, str]:
     """A relation-kind qualifier is 'discrete' (treatable as a controlled enum)
     if its distinct values are few relative to edge count — i.e. values repeat.
@@ -715,7 +764,7 @@ def _qualifier_is_discrete(edges: list[Hyperedge], max_ratio: float = 0.6) -> tu
 
 
 def cluster_pattern_instances(edges: list[Hyperedge], instance: InstanceHypergraph,
-                              prefer: str = "auto") -> tuple[list[list[int]], str]:
+                              meta: MetaHypergraph, prefer: str = "auto") -> tuple[list[list[int]], str]:
     """Cluster a pattern's instance edges. Returns (clusters, method_used).
     method_used in {"discrete","embedding","token"} — always reported so the
     split decision's evidence base is auditable (A4: deterministic, but we
@@ -738,6 +787,15 @@ def cluster_pattern_instances(edges: list[Hyperedge], instance: InstanceHypergra
             v = he.qualifiers.get(qk, "(none)")
             groups.setdefault(v if v else "(none)", []).append(i)
         return list(groups.values()), "discrete"
+    # tier 1.5: dependency-context clustering (REDESIGN v2 step 5 — the new
+    # split dimension). Groups edges by the SET of other families co-occurring
+    # on their nodes. Catches an over-wide pattern behaving differently in
+    # different relational contexts (qualifier/embedding miss this when edge
+    # text is similar but surrounding graph structure differs). Returns None
+    # when all edges share the same context (no signal) -> falls through.
+    dc = _dependency_context_clusters(edges, instance, meta)
+    if dc is not None:
+        return dc, "dependency_context"
     # tier 2: embedding (free-text qualifier — needs semantic clustering)
     texts = [_edge_cluster_text(he, instance) for he in edges]
     if prefer in ("auto", "embedding"):
@@ -832,7 +890,7 @@ def detect_split_triggers(meta: MetaHypergraph, instance: InstanceHypergraph,
     for pid, edges in by_pat.items():
         if len(edges) < 2 * MIN_CLUSTER:
             continue  # not enough to form two real clusters
-        clusters, method = cluster_pattern_instances(edges, instance, prefer=prefer)
+        clusters, method = cluster_pattern_instances(edges, instance, meta, prefer=prefer)
         big = [c for c in clusters if len(c) >= MIN_CLUSTER]
         # tier 3 fallback: LLM semantic grouping (for over-wide patterns with
         # no discrete qualifier + continuous embedding — the common real case)
@@ -1014,6 +1072,119 @@ def infer_pattern_dependencies(meta: MetaHypergraph, instance: InstanceHypergrap
                                                  paper_id=paper_id)
                 if nv:
                     applied.append({"dependent": a, "depends_on": b,
+                                    "via_node": surface, "version": nv})
+    return applied
+
+
+# ===========================================================================
+# REDESIGN v2 step 3: pattern-level CONSTRAINT + COMPOSITION inference.
+#
+# Two more schema-layer topology edges, inferred FROM INSTANCES (deterministic,
+# graph reachability, no LLM — A4 preserved). They differ from depends_on in
+# DIRECTION + the family roles they apply to, so they are NOT redundant with it:
+#
+#   depends_on (A -> B):  A references an entity B DEFINES.        B = producer.
+#                           A cannot exist without B. (definition is authority.)
+#   constrains   (A -> B): A (a law/definition) GOVERNS B (a measure/claim).
+#                           B must conform to A.                   A = authority.
+#   composes      (A -> B): A (a composition) INCLUDES B's entity as a part.
+#                           A structurally contains B.             A = whole.
+#
+# All three are co-occurrence-based but pick out different relations by which
+# family plays which role. This is what makes the schema layer a directed
+# constrained hypergraph (DIAL-KG's flat schema has none of these).
+# ===========================================================================
+
+# Authority families: patterns that FIX a relation among quantities (a law or
+# a definition). These CONSTRAIN the patterns that consume those quantities.
+AUTHORITY_FAMILIES = ("definition", "constitutive_law")
+# Consumer families: patterns whose content is bounded by an authority (a
+# measure is validated against a law; a claim is scoped by a definition).
+CONSUMER_FAMILIES = ("measure", "claim")
+
+
+def infer_pattern_constraints(meta: MetaHypergraph, instance: InstanceHypergraph,
+                               paper_id: str) -> list[dict]:
+    """Infer pattern-level CONSTRAINT edges from instance co-occurrence.
+    A constrains B when A is an AUTHORITY (definition/constitutive_law family)
+    and B is a CONSUMER (measure/claim family) and they reference the same node
+    surface — the law governs the quantity the measure/claim uses. Deterministic.
+
+    Direction (authority -> constrains -> consumer) is the OPPOSITE of depends_on
+    (consumer -> depends_on -> producer): constrains says who GOVERNS, depends_on
+    says who NEEDS. A pair can carry both when the roles warrant it; they are
+    not mutually exclusive, just different relations."""
+    # surface -> set of patterns referencing it
+    node_pats: dict[str, set[str]] = {}
+    for he in instance.hyperedges.values():
+        for nid in he.node_ids:
+            n = instance.nodes.get(nid)
+            if n:
+                node_pats.setdefault(n.surface, set()).add(he.pattern_type)
+    applied = []
+    for surface, pats in node_pats.items():
+        authorities = {p for p in pats if p in meta.patterns
+                       and meta.patterns[p].family in AUTHORITY_FAMILIES
+                       and not meta.patterns[p].deprecated}
+        if not authorities:
+            continue
+        consumers = {p for p in pats if p in meta.patterns
+                     and meta.patterns[p].family in CONSUMER_FAMILIES
+                     and not meta.patterns[p].deprecated}
+        if not consumers:
+            continue
+        # each authority constrains each consumer that shares this node
+        for a in authorities:
+            for b in consumers:
+                if a == b:
+                    continue
+                nv = meta.add_pattern_dependency(a, b, rel="constrains",
+                                                 evidence=f"node '{surface}' governed by authority + used by consumer",
+                                                 paper_id=paper_id)
+                if nv:
+                    applied.append({"authority": a, "constrains": b,
+                                    "via_node": surface, "version": nv})
+    return applied
+
+
+def infer_pattern_compositions(meta: MetaHypergraph, instance: InstanceHypergraph,
+                                paper_id: str) -> list[dict]:
+    """Infer pattern-level COMPOSITION edges from instance co-occurrence.
+    A composes B when A is a COMPOSITION-family pattern (a whole made of parts)
+    and B is any other pattern referencing a node A connects — A's whole
+    includes an entity B also relates/defines. Deterministic.
+
+    Direction (whole -> composes -> part): A is the composite relation, B is
+    one of its components' patterns. This captures 'a constitutive relation is
+    composed of a dependency + a definition' style structure at the pattern
+    level, which depends_on (consumer->producer) and constrains (authority->
+    consumer) do not."""
+    # surface -> set of patterns referencing it
+    node_pats: dict[str, set[str]] = {}
+    for he in instance.hyperedges.values():
+        for nid in he.node_ids:
+            n = instance.nodes.get(nid)
+            if n:
+                node_pats.setdefault(n.surface, set()).add(he.pattern_type)
+    applied = []
+    for surface, pats in node_pats.items():
+        wholes = {p for p in pats if p in meta.patterns
+                  and meta.patterns[p].family == "composition"
+                  and not meta.patterns[p].deprecated}
+        if not wholes:
+            continue
+        for w in wholes:
+            for b in pats:
+                if b == w:
+                    continue
+                pat_b = meta.patterns.get(b)
+                if not pat_b or pat_b.deprecated:
+                    continue
+                nv = meta.add_pattern_dependency(w, b, rel="composes",
+                                                 evidence=f"node '{surface}' is a component of a composition + referenced by another pattern",
+                                                 paper_id=paper_id)
+                if nv:
+                    applied.append({"whole": w, "composes": b,
                                     "via_node": surface, "version": nv})
     return applied
 

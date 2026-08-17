@@ -1084,11 +1084,29 @@ class MetaHypergraph:
         # show ALL current families (seed 6 + any grown), so the probe sees
         # what already exists before proposing a new one.
         families_str = ", ".join(sorted(set(p.family for p in self.patterns.values() if p.family))) or "(none)"
+        # REDESIGN v2 step 4: render the pattern-level TOPOLOGY edges
+        # (depends_on / constrains / composes) so the schema's富拓扑 is visible
+        # to the extractor, not just the IS-A tree. These are the edges that
+        # make the schema layer a directed constrained hypergraph; without
+        # rendering them the extractor never sees that e.g. a measure edge
+        # is CONSTRAINED BY a law, so it can't use the constraint to guide
+        # extraction. Only edges between NON-deprecated patterns are shown.
+        topo = []
+        for e in self.meta_edges:
+            if e.relation not in ("depends_on", "constrains", "composes"):
+                continue
+            src_p = self.patterns.get(e.src)
+            dst_p = self.patterns.get(e.dst)
+            if not src_p or not dst_p or src_p.deprecated or dst_p.deprecated:
+                continue
+            topo.append(f"  {e.src} {e.relation} {e.dst}")
+        topo_str = "\n".join(topo) if topo else "  (none)"
         return (f"Meta-Hypergraph (schema v{self.version}):\n"
                 f"Node types: {types}\n"
                 f"Node subclass hierarchy: {type_sub_str}\n"
                 f"Seed families (growable — specialize within, or propose a new one if none fits): {families_str}\n"
-                f"Hyperedge patterns (taxonomy — indented = IS-A specialization of parent):\n{pats_str}\n")
+                f"Hyperedge patterns (taxonomy — indented = IS-A specialization of parent):\n{pats_str}\n"
+                f"Pattern-level topology (directed constrained hypergraph — A depends_on/constrains/composes B):\n{topo_str}\n")
 
 
 def seed_meta_hypergraph() -> MetaHypergraph:

@@ -29,7 +29,7 @@ from granular_agent.hypergraph_schema import seed_meta_hypergraph, InstanceCorpu
 from granular_agent.hypergraph_extractor import extract_hypergraph
 from granular_agent.hypergraph_evolution import (
     EvolutionTrigger, run_split, run_merge, run_retire, run_rename,
-    infer_pattern_dependencies)
+    infer_pattern_dependencies, infer_pattern_constraints, infer_pattern_compositions)
 
 
 class GranularFlowAgent:
@@ -319,6 +319,8 @@ class GranularFlowAgent:
         retires = run_retire(self.meta_hg, inst, paper_id=paper_id)
         renames = run_rename(self.meta_hg, llm=llm)
         deps = infer_pattern_dependencies(self.meta_hg, inst, paper_id=paper_id)
+        cons = infer_pattern_constraints(self.meta_hg, inst, paper_id=paper_id)
+        comp = infer_pattern_compositions(self.meta_hg, inst, paper_id=paper_id)
         violations = self.meta_hg.detect_constraint_violations(inst)
         result = {
             "paper_id": paper_id,
@@ -334,6 +336,19 @@ class GranularFlowAgent:
             "version_before": pre_v,
             "version_after": self.meta_hg.version,
             "total_patterns_after": len(self.meta_hg.patterns),
+            "topology": {
+                "dependencies": len(deps),
+                "constraints": len(cons),
+                "compositions": len(comp),
+                "violations": len(violations),
+                "dependency_edges": [{"dependent": d["dependent"], "depends_on": d["depends_on"],
+                                     "via_node": d["via_node"]} for d in deps],
+                "constraint_edges": [{"authority": c["authority"], "constrains": c["constrains"],
+                                     "via_node": c["via_node"]} for c in cons],
+                "composition_edges": [{"whole": c["whole"], "composes": c["composes"],
+                                      "via_node": c["via_node"]} for c in comp],
+                "violations_detail": violations,
+            },
             "repair": {
                 "splits": [{"pattern": s.get("pattern_id"),
                             "sub_patterns": s.get("sub_patterns"),
@@ -356,7 +371,7 @@ class GranularFlowAgent:
               f"v{pre_v}->{self.meta_hg.version} ({len(self.meta_hg.patterns)} patterns) | "
               f"split={len([s for s in splits if not s.get('skipped')])} "
               f"merge={len([m for m in merges if not m.get('skipped')])} "
-              f"retire={len(retires)}", flush=True)
+              f"retire={len(retires)} | topo: dep={len(deps)} cons={len(cons)} comp={len(comp)} viol={len(violations)}", flush=True)
         return result
 
     def process_batch_hypergraph(self, paper_ids: list[str]) -> list[dict]:
