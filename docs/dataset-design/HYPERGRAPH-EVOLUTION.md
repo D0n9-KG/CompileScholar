@@ -2801,3 +2801,48 @@ LA-RL/HGNet 的 zero-shot 也是给定 schema（relation types），所以给 en
 - strict match（entity substring + relation exact match）
 - 452句（有gold关系的句子，非全部21万句）
 - 之前裸LLM F1=33.4 是不同norm+不同匹配标准，不可直接比
+
+## REDESIGN v2 step 3+4+5 实现 (2026-08-14, code-only)
+
+### 实现内容
+1. **pattern_constraint** (`infer_pattern_constraints`): 确定性，A(constitutive_law)
+   constrains B(dependency/measure/claim)。从实例 co-occurrence 归纳（图可达性，
+   非 LLM）。与 depends_on 不重叠：depends_on 是 consumer→definition，constrains 是
+   law→governed-relation。见 DECISION-constraint-trigger-scope.md（初版把 definition
+   也当 authority → 在理论论文上零触发且与 dependency 反向冗余，已收窄为只 law）。
+2. **pattern_composition** (`infer_pattern_compositions`): composition-family pattern
+   composes 其他 pattern（whole→part，共享节点）。
+3. **split dependency_context 维度** (`cluster_pattern_instances` 新 tier): 按
+   co-occurring family 集合聚类——过宽 pattern 在不同关系上下文表现不同时拆。所有
+   edge 同上下文时返回 None 落到 embedding tier。
+4. **to_prompt 富拓扑渲染**: depends_on/constrains/composes 边现在在 prompt 可见
+   （之前只渲染 IS-A 树）。
+5. **split 继承**: 子 pattern 继承父的 constraint/composition 边（lines 738-750
+   已涵盖三类，验证通过）。
+6. **smoke 测试**: +16 assertions（constraint/composition/dependency_context/继承/
+   非重叠），全过。
+
+### 真实论文审视（cached smap，旧 scope 结果已记录，新 scope 重跑中）
+
+PPR_00180B90C8D8（Oda fabric 论文，纯理论）:
+- dependency 11 条、composition 4 条、constraint 0 条（旧 scope，无 measure/claim 边）
+- violation 1 条真阳性："15%" NUMERIC 被引用未定义（轴向应变值，论文中是顺带提及）
+- split 触发：`defines` 拆成 defines_identity/equivalence/characterization/measure_definition
+- **宏观覆盖**：fabric(Eαβ)、fabric ellipsoid~stress ellipsoid、coaxiality/noncoaxiality、
+  hardening/softening、coordination number~strength/heterogeneity、porosity~void ratio、
+  两条本构律(τ/σN=kM, S1/S3=f(σ1/2)) 全抽到 → 论文核心内容被覆盖
+- **微观**：每条超边角色对、evidence verbatim、qualifier(method/evidence_strength/
+  cited_from/applies_in_regime/function_form/parameters) 填充正确
+
+PPR_08CE5406F5B2（contact force/DEM-like）:
+- dependency 30+、composition 6 条
+- split 更深：constitutive_law 拆成 _contact_force_theory / _contact_force_formula
+  （理论 vs 公式变体，语义真不同）
+- violation 2 条：shear rate 平方"2"、粒子数"3.4×10^7"（都是真未定义数值引用）
+
+新 scope（constrains=law→dependency）重跑验证中。
+
+### 诚实标注
+- constraint 在纯理论论文上仍可能稀疏（law↔dependency 共享节点才触发），需要实验
+  /方法类论文才显著触发。这是 corpus 形态决定的，不是 bug。
+- 待 multi-seed CI + constraint 在混合 corpus 上的触发率统计。

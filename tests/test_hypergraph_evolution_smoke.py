@@ -201,32 +201,31 @@ check("meta round-trip: subclass_of queryable on loaded", "cl_a" in m5.pattern_s
 # to_prompt topology render, split dependency_context dimension.
 # ===========================================================================
 
-# 8. infer_pattern_constraints: authority (definition/constitutive_law) constrains consumer (measure/claim)
+# 8. infer_pattern_constraints: authority (constitutive_law) constrains consumer (dependency/measure/claim)
 mc = seed_meta_hypergraph()
-# add a measure-family pattern + reuse seed 'defines' (definition) + 'measures' (measure)
 inst_c = InstanceHypergraph(paper_id="pc")
-# shared node 'mu' appears in a definition edge (defines) AND a measure edge (measures)
-inst_c.add_node(HGNode(nid="mu", labels=["PROPERTY"], surface="friction coefficient mu"))
-inst_c.add_node(HGNode(nid="def_text", labels=["PROPERTY"], surface="friction law text"))
-inst_c.add_node(HGNode(nid="dev", labels=["MATERIAL"], surface="ring shear tester"))
-inst_c.add_node(HGNode(nid="obj", labels=["PROPERTY"], surface="measured stress"))
-# definition edge: defines mu (authority)
-inst_c.add_hyperedge(Hyperedge(eid="d1", pattern_type="defines",
-    node_ids=["mu","def_text"], node_roles=["subject","definition"], evidence_span="mu is the friction coefficient"))
-# measure edge: measures uses mu (consumer)
-inst_c.add_hyperedge(Hyperedge(eid="m1", pattern_type="measures",
-    node_ids=["dev","mu"], node_roles=["object","instrument"], evidence_span="the tester measured mu"))
+# shared node 'stress' appears in a constitutive_law edge (authority) AND an
+# influences edge (dependency = consumer)
+inst_c.add_node(HGNode(nid="stress", labels=["PROPERTY"], surface="stress"))
+inst_c.add_node(HGNode(nid="strain", labels=["PROPERTY"], surface="strain"))
+inst_c.add_node(HGNode(nid="dep_t", labels=["PROPERTY"], surface="rate"))
+# constitutive_law edge on stress (authority)
+inst_c.add_hyperedge(Hyperedge(eid="cl1", pattern_type="constitutive_law",
+    node_ids=["stress","strain"], node_roles=["output","input"],
+    evidence_span="tau = mu * sigma (a constitutive law)"))
+# influences edge (dependency = consumer) sharing stress
+inst_c.add_hyperedge(Hyperedge(eid="i1", pattern_type="influences",
+    node_ids=["stress","dep_t"], node_roles=["source","target"], evidence_span="stress influences the rate"))
 cons = hev.infer_pattern_constraints(mc, inst_c, paper_id="pc")
 check("infer_pattern_constraints returns >=1 constraint",
       len(cons) >= 1)
-has_cons = any(c["authority"] == "defines" and c["constrains"] == "measures" for c in cons)
-check("constraint: defines CONSTRAINS measures (authority -> consumer, shared node)",
+has_cons = any(c["authority"] == "constitutive_law" and c["constrains"] == "influences" for c in cons)
+check("constraint: constitutive_law CONSTRAINS influences (law -> dependency, shared node)",
       has_cons)
-# the constraint edge must be queryable both ways
 check("constraint edge queryable via pattern_dependencies(rel=constrains)",
-      "measures" in mc.pattern_dependencies("defines", rel="constrains"))
+      "influences" in mc.pattern_dependencies("constitutive_law", rel="constrains"))
 check("constraint edge queryable via pattern_dependents(rel=constrains)",
-      "defines" in mc.pattern_dependents("measures", rel="constrains"))
+      "constitutive_law" in mc.pattern_dependents("influences", rel="constrains"))
 
 # 8b. infer_pattern_compositions: composition-family pattern composes others
 mp = seed_meta_hypergraph()
@@ -246,26 +245,28 @@ has_comp = any(c["whole"] == "composed_of" and c["composes"] == "defines" for c 
 check("composition: composed_of COMPOSES defines (whole -> part, shared node)",
       has_comp)
 
-# 8c. constraint/composition are DISTINCT from depends_on (different direction/role)
-# depends_on: consumer -> producer; constrains: authority -> consumer.
-# A measure edge that shares a node with defines -> measure depends_on defines AND defines constrains measure.
+# 8c. constraint does NOT overlap depends_on: a (definition, dependency) pair
+# that shares a node fires depends_on (dependency depends_on definition) but
+# NOT constrains (definitions are not authority — only laws are). This is the
+# non-redundancy property: constraint picks law↔dependency, depends_on picks
+# consumer↔definition, no pair carries both.
 md = seed_meta_hypergraph()
 inst_d = InstanceHypergraph(paper_id="pd")
 inst_d.add_node(HGNode(nid="x", labels=["PROPERTY"], surface="shared quantity"))
 inst_d.add_node(HGNode(nid="d_text", labels=["PROPERTY"], surface="definition text"))
-inst_d.add_node(HGNode(nid="dev2", labels=["MATERIAL"], surface="device"))
+inst_d.add_node(HGNode(nid="dep_t2", labels=["PROPERTY"], surface="rate"))
 inst_d.add_hyperedge(Hyperedge(eid="dd", pattern_type="defines",
     node_ids=["x","d_text"], node_roles=["subject","definition"], evidence_span="x is defined as"))
-inst_d.add_hyperedge(Hyperedge(eid="mm", pattern_type="measures",
-    node_ids=["dev2","x"], node_roles=["object","instrument"], evidence_span="device measured x"))
+inst_d.add_hyperedge(Hyperedge(eid="ii", pattern_type="influences",
+    node_ids=["x","dep_t2"], node_roles=["source","target"], evidence_span="x influences the rate"))
 deps_d = hev.infer_pattern_dependencies(md, inst_d, paper_id="pd")
 cons_d = hev.infer_pattern_constraints(md, inst_d, paper_id="pd")
-dep_pair = any(d["dependent"] == "measures" and d["depends_on"] == "defines" for d in deps_d)
-cons_pair = any(c["authority"] == "defines" and c["constrains"] == "measures" for c in cons_d)
-check("dependency + constraint both fire on the same shared node (different relations)",
-      dep_pair and cons_pair)
-check("dependency direction (consumer->producer) differs from constraint (authority->consumer)",
-      dep_pair and cons_pair)  # same pair, opposite direction = different edges
+dep_pair = any(d["dependent"] == "influences" and d["depends_on"] == "defines" for d in deps_d)
+cons_on_def = any(c["authority"] == "defines" for c in cons_d)
+check("definition→dependency fires depends_on (consumer->producer)",
+      dep_pair)
+check("definition is NOT a constraint authority (no constrains on definition pair)",
+      not cons_on_def)
 
 # 8d. to_prompt renders pattern-level topology edges
 mt = seed_meta_hypergraph()
@@ -328,7 +329,7 @@ mi = seed_meta_hypergraph()
 mi.add_pattern(MetaHyperedgePattern(pattern_id="wide_pat", family="measure",
     role_slots=[{"role":"object","type":"PROPERTY"},{"role":"instrument","type":"PROPERTY","repeatable":True}],
     allowed_qualifiers=["method"]))
-mi.add_pattern_dependency("defines", "wide_pat", rel="constrains", evidence="test", paper_id="pz")
+mi.add_pattern_dependency("constitutive_law", "wide_pat", rel="constrains", evidence="test", paper_id="pz")
 mi.add_pattern_dependency("composed_of", "wide_pat", rel="composes", evidence="test", paper_id="pz")
 parent_w = mi.patterns["wide_pat"]
 nv_inh = mi.split_pattern("wide_pat", [
@@ -336,7 +337,7 @@ nv_inh = mi.split_pattern("wide_pat", [
         role_slots=[dict(s) for s in parent_w.role_slots], allowed_qualifiers=list(parent_w.allowed_qualifiers)),
     MetaHyperedgePattern(pattern_id="wide_b", family="measure",
         role_slots=[dict(s) for s in parent_w.role_slots], allowed_qualifiers=list(parent_w.allowed_qualifiers))])
-check("split children inherit constraint edge (constrains)", nv_inh is not None and "wide_a" in mi.pattern_dependencies("defines", rel="constrains"))
+check("split children inherit constraint edge (constrains)", nv_inh is not None and "wide_a" in mi.pattern_dependencies("constitutive_law", rel="constrains"))
 check("split children inherit composition edge (composes)", "wide_a" in mi.pattern_dependencies("composed_of", rel="composes"))
 
 print()

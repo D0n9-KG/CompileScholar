@@ -119,7 +119,22 @@ gate v1（改 signature 太粗）→ 撤（pattern 暴跌）。gate v2（只加 
 ### step 4: split 拓扑继承 ✅ (5f5bd95e)
 split 后子 pattern 继承父的 pattern_dependency/constraint/composition 边，拓扑不丢。
 
+### step 3: pattern_constraint + pattern_composition ✅
+- `infer_pattern_constraints`: A(constitutive_law) constrains B(dependency/measure/claim)
+  确定性图可达性。初版把 definition 当 authority → 与 depends_on 反向冗余 + 理论论文零触发，
+  收窄为只 law（见 DECISION-constraint-trigger-scope.md）。
+- `infer_pattern_compositions`: composition-family pattern composes 其他 pattern。
+- 两者均从实例 co-occurrence 归纳（确定性，非 LLM）。
+- 真实论文验证：dependency/composition 正常触发，constraint 在 law↔dependency 共享
+  节点时触发（重跑验证中）。
+
+### step 5: split 多维度 + step 4 to_prompt 富拓扑 ✅
+- split 加 dependency_context tier（按 co-occurring family 集合聚类，过宽 pattern
+  在不同关系上下文表现不同时拆）。
+- to_prompt 渲染 depends_on/constrains/composes 边（富拓扑对抽取器可见）。
+- smoke +16 assertions 全过。
+
 ### 待办
-- step 3 pattern_constraint/composition（增量补充，优先级低于测试）
 - 测试：constraint violation 率作为主指标（4 篇跨论文测，进行中）
 - 多 seed CI + 论文撰写
+- constraint 在混合 corpus（实验/方法类论文）上的触发率统计

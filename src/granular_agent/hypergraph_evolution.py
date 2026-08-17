@@ -1095,12 +1095,19 @@ def infer_pattern_dependencies(meta: MetaHypergraph, instance: InstanceHypergrap
 # constrained hypergraph (DIAL-KG's flat schema has none of these).
 # ===========================================================================
 
-# Authority families: patterns that FIX a relation among quantities (a law or
-# a definition). These CONSTRAIN the patterns that consume those quantities.
-AUTHORITY_FAMILIES = ("definition", "constitutive_law")
-# Consumer families: patterns whose content is bounded by an authority (a
-# measure is validated against a law; a claim is scoped by a definition).
-CONSUMER_FAMILIES = ("measure", "claim")
+# Authority families: patterns that FIX a functional relation among quantities.
+# NARROWED after real-paper inspection (see DECISION-constraint-trigger-scope.md):
+# only constitutive_law constrains — definitions just NAME an entity, and
+# "definition A constrains dependency B" would be the reverse of depends_on
+# (B depends_on A), i.e. two edges on one pair saying the same co-occurrence
+# (redundant). A LAW, by contrast, fixes the functional FORM among quantities,
+# which genuinely constrains the dependencies among them — distinct from
+# depends_on (about definitions, not laws).
+AUTHORITY_FAMILIES = ("constitutive_law",)
+# Consumer families: relations whose form is bounded by a law (a dependency
+# among quantities the law relates; a measure validated against the law; a
+# claim scoped by the law).
+CONSUMER_FAMILIES = ("dependency", "measure", "claim")
 
 
 def infer_pattern_constraints(meta: MetaHypergraph, instance: InstanceHypergraph,
