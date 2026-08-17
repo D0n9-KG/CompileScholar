@@ -2846,3 +2846,42 @@ PPR_08CE5406F5B2（contact force/DEM-like）:
 - constraint 在纯理论论文上仍可能稀疏（law↔dependency 共享节点才触发），需要实验
   /方法类论文才显著触发。这是 corpus 形态决定的，不是 bug。
 - 待 multi-seed CI + constraint 在混合 corpus 上的触发率统计。
+
+### 新 scope 重跑验证（8 篇，新 constraint scope: law→dependency/measure/claim）
+
+8 篇累计拓扑计数（跨论文累积，非去重）：
+| 边类型 | 累计触发 |
+|--------|----------|
+| depends_on | 90 |
+| constrains | 106 |
+| composes | 33 |
+| violations(referenced_undefined_numeric) | 172 |
+
+final 去重 schema：15 depends_on + 13 constrains + 5 composes = 33 条唯一富拓扑边
+（+ IS-A 树 40+ pattern，constitutive_law 拆成 20+ 有语义子律：
+power_law_scaling / balance_equation_law / dispersion_relation_law /
+flux_transport_law / empirical_constant_law 等，全是真实物理律类型）。
+
+**constraint 从旧 scope 的 0 → 106**，scope 收窄（authority=只 constitutive_law）
+成功：律约束依赖关系，与 depends_on（依赖定义）不重叠。
+
+**constraint 原文对照验证**（PPR_08CE5406F5B2，DEM 接触力论文）：
+- 律 `constitutive_law_contact_mechanics`: contact_force = f(线性弹簧常数, 阻尼系数,
+  法向重叠, 法向相对速度) [ev: "k and v are the linear spring constant and dashpot
+  coefficient... δ_contact... normal overlap distance"]
+- 依赖 `influences`: overlap_volume → contact_force [ev: "contact forces... depend
+  not only on the overlap area or volume, but also on the geometrical configuration"]
+- 共享节点 `contact force` → 律约束该依赖（依赖的函数形式受律约束）。
+  语义正确，evidence 逐字。非花架子。
+
+**constraint 非重叠验证**：(definition, dependency) 共享节点对只产生 depends_on，
+不产生 constrains（definition 不是 authority）——smoke test 8c 验证通过。
+
+**violation 验证**：referenced_undefined_numeric 真阳性，如 P3 "应力正比于剪切率平方"
+的指数"2"被引用未定义（3 条同型），P2 粒子数"3.4×10^7"。这是 DIAL-KG 做不到的
+结构错误检测，可量化。
+
+### 诚实标注
+- 单 seed（deepseek 非确定性，每次 run split 子 pattern 命名不同但结构稳定）
+- constraint 触发率依赖 corpus 形态（需有律+依赖共现）；纯理论论文上稀疏但非零
+- 待 multi-seed CI + constraint/composition 在论文中的触发率统计
