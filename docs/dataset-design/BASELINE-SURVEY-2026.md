@@ -168,3 +168,31 @@ hf-mirror Xet 协议 401 (HF 新大文件协议认证)。试 HF_HUB_DISABLE_XET=
 - [ ] bge-m3 下载成功 (Xet 401 待解)
 - [ ] induce_ours 跑 SciERC (extract_hypergraph, sample 50 句先试, LLM成本)
 - [ ] run_eval 算 4 指标, 和 SCION-lite 比, Graph F1 看富拓扑优势
+
+## SCOPE 全链路跑通 (2026-08-14, 20句初步)
+
+**bge-m3 下载成功** (HF_HUB_DISABLE_XET=1 + hf-mirror, pytorch_model.bin 2165MB).
+Steam++ hosts 加速 github 通; hf-mirror 通但 Xet 大文件要禁用.
+
+**修了 1 个 bug**: validate() UnboundLocalError on empty-seed schema (空 meta
+时 concrete+abstract 为空, for 循环不执行, pid 未赋值). granular 有 seed
+没触发; schema-free induction 触发. 修: for 前 pid=None. smoke 53/53 无回归.
+
+**20句 SciERC induce 初步数字** (4 pattern, 0 topology edges):
+| metric | P | R | F1 |
+|--------|---|---|----|
+| literal | 0.188 | 0.125 | 0.150 |
+| fuzzy | 1.000 | 0.667 | 0.800 |
+| continuous | 0.867 | 0.578 | 0.693 |
+| graph | 0.967 | 0.791 | 0.871 |
+
+- induce 出语义合理 pattern: comparison_outperforms/contrasts/comparable_to
+  (对应 gold "compare", 我们细分了) + composition (对应 "part of"/"conjunction")
+- literal 低 (命名/粒度不一致, 预期) → fuzzy/graph 容差异 (0.80/0.87)
+- graph F1=0.87 高但 **0 topology edges** → 是 pred 小 (9 nodes) 易匹配, 非
+  富拓扑优势. 需 scale induce (更多句→topology edges 出现) 看 graph F1 随
+  富拓扑变化. 100句 induce 进行中.
+
+**诚实**: 20句 sample 太小 (4 pattern vs gold 7), 单源, 不可直接比 SCION 论文
+macro-avg. 但全链路跑通 (bge-m3+SCION metrics+我们 induce+ours_to_graph+
+4指标) 是路线 A 主战场可执行的关键证明.
