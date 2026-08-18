@@ -132,3 +132,39 @@ relation。entity type 我们已映射 SPHERE 15 types (make_sphere_seed), 可�
 - [ ] 读 SCION 代码: 数据格式 + 指标实现 + 怎么接 baseline
 - [ ] 写 SCOPE 适配脚本 (induce + flatten + score)
 - [ ] 跑我们方法 + SCION/Text2Onto/LLM-only 对比
+
+## SCOPE 数据 + 代码到手 (2026-08-14, Steam++ hosts 加速 github 通)
+
+Steam++ (Watt Toolkit) hosts 加速 github.com → git clone 成功 (701 文件,
+GIT_LFS_SKIP_SMUDGE=1 跳过 lfs 大文件)。
+
+**到手**:
+- src/ontology_eval.py — 4 指标 (Literal/Fuzzy/Continuous/Graph F1) 实现
+- src/ontology_generate.py — SCION induction (prompt + candidate mining, 1850行)
+- src/knowledge_graph_maker/ — SCION 自带抽取器 baseline
+- data/scope/subsets/ — 24 源 unified gold schema + docs.train.jsonl (induction texts)
+- **SciERC 在内** (科学域, 7 relation, head/tail=Entity, 1536 train docs)
+
+**指标机制确认**:
+- OntologyGraph = {nodes:{id:label}, edges:Set[Edge(src,tgt)]}
+- schema_dict_to_graph: rel_label="{head}->{tail}({rel})", 边 section->rel_label,
+  head->rel_label->tail
+- graph_f1 用 graph_smooth (K=2 邻居均值, alpha=0.5) 后 node-level Hungarian
+  → **邻居结构影响 → 我们富拓扑边 (dep/constraint/comp) 让结构更丰富 →
+  graph_f1 高 = 优势体现点**
+- fuzzy threshold 0.45, continuous Hungarian, literal 精确边
+
+**适配写好** (ours_to_graph.py, 测试通过):
+- 8篇granular final_meta → OntologyGraph 67 nodes 220 edges (含33富拓扑边)
+- pattern role_slots types → entities, pattern → rel_label, 富拓扑边 →
+  rel_label→rel_label (SCION flat schema 无此层 = 我们优势维度)
+
+**卡点**: bge-m3 embedding 模型 (compute_ontology_metrics 必需)。
+hf-mirror Xet 协议 401 (HF 新大文件协议认证)。试 HF_HUB_DISABLE_XET=1。
+备选: 写 wrapper 用我们 _embed_texts_robust (Paratera/CST) 替代 (不同 embedding,
+绝对数字不可直接比 SCION 论文, 但我们 vs SCION 重跑同 embedding 公平)。
+
+**待办**:
+- [ ] bge-m3 下载成功 (Xet 401 待解)
+- [ ] induce_ours 跑 SciERC (extract_hypergraph, sample 50 句先试, LLM成本)
+- [ ] run_eval 算 4 指标, 和 SCION-lite 比, Graph F1 看富拓扑优势
