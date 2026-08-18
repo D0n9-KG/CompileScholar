@@ -128,6 +128,15 @@ Rules:
 - evidence_span MUST be a verbatim phrase copied from the failing hyperedges' evidence above (or empty if none supports it). A proposal with NO supporting evidence will be rejected.
 - Only propose a structural change if the failing hyperedge genuinely cannot fit the current schema without it. If the hyperedge is just wrong/garbage (extraction error), propose NOTHING for it.
 - Prefer add_pattern / add_subclass over add_meta_node when the gap is about a RELATION or a specialization, not a new entity category.
+- REDUNDANCY CONTROL (critical — schema-free induction): do NOT propose a new
+  pattern for every surface variation of a relation. If a failing edge differs
+  from an EXISTING pattern only in verb phrasing or granularity (e.g.
+  "outperforms" vs "is better than" vs "superior to"), reuse the existing
+  pattern — express the nuance as a qualifier (e.g. relation_type/evidence_strength),
+  NOT a new pattern. Prefer FEWER, more general patterns; only add a new pattern
+  when the relation is STRUCTURALLY or SEMANTICALLY distinct from every existing
+  one. Reuse an existing pattern's role-structure when the roles are compatible
+  (same participants in same roles) — vary only via qualifier, not new role slots.
 - ACTIVELY consider split/merge when the schema has grown redundant or conflated:
   * split_meta_node: if an existing type's instances appear in MULTIPLE distinct contexts that should be distinguished (e.g. PROPERTY used for both an intensive quantity and an extensive one, or MATERIAL for both the bulk and a boundary phase).
   * merge_meta_nodes: if two existing types are semantically near-duplicate and should be unified into one.
