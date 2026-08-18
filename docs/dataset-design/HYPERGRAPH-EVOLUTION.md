@@ -2903,3 +2903,44 @@ qualifier 且 embedding 不分**的 pattern 上接管。当前数据中 `defines
 **结论**：dependency_context tier 作为 fallback 设计正确（机制对、在真实数据形态下能产生多组），
 但真实触发条件较窄（需无 discrete qualifier + ≥2 个各 ≥3 边的 context 组）。当前 corpus 形态
 下它处于"待命"状态而非高频触发。诚实记录，不夸大为"已验证有用"。
+
+### 缺口验证 (2026-08-14): 富拓扑渲染 ablation + dependency_context 实触发
+
+**Ablation 设计**：同一批 3 篇论文，同一方法(extract_hypergraph，非裸 LLM)，两臂：
+- A) include_topology=True（抽取 prompt 含 depends_on/constrains/composes 边）
+- B) include_topology=False（只 IS-A 树，拓扑边对抽取器隐藏）
+evolution loop 两臂都看全拓扑（probe 需要它判断 schema gap）。隔离"抽取器看富拓扑是否受益"。
+
+**结果（3 篇，单 seed，deepseek）**：
+
+| 论文 | 指标 | topo(A) | notopo(B) | delta |
+|------|------|---------|-----------|-------|
+| P1(Oda) | edges | 53 | 53 | 0 |
+| P1 | val_fail | 13 | 15 | -2 |
+| P1 | cons | 6 | 0 | +6 |
+| P2(contact force) | edges | 111 | 136 | -25 |
+| P2 | acc(新pattern) | 16 | 5 | **+11** |
+| P2 | patterns_after | 36 | 21 | **+15** |
+| P2 | viol | 5 | 9 | **-4** |
+| P3 | edges | 50 | 39 | **+11** |
+| P3 | patterns_after | 41 | 24 | **+17** |
+| P3 | acc | 5 | 3 | +2 |
+
+**方向一致**：看到富拓扑的抽取器（A）在 P2/P3 演化出更多 pattern（+15/+17）、
+violations 更少（P2: 5 vs 9，未定义数值引用更少 = 抽取更完整）。
+P1 差异小（第一篇，schema 还没富拓扑边可看）。
+
+**诚实**：单 seed、3 篇、deepseek 非确定性。P2 edges A<B 但 acc/patterns A>>B
+（A 抽得更精而非更多）。violations 减少是真信号（更少未定义数值 = 抽取更完整）。
+初步证据非定论，但方向一致 + 可量化。
+
+**dependency_context 实触发**（split method audit）：
+- arm=notopo 触发 1 次 `dependency_context` split（真实 run 里接管了
+  discrete/embedding 都不分的 pattern）——**不是死代码，真实触发**。
+- 其余 split 走 llm_semantic/discrete（符合 tier 优先级设计）。
+- arm=topo 0 次 dependency_context（拓扑可见时 split 路径不同）。
+
+**结论**：
+1. 富拓扑渲染对抽取器有用（ablation 方向一致，violations 减少）。
+2. dependency_context tier 真实触发（非死代码），作为 discrete/embedding 的 fallback。
+两个缺口都验证，机制层面"有用"成立。定量定论需 multi-seed + gold。
