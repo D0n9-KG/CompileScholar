@@ -196,3 +196,60 @@ Steam++ hosts 加速 github 通; hf-mirror 通但 Xet 大文件要禁用.
 **诚实**: 20句 sample 太小 (4 pattern vs gold 7), 单源, 不可直接比 SCION 论文
 macro-avg. 但全链路跑通 (bge-m3+SCION metrics+我们 induce+ours_to_graph+
 4指标) 是路线 A 主战场可执行的关键证明.
+
+## schema 自进化工作评测范式 (2026-08-14, 用户关键追问)
+
+用户问"schema 自进化工作怎么评自己 schema 质量"。诚实: 这是我之前调研盲区。
+
+调研 3 个 schema-evolving 工作评测方法:
+
+### SCION (schema induction benchmark)
+1. gold schema graph + 4 F1 (Literal/Fuzzy/Continuous/Graph) — 需 gold schema
+2. compactness penalty (RL reward 权重0.10, 防 proliferation) — 无 gold
+3. consistency checks (domain/range + role signature) — 无 gold
+4. **5.8 downstream: fixed extractor + vary schema, 看 instance-level F1**
+   (released-schema 0.5633, ETA 0.6523, SCION-lite 0.6800) — 需 gold INSTANCE 非 schema
+5. controllability/auditability 统计 (parse/fallback/retention logs) — 无 gold
+
+### DIAL-KG (schema-free streaming, RQ3 Schema Quality)
+1. 静态 P/R/F1 (WebNLG/Wiki-NRE) — 需 gold
+2. streaming Δ-Precision / D-HP — 需 gold
+3. **RQ3 Schema Quality = compactness + redundancy**:
+   - compactness = #relation types (少=好, vs EDC 少15%)
+   - redundancy = 近重复 relation 比例 (vs EDC 降1.6-2.8点, 用相似度算)
+   — 无 gold!
+4. consistency checks (fidelity/currency 防 hallucination) — 无 gold
+
+### Hyper-KGGen (超图 n-ary)
+1. n-ary P/R/F1 (HyperDocRED) — 需 gold
+2. graph quality = retrieval efficiency (同budget覆盖更多key fact) — 无 gold
+3. downstream RAG accuracy — 需 gold QA
+4. stability-based feedback (抽取稳定性作reward) — 无 gold
+
+## 关键: 三个无 gold-schema 路径
+1. **compactness** = #relation types (无 gold)
+2. **redundancy** = 近重复率 (embedding cos, 无 gold)
+3. **downstream F1** = schema 反哺 fixed extractor 的 instance F1 (需 gold INSTANCE
+   非 schema — SciERC/HyperDocRED test split 自带 relation 标注!)
+
+绕开"schema 无 gold"困境: 不评 schema 对不对, 评 schema 好不好用 (反哺抽取).
+
+## 我们实测 (100句 SciERC induce, schema-free, 无 gold 评测)
+- compactness = 22 patterns (gold 7, 我们过细3倍)
+- redundancy_rate = 0.186 (43/231对≥0.85cos, 18.6%近重复)
+- pct_with_near_dup = 0.773 (77% pattern 有近重复邻居)
+- avg_max_sim = 0.880
+- 近重复例: equivalence_relation ~ resource_equivalence/superiority/improvement/
+  comparison_method (语义确相近, merge/semantic-dedup 没合并)
+
+## 诚实诊断: schema-free 下 schema 质量不好
+- 22 vs gold 7 过细; 18.6% redundancy 远高于 DIAL-KG vs EDC 的 1.6-2.8点
+- 说明 schema-free 下 merge/semantic-dedup gate 没起作用 (evolution probe
+  提议新 pattern, gate 该拒近重复但没拒) — 真实弱点
+- 但这是 schema-free+100句+单源; 8篇granular(物理seed+多论文)是33拓扑边+收敛
+- 设定差异导致结论差异
+
+## 路线重塑
+三个无 gold 路径中, **downstream F1 最有说服力** (schema好不好用看反哺抽取).
+SciERC test 214 docs 自带 relation gold → 可做, 无需专家.
+但 redundancy 18.6% 是真问题, 要先修 (gate 为何没拒近重复) 再报.
