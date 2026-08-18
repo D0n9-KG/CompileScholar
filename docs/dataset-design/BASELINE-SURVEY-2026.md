@@ -253,3 +253,39 @@ macro-avg. 但全链路跑通 (bge-m3+SCION metrics+我们 induce+ours_to_graph+
 三个无 gold 路径中, **downstream F1 最有说服力** (schema好不好用看反哺抽取).
 SciERC test 214 docs 自带 relation gold → 可做, 无需专家.
 但 redundancy 18.6% 是真问题, 要先修 (gate 为何没拒近重复) 再报.
+
+## Downstream instance F1 结果 (2026-08-14, SciERC 50 doc, 3 arm)
+
+3 arm 都用我们方法 (extract_hypergraph schema-grounded, 非裸LLM), 变 schema:
+| arm | strict | fuzzy | semantic(pred-emb) |
+|-----|--------|-------|---------------------|
+| A 空 schema | 0.0 | 0.0 | 0.114 |
+| B 我们induced | 0.0 | 0.0 | 0.107 |
+| C gold schema | 0.043 | 0.136 | 0.157 |
+
+semantic_match (predicate bge-m3 cos>=0.6 + subj/obj substring) 容 induced
+schema 命名差异 (comparison_method~compare cos0.77, 0.6合理阈值).
+
+**诚实负面结果**: B(0.107) < A(0.114) < C(0.157) — 我们induced schema
+没有比空schema反哺抽取更好, 反而略差. 与SCION 5.8论点(induced>baseline)相反.
+
+诊断:
+1. induced schema 过细+命名偏离gold (19 vs gold 7, 自定义名comparison_method)
+   误导LLM抽取
+2. schema-free induce全是dependency family, 缺gold的used-for/part-of等
+3. 单seed+100句induce样本小
+
+更重要: A空schema semantic也有0.114 — LLM无schema也能抽接近gold关系,
+我们induced schema没带来增量价值.
+
+## 根本问题: schema-free单源设定不匹配我们方法设计场景
+三条路都试过(SCOPE F1/SPHERE Rel+/downstream F1), 都暴露同一问题:
+schema-free单源下我们核心优势(富拓扑/evolution/split)不触发, induced schema
+质量不足以反哺抽取.
+
+我们方法设计场景=物理seed+多论文演化 (8篇granular验证33拓扑边+收敛+
+violation检测). 此场景优势才体现. 但此场景无现成gold benchmark — 回到
+需专家gold问题.
+
+诚实: 现有benchmark全schema-free单源, 都不匹配我们物理seed+演化场景.
+要么改方法适应schema-free(失去物理优势), 要么自建物理gold(需专家).
