@@ -53,8 +53,32 @@ EXTRACT_HG_PROMPT = """You are extracting a knowledge HYPERGRAPH from ONE sectio
 This section's discourse role is: {discourse_role}.
 
 Extract:
-1. NODES: the physical entities/quantities/values mentioned in this section. Each node has >=1 label from the schema's node types above, a surface (the mention text), and a verbatim evidence_span copied exactly from the section.
+1. NODES: the entities/concepts/methods/quantities/results mentioned in this section. Each node has >=1 label from the schema's node types above, a surface (the mention text), and a verbatim evidence_span copied exactly from the section.
 2. HYPEREDGES: the N-ARY relations connecting those nodes. A hyperedge connects N nodes (N>=2, and N>=3 whenever the relation is genuinely n-ary — see below). Each hyperedge has a pattern_type, node_ids (the nodes it connects, in order), node_roles, qualifiers, and a verbatim evidence_span.
+
+EXTRACT DIVERSE RELATION TYPES (critical — do NOT default everything to "influences").
+A section usually expresses several DISTINCT kinds of relations; capture each with the
+matching pattern_type from the schema. The common families:
+  * definition   (defines) — "X is defined as Y", "we refer to Z as ...", "X denotes ..."
+  * composition  (composed_of) — "X consists of Y and Z", "X is composed of ...", "the pipeline is A + B + C"
+  * dependency   (influences) — "X affects/depends on/scales with Y", "X improves Y"
+  * measure      (uses_method / measures) — "we use method M to evaluate X", "M is applied to X"
+  * claim        (reports / claim_relation) — "we find that ...", "results show ...", "X outperforms Y"
+  * constitutive_law — a quantitative/formal law "output = f(input1, input2, ...)" (use when a formula or formal relation is stated)
+Pick the pattern_type that matches the RELATION SEMANTICS, not the surface verb. A paper's
+core contribution usually appears as a DEFINITION (what they propose), a COMPOSITION (what
+it's made of), and CLAIMS (what they show) — extract all three, not just "influences".
+
+CORE-ENTITY SHARING (critical for schema topology): papers have a few CENTRAL entities
+(the proposed method/model/concept, the main metric, the key dataset) that RECUR across many
+relations. These central entities MUST be emitted ONCE (reused by nid) and connected to
+MULTIPLE hyperedges of DIFFERENT pattern_types. E.g. if "Informer" is the proposed model:
+  - defines: Informer is defined as a transformer-based forecasting model
+  - composed_of: Informer is composed of ProbSparse attention + distilling + decoder
+  - reports: experiments show Informer outperforms DeepAR on MSE
+  -> "Informer" is ONE node shared across 3 hyperedges (different pattern_types).
+Do NOT invent a new node per relation; reuse the central entity so the schema can link
+relations through it. This is what makes the schema a connected graph, not isolated edges.
 
 Rules:
 - node_roles = the FUNCTIONAL ROLE of each node IN the relation, NOT the node's name/entity. A role describes the node's position in this relation. Use ONLY these role kinds (pick the best fit; pluralize/repeat for multiple same-role nodes):
@@ -66,33 +90,35 @@ Rules:
     * source / target — for influence/flow relations
     * instrument / object — for measurement (what measures vs what's measured)
     * exponent / parameter / coefficient — for numeric roles in equations
-  Do NOT use entity names or property names as roles. "shear_rate", "stress", "velocity", "volume_fraction" are NODES (surfaces), NOT roles — the role of shear_rate in "stress depends on shear_rate" is "input", NOT "shear_rate". Using an entity name as a role is a category error and breaks schema reuse.
-  Keep roles from this small set; reuse the SAME role name across hyperedges of the same pattern (e.g. all constitutive_law edges use output/input, not some using "stress_role" and others "dependent"). This lets the schema recognize the same relation structure across papers.
+  Do NOT use entity names or concept names as roles. The role of a method M in "we use M to evaluate X" is "instrument", NOT "M" or the method's name. Using an entity name as a role is a category error and breaks schema reuse.
+  Keep roles from this small set; reuse the SAME role name across hyperedges of the same pattern (e.g. all influences edges use source/target). This lets the schema recognize the same relation structure across papers.
 - evidence_span MUST be a verbatim phrase copied from the section (exact string, including symbols/units). Paraphrasing causes rejection.
 - Use existing patterns when they fit. Only propose a NEW pattern_type when the section expresses a relation none of the existing patterns can hold (the system will validate it).
-- A node can carry multiple labels (e.g. a dimensionless number is both NUMERIC and a dimensionless quantity).
+- A node can carry multiple labels (e.g. a metric that is both a RESULT and a numeric quantity).
 - HYPERGRAPH = N-ARY (the core point, do NOT degrade to binary):
-    * A constitutive_law / governing equation MUST be ONE hyperedge connecting its output PLUS every input it depends on PLUS every named constant/parameter. E.g. "stresses are proportional to the square of the shear rate" -> ONE arity-3 edge: [stress(output) <- shear_rate(input) <- 2(exponent)] — NOT two binary edges. "increase with both particle diameter and curvature of the shear surfaces" -> ONE arity-3 edge [stress <- particle_diameter <- curvature].
+    * A constitutive_law / governing relation MUST be ONE hyperedge connecting its output PLUS every input it depends on PLUS every named constant/parameter. E.g. "loss = -sum(y log p)" -> ONE arity-3 edge: [loss(output) <- y(input) <- p(input)]. "accuracy improves with both dataset size and model capacity" -> ONE arity-3 edge [accuracy <- dataset_size <- model_capacity].
     * If a relation has 1 output and >=2 inputs, the hyperedge MUST connect all of them (arity = 1 + n_inputs + n_params).
     * Only use arity 2 for genuinely binary relations (A depends on B alone, nothing else).
 - COORDINATED ENTITIES MUST SHARE ONE EDGE (the most common arity-loss bug): when
   a sentence lists PARALLEL entities all in the same relation to the same
   other entity, they MUST all be nodes of ONE hyperedge, NOT split into
   separate binary edges and NOT dropped. Examples:
-    "strain hardening, strength anisotropy and deformational anisotropy had a
-     strong dependence on the distribution of contact normals" ->
-       ONE arity-4 edge [strain_hardening, strength_anisotropy, deformational_anisotropy] <- distribution_of_contact_normals
-       (three dependents, one independent — arity 4, dependency_type=monotonic).
-    "the stresses increase with both particle diameter and curvature" ->
-       ONE arity-3 edge stress <- [particle_diameter, curvature] (arity 3).
+    "we compare against DeepAR, ARIMA, and Prophet" ->
+       ONE arity-4 edge [DeepAR, ARIMA, Prophet] <- (baseline comparison), arity 4.
+    "the model is composed of an encoder, a decoder, and a distilling layer" ->
+       ONE arity-4 edge model <- [encoder, decoder, distilling_layer], arity 4.
   Do NOT extract only the first listed entity and drop the rest — that loses
   information and orphans the dropped nodes. If the schema's pattern has a
-  repeatable input/dependent role, use it; if not, propose a new pattern that
+  repeatable input/component role, use it; if not, propose a new pattern that
   does (the system will validate variadic patterns).
-- NUMERIC NODES (REQUIRED): every number, constant, coefficient, exponent, and measured value in the section MUST be emitted as a NUMERIC node (with properties.value set). Constitutive-law parameters (mu_s, friction coefficient, exponents, critical values) MUST be nodes AND wired into the constitutive_law hyperedge. A physics section with zero NUMERIC nodes is WRONG.
+- NUMERIC NODES (REQUIRED): every number, constant, coefficient, exponent, and measured
+  value in the section MUST be emitted as a NUMERIC node (with properties.value set).
+  Parameters of laws/formulas (learning rates, exponents, thresholds, metric values)
+  MUST be nodes AND wired into the relevant hyperedge. A section stating quantitative
+  results with zero NUMERIC nodes is WRONG.
 - NO ORPHAN NODES: every node you emit MUST participate in >=1 hyperedge. If you would emit a node that no edge connects, either (a) find the edge it belongs to and add it, or (b) do NOT emit that node. Dangling mentions are noise.
-- NO DUPLICATE NODES: before emitting a node, check if an existing node has the SAME surface (case/punctuation-insensitive). If so, reuse its nid; do NOT create a second node for "Granular Materials" when "granular materials" exists.
-- Equations/laws: when the section states a quantitative law (output computed from inputs + parameters), emit ONE n-ary hyperedge wiring the output + every input + every named constant/parameter as nodes. Carry the equation text in a qualifier if a function-form key is among the pattern's allowed_qualifiers. Pick the pattern_type from the schema's existing patterns (shown above); if the schema lacks a fitting pattern, use the relation's natural name as pattern_type (the system will validate + evolve the schema to accommodate it).
+- NO DUPLICATE NODES: before emitting a node, check if an existing node has the SAME surface (case/punctuation-insensitive). If so, reuse its nid; do NOT create a second node for "attention mechanism" when "Attention Mechanism" exists. This is ESPECIALLY important for central entities — they must be one node, reused across all their relations.
+- Equations/laws: when the section states a quantitative or formal relation (output computed from inputs + parameters), emit ONE n-ary hyperedge wiring the output + every input + every named constant/parameter as nodes. Carry the equation text in a qualifier if a function-form key is among the pattern's allowed_qualifiers. Pick the pattern_type from the schema's existing patterns (shown above); if the schema lacks a fitting pattern, use the relation's natural name as pattern_type (the system will validate + evolve the schema to accommodate it).
 - Be exhaustive but wired: extract every distinct entity and relation, and ensure every node is connected. A section typically yields 8-20 nodes and 5-12 hyperedges, with most hyperedges arity>=3.
 - node_ids must reference node nid values you defined in THIS output.
 - CONTROLLED-ENUM relation kind (REQUIRED for any dependency/relates pattern): the
@@ -104,7 +130,7 @@ Rules:
     * "composition" — one relation is composed of / accounts for / is a measure of another (divided by, accounts for, is a measure of)
   Do NOT write free-text values like "increases with" or "possible representation" — write the enum value. This constraint is what lets the schema-refinement loop detect over-wide patterns and split them.
 - applies_in_regime (when the pattern declares it as an allowed qualifier):
-  carry it as a SHORT tag chosen from: dense, quasi-static, inertial, solid-like, flow, static, unknown. If the section does not specify a regime, use "unknown".
+  carry a SHORT tag for the operational regime/condition the relation holds under (e.g. dense/quasi-static/inertial/flow for physics, or train/test/online for ML, or any short domain-appropriate tag). If the section does not specify, use "unknown".
 - cited_from provenance (REQUIRED): every hyperedge carries cited_from, one of:
     * "this_work"   — the relation is asserted by THIS paper's own experiments/analysis
     * "prior_art"   — the relation is reported as another's result being cited/built on (the evidence span will name the cited work or use citation markers)
@@ -113,7 +139,7 @@ Rules:
   provenance qualifier causes silent mis-attribution).
 - method (REQUIRED when the source specifies it): how the relation was established, one of:
     * "experiment"  — measured in an experiment / apparatus
-    * "simulation"  — from a numerical simulation (DEM/CFD/etc)
+    * "simulation"  — from a numerical simulation
     * "theory"      — derived theoretically / analytically
     * "review"      — surveyed / asserted in a review without derivation
   Pick by how THIS paper establishes the relation, not by the field. Omit only if the section genuinely does not say.
@@ -135,10 +161,12 @@ Rules:
 SECTION TEXT ({section_name}):
 {section_text}
 
-Output a JSON object (note: hyperedges are N-ARY — connect >=3 nodes when the relation involves multiple inputs/dependents):
-{{"nodes":[{{"nid":"n1","labels":["PROPERTY"],"surface":"stress","evidence_span":"stresses tend to be proportional to the square of the shear rate","properties":{{}}}},
-          {{"nid":"n2","labels":["PROPERTY"],"surface":"shear rate","evidence_span":"...","properties":{{}}}},
-          {{"nid":"n3","labels":["NUMERIC","PROPERTY"],"surface":"2","evidence_span":"...","properties":{{"value":2}}}}],"hyperedges":[{{"eid":"e1","pattern_type":"constitutive_law","node_ids":["n1","n2","n3"],"node_roles":["output","input","input"],"qualifiers":{{"applies_in_regime":"flow","function_form":"stress ~ (shear rate)^2","parameters":["2"],"cited_from":"this_work"}},"evidence_span":"stresses tend to be proportional to the square of the shear rate"}}],"summary":"<=150 token compact summary for the next section"}}
+Output a JSON object (note: hyperedges are N-ARY — connect >=3 nodes when the relation involves multiple inputs/dependents/components):
+{{"nodes":[{{"nid":"n1","labels":["METHOD"],"surface":"Informer","evidence_span":"we propose Informer for long-sequence forecasting","properties":{{}}}},
+          {{"nid":"n2","labels":["METHOD"],"surface":"ProbSparse self-attention","evidence_span":"ProbSparse self-attention mechanism","properties":{{}}}},
+          {{"nid":"n3","labels":["RESULT"],"surface":"MSE","evidence_span":"MSE decrease of 26.8%","properties":{{}}}},
+          {{"nid":"n4","labels":["NUMERIC"],"surface":"26.8%","evidence_span":"MSE decrease of 26.8%","properties":{{"value":26.8}}}}],"hyperedges":[{{"eid":"e1","pattern_type":"composed_of","node_ids":["n1","n2"],"node_roles":["whole","component"],"qualifiers":{{"relation_type":"composition","method":"theory","evidence_strength":"derived","cited_from":"this_work"}},"evidence_span":"Informer is composed of ProbSparse self-attention"}},
+          {{"eid":"e2","pattern_type":"reports","node_ids":["n1","n3","n4"],"node_roles":["from","to","parameter"],"qualifiers":{{"relation_type":"monotonic","method":"experiment","evidence_strength":"measured","cited_from":"this_work"}},"evidence_span":"Informer achieves MSE decrease of 26.8%"}}],"summary":"<=150 token compact summary for the next section"}}
 Output ONLY the JSON object."""
 
 

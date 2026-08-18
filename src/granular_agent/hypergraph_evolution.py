@@ -113,7 +113,7 @@ Failing hyperedges (instance level — these are what the extractor produced but
 {failing_hes}
 
 For each distinct structural mismatch you judge to be a genuine schema gap (not an extraction error), propose ONE evolution operation. Choose from EXACTLY these 5:
-1. add_meta_node      — add a new node TYPE (e.g. a physical category the schema lacks). Needs: type_id (UPPER_SNAKE), description.
+1. add_meta_node      — add a new node TYPE (e.g. a domain entity category the schema lacks). Needs: type_id (UPPER_SNAKE), description.
 2. add_pattern        — add a new hyperedge PATTERN (a relation the schema lacks, connecting existing or new types). Needs: pattern_id, description, role_slots (list of {{"role":"...","type":"..."}}), allowed_qualifiers (list — reuse registry keys or propose new), family (an existing family that fits, OR a new family name if none fits).
 3. add_subclass       — declare an existing-or-new type as a specialization of another. Needs: sub (type_id), sup (existing type_id).
 4. split_meta_node     — split an existing type into a subclass. Needs: type_id (existing), new_sub (new type_id).
@@ -138,7 +138,7 @@ Rules:
   one. Reuse an existing pattern's role-structure when the roles are compatible
   (same participants in same roles) — vary only via qualifier, not new role slots.
 - ACTIVELY consider split/merge when the schema has grown redundant or conflated:
-  * split_meta_node: if an existing type's instances appear in MULTIPLE distinct contexts that should be distinguished (e.g. PROPERTY used for both an intensive quantity and an extensive one, or MATERIAL for both the bulk and a boundary phase).
+  * split_meta_node: if an existing type's instances appear in MULTIPLE distinct contexts that should be distinguished (e.g. METHOD used for both a model architecture and a training procedure, or RESULT for both a metric value and a qualitative finding).
   * merge_meta_nodes: if two existing types are semantically near-duplicate and should be unified into one.
 - role_slots types must use existing node types from the schema above (or a type you propose in the SAME batch via add_meta_node).
 
@@ -411,10 +411,10 @@ Reject ONLY if:
 - it's too paper-specific to generalize.
 
 IMPORTANT — do NOT conflate these two:
-  * REJECT: "X is defined as 0.5" / "the friction coefficient is 0.4" (a value assignment, no relation).
-  * ACCEPT: "the slurry stage system is the one in which the free medium phase is continuous" / "X is composed of Y and Z" / "a motion is universal if it is an exact solution of the equations" — these are DEFINITIONAL RELATIONS (one entity is defined BY / composed OF others). They ARE physical relations between entities and should be accepted as new patterns (e.g. defines_composition, identified_with), not rejected as "definitions".
+  * REJECT: "X is defined as 0.5" / "the learning rate is 0.4" (a value assignment, no relation).
+  * ACCEPT: "Informer is the model composed of ProbSparse attention and a distilling layer" / "X is composed of Y and Z" / "a relation is universal if it holds under any input distribution" — these are DEFINITIONAL/COMPOSITIONAL RELATIONS (one entity is defined BY / composed OF others). They ARE relations between entities and should be accepted as new patterns (e.g. defines_composition, identified_with), not rejected as "definitions".
 
-Accept if the span supports a distinct, generalizable physical relation the schema lacks (including multi-input/joint dependencies AND definitional/compositional relations).
+Accept if the span supports a distinct, generalizable relation the schema lacks (including multi-input/joint dependencies AND definitional/compositional relations).
 
 Output ONLY JSON: {{"valid": true/false, "reason": "one short sentence citing the span and the role-structure judgment"}}"""
     raw = _call(check_prompt, llm, max_tokens=300)

@@ -1170,3 +1170,55 @@ def seed_meta_hypergraph() -> MetaHypergraph:
     # attaches new same-family patterns IS-A this root.
     m.family_roots = {p.family: p.pattern_id for p in m.patterns.values()}
     return m
+
+
+def seed_meta_hypergraph_general() -> MetaHypergraph:
+    """General-domain seed (non-physics): same 6-family skeleton as the physics
+    seed but with domain-agnostic node types (ENTITY/METHOD/RESULT/NUMERIC) and
+    general-paper relation descriptions. Use for non-physics corpora (e.g.
+    ResearchQA, SciERC) so the schema isn't biased toward physical quantities.
+
+    Same family structure as seed_meta_hypergraph() — so the topology-inference
+    logic (depends_on needs definition family; constrains needs constitutive_law;
+    composes needs composition family) works identically. Only the type semantics
+    change (general entities vs MATERIAL/PROPERTY/REGIME)."""
+    m = MetaHypergraph()
+    # general academic node types (not physics-specific)
+    for t, d in [("ENTITY", "a research entity/concept (model, method, dataset, task, etc.)"),
+                 ("METHOD", "a method/technique/approach/model"),
+                 ("RESULT", "a finding/metric/result"),
+                 ("NUMERIC", "a numeric value (parameter, score, count)")]:
+        m.meta_nodes[t] = MetaNode(type_id=t, description=d)
+    # same 6 families, general-paper descriptions, role types use general types
+    m.patterns["constitutive_law"] = MetaHyperedgePattern(
+        pattern_id="constitutive_law", family="constitutive_law",
+        description="a quantitative/formal relation (output computed from inputs + parameters): loss, score formula, scaling law",
+        role_slots=[{"role": "output", "type": "RESULT", "repeatable": True}, {"role": "input", "type": "ENTITY", "repeatable": True}],
+        allowed_qualifiers=["applies_in_regime", "function_form", "parameters", "method", "evidence_strength", "cited_from"])
+    m.patterns["influences"] = MetaHyperedgePattern(
+        pattern_id="influences", family="dependency",
+        description="one concept/quantity influences / depends on / improves another (n-ary)",
+        role_slots=[{"role": "source", "type": "ENTITY", "repeatable": True}, {"role": "target", "type": "ENTITY", "repeatable": True}],
+        allowed_qualifiers=["dependency_type", "applies_in_regime", "method", "evidence_strength", "cited_from"])
+    m.patterns["defines"] = MetaHyperedgePattern(
+        pattern_id="defines", family="definition",
+        description="one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+        role_slots=[{"role": "subject", "type": "ENTITY", "repeatable": True}, {"role": "definition", "type": "ENTITY", "repeatable": True}],
+        allowed_qualifiers=["relation_type", "method", "evidence_strength", "cited_from"])
+    m.patterns["composed_of"] = MetaHyperedgePattern(
+        pattern_id="composed_of", family="composition",
+        description="one whole (model/pipeline/system) is composed-of / part-of >=1 component (n-ary)",
+        role_slots=[{"role": "whole", "type": "ENTITY", "repeatable": True}, {"role": "component", "type": "ENTITY", "repeatable": True}],
+        allowed_qualifiers=["relation_type", "method", "evidence_strength", "cited_from"])
+    m.patterns["measures"] = MetaHyperedgePattern(
+        pattern_id="measures", family="measure",
+        description="a method/approach is used to evaluate/measure >=1 target (n-ary)",
+        role_slots=[{"role": "object", "type": "ENTITY"}, {"role": "instrument", "type": "METHOD", "repeatable": True}],
+        allowed_qualifiers=["condition", "applies_in_regime", "method", "evidence_strength", "cited_from"])
+    m.patterns["claim_relation"] = MetaHyperedgePattern(
+        pattern_id="claim_relation", family="claim",
+        description="a discourse relation between >=2 claims/findings/approaches (supports/contrasts/outperforms/extends)",
+        role_slots=[{"role": "from", "type": "ENTITY", "repeatable": True}, {"role": "to", "type": "RESULT", "repeatable": True}],
+        allowed_qualifiers=["relation_type", "applies_in_regime", "method", "evidence_strength", "cited_from"])
+    m.family_roots = {p.family: p.pattern_id for p in m.patterns.values()}
+    return m
