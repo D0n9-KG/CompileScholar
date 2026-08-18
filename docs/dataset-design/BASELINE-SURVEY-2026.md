@@ -90,3 +90,45 @@ boundary 宽松会虚高 F1**。对齐方案: 改 strict_match 为 boundary(span
 relation。entity type 我们已映射 SPHERE 15 types (make_sphere_seed), 可对齐。
 重算要 LLM 调用(评测阶段做), 现在只记对齐方案。对齐后 F1 可能下降, 需确认
 仍超 HGNet zero-shot 0.276。
+
+## SCOPE 评测适配方案 (2026-08-14, 路线A主战场)
+
+### 为什么 SCOPE 是对的主战场
+- 评 schema-level edge `(head_type, rel_type, tail_type)` 类型三元组,
+  **不评 entity 实例 boundary** — 避开我们 entity typing 弱项 (见
+  sphere-benchmark-result 对齐后崩)
+- Graph F1 (graph-structure-enhanced node-level) 体现富拓扑 — 我们的
+  dependency/constraint/composition 边让 schema graph 有结构, Graph F1 奖励
+- SCION 只比 ETA 高 +0.026 Graph F1, 有空间
+- 同型操作 (naming/merge/fusion/validate/conservative gate), 公平比
+- 开源 (github.com/wandugu/paper_scion, CC BY 4.0)
+
+### 评测协议 (从论文读到)
+- 24 源 (15 RE + 9 EE), 每源有 `induction_texts.jsonl` (train-text-only) +
+  gold schema graph (评测保留)
+- 任务: 从 induction_texts 诱导 schema → predicted schema graph
+- 比较: predicted vs gold, macro-avg P/R/F1 over sources, 4 指标
+- schema edge = (head_type, rel_type, tail_type); rel_type=predicate name,
+  head/tail_type = domain/range type (RE) 或 event type/role (EE)
+
+### 我们方法适配
+1. 对每源读 induction_texts.jsonl
+2. 跑 extract_hypergraph (空/通用 seed, 从 corpus 诱导 — 体现 schema induction)
+3. flatten induced schema: pattern 的 role_slots (role: type) → (head_type,
+   pattern_id, tail_type) 边集 (pattern >2 role 时拆多个三元组)
+4. 和 gold schema graph 比 4 指标 (Literal/Fuzzy/Continuous/Graph F1)
+   — 指标实现复用 SCION 开源代码 (下载后看 eval/ 目录)
+5. macro-avg over sources, 和 SCION-lite/Text2Onto/LLM-only 比
+
+### 适配挑战 (诚实)
+- seed 不能用物理 6 family (SCOPE 是通用域 IE) — 用空 seed 或源 type 集
+- 我们方法 pattern 的 type 系统要对齐源的 entity type 体系
+- 富拓扑边 (dependency/constraint/composition) 要映射进 schema graph 让
+  Graph F1 能看见 — 这是关键 (否则富拓扑在指标里不显)
+- 数据下载遇网络问题 (codeload zip 多次截断), 待解
+
+### 待办
+- [ ] 下载 SCOPE 数据成功 (in_progress, 网络问题)
+- [ ] 读 SCION 代码: 数据格式 + 指标实现 + 怎么接 baseline
+- [ ] 写 SCOPE 适配脚本 (induce + flatten + score)
+- [ ] 跑我们方法 + SCION/Text2Onto/LLM-only 对比
