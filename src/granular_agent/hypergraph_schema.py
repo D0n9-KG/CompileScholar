@@ -540,6 +540,7 @@ class MetaHypergraph:
                     if not p.deprecated and not p.is_abstract]
         abstract = [(pid, p) for pid, p in self.patterns.items()
                     if not p.deprecated and p.is_abstract]
+        pid = None  # init: if no patterns (empty-seed schema), loop body never runs
         for pat_id, pat in concrete + abstract:
             pid = self._try_match(pat, he, instance)
             if pid:
