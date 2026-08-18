@@ -369,8 +369,12 @@ QUALIFIER_REGISTRY: dict[str, tuple[str, tuple[str, ...] | None]] = {
     "evidence_strength":("enum", ("measured", "derived", "hypothesized", "assumed")),
     "cited_from":       ("enum", ("this_work", "prior_art", "definition")),
     # --- load-bearing qualifiers the working code depends on (kept, not dropped) ---
-    "applies_in_regime":("enum", ("dense", "quasi-static", "inertial", "solid-like",
-                                  "flow", "static", "unknown")),
+    "applies_in_regime":("free_text", None),  # domain-dependent: dense/quasi-static
+        # for physics, LSTF/train/test for ML, etc. Enum-restricting to physics
+        # regimes rejects every general-paper edge whose regime tag is a valid ML
+        # task tag (see DECISION-validation-rejects-all-general-edges). Free-text
+        # here; split-by-regime still works via discrete-value detection on the
+        # actual values present (qualifier_is_discrete), not a fixed enum.
     "dependency_type":  ("enum", ("monotonic", "derivation", "analogy", "composition")),
     "relation_type":   ("free_text", None),    # claim discourse verbs (supports/contrasts/...)
     "function_form":    ("free_text", None),    # constitutive_law equation text
@@ -435,11 +439,16 @@ def _match_variadic_set(slots: list[dict], roles: list[str]) -> tuple[bool, list
     role_to_slot: dict[str, int] = {}
     for i, s in enumerate(slots):
         role_to_slot[s.get("role", "")] = i
-    # count constraints: non-repeatable slots need exactly 1; repeatable >=1
+    # count constraints: non-repeatable slots need exactly 1; repeatable slots
+    # are OPTIONAL (min=0) — a pattern declares the roles it ACCEPTS, not the
+    # roles every edge must fill. Requiring >=1 of every declared repeatable role
+    # makes adding optional auxiliary roles (output/parameter on an influences
+    # edge) STRICTER not looser, rejecting exactly the rich n-ary edges we want.
+    # The arity>=2 invariant is enforced separately (a hyperedge has >=2 nodes).
     needed = {i: (1, 1) for i in range(len(slots))}  # (min, max)
     for i, s in enumerate(slots):
         if s.get("repeatable"):
-            needed[i] = (1, 10**9)
+            needed[i] = (0, 10**9)
     counts = [0] * len(slots)
     node_to_slot: list[int] = []
     for r in roles:
@@ -1181,44 +1190,67 @@ def seed_meta_hypergraph_general() -> MetaHypergraph:
     Same family structure as seed_meta_hypergraph() — so the topology-inference
     logic (depends_on needs definition family; constrains needs constitutive_law;
     composes needs composition family) works identically. Only the type semantics
-    change (general entities vs MATERIAL/PROPERTY/REGIME)."""
+    change (general entities vs MATERIAL/PROPERTY/REGIME).
+
+    ROLE VOCAB (DECISION-validation-rejects-all-general-edges): each pattern now
+    declares the FULL role vocabulary the EXTRACT_HG_PROMPT encourages for its
+    family (output/parameter/coefficient on laws; output/cause/effect on
+    influences; object on defines; parameter on claims). Previously only 2 roles
+    were declared, so every n-ary edge the LLM emitted with the encouraged extra
+    roles was rejected by _match_variadic_set (role not in pattern) -> 0 edges.
+
+    TYPE ROOT (same DECISION): general papers mix METHOD+ENTITY+RESULT in one
+    relation. The 4 general types are independent with no shared supertype, so a
+    METHOD whole with ENTITY components failed is_subtype -> rejected. THING is a
+    common root and all 4 types subclass_of THING; slot types are THING so
+    cross-type n-ary edges pass while node types stay informative."""
     m = MetaHypergraph()
-    # general academic node types (not physics-specific)
+    # common root so cross-type n-ary edges pass (METHOD whole + ENTITY components)
+    m.meta_nodes["THING"] = MetaNode(type_id="THING", description="root: any node type is-a THING")
+    # general academic node types (not physics-specific), all under THING
     for t, d in [("ENTITY", "a research entity/concept (model, method, dataset, task, etc.)"),
                  ("METHOD", "a method/technique/approach/model"),
                  ("RESULT", "a finding/metric/result"),
                  ("NUMERIC", "a numeric value (parameter, score, count)")]:
         m.meta_nodes[t] = MetaNode(type_id=t, description=d)
-    # same 6 families, general-paper descriptions, role types use general types
+        m.meta_edges.append(MetaEdge(src=t, dst="THING", relation="subclass_of"))
+    T = "THING"  # permissive slot type (any labeled node is-a THING)
+    # same 6 families, general-paper descriptions, expanded role vocab, type THING
     m.patterns["constitutive_law"] = MetaHyperedgePattern(
         pattern_id="constitutive_law", family="constitutive_law",
         description="a quantitative/formal relation (output computed from inputs + parameters): loss, score formula, scaling law",
-        role_slots=[{"role": "output", "type": "RESULT", "repeatable": True}, {"role": "input", "type": "ENTITY", "repeatable": True}],
+        role_slots=[{"role": "output", "type": T, "repeatable": True}, {"role": "input", "type": T, "repeatable": True},
+                    {"role": "parameter", "type": T, "repeatable": True}, {"role": "coefficient", "type": T, "repeatable": True},
+                    {"role": "exponent", "type": T, "repeatable": True}],
         allowed_qualifiers=["applies_in_regime", "function_form", "parameters", "method", "evidence_strength", "cited_from"])
     m.patterns["influences"] = MetaHyperedgePattern(
         pattern_id="influences", family="dependency",
         description="one concept/quantity influences / depends on / improves another (n-ary)",
-        role_slots=[{"role": "source", "type": "ENTITY", "repeatable": True}, {"role": "target", "type": "ENTITY", "repeatable": True}],
+        role_slots=[{"role": "source", "type": T, "repeatable": True}, {"role": "target", "type": T, "repeatable": True},
+                    {"role": "output", "type": T, "repeatable": True}, {"role": "cause", "type": T, "repeatable": True},
+                    {"role": "effect", "type": T, "repeatable": True}],
         allowed_qualifiers=["dependency_type", "applies_in_regime", "method", "evidence_strength", "cited_from"])
     m.patterns["defines"] = MetaHyperedgePattern(
         pattern_id="defines", family="definition",
         description="one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
-        role_slots=[{"role": "subject", "type": "ENTITY", "repeatable": True}, {"role": "definition", "type": "ENTITY", "repeatable": True}],
+        role_slots=[{"role": "subject", "type": T, "repeatable": True}, {"role": "definition", "type": T, "repeatable": True},
+                    {"role": "object", "type": T, "repeatable": True}],
         allowed_qualifiers=["relation_type", "method", "evidence_strength", "cited_from"])
     m.patterns["composed_of"] = MetaHyperedgePattern(
         pattern_id="composed_of", family="composition",
         description="one whole (model/pipeline/system) is composed-of / part-of >=1 component (n-ary)",
-        role_slots=[{"role": "whole", "type": "ENTITY", "repeatable": True}, {"role": "component", "type": "ENTITY", "repeatable": True}],
+        role_slots=[{"role": "whole", "type": T, "repeatable": True}, {"role": "component", "type": T, "repeatable": True}],
         allowed_qualifiers=["relation_type", "method", "evidence_strength", "cited_from"])
     m.patterns["measures"] = MetaHyperedgePattern(
         pattern_id="measures", family="measure",
         description="a method/approach is used to evaluate/measure >=1 target (n-ary)",
-        role_slots=[{"role": "object", "type": "ENTITY"}, {"role": "instrument", "type": "METHOD", "repeatable": True}],
+        role_slots=[{"role": "object", "type": T, "repeatable": True}, {"role": "instrument", "type": T, "repeatable": True}],
         allowed_qualifiers=["condition", "applies_in_regime", "method", "evidence_strength", "cited_from"])
     m.patterns["claim_relation"] = MetaHyperedgePattern(
         pattern_id="claim_relation", family="claim",
         description="a discourse relation between >=2 claims/findings/approaches (supports/contrasts/outperforms/extends)",
-        role_slots=[{"role": "from", "type": "ENTITY", "repeatable": True}, {"role": "to", "type": "RESULT", "repeatable": True}],
+        role_slots=[{"role": "from", "type": T, "repeatable": True}, {"role": "to", "type": T, "repeatable": True},
+                    {"role": "parameter", "type": T, "repeatable": True}],
         allowed_qualifiers=["relation_type", "applies_in_regime", "method", "evidence_strength", "cited_from"])
     m.family_roots = {p.family: p.pattern_id for p in m.patterns.values()}
     return m
