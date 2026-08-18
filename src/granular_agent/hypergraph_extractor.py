@@ -373,7 +373,8 @@ def _crossref_lookup(title: str, paper_id: str) -> dict | None:
 def extract_hypergraph(structure_map: dict, blocks: list, meta: MetaHypergraph,
                        llm: str = "deepseek", paper_id: str = "",
                        domain: str = "granular flow physics",
-                       trigger: EvolutionTrigger | None = None) -> dict:
+                       trigger: EvolutionTrigger | None = None,
+                       include_topology: bool = True) -> dict:
     """Phase 1: run all DAG nodes in topo order, producing an InstanceHypergraph
     and evolving the meta-hypergraph in place (deep self-evolution closed loop).
 
@@ -399,7 +400,7 @@ def extract_hypergraph(structure_map: dict, blocks: list, meta: MetaHypergraph,
 
     for node in nodes:
         # P4 forward propagation: re-fetch the (possibly evolved) schema prompt
-        schema_prompt = meta.to_prompt()
+        schema_prompt = meta.to_prompt(include_topology=include_topology)
         hg_nodes, hg_edges, summary = _run_hg_node(node, sections, blocks, schema_prompt, bb, llm, domain)
         n_calls += 1
 

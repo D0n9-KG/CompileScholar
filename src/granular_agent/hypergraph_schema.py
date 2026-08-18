@@ -1028,7 +1028,7 @@ class MetaHypergraph:
         except ValueError:
             return "0.2"
 
-    def to_prompt(self, compact: bool = False) -> str:
+    def to_prompt(self, compact: bool = False, include_topology: bool = True) -> str:
         """Render the meta-hypergraph as a prompt fragment for extraction.
         (Forward propagation: downstream nodes get the evolved schema via this.)
 
@@ -1101,12 +1101,19 @@ class MetaHypergraph:
                 continue
             topo.append(f"  {e.src} {e.relation} {e.dst}")
         topo_str = "\n".join(topo) if topo else "  (none)"
+        # include_topology (REDESIGN v2): the pattern-level topology edges can
+        # be omitted from the prompt for an ablation — does rendering them
+        # improve extraction quality? Default True (show富拓扑). validate() is
+        # unaffected either way (uses the in-memory pattern, not this string).
+        topo_section = ""
+        if include_topology:
+            topo_section = (f"Pattern-level topology (directed constrained hypergraph — A depends_on/constrains/composes B):\n{topo_str}\n")
         return (f"Meta-Hypergraph (schema v{self.version}):\n"
                 f"Node types: {types}\n"
                 f"Node subclass hierarchy: {type_sub_str}\n"
                 f"Seed families (growable — specialize within, or propose a new one if none fits): {families_str}\n"
                 f"Hyperedge patterns (taxonomy — indented = IS-A specialization of parent):\n{pats_str}\n"
-                f"Pattern-level topology (directed constrained hypergraph — A depends_on/constrains/composes B):\n{topo_str}\n")
+                f"{topo_section}")
 
 
 def seed_meta_hypergraph() -> MetaHypergraph:
