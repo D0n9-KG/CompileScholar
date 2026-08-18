@@ -76,3 +76,17 @@
 - **SCOPE** (schema induction F1, 和 SCION 比, Graph F1 体现富拓扑) — schema 质量
 - 下游 QA (Agent 调研中)
 三个战场各体现一个优势维度 + 三个直接 baseline。
+
+## HGNet SPHERE 匹配标准 (对齐方案, 2026-08-14)
+HGNet 用 **strict Rel+ F1** (ref 29): TP 要求正确预测
+  ① 两个实体的 boundaries (精确 span)
+  ② 两个实体的 types
+  ③ relation type
+三者全对才算 TP。还把 relation 分 hierarchical / peer 两类报 macro F1。
+
+我们之前 sphere_eval_ours_v3.py 的 strict_match 只用 substring
+(pred[0] in g[0]) + relation exact — **没匹配 entity type, substring 比
+boundary 宽松会虚高 F1**。对齐方案: 改 strict_match 为 boundary(span)+type+
+relation。entity type 我们已映射 SPHERE 15 types (make_sphere_seed), 可对齐。
+重算要 LLM 调用(评测阶段做), 现在只记对齐方案。对齐后 F1 可能下降, 需确认
+仍超 HGNet zero-shot 0.276。
