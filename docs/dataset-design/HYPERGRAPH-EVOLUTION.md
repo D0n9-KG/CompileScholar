@@ -2885,3 +2885,21 @@ flux_transport_law / empirical_constant_law 等，全是真实物理律类型）
 - 单 seed（deepseek 非确定性，每次 run split 子 pattern 命名不同但结构稳定）
 - constraint 触发率依赖 corpus 形态（需有律+依赖共现）；纯理论论文上稀疏但非零
 - 待 multi-seed CI + constraint/composition 在论文中的触发率统计
+
+### 缺口验证 (2026-08-14): dependency_context tier 在真实数据上是否触发
+
+**离线审计（0 LLM，加载 final meta + 8 篇 instance 重跑 _dependency_context_clusters）**：
+
+dependency_context tier 在真实数据形态下能产生多 cluster——14 处 pattern 会被判为"有 ≥2 context 组"
+（如 `influences` 在与 constitutive_law 共现 vs 与 claim 共现 vs 纯净 context 下行为不同）。
+机制不是死代码。
+
+**但诚实发现**：实际 run 时 `influences` 走 discrete tier（有 dependency_type enum qualifier），
+discrete 是 tier 1，优先于 dependency_context (tier 1.5)。dependency_context 只在**无 discrete
+qualifier 且 embedding 不分**的 pattern 上接管。当前数据中 `defines_operational` 是目标场景
+（无 discrete qualifier），但其 cluster 形态 (22,2,5,1,1) 只 1 个 big cluster，不满足 ≥2 big →
+实际未触发 split。
+
+**结论**：dependency_context tier 作为 fallback 设计正确（机制对、在真实数据形态下能产生多组），
+但真实触发条件较窄（需无 discrete qualifier + ≥2 个各 ≥3 边的 context 组）。当前 corpus 形态
+下它处于"待命"状态而非高频触发。诚实记录，不夸大为"已验证有用"。
