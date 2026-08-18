@@ -59,15 +59,20 @@ Extract:
 EXTRACT DIVERSE RELATION TYPES (critical — do NOT default everything to "influences").
 A section usually expresses several DISTINCT kinds of relations; capture each with the
 matching pattern_type from the schema. The common families:
-  * definition   (defines) — "X is defined as Y", "we refer to Z as ...", "X denotes ..."
-  * composition  (composed_of) — "X consists of Y and Z", "X is composed of ...", "the pipeline is A + B + C"
-  * dependency   (influences) — "X affects/depends on/scales with Y", "X improves Y"
-  * measure      (uses_method / measures) — "we use method M to evaluate X", "M is applied to X"
-  * claim        (reports / claim_relation) — "we find that ...", "results show ...", "X outperforms Y"
+  * definition   (defines) — "X is defined as Y", "we refer to Z as ...", "X denotes ...", "X is among the most ...", "X is a type of Y"
+  * composition  (composed_of) — "X consists of Y and Z", "X is composed of ...", "X includes A, B, C", "the pipeline is A + B + C", "adverse events include sedation, ..., weight gain"
+  * dependency   (influences) — "X affects/depends on/scales with Y", "X improves Y" (a genuine causal/functional dependence, NOT a mere co-listing or classification — those are composed_of / defines)
+  * measure      (uses_method / measures) — "we use method M to evaluate X", "M is applied to X", "X was measured by M"
+  * claim        (reports / claim_relation) — "we find that ...", "results show ...", "X outperforms Y", "X is associated with Y"
   * constitutive_law — a quantitative/formal law "output = f(input1, input2, ...)" (use when a formula or formal relation is stated)
 Pick the pattern_type that matches the RELATION SEMANTICS, not the surface verb. A paper's
 core contribution usually appears as a DEFINITION (what they propose), a COMPOSITION (what
 it's made of), and CLAIMS (what they show) — extract all three, not just "influences".
+Self-check before output: if >70% of your edges are the SAME pattern_type (especially all
+"influences"), you are collapsing distinct relations — re-read and re-classify at least a
+third of them into definition / composed_of / measures / claim_relation as the semantics
+warrant. A sentence like "X includes A, B, and C" is composed_of, NOT influences. A sentence
+like "X is among the most heritable Y" is defines, NOT influences.
 
 CORE-ENTITY SHARING (critical for schema topology): papers have a few CENTRAL entities
 (the proposed method/model/concept, the main metric, the key dataset) that RECUR across many

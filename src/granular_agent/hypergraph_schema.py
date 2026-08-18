@@ -1228,7 +1228,7 @@ def seed_meta_hypergraph_general() -> MetaHypergraph:
         description="one concept/quantity influences / depends on / improves another (n-ary)",
         role_slots=[{"role": "source", "type": T, "repeatable": True}, {"role": "target", "type": T, "repeatable": True},
                     {"role": "output", "type": T, "repeatable": True}, {"role": "cause", "type": T, "repeatable": True},
-                    {"role": "effect", "type": T, "repeatable": True}],
+                    {"role": "effect", "type": T, "repeatable": True}, {"role": "condition", "type": T, "repeatable": True}],
         allowed_qualifiers=["dependency_type", "applies_in_regime", "method", "evidence_strength", "cited_from"])
     m.patterns["defines"] = MetaHyperedgePattern(
         pattern_id="defines", family="definition",
@@ -1250,7 +1250,7 @@ def seed_meta_hypergraph_general() -> MetaHypergraph:
         pattern_id="claim_relation", family="claim",
         description="a discourse relation between >=2 claims/findings/approaches (supports/contrasts/outperforms/extends)",
         role_slots=[{"role": "from", "type": T, "repeatable": True}, {"role": "to", "type": T, "repeatable": True},
-                    {"role": "parameter", "type": T, "repeatable": True}],
+                    {"role": "parameter", "type": T, "repeatable": True}, {"role": "condition", "type": T, "repeatable": True}],
         allowed_qualifiers=["relation_type", "applies_in_regime", "method", "evidence_strength", "cited_from"])
     m.family_roots = {p.family: p.pattern_id for p in m.patterns.values()}
     return m
