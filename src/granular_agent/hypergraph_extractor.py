@@ -407,13 +407,21 @@ def extract_hypergraph(structure_map: dict, blocks: list, meta: MetaHypergraph,
                        llm: str = "deepseek", paper_id: str = "",
                        domain: str = "granular flow physics",
                        trigger: EvolutionTrigger | None = None,
-                       include_topology: bool = True) -> dict:
+                       include_topology: bool = True,
+                       evolve: bool = True,
+                       propagate_intra_dag: bool = True) -> dict:
     """Phase 1: run all DAG nodes in topo order, producing an InstanceHypergraph
     and evolving the meta-hypergraph in place (deep self-evolution closed loop).
 
     `meta` is mutated in place (caller holds the shared schema for cross-paper
     evolution). `trigger` may be passed in to persist cross-paper recurrence
     accounting; a fresh one is created if None.
+
+    Ablation switches (default behavior unchanged):
+      - evolve=False: skip run_evolution_loop entirely (frozen schema arm).
+      - propagate_intra_dag=False: compute the schema prompt ONCE before the
+        loop and do not re-fetch per node (disables intra-DAG propagation;
+        evolution still mutates meta for cross-paper + downstream maintenance).
 
     Returns {instance, evolutions, n_calls, n_nodes, n_hyperedges, validation_failures}.
     """
@@ -431,9 +439,13 @@ def extract_hypergraph(structure_map: dict, blocks: list, meta: MetaHypergraph,
     failed_edges: list[dict] = []  # debug: rejected edges + reasons
     surface2nid: dict[str, str] = {}  # cross-section surface dedup
 
+    # schema prompt: re-fetched per node when propagate_intra_dag (P4 forward
+    # propagation); computed once and frozen across nodes when not (ablation).
+    schema_prompt = meta.to_prompt(include_topology=include_topology)
     for node in nodes:
         # P4 forward propagation: re-fetch the (possibly evolved) schema prompt
-        schema_prompt = meta.to_prompt(include_topology=include_topology)
+        if propagate_intra_dag:
+            schema_prompt = meta.to_prompt(include_topology=include_topology)
         hg_nodes, hg_edges, summary = _run_hg_node(node, sections, blocks, schema_prompt, bb, llm, domain)
         n_calls += 1
 
@@ -479,7 +491,7 @@ def extract_hypergraph(structure_map: dict, blocks: list, meta: MetaHypergraph,
         total_failures += len(failures)
 
         # closed loop: failures -> probe -> validate -> apply (mutates meta in place)
-        if failures:
+        if failures and evolve:
             evols, nc = run_evolution_loop(meta, failures, trigger, node["id"], paper_id,
                                            domain=domain, llm=llm, instance=instance)
             n_calls += nc
