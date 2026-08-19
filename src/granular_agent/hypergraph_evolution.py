@@ -926,8 +926,11 @@ SPLIT_NAMING_PROMPT = """You are naming the result of a SCHEMA SPLIT. A hyperedg
 Representative evidence for each cluster:
 {cluster_evidence}
 
+Existing sub-patterns of '{parent_id}' already in the schema (REUSE one of these if a cluster's semantics matches — do NOT mint a new name that means the same thing as an existing one; cross-paper name divergence is a known failure mode we must avoid):
+{existing_subpatterns}
+
 For each cluster, propose:
-- pattern_id: a short lowercase snake_case name, derived from {parent_id} (e.g. {parent_id}_monotonic, {parent_id}_analogical). Use the SAME case as {parent_id}. Each must be distinct.
+- pattern_id: a short lowercase snake_case name, derived from {parent_id} (e.g. {parent_id}_monotonic, {parent_id}_analogical). Use the SAME case as {parent_id}. Each must be distinct. PREFER reusing an existing sub-pattern name from the list above when the cluster's semantics fit; only mint a new name when no existing one matches.
 - description: one sentence capturing what distinguishes this cluster's relation, citing the evidence.
 - allowed_qualifiers (OPTIONAL): a list of qualifier keys this sub-pattern uses, drawn from the parent's set. Omit to inherit the parent's full set. A specialization may use a subset (e.g. a power-law sub-pattern needs function_form but not relation_type).
 
@@ -936,15 +939,33 @@ Output ONLY a JSON array of {k} objects:
 
 
 def name_split_subpatterns(parent: MetaHyperedgePattern, trigger: dict,
-                           llm: str = "deepseek") -> list[dict]:
+                           meta: "MetaHypergraph" = None, llm: str = "deepseek") -> list[dict]:
     """LLM naming-only step. The split decision is already made (deterministic
     clustering); the LLM just labels the sub-patterns. This keeps the A4
-    circularity broken: the LLM never decides WHETHER to split."""
+    circularity broken: the LLM never decides WHETHER to split.
+
+    If meta is provided, existing sub-patterns of the parent (same family,
+    already evolved in earlier papers) are fed to the naming LLM so it REUSES
+    names instead of minting divergent new ones per paper — the cross-paper
+    name-divergence bug that shattered silhouette."""
     k = len(trigger["clusters"])
     ce = "\n".join(f"  Cluster {i+1}: \"{ev}\"" for i, ev in enumerate(trigger["representatives"]))
+    # gather existing sub-patterns: descendants of parent, or same-family
+    # evolved patterns whose id starts with parent_id (the split lineage)
+    existing = []
+    if meta is not None:
+        for pid, pat in meta.active_patterns().items():
+            if pid == parent.pattern_id or pat.deprecated:
+                continue
+            # lineage: name derived from parent (starts with parent_id + '_')
+            # OR shares the parent's family
+            if pid.startswith(parent.pattern_id + "_") or getattr(pat, "family", "") == getattr(parent, "family", "") and pid != parent.pattern_id:
+                existing.append(f"- {pid}: {pat.description[:120]}")
+    existing_str = "\n".join(existing) if existing else "(none yet — this is the first split of this pattern)"
     prompt = SPLIT_NAMING_PROMPT.format(
         parent_id=parent.pattern_id, parent_desc=parent.description,
-        k=k, method=trigger["method"], cluster_evidence=ce)
+        k=k, method=trigger["method"], cluster_evidence=ce,
+        existing_subpatterns=existing_str)
     raw = _call(prompt, llm, max_tokens=600)
     parsed = parse_json_response(raw)
     if not isinstance(parsed, list) or len(parsed) != k:
@@ -1218,7 +1239,7 @@ def run_split(meta: MetaHypergraph, instance: InstanceHypergraph, paper_id: str,
         parent = meta.patterns.get(t["pattern_id"])
         if not parent or parent.deprecated:
             continue
-        names = name_split_subpatterns(parent, t, llm=llm)
+        names = name_split_subpatterns(parent, t, meta=meta, llm=llm)
         if len(names) != len(t["clusters"]):
             applied.append({"pattern_id": t["pattern_id"], "skipped": True,
                             "reason": "naming failed", "method": t["method"]})
