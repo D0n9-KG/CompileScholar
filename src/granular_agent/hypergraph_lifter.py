@@ -300,13 +300,19 @@ def lift_into_schema(meta, edges_by_method, llm="deepseek-chat"):
                                 "name": node['method_name']})
 
     # step 2: judge + persist higher-order relation patterns.
-    # pattern_id encodes (src_idx, tgt_idx, rel) — collision-free across
-    # different method pairs (the old name-based id collided when names shared
-    # a leading token). Only the non-null relation direction is stored.
+    # For each method PAIR we judge BOTH directions, then keep only the
+    # higher-confidence (more specific) relation — A->B=improves and B->A=
+    # extends for the same pair are redundant; improves (a resolved limitation)
+    # is more informative than extends (range generalised), so prefer it. This
+    # halves the relation count and removes direction-noise the GLM-5 judge
+    # flagged (e.g. the reverse-extends of a correct improves).
+    _CONF_RANK = {"improves": 3, "compares": 2, "replaces": 3,
+                  "adapts": 2, "extends": 1, "background": 0}
     written_rels = []
     labels = list(induced.keys())
     for i, a in enumerate(labels):
         for b in labels[i + 1:]:
+            judged = []
             for src, tgt in ((a, b), (b, a)):
                 r = judge_relation(src, induced[src], edges_by_method[src],
                                    tgt, induced[tgt], edges_by_method[tgt], llm=llm)
@@ -315,22 +321,31 @@ def lift_into_schema(meta, edges_by_method, llm="deepseek-chat"):
                 rel = r.get('relation')
                 if not rel or rel == "null":
                     continue
-                src_tid = type_ids[src]
-                tgt_tid = type_ids[tgt]
-                pid = f"method_{rel}_{src_tid}_{tgt_tid}".lower()
-                pat = MetaHyperedgePattern(
-                    pattern_id=pid,
-                    description=f"{induced[src].get('method_name','')} {rel} "
-                                f"{induced[tgt].get('method_name','')}: "
-                                f"{r.get('rationale','')}",
-                    role_slots=[{"role": "src_method", "type": src_tid},
-                                {"role": "tgt_method", "type": tgt_tid}],
-                    allowed_qualifiers=["relation_type", "confidence",
-                                        "b_limitation", "a_resolves_it"],
-                    family=HIGHER_ORDER_FAMILY,
-                )
-                meta.add_pattern(pat, evidence=r.get('rationale', ''), paper_id="lift")
-                written_rels.append({"pattern_id": pid, "relation": rel,
+                judged.append((src, tgt, rel, r))
+            if not judged:
+                continue
+            # keep the best-scoring direction (confidence then specificity).
+            conf_of = lambda rr: ({"high": 3, "medium": 2, "low": 1}.get(
+                rr.get('confidence'), 0))
+            best = max(judged, key=lambda t: (conf_of(t[3]),
+                                              _CONF_RANK.get(t[2], 0)))
+            src, tgt, rel, r = best
+            src_tid = type_ids[src]
+            tgt_tid = type_ids[tgt]
+            pid = f"method_{rel}_{src_tid}_{tgt_tid}".lower()
+            pat = MetaHyperedgePattern(
+                pattern_id=pid,
+                description=f"{induced[src].get('method_name','')} {rel} "
+                            f"{induced[tgt].get('method_name','')}: "
+                            f"{r.get('rationale','')}",
+                role_slots=[{"role": "src_method", "type": src_tid},
+                            {"role": "tgt_method", "type": tgt_tid}],
+                allowed_qualifiers=["relation_type", "confidence",
+                                    "b_limitation", "a_resolves_it"],
+                family=HIGHER_ORDER_FAMILY,
+            )
+            meta.add_pattern(pat, evidence=r.get('rationale', ''), paper_id="lift")
+            written_rels.append({"pattern_id": pid, "relation": rel,
                                      "confidence": r.get('confidence'),
                                      "src": induced[src].get('method_name', ''),
                                      "tgt": induced[tgt].get('method_name', ''),
