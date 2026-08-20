@@ -392,7 +392,8 @@ def _chunk_text(text: str, thresh: int = CHUNK_THRESH) -> list[str]:
 
 def _run_hg_node(node: dict, sections: list, blocks: list, schema_prompt: str,
                  bb: HGBlackboard, llm: str, domain: str,
-                 meta=None, use_retrieval=False) -> tuple[list[HGNode], list[Hyperedge], str]:
+                 meta=None, use_retrieval=False,
+                 feedback_hint: str = "") -> tuple[list[HGNode], list[Hyperedge], str]:
     sec_text = section_text_for_node(node, sections, blocks)
     if not sec_text:
         return [], [], ""
@@ -420,6 +421,13 @@ def _run_hg_node(node: dict, sections: list, blocks: list, schema_prompt: str,
             discourse_role=discourse_role, predecessor_context=predecessor,
             section_name=node.get("section", ""), section_text=chunk,
         )
+        if feedback_hint:
+            # high-order feedback driving low-order extraction (goal step 3):
+            # appended AFTER the standard prompt so it biases toward
+            # extracting comparison/limitation/extension relations the high-order
+            # lift found missing. Does not alter the base prompt or schema.
+            prompt = prompt + "\n\nFEEDBACK (high-order lift found this paper's "
+            prompt = prompt + "cross-method relations weak — prioritize):\n" + feedback_hint
         raw = _call(prompt, llm)
         cnodes, cedges, csum = _parse_hg_response(raw, nid_prefix)
         all_nodes.extend(cnodes)
@@ -536,7 +544,8 @@ def extract_hypergraph(structure_map: dict, blocks: list, meta: MetaHypergraph,
                        trigger: EvolutionTrigger | None = None,
                        include_topology: bool = True,
                        evolve: bool = True,
-                       propagate_intra_dag: bool = True) -> dict:
+                       propagate_intra_dag: bool = True,
+                       feedback_hint: str = "") -> dict:
     """Phase 1: run all DAG nodes in topo order, producing an InstanceHypergraph
     and evolving the meta-hypergraph in place (deep self-evolution closed loop).
 
@@ -574,7 +583,7 @@ def extract_hypergraph(structure_map: dict, blocks: list, meta: MetaHypergraph,
         if propagate_intra_dag:
             schema_prompt = meta.to_prompt(include_topology=include_topology)
         hg_nodes, hg_edges, summary = _run_hg_node(node, sections, blocks, schema_prompt, bb, llm, domain, meta,
-                                                    use_retrieval=False)
+                                                    use_retrieval=False, feedback_hint=feedback_hint)
         n_calls += 1
 
         # add nodes to the instance graph (dedup by SURFACE, cross-section):
