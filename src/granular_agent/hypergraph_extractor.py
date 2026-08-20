@@ -212,56 +212,103 @@ _pat_emb_cache = {}  # meta_id -> {pid: emb}  (cleared when meta version changes
 
 
 def _retrieved_schema_prompt(meta, chunk_text, k=RETRIEVAL_K):
-    """Build a compact schema prompt with only the top-k patterns relevant to
-    this chunk + all seed patterns (so basic relations are always extractable).
-    Falls back to full meta.to_prompt() if embedding unavailable or schema small."""
+    """Build a compact schema prompt with the top-k patterns relevant to this
+    chunk, EXPANDED to preserve topology (IS-A ancestors/descendants + dep/con/
+    comp neighbors), so the extractor sees connected structure, not isolated
+    patterns. Falls back to full meta.to_prompt() if embedding unavailable or
+    schema small. Seed patterns always included (basic relations extractable)."""
     active = meta.active_patterns()
     if len(active) <= k:
         return meta.to_prompt()
     try:
         from granular_agent.hypergraph_evolution import _ensure_pattern_embeds, _embed_texts_robust
         from granular_agent.llm_client import cosine_sim
-        import numpy as np
         pat_embs = _ensure_pattern_embeds(meta)
         if not pat_embs:
             return meta.to_prompt()
-        # chunk embedding
         chunk_emb = _embed_texts_robust([chunk_text[:2000]])
         if not chunk_emb:
             return meta.to_prompt()
         chunk_emb = chunk_emb[0]
-        # rank active patterns by cosine to chunk
-        scored = []
-        for pid, emb in pat_embs.items():
-            if pid not in active:
-                continue
-            scored.append((pid, cosine_sim(emb, chunk_emb)))
+        scored = [(pid, cosine_sim(emb, chunk_emb))
+                  for pid, emb in pat_embs.items() if pid in active]
         scored.sort(key=lambda x: -x[1])
-        top = [pid for pid, _ in scored[:k]]
-        # always include seed patterns (basic relations must stay extractable)
+        top = {pid for pid, _ in scored[:k]}
+        # always include seed patterns
         keep = set(top) | {p for p in SEED_PATTERN_IDS if p in active}
-        # render only kept patterns (compact form to stay bounded)
+        # topology-preserving expansion: IS-A ancestors/descendants + dep/con/comp neighbors
+        keep = _expand_topology(meta, keep)
         return _render_patterns_compact(meta, keep)
     except Exception:
         return meta.to_prompt()
 
 
+def _expand_topology(meta, keep):
+    """Expand the kept set so the schema stays CONNECTED:
+    (1) IS-A: add ancestors (so a sub-pattern's parent generalization is
+        visible — the LLM can fall back to the abstract parent) and descendants
+        (so a retrieved parent's concrete specializations are pickable).
+    (2) dep/con/comp: add patterns directly connected by a schema topology edge
+        to a kept pattern (so 'constitutive_law constrains measures' isn't
+        severed when only one endpoint is retrieved).
+    One hop is enough — multi-hop would re-bloat the prompt."""
+    # IS-A edges (subclass_of): src is child, dst is parent
+    isa_parent_of = {}   # child -> parent
+    isa_children_of = {} # parent -> [children]
+    topo_neighbors = {}  # pattern -> [patterns via dep/con/comp]
+    for e in meta.meta_edges:
+        if e.relation == "subclass_of":
+            isa_parent_of.setdefault(e.src, []).append(e.dst)
+            isa_children_of.setdefault(e.dst, []).append(e.src)
+        elif e.relation in ("depends_on", "constrains", "composes"):
+            topo_neighbors.setdefault(e.src, []).append(e.dst)
+            topo_neighbors.setdefault(e.dst, []).append(e.src)
+    expanded = set(keep)
+    for pid in list(keep):
+        # IS-A ancestors (walk up)
+        stack = list(isa_parent_of.get(pid, []))
+        while stack:
+            p = stack.pop()
+            if p in expanded:
+                continue
+            expanded.add(p)
+            stack.extend(isa_parent_of.get(p, []))
+        # IS-A direct descendants (one hop down)
+        for child in isa_children_of.get(pid, []):
+            expanded.add(child)
+        # dep/con/comp direct neighbors (one hop)
+        for nb in topo_neighbors.get(pid, []):
+            expanded.add(nb)
+    return expanded
+
+
 def _render_patterns_compact(meta, keep_ids):
-    """Render only the patterns in keep_ids, compact form (id + description +
-    family), preserving the seed-first ordering. Role slots omitted to stay
-    bounded; the LLM still picks by description. (Same tradeoff as
-    to_prompt(compact=True) but selective.)"""
-    lines = ["Schema (retrieved top-K relevant patterns + seeds):"]
-    # seed patterns first
-    ordered = [p for p in SEED_PATTERN_IDS if p in keep_ids]
-    ordered += [p for p in keep_ids if p not in SEED_PATTERN_IDS]
+    """Render kept patterns + the topology edges AMONG them (IS-A + dep/con/comp),
+    so the extractor sees connected structure. Compact: id + description +
+    family (role slots omitted to stay bounded)."""
+    keep = {p for p in keep_ids if p in meta.patterns and not meta.patterns[p].deprecated}
+    lines = ["Schema (topology-preserving retrieved subset; seed patterns always present):"]
+    ordered = [p for p in SEED_PATTERN_IDS if p in keep]
+    ordered += sorted(p for p in keep if p not in SEED_PATTERN_IDS)
     for pid in ordered:
         pat = meta.patterns.get(pid)
         if not pat or pat.deprecated:
             continue
         fam = f"<{pat.family}>" if pat.family else ""
+        abs_tag = " (abstract)" if pat.is_abstract else ""
         desc = (pat.description or "")[:120]
-        lines.append(f"- {pid}{fam}: {desc}")
+        lines.append(f"- {pid}{fam}{abs_tag}: {desc}")
+    # topology edges among kept patterns (IS-A + dep/con/comp)
+    topo = []
+    for e in meta.meta_edges:
+        if e.src not in keep or e.dst not in keep:
+            continue
+        if e.relation == "subclass_of":
+            topo.append(f"{e.src} subclass_of {e.dst}")
+        elif e.relation in ("depends_on", "constrains", "composes"):
+            topo.append(f"{e.src} {e.relation} {e.dst}")
+    if topo:
+        lines.append("Topology: " + "; ".join(topo))
     return "\n".join(lines)
 
 

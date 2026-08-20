@@ -553,17 +553,19 @@ def run_evolution_loop(meta: MetaHypergraph, failing_hes: list[Hyperedge],
 # already-computed cross_node recurrence rather than an LLM judgment (A4
 # circularity preserved — the gate is deterministic).
 CONSERVATIVE_CROSS_NODE = 2
-# RETUNE (gate v3): cumulative-failure threshold raised 3->8. The v2 value of 3
-# let the schema balloon to 237 patterns on 30 papers (seed 6 -> 237), which
-# bloated the extractor's schema prompt and caused it to MISS basic influences
-# edges (frozen 57 -> full 30 on one paper). A higher bar keeps the schema
-# small so extraction quality doesn't degrade as the corpus grows.
-CONSERVATIVE_CUMULATIVE = 8
-# Hard cap on total active patterns. Once reached, growth ops (add_pattern /
-# add_meta_node / add_subclass) are rejected outright — only split/merge/retire
-# (which restructure existing patterns without growing count much) proceed.
-# Prevents runaway schema bloat from degrading extraction.
-MAX_ACTIVE_PATTERNS = 40
+# RETUNE (gate v3): cumulative threshold. v2=3 let schema balloon (6->237 on
+# 30 papers) which bloated the prompt and degraded extraction. v3 raised to 8
+# as a backstop. NOW (v4): retrieval-based schema injection (see
+# hypergraph_extractor._retrieved_schema_prompt) keeps the prompt bounded
+# regardless of schema size, so the gate can relax back to let the schema
+# evolve fully. Kept at 5 (between v2's looseness and v3's tightness) as a
+# mild anti-noise guard — a pattern must recur across >=5 cumulative failures
+# to be added, filtering one-off LLM naming noise.
+CONSERVATIVE_CUMULATIVE = 5
+# No hard cap — retrieval injection handles prompt size. Cap removed so the
+# schema can grow as the corpus demands (DIAL-KG style: grow schema, retrieve
+# relevant subset per chunk).
+MAX_ACTIVE_PATTERNS = 10**9
 
 
 def mismatch_signature_for_proposal(p: dict) -> tuple:
