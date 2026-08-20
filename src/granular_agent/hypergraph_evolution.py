@@ -34,6 +34,7 @@ mechanism mirrors chained_extractor's schema_dirty flag.
 from __future__ import annotations
 
 import os
+import re
 import sys
 from typing import Any
 
@@ -903,10 +904,10 @@ def detect_split_triggers(meta: MetaHypergraph, instance: InstanceHypergraph,
     asks the LLM only to NAME the clusters, not to decide whether to split.
 
     Tier order: (1) discrete qualifier -> (2) embedding -> (3) LLM semantic
-    grouping (NEW: handles over-wide patterns with NO discrete qualifier, e.g.
-    constitutive_law conflating heat-flux/stress/transport laws — the real
-    over-wide case the discrete/embedding tiers miss). The LLM only GROUPS;
-    split still requires >=2 sizeable groups (deterministic gate)."""
+    grouping (only for patterns with STRUCTURAL SIGNAL — equations/formulas in
+    evidence; pure-prose patterns like 'influences' are too broad to split
+    meaningfully and the LLM groups by surface wording, producing misnamed
+    catch-all sub-patterns. Such patterns evolve via add_pattern instead)."""
     # group instance hyperedges by their pattern_type
     by_pat: dict[str, list[Hyperedge]] = {}
     for he in instance.hyperedges.values():
@@ -921,12 +922,19 @@ def detect_split_triggers(meta: MetaHypergraph, instance: InstanceHypergraph,
             continue  # not enough to form two real clusters
         clusters, method = cluster_pattern_instances(edges, instance, meta, prefer=prefer)
         big = [c for c in clusters if len(c) >= MIN_CLUSTER]
-        # tier 3 fallback: LLM semantic grouping (for over-wide patterns with
-        # no discrete qualifier + continuous embedding — the common real case)
+        # tier 3 fallback: LLM semantic grouping — only if the resulting
+        # clusters pass a COHERENCE check (DIAL-KG style: a split is only
+        # valid if each sub-cluster has high internal semantic coherence;
+        # low-coherence clusters mean the pattern is too broad to split
+        # meaningfully and the LLM grouped by surface wording, not relation
+        # nature — those evolve via add_pattern instead).
         if len(big) < 2 and llm:
             lc, lmethod = _llm_semantic_clusters(edges, instance, pid, llm=llm)
             lbig = [c for c in lc if len(c) >= MIN_CLUSTER]
-            if len(lbig) >= 2:
+            # coherence gate: each cluster's edges must be internally coherent
+            # (mean pairwise cosine >= SPLIT_COHERENCE_THRESH) for the split
+            # to be meaningful. Drops catch-all clusters of unrelated edges.
+            if len(lbig) >= 2 and _clusters_coherent(edges, lbig, instance):
                 big, method = lbig, lmethod
         if len(big) >= 2:
             triggers.append({
@@ -939,6 +947,51 @@ def detect_split_triggers(meta: MetaHypergraph, instance: InstanceHypergraph,
                 "representatives": [edges[c[0]].evidence_span[:160] for c in big],
             })
     return triggers
+
+
+# Coherence threshold for split clusters (DIAL-KG style). A split is only
+# valid if each resulting sub-cluster's edges are internally coherent —
+# mean pairwise embedding cosine >= this. Lower = looser clustering (more
+# splits accepted, but risk catch-all sub-patterns); higher = stricter
+# (fewer splits, only when sub-groups are genuinely tight). 0.55 matches
+# the embedding single-link threshold used elsewhere.
+SPLIT_COHERENCE_THRESH = 0.55
+
+
+def _clusters_coherent(edges, clusters, instance) -> bool:
+    """DIAL-KG-style coherence gate: every cluster must have mean pairwise
+    embedding cosine >= SPLIT_COHERENCE_THRESH. A cluster of unrelated edges
+    (e.g. 21 mixed influences edges dumped together) fails this and the split
+    is rejected — the pattern is too broad to split meaningfully and should
+    evolve via add_pattern instead. Degrades to True (allow) if embedding
+    unavailable (honest: don't block splits on infra failure)."""
+    try:
+        texts = [_edge_cluster_text(edges[i], instance) for c in clusters for i in c]
+        if not texts:
+            return True
+        embs = _embed_texts_robust(texts)
+        if embs is None or len(embs) != len(texts):
+            return True  # degrade: don't block on embed failure
+        import numpy as np
+        A = np.asarray(embs, dtype=np.float32)
+        A = A / (np.linalg.norm(A, axis=1, keepdims=True) + 1e-9)
+        sim = A @ A.T
+        idx = 0
+        for c in clusters:
+            n = len(c)
+            if n < 2:
+                idx += n
+                continue
+            sub = sim[idx:idx+n, idx:idx+n]
+            # mean pairwise cosine (off-diagonal)
+            mask = ~np.eye(n, dtype=bool)
+            mean_cos = sub[mask].mean() if n > 1 else 1.0
+            if mean_cos < SPLIT_COHERENCE_THRESH:
+                return False  # this cluster is incoherent -> reject split
+            idx += n
+        return True
+    except Exception:
+        return True
 
 
 SPLIT_NAMING_PROMPT = """You are naming the result of a SCHEMA SPLIT. A hyperedge pattern '{parent_id}' (description: {parent_desc}) was found to be over-wide: its instances fall into {k} clusters with distinct semantics. The split decision was made by deterministic clustering (method: {method}); your job is ONLY to NAME the sub-patterns, NOT to judge whether the split is correct.
