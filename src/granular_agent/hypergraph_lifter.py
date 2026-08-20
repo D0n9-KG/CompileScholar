@@ -262,12 +262,6 @@ METHOD_NS = "METHOD_"  # prefix for lifted method node type_ids
 HIGHER_ORDER_FAMILY = "higher_order_method_relation"
 
 
-def _method_type_id(label):
-    """Stable METHOD_ type_id from a method label (snake, namespaced)."""
-    import re
-    s = re.sub(r'[^a-zA-Z0-9]+', '_', label).strip('_').lower()
-    return METHOD_NS + s
-
 
 def lift_into_schema(meta, edges_by_method, llm="deepseek-chat"):
     """Lift cross-paper common patterns INTO the meta schema.
@@ -282,24 +276,33 @@ def lift_into_schema(meta, edges_by_method, llm="deepseek-chat"):
     """
     from .hypergraph_schema import MetaHyperedgePattern
 
-    # step 1: induce + persist method nodes
+    # step 1: induce + persist method nodes.
+    # type_id uses a STABLE INDEX (METHOD_0, METHOD_1, ...) NOT the LLM method
+    # name, because method names are often Chinese and _method_type_id's regex
+    # collapses Chinese to a single letter (e.g. "基于惯性数I..." -> "i"),
+    # colliding different methods onto the same type_id -> duplicate patterns.
     induced = {}
     written_methods = []
-    for label, edges in edges_by_method.items():
+    type_ids = {}  # label -> stable METHOD_<idx>
+    for idx, (label, edges) in enumerate(edges_by_method.items()):
         if not edges:
             continue
         node = induce_method_node(edges, label, llm=llm)
         if not node or not node.get('method_name'):
             continue
         induced[label] = node
-        type_id = _method_type_id(node['method_name'])
+        type_id = f"{METHOD_NS}{idx}"
+        type_ids[label] = type_id
         ev = (node.get('key_evidence') or [None])[0] or ""
         meta.add_meta_node(type_id, node.get('method_name', label),
                            evidence=ev, paper_id="lift")
         written_methods.append({"label": label, "type_id": type_id,
                                 "name": node['method_name']})
 
-    # step 2: judge + persist higher-order relation patterns
+    # step 2: judge + persist higher-order relation patterns.
+    # pattern_id encodes (src_idx, tgt_idx, rel) — collision-free across
+    # different method pairs (the old name-based id collided when names shared
+    # a leading token). Only the non-null relation direction is stored.
     written_rels = []
     labels = list(induced.keys())
     for i, a in enumerate(labels):
@@ -312,23 +315,27 @@ def lift_into_schema(meta, edges_by_method, llm="deepseek-chat"):
                 rel = r.get('relation')
                 if not rel or rel == "null":
                     continue
-                # one higher-order pattern per (src, tgt, rel) triple.
-                pid = f"method_{rel}_{_method_type_id(src)}_{_method_type_id(tgt)}" \
-                      .replace(METHOD_NS, "").lower()
+                src_tid = type_ids[src]
+                tgt_tid = type_ids[tgt]
+                pid = f"method_{rel}_{src_tid}_{tgt_tid}".lower()
                 pat = MetaHyperedgePattern(
                     pattern_id=pid,
                     description=f"{induced[src].get('method_name','')} {rel} "
                                 f"{induced[tgt].get('method_name','')}: "
                                 f"{r.get('rationale','')}",
-                    role_slots=[{"role": "src_method", "type": _method_type_id(induced[src]['method_name'])},
-                                {"role": "tgt_method", "type": _method_type_id(induced[tgt]['method_name'])}],
+                    role_slots=[{"role": "src_method", "type": src_tid},
+                                {"role": "tgt_method", "type": tgt_tid}],
                     allowed_qualifiers=["relation_type", "confidence",
                                         "b_limitation", "a_resolves_it"],
                     family=HIGHER_ORDER_FAMILY,
                 )
                 meta.add_pattern(pat, evidence=r.get('rationale', ''), paper_id="lift")
                 written_rels.append({"pattern_id": pid, "relation": rel,
-                                     "confidence": r.get('confidence')})
+                                     "confidence": r.get('confidence'),
+                                     "src": induced[src].get('method_name', ''),
+                                     "tgt": induced[tgt].get('method_name', ''),
+                                     "rationale": r.get('rationale', ''),
+                                     "b_limitation": r.get('b_limitation')})
     return {"method_nodes": written_methods, "relation_patterns": written_rels}
 
 
