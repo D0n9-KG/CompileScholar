@@ -943,8 +943,14 @@ def detect_split_triggers(meta: MetaHypergraph, instance: InstanceHypergraph,
                 "clusters": big,
                 "cluster_sizes": [len(c) for c in big],
                 "method": method,
-                # representative evidence per cluster for the naming LLM
-                "representatives": [edges[c[0]].evidence_span[:160] for c in big],
+                # representative evidence per cluster for the naming LLM:
+                # show up to 3 edges per cluster (not just the first) so the
+                # LLM names from the cluster's shared relation, not one edge's
+                # wording — reduces misnamed catch-all sub-patterns.
+                "representatives": [
+                    " | ".join(edges[i].evidence_span[:100] for i in c[:3])
+                    for c in big
+                ],
             })
     return triggers
 
@@ -1021,7 +1027,7 @@ BAD names (entity/loose-association names — DO NOT USE):
 For each cluster, read its evidence, identify the RELATION VERB/MECHANISM (depends on / balances / scales with / thresholds at / induces / constrains / ...), and name the sub-pattern after that mechanism.
 
 For each cluster, propose:
-- pattern_id: a short lowercase snake_case name, derived from {parent_id} + the relation mechanism (e.g. {parent_id}_parameter_dependency). Use the SAME case as {parent_id}. Each must be distinct. PREFER reusing an existing sub-pattern name from the list above when the cluster's semantics fit; only mint a new name when no existing one matches.
+- pattern_id: a lowercase snake_case name, derived from {parent_id} + the relation mechanism (e.g. {parent_id}_parameter_dependency). Use the SAME case as {parent_id}. Each must be distinct. PREFER reusing an existing sub-pattern name from the list above when the cluster's semantics fit; only mint a new name when no existing one matches. The suffix should be the PRIMARY mechanism word from the evidence (<=30 chars); if a secondary mechanism matters, express it via qualifier, not a longer name.
 - description: one sentence capturing what distinguishes this cluster's relation, citing the evidence verb.
 - allowed_qualifiers (OPTIONAL): a list of qualifier keys this sub-pattern uses, drawn from the parent's set. Omit to inherit the parent's full set. A specialization may use a subset (e.g. a power-law sub-pattern needs function_form but not relation_type).
 
@@ -1072,7 +1078,8 @@ def name_split_subpatterns(parent: MetaHyperedgePattern, trigger: dict,
         # same-run merge gate catches unreliably. Normalizing at the source
         # prevents the dup rather than detecting it after.
         pid = str(p["pattern_id"]).strip().strip("`\"' ")
-        p["pattern_id"] = pid.lower()
+        pid = pid.lower()
+        p["pattern_id"] = pid
         out.append(p)
     return out
 
