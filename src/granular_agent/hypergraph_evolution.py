@@ -949,9 +949,27 @@ Representative evidence for each cluster:
 Existing sub-patterns of '{parent_id}' already in the schema (REUSE one of these if a cluster's semantics matches — do NOT mint a new name that means the same thing as an existing one; cross-paper name divergence is a known failure mode we must avoid):
 {existing_subpatterns}
 
+CRITICAL NAMING RULE — name from the RELATION'S NATURE, not from the entities:
+The sub-pattern name must capture HOW the relation works (the verb/mechanism in the evidence), NOT WHAT entities are involved. Read the evidence verb phrase and name the sub-pattern after it.
+
+GOOD names (suffix reflects the relation nature, derived from the evidence verb):
+  {parent_id}_parameter_dependency   (evidence: "u depends on h and θ" — relation is parameter dependence)
+  {parent_id}_force_balance          (evidence: "flow controlled by balance of gravity and friction" — force balance)
+  {parent_id}_threshold_condition    (evidence: "flow occurs only above critical inclination" — threshold)
+  {parent_id}_geometric_scaling      (evidence: "u scales with sqrt(g h)" — scaling law)
+  {parent_id}_kinematic_relation     (evidence: "velocity field relates to shear rate" — kinematics)
+
+BAD names (entity/loose-association names — DO NOT USE):
+  {parent_id}_performance_enhancement  (WRONG: the edges are parameter dependencies, not "performance enhancement")
+  {parent_id}_granular_chute          (WRONG: names the entity "granular chute", not the relation nature)
+  {parent_id}_experimental            (WRONG: names the context, not the relation)
+  {parent_id}_system_response         (WRONG: too vague, doesn't say how)
+
+For each cluster, read its evidence, identify the RELATION VERB/MECHANISM (depends on / balances / scales with / thresholds at / induces / constrains / ...), and name the sub-pattern after that mechanism.
+
 For each cluster, propose:
-- pattern_id: a short lowercase snake_case name, derived from {parent_id} (e.g. {parent_id}_monotonic, {parent_id}_analogical). Use the SAME case as {parent_id}. Each must be distinct. PREFER reusing an existing sub-pattern name from the list above when the cluster's semantics fit; only mint a new name when no existing one matches.
-- description: one sentence capturing what distinguishes this cluster's relation, citing the evidence.
+- pattern_id: a short lowercase snake_case name, derived from {parent_id} + the relation mechanism (e.g. {parent_id}_parameter_dependency). Use the SAME case as {parent_id}. Each must be distinct. PREFER reusing an existing sub-pattern name from the list above when the cluster's semantics fit; only mint a new name when no existing one matches.
+- description: one sentence capturing what distinguishes this cluster's relation, citing the evidence verb.
 - allowed_qualifiers (OPTIONAL): a list of qualifier keys this sub-pattern uses, drawn from the parent's set. Omit to inherit the parent's full set. A specialization may use a subset (e.g. a power-law sub-pattern needs function_form but not relation_type).
 
 Output ONLY a JSON array of {k} objects:
