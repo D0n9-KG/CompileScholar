@@ -180,8 +180,19 @@ def induce_method_node(edges, method_label, llm="deepseek-chat", k=8):
     body, npaper = _fmt_edges(edges, k=k)
     prompt = METHOD_PROMPT.format(method=method_label, npaper=npaper,
                                   k=min(k, len(edges)), edges=body)
-    resp = call_llm(prompt, model=llm, max_tokens=700, temperature=0.0)
-    return parse_json_response(resp) if resp is not None else None
+    return _call_json(prompt, llm=llm, max_tokens=700)
+
+
+def _call_json(prompt, llm="deepseek-chat", max_tokens=700, retries=3):
+    """call_llm + parse, with retry on deepseek's intermittent 400s
+    (which surface as None since call_llm's own retry handles timeouts
+    but not 400s). Returns parsed dict or None."""
+    for _ in range(retries):
+        resp = call_llm(prompt, model=llm, max_tokens=max_tokens, temperature=0.0)
+        obj = parse_json_response(resp) if resp is not None else None
+        if obj is not None:
+            return obj
+    return None
 
 
 def judge_relation(method_a, induced_a, edges_a,
@@ -199,8 +210,7 @@ def judge_relation(method_a, induced_a, edges_a,
         method_b=method_b, b_name=induced_b.get('method_name'),
         b_core=induced_b.get('core_quantities'), b_does=induced_b.get('what_it_does'),
         a_mentions_b=_fmt_mentions(a_mb), b_mentions_a=_fmt_mentions(b_ma))
-    resp = call_llm(prompt, model=llm, max_tokens=400, temperature=0.0)
-    return parse_json_response(resp) if resp is not None else None
+    return _call_json(prompt, llm=llm, max_tokens=400)
 
 
 def lift(edges_by_method, llm="deepseek-chat"):
@@ -406,8 +416,7 @@ def cluster_methods_by_llm(edges_by_paper, llm="deepseek-chat", k=8):
         return {}
     prompt = CLUSTER_PROMPT.format(npaper=len(names), paper_names=", ".join(names),
                                    edges="\n\n".join(bodies))
-    resp = call_llm(prompt, model=llm, max_tokens=1500, temperature=0.0)
-    obj = parse_json_response(resp) if resp is not None else None
+    obj = _call_json(prompt, llm=llm, max_tokens=1500)
     if not obj:
         return {}
     out = {}
