@@ -392,7 +392,7 @@ def _chunk_text(text: str, thresh: int = CHUNK_THRESH) -> list[str]:
 
 def _run_hg_node(node: dict, sections: list, blocks: list, schema_prompt: str,
                  bb: HGBlackboard, llm: str, domain: str,
-                 meta=None) -> tuple[list[HGNode], list[Hyperedge], str]:
+                 meta=None, use_retrieval=False) -> tuple[list[HGNode], list[Hyperedge], str]:
     sec_text = section_text_for_node(node, sections, blocks)
     if not sec_text:
         return [], [], ""
@@ -408,7 +408,13 @@ def _run_hg_node(node: dict, sections: list, blocks: list, schema_prompt: str,
         # patterns instead of the full schema (prevents prompt bloat degrading
         # extraction as the schema evolves). Falls back to full schema_prompt
         # when the schema is small or embedding unavailable.
-        chunk_schema = _retrieved_schema_prompt(meta, chunk) if meta is not None else schema_prompt
+        # DEFAULT OFF (use_retrieval=False): full schema preserves topology
+        # (dep/con/comp + IS-A connections), retrieval severs them. Only
+        # enable when schema > context-window limit.
+        if use_retrieval and meta is not None:
+            chunk_schema = _retrieved_schema_prompt(meta, chunk)
+        else:
+            chunk_schema = schema_prompt
         prompt = EXTRACT_HG_PROMPT.format(
             domain=domain, schema_prompt=chunk_schema,
             discourse_role=discourse_role, predecessor_context=predecessor,
@@ -567,7 +573,8 @@ def extract_hypergraph(structure_map: dict, blocks: list, meta: MetaHypergraph,
         # P4 forward propagation: re-fetch the (possibly evolved) schema prompt
         if propagate_intra_dag:
             schema_prompt = meta.to_prompt(include_topology=include_topology)
-        hg_nodes, hg_edges, summary = _run_hg_node(node, sections, blocks, schema_prompt, bb, llm, domain, meta)
+        hg_nodes, hg_edges, summary = _run_hg_node(node, sections, blocks, schema_prompt, bb, llm, domain, meta,
+                                                    use_retrieval=False)
         n_calls += 1
 
         # add nodes to the instance graph (dedup by SURFACE, cross-section):
