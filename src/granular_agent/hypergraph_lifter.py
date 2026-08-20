@@ -320,3 +320,122 @@ def lift_into_schema(meta, edges_by_method, llm="deepseek-chat"):
                 written_rels.append({"pattern_id": pid, "relation": rel,
                                      "confidence": r.get('confidence')})
     return {"method_nodes": written_methods, "relation_patterns": written_rels}
+
+
+# ---------------------------------------------------------------------------
+# cluster_methods_by_llm + lift_corpus: the FULLY-AUTOMATIC A path.
+#
+# lift_into_schema takes edges_by_method (a PRE-SPLIT method mapping). That
+# split was the hard part and we used to do it by hand (gold) or by embedding
+# (failed — embedding clusters by physical topic, not by modeling method).
+#
+# cluster_methods_by_llm: an LLM reads representative edges across all papers
+# and groups them by MODELING METHOD (not topic). Validated: LLM correctly
+# separates μ(I) / NGF / I-gradient where embedding collapsed everything into
+# one "granular flow" topic cluster. LLM has methodological understanding that
+# surface embeddings lack. See DECISION_lift_as_evolution_op.md.
+#
+# lift_corpus = cluster_methods_by_llm + lift_into_schema. This is the truly
+# automatic lift: takes raw cross-paper edges, no external method mapping.
+# A frozen schema never calls it -> cannot grow a higher-order layer.
+# ---------------------------------------------------------------------------
+
+CLUSTER_PROMPT = """你是科学知识图谱的方法学分析器。下面是 {npaper} 篇颗粒流论文各自抽取出的
+低阶超边实例 (pattern + 节点 + 原文证据)。这些论文可能涉及不同的【建模方法】
+(建模方法 = 用什么数学形式/物理图像描述颗粒流, 如本构律流变、非局部模型、
+梯度模型等; 注意: 不同方法可能描述同一物理现象, 区分在建模形式)。
+
+【任务】基于证据, 把这些论文按"建模方法"分组 —— 哪几篇用同一类方法。
+不要按物理主题分 (都是颗粒流), 要按建模方法分。每篇归一个方法组。
+然后给每个方法组命名 (基于证据, 不臆测方法名; 若论文未自称方法名,
+按其建模特征命名, 如 "基于惯性数I的本构律流变")。
+
+论文超边 (每篇最多8条代表):
+{edges}
+
+输出严格 JSON (无 markdown 围栏):
+{{
+  "method_groups": [
+    {{
+      "method_name": "该方法组的命名 (基于建模特征)",
+      "member_papers": ["论文短名1", "..."],
+      "modeling_form": "该方法的建模形式 (一句话)",
+      "key_evidence": ["支撑该方法的证据片段1", "..."]
+    }}
+  ]
+}}
+
+论文短名: {paper_names}
+"""
+
+
+def _reps_for_paper(edges, k=8):
+    """k edges with shortest evidence (most concrete) as paper reps."""
+    return sorted(edges, key=lambda e: len(e.get('ev', '') or ''))[:k]
+
+
+def _fmt_paper_edges(paper, edges):
+    lines = [f"[{paper}]"]
+    for e in edges:
+        nodes = ", ".join(n[0] if isinstance(n, (list, tuple)) else str(n)
+                          for n in e.get('nodes', []))
+        lines.append(f"  pat={e['pat']} nodes=[{nodes}] "
+                     f"ev=\"{(e.get('ev','') or '')[:150]}\"")
+    return "\n".join(lines)
+
+
+def cluster_methods_by_llm(edges_by_paper, llm="deepseek-chat", k=8):
+    """Group cross-paper edges into method families via LLM.
+
+    edges_by_paper: {paper_id: [instance edges]}.
+    Returns {method_name: [edges]} (edges pooled from member papers).
+    The LLM separates by modeling method, not physical topic (where embedding
+    clustering collapsed). Returns {} on failure.
+    """
+    bodies, names = [], []
+    for paper, edges in edges_by_paper.items():
+        if not edges:
+            continue
+        reps = _reps_for_paper(edges, k=k)
+        bodies.append(_fmt_paper_edges(paper, reps))
+        names.append(paper)
+    if len(names) < 2:
+        # need >=2 papers for cross-paper lifting; single paper -> 1 group
+        if len(names) == 1:
+            return {names[0]: edges_by_paper[names[0]]}
+        return {}
+    prompt = CLUSTER_PROMPT.format(npaper=len(names), paper_names=", ".join(names),
+                                   edges="\n\n".join(bodies))
+    resp = call_llm(prompt, model=llm, max_tokens=1500, temperature=0.0)
+    obj = parse_json_response(resp) if resp is not None else None
+    if not obj:
+        return {}
+    out = {}
+    for g in obj.get('method_groups', []):
+        mname = g.get('method_name', '').strip()
+        if not mname:
+            continue
+        pooled = []
+        for m in g.get('member_papers', []):
+            for paper in edges_by_paper:
+                if paper in m or m in paper:
+                    pooled.extend(edges_by_paper[paper])
+                    break
+        if pooled:
+            out[mname] = pooled
+    return out
+
+
+def lift_corpus(meta, edges_by_paper, llm="deepseek-chat"):
+    """Fully-automatic lift: cluster cross-paper edges into method families
+    (LLM), then lift_into_schema (induce method nodes + relations, write into
+    schema). No external method mapping needed.
+
+    edges_by_paper: {paper_id: [instance edges]}.
+    Returns {"clusters": {...}, "written": {...}}.
+    """
+    clusters = cluster_methods_by_llm(edges_by_paper, llm=llm)
+    if not clusters:
+        return {"clusters": {}, "written": {"method_nodes": [], "relation_patterns": []}}
+    written = lift_into_schema(meta, clusters, llm=llm)
+    return {"clusters": list(clusters.keys()), "written": written}
