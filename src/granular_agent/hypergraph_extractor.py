@@ -197,6 +197,74 @@ def _call(prompt: str, llm: str, max_tokens: int = 8192) -> str | None:
     return call_paratera(prompt, model=llm, max_tokens=max_tokens)
 
 
+# ---- retrieval-based schema injection (DIAL-KG style) ----
+# When the schema grows, meta.to_prompt() bloats the extraction prompt and the
+# LLM starts missing basic seed-pattern edges (measured: frozen 57 -> full 30
+# influences on one paper as schema went 6 -> 237 patterns). Fix: for each
+# chunk, retrieve the top-K most relevant patterns (by embedding cosine) and
+# render ONLY those + always-include seed patterns, so the schema can grow
+# without degrading extraction. Mirrors DIAL-KG's "retrieve top-K=30 relevant
+# schemas from S_{k-1}".
+RETRIEVAL_K = 30
+SEED_PATTERN_IDS = ("influences", "constitutive_law", "defines",
+                     "composed_of", "measures", "claim_relation")
+_pat_emb_cache = {}  # meta_id -> {pid: emb}  (cleared when meta version changes)
+
+
+def _retrieved_schema_prompt(meta, chunk_text, k=RETRIEVAL_K):
+    """Build a compact schema prompt with only the top-k patterns relevant to
+    this chunk + all seed patterns (so basic relations are always extractable).
+    Falls back to full meta.to_prompt() if embedding unavailable or schema small."""
+    active = meta.active_patterns()
+    if len(active) <= k:
+        return meta.to_prompt()
+    try:
+        from granular_agent.hypergraph_evolution import _ensure_pattern_embeds, _embed_texts_robust
+        from granular_agent.llm_client import cosine_sim
+        import numpy as np
+        pat_embs = _ensure_pattern_embeds(meta)
+        if not pat_embs:
+            return meta.to_prompt()
+        # chunk embedding
+        chunk_emb = _embed_texts_robust([chunk_text[:2000]])
+        if not chunk_emb:
+            return meta.to_prompt()
+        chunk_emb = chunk_emb[0]
+        # rank active patterns by cosine to chunk
+        scored = []
+        for pid, emb in pat_embs.items():
+            if pid not in active:
+                continue
+            scored.append((pid, cosine_sim(emb, chunk_emb)))
+        scored.sort(key=lambda x: -x[1])
+        top = [pid for pid, _ in scored[:k]]
+        # always include seed patterns (basic relations must stay extractable)
+        keep = set(top) | {p for p in SEED_PATTERN_IDS if p in active}
+        # render only kept patterns (compact form to stay bounded)
+        return _render_patterns_compact(meta, keep)
+    except Exception:
+        return meta.to_prompt()
+
+
+def _render_patterns_compact(meta, keep_ids):
+    """Render only the patterns in keep_ids, compact form (id + description +
+    family), preserving the seed-first ordering. Role slots omitted to stay
+    bounded; the LLM still picks by description. (Same tradeoff as
+    to_prompt(compact=True) but selective.)"""
+    lines = ["Schema (retrieved top-K relevant patterns + seeds):"]
+    # seed patterns first
+    ordered = [p for p in SEED_PATTERN_IDS if p in keep_ids]
+    ordered += [p for p in keep_ids if p not in SEED_PATTERN_IDS]
+    for pid in ordered:
+        pat = meta.patterns.get(pid)
+        if not pat or pat.deprecated:
+            continue
+        fam = f"<{pat.family}>" if pat.family else ""
+        desc = (pat.description or "")[:120]
+        lines.append(f"- {pid}{fam}: {desc}")
+    return "\n".join(lines)
+
+
 def _parse_hg_response(raw: str | None, node_id: str) -> tuple[list[HGNode], list[Hyperedge], str]:
     """Parse LLM output into HGNode/Hyperedge. Rewrites nids with a node_id
     prefix so nodes from different DAG nodes never collide."""
@@ -276,7 +344,8 @@ def _chunk_text(text: str, thresh: int = CHUNK_THRESH) -> list[str]:
 
 
 def _run_hg_node(node: dict, sections: list, blocks: list, schema_prompt: str,
-                 bb: HGBlackboard, llm: str, domain: str) -> tuple[list[HGNode], list[Hyperedge], str]:
+                 bb: HGBlackboard, llm: str, domain: str,
+                 meta=None) -> tuple[list[HGNode], list[Hyperedge], str]:
     sec_text = section_text_for_node(node, sections, blocks)
     if not sec_text:
         return [], [], ""
@@ -288,8 +357,13 @@ def _run_hg_node(node: dict, sections: list, blocks: list, schema_prompt: str,
     summary = ""
     for ci, chunk in enumerate(chunks):
         nid_prefix = f"{node['id']}c{ci}" if len(chunks) > 1 else node["id"]
+        # retrieval-based schema: for THIS chunk, retrieve top-K relevant
+        # patterns instead of the full schema (prevents prompt bloat degrading
+        # extraction as the schema evolves). Falls back to full schema_prompt
+        # when the schema is small or embedding unavailable.
+        chunk_schema = _retrieved_schema_prompt(meta, chunk) if meta is not None else schema_prompt
         prompt = EXTRACT_HG_PROMPT.format(
-            domain=domain, schema_prompt=schema_prompt,
+            domain=domain, schema_prompt=chunk_schema,
             discourse_role=discourse_role, predecessor_context=predecessor,
             section_name=node.get("section", ""), section_text=chunk,
         )
@@ -446,7 +520,7 @@ def extract_hypergraph(structure_map: dict, blocks: list, meta: MetaHypergraph,
         # P4 forward propagation: re-fetch the (possibly evolved) schema prompt
         if propagate_intra_dag:
             schema_prompt = meta.to_prompt(include_topology=include_topology)
-        hg_nodes, hg_edges, summary = _run_hg_node(node, sections, blocks, schema_prompt, bb, llm, domain)
+        hg_nodes, hg_edges, summary = _run_hg_node(node, sections, blocks, schema_prompt, bb, llm, domain, meta)
         n_calls += 1
 
         # add nodes to the instance graph (dedup by SURFACE, cross-section):

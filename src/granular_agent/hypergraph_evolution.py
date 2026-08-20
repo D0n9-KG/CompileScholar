@@ -513,8 +513,19 @@ def run_evolution_loop(meta: MetaHypergraph, failing_hes: list[Hyperedge],
         # not by a single failure) are NOT gated; only growth is.
         op = p.get("op", "")
         is_growth = op in ("add_pattern", "add_meta_node", "add_subclass")
-        # RETUNE (gate v2): accept if cross_node>=2 OR cumulative>=3.
+        # RETUNE (gate v2): accept if cross_node>=2 OR cumulative>=8.
         gate_pass = batch_cross >= CONSERVATIVE_CROSS_NODE or batch_cumulative >= CONSERVATIVE_CUMULATIVE
+        # schema-bloat cap: once MAX_ACTIVE_PATTERNS reached, reject all growth
+        # so the extractor's schema prompt stays bounded (extraction quality
+        # degrades when the schema balloons — see CONSERVATIVE_CUMULATIVE note).
+        if is_growth and len(meta.active_patterns()) >= MAX_ACTIVE_PATTERNS:
+            evolutions.append({"op": op, "rejected": True,
+                               "reason": f"schema cap: active_patterns={len(meta.active_patterns())} >= {MAX_ACTIVE_PATTERNS}",
+                               "evidence": p.get("evidence_span", ""),
+                               "proposal": p, "cross_node": batch_cross,
+                               "cumulative": batch_cumulative,
+                               "node_id": node_id, "paper_id": paper_id})
+            continue
         if is_growth and not gate_pass:
             evolutions.append({"op": op, "rejected": True,
                                "reason": f"conservative gate: cross_node={batch_cross} < {CONSERVATIVE_CROSS_NODE} AND cumulative={batch_cumulative} < {CONSERVATIVE_CUMULATIVE}",
@@ -542,10 +553,17 @@ def run_evolution_loop(meta: MetaHypergraph, failing_hes: list[Hyperedge],
 # already-computed cross_node recurrence rather than an LLM judgment (A4
 # circularity preserved — the gate is deterministic).
 CONSERVATIVE_CROSS_NODE = 2
-# RETUNE (gate v2): cumulative-failure threshold (cross-paper accumulation).
-# Lets small corpora trigger evolution where cross_node>=2 is too strict.
-# Signature UNCHANGED (role-tuple) — only threshold relaxes.
-CONSERVATIVE_CUMULATIVE = 3
+# RETUNE (gate v3): cumulative-failure threshold raised 3->8. The v2 value of 3
+# let the schema balloon to 237 patterns on 30 papers (seed 6 -> 237), which
+# bloated the extractor's schema prompt and caused it to MISS basic influences
+# edges (frozen 57 -> full 30 on one paper). A higher bar keeps the schema
+# small so extraction quality doesn't degrade as the corpus grows.
+CONSERVATIVE_CUMULATIVE = 8
+# Hard cap on total active patterns. Once reached, growth ops (add_pattern /
+# add_meta_node / add_subclass) are rejected outright — only split/merge/retire
+# (which restructure existing patterns without growing count much) proceed.
+# Prevents runaway schema bloat from degrading extraction.
+MAX_ACTIVE_PATTERNS = 40
 
 
 def mismatch_signature_for_proposal(p: dict) -> tuple:
