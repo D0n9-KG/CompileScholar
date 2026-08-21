@@ -37,7 +37,7 @@ survey). extends/improves lift well. Evaluators must report this coverage gap
 rather than claim full relation-type coverage.
 """
 import json
-from .llm_client import call_llm, parse_json_response
+from .llm_client import call_llm, call_paratera, parse_json_response
 
 # ---------------------------------------------------------------------------
 # prompts
@@ -195,6 +195,20 @@ def _call_json(prompt, llm="deepseek-chat", max_tokens=700, retries=3):
     return None
 
 
+def _call_json_judge(prompt, max_tokens=500, retries=3):
+    """Judge-role LLM call via Paratera GLM-5-Turbo (goal 纪律6: LLM-as-judge
+    uses GLM-5, distinct family from the deepseek extraction arm). Also
+    sidesteps deepseek's intermittent 400s that were dropping all relation
+    judgments in large-corpus lifts (19-paper -> 0 relations). Returns parsed
+    dict or None."""
+    for _ in range(retries):
+        resp = call_paratera(prompt, model="GLM-5-Turbo", max_tokens=max_tokens, temperature=0.0)
+        obj = parse_json_response(resp) if resp is not None else None
+        if obj is not None:
+            return obj
+    return None
+
+
 def judge_relation(method_a, induced_a, edges_a,
                    method_b, induced_b, edges_b, llm="deepseek-chat"):
     """Judge A->B relation from induced method nodes + cross-mention evidence.
@@ -210,7 +224,8 @@ def judge_relation(method_a, induced_a, edges_a,
         method_b=method_b, b_name=induced_b.get('method_name'),
         b_core=induced_b.get('core_quantities'), b_does=induced_b.get('what_it_does'),
         a_mentions_b=_fmt_mentions(a_mb), b_mentions_a=_fmt_mentions(b_ma))
-    return _call_json(prompt, llm=llm, max_tokens=400)
+    # judge role -> GLM-5 (纪律6 + bypass deepseek 400). See DECISION_judge_to_glm5.
+    return _call_json_judge(prompt, max_tokens=500)
 
 
 def lift(edges_by_method, llm="deepseek-chat"):
