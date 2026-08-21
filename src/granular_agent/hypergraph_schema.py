@@ -109,6 +109,29 @@ class InstanceHypergraph:
                 "nodes": {k: v.to_dict() for k, v in self.nodes.items()},
                 "hyperedges": {k: v.to_dict() for k, v in self.hyperedges.items()}}
 
+    @classmethod
+    def from_dict(cls, d: dict) -> "InstanceHypergraph":
+        """Inverse of to_dict. Reconstructs nodes/hyperedges from their asdict form.
+        Used by corpus_driver.load_instance to restore a persisted instance."""
+        inst = cls(paper_id=d.get("paper_id", ""), metadata=d.get("metadata", {}) or {})
+        for nid, nd in (d.get("nodes") or {}).items():
+            n = HGNode(nid=nd.get("nid", nid),
+                       labels=list(nd.get("labels", [])),
+                       surface=nd.get("surface", ""),
+                       properties=dict(nd.get("properties", {}) or {}),
+                       evidence_span=nd.get("evidence_span", ""),
+                       source_paper=nd.get("source_paper", ""))
+            inst.nodes[n.nid] = n
+        for eid, ed in (d.get("hyperedges") or {}).items():
+            he = Hyperedge(eid=ed.get("eid", eid),
+                           pattern_type=ed.get("pattern_type", ""),
+                           node_ids=list(ed.get("node_ids", [])),
+                           node_roles=list(ed.get("node_roles", [])),
+                           qualifiers=dict(ed.get("qualifiers", {}) or {}),
+                           evidence_span=ed.get("evidence_span", ""))
+            inst.hyperedges[he.eid] = he
+        return inst
+
 
 class InstanceCorpus:
     """Cross-paper instance accumulation (Path C stage-3 infrastructure).

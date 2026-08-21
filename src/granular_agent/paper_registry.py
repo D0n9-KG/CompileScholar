@@ -26,6 +26,7 @@ DEFAULT_BASE_URL = os.environ.get(
 
 # artifact kinds (sci-evo-extract mineru pipeline + reserved future kinds)
 KIND_MINERU_MARKDOWN = "mineru_markdown"
+KIND_MINERU_CONTENT_LIST = "mineru_content_list"
 KIND_LOGICKG_HYPERGRAPH = "logickg_hypergraph"  # produced by step-6 storage loop
 
 
@@ -191,6 +192,18 @@ class PaperRegistryClient:
         payload = self._get(f"/library/papers/{urllib.parse.quote(paper_id)}/artifacts")
         return payload.get("items", [])
 
+    def get_content_list(self, paper_id: str) -> list[dict] | None:
+        """Fetch the mineru content_list artifact (structured block list) as JSON.
+
+        This is the block-level source equivalent to the local
+        ``content_list.json`` that ``load_paper_blocks`` reads. Returns None if
+        no ready mineru_content_list artifact exists. Raises on fetch errors.
+        """
+        artifact = self._find_artifact(paper_id, KIND_MINERU_CONTENT_LIST)
+        if artifact is None:
+            return None
+        return self._fetch_artifact_json(artifact)
+
     def get_fulltext(self, paper_id: str, kind: str = KIND_MINERU_MARKDOWN) -> str | None:
         """Fetch the fulltext artifact (default mineru_markdown) as text.
 
@@ -222,20 +235,26 @@ class PaperRegistryClient:
         artifact = self._find_artifact(paper_id, KIND_LOGICKG_HYPERGRAPH)
         if artifact is None:
             return None
+        return self._fetch_artifact_json(artifact)
+
+    # -- helpers ----------------------------------------------------------
+
+    def _fetch_artifact_json(self, artifact: dict[str, Any]) -> Any:
+        """Fetch a downloadable artifact's content_url and parse as JSON."""
         content_url = artifact.get("content_url")
         if not content_url:
-            return None
+            raise PaperRegistryError(
+                f"artifact {artifact.get('artifact_id')} has no content_url"
+            )
         url = f"{self._origin()}{content_url}"
-        req = urllib.request.Request(url, headers={"Accept": "application/json"})
+        req = urllib.request.Request(url, headers={"Accept": "application/json, */*"})
         try:
             with urllib.request.urlopen(req, timeout=self.timeout) as resp:
                 return json.loads(resp.read().decode("utf-8"))
         except urllib.error.HTTPError as exc:
-            raise PaperRegistryError(f"hypergraph fetch {url} -> {exc.code}") from None
+            raise PaperRegistryError(f"artifact fetch {url} -> {exc.code}") from None
         except urllib.error.URLError as exc:
-            raise PaperRegistryError(f"hypergraph fetch {url} failed: {exc.reason}") from None
-
-    # -- helpers ----------------------------------------------------------
+            raise PaperRegistryError(f"artifact fetch {url} failed: {exc.reason}") from None
 
     def _find_artifact(
         self, paper_id: str, kind: str
