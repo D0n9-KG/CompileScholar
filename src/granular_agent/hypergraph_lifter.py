@@ -469,55 +469,69 @@ def lift_into_schema(meta, edges_by_method, llm="deepseek-chat",
                   "adapts": 2, "extends": 1, "background": 0}
     written_rels = []
     labels = list(induced.keys())
-    n_pairs = len(labels) * (len(labels) - 1) // 2
-    pair_idx = 0
-    for i, a in enumerate(labels):
-        for b in labels[i + 1:]:
-            pair_idx += 1
-            if pair_idx % 5 == 0:
-                print(f"  [lift] judge pair {pair_idx}/{n_pairs}", flush=True)
-            judged = []
-            for src, tgt in ((a, b), (b, a)):
-                cit_ev = _citation_evidence(edges_by_method[src], edges_by_method[tgt],
-                                            paper_citations)
-                r = judge_relation(src, induced[src], edges_by_method[src],
-                                   tgt, induced[tgt], edges_by_method[tgt], llm=llm,
-                                   citation_evidence=cit_ev, use_quals=use_quals)
-                if not r:
-                    continue
-                rel = r.get('relation')
-                if not rel or rel == "null":
-                    continue
-                judged.append((src, tgt, rel, r))
-            if not judged:
+
+    def _judge_pair(a, b):
+        """Judge both directions for one pair, return best (src,tgt,rel,r) or None."""
+        judged = []
+        for src, tgt in ((a, b), (b, a)):
+            cit_ev = _citation_evidence(edges_by_method[src], edges_by_method[tgt],
+                                        paper_citations)
+            r = judge_relation(src, induced[src], edges_by_method[src],
+                               tgt, induced[tgt], edges_by_method[tgt], llm=llm,
+                               citation_evidence=cit_ev, use_quals=use_quals)
+            if not r:
                 continue
-            # keep the best-scoring direction (confidence then specificity).
-            conf_of = lambda rr: ({"high": 3, "medium": 2, "low": 1}.get(
-                rr.get('confidence'), 0))
-            best = max(judged, key=lambda t: (conf_of(t[3]),
-                                              _CONF_RANK.get(t[2], 0)))
-            src, tgt, rel, r = best
-            src_tid = type_ids[src]
-            tgt_tid = type_ids[tgt]
-            pid = f"method_{rel}_{src_tid}_{tgt_tid}".lower()
-            pat = MetaHyperedgePattern(
-                pattern_id=pid,
-                description=f"{induced[src].get('method_name','')} {rel} "
-                            f"{induced[tgt].get('method_name','')}: "
-                            f"{r.get('rationale','')}",
-                role_slots=[{"role": "src_method", "type": src_tid},
-                            {"role": "tgt_method", "type": tgt_tid}],
-                allowed_qualifiers=["relation_type", "confidence",
-                                    "b_limitation", "a_resolves_it"],
-                family=HIGHER_ORDER_FAMILY,
-            )
-            meta.add_pattern(pat, evidence=r.get('rationale', ''), paper_id="lift")
-            written_rels.append({"pattern_id": pid, "relation": rel,
-                                     "confidence": r.get('confidence'),
-                                     "src": induced[src].get('method_name', ''),
-                                     "tgt": induced[tgt].get('method_name', ''),
-                                     "rationale": r.get('rationale', ''),
-                                     "b_limitation": r.get('b_limitation')})
+            rel = r.get('relation')
+            if not rel or rel == "null":
+                continue
+            judged.append((src, tgt, rel, r))
+        if not judged:
+            return None
+        conf_of = lambda rr: ({"high": 3, "medium": 2, "low": 1}.get(
+            rr.get('confidence'), 0))
+        return max(judged, key=lambda t: (conf_of(t[3]), _CONF_RANK.get(t[2], 0)))
+
+    pairs = [(a, b) for i, a in enumerate(labels) for b in labels[i + 1:]]
+    n_pairs = len(pairs)
+    # Parallelize judge calls — pairs are independent (each uses induced nodes +
+    # edges_by_method, both read-only here). Serial 132-pair lifts stall on
+    # occasional LLM hangs; a thread pool lets hung calls overlap.
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    results = {}
+    max_workers = min(16, max(2, n_pairs))
+    with ThreadPoolExecutor(max_workers=max_workers) as pool:
+        futures = {pool.submit(_judge_pair, a, b): (a, b) for a, b in pairs}
+        done = 0
+        for fut in as_completed(futures):
+            done += 1
+            if done % 10 == 0:
+                print(f"  [lift] judge pair {done}/{n_pairs}", flush=True)
+            best = fut.result()
+            if best:
+                results[futures[fut]] = best
+
+    for (a, b), (src, tgt, rel, r) in results.items():
+        src_tid = type_ids[src]
+        tgt_tid = type_ids[tgt]
+        pid = f"method_{rel}_{src_tid}_{tgt_tid}".lower()
+        pat = MetaHyperedgePattern(
+            pattern_id=pid,
+            description=f"{induced[src].get('method_name','')} {rel} "
+                        f"{induced[tgt].get('method_name','')}: "
+                        f"{r.get('rationale','')}",
+            role_slots=[{"role": "src_method", "type": src_tid},
+                        {"role": "tgt_method", "type": tgt_tid}],
+            allowed_qualifiers=["relation_type", "confidence",
+                                "b_limitation", "a_resolves_it"],
+            family=HIGHER_ORDER_FAMILY,
+        )
+        meta.add_pattern(pat, evidence=r.get('rationale', ''), paper_id="lift")
+        written_rels.append({"pattern_id": pid, "relation": rel,
+                                 "confidence": r.get('confidence'),
+                                 "src": induced[src].get('method_name', ''),
+                                 "tgt": induced[tgt].get('method_name', ''),
+                                 "rationale": r.get('rationale', ''),
+                                 "b_limitation": r.get('b_limitation')})
     return {"method_nodes": written_methods, "relation_patterns": written_rels}
 
 
