@@ -79,9 +79,15 @@ REL_PROMPT = """你是科学知识图谱的高阶关系判断器。下面有两�
 【B 论文里提到 A 核心量的证据】:
 {b_mentions_a}
 
+【引用关系证据】(论文级引用, A/B 族论文间):
+{citation_evidence}
+
 【任务】判断方法 A 对方法 B 的关系 (A → B)。
 ★ 重要: 即使两篇论文没互提对方方法名, 只要 A/B 的【建模形式/适用范围/原理】有联系,
 就要判关系 (不依赖互提名字). 互提证据是加分项, 但原理/适用范围联系是主要判据.
+★ 引用关系是【方法继承/背景的先验线索】: A 族论文引用 B 族论文时, A 很可能 extends/
+improves/background B (A 站在 B 肩上); 但引用≠方法继承 (A 引 B 未必 extends, 可能仅
+背景或对比)。引用先验仅作倾向提示, 最终以建模形式/适用范围判断为准。
 先按决策路径判断:
   路径1 - B 有做不到的/失效的情景吗? A 是否在该情景下能处理? 若是 → improves
           (例: B=μ(I) 局部流变在 yield 附近失效, A=非局部能 across yield → improves)
@@ -175,6 +181,53 @@ def _fmt_mentions(edges):
     return "\n".join(lines)
 
 
+def _papers_in_method(edges) -> set:
+    """Distinct paper ids appearing in a method family's pooled edges."""
+    return {e.get('paper') for e in edges if e.get('paper')}
+
+
+def _citation_evidence(edges_a, edges_b, paper_citations):
+    """Paper-level citation direction between method families A and B.
+
+    paper_citations: {paper_id: [paper_ids it cites]}.
+    Returns {a_cites_b: [(citing,cited),...], b_cites_a: [...]} or None when
+    paper_citations is None (pure-text baseline).
+    """
+    if not paper_citations:
+        return None
+    papers_a = _papers_in_method(edges_a)
+    papers_b = _papers_in_method(edges_b)
+    a_cites_b, b_cites_a = [], []
+    for pa in papers_a:
+        for cited in paper_citations.get(pa, []) or []:
+            if cited in papers_b:
+                a_cites_b.append((pa, cited))
+    for pb in papers_b:
+        for cited in paper_citations.get(pb, []) or []:
+            if cited in papers_a:
+                b_cites_a.append((pb, cited))
+    return {"a_cites_b": a_cites_b, "b_cites_a": b_cites_a}
+
+
+def _fmt_citation_evidence(ev) -> str:
+    """Render citation evidence for the REL_PROMPT {citation_evidence} slot."""
+    if not ev:
+        return "  (无引用关系数据)"
+    a_cb, b_ca = ev.get("a_cites_b", []), ev.get("b_cites_a", [])
+    if not a_cb and not b_ca:
+        return "  (A/B 族论文间无直接引用关系)"
+    lines = []
+    if a_cb:
+        lines.append("  A 族论文引用 B 族论文 (A 站在 B 肩上 → extends/improves/background 先验):")
+        for citing, cited in a_cb[:6]:
+            lines.append(f"    - {citing} 引用 {cited}")
+    if b_ca:
+        lines.append("  B 族论文引用 A 族论文 (反向):")
+        for citing, cited in b_ca[:6]:
+            lines.append(f"    - {citing} 引用 {cited}")
+    return "\n".join(lines)
+
+
 # ---------------------------------------------------------------------------
 # public API
 # ---------------------------------------------------------------------------
@@ -218,8 +271,14 @@ def _call_json_judge(prompt, max_tokens=500, retries=3):
 
 
 def judge_relation(method_a, induced_a, edges_a,
-                   method_b, induced_b, edges_b, llm="deepseek-chat"):
+                   method_b, induced_b, edges_b, llm="deepseek-chat",
+                   citation_evidence=None):
     """Judge A->B relation from induced method nodes + cross-mention evidence.
+
+    citation_evidence: optional dict from _citation_evidence() with keys
+    a_cites_b / b_cites_a (lists of (citing_paper, cited_paper) pairs). Injected
+    as a paper-level citation prior for extends/improves/background (step 3,
+    structural signal). None -> "no citation relation" (pure-text baseline).
 
     Returns parsed JSON dict (relation/rationale/confidence/b_limitation/
     a_resolves_it) or None.
@@ -231,15 +290,17 @@ def judge_relation(method_a, induced_a, edges_a,
         a_core=induced_a.get('core_quantities'), a_does=induced_a.get('what_it_does'),
         method_b=method_b, b_name=induced_b.get('method_name'),
         b_core=induced_b.get('core_quantities'), b_does=induced_b.get('what_it_does'),
-        a_mentions_b=_fmt_mentions(a_mb), b_mentions_a=_fmt_mentions(b_ma))
+        a_mentions_b=_fmt_mentions(a_mb), b_mentions_a=_fmt_mentions(b_ma),
+        citation_evidence=_fmt_citation_evidence(citation_evidence))
     # judge role -> GLM-5 (纪律6 + bypass deepseek 400). See DECISION_judge_to_glm5.
     return _call_json_judge(prompt, max_tokens=500)
 
 
-def lift(edges_by_method, llm="deepseek-chat"):
+def lift(edges_by_method, llm="deepseek-chat", paper_citations=None):
     """Full two-step lift over a method->edges mapping.
 
     edges_by_method: {method_label: [instance edges]}.
+    paper_citations: optional {paper_id: [paper_ids it cites]} (step-3 prior).
     Returns {"induced": {label: node}, "relations": {"A->B": verdict}}.
     """
     induced, relations = {}, {}
@@ -256,8 +317,11 @@ def lift(edges_by_method, llm="deepseek-chat"):
             # judge both directions (A->B and B->A); caller picks the gold
             # direction at evaluation time.
             for src, tgt in ((a, b), (b, a)):
+                cit_ev = _citation_evidence(edges_by_method[src], edges_by_method[tgt],
+                                            paper_citations)
                 r = judge_relation(src, induced[src], edges_by_method[src],
-                                   tgt, induced[tgt], edges_by_method[tgt], llm=llm)
+                                   tgt, induced[tgt], edges_by_method[tgt], llm=llm,
+                                   citation_evidence=cit_ev)
                 if r:
                     relations[f"{src}->{tgt}"] = r
     return {"induced": induced, "relations": relations}
@@ -286,13 +350,18 @@ HIGHER_ORDER_FAMILY = "higher_order_method_relation"
 
 
 
-def lift_into_schema(meta, edges_by_method, llm="deepseek-chat"):
+def lift_into_schema(meta, edges_by_method, llm="deepseek-chat", paper_citations=None):
     """Lift cross-paper common patterns INTO the meta schema.
 
     For each method family with edges, induce a method node and ADD it to the
     schema (add_meta_node). For each pair, judge the relation and ADD a
     higher-order pattern (add_pattern) encoding it, with the relation type as
     a qualifier and the rationale's cited evidence as the pattern evidence.
+
+    paper_citations: optional {paper_id: [paper_ids it cites]} — when present,
+    each judge_relation call gets a paper-level citation prior for
+    extends/improves/background (step-3 structural signal). None = pure-text
+    baseline (current behavior; backward compatible).
 
     Returns a record of what was written (method_nodes, relation_patterns).
     Idempotent: re-running on the same meta is a no-op (add_* dedup by id).
@@ -337,8 +406,11 @@ def lift_into_schema(meta, edges_by_method, llm="deepseek-chat"):
         for b in labels[i + 1:]:
             judged = []
             for src, tgt in ((a, b), (b, a)):
+                cit_ev = _citation_evidence(edges_by_method[src], edges_by_method[tgt],
+                                            paper_citations)
                 r = judge_relation(src, induced[src], edges_by_method[src],
-                                   tgt, induced[tgt], edges_by_method[tgt], llm=llm)
+                                   tgt, induced[tgt], edges_by_method[tgt], llm=llm,
+                                   citation_evidence=cit_ev)
                 if not r:
                     continue
                 rel = r.get('relation')
@@ -488,16 +560,18 @@ def cluster_methods_by_llm(edges_by_paper, llm="deepseek-chat", k=8):
     return out
 
 
-def lift_corpus(meta, edges_by_paper, llm="deepseek-chat"):
+def lift_corpus(meta, edges_by_paper, llm="deepseek-chat", paper_citations=None):
     """Fully-automatic lift: cluster cross-paper edges into method families
     (LLM), then lift_into_schema (induce method nodes + relations, write into
     schema). No external method mapping needed.
 
     edges_by_paper: {paper_id: [instance edges]}.
+    paper_citations: optional {paper_id: [paper_ids it cites]} — citation prior
+    for judge_relation (step-3 structural signal). None = pure-text baseline.
     Returns {"clusters": {...}, "written": {...}}.
     """
     clusters = cluster_methods_by_llm(edges_by_paper, llm=llm)
     if not clusters:
         return {"clusters": {}, "written": {"method_nodes": [], "relation_patterns": []}}
-    written = lift_into_schema(meta, clusters, llm=llm)
+    written = lift_into_schema(meta, clusters, llm=llm, paper_citations=paper_citations)
     return {"clusters": list(clusters.keys()), "written": written}
