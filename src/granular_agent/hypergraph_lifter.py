@@ -50,6 +50,9 @@ METHOD_PROMPT = """你是科学知识图谱的高阶归纳器。下面是来自 
 低阶超边实例 (最多 {k} 条, 已按最具体证据选样):
 {edges}
 
+【本方法族 qualifier 构成】(结构信号: 证据强度/来源/研究方法分布):
+{quals_profile}
+
 【任务】基于真实证据归纳这个方法族的核心方法。只基于 evidence, 不凭空臆测。
 输出严格 JSON (无 markdown 围栏):
 {{
@@ -73,6 +76,10 @@ REL_PROMPT = """你是科学知识图谱的高阶关系判断器。下面有两�
   core: {b_core}
   does: {b_does}
 
+【A/B 方法族证据构成对比】(结构信号: derived=理论推导/measured=实验测量, prior_art=引用前人/this_work=自创):
+{a_quals}
+{b_quals}
+
 【A 论文里提到 B 核心量的证据】:
 {a_mentions_b}
 
@@ -88,6 +95,10 @@ REL_PROMPT = """你是科学知识图谱的高阶关系判断器。下面有两�
 ★ 引用关系是【方法继承/背景的先验线索】: A 族论文引用 B 族论文时, A 很可能 extends/
 improves/background B (A 站在 B 肩上); 但引用≠方法继承 (A 引 B 未必 extends, 可能仅
 背景或对比)。引用先验仅作倾向提示, 最终以建模形式/适用范围判断为准。
+★ 证据构成是【关系性质的结构线索】: A 族 derived(理论推导) 居多而 B 族 measured(实验) 居多时,
+A 可能是 B 的理论推广/解读 (extends/compares); A 族 prior_art(引用前人) 居多说明 A 大量
+借鉴既有方法 (extends/background 倾向); 两族都 theory 居多且 evidence_strength 相近 → compares。
+最终仍以建模形式/适用范围判断为准。
 先按决策路径判断:
   路径1 - B 有做不到的/失效的情景吗? A 是否在该情景下能处理? 若是 → improves
           (例: B=μ(I) 局部流变在 yield 附近失效, A=非局部能 across yield → improves)
@@ -143,6 +154,52 @@ def _fmt_edges(edges, k=8):
         lines.append(f"  - [{paper}] pat={e['pat']} nodes=[{nodes}]")
         lines.append(f"    ev: \"{(e.get('ev','') or '')[:180]}\"")
     return "\n".join(lines), len({e.get('paper') for e in reps})
+
+
+# --- qualifier profiles (step-4 structural signal) ---------------------
+
+def _quals_profile(edges):
+    """Aggregate qualifier distribution across a method family's edges.
+
+    Returns {evidence_strength: {value: pct}, cited_from: {value: pct},
+    method: {value: pct}} over edges that carry that qualifier. Pcts are 0-100
+    of the count of edges with that key. Empty families return {}.
+    """
+    from collections import Counter
+    n = len(edges)
+    if not n:
+        return {}
+    out = {}
+    for key in ("evidence_strength", "cited_from", "method"):
+        c = Counter()
+        for e in edges:
+            q = e.get("quals") or {}
+            v = q.get(key)
+            if v:
+                c[v] += 1
+        if c:
+            with_key = sum(c.values())
+            out[key] = {val: round(100 * cnt / with_key) for val, cnt in c.most_common(4)}
+    return out
+
+
+def _fmt_quals_profile(profile, label="本方法族"):
+    """Render a quals profile as a compact prompt block."""
+    if not profile:
+        return f"  ({label}无 qualifier 数据)"
+    parts = []
+    if "evidence_strength" in profile:
+        es = ", ".join(f"{k}:{v}%" for k, v in profile["evidence_strength"].items())
+        parts.append(f"证据强度: {es}")
+    if "cited_from" in profile:
+        cf = ", ".join(f"{k}:{v}%" for k, v in profile["cited_from"].items())
+        parts.append(f"来源(this_work自创/prior_art引用前人): {cf}")
+    if "method" in profile:
+        m = ", ".join(f"{k}:{v}%" for k, v in profile["method"].items())
+        parts.append(f"研究方法: {m}")
+    return f"  {label}: " + "; ".join(parts)
+
+
 
 
 def _keywords_from(obj):
@@ -232,15 +289,19 @@ def _fmt_citation_evidence(ev) -> str:
 # public API
 # ---------------------------------------------------------------------------
 
-def induce_method_node(edges, method_label, llm="deepseek-chat", k=8):
+def induce_method_node(edges, method_label, llm="deepseek-chat", k=8, use_quals=True):
     """Lift a method node (name/core/does/evidence) from low-order edges.
 
     edges: list of instance edges (dicts with pat/nodes/ev/quals/paper).
+    use_quals: inject the quals profile (step-4 structural signal) into the
+    prompt. False = step-3 baseline (text-only induction) for A/B comparison.
     Returns the parsed JSON dict or None.
     """
     body, npaper = _fmt_edges(edges, k=k)
+    qp = _fmt_quals_profile(_quals_profile(edges)) if use_quals else "  (未启用 qualifier 信号)"
     prompt = METHOD_PROMPT.format(method=method_label, npaper=npaper,
-                                  k=min(k, len(edges)), edges=body)
+                                  k=min(k, len(edges)), edges=body,
+                                  quals_profile=qp)
     return _call_json(prompt, llm=llm, max_tokens=700)
 
 
@@ -272,31 +333,36 @@ def _call_json_judge(prompt, max_tokens=500, retries=3):
 
 def judge_relation(method_a, induced_a, edges_a,
                    method_b, induced_b, edges_b, llm="deepseek-chat",
-                   citation_evidence=None):
+                   citation_evidence=None, use_quals=True):
     """Judge A->B relation from induced method nodes + cross-mention evidence.
 
     citation_evidence: optional dict from _citation_evidence() with keys
     a_cites_b / b_cites_a (lists of (citing_paper, cited_paper) pairs). Injected
     as a paper-level citation prior for extends/improves/background (step 3,
     structural signal). None -> "no citation relation" (pure-text baseline).
+    use_quals: inject A/B quals profiles (step-4 structural signal). False =
+    step-3 baseline (citation only, no quals) for A/B comparison.
 
     Returns parsed JSON dict (relation/rationale/confidence/b_limitation/
     a_resolves_it) or None.
     """
     a_mb = _cross_mention(edges_a, _keywords_from(induced_b))  # A mentions B
     b_ma = _cross_mention(edges_b, _keywords_from(induced_a))  # B mentions A
+    a_qp = _fmt_quals_profile(_quals_profile(edges_a), label="A 族") if use_quals else "  (A 族: 未启用 qualifier 信号)"
+    b_qp = _fmt_quals_profile(_quals_profile(edges_b), label="B 族") if use_quals else "  (B 族: 未启用 qualifier 信号)"
     prompt = REL_PROMPT.format(
         method_a=method_a, a_name=induced_a.get('method_name'),
         a_core=induced_a.get('core_quantities'), a_does=induced_a.get('what_it_does'),
         method_b=method_b, b_name=induced_b.get('method_name'),
         b_core=induced_b.get('core_quantities'), b_does=induced_b.get('what_it_does'),
+        a_quals=a_qp, b_quals=b_qp,
         a_mentions_b=_fmt_mentions(a_mb), b_mentions_a=_fmt_mentions(b_ma),
         citation_evidence=_fmt_citation_evidence(citation_evidence))
     # judge role -> GLM-5 (纪律6 + bypass deepseek 400). See DECISION_judge_to_glm5.
     return _call_json_judge(prompt, max_tokens=500)
 
 
-def lift(edges_by_method, llm="deepseek-chat", paper_citations=None):
+def lift(edges_by_method, llm="deepseek-chat", paper_citations=None, use_quals=True):
     """Full two-step lift over a method->edges mapping.
 
     edges_by_method: {method_label: [instance edges]}.
@@ -307,7 +373,7 @@ def lift(edges_by_method, llm="deepseek-chat", paper_citations=None):
     for label, edges in edges_by_method.items():
         if not edges:
             continue
-        node = induce_method_node(edges, label, llm=llm)
+        node = induce_method_node(edges, label, llm=llm, use_quals=use_quals)
         if node:
             induced[label] = node
 
@@ -321,7 +387,7 @@ def lift(edges_by_method, llm="deepseek-chat", paper_citations=None):
                                             paper_citations)
                 r = judge_relation(src, induced[src], edges_by_method[src],
                                    tgt, induced[tgt], edges_by_method[tgt], llm=llm,
-                                   citation_evidence=cit_ev)
+                                   citation_evidence=cit_ev, use_quals=use_quals)
                 if r:
                     relations[f"{src}->{tgt}"] = r
     return {"induced": induced, "relations": relations}
@@ -350,7 +416,8 @@ HIGHER_ORDER_FAMILY = "higher_order_method_relation"
 
 
 
-def lift_into_schema(meta, edges_by_method, llm="deepseek-chat", paper_citations=None):
+def lift_into_schema(meta, edges_by_method, llm="deepseek-chat",
+                     paper_citations=None, use_quals=True):
     """Lift cross-paper common patterns INTO the meta schema.
 
     For each method family with edges, induce a method node and ADD it to the
@@ -379,7 +446,7 @@ def lift_into_schema(meta, edges_by_method, llm="deepseek-chat", paper_citations
     for idx, (label, edges) in enumerate(edges_by_method.items()):
         if not edges:
             continue
-        node = induce_method_node(edges, label, llm=llm)
+        node = induce_method_node(edges, label, llm=llm, use_quals=use_quals)
         if not node or not node.get('method_name'):
             continue
         induced[label] = node
@@ -410,7 +477,7 @@ def lift_into_schema(meta, edges_by_method, llm="deepseek-chat", paper_citations
                                             paper_citations)
                 r = judge_relation(src, induced[src], edges_by_method[src],
                                    tgt, induced[tgt], edges_by_method[tgt], llm=llm,
-                                   citation_evidence=cit_ev)
+                                   citation_evidence=cit_ev, use_quals=use_quals)
                 if not r:
                     continue
                 rel = r.get('relation')
@@ -563,7 +630,8 @@ def cluster_methods_by_llm(edges_by_paper, llm="deepseek-chat", k=8):
     return out
 
 
-def lift_corpus(meta, edges_by_paper, llm="deepseek-chat", paper_citations=None):
+def lift_corpus(meta, edges_by_paper, llm="deepseek-chat", paper_citations=None,
+                use_quals=True):
     """Fully-automatic lift: cluster cross-paper edges into method families
     (LLM), then lift_into_schema (induce method nodes + relations, write into
     schema). No external method mapping needed.
@@ -576,5 +644,6 @@ def lift_corpus(meta, edges_by_paper, llm="deepseek-chat", paper_citations=None)
     clusters = cluster_methods_by_llm(edges_by_paper, llm=llm)
     if not clusters:
         return {"clusters": {}, "written": {"method_nodes": [], "relation_patterns": []}}
-    written = lift_into_schema(meta, clusters, llm=llm, paper_citations=paper_citations)
+    written = lift_into_schema(meta, clusters, llm=llm, paper_citations=paper_citations,
+                               use_quals=use_quals)
     return {"clusters": list(clusters.keys()), "written": written}
