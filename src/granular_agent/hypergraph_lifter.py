@@ -61,8 +61,7 @@ METHOD_PROMPT = """你是科学知识图谱的高阶归纳器。下面是来自 
 """
 
 REL_PROMPT = """你是科学知识图谱的高阶关系判断器。下面有两个方法 (A 和 B),
-各自有归纳出的方法描述 + 核心物理量。还给出【跨方法互提证据】:
-A 的论文里提到 B 核心量的证据, 以及 B 的论文里提到 A 核心量的证据。
+各自有归纳出的方法描述 + 核心物理量 + 建模形式(does). 还给出【跨方法互提证据】.
 
 方法 A ({method_a}):
   name: {a_name}
@@ -80,27 +79,36 @@ A 的论文里提到 B 核心量的证据, 以及 B 的论文里提到 A 核心�
 【B 论文里提到 A 核心量的证据】:
 {b_mentions_a}
 
-【任务】基于上面的描述 + 跨方法互提证据, 判断方法 A 对方法 B 的关系 (A → B)。
-只基于给出的证据, 不臆测。先按决策路径判断:
+【任务】判断方法 A 对方法 B 的关系 (A → B)。
+★ 重要: 即使两篇论文没互提对方方法名, 只要 A/B 的【建模形式/适用范围/原理】有联系,
+就要判关系 (不依赖互提名字). 互提证据是加分项, 但原理/适用范围联系是主要判据.
+先按决策路径判断:
   路径1 - B 有做不到的/失效的情景吗? A 是否在该情景下能处理? 若是 → improves
           (例: B=μ(I) 局部流变在 yield 附近失效, A=非局部能 across yield → improves)
-  路径2 - A 仅推广 B 的适用范围 (B 能做的 A 也能, A 范围更广) 但未体现 B 局限被解决 → extends
-  路径3 - A 与 B 各有优劣, 互有做不到的 → compares
-关系类型从下列选 (或 null):
+  路径2 - A 是 B 的直接扩展/推广 (A 在 B 基础上加非局部项/梯度项/新参数,
+          或把 B 推广到新工况) → extends
+          (例: I-gradient 是 μ(I) 的非局部扩展, ext-kinetic 是 kinetic 的密堆扩展 → extends)
+  路径3 - A 与 B 建模形式不同但适用范围重叠(都建模同一类现象), 各有优劣/不同机制
+          (例: Gray尺寸分离 vs Tripathi密度分离, 都建模颗粒分离但机制不同) → compares
+  路径4 - A 与 B 建模形式/适用范围无任何联系(不同领域不同现象) → null
+关系类型从下列选:
   extends  : A 推广 B 的适用范围 (路径2)
   improves : A 解决 B 的局限, B 有做不到的而 A 能处理 (路径1)
-  compares : A 与 B 对比, 各有优劣 (路径3)
+  compares : A 与 B 建模形式不同但适用范围重叠, 各有优劣/不同机制 (路径3)
   replaces : A 替代 B
   adapts   : A 改编自 B
   background: A 是 B 的背景/启发
-  null     : 无跨方法互提证据, 或证据不足以判断关系
+  null     : A 与 B 建模形式/适用范围无联系 (路径4)
 
 输出严格 JSON:
 {{
+  "a_modeling": "A 的建模形式 (一句话, 从 does 提炼)",
+  "b_modeling": "B 的建模形式 (一句话, 从 does 提炼)",
+  "scope_overlap": "A 与 B 适用范围重叠处? (若无写 null)",
   "b_limitation": "B 有什么做不到的/失效情景? (若无写 null)",
   "a_resolves_it": "A 是否解决该局限? (yes/no/null)",
   "relation": "extends|improves|compares|replaces|adapts|background|null",
-  "rationale": "判断依据 (一句话, 必须引用上面某条跨方法证据, 并说明 B 有无局限被 A 解决)",
+  "rationale": "判断依据 (一句话, 引用 A/B 建模形式或适用范围联系, 不要求互提名字)",
   "confidence": "high|medium|low"
 }}
 """
