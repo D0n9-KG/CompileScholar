@@ -56,7 +56,7 @@ METHOD_PROMPT = """你是科学知识图谱的高阶归纳器。下面是来自 
 【任务】基于真实证据归纳这个方法族的核心方法。只基于 evidence, 不凭空臆测。
 输出严格 JSON (无 markdown 围栏):
 {{
-  "method_name": "归纳出的方法名 (简短, 如 μ(I) rheology / nonlocal granular fluidity / I-gradient model)",
+  "method_name": "归纳出的方法名 (必须用英文学术术语, 简短, 如 μ(I) rheology / I-gradient model / nonlocal granular fluidity (NGF) / Savage-Lun kinetic sieving; 近义但不同的方法必须用不同名区分, 如 I-gradient model 与 NGF model 是不同方法不可同名; 带提出者名区分同族变体如 Gray-Thornton segregation)",
   "core_quantities": "该方法围绕的核心物理量 (如 μ, I, g, 非局部流度 g)",
   "what_it_does": "该方法做什么 (一句话, 基于证据)",
   "key_evidence": ["支撑判断的关键证据片段 1", "..."]
@@ -564,12 +564,16 @@ CLUSTER_PROMPT = """你是科学知识图谱的方法学分析器。下面是 {n
   (扩展论文会显式修改/推广原理论的假设或方程, 如扩展到密堆极限);
   μ(I)本构律 与 非局部扩展(I-gradient/NGF) 是不同方法, 应分;
   同一方法的多篇奠基/应用论文 (都用同样的核心本构律, 未修改方程) 归一组。
-- 不要把建模形式本质不同的方法合并 (即便都叫"非局部")。
+- 不要把建模形式本质不同的方法合并 (即便都叫"非local")。
 - 也不要按物理主题分 (都是颗粒流)。
 每篇归一个方法组。
 
-然后给每个方法组命名 (基于证据, 不臆测方法名; 若论文未自称方法名,
-按其建模特征命名, 如 "基于惯性数I的本构律流变"、"动理学理论的密堆扩展")。
+然后给每个方法组命名: **必须用英文学术术语** (基于证据, 不臆测方法名;
+若论文未自称方法名, 按其建模特征用英文命名, 如 "μ(I) rheology"、
+"dense-limit kinetic theory extension"、"I-gradient model"、"nonlocal granular fluidity (NGF) model")。
+近义但不同的方法组必须用不同英文名区分 (如 I-gradient model ≠ NGF model;
+segregation 各家按提出者区分: Gray-Thornton / Savage-Lun / Sarkar-Khakhar)。
+不可用中文名。
 
 论文超边 (每篇最多8条代表):
 {edges}
