@@ -469,8 +469,13 @@ def lift_into_schema(meta, edges_by_method, llm="deepseek-chat",
                   "adapts": 2, "extends": 1, "background": 0}
     written_rels = []
     labels = list(induced.keys())
+    n_pairs = len(labels) * (len(labels) - 1) // 2
+    pair_idx = 0
     for i, a in enumerate(labels):
         for b in labels[i + 1:]:
+            pair_idx += 1
+            if pair_idx % 5 == 0:
+                print(f"  [lift] judge pair {pair_idx}/{n_pairs}", flush=True)
             judged = []
             for src, tgt in ((a, b), (b, a)):
                 cit_ev = _citation_evidence(edges_by_method[src], edges_by_method[tgt],
