@@ -541,7 +541,10 @@ def cluster_methods_by_llm(edges_by_paper, llm="deepseek-chat", k=8):
         return {}
     prompt = CLUSTER_PROMPT.format(npaper=len(names), paper_names=", ".join(names),
                                    edges="\n\n".join(bodies))
-    obj = _call_json(prompt, llm=llm, max_tokens=1500)
+    # max_tokens scales with corpus size: each method_group entry is ~150 tokens,
+    # and deepseek truncates at the cap → incomplete JSON → parse None → empty
+    # clusters on larger corpora (14-19 papers). Give it headroom.
+    obj = _call_json(prompt, llm=llm, max_tokens=max(1500, 250 * len(names)))
     if not obj:
         return {}
     out = {}
