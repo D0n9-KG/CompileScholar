@@ -840,7 +840,29 @@ class MetaHypergraph:
         71 violations almost all false-positives (stress/shear_rate flagged as
         undefined = wrong). Only NUMERIC nodes (a paper-specific parameter like
         a friction coefficient μ_s) referenced-but-undefined is a real schema
-        gap (the constitutive law uses a constant the schema never defined)."""
+        gap (the constitutive law uses a constant the schema never defined).
+
+        REFINED (2026-08-14): exclude single-letter universal physics symbols
+        (d grain diameter / ρ density / g gravity / I inertial number /
+        σ stress / τ shear stress / P pressure / v velocity / h depth /
+        φ friction angle / θ angle) — these are field-wide vocabulary, not
+        paper-specific constants. Real violations are paper-specific constants
+        (e.g. μ_s base friction, b slope, I_0 scaling) the schema must define."""
+        UNIVERSAL_PHYSICS_SYMBOLS = {
+            "d", "ρ", "ρ_s", "g", "i", "σ", "τ", "p", "v", "h", "φ", "θ",
+            "γ", "γ̇", "μ", "n", "e", "k", "λ", "l", "t", "x", "y", "z",
+            # also full-word forms (extractor may emit surface as word)
+            "diameter", "density", "gravity", "stress", "shear stress",
+            "pressure", "velocity", "depth", "angle", "time",
+        }
+        def _is_universal(surface: str) -> bool:
+            s = surface.strip().lower()
+            # single-letter or listed universal symbol -> not a paper-specific constant
+            if s in UNIVERSAL_PHYSICS_SYMBOLS:
+                return True
+            # multi-char with subscript (μ_s, I_0, b_1) -> paper-specific, NOT universal
+            return False
+
         violations = []
         # build: set of node surfaces that ARE defined (in definition-family edges)
         defined_surfaces: set[str] = set()
@@ -864,6 +886,8 @@ class MetaHypergraph:
                 # generic PROPERTY terms are universal vocab, not violations
                 if "NUMERIC" not in n.labels:
                     continue
+                if _is_universal(n.surface):
+                    continue  # d/ρ/g etc are field vocabulary, not a schema gap
                 if n.surface not in defined_surfaces:
                     violations.append({
                         "violation": "referenced_undefined_numeric",
