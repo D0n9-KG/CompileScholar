@@ -1181,6 +1181,9 @@ def seed_meta_hypergraph() -> MetaHypergraph:
     would force the LLM to propose a new top-level dimension (which the
     bounded-op gate now rejects)."""
     m = MetaHypergraph()
+    # common root so cross-type n-ary edges pass validation (METHOD whole +
+    # PARAMETER components, etc.) — mirrors seed_meta_hypergraph_general's THING root.
+    m.meta_nodes["THING"] = MetaNode(type_id="THING", description="root: any node type is-a THING")
     # node types — fine-grained so the rich topology (method/parameter/phenomenon
     # relations) can be read directly from instance hyperedges without co-occurrence
     # guessing. METHOD/PHENOMENON/PARAMETER added so extract labels them distinctly
@@ -1193,6 +1196,8 @@ def seed_meta_hypergraph() -> MetaHypergraph:
                  ("NUMERIC", "a numeric value / measured number"),
                  ("REGIME", "a flow regime (dense/quasi-static/inertial)")]:
         m.meta_nodes[t] = MetaNode(type_id=t, description=d)
+        m.meta_edges.append(MetaEdge(src=t, dst="THING", relation="subclass_of"))
+    T = "THING"  # permissive slot type (any labeled node is-a THING)
     # one seed pattern per top-level family. method/evidence_strength added
     # as allowed qualifiers on the physics families (constitutive_law /
     # dependency / measure) — the new context dimensions (P-E2 attribution +
@@ -1201,32 +1206,32 @@ def seed_meta_hypergraph() -> MetaHypergraph:
     m.patterns["constitutive_law"] = MetaHyperedgePattern(
         pattern_id="constitutive_law", family="constitutive_law",
         description="a constitutive law relating output quantity/quantities to >=1 input quantity (n-ary)",
-        role_slots=[{"role": "output", "type": "PROPERTY", "repeatable": True}, {"role": "input", "type": "PROPERTY", "repeatable": True}],
+        role_slots=[{"role": "output", "type": T, "repeatable": True}, {"role": "input", "type": T, "repeatable": True}, {"role": "parameter", "type": T, "repeatable": True}, {"role": "coefficient", "type": T, "repeatable": True}, {"role": "exponent", "type": T, "repeatable": True}],
         allowed_qualifiers=["applies_in_regime", "function_form", "parameters", "method", "evidence_strength", "cited_from"])
     m.patterns["influences"] = MetaHyperedgePattern(
         pattern_id="influences", family="dependency",
         description="one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
-        role_slots=[{"role": "source", "type": "PROPERTY", "repeatable": True}, {"role": "target", "type": "PROPERTY", "repeatable": True}],
+        role_slots=[{"role": "source", "type": T, "repeatable": True}, {"role": "target", "type": T, "repeatable": True}, {"role": "cause", "type": T, "repeatable": True}, {"role": "effect", "type": T, "repeatable": True}],
         allowed_qualifiers=["dependency_type", "applies_in_regime", "method", "evidence_strength", "cited_from"])
     m.patterns["defines"] = MetaHyperedgePattern(
         pattern_id="defines", family="definition",
         description="one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
-        role_slots=[{"role": "subject", "type": "PROPERTY", "repeatable": True}, {"role": "definition", "type": "PROPERTY", "repeatable": True}],
+        role_slots=[{"role": "subject", "type": T, "repeatable": True}, {"role": "definition", "type": T, "repeatable": True}, {"role": "object", "type": T, "repeatable": True}],
         allowed_qualifiers=["relation_type", "method", "evidence_strength", "cited_from"])
     m.patterns["composed_of"] = MetaHyperedgePattern(
         pattern_id="composed_of", family="composition",
         description="one whole is composed-of / part-of >=1 component (n-ary composition)",
-        role_slots=[{"role": "whole", "type": "PROPERTY", "repeatable": True}, {"role": "component", "type": "PROPERTY", "repeatable": True}],
+        role_slots=[{"role": "whole", "type": T, "repeatable": True}, {"role": "component", "type": T, "repeatable": True}],
         allowed_qualifiers=["relation_type", "method", "evidence_strength", "cited_from"])
     m.patterns["measures"] = MetaHyperedgePattern(
         pattern_id="measures", family="measure",
         description="a quantity is measured by / characterizes >=1 measure",
-        role_slots=[{"role": "object", "type": "PROPERTY"}, {"role": "instrument", "type": "PROPERTY", "repeatable": True}],
+        role_slots=[{"role": "object", "type": T}, {"role": "instrument", "type": T, "repeatable": True}],
         allowed_qualifiers=["condition", "applies_in_regime", "method", "evidence_strength", "cited_from"])
     m.patterns["claim_relation"] = MetaHyperedgePattern(
         pattern_id="claim_relation", family="claim",
         description="a discourse relation between >=2 claims/approaches (supports/contrasts/extends/...)",
-        role_slots=[{"role": "from", "type": "PROPERTY", "repeatable": True}, {"role": "to", "type": "PROPERTY", "repeatable": True}],
+        role_slots=[{"role": "from", "type": T, "repeatable": True}, {"role": "to", "type": T, "repeatable": True}],
         allowed_qualifiers=["relation_type", "applies_in_regime", "method", "evidence_strength", "cited_from"])
     # each seed pattern is the root of its top-level family — add_pattern
     # attaches new same-family patterns IS-A this root.
