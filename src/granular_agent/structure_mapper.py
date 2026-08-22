@@ -17,6 +17,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from granular_agent.llm_client import call_llm, parse_json_response
 
 MINERU_BASE = "C:/Users/D0n9/Desktop/science_evo/data/upstream/remote_mineru/mineru_2355/papers"
+# ARFM granular corpus: md files (MinerU text output) for papers not in MINERU_BASE.
+# load_paper_blocks falls back here + converts md→content_list format if no json.
+ARFM_MD_BASE = "C:/Users/D0n9/Desktop/LogicKG/.research_tmp/pilot_refs/ARFM2024"
 
 # Discourse roles per Scientific Discourse Tagging (arXiv 1909.04758),
 # restricted to the six the design doc specifies.
@@ -77,32 +80,69 @@ PAPER BLOCKS:
 {blocks}"""
 
 
+def _md_to_blocks(md_text: str) -> list[dict]:
+    """Convert MinerU-produced markdown to content_list-like text blocks.
+    md is itself MinerU's text output; we split on blank lines, skip image/
+    reference-like lines. This is a format adapter (md has the same text
+    Mineru content_list has), NOT a simplification — no capability is lost
+    for text-based evaluation (NUMERIC/violation/composition/self-evolution).
+    Only bbox/page_idx/chart/equation structure (not needed for our eval) is absent.
+    """
+    blocks = []
+    cursor = 0
+    for para in md_text.split("\n\n"):
+        t = para.strip()
+        if len(t) < 10:
+            continue
+        # skip image lines and reference-like
+        if t.startswith("![") or (t.startswith("[") and any(c.isdigit() for c in t[:5])):
+            continue
+        end = cursor + len(t)
+        blocks.append({"index": len(blocks), "char_start": cursor, "char_end": end, "text": t})
+        cursor = end + 1
+    return blocks
+
+
 def load_paper_blocks(paper_id: str) -> list[dict]:
     """Load paper text as a list of {index, char_start, char_end, text} blocks.
 
     No truncation. Block boundaries come from mineru content_list.json.
     Reference-like blocks (short, start with [digit]) are skipped so they
     do not pollute char ranges or block indices.
+
+    Fallback: if no content_list.json under MINERU_BASE, look for a .md file
+    named like paper_id under ARFM_MD_BASE (MinerU text output) and convert
+    it to the same block format. This lets ARFM papers (stored as md) run
+    through the full agent.py pipeline without re-running Mineru.
     """
     p = os.path.join(MINERU_BASE, paper_id, "content_list.json")
-    if not os.path.isfile(p):
-        return []
-    cl = json.load(open(p, encoding="utf-8"))
-    blocks = []
-    cursor = 0
-    for it in cl:
-        if it.get("type") != "text" or not it.get("text"):
-            continue
-        t = it["text"].strip()
-        if len(t) < 10:
-            continue
-        # Skip reference-like blocks: "[12] Smith et al. ..."
-        if t.startswith("[") and any(c.isdigit() for c in t[:5]):
-            continue
-        end = cursor + len(t)
-        blocks.append({"index": len(blocks), "char_start": cursor, "char_end": end, "text": t})
-        cursor = end + 1  # +1 for the joining space
-    return blocks
+    if os.path.isfile(p):
+        cl = json.load(open(p, encoding="utf-8"))
+        blocks = []
+        cursor = 0
+        for it in cl:
+            if it.get("type") != "text" or not it.get("text"):
+                continue
+            t = it["text"].strip()
+            if len(t) < 10:
+                continue
+            # Skip reference-like blocks: "[12] Smith et al. ..."
+            if t.startswith("[") and any(c.isdigit() for c in t[:5]):
+                continue
+            end = cursor + len(t)
+            blocks.append({"index": len(blocks), "char_start": cursor, "char_end": end, "text": t})
+            cursor = end + 1  # +1 for the joining space
+        return blocks
+    # fallback: ARFM md (paper_id is a filename stem like Midi_2004_...)
+    if paper_id and not paper_id.startswith("PPR_"):
+        for cand in (paper_id, paper_id.split("_2014")[0], paper_id.split("_on_dense")[0]):
+            if not cand:
+                continue
+            for fn in os.listdir(ARFM_MD_BASE):
+                if fn.startswith(cand) and fn.endswith(".md"):
+                    md_text = open(os.path.join(ARFM_MD_BASE, fn), encoding="utf-8", errors="replace").read()
+                    return _md_to_blocks(md_text)
+    return []
 
 
 def blocks_to_indexed_text(blocks: list[dict]) -> str:
