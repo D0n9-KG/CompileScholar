@@ -53,7 +53,11 @@ METHOD_PROMPT = """你是科学知识图谱的高阶归纳器。下面是来自 
 【本方法族 qualifier 构成】(结构信号: 证据强度/来源/研究方法分布):
 {quals_profile}
 
+【已归纳的其他方法名】(避免同名归并: 本方法若与下列不同, 必须用不同英文名区分):
+{known_methods}
+
 【任务】基于真实证据归纳这个方法族的核心方法。只基于 evidence, 不凭空臆测。
+若本方法与上面"已归纳方法名"中的某个是同一方法, 复用其名; 若是不同方法, 必须用不同的英文名(带提出者/特征区分)。
 输出严格 JSON (无 markdown 围栏):
 {{
   "method_name": "归纳出的方法名 (必须用英文学术术语, 简短, 如 μ(I) rheology / I-gradient model / nonlocal granular fluidity (NGF) / Savage-Lun kinetic sieving; 近义但不同的方法必须用不同名区分, 如 I-gradient model 与 NGF model 是不同方法不可同名; 带提出者名区分同族变体如 Gray-Thornton segregation)",
@@ -102,15 +106,20 @@ A 可能是 B 的理论推广/解读 (extends/compares); A 族 prior_art(引用�
 先按决策路径判断:
   路径1 - B 有做不到的/失效的情景吗? A 是否在该情景下能处理? 若是 → improves
           (例: B=μ(I) 局部流变在 yield 附近失效, A=非局部能 across yield → improves)
+  路径1b - A 是否从第一性原理推导出更准的参数/系数/本构, 改进 B 的经验参数?
+          (例: A 从 first principles 推导 drag/diffusion/segregation 系数, B 是 phenomenological 经验系数 → improves)
+          (例: A 给出更准的 segregation flux form, B 是简化版 → improves)
+          (注意: "derived from first principles" 对比 "phenomenological/经验" → improves, 非 compares)
   路径2 - A 是 B 的直接扩展/推广 (A 在 B 基础上加非局部项/梯度项/新参数,
           或把 B 推广到新工况) → extends
           (例: I-gradient 是 μ(I) 的非局部扩展, ext-kinetic 是 kinetic 的密堆扩展 → extends)
   路径3 - A 与 B 建模形式不同但适用范围重叠(都建模同一类现象), 各有优劣/不同机制
           (例: Gray尺寸分离 vs Tripathi密度分离, 都建模颗粒分离但机制不同) → compares
+          (注意: 仅当A和B是不同机制/不同出发点并列对比才compares; 若A改进B的参数/精度/适用范围则improves非compares)
   路径4 - A 与 B 建模形式/适用范围无任何联系(不同领域不同现象) → null
 关系类型从下列选:
   extends  : A 推广 B 的适用范围 (路径2)
-  improves : A 解决 B 的局限, B 有做不到的而 A 能处理 (路径1)
+  improves : A 解决 B 的局限 (路径1), 或 A 从第一性原理推导更准参数改进 B (路径1b)
   compares : A 与 B 建模形式不同但适用范围重叠, 各有优劣/不同机制 (路径3)
   replaces : A 替代 B
   adapts   : A 改编自 B
@@ -289,19 +298,22 @@ def _fmt_citation_evidence(ev) -> str:
 # public API
 # ---------------------------------------------------------------------------
 
-def induce_method_node(edges, method_label, llm="deepseek-chat", k=8, use_quals=True):
+def induce_method_node(edges, method_label, llm="deepseek-chat", k=8, use_quals=True, known_methods=None):
     """Lift a method node (name/core/does/evidence) from low-order edges.
 
     edges: list of instance edges (dicts with pat/nodes/ev/quals/paper).
     use_quals: inject the quals profile (step-4 structural signal) into the
     prompt. False = step-3 baseline (text-only induction) for A/B comparison.
+    known_methods: list of method names already induced (to avoid naming
+    collisions — distinct methods must get distinct names).
     Returns the parsed JSON dict or None.
     """
     body, npaper = _fmt_edges(edges, k=k)
     qp = _fmt_quals_profile(_quals_profile(edges)) if use_quals else "  (未启用 qualifier 信号)"
+    known_str = "\n".join(f"- {nm}" for nm in known_methods) if known_methods else "(尚无)"
     prompt = METHOD_PROMPT.format(method=method_label, npaper=npaper,
                                   k=min(k, len(edges)), edges=body,
-                                  quals_profile=qp)
+                                  quals_profile=qp, known_methods=known_str)
     return _call_json(prompt, llm=llm, max_tokens=700)
 
 
@@ -443,15 +455,18 @@ def lift_into_schema(meta, edges_by_method, llm="deepseek-chat",
     induced = {}
     written_methods = []
     type_ids = {}  # label -> stable METHOD_<idx>
+    known_methods = []  # accumulate induced method names to avoid collisions
     for idx, (label, edges) in enumerate(edges_by_method.items()):
         if not edges:
             continue
-        node = induce_method_node(edges, label, llm=llm, use_quals=use_quals)
+        node = induce_method_node(edges, label, llm=llm, use_quals=use_quals,
+                                  known_methods=known_methods)
         if not node or not node.get('method_name'):
             continue
         induced[label] = node
         type_id = f"{METHOD_NS}{idx}"
         type_ids[label] = type_id
+        known_methods.append(node['method_name'])  # register for next induce
         ev = (node.get('key_evidence') or [None])[0] or ""
         meta.add_meta_node(type_id, node.get('method_name', label),
                            evidence=ev, paper_id="lift")
