@@ -2,1298 +2,243 @@
   "_meta": {
     "source": "Kamrin, Hill, Goldman, Andrade. Advances in Modeling Dense Granular Media. Annu. Rev. Fluid Mech. 2024.56:215-40",
     "doi": "10.1146/annurev-fluid-121021-022045",
-    "constructed_by": "manual v3 (full read, 2026-08-14) — all constructible edges included, no fabrication",
-    "note": "methods are named modeling approaches/theories/laws (not paper titles, not generic categories). Each edge has verbatim evidence from the review text.",
+    "constructed_by": "manual v4 (full read, 2026-08-14) — independent benchmark for complex scientific-paper extraction, not tailored to any specific method. Covers method evolution, parameter laws, method-phenomenon capture, composition, n-ary relations.",
+    "node_types": {
+      "Method": "A named modeling approach/theory/law (not paper title, not generic category)",
+      "Parameter": "A physical quantity/constant/coefficient appearing in equations (e.g. μ, I, d, P, τ, g, ρ_s, T, A, ξ, μ_s, b)",
+      "Phenomenon": "A physical effect/behavior that methods aim to capture (e.g. nonlocal creep, thin-body strengthening, secondary rheology, segregation, hopper clogging)",
+      "Regime": "A flow regime (e.g. quasi-static, dense, gaseous/collisional)"
+    },
+    "relation_types": {
+      "extends": "A generalizes/extends B",
+      "improves": "A improves B's accuracy/applicability, resolving B's limitation",
+      "compares": "A is compared with B",
+      "replaces": "A replaces B",
+      "adapts": "A adapts B to a new scenario",
+      "background": "A uses B as background/motivation",
+      "uses_parameter": "A method uses parameter P (Method→Parameter)",
+      "defines": "A law/equation defines parameter P (Law text→Parameter)",
+      "captures": "A method captures/predicts phenomenon X (Method→Phenomenon)",
+      "applicable_in": "A method is applicable in regime R (Method→Regime)",
+      "composed_of": "Method A is composed of / includes Method B (A⊃B)",
+      "limited_in": "A method fails/limited in regime/phenomenon (Method→Phenomenon/Regime, negative)"
+    },
     "difficulty_legend": {
-      "A": "cross-paper: A0=same-paper, A1=across 2 papers, A2=across 3+ papers",
-      "B": "rich-topology: B0=flat, B1=composition hierarchy, B2=law-constraint nesting",
-      "C": "reasoning: C0=explicit, C1=semi-implicit(1-step), C2=implicit(multi-step)"
+      "A": "cross-paper: A0=same-paper refs, A1=across 2 papers, A2=across 3+ papers",
+      "B": "rich-topology: B0=flat binary, B1=composition, B2=law-constraint nesting, B3=n-ary(≥3 nodes)",
+      "C": "reasoning: C0=explicit(stated), C1=semi-implicit(1-step), C2=implicit(multi-step infer)"
     }
   },
   "methods": [
-    {
-      "id": "M1",
-      "name": "μ(I) inertial rheology",
-      "aliases": [
-        "μ(I) model",
-        "mu(I) rheology",
-        "inertial rheology",
-        "local rheology",
-        "μ(I)"
-      ],
-      "refs": [
-        "MiDi 2004",
-        "Jop et al. 2006",
-        "Forterre & Pouliquen 2008",
-        "da Cruz et al. 2005"
-      ]
-    },
-    {
-      "id": "M2",
-      "name": "Granular kinetic theory",
-      "aliases": [
-        "kinetic theory",
-        "kinetic theory of granular flow"
-      ],
-      "refs": [
-        "Haff 1983",
-        "Jenkins & Savage 1983",
-        "Lun et al. 1984",
-        "Garzo & Dufty 1999"
-      ]
-    },
-    {
-      "id": "M3",
-      "name": "Dense-limit kinetic theory extension",
-      "aliases": [
-        "extension of kinetic theory to the dense limit",
-        "extended kinetic theory"
-      ],
-      "refs": [
-        "Jenkins & Berzi 2010",
-        "Berzi 2014"
-      ]
-    },
-    {
-      "id": "M4",
-      "name": "Partial fluidization model",
-      "aliases": [
-        "partial fluidization theory",
-        "order-parameter model"
-      ],
-      "refs": [
-        "Aranson & Tsimring 2001",
-        "Aranson & Tsimring 2002",
-        "Aranson et al. 2008"
-      ]
-    },
-    {
-      "id": "M5",
-      "name": "Nonlocal granular fluidity model",
-      "aliases": [
-        "NGF",
-        "nonlocal granular fluidity",
-        "granular fluidity model",
-        "fluidity model"
-      ],
-      "refs": [
-        "Kamrin & Koval 2012",
-        "Henann & Kamrin 2013"
-      ]
-    },
-    {
-      "id": "M6",
-      "name": "I-gradient model",
-      "aliases": [
-        "I-gradient",
-        "nonlocal I-gradient extension"
-      ],
-      "refs": [
-        "Bouzid et al. 2013",
-        "Bouzid et al. 2015"
-      ]
-    },
-    {
-      "id": "M7",
-      "name": "Body-wide self-activation model",
-      "aliases": [
-        "self-activation model",
-        "strongly nonlocal integral model"
-      ],
-      "refs": [
-        "Pouliquen & Forterre 2009"
-      ]
-    },
-    {
-      "id": "M8",
-      "name": "Kernel-convolution local rheology model",
-      "aliases": [
-        "convolution model",
-        "kernel-based nonlocal model"
-      ],
-      "refs": [
-        "Nott 2017"
-      ]
-    },
-    {
-      "id": "M9",
-      "name": "Integrated eddy-viscosity formulation",
-      "aliases": [
-        "eddy-viscosity model"
-      ],
-      "refs": [
-        "Miller et al. 2013"
-      ]
-    },
-    {
-      "id": "M10",
-      "name": "Cosserat continuum model",
-      "aliases": [
-        "micropolar continuum",
-        "Cosserat theory",
-        "Cosserat continua"
-      ],
-      "refs": [
-        "Cosserat & Cosserat 1909",
-        "Muhlhaus & Vardoulakis 1987",
-        "Mohan et al. 2002"
-      ]
-    },
-    {
-      "id": "M11",
-      "name": "Kinematic model of granular drainage",
-      "aliases": [
-        "kinematic model",
-        "silo diffusion model"
-      ],
-      "refs": [
-        "Tüzün & Nedderman 1979"
-      ]
-    },
-    {
-      "id": "M12",
-      "name": "Void model",
-      "aliases": [
-        "void diffusion model"
-      ],
-      "refs": [
-        "Mullins 1972"
-      ]
-    },
-    {
-      "id": "M13",
-      "name": "Spot model",
-      "aliases": [
-        "spot model for silo flow"
-      ],
-      "refs": [
-        "Bazant 2006"
-      ]
-    },
-    {
-      "id": "M14",
-      "name": "Emulsion fluidity model",
-      "aliases": [
-        "related model for emulsions",
-        "emulsion model"
-      ],
-      "refs": [
-        "Bocquet et al. 2009"
-      ]
-    },
-    {
-      "id": "M15",
-      "name": "Yoon-Jenkins segregation flux model",
-      "aliases": [
-        "Yoon & Jenkins model",
-        "kinetic-theory segregation model for mixtures"
-      ],
-      "refs": [
-        "Yoon & Jenkins 2006"
-      ]
-    },
-    {
-      "id": "M16",
-      "name": "Khakhar buoyancy-driven segregation model",
-      "aliases": [
-        "Khakhar et al. buoyancy model",
-        "buoyancy-driven segregation"
-      ],
-      "refs": [
-        "Khakhar et al. 1997"
-      ]
-    },
-    {
-      "id": "M17",
-      "name": "Gray-Thornton-Chugunov segregation model",
-      "aliases": [
-        "Gray-Thornton model",
-        "GTA mixture-theory segregation",
-        "kinetic sieving mixture theory"
-      ],
-      "refs": [
-        "Gray & Thornton 2005",
-        "Gray & Chugunov 2006"
-      ]
-    },
-    {
-      "id": "M18",
-      "name": "Savage-Lun kinetic sieving model",
-      "aliases": [
-        "Savage & Lun kinetic sieving",
-        "kinetic sieving model"
-      ],
-      "refs": [
-        "Savage & Lun 1988"
-      ]
-    },
-    {
-      "id": "M19",
-      "name": "Hill-Tan-Fan stress-partitioning segregation model",
-      "aliases": [
-        "THF model",
-        "THF stress-partitioning segregation",
-        "stress partitioning segregation"
-      ],
-      "refs": [
-        "Fan & Hill 2011a",
-        "Hill & Tan 2014"
-      ]
-    },
-    {
-      "id": "M20",
-      "name": "Sarkar-Khakhar first-principles segregation coefficients model",
-      "aliases": [
-        "Sarkar & Khakhar model",
-        "first-principles drag/diffusion/segregation coefficients"
-      ],
-      "refs": [
-        "Sarkar & Khakhar 2008",
-        "Tripathi & Khakhar 2013"
-      ]
-    },
-    {
-      "id": "M21",
-      "name": "Saffman-like segregation force model",
-      "aliases": [
-        "Saffman-like segregation forces on an intruding particle"
-      ],
-      "refs": [
-        "van der Vaart et al. 2018"
-      ]
-    },
-    {
-      "id": "M22",
-      "name": "Hernández-Delfin asphericity segregation model",
-      "aliases": [
-        "ellipsoid segregation model",
-        "asphericity stress-partitioning model"
-      ],
-      "refs": [
-        "Hernández-Delfin et al. 2022"
-      ]
-    },
-    {
-      "id": "M23",
-      "name": "Discrete element method",
-      "aliases": [
-        "DEM",
-        "discrete particle method",
-        "discrete particle approach",
-        "DEM simulation"
-      ],
-      "refs": [
-        "Cundall & Strack 1979"
-      ]
-    },
-    {
-      "id": "M24",
-      "name": "Ellipsoidal particle DEM",
-      "aliases": [
-        "ellipsoidal DEM",
-        "ellipsoid-based discrete element method"
-      ],
-      "refs": [
-        "Ting et al. 1993"
-      ]
-    },
-    {
-      "id": "M25",
-      "name": "Sphere-clumping method",
-      "aliases": [
-        "clumped-sphere DEM",
-        "sphere clumping"
-      ],
-      "refs": [
-        "Garcia et al. 2009b"
-      ]
-    },
-    {
-      "id": "M26",
-      "name": "Polyhedral element DEM",
-      "aliases": [
-        "polyhedral DEM",
-        "polyhedral discrete element method"
-      ],
-      "refs": [
-        "Cundall 1988",
-        "Alonso-Marroquin & Herrmann 2002"
-      ]
-    },
-    {
-      "id": "M27",
-      "name": "Combined finite-discrete element method",
-      "aliases": [
-        "FDEM",
-        "combined finite-discrete element method",
-        "finite-discrete element method"
-      ],
-      "refs": [
-        "Munjiza 2004"
-      ]
-    },
-    {
-      "id": "M28",
-      "name": "Convex complementarity approach",
-      "aliases": [
-        "convex complementarity",
-        "differential variational inequalities approach"
-      ],
-      "refs": [
-        "Tasora & Anitescu 2010"
-      ]
-    },
-    {
-      "id": "M29",
-      "name": "Potential particle approach",
-      "aliases": [
-        "potential particle method",
-        "convex-function level-surface DEM"
-      ],
-      "refs": [
-        "Houlsby 2009"
-      ]
-    },
-    {
-      "id": "M30",
-      "name": "Granular element method",
-      "aliases": [
-        "GEM",
-        "NURBS-based granular element method"
-      ],
-      "refs": [
-        "Andrade et al. 2012",
-        "Lim et al. 2014"
-      ]
-    },
-    {
-      "id": "M31",
-      "name": "XRCT-based particle shape characterization",
-      "aliases": [
-        "XRCT imaging",
-        "X-ray computed tomography particle shape extraction"
-      ],
-      "refs": [
-        "Vlahinić et al. 2014"
-      ]
-    },
-    {
-      "id": "M32",
-      "name": "Level set discrete element method",
-      "aliases": [
-        "LS-DEM",
-        "level set DEM"
-      ],
-      "refs": [
-        "Kawamoto et al. 2016"
-      ]
-    },
-    {
-      "id": "M33",
-      "name": "Unified DEM framework (encapsulating LS-DEM)",
-      "aliases": [
-        "unified framework encapsulating LS-DEM and other DEM variants"
-      ],
-      "refs": [
-        "Lai et al. 2022"
-      ]
-    },
-    {
-      "id": "M34",
-      "name": "FE² multiscale approach",
-      "aliases": [
-        "FE2",
-        "FE-squared",
-        "FE² approach"
-      ],
-      "refs": [
-        "Feyel & Chaboche 2000 (implied)"
-      ]
-    },
-    {
-      "id": "M35",
-      "name": "FEM × DEM multiscale approach",
-      "aliases": [
-        "FEM-DEM",
-        "FEM×DEM",
-        "finite-element × discrete-element approach"
-      ],
-      "refs": []
-    },
-    {
-      "id": "M36",
-      "name": "Buscarnera-Einav shape-evolving constitutive model",
-      "aliases": [
-        "coevolving grain shape and size distribution constitutive model",
-        "micromechanics-based constitutive model with shape"
-      ],
-      "refs": [
-        "Buscarnera & Einav 2021"
-      ]
-    },
-    {
-      "id": "M37",
-      "name": "Phenomenological impact force model",
-      "aliases": [
-        "impact force model",
-        "Katsuragi-Durian impact model"
-      ],
-      "refs": [
-        "Katsuragi & Durian 2007"
-      ]
-    },
-    {
-      "id": "M38",
-      "name": "Resistive force theory (fluid original)",
-      "aliases": [
-        "RFT (viscous)",
-        "low-Reynolds-number RFT"
-      ],
-      "refs": [
-        "Gray & Hancock 1955",
-        "Lighthill 1976"
-      ]
-    },
-    {
-      "id": "M39",
-      "name": "Granular resistive force theory",
-      "aliases": [
-        "granular RFT",
-        "RFT for granular locomotion"
-      ],
-      "refs": [
-        "Zhang & Goldman 2014",
-        "Li et al. 2013"
-      ]
-    },
-    {
-      "id": "M40",
-      "name": "Dynamic RFT",
-      "aliases": [
-        "dynamic resistive force theory",
-        "inertia-augmented RFT"
-      ],
-      "refs": [
-        "Aguilar & Goldman 2016",
-        "Agarwal et al. 2021"
-      ]
-    },
-    {
-      "id": "M41",
-      "name": "Stokeslet and slender body theory",
-      "aliases": [
-        "Stokeslet theory",
-        "slender body theory",
-        "method of regularized Stokeslets"
-      ],
-      "refs": [
-        "Johnson 1980",
-        "Cortez et al. 2005"
-      ]
-    },
-    {
-      "id": "M42",
-      "name": "Tension-free frictional rheology",
-      "aliases": [
-        "local tension-free frictional rheology",
-        "tension-free local rheology"
-      ],
-      "refs": [
-        "Askari & Kamrin 2016"
-      ]
-    },
-    {
-      "id": "M43",
-      "name": "Geometric and added-mass model",
-      "aliases": [
-        "geometric added-mass model",
-        "solidifying-cone model"
-      ],
-      "refs": [
-        "Aguilar & Goldman 2016"
-      ]
-    }
+    {"id": "M1", "name": "μ(I) inertial rheology", "aliases": ["μ(I) model", "mu(I) rheology", "inertial rheology", "local rheology", "μ(I)"], "refs": ["MiDi 2004", "Jop et al. 2006", "Forterre & Pouliquen 2008", "da Cruz et al. 2005"]},
+    {"id": "M2", "name": "Granular kinetic theory", "aliases": ["kinetic theory", "kinetic theory of granular flow"], "refs": ["Haff 1983", "Jenkins & Savage 1983", "Lun et al. 1984", "Garzo & Dufty 1999"]},
+    {"id": "M3", "name": "Dense-limit kinetic theory extension", "aliases": ["extension of kinetic theory to the dense limit", "extended kinetic theory"], "refs": ["Jenkins & Berzi 2010", "Berzi 2014"]},
+    {"id": "M4", "name": "Partial fluidization model", "aliases": ["partial fluidization theory", "order-parameter model"], "refs": ["Aranson & Tsimring 2001", "Aranson & Tsimring 2002", "Aranson et al. 2008"]},
+    {"id": "M5", "name": "Nonlocal granular fluidity model", "aliases": ["NGF", "nonlocal granular fluidity", "granular fluidity model", "fluidity model"], "refs": ["Kamrin & Koval 2012", "Henann & Kamrin 2013"]},
+    {"id": "M6", "name": "I-gradient model", "aliases": ["I-gradient", "nonlocal I-gradient extension"], "refs": ["Bouzid et al. 2013", "Bouzid et al. 2015"]},
+    {"id": "M7", "name": "Body-wide self-activation model", "aliases": ["self-activation model", "strongly nonlocal integral model"], "refs": ["Pouliquen & Forterre 2009"]},
+    {"id": "M8", "name": "Kernel-convolution local rheology model", "aliases": ["convolution model", "kernel-based nonlocal model"], "refs": ["Nott 2017"]},
+    {"id": "M9", "name": "Integrated eddy-viscosity formulation", "aliases": ["eddy-viscosity model"], "refs": ["Miller et al. 2013"]},
+    {"id": "M10", "name": "Cosserat continuum model", "aliases": ["micropolar continuum", "Cosserat theory", "Cosserat continua"], "refs": ["Cosserat & Cosserat 1909", "Muhlhaus & Vardoulakis 1987", "Mohan et al. 2002"]},
+    {"id": "M11", "name": "Kinematic model of granular drainage", "aliases": ["kinematic model", "silo diffusion model"], "refs": ["Tüzün & Nedderman 1979"]},
+    {"id": "M12", "name": "Void model", "aliases": ["void diffusion model"], "refs": ["Mullins 1972"]},
+    {"id": "M13", "name": "Spot model", "aliases": ["spot model for silo flow"], "refs": ["Bazant 2006"]},
+    {"id": "M14", "name": "Emulsion fluidity model", "aliases": ["related model for emulsions", "emulsion model"], "refs": ["Bocquet et al. 2009"]},
+    {"id": "M15", "name": "Yoon-Jenkins segregation flux model", "aliases": ["Yoon & Jenkins model", "kinetic-theory segregation model for mixtures"], "refs": ["Yoon & Jenkins 2006"]},
+    {"id": "M16", "name": "Khakhar buoyancy-driven segregation model", "aliases": ["Khakhar et al. buoyancy model", "buoyancy-driven segregation"], "refs": ["Khakhar et al. 1997"]},
+    {"id": "M17", "name": "Gray-Thornton-Chugunov segregation model", "aliases": ["Gray-Thornton model", "GTA mixture-theory segregation", "kinetic sieving mixture theory"], "refs": ["Gray & Thornton 2005", "Gray & Chugunov 2006"]},
+    {"id": "M18", "name": "Savage-Lun kinetic sieving model", "aliases": ["Savage & Lun kinetic sieving", "kinetic sieving model"], "refs": ["Savage & Lun 1988"]},
+    {"id": "M19", "name": "Hill-Tan-Fan stress-partitioning segregation model", "aliases": ["THF model", "THF stress-partitioning segregation", "stress partitioning segregation"], "refs": ["Fan & Hill 2011a", "Hill & Tan 2014"]},
+    {"id": "M20", "name": "Sarkar-Khakhar first-principles segregation coefficients model", "aliases": ["Sarkar & Khakhar model", "first-principles drag/diffusion/segregation coefficients"], "refs": ["Sarkar & Khakhar 2008", "Tripathi & Khakhar 2013"]},
+    {"id": "M21", "name": "Saffman-like segregation force model", "aliases": ["Saffman-like segregation forces on an intruding particle"], "refs": ["van der Vaart et al. 2018"]},
+    {"id": "M22", "name": "Hernández-Delfin asphericity segregation model", "aliases": ["ellipsoid segregation model", "asphericity stress-partitioning model"], "refs": ["Hernández-Delfin et al. 2022"]},
+    {"id": "M23", "name": "Discrete element method", "aliases": ["DEM", "discrete particle method", "discrete particle approach", "DEM simulation"], "refs": ["Cundall & Strack 1979"]},
+    {"id": "M24", "name": "Ellipsoidal particle DEM", "aliases": ["ellipsoidal DEM", "ellipsoid-based discrete element method"], "refs": ["Ting et al. 1993"]},
+    {"id": "M25", "name": "Sphere-clumping method", "aliases": ["clumped-sphere DEM", "sphere clumping"], "refs": ["Garcia et al. 2009b"]},
+    {"id": "M26", "name": "Polyhedral element DEM", "aliases": ["polyhedral DEM", "polyhedral discrete element method"], "refs": ["Cundall 1988", "Alonso-Marroquin & Herrmann 2002"]},
+    {"id": "M27", "name": "Combined finite-discrete element method", "aliases": ["FDEM", "combined finite-discrete element method", "finite-discrete element method"], "refs": ["Munjiza 2004"]},
+    {"id": "M28", "name": "Convex complementarity approach", "aliases": ["convex complementarity", "differential variational inequalities approach"], "refs": ["Tasora & Anitescu 2010"]},
+    {"id": "M29", "name": "Potential particle approach", "aliases": ["potential particle method", "convex-function level-surface DEM"], "refs": ["Houlsby 2009"]},
+    {"id": "M30", "name": "Granular element method", "aliases": ["GEM", "NURBS-based granular element method"], "refs": ["Andrade et al. 2012", "Lim et al. 2014"]},
+    {"id": "M31", "name": "XRCT-based particle shape characterization", "aliases": ["XRCT imaging", "X-ray computed tomography particle shape extraction"], "refs": ["Vlahinić et al. 2014"]},
+    {"id": "M32", "name": "Level set discrete element method", "aliases": ["LS-DEM", "level set DEM"], "refs": ["Kawamoto et al. 2016"]},
+    {"id": "M33", "name": "Unified DEM framework (encapsulating LS-DEM)", "aliases": ["unified framework encapsulating LS-DEM and other DEM variants"], "refs": ["Lai et al. 2022"]},
+    {"id": "M34", "name": "FE² multiscale approach", "aliases": ["FE2", "FE-squared", "FE² approach"], "refs": ["Feyel & Chaboche 2000 (implied)"]},
+    {"id": "M35", "name": "FEM × DEM multiscale approach", "aliases": ["FEM-DEM", "FEM×DEM", "finite-element × discrete-element approach"], "refs": []},
+    {"id": "M36", "name": "Buscarnera-Einav shape-evolving constitutive model", "aliases": ["coevolving grain shape and size distribution constitutive model", "micromechanics-based constitutive model with shape"], "refs": ["Buscarnera & Einav 2021"]},
+    {"id": "M37", "name": "Phenomenological impact force model", "aliases": ["impact force model", "Katsuragi-Durian impact model"], "refs": ["Katsuragi & Durian 2007"]},
+    {"id": "M38", "name": "Resistive force theory (fluid original)", "aliases": ["RFT (viscous)", "low-Reynolds-number RFT"], "refs": ["Gray & Hancock 1955", "Lighthill 1976"]},
+    {"id": "M39", "name": "Granular resistive force theory", "aliases": ["granular RFT", "RFT for granular locomotion"], "refs": ["Zhang & Goldman 2014", "Li et al. 2013"]},
+    {"id": "M40", "name": "Dynamic RFT", "aliases": ["dynamic resistive force theory", "inertia-augmented RFT"], "refs": ["Aguilar & Goldman 2016", "Agarwal et al. 2021"]},
+    {"id": "M41", "name": "Stokeslet and slender body theory", "aliases": ["Stokeslet theory", "slender body theory", "method of regularized Stokeslets"], "refs": ["Johnson 1980", "Cortez et al. 2005"]},
+    {"id": "M42", "name": "Tension-free frictional rheology", "aliases": ["local tension-free frictional rheology", "tension-free local rheology"], "refs": ["Askari & Kamrin 2016"]},
+    {"id": "M43", "name": "Geometric and added-mass model", "aliases": ["geometric added-mass model", "solidifying-cone model"], "refs": ["Aguilar & Goldman 2016"]}
+  ],
+  "parameters": [
+    {"id": "P1", "name": "μ (friction ratio)", "aliases": ["mu", "shear stress to pressure ratio"], "defined_by": "μ ≡ τ / P"},
+    {"id": "P2", "name": "I (inertial number)", "aliases": ["inertial number", "normalized flow rate"], "defined_by": "I ≡ γ̇ d √(ρ_s / P)"},
+    {"id": "P3", "name": "d (grain diameter)", "aliases": ["mean grain diameter", "grain size", "particle size"]},
+    {"id": "P4", "name": "P (pressure)", "aliases": ["ambient pressure", "confining pressure"]},
+    {"id": "P5", "name": "τ (shear stress)", "aliases": ["shear stress"]},
+    {"id": "P6", "name": "ρ_s (grain density)", "aliases": ["density of a grain", "solid density"]},
+    {"id": "P7", "name": "μ_s (static friction)", "aliases": ["base friction coefficient", "μ_s"]},
+    {"id": "P8", "name": "b (slope coefficient)", "aliases": ["b"]},
+    {"id": "P9", "name": "T (granular temperature)", "aliases": ["collisional temperature", "granular temperature"]},
+    {"id": "P10", "name": "g (granular fluidity)", "aliases": ["fluidity", "granular fluidity field"]},
+    {"id": "P11", "name": "A (nonlocal amplitude)", "aliases": ["dimensionless nonlocal amplitude", "A"]},
+    {"id": "P12", "name": "ξ (cooperativity length)", "aliases": ["apparent cooperativity length", "ξ"]},
+    {"id": "P13", "name": "ρ (order parameter)", "aliases": ["order parameter (not density)", "fluidization variable"]},
+    {"id": "P14", "name": "η (viscosity)", "aliases": ["granular viscosity"]},
+    {"id": "P15", "name": "K (thermal conductivity)", "aliases": ["conductivity"]},
+    {"id": "P16", "name": "Γ (dissipation rate)", "aliases": ["volumetric dissipation rate"]},
+    {"id": "P17", "name": "ν (gradient coefficient)", "aliases": ["ν (I-gradient)"]},
+    {"id": "P18", "name": "B (silo spread factor)", "aliases": ["spread factor B"]},
+    {"id": "P19", "name": "μ_d (dynamic friction)", "aliases": ["dynamic friction μ_d"]}
+  ],
+  "phenomena": [
+    {"id": "F1", "name": "Nonlocal creep", "aliases": ["creeping decay of shear rate", "diffusive flow field", "nonlocal creeping"]},
+    {"id": "F2", "name": "Thin-body strengthening", "aliases": ["H_stop effect", "thin-layer arrest", "thin-body strengthening"]},
+    {"id": "F3", "name": "Secondary rheology", "aliases": ["far-away flow removes yield stress", "probe mobility under remote flow"]},
+    {"id": "F4", "name": "Hopper clogging", "aliases": ["silo clogging", "flow arrest by arching"]},
+    {"id": "F5", "name": "Segregation (Brazil nut)", "aliases": ["particle unmixing", "size segregation", "density segregation"]},
+    {"id": "F6", "name": "Nonlocal rate independence", "aliases": ["rate-independent rheology in slow regime"]}
+  ],
+  "regimes": [
+    {"id": "R1", "name": "Quasi-static regime", "aliases": ["quasi-static", "slow flow", "solid-like"]},
+    {"id": "R2", "name": "Dense flow regime", "aliases": ["dense", "liquid-like", "dense (noncollisional) limit"]},
+    {"id": "R3", "name": "Gaseous/collisional regime", "aliases": ["gaseous", "collisional", "rapid flow"]}
   ],
   "evolution_edges": [
-    {
-      "src": "M2",
-      "tgt": "M1",
-      "type": "compares",
-      "evidence": "recently, proposed models have focused on capturing nonlocal creep. Fewer have also been demonstrated to capture thin-body strengthening and secondary rheology—many of these models are not of a mathematical form capable of representing",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C1"
-      }
-    },
-    {
-      "src": "M3",
-      "tgt": "M2",
-      "type": "extends",
-      "evidence": "Extensions of kinetic theory to the d",
-      "difficulty": {
-        "A": "A0",
-        "B": "B0",
-        "C": "C0"
-      }
-    },
-    {
-      "src": "M4",
-      "tgt": "M1",
-      "type": "background",
-      "evidence": "Some models employ the self-heating idea holistically by coupling the rheology to a diffusing fluidization variable in an attempt to formulate a simpler and potentially more quantitative (albeit more empirical) model. The first proposed holistic model of this type is the partial fluidization model",
-      "difficulty": {
-        "A": "A1",
-        "B": "B1",
-        "C": "C0"
-      }
-    },
-    {
-      "src": "M5",
-      "tgt": "M14",
-      "type": "background",
-      "evidence": "Introduced in 2012 (Kamrin & Koval 2012) and inspired by a related model for emulsions (Bocquet et al. 2009), NGF is designed to give quantitative outcomes",
-      "difficulty": {
-        "A": "A2",
-        "B": "B0",
-        "C": "C0"
-      }
-    },
-    {
-      "src": "M5",
-      "tgt": "M1",
-      "type": "improves",
-      "evidence": "In the absence of flow gradients (or negligible $d$ ), the two equations above, at steady state, produce a fluidity that replicates the $\\mu(I)$ model (Equation 1). But when flow gradients are present, the diffusion term spreads fluidization based on the grain size.",
-      "difficulty": {
-        "A": "A1",
-        "B": "B2",
-        "C": "C1"
-      }
-    },
-    {
-      "src": "M6",
-      "tgt": "M1",
-      "type": "extends",
-      "evidence": "The I-gradient model of Bouzid et al. (2013, 2015) supposes μ = μ(I)(1 − ν∇²I / I), a direct nonlocal extension of the μ(I) model.",
-      "difficulty": {
-        "A": "A1",
-        "B": "B2",
-        "C": "C0"
-      }
-    },
-    {
-      "src": "M6",
-      "tgt": "M5",
-      "type": "compares",
-      "evidence": "it cannot capture thin-body strengthening and it has been shown to be mathematically ill posed in the sense of Hadamard",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C1"
-      }
-    },
-    {
-      "src": "M7",
-      "tgt": "M1",
-      "type": "background",
-      "evidence": "a body-wide self-activation model where perturbations from flow everywhere influence shear rate at each point",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C0"
-      }
-    },
-    {
-      "src": "M8",
-      "tgt": "M1",
-      "type": "extends",
-      "evidence": "a model based on convolving local rheology over a kernel",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C0"
-      }
-    },
-    {
-      "src": "M9",
-      "tgt": "M1",
-      "type": "extends",
-      "evidence": "an integrated eddy-viscosity formulation",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C0"
-      }
-    },
-    {
-      "src": "M10",
-      "tgt": "M1",
-      "type": "background",
-      "evidence": "instances of nonlocal effects have been considered in the soil mechanics literature for many decades, primarily based on micropolar or Cosserat continua",
-      "difficulty": {
-        "A": "A2",
-        "B": "B0",
-        "C": "C0"
-      }
-    },
-    {
-      "src": "M11",
-      "tgt": "M1",
-      "type": "background",
-      "evidence": "The kinematic model of granular drainage (Tüzün & Nedderman 1979) and its related mechanisms [the void model (Mullins 1972) and spot model (Bazant 2006)] were inspired by the observation of silo diffusion.",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C0"
-      }
-    },
-    {
-      "src": "M12",
-      "tgt": "M11",
-      "type": "background",
-      "evidence": "The kinematic model of granular drainage (Tüzün & Nedderman 1979) and its related mechanisms [the void model (Mullins 1972) and spot model (Bazant 2006)] were inspired by the observation of silo diffusion.",
-      "difficulty": {
-        "A": "A1",
-        "B": "B1",
-        "C": "C0"
-      }
-    },
-    {
-      "src": "M13",
-      "tgt": "M11",
-      "type": "background",
-      "evidence": "The kinematic model of granular drainage (Tüzün & Nedderman 1979) and its related mechanisms [the void model (Mullins 1972) and spot model (Bazant 2006)] were inspired by the observation of silo diffusion.",
-      "difficulty": {
-        "A": "A1",
-        "B": "B1",
-        "C": "C0"
-      }
-    },
-    {
-      "src": "M15",
-      "tgt": "M2",
-      "type": "extends",
-      "evidence": "we consider segregation associated with variations in both particle size and density of constituents $A$ and $B$ , based on work by Yoon & Jenkins (2006), in a shear flow in the direction of gravity",
-      "difficulty": {
-        "A": "A1",
-        "B": "B2",
-        "C": "C0"
-      }
-    },
-    {
-      "src": "M16",
-      "tgt": "M15",
-      "type": "compares",
-      "evidence": "Khakhar et al. (1997) proposed a buoyancy mechanism for gravity-driven segregation that models segregation of particles of similar size and different material density",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C0"
-      }
-    },
-    {
-      "src": "M17",
-      "tgt": "M18",
-      "type": "adapts",
-      "evidence": "Gray and colleagues (Gray & Thornton 2005, Gray & Chugunov 2006) captured effects of kinetic sieving proposed by Savage & Lun (1988) in a continuum mixture-theory framework.",
-      "difficulty": {
-        "A": "A1",
-        "B": "B1",
-        "C": "C0"
-      }
-    },
-    {
-      "src": "M17",
-      "tgt": "M16",
-      "type": "compares",
-      "evidence": "We note the approximate mathematical equivalence with Equation 9, particularly for the cases where the phenomenologically determined coefficients are all constant.",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C1"
-      }
-    },
-    {
-      "src": "M19",
-      "tgt": "M17",
-      "type": "improves",
-      "evidence": "Hill and colleagues (Fan & Hill 2011a, Hill & Tan 2014) showed that including this in the mass and momentum balance equations of the mixtures gives rise to the following form for segregation fluxes",
-      "difficulty": {
-        "A": "A1",
-        "B": "B1",
-        "C": "C1"
-      }
-    },
-    {
-      "src": "M20",
-      "tgt": "M16",
-      "type": "improves",
-      "evidence": "Sarkar & Khakhar (2008) and Tripathi & Khakhar (2013) derived representative drag, diffusion, and segregation coefficients from first principles for different density particle mixtures.",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C1"
-      }
-    },
-    {
-      "src": "M21",
-      "tgt": "M18",
-      "type": "compares",
-      "evidence": "Another example involves Saffman-like segregation forces on an intruding particle (van der Vaart et al. 2018), not unlike the squeeze-expulsion accompanying the kinetic sieving first modeled by Savage (1998)",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C1"
-      }
-    },
-    {
-      "src": "M22",
-      "tgt": "M19",
-      "type": "extends",
-      "evidence": "Hernández-Delfin et al. (2022) showed that for ellipsoids, both kinetic stress and gravity terms can dominate, depending on the aspect ratio of the species in the mixture.",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C1"
-      }
-    },
-    {
-      "src": "M24",
-      "tgt": "M23",
-      "type": "extends",
-      "evidence": "One of the first efforts employed ellipsoidal particles (Ting et al. 1993)",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C0"
-      }
-    },
-    {
-      "src": "M25",
-      "tgt": "M23",
-      "type": "extends",
-      "evidence": "a more versatile approach relied on the clumping of spheres (Garcia et al. 2009b)",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C0"
-      }
-    },
-    {
-      "src": "M26",
-      "tgt": "M23",
-      "type": "extends",
-      "evidence": "Another popular approach considers polyhedral elements (Cundall 1988, Alonso-Marroquin & Herrmann 2002)",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C0"
-      }
-    },
-    {
-      "src": "M27",
-      "tgt": "M23",
-      "type": "extends",
-      "evidence": "the combined finite-discrete element method (Munjiza 2004), where each particle is treated as a continuum and discretized into a finite element mesh",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C0"
-      }
-    },
-    {
-      "src": "M28",
-      "tgt": "M23",
-      "type": "replaces",
-      "evidence": "One method of this nature that deviates from the soft-contact formulation of DEM is the convex complementarity approach (Tasora & Anitescu 2010), where nonoverlapping contacts are enforced geometrically through differential variational inequalities.",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C2"
-      }
-    },
-    {
-      "src": "M29",
-      "tgt": "M23",
-      "type": "extends",
-      "evidence": "the potential particle approach (Houlsby 2009) (Figure 5d) remains faithful to the overlapping particle approach of DEM but describes general particle shapes through convex functions",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C0"
-      }
-    },
-    {
-      "src": "M30",
-      "tgt": "M23",
-      "type": "extends",
-      "evidence": "the granular element method (Andrade et al. 2012) was proposed to capture general particle morphologies accurately, including nonconvex shape interactions",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C0"
-      }
-    },
-    {
-      "src": "M32",
-      "tgt": "M31",
-      "type": "extends",
-      "evidence": "This inspired the development of the level set discrete element method (LS-DEM) (Kawamoto et al. 2016) (Figure 5e), a framework that overcomes many limitations of the aforementioned DEM techniques",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C0"
-      }
-    },
-    {
-      "src": "M32",
-      "tgt": "M23",
-      "type": "extends",
-      "evidence": "a framework that overcomes many limitations of the aforementioned DEM techniques, providing a simple contact interaction procedure",
-      "difficulty": {
-        "A": "A2",
-        "B": "B0",
-        "C": "C0"
-      }
-    },
-    {
-      "src": "M33",
-      "tgt": "M32",
-      "type": "extends",
-      "evidence": "a unified framework has been presented that encapsulates LS-DEM and other DEM variants as particular cases",
-      "difficulty": {
-        "A": "A1",
-        "B": "B1",
-        "C": "C0"
-      }
-    },
-    {
-      "src": "M35",
-      "tgt": "M34",
-      "type": "adapts",
-      "evidence": "e to the boundary of the particle (the zero-th level set), which is used to readily evaluate any interpenetration between two particles using classic leader-follower approaches in contact mechanics. LS-DEM ha",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C0"
-      }
-    },
-    {
-      "src": "M36",
-      "tgt": "M30",
-      "type": "background",
-      "evidence": "The constitutive model presented in a recent study by Buscarnera & Einav (2021) is an exception; it considers the effect of coevolving grain shape and size distribution",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C0"
-      }
-    },
-    {
-      "src": "M39",
-      "tgt": "M38",
-      "type": "adapts",
-      "evidence": "a scheme called resistive force theory (RFT) was hypothesized for granular locomotors (Zhang & Goldman 2014). RFT was initially developed in the mid-twentieth century by Gray & Hancock (1955) and Lighthill (1976) to model the locomotion of tiny organisms moving in viscous fluids",
-      "difficulty": {
-        "A": "A2",
-        "B": "B0",
-        "C": "C0"
-      }
-    },
-    {
-      "src": "M40",
-      "tgt": "M39",
-      "type": "improves",
-      "evidence": "material inertia could also be accounted for by quadratic terms in the RFT; these effects were dubbed dynamic RFT",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C0"
-      }
-    },
-    {
-      "src": "M41",
-      "tgt": "M38",
-      "type": "replaces",
-      "evidence": "RFT in fluids is often supplanted by so-called Stokeslet and slender body theories (Johnson 1980, Cortez et al. 2005), which produce better agreement with experimental data at the cost of additional computational complexity",
-      "difficulty": {
-        "A": "A2",
-        "B": "B0",
-        "C": "C1"
-      }
-    },
-    {
-      "src": "M42",
-      "tgt": "M1",
-      "type": "extends",
-      "evidence": "es (Johnson 1980, Cortez et al. 2005), which produce better agreement with experimental data at the cost of additional computational complexity; readers are referred to Rodenborn et al. (2013) for a comprehensive study of the different techniques. To apply RFT",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C0"
-      }
-    },
-    {
-      "src": "M43",
-      "tgt": "M39",
-      "type": "extends",
-      "evidence": "in accelerating intrusions, Aguilar & Goldman (2016) demonstrated that the RFT intrusion surface could be formed via the solidifying cone of media beneath a flat plate",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C0"
-      }
-    },
-    {
-      "src": "M23",
-      "tgt": "M2",
-      "type": "compares",
-      "evidence": "Discrete element method (DEM) simulations demonstrate that theory and results start to disagree when multiple particle contacts grow to a scale that dominates the system",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C2"
-      }
-    },
-    {
-      "src": "M16",
-      "tgt": "M15",
-      "type": "improves",
-      "evidence": "researchers developed complementary macroscale models for segregation in denser flows where assumptions of kinetic theory break down",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C2"
-      }
-    },
-    {
-      "src": "M32",
-      "tgt": "M23",
-      "type": "improves",
-      "evidence": "a framework that overcomes many limitations of the aforementioned DEM techniques, providing a simple contact interaction procedure",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C1"
-      }
-    },
-    {
-      "src": "M37",
-      "tgt": "M39",
-      "type": "background",
-      "evidence": "a phenomenological form for the impact force was obtained that contained terms quadratic in intruder speed and increasing in depth (Katsuragi & Durian 2007)",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C1"
-      }
-    },
-    {
-      "src": "M5",
-      "tgt": "M4",
-      "type": "improves",
-      "evidence": "NGF is designed to give quantitative outcomes and a broad representation of the three aforementioned families of nonlocal phenomena",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C2"
-      }
-    },
-    {
-      "src": "M4",
-      "tgt": "M2",
-      "type": "background",
-      "evidence": "nonlocal creep emerges as a self-heating process, an idea common to a variety of the nonlocal models we discuss",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C2"
-      }
-    },
-    {
-      "src": "M5",
-      "tgt": "M2",
-      "type": "background",
-      "evidence": "nonlocal creep emerges as a self-heating process, an idea common to a variety of the nonlocal models we discuss",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C2"
-      }
-    },
-    {
-      "src": "M5",
-      "tgt": "M2",
-      "type": "compares",
-      "evidence": "the NGF PDE acts as an empirically simplified heat equation for a conglomerated thermally related variable",
-      "difficulty": {
-        "A": "A1",
-        "B": "B0",
-        "C": "C2"
-      }
-    },
-    {
-      "src": "M13",
-      "tgt": "M12",
-      "type": "compares",
-      "evidence": "The kinematic model of granular drainage (Tüzün & Nedderman 1979) and its related mechanisms [the void model (Mullins 1972) and spot model (Bazant 2006)] were inspired by the observation of silo diffusion",
-      "difficulty": {
-        "A": "A1",
-        "B": "B1",
-        "C": "C1"
-      }
-    }
+    {"src": "M2", "tgt": "M1", "type": "compares", "evidence": "Granular kinetic theory could be considered a mechanically nonlocal form since it couples the granular viscosity to a collisional temperature", "difficulty": {"A": "A1", "B": "B0", "C": "C1"}},
+    {"src": "M3", "tgt": "M2", "type": "extends", "evidence": "Extensions of kinetic theory to the dense limit (Jenkins & Berzi 2010, Berzi 2014) have emerged over the last decade by generalizing the length scale to a larger multiple of d", "difficulty": {"A": "A0", "B": "B0", "C": "C0"}},
+    {"src": "M4", "tgt": "M1", "type": "background", "evidence": "Some models employ the self-heating idea holistically by coupling the rheology to a diffusing fluidization variable in an attempt to formulate a simpler and potentially more quantitative (albeit more empirical) model. The first proposed holistic model of this type is the partial fluidization model", "difficulty": {"A": "A1", "B": "B1", "C": "C0"}},
+    {"src": "M5", "tgt": "M14", "type": "background", "evidence": "Introduced in 2012 (Kamrin & Koval 2012) and inspired by a related model for emulsions (Bocquet et al. 2009), NGF is designed to give quantitative outcomes", "difficulty": {"A": "A2", "B": "B0", "C": "C0"}},
+    {"src": "M5", "tgt": "M1", "type": "improves", "evidence": "In the absence of flow gradients (or negligible d), the two equations above, at steady state, produce a fluidity that replicates the μ(I) model. But when flow gradients are present, the diffusion term spreads fluidization based on the grain size.", "difficulty": {"A": "A1", "B": "B2", "C": "C1"}},
+    {"src": "M5", "tgt": "M4", "type": "improves", "evidence": "NGF is designed to give quantitative outcomes and a broad representation of the three aforementioned families of nonlocal phenomena", "difficulty": {"A": "A1", "B": "B0", "C": "C2"}},
+    {"src": "M5", "tgt": "M2", "type": "background", "evidence": "nonlocal creep emerges as a self-heating process, an idea common to a variety of the nonlocal models we discuss", "difficulty": {"A": "A1", "B": "B0", "C": "C2"}},
+    {"src": "M5", "tgt": "M2", "type": "compares", "evidence": "the NGF PDE acts as an empirically simplified heat equation for a conglomerated thermally related variable", "difficulty": {"A": "A1", "B": "B0", "C": "C2"}},
+    {"src": "M6", "tgt": "M1", "type": "extends", "evidence": "gradient model of Bouzid et al. (2013, 2015) supposes μ = μ(I)(1 − ν∇²I / I), a direct nonlocal extension of the μ(I) model", "difficulty": {"A": "A1", "B": "B2", "C": "C0"}},
+    {"src": "M6", "tgt": "M5", "type": "compares", "evidence": "it cannot capture thin-body strengthening and it has been shown to be mathematically ill posed in the sense of Hadamard", "difficulty": {"A": "A1", "B": "B0", "C": "C1"}},
+    {"src": "M7", "tgt": "M1", "type": "background", "evidence": "a body-wide self-activation model where perturbations from flow everywhere influence shear rate at each point", "difficulty": {"A": "A1", "B": "B0", "C": "C0"}},
+    {"src": "M8", "tgt": "M1", "type": "extends", "evidence": "a model based on convolving local rheology over a kernel", "difficulty": {"A": "A1", "B": "B0", "C": "C0"}},
+    {"src": "M9", "tgt": "M1", "type": "extends", "evidence": "an integrated eddy-viscosity formulation", "difficulty": {"A": "A1", "B": "B0", "C": "C0"}},
+    {"src": "M10", "tgt": "M1", "type": "background", "evidence": "instances of nonlocal effects have been considered in the soil mechanics literature for many decades, primarily based on micropolar or Cosserat continua", "difficulty": {"A": "A2", "B": "B0", "C": "C0"}},
+    {"src": "M11", "tgt": "M1", "type": "background", "evidence": "The kinematic model of granular drainage (Tüzün & Nedderman 1979) and its related mechanisms [the void model (Mullins 1972) and spot model (Bazant 2006)] were inspired by the observation of silo diffusion.", "difficulty": {"A": "A1", "B": "B0", "C": "C0"}},
+    {"src": "M12", "tgt": "M11", "type": "background", "evidence": "The kinematic model of granular drainage (Tüzün & Nedderman 1979) and its related mechanisms [the void model (Mullins 1972) and spot model (Bazant 2006)] were inspired by the observation of silo diffusion.", "difficulty": {"A": "A1", "B": "B1", "C": "C0"}},
+    {"src": "M13", "tgt": "M11", "type": "background", "evidence": "The kinematic model of granular drainage (Tüzün & Nedderman 1979) and its related mechanisms [the void model (Mullins 1972) and spot model (Bazant 2006)] were inspired by the observation of silo diffusion.", "difficulty": {"A": "A1", "B": "B1", "C": "C0"}},
+    {"src": "M13", "tgt": "M12", "type": "compares", "evidence": "The kinematic model of granular drainage (Tüzün & Nedderman 1979) and its related mechanisms [the void model (Mullins 1972) and spot model (Bazant 2006)] were inspired by the observation of silo diffusion", "difficulty": {"A": "A1", "B": "B1", "C": "C1"}},
+    {"src": "M15", "tgt": "M2", "type": "extends", "evidence": "we consider segregation associated with variations in both particle size and density of constituents A and B, based on work by Yoon & Jenkins (2006), in a shear flow in the direction of gravity", "difficulty": {"A": "A1", "B": "B2", "C": "C0"}},
+    {"src": "M16", "tgt": "M15", "type": "compares", "evidence": "Khakhar et al. (1997) proposed a buoyancy mechanism for gravity-driven segregation that models segregation of particles of similar size and different material density", "difficulty": {"A": "A1", "B": "B0", "C": "C0"}},
+    {"src": "M16", "tgt": "M15", "type": "improves", "evidence": "researchers developed complementary macroscale models for segregation in denser flows where assumptions of kinetic theory break down", "difficulty": {"A": "A1", "B": "B0", "C": "C2"}},
+    {"src": "M17", "tgt": "M18", "type": "adapts", "evidence": "Gray and colleagues (Gray & Thornton 2005, Gray & Chugunov 2006) captured effects of kinetic sieving proposed by Savage & Lun (1988) in a continuum mixture-theory framework.", "difficulty": {"A": "A1", "B": "B1", "C": "C0"}},
+    {"src": "M17", "tgt": "M16", "type": "compares", "evidence": "We note the approximate mathematical equivalence with Equation 9, particularly for the cases where the phenomenologically determined coefficients are all constant.", "difficulty": {"A": "A1", "B": "B0", "C": "C1"}},
+    {"src": "M19", "tgt": "M17", "type": "improves", "evidence": "Hill and colleagues (Fan & Hill 2011a, Hill & Tan 2014) showed that including this in the mass and momentum balance equations of the mixtures gives rise to the following form for segregation fluxes", "difficulty": {"A": "A1", "B": "B1", "C": "C1"}},
+    {"src": "M20", "tgt": "M16", "type": "improves", "evidence": "Sarkar & Khakhar (2008) and Tripathi & Khakhar (2013) derived representative drag, diffusion, and segregation coefficients from first principles for different density particle mixtures.", "difficulty": {"A": "A1", "B": "B0", "C": "C1"}},
+    {"src": "M21", "tgt": "M18", "type": "compares", "evidence": "Another example involves Saffman-like segregation forces on an intruding particle, not unlike the squeeze-expulsion accompanying the kinetic sieving first modeled by Savage (1998)", "difficulty": {"A": "A1", "B": "B0", "C": "C1"}},
+    {"src": "M22", "tgt": "M19", "type": "extends", "evidence": "Hernández-Delfin et al. (2022) showed that for ellipsoids, both kinetic stress and gravity terms can dominate, depending on the aspect ratio of the species in the mixture.", "difficulty": {"A": "A1", "B": "B0", "C": "C1"}},
+    {"src": "M24", "tgt": "M23", "type": "extends", "evidence": "One of the first efforts employed ellipsoidal particles (Ting et al. 1993)", "difficulty": {"A": "A1", "B": "B0", "C": "C0"}},
+    {"src": "M25", "tgt": "M23", "type": "extends", "evidence": "a more versatile approach relied on the clumping of spheres (Garcia et al. 2009b)", "difficulty": {"A": "A1", "B": "B0", "C": "C0"}},
+    {"src": "M26", "tgt": "M23", "type": "extends", "evidence": "Another popular approach considers polyhedral elements (Cundall 1988, Alonso-Marroquin & Herrmann 2002)", "difficulty": {"A": "A1", "B": "B0", "C": "C0"}},
+    {"src": "M27", "tgt": "M23", "type": "extends", "evidence": "the combined finite-discrete element method (Munjiza 2004), where each particle is treated as a continuum and discretized into a finite element mesh", "difficulty": {"A": "A1", "B": "B0", "C": "C0"}},
+    {"src": "M28", "tgt": "M23", "type": "replaces", "evidence": "One method of this nature that deviates from the soft-contact formulation of DEM is the convex complementarity approach, where nonoverlapping contacts are enforced geometrically through differential variational inequalities.", "difficulty": {"A": "A1", "B": "B0", "C": "C2"}},
+    {"src": "M29", "tgt": "M23", "type": "extends", "evidence": "the potential particle approach (Houlsby 2009) remains faithful to the overlapping particle approach of DEM but describes general particle shapes through convex functions", "difficulty": {"A": "A1", "B": "B0", "C": "C0"}},
+    {"src": "M30", "tgt": "M23", "type": "extends", "evidence": "the granular element method (Andrade et al. 2012) was proposed to capture general particle morphologies accurately, including nonconvex shape interactions", "difficulty": {"A": "A1", "B": "B0", "C": "C0"}},
+    {"src": "M32", "tgt": "M31", "type": "extends", "evidence": "This inspired the development of the level set discrete element method (LS-DEM), a framework that overcomes many limitations of the aforementioned DEM techniques", "difficulty": {"A": "A1", "B": "B0", "C": "C0"}},
+    {"src": "M32", "tgt": "M23", "type": "improves", "evidence": "a framework that overcomes many limitations of the aforementioned DEM techniques, providing a simple contact interaction procedure", "difficulty": {"A": "A1", "B": "B0", "C": "C1"}},
+    {"src": "M33", "tgt": "M32", "type": "extends", "evidence": "a unified framework has been presented that encapsulates LS-DEM and other DEM variants as particular cases", "difficulty": {"A": "A1", "B": "B1", "C": "C0"}},
+    {"src": "M35", "tgt": "M34", "type": "adapts", "evidence": "variants of the FE² approach have been proposed within the so-called FEM × DEM approach, where a discrete element model is called as a surrogate for constitutive models.", "difficulty": {"A": "A1", "B": "B0", "C": "C0"}},
+    {"src": "M36", "tgt": "M30", "type": "background", "evidence": "The constitutive model presented in a recent study by Buscarnera & Einav (2021) is an exception; it considers the effect of coevolving grain shape and size distribution", "difficulty": {"A": "A1", "B": "B0", "C": "C0"}},
+    {"src": "M37", "tgt": "M39", "type": "background", "evidence": "a phenomenological form for the impact force was obtained that contained terms quadratic in intruder speed and increasing in depth (Katsuragi & Durian 2007)", "difficulty": {"A": "A1", "B": "B0", "C": "C1"}},
+    {"src": "M39", "tgt": "M38", "type": "adapts", "evidence": "a scheme called resistive force theory (RFT) was hypothesized for granular locomotors. RFT was initially developed in the mid-twentieth century by Gray & Hancock (1955) and Lighthill (1976) to model the locomotion of tiny organisms moving in viscous fluids", "difficulty": {"A": "A2", "B": "B0", "C": "C0"}},
+    {"src": "M40", "tgt": "M39", "type": "improves", "evidence": "material inertia could also be accounted for by quadratic terms in the RFT; these effects were dubbed dynamic RFT", "difficulty": {"A": "A1", "B": "B0", "C": "C0"}},
+    {"src": "M41", "tgt": "M38", "type": "replaces", "evidence": "RFT in fluids is often supplanted by so-called Stokeslet and slender body theories, which produce better agreement with experimental data at the cost of additional computational complexity", "difficulty": {"A": "A2", "B": "B0", "C": "C1"}},
+    {"src": "M42", "tgt": "M1", "type": "extends", "evidence": "a local, tension-free frictional rheology has been shown in simulated drag tests to produce results that are very close to experimentally obtained data in cohesionless grains. This constitutive model invokes only two material parameters", "difficulty": {"A": "A1", "B": "B0", "C": "C0"}},
+    {"src": "M43", "tgt": "M39", "type": "extends", "evidence": "In accelerating intrusions, Aguilar & Goldman (2016) demonstrated that the RFT intrusion surface could be formed via the solidifying cone of media beneath a flat plate", "difficulty": {"A": "A1", "B": "B0", "C": "C0"}},
+    {"src": "M23", "tgt": "M2", "type": "compares", "evidence": "Discrete element method (DEM) simulations demonstrate that theory and results start to disagree when multiple particle contacts grow to a scale that dominates the system", "difficulty": {"A": "A1", "B": "B0", "C": "C2"}}
+  ],
+  "parameter_relations": [
+    {"method": "M1", "parameter": "P1", "type": "uses_parameter", "evidence": "there is a one-to-one relationship between the ratio of shear stress to pressure acting on a granular material element, μ ≡ τ / P"},
+    {"method": "M1", "parameter": "P2", "type": "uses_parameter", "evidence": "the normalized flow rate or inertial number, I ≡ γ̇ d √(ρ_s / P)"},
+    {"method": "M1", "parameter": "P7", "type": "uses_parameter", "evidence": "this function is often found to obey a roughly linear form (da Cruz et al. 2005) for constants μ_s and b: μ(I) = μ_s + b I"},
+    {"method": "M1", "parameter": "P8", "type": "uses_parameter", "evidence": "this function is often found to obey a roughly linear form (da Cruz et al. 2005) for constants μ_s and b"},
+    {"method": "M1", "parameter": "P3", "type": "uses_parameter", "evidence": "where d is the mean grain diameter"},
+    {"method": "M1", "parameter": "P6", "type": "uses_parameter", "evidence": "ρ_s is the density of a grain"},
+    {"method": "M1", "parameter": "P4", "type": "uses_parameter", "evidence": "flowing steadily under a finite pressure"},
+    {"method": "M2", "parameter": "P9", "type": "uses_parameter", "evidence": "it couples the granular viscosity to a collisional temperature T that obeys a diffusive energy balance equation"},
+    {"method": "M2", "parameter": "P14", "type": "uses_parameter", "evidence": "it couples the granular viscosity to a collisional temperature T"},
+    {"method": "M2", "parameter": "P15", "type": "uses_parameter", "evidence": "Both the viscosity η and the conductivity K are proportional to ∼ Pd / √T"},
+    {"method": "M2", "parameter": "P16", "type": "uses_parameter", "evidence": "the volumetric dissipation rate Γ is proportional to (1 / d)T^{3/2}"},
+    {"method": "M2", "parameter": "P3", "type": "uses_parameter", "evidence": "The length scale for the self-heating is d due to its role as the length scale in K"},
+    {"method": "M4", "parameter": "P13", "type": "uses_parameter", "evidence": "which utilizes an order parameter ρ (not density)"},
+    {"method": "M4", "parameter": "P1", "type": "uses_parameter", "evidence": "δ ≡ (μ − μ_d) / (μ_s − μ_d)"},
+    {"method": "M4", "parameter": "P19", "type": "uses_parameter", "evidence": "δ ≡ (μ − μ_d) / (μ_s − μ_d) for μ_d < μ_s"},
+    {"method": "M5", "parameter": "P10", "type": "uses_parameter", "evidence": "proposing the existence of a nonnegative state field called the granular fluidity, g, which satisfies the following system"},
+    {"method": "M5", "parameter": "P11", "type": "uses_parameter", "evidence": "the dimensionless nonlocal amplitude A, which tends to be order-one in size"},
+    {"method": "M5", "parameter": "P12", "type": "uses_parameter", "evidence": "ξ is the apparent cooperativity length"},
+    {"method": "M5", "parameter": "P3", "type": "uses_parameter", "evidence": "the diffusion term spreads fluidization based on the grain size"},
+    {"method": "M6", "parameter": "P17", "type": "uses_parameter", "evidence": "μ = μ(I)(1 − ν∇²I / I), a direct nonlocal extension of the μ(I) model"},
+    {"method": "M11", "parameter": "P18", "type": "uses_parameter", "evidence": "the horizontal distribution of downward velocity appearing to spread diffusively with height, i.e., v_z(x,z) ~ e^{-x² / 4Bz}"},
+    {"method": "M11", "parameter": "P3", "type": "uses_parameter", "evidence": "The fact that the spread factor B is proportional to grain size d points to a nonlocal flow mechanism governed by the grain scale"},
+    {"method": "M42", "parameter": "P7", "type": "uses_parameter", "evidence": "This constitutive model invokes only two material parameters: a constant friction coefficient μ_s"},
+    {"method": "M42", "parameter": "P4", "type": "uses_parameter", "evidence": "a local, tension-free frictional rheology has been shown in simulated drag tests to produce results that are very close to experimentally obtained data in cohesionless grains"}
+  ],
+  "captures_edges": [
+    {"method": "M5", "phenomenon": "F1", "type": "captures", "evidence": "the diffusion term spreads fluidization based on the grain size"},
+    {"method": "M5", "phenomenon": "F2", "type": "captures", "evidence": "the H_stop curve (Kamrin & Henann 2015), silo stoppage (Dunatunga & Kamrin 2022), and other thin-body strengthening diagrams (Liu & Henann 2018)"},
+    {"method": "M5", "phenomenon": "F3", "type": "captures", "evidence": "secondary rheology phenomenology in Reddy et al.'s (2011) rod-probe geometry (Henann & Kamrin 2014)"},
+    {"method": "M4", "phenomenon": "F1", "type": "captures", "evidence": "Partial fluidization theory has been shown to qualitatively produce nonlocal creep and thin-body strengthening"},
+    {"method": "M4", "phenomenon": "F2", "type": "captures", "evidence": "Partial fluidization theory has been shown to qualitatively produce nonlocal creep and thin-body strengthening"},
+    {"method": "M6", "phenomenon": "F1", "type": "captures", "evidence": "It captures the emergence of nonlocal rate independence, quantitatively predicts nonlocal creep in 2D test cases"},
+    {"method": "M6", "phenomenon": "F6", "type": "captures", "evidence": "It captures the emergence of nonlocal rate independence, quantitatively predicts nonlocal creep in 2D test cases"},
+    {"method": "M6", "phenomenon": "F2", "type": "limited_in", "evidence": "However, it cannot capture thin-body strengthening"},
+    {"method": "M1", "phenomenon": "F1", "type": "limited_in", "evidence": "This diffusive effect causes a creeping decay of shear rate deep into the bulk that is not correctly predicted by inertial rheology, which predicts sharp flow/no-flow transitions"},
+    {"method": "M1", "phenomenon": "F2", "type": "limited_in", "evidence": "The μ(I) model, like other local granular flow models, always predicts a single repose angle for a material"},
+    {"method": "M1", "phenomenon": "F4", "type": "limited_in", "evidence": "This runs counter to the μ(I) rheology, which predicts nonzero flow unless the opening size is reduced to zero"},
+    {"method": "M2", "phenomenon": "F5", "type": "captures", "evidence": "Kinetic theory applied to granular materials can capture segregation spontaneously"},
+    {"method": "M15", "phenomenon": "F5", "type": "captures", "evidence": "we consider segregation associated with variations in both particle size and density of constituents A and B"},
+    {"method": "M16", "phenomenon": "F5", "type": "captures", "evidence": "Khakhar et al. (1997) proposed a buoyancy mechanism for gravity-driven segregation"},
+    {"method": "M17", "phenomenon": "F5", "type": "captures", "evidence": "Gray and colleagues captured effects of kinetic sieving proposed by Savage & Lun (1988) in a continuum mixture-theory framework"},
+    {"method": "M19", "phenomenon": "F5", "type": "captures", "evidence": "Hill and colleagues showed that including this in the mass and momentum balance equations of the mixtures gives rise to the following form for segregation fluxes"},
+    {"method": "M39", "phenomenon": "F5", "type": "limited_in", "evidence": "RFT began to break down with more complex-shaped and polydisperse grains, which are a frontier for future modeling"}
   ],
   "composition_edges": [
-    {
-      "whole": "M11",
-      "component": "M12",
-      "evidence": "The kinematic model of granular drainage (Tüzün & Nedderman 1979) and its related mechanisms [the void model (Mullins 1972) and spot model (Bazant 2006)]",
-      "difficulty": {
-        "A": "A2",
-        "B": "B1",
-        "C": "C0"
-      }
-    },
-    {
-      "whole": "M11",
-      "component": "M13",
-      "evidence": "The kinematic model of granular drainage (Tüzün & Nedderman 1979) and its related mechanisms [the void model (Mullins 1972) and spot model (Bazant 2006)]",
-      "difficulty": {
-        "A": "A2",
-        "B": "B1",
-        "C": "C0"
-      }
-    },
-    {
-      "whole": "M19",
-      "component": "M17",
-      "evidence": "segregation fluxes: Φ_THF^i = Φ_g,THF^i + Φ_T',THF^i + Φ_D,THF^i, which is similar to Equation 8, with an additional temperature gradient term",
-      "difficulty": {
-        "A": "A2",
-        "B": "B1",
-        "C": "C0"
-      }
-    },
-    {
-      "whole": "M33",
-      "component": "M32",
-      "evidence": "a unified framework has been presented that encapsulates LS-DEM and other DEM variants as particular cases",
-      "difficulty": {
-        "A": "A2",
-        "B": "B1",
-        "C": "C0"
-      }
-    },
-    {
-      "whole": "M35",
-      "component": "M34",
-      "evidence": "e to the boundary of the particle (the zero-th level set), which is used to readily evaluate any interpenetration between two particles using classic leader-follower appro",
-      "difficulty": {
-        "A": "A0",
-        "B": "B1",
-        "C": "C0"
-      }
-    }
+    {"whole": "M11", "component": "M12", "evidence": "The kinematic model of granular drainage (Tüzün & Nedderman 1979) and its related mechanisms [the void model (Mullins 1972) and spot model (Bazant 2006)]"},
+    {"whole": "M11", "component": "M13", "evidence": "The kinematic model of granular drainage (Tüzün & Nedderman 1979) and its related mechanisms [the void model (Mullins 1972) and spot model (Bazant 2006)]"},
+    {"whole": "M19", "component": "M17", "evidence": "segregation fluxes: Φ_THF^i = Φ_g,THF^i + Φ_T',THF^i + Φ_D,THF^i, which is similar to Equation 8, with an additional temperature gradient term"},
+    {"whole": "M33", "component": "M32", "evidence": "a unified framework has been presented that encapsulates LS-DEM and other DEM variants as particular cases"},
+    {"whole": "M35", "component": "M34", "evidence": "variants of the FE² approach have been proposed within the so-called FEM × DEM approach"}
   ],
   "law_constraints": [
-    {
-      "law_text": "μ ≡ τ / P",
-      "constrains": "M1",
-      "consumer": "M1",
-      "evidence": "e case of small, hard, quasi-monodisperse particles flowing steadily under a finite pressure. The basic premise of the model is that there is a one-to-one relationship betwe",
-      "difficulty": {
-        "A": "A0",
-        "B": "B2",
-        "C": "C1"
-      }
-    },
-    {
-      "law_text": "I ≡ γ̇ d √(ρ_s / P)",
-      "constrains": "M1",
-      "consumer": "M1",
-      "evidence": "the normalized flow rate or inertial number, $I \\equiv \\dot{\\gamma} d \\sqrt{\\rho_{\\mathrm{s}} / P}$ , where $d$ is the mean grain",
-      "difficulty": {
-        "A": "A0",
-        "B": "B2",
-        "C": "C1"
-      }
-    },
-    {
-      "law_text": "μ(I) = μ_s + b I",
-      "constrains": "M1",
-      "consumer": "M1",
-      "evidence": "this function is often found to obey a roughly li",
-      "difficulty": {
-        "A": "A0",
-        "B": "B2",
-        "C": "C1"
-      }
-    },
-    {
-      "law_text": "v_z(x,z) ~ e^{-x² / 4Bz}",
-      "constrains": "M11",
-      "consumer": "M11",
-      "evidence": "the horizontal distribution of downward velocity appearing to spread diffusively with height, i.e., $v_{z}(x,z) \\sim e^{-x^{2} / 4Bz}",
-      "difficulty": {
-        "A": "A0",
-        "B": "B2",
-        "C": "C1"
-      }
-    },
-    {
-      "law_text": "ρ/2 Ṫ = 2η ε̇_ij ε̇_ij + ∇·(K∇T) − Γ",
-      "constrains": "M2",
-      "consumer": "M2",
-      "evidence": "these models are not of a mathematical form capable of representing these effects. Nonlocal models often cannot be solved with common codes, which means users mu",
-      "difficulty": {
-        "A": "A0",
-        "B": "B2",
-        "C": "C1"
-      }
-    },
-    {
-      "law_text": "t_0 ρ̇ = l² ∇²ρ + (1−ρ)(ρ−δ)ρ",
-      "constrains": "M4",
-      "consumer": "M4",
-      "evidence": "t_0 ρ̇ = l² ∇²ρ + (1−ρ)(ρ−δ)ρ, δ ≡ (μ−μ_d)/(μ_s−μ_d) for μ_d < μ_s. The viscosity is then presumed to be ~1/(1−ρ)",
-      "difficulty": {
-        "A": "A0",
-        "B": "B2",
-        "C": "C1"
-      }
-    },
-    {
-      "law_text": "η ~ 1/(1−ρ)",
-      "constrains": "M4",
-      "consumer": "M4",
-      "evidence": "The viscosity is then presumed to be $\\sim 1",
-      "difficulty": {
-        "A": "A0",
-        "B": "B2",
-        "C": "C1"
-      }
-    },
-    {
-      "law_text": "γ̇ = g μ, t_0 ġ = A² d² ∇²g − (μ_s−μ)g − b√(ρ_s d²/P) μ g²",
-      "constrains": "M5",
-      "consumer": "M5",
-      "evidence": "ynamic friction $\\mu_{d}$ as $\\nabla^2\\rho$ tends to 0. The Laplacian term, scaled by $l\\sim d$ , then diffuses the order parameter in inhomogeneous flow cases,",
-      "difficulty": {
-        "A": "A0",
-        "B": "B2",
-        "C": "C1"
-      }
-    },
-    {
-      "law_text": "g = ξ² ∇²g + g_loc(μ,P), ξ = A d / √|μ−μ_s|",
-      "constrains": "M5",
-      "consumer": "M5",
-      "evidence": "g = ξ² ∇²g + g_loc(μ,P), where g_loc(μ,P) = ⟨√(P/(ρ_s d²)) (μ−μ_s)/(μ b)⟩ and ξ = A d / √|μ−μ_s|",
-      "difficulty": {
-        "A": "A0",
-        "B": "B2",
-        "C": "C1"
-      }
-    },
-    {
-      "law_text": "μ = μ(I)(1 − ν∇²I / I)",
-      "constrains": "M6",
-      "consumer": "M6",
-      "evidence": "The I-gradient model of Bouzid et al. (2013, 2015) supposes μ = μ(I)(1 − ν∇²I / I)",
-      "difficulty": {
-        "A": "A0",
-        "B": "B2",
-        "C": "C1"
-      }
-    },
-    {
-      "law_text": "Φ^B = Φ_g,YJ^B + Φ_pp,YJ^B + Φ_T',YJ^B + Φ_D,YJ^B",
-      "constrains": "M15",
-      "consumer": "M15",
-      "evidence": " time with velocities independent of one another and of any previous interparticle interactions. Complete pair distribution functions at collisions are approxima",
-      "difficulty": {
-        "A": "A0",
-        "B": "B2",
-        "C": "C1"
-      }
-    },
-    {
-      "law_text": "Φ_g,YJ ∝ g/(√T K_AB), Φ_pp,YJ^B ∝ π_B/√T (π_A/π_B)', Φ_T',YJ^B ∝ −T'/√T, Φ_D,YJ^B ∝ −√T (ln(n_B/n_A))'",
-      "constrains": "M15",
-      "consumer": "M15",
-      "evidence": "The four terms on the right-hand side of Equation 6 describe the effect of gravity, partial pressure, granular temperature gradient, and diffusion, respectively",
-      "difficulty": {
-        "A": "A0",
-        "B": "B2",
-        "C": "C1"
-      }
-    },
-    {
-      "law_text": "Φ^ld = −C_KMO^(−1)(1−ρ_m^ld/ρ_m^d) φ^ld φ^d g_y − D_KMO ∂φ^ld/∂y",
-      "constrains": "M16",
-      "consumer": "M16",
-      "evidence": "Khakhar et al. (1997) proposed a buoyancy mechanism for gravity-driven segregation that models segregation of particles of similar size and different material density",
-      "difficulty": {
-        "A": "A0",
-        "B": "B2",
-        "C": "C1"
-      }
-    },
-    {
-      "law_text": "Φ_GTA^l = (b^l φ^s / C_GTA) g_y − D_GTA d/dy ln(φ^l/φ^s)",
-      "constrains": "M17",
-      "consumer": "M17",
-      "evidence": "yancy mechanism for gravity-driven segregation that models segregation of particles of similar size and different material density akin to the pressure on a subm",
-      "difficulty": {
-        "A": "A0",
-        "B": "B2",
-        "C": "C1"
-      }
-    },
-    {
-      "law_text": "Φ_THF^i = Φ_g,THF^i + Φ_T',THF^i + Φ_D,THF^i",
-      "constrains": "M19",
-      "consumer": "M19",
-      "evidence": "and colleagues captured this effect using partial pressures; the large particles bare a higher fraction of the pressure (associated with gravity) than the smaller",
-      "difficulty": {
-        "A": "A0",
-        "B": "B2",
-        "C": "C1"
-      }
-    },
-    {
-      "law_text": "Φ_g,THF^i = (φ_m^i − ψ^c,i)/C_THF ρ g_y",
-      "constrains": "M19",
-      "consumer": "M19",
-      "evidence": "^{1} = \\frac{b^{1}\\phi^{s}}{C_{\\mathrm{GTA}}} g_{y} - D_{\\mathrm{GTA}}\\frac{\\mathrm{d}}{\\mathrm{dy}}\\ln \\frac{\\phi^{1}}{\\phi^{s}}$ , and $\\Phi_{\\mathrm{GTA}}^{s} ",
-      "difficulty": {
-        "A": "A0",
-        "B": "B2",
-        "C": "C1"
-      }
-    },
-    {
-      "law_text": "ψ^k,i = σ_yy^k,i / σ_yy^k,  ψ^c,i = σ_yy^c,i / σ_yy^c",
-      "constrains": "M19",
-      "consumer": "M19",
-      "evidence": " which are all initially set on a case-by-case basis. Slightly more specifically, $b^{i}$ scales with the magnitude of the deviation from the equipartition of pr",
-      "difficulty": {
-        "A": "A0",
-        "B": "B2",
-        "C": "C1"
-      }
-    },
-    {
-      "law_text": "F = L² P ψ̃(v̂,n; μ_s, μ_w)",
-      "constrains": "M42",
-      "consumer": "M39",
-      "evidence": " provide critical parameters to reckon with for the next-generation of constitutive models. It is encouraging to see that physical and virtual experiments are p",
-      "difficulty": {
-        "A": "A2",
-        "B": "B2",
-        "C": "C1"
-      }
-    }
+    {"law_text": "μ ≡ τ / P", "constrains": "M1", "consumer": "M1", "evidence": "there is a one-to-one relationship between the ratio of shear stress to pressure acting on a granular material element, μ ≡ τ / P"},
+    {"law_text": "I ≡ γ̇ d √(ρ_s / P)", "constrains": "M1", "consumer": "M1", "evidence": "the normalized flow rate or inertial number, I ≡ γ̇ d √(ρ_s / P), where d is the mean grain diameter and ρ_s is the density of a grain"},
+    {"law_text": "μ(I) = μ_s + b I", "constrains": "M1", "consumer": "M5", "evidence": "Most parameters above are borrowed from μ(I) rheology (e.g., ρ_s, b, μ_s)"},
+    {"law_text": "μ(I) = μ_s + b I", "constrains": "M1", "consumer": "M6", "evidence": "gradient model of Bouzid et al. (2013, 2015) supposes μ = μ(I)(1 − ν∇²I / I), a direct nonlocal extension of the μ(I) model"},
+    {"law_text": "v_z(x,z) ~ e^{-x² / 4Bz}", "constrains": "M11", "consumer": "M11", "evidence": "the horizontal distribution of downward velocity appearing to spread diffusively with height, i.e., v_z(x,z) ~ e^{-x² / 4Bz}"},
+    {"law_text": "ρ/2 Ṫ = 2η ε̇_ij ε̇_ij + ∇·(K∇T) − Γ", "constrains": "M2", "consumer": "M2", "evidence": "it couples the granular viscosity to a collisional temperature T that obeys a diffusive energy balance equation, ρ/2 Ṫ = 2η ε̇_ij ε̇_ij + ∇·(K∇T) − Γ"},
+    {"law_text": "t_0 ρ̇ = l² ∇²ρ + (1−ρ)(ρ−δ)ρ", "constrains": "M4", "consumer": "M4", "evidence": "t_0 ρ̇ = l² ∇²ρ + (1−ρ)(ρ−δ)ρ, δ ≡ (μ−μ_d)/(μ_s−μ_d) for μ_d < μ_s. The viscosity is then presumed to be ~1/(1−ρ)"},
+    {"law_text": "η ~ 1/(1−ρ)", "constrains": "M4", "consumer": "M4", "evidence": "The viscosity is then presumed to be ~1/(1−ρ), so the material solidifies as ρ tends to 1"},
+    {"law_text": "γ̇ = g μ, t_0 ġ = A² d² ∇²g − (μ_s−μ)g − b√(ρ_s d²/P) μ g²", "constrains": "M5", "consumer": "M5", "evidence": "proposing the existence of a nonnegative state field called the granular fluidity, g, which satisfies γ̇ = g μ, t_0 ġ = A² d² ∇²g − (μ_s−μ)g − b√(ρ_s d²/P) μ g²"},
+    {"law_text": "g = ξ² ∇²g + g_loc(μ,P), ξ = A d / √|μ−μ_s|", "constrains": "M5", "consumer": "M5", "evidence": "g = ξ² ∇²g + g_loc(μ,P), where g_loc(μ,P) = ⟨√(P/(ρ_s d²)) (μ−μ_s)/(μ b)⟩ and ξ = A d / √|μ−μ_s|"},
+    {"law_text": "μ = μ(I)(1 − ν∇²I / I)", "constrains": "M6", "consumer": "M6", "evidence": "gradient model of Bouzid et al. (2013, 2015) supposes μ = μ(I)(1 − ν∇²I / I)"},
+    {"law_text": "Φ^B = Φ_g,YJ^B + Φ_pp,YJ^B + Φ_T',YJ^B + Φ_D,YJ^B", "constrains": "M15", "consumer": "M15", "evidence": "we express a segregation flux of particles of type B relative to the mixture Φ^B = Φ_g,YJ^B + Φ_pp,YJ^B + Φ_T',YJ^B + Φ_D,YJ^B"},
+    {"law_text": "Φ_g,YJ ∝ g/(√T K_AB), Φ_pp,YJ^B ∝ π_B/√T (π_A/π_B)', Φ_T',YJ^B ∝ −T'/√T, Φ_D,YJ^B ∝ −√T (ln(n_B/n_A))'", "constrains": "M15", "consumer": "M15", "evidence": "The four terms on the right-hand side of Equation 6 describe the effect of gravity, partial pressure, granular temperature gradient, and diffusion, respectively"},
+    {"law_text": "Φ^ld = −C_KMO^(−1)(1−ρ_m^ld/ρ_m^d) φ^ld φ^d g_y − D_KMO ∂φ^ld/∂y", "constrains": "M16", "consumer": "M16", "evidence": "Khakhar et al. (1997) proposed a buoyancy mechanism for gravity-driven segregation that models segregation of particles of similar size and different material density"},
+    {"law_text": "Φ_GTA^l = (b^l φ^s / C_GTA) g_y − D_GTA d/dy ln(φ^l/φ^s)", "constrains": "M17", "consumer": "M17", "evidence": "Segregation fluxes of large and small particles are expressed according to Φ_GTA^l = (b^l φ^s / C_GTA) g_y − D_GTA d/dy ln(φ^l/φ^s)"},
+    {"law_text": "Φ_THF^i = Φ_g,THF^i + Φ_T',THF^i + Φ_D,THF^i", "constrains": "M19", "consumer": "M19", "evidence": "Hill and colleagues showed that including this in the mass and momentum balance equations gives rise to the following form for segregation fluxes: Φ_THF^i = Φ_g,THF^i + Φ_T',THF^i + Φ_D,THF^i"},
+    {"law_text": "Φ_g,THF^i = (φ_m^i − ψ^c,i)/C_THF ρ g_y", "constrains": "M19", "consumer": "M19", "evidence": "The form of each term on the right-hand side: Φ_g,THF^i = (φ_m^i − ψ^c,i)/C_THF ρ g_y"},
+    {"law_text": "ψ^k,i = σ_yy^k,i / σ_yy^k,  ψ^c,i = σ_yy^c,i / σ_yy^c", "constrains": "M19", "consumer": "M19", "evidence": "The partitioning of the stresses is represented by ψ^k,i = σ_yy^k,i / σ_yy^k and ψ^c,i = σ_yy^c,i / σ_yy^c"},
+    {"law_text": "F = L² P ψ̃(v̂,n; μ_s, μ_w)", "constrains": "M42", "consumer": "M39", "evidence": "the drag force on a buried plate element of size L×L oriented with normal n and moving slowly in direction v̂ in a material at ambient pressure P must have the form F = L²P ψ̃(v̂,n; μ_s, μ_w)"}
+  ],
+  "nary_relations": [
+    {"nodes": ["M5", "P10", "P12", "F1"], "relation": "uses_parameter_and_captures", "evidence": "proposing the existence of a nonnegative state field called the granular fluidity, g, which satisfies the following system... the diffusion term spreads fluidization based on the grain size... ξ is the apparent cooperativity length", "description": "NGF uses fluidity g and cooperativity length ξ to capture nonlocal creep"},
+    {"nodes": ["M5", "P10", "P12", "F2"], "relation": "uses_parameter_and_captures", "evidence": "the H_stop curve (Kamrin & Henann 2015), silo stoppage, and other thin-body strengthening diagrams", "description": "NGF uses g and ξ to capture thin-body strengthening"},
+    {"nodes": ["M5", "P10", "P12", "F3"], "relation": "uses_parameter_and_captures", "evidence": "secondary rheology phenomenology in Reddy et al.'s (2011) rod-probe geometry (Henann & Kamrin 2014)", "description": "NGF uses g to capture secondary rheology"},
+    {"nodes": ["M1", "P1", "P2", "M5"], "relation": "law_consumed_by", "evidence": "Most parameters above are borrowed from μ(I) rheology (e.g., ρ_s, b, μ_s). In the absence of flow gradients, the two equations above, at steady state, produce a fluidity that replicates the μ(I) model", "description": "μ(I) law (μ=μ_s+bI) consumed by NGF (borrows parameters)"},
+    {"nodes": ["M1", "P1", "P2", "M6"], "relation": "law_consumed_by", "evidence": "gradient model of Bouzid et al. (2013, 2015) supposes μ = μ(I)(1 − ν∇²I / I), a direct nonlocal extension of the μ(I) model", "description": "μ(I) law consumed by I-gradient (extends with gradient term)"},
+    {"nodes": ["M19", "M17", "P9"], "relation": "improves_by_adding_term", "evidence": "segregation fluxes: Φ_THF^i = Φ_g,THF^i + Φ_T',THF^i + Φ_D,THF^i, which is similar to Equation 8, with an additional temperature gradient term", "description": "THF improves GTA by adding granular temperature gradient term"},
+    {"nodes": ["M2", "P9", "P14", "P15", "F1"], "relation": "uses_parameter_and_captures", "evidence": "the way kinetic theory causes nonlocal creep is a coupled process: Stress drives flow in high-stress regions, which increases T there; T then diffuses everywhere", "description": "Kinetic theory uses temperature T, viscosity η, conductivity K to capture nonlocal creep"},
+    {"nodes": ["M4", "P13", "P1", "F1"], "relation": "uses_parameter_and_captures", "evidence": "which utilizes an order parameter ρ... giving rise to nonlocality in a fashion analogous to that of kinetic theory. Partial fluidization theory has been shown to qualitatively produce nonlocal creep", "description": "Partial fluidization uses order parameter ρ and friction μ to capture nonlocal creep"},
+    {"nodes": ["M11", "P18", "P3", "F1"], "relation": "uses_parameter_and_captures", "evidence": "the horizontal distribution of downward velocity appearing to spread diffusively with height, i.e., v_z(x,z) ~ e^{-x² / 4Bz}. The fact that the spread factor B is proportional to grain size d", "description": "Kinematic model uses spread factor B and grain size d to capture silo diffusion creep"},
+    {"nodes": ["M42", "P7", "P4", "M39"], "relation": "law_consumed_by", "evidence": "the drag force on a buried plate element must have the form F = L²P ψ̃(v̂,n; μ_s, μ_w). a local, tension-free frictional rheology has been shown in simulated drag tests to produce results that are very close to experimentally obtained data", "description": "Tension-free frictional rheology law (F=L²Pψ̃) consumed by granular RFT"}
   ]
 }
