@@ -1564,3 +1564,75 @@ def run_retire(meta: MetaHypergraph, instance: InstanceHypergraph,
                                 "reason": "empty abstract parent (no active descendants)",
                                 "version": new_ver})
     return applied
+
+
+def infer_rich_topology_direct(instance: InstanceHypergraph,
+                                paper_id: str, include_other: bool = False) -> list[dict]:
+    """Read rich-topology edges DIRECTLY from instance hyperedges (no co-occurrence).
+
+    Each hyperedge already encodes a rich relation (its pattern_type + the
+    labeled nodes it connects). Instead of scanning for shared nodes across
+    patterns (co-occurrence, which produces noise), we read each hyperedge's
+    OWN structure and classify it into a rich-topology edge by what node
+    TYPES it connects:
+
+    - law_parameter: a constitutive_law hyperedge -> (law, [PARAMETER nodes])
+    - method_parameter: a hyperedge with METHOD + PARAMETER nodes -> (method, params)
+    - method_phenomenon: a hyperedge with METHOD + PHENOMENON -> (method, phenomenon)
+    - method_regime: a hyperedge with METHOD + REGIME -> (method, regime)
+    - composition: a composed_of hyperedge -> (whole, [components])
+    - definition: a defines hyperedge -> (subject, definition)
+    - nary: any hyperedge with >=3 nodes of distinct types -> recorded as n-ary
+
+    Returns list of {kind, nodes: [(surface, label)], pattern_type, evidence}.
+    """
+    edges = []
+    for he in instance.hyperedges.values():
+        nodes = []
+        for nid in he.node_ids:
+            n = instance.nodes.get(nid)
+            if n:
+                nodes.append({"surface": n.surface, "labels": list(n.labels)})
+        if len(nodes) < 2:
+            continue
+        labels_present = set()
+        for nd in nodes:
+            labels_present.update(nd["labels"])
+        # classify by what node-type combination this hyperedge connects
+        has_method = bool(labels_present & {"METHOD"})
+        has_param = bool(labels_present & {"PARAMETER"})
+        has_phenom = bool(labels_present & {"PHENOMENON"})
+        has_regime = bool(labels_present & {"REGIME"})
+        has_numeric = bool(labels_present & {"NUMERIC"})
+        n_distinct_types = sum([has_method, has_param, has_phenom, has_regime, has_numeric])
+
+        # determine kind
+        if "constitutive_law" in he.pattern_type:
+            kind = "law_parameter"
+        elif "composed_of" in he.pattern_type:
+            kind = "composition"
+        elif "defines" in he.pattern_type:
+            kind = "definition"
+        elif has_method and has_param and not has_phenom:
+            kind = "method_parameter"
+        elif has_method and has_phenom:
+            kind = "method_phenomenon"
+        elif has_method and has_regime:
+            kind = "method_regime"
+        elif n_distinct_types >= 3:
+            kind = "nary"
+        else:
+            kind = "other"
+
+        if kind == "other" and not include_other:
+            continue  # skip low-value param→param dependencies
+        edges.append({
+            "kind": kind,
+            "pattern_type": he.pattern_type,
+            "nodes": [{"surface": nd["surface"][:40], "labels": nd["labels"]} for nd in nodes],
+            "n_nodes": len(nodes),
+            "n_distinct_types": n_distinct_types,
+            "evidence": (he.evidence_span or "")[:80],
+            "paper_id": paper_id,
+        })
+    return edges

@@ -29,7 +29,8 @@ from granular_agent.hypergraph_schema import seed_meta_hypergraph, InstanceCorpu
 from granular_agent.hypergraph_extractor import extract_hypergraph
 from granular_agent.hypergraph_evolution import (
     EvolutionTrigger, run_split, run_merge, run_retire, run_rename,
-    infer_pattern_dependencies, infer_pattern_constraints, infer_pattern_compositions)
+    infer_pattern_dependencies, infer_pattern_constraints, infer_pattern_compositions,
+    infer_rich_topology_direct)
 
 
 class GranularFlowAgent:
@@ -322,6 +323,7 @@ class GranularFlowAgent:
         cons = infer_pattern_constraints(self.meta_hg, inst, paper_id=paper_id)
         comp = infer_pattern_compositions(self.meta_hg, inst, paper_id=paper_id)
         violations = self.meta_hg.detect_constraint_violations(inst)
+        rich_topo = infer_rich_topology_direct(inst, paper_id=paper_id)
         result = {
             "paper_id": paper_id,
             "n_nodes": res["n_nodes"],
@@ -348,6 +350,13 @@ class GranularFlowAgent:
                 "composition_edges": [{"whole": c["whole"], "composes": c["composes"],
                                       "via_node": c["via_node"]} for c in comp],
                 "violations_detail": violations,
+                "rich_topology_direct": {
+                    "total": len(rich_topo),
+                    "by_kind": {k: sum(1 for e in rich_topo if e["kind"] == k) for k in
+                                ["law_parameter", "method_parameter", "method_phenomenon",
+                                 "method_regime", "composition", "definition", "nary"]},
+                    "edges": rich_topo[:30],
+                },
             },
             "repair": {
                 "splits": [{"pattern": s.get("pattern_id"),
