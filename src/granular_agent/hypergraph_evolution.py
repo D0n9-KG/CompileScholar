@@ -1613,14 +1613,14 @@ def infer_rich_topology_direct(instance: InstanceHypergraph,
             kind = "composition"
         elif "defines" in he.pattern_type:
             kind = "definition"
+        elif n_distinct_types >= 3:
+            kind = "nary"  # check n-ary FIRST so 3+type edges aren't swallowed by method_phenomenon
         elif has_method and has_param and not has_phenom:
             kind = "method_parameter"
         elif has_method and has_phenom:
             kind = "method_phenomenon"
         elif has_method and has_regime:
             kind = "method_regime"
-        elif n_distinct_types >= 3:
-            kind = "nary"
         else:
             kind = "other"
 

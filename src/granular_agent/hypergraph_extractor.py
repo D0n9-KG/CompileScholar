@@ -59,12 +59,22 @@ Extract:
 EXTRACT DIVERSE RELATION TYPES (critical — do NOT default everything to "influences").
 A section usually expresses several DISTINCT kinds of relations; capture each with the
 matching pattern_type from the schema. The common families:
-  * definition   (defines) — "X is defined as Y", "we refer to Z as ...", "X denotes ...", "X is among the most ...", "X is a type of Y"
-  * composition  (composed_of) — "X consists of Y and Z", "X is composed of ...", "X includes A, B, C", "the pipeline is A + B + C", "adverse events include sedation, ..., weight gain"
-  * dependency   (influences) — "X affects/depends on/scales with Y", "X improves Y" (a genuine causal/functional dependence, NOT a mere co-listing or classification — those are composed_of / defines)
+  * definition   (defines) — "X is defined as Y", "we refer to Z as ...", "X denotes ...",
+    "X is among the most ...", "X is a type of Y", "X is classified into A, B, C" (classification = defines, NOT composed_of)
+  * composition  (composed_of) — "X consists of Y and Z", "X is composed of ...",
+    "the model is A + B + C" — ONLY structural/constitutive composition (parts that make up a whole).
+    "X is divided into A, B, C" or "X includes types A, B, C" is classification → use defines, NOT composed_of.
+  * dependency   (influences) — "X affects/depends on/scales with Y", "X improves Y"
+    (a genuine causal/functional dependence, NOT a mere co-listing or classification — those are composed_of / defines)
   * measure      (uses_method / measures) — "we use method M to evaluate X", "M is applied to X", "X was measured by M"
   * claim        (reports / claim_relation) — "we find that ...", "results show ...", "X outperforms Y", "X is associated with Y"
   * constitutive_law — a quantitative/formal law "output = f(input1, input2, ...)" (use when a formula or formal relation is stated)
+METHOD-PARAMETER N-ARY EDGES (critical for rich topology): when a section discusses
+a method/model AND the parameters/quantities it uses, connect them in ONE n-ary hyperedge.
+E.g. "the NGF model uses fluidity g and cooperativity length ξ" → ONE arity-3 edge:
+[NGF model(METHOD) — uses → g(PARAMETER), ξ(PARAMETER)].
+Do NOT split method and its parameters into separate edges — the method→parameter
+connection is what the rich topology needs.
 Pick the pattern_type that matches the RELATION SEMANTICS, not the surface verb. A paper's
 core contribution usually appears as a DEFINITION (what they propose), a COMPOSITION (what
 it's made of), and CLAIMS (what they show) — extract all three, not just "influences".
@@ -122,9 +132,13 @@ Rules:
   MUST be nodes AND wired into the relevant hyperedge. A section stating quantitative
   results with zero NUMERIC nodes is WRONG.
 - NODE LABELING (critical for rich topology — do NOT default everything to PROPERTY):
-    * METHOD — a named modeling approach/theory/law/model when the section discusses one
-      (e.g. "μ(I) rheology", "kinetic theory", "nonlocal granular fluidity", "DEM", "RFT").
-      A method is what the paper proposes/uses/reviews, NOT a physical quantity.
+    * METHOD — a named scientific modeling approach/theory/law/model (e.g. "μ(I) rheology",
+      "kinetic theory", "nonlocal granular fluidity", "DEM", "RFT").
+      A method is what the paper proposes/uses/reviews as a MODELING approach.
+      NOT a research group name (e.g. "GDR MiDi" is NOT a method).
+      NOT an experiment type (e.g. "numerical simulation", "experiments" are NOT methods —
+      they are experimental procedures. Only label a node METHOD if it refers to a specific
+      named model/theory/rheology/constitutive relation).
     * PARAMETER — named physical quantities/constants/coefficients that appear in equations
       (e.g. μ, I, d, P, τ, g, ρ_s, T, A, ξ, μ_s, b, ν). Distinguish from generic PROPERTY:
       a PARAMETER is a specific named symbol/constant in a law, while PROPERTY is a
