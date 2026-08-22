@@ -1181,10 +1181,16 @@ def seed_meta_hypergraph() -> MetaHypergraph:
     would force the LLM to propose a new top-level dimension (which the
     bounded-op gate now rejects)."""
     m = MetaHypergraph()
-    # minimal node types
+    # node types — fine-grained so the rich topology (method/parameter/phenomenon
+    # relations) can be read directly from instance hyperedges without co-occurrence
+    # guessing. METHOD/PHENOMENON/PARAMETER added so extract labels them distinctly
+    # (was all PROPERTY, losing the method↔parameter↔phenomenon structure).
     for t, d in [("MATERIAL", "a granular material or substance"),
-                 ("PROPERTY", "a physical property/quantity"),
-                 ("NUMERIC", "a numeric value"),
+                 ("METHOD", "a named modeling approach/theory/law/model (e.g. μ(I) rheology, kinetic theory, NGF, DEM, RFT)"),
+                 ("PARAMETER", "a named physical quantity/constant/coefficient in equations (e.g. μ, I, d, P, τ, g, ρ_s, T, A, ξ, μ_s, b)"),
+                 ("PHENOMENON", "a physical effect/behavior methods capture (e.g. nonlocal creep, thin-body strengthening, secondary rheology, segregation, clogging)"),
+                 ("PROPERTY", "a generic physical property/quantity not fitting the above (kept for residual cases)"),
+                 ("NUMERIC", "a numeric value / measured number"),
                  ("REGIME", "a flow regime (dense/quasi-static/inertial)")]:
         m.meta_nodes[t] = MetaNode(type_id=t, description=d)
     # one seed pattern per top-level family. method/evidence_strength added

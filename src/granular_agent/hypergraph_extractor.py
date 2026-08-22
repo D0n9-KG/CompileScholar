@@ -121,6 +121,25 @@ Rules:
   Parameters of laws/formulas (learning rates, exponents, thresholds, metric values)
   MUST be nodes AND wired into the relevant hyperedge. A section stating quantitative
   results with zero NUMERIC nodes is WRONG.
+- NODE LABELING (critical for rich topology — do NOT default everything to PROPERTY):
+    * METHOD — a named modeling approach/theory/law/model when the section discusses one
+      (e.g. "μ(I) rheology", "kinetic theory", "nonlocal granular fluidity", "DEM", "RFT").
+      A method is what the paper proposes/uses/reviews, NOT a physical quantity.
+    * PARAMETER — named physical quantities/constants/coefficients that appear in equations
+      (e.g. μ, I, d, P, τ, g, ρ_s, T, A, ξ, μ_s, b, ν). Distinguish from generic PROPERTY:
+      a PARAMETER is a specific named symbol/constant in a law, while PROPERTY is a
+      generic physical quantity (stress, velocity, shear rate).
+    * PHENOMENON — a physical effect/behavior that methods aim to capture or fail in
+      (e.g. nonlocal creep, thin-body strengthening, secondary rheology, segregation,
+      hopper clogging, rate independence). Not a method, not a parameter.
+    * REGIME — a flow regime (quasi-static, dense, gaseous/collisional).
+    * MATERIAL — a granular material or substance.
+    * NUMERIC — a numeric value.
+    * PROPERTY — ONLY use for generic physical quantities not fitting the above.
+  A node can carry MULTIPLE labels (e.g. a method that is also a parameter: ["METHOD","PARAMETER"]).
+  This labeling is what lets the schema link method↔parameter↔phenomenon relations directly
+  from hyperedge structure — without it, all entities collapse to PROPERTY and the rich
+  topology is lost.
 - NO ORPHAN NODES: every node you emit MUST participate in >=1 hyperedge. If you would emit a node that no edge connects, either (a) find the edge it belongs to and add it, or (b) do NOT emit that node. Dangling mentions are noise.
 - NO DUPLICATE NODES: before emitting a node, check if an existing node has the SAME surface (case/punctuation-insensitive). If so, reuse its nid; do NOT create a second node for "attention mechanism" when "Attention Mechanism" exists. This is ESPECIALLY important for central entities — they must be one node, reused across all their relations.
 - Equations/laws: when the section states a quantitative or formal relation (output computed from inputs + parameters), emit ONE n-ary hyperedge wiring the output + every input + every named constant/parameter as nodes. Carry the equation text in a qualifier if a function-form key is among the pattern's allowed_qualifiers. Pick the pattern_type from the schema's existing patterns (shown above); if the schema lacks a fitting pattern, use the relation's natural name as pattern_type (the system will validate + evolve the schema to accommodate it).
