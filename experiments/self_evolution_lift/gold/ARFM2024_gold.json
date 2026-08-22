@@ -2,12 +2,12 @@
   "_meta": {
     "source": "Kamrin, Hill, Goldman, Andrade. Advances in Modeling Dense Granular Media. Annu. Rev. Fluid Mech. 2024.56:215-40",
     "doi": "10.1146/annurev-fluid-121021-022045",
-    "constructed_by": "manual v2 (read full review, 2026-08-14) — edges tagged A(cross-paper)/B(rich-topology)/C(reasoning), incl. implicit edges",
+    "constructed_by": "manual v3 (full read, 2026-08-14) — all constructible edges included, no fabrication",
     "note": "methods are named modeling approaches/theories/laws (not paper titles, not generic categories). Each edge has verbatim evidence from the review text.",
     "difficulty_legend": {
-      "A": "cross-paper: A0=same-paper, A1=across 2 papers, A2=across 3+ papers (multi-paper aggregation, baseline single-doc RE weak)",
-      "B": "rich-topology: B0=flat triple, B1=composition hierarchy, B2=law-constraint nesting (baseline flat-schema weak)",
-      "C": "reasoning: C0=explicit(stated), C1=semi-implicit(1-step), C2=implicit(multi-step, schema-guided)"
+      "A": "cross-paper: A0=same-paper, A1=across 2 papers, A2=across 3+ papers",
+      "B": "rich-topology: B0=flat, B1=composition hierarchy, B2=law-constraint nesting",
+      "C": "reasoning: C0=explicit, C1=semi-implicit(1-step), C2=implicit(multi-step)"
     }
   },
   "methods": [
@@ -974,6 +974,72 @@
       "difficulty": {
         "A": "A1",
         "B": "B0",
+        "C": "C1"
+      }
+    },
+    {
+      "src": "M37",
+      "tgt": "M39",
+      "type": "background",
+      "evidence": "a phenomenological form for the impact force was obtained that contained terms quadratic in intruder speed and increasing in depth (Katsuragi & Durian 2007)",
+      "difficulty": {
+        "A": "A1",
+        "B": "B0",
+        "C": "C1"
+      }
+    },
+    {
+      "src": "M5",
+      "tgt": "M4",
+      "type": "improves",
+      "evidence": "NGF is designed to give quantitative outcomes and a broad representation of the three aforementioned families of nonlocal phenomena",
+      "difficulty": {
+        "A": "A1",
+        "B": "B0",
+        "C": "C2"
+      }
+    },
+    {
+      "src": "M4",
+      "tgt": "M2",
+      "type": "background",
+      "evidence": "nonlocal creep emerges as a self-heating process, an idea common to a variety of the nonlocal models we discuss",
+      "difficulty": {
+        "A": "A1",
+        "B": "B0",
+        "C": "C2"
+      }
+    },
+    {
+      "src": "M5",
+      "tgt": "M2",
+      "type": "background",
+      "evidence": "nonlocal creep emerges as a self-heating process, an idea common to a variety of the nonlocal models we discuss",
+      "difficulty": {
+        "A": "A1",
+        "B": "B0",
+        "C": "C2"
+      }
+    },
+    {
+      "src": "M5",
+      "tgt": "M2",
+      "type": "compares",
+      "evidence": "the NGF PDE acts as an empirically simplified heat equation for a conglomerated thermally related variable",
+      "difficulty": {
+        "A": "A1",
+        "B": "B0",
+        "C": "C2"
+      }
+    },
+    {
+      "src": "M13",
+      "tgt": "M12",
+      "type": "compares",
+      "evidence": "The kinematic model of granular drainage (Tüzün & Nedderman 1979) and its related mechanisms [the void model (Mullins 1972) and spot model (Bazant 2006)] were inspired by the observation of silo diffusion",
+      "difficulty": {
+        "A": "A1",
+        "B": "B1",
         "C": "C1"
       }
     }
