@@ -43,7 +43,8 @@ class GranularFlowAgent:
     def __init__(self, worktree: str = "C:/Users/D0n9/Desktop/LogicKG-benchmark",
                  llms: list[str] = None,
                  self_evolution_enabled: bool = True,
-                 domain: str = "granular flow physics"):
+                 domain: str = "granular flow physics",
+                 corpus_dir: str = ""):
         self.worktree = worktree
         self.schema_manager = SchemaManager(worktree)
         self.llms = llms or ["deepseek"]
@@ -53,6 +54,10 @@ class GranularFlowAgent:
         # gates domain-specific cleanup regexes so non-granular inputs aren't
         # overfit-cleaned). Default is granular-flow (the current pilot domain).
         self.domain = domain
+        # corpus_dir: caller-provided md directory for load_paper_blocks fallback
+        # (NOT guessed from paper_id format — that was overfit). Empty = use
+        # MINERU_BASE only (no md fallback).
+        self.corpus_dir = corpus_dir
 
         # Hook registry (event-driven triggers)
         self.hooks = {
@@ -105,14 +110,14 @@ class GranularFlowAgent:
         Falls back to the old extractor only if structure mapping fails.
         When intra_dag_evolution=True, schema evolves DURING Phase 1 (v2 design).
         """
-        blocks = load_paper_blocks(paper_id)
+        blocks = load_paper_blocks(paper_id, corpus_dir=self.corpus_dir)
         if not blocks:
             return {"atoms": [], "gaps": [], "error": "no_text", "n_calls": 0}
 
         llm = self.llms[0] if self.llms else "deepseek"
 
         # Phase 0: structure mapping (1 call, full text in context)
-        smap = map_structure(paper_id, blocks, llm=llm)
+        smap = map_structure(paper_id, blocks, llm=llm, domain=self.domain)
         if not smap or not smap.get("dag", {}).get("nodes"):
             # Fallback to old truncated extractor if structure mapping fails
             print(f"    [fallback] structure mapping failed → old extractor", flush=True)
@@ -318,10 +323,10 @@ class GranularFlowAgent:
         llm = self.llms[0] if self.llms else "deepseek"
         evolve = arm in ("full", "add_only", "no_intra_dag")
         propagate = arm in ("full", "add_only")
-        blocks = load_paper_blocks(paper_id)
+        blocks = load_paper_blocks(paper_id, corpus_dir=self.corpus_dir)
         if not blocks:
             return {"paper_id": paper_id, "error": "no_text", "n_nodes": 0, "n_hyperedges": 0}
-        smap = map_structure(paper_id, blocks, llm=llm)
+        smap = map_structure(paper_id, blocks, llm=llm, domain=self.domain)
         if not smap or not smap.get("dag", {}).get("nodes"):
             print(f"  [hypergraph] structure mapping failed for {paper_id}", flush=True)
             return {"paper_id": paper_id, "error": "structure_map_failed"}

@@ -33,7 +33,7 @@ SCHEMA_FIELDS = [
     "L2_RELATION", "CONTRIBUTION", "CONTRIBUTION_RELATION", "RESEARCH_QUESTION", "CLOSURE", "PAPER_TYPE",
 ]
 
-STRUCTURE_PROMPT = """You are reading a full scientific paper from granular flow physics. Your job is ONLY to map its structure — do NOT extract atoms or facts.
+STRUCTURE_PROMPT = """You are reading a full scientific paper from {domain}. Your job is ONLY to map its structure — do NOT extract atoms or facts.
 
 The paper text is presented as numbered blocks. Each block begins with a tag like [§12] which is its block index. Block indices are contiguous integers starting at 0.
 
@@ -48,7 +48,7 @@ Output a JSON object with this exact shape:
     {{"name": "Discussion", "block_range": [26, 30], "discourse_role": "interpretation"}},
     {{"name": "Conclusion", "block_range": [30, 35], "discourse_role": "claim"}}
   ],
-  "key_entities": ["mu(I)", "shear rate", "inertial number", "glass beads"],
+  "key_entities": ["the paper's central method/model, its main parameter(s), its key phenomenon/result"],
   "dag": {{
     "nodes": [
       {{"id": "n1", "section": "Method", "fields": ["MATERIAL", "BOUNDARY_CONDITION", "CLOSURE"], "deps": []}},
@@ -103,7 +103,7 @@ def _md_to_blocks(md_text: str) -> list[dict]:
     return blocks
 
 
-def load_paper_blocks(paper_id: str) -> list[dict]:
+def load_paper_blocks(paper_id: str, corpus_dir: str = "") -> list[dict]:
     """Load paper text as a list of {index, char_start, char_end, text} blocks.
 
     No truncation. Block boundaries come from mineru content_list.json.
@@ -111,9 +111,15 @@ def load_paper_blocks(paper_id: str) -> list[dict]:
     do not pollute char ranges or block indices.
 
     Fallback: if no content_list.json under MINERU_BASE, look for a .md file
-    named like paper_id under ARFM_MD_BASE (MinerU text output) and convert
-    it to the same block format. This lets ARFM papers (stored as md) run
-    through the full agent.py pipeline without re-running Mineru.
+    named like paper_id (or paper_id as a filename prefix) under corpus_dir
+    (caller-provided md directory; MinerU text output) and convert it to the
+    same block format. This lets papers stored as md run through the full
+    agent.py pipeline without re-running Mineru.
+
+    corpus_dir: caller passes the md directory explicitly (NOT guessed from
+    paper_id format — that was overfit: old code branched on PPR_ prefix and
+    split on '_2014'/'_on_dense' filename fragments of specific ARFM files).
+    If not given, no md fallback (caller must use MINERU_BASE or pass a dir).
     """
     p = os.path.join(MINERU_BASE, paper_id, "content_list.json")
     if os.path.isfile(p):
@@ -133,15 +139,12 @@ def load_paper_blocks(paper_id: str) -> list[dict]:
             blocks.append({"index": len(blocks), "char_start": cursor, "char_end": end, "text": t})
             cursor = end + 1  # +1 for the joining space
         return blocks
-    # fallback: ARFM md (paper_id is a filename stem like Midi_2004_...)
-    if paper_id and not paper_id.startswith("PPR_"):
-        for cand in (paper_id, paper_id.split("_2014")[0], paper_id.split("_on_dense")[0]):
-            if not cand:
-                continue
-            for fn in os.listdir(ARFM_MD_BASE):
-                if fn.startswith(cand) and fn.endswith(".md"):
-                    md_text = open(os.path.join(ARFM_MD_BASE, fn), encoding="utf-8", errors="replace").read()
-                    return _md_to_blocks(md_text)
+    # fallback: md file under caller-provided corpus_dir (prefix match on paper_id)
+    if corpus_dir and paper_id and os.path.isdir(corpus_dir):
+        for fn in os.listdir(corpus_dir):
+            if fn.startswith(paper_id) and fn.endswith(".md"):
+                md_text = open(os.path.join(corpus_dir, fn), encoding="utf-8", errors="replace").read()
+                return _md_to_blocks(md_text)
     return []
 
 
@@ -164,15 +167,19 @@ def slice_blocks(blocks: list[dict], start: int, end: int) -> str:
     return " ".join(b["text"] for b in sel)
 
 
-def map_structure(paper_id: str, blocks: list[dict], llm: str = "deepseek") -> dict | None:
+def map_structure(paper_id: str, blocks: list[dict], llm: str = "deepseek",
+                  domain: str = "granular flow physics") -> dict | None:
     """Phase 0: one LLM call over the full paper → structure map.
 
-    Returns {sections, key_entities, dag} or None on failure.
+    domain: parameterizes the prompt (NOT hardcoded — callers pass it; the
+    pilot domain default is granular-flow). Returns {sections, key_entities,
+    dag} or None on failure.
     """
     if not blocks:
         return None
     text = blocks_to_indexed_text(blocks)
     prompt = STRUCTURE_PROMPT.format(
+        domain=domain,
         roles=", ".join(DISCOURSE_ROLES),
         fields=", ".join(SCHEMA_FIELDS),
         blocks=text,
