@@ -72,15 +72,12 @@ matching pattern_type from the schema. The common families:
   * measure      (uses_method / measures) — "we use method M to evaluate X", "M is applied to X", "X was measured by M"
   * claim        (reports / claim_relation) — "we find that ...", "results show ...", "X outperforms Y", "X is associated with Y"
   * constitutive_law — a quantitative/formal law "output = f(input1, input2, ...)" (use when a formula or formal relation is stated)
-  * evolution    (extends / improves / compares / replaces / adapts / background) — an
-    evolution relation between two entities of the SAME type that the text states/implies.
-    NOT METHOD-only: any typed entity can evolve — METHOD→METHOD (most common), but also
-    PHENOMENON→PHENOMENON (a phenomenon refines/generalizes another), PARAMETER→PARAMETER
-    (a parameter supersedes/extends an older one), REGIME→REGIME (a regime sub-divides/
-    extends another), MATERIAL→MATERIAL, INSTRUMENT→INSTRUMENT. Extract the relation when
-    the text expresses it, regardless of entity type. Extract BOTH what the text STATES
-    and what it IMPLIES (you read the source text; a relation that is expressed indirectly
-    still counts as extraction, not inference). Examples:
+  * evolution    (extends / improves / compares / replaces / adapts / background) — a
+    METHOD→METHOD development relation: how one method/theory builds on another. This is
+    ONE of a method's relation types (alongside uses_parameter/captures/composed_of), not
+    a special category. Extract BOTH what the text STATES and what it IMPLIES (you read
+    the source text; a relation that is expressed indirectly still counts as extraction,
+    not inference). Examples:
     EXPLICIT: "X extends/generalizes Y", "X improves Y's accuracy", "X compared with Y".
     IMPLIED (still extract — the text points to it, just not with the verb directly):
       "X resolves/overcomes Y's limitation" or "X provides the solution to [issues
