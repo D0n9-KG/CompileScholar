@@ -1713,13 +1713,10 @@ def _relabel(n, new):
 
 
 def _norm_surface(s):
-    s = s.lower()
-    s = s.replace('μ', 'mu').replace('ξ', 'xi').replace('γ', 'g')
-    s = re.sub(r'[^a-z0-9]', '', s)
-    for suf in ('model', 'theory', 'approach', 'formulation', 'framework',
-                'relation', 'equations'):
-        s = s.replace(suf, '')
-    return s
+    # (REMOVED — was the suffix-stripping synonym-merge key for consolidate
+    # dedup. Synonym merging is now LLM (align_concepts). Kept as a no-op stub
+    # in case other modules import it; concept_graph has its own _norm_surface.)
+    return s.lower().strip()
 
 
 def consolidate_instance(instance: InstanceHypergraph, domain: str = "") -> dict:
@@ -1757,34 +1754,14 @@ def consolidate_instance(instance: InstanceHypergraph, domain: str = "") -> dict
             _relabel(n, "PROPERTY"); n_relabel += 1
         elif _GENERIC_RE.match(s):
             _relabel(n, "drop"); n_relabel += 1
-    # dedup duplicate method surfaces
-    method_nodes = [(nid, n) for nid, n in instance.nodes.items() if "METHOD" in n.labels]
-    groups = {}
-    for nid, n in method_nodes:
-        groups.setdefault(_norm_surface(n.surface), []).append((nid, n.surface))
-    merged = {}
-    norms = list(groups.keys())
-    for i, ni in enumerate(norms):
-        for nj in norms:
-            if ni == nj or len(ni) < 4 or len(nj) < 4:
-                continue
-            if ('nonlocal' in ni) != ('nonlocal' in nj):
-                continue  # local vs nonlocal must NOT merge
-            if ni in nj or nj in ni:
-                canon_norm = ni if len(ni) <= len(nj) else nj
-                canon = groups[canon_norm][0][0]
-                for nidj, _ in groups[nj]:
-                    if nidj != canon:
-                        merged[nidj] = canon
-    n_dedup = 0
-    if merged:
-        for he in instance.hyperedges.values():
-            he.node_ids = [merged.get(x, x) for x in he.node_ids]
-        for nid in list(merged.keys()):
-            if nid in instance.nodes:
-                del instance.nodes[nid]
-        n_dedup = len(merged)
-    return {"relabeled": n_relabel, "deduped": n_dedup}
+    # (DEDUP REMOVED per DESIGN rules_vs_llm_boundary #5: the _norm_surface
+    # suffix-stripping + substring-merge was a RULE doing semantic synonym
+    # merging ('μ(I) model' ~ 'μ(I) theory' merged by stripping suffixes). That
+    # is a semantic task — now done by align_concepts (LLM, batched, covers
+    # METHOD/PHENOMENON/PARAMETER cross-paper AND within-paper synonyms).
+    # EXACT-surface duplicates are already deduped by extract_hypergraph
+    # (surface2nid in _run_hg_node). What's left here is relabel only.
+    return {"relabeled": n_relabel, "deduped": 0}
 
 
 def infer_rich_topology_direct(instance: InstanceHypergraph,
