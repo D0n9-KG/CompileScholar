@@ -474,19 +474,30 @@ The KIND test: would a scientist say these are the SAME relation category
 with a flavor difference, or TWO different relation categories? Same category
 + flavor = variant; two categories = distinct new kind.
 
-Reject (valid=false) if:
-- the proposal is an INSTANCE VARIANT of an existing pattern (same relation
-  kind, only form/condition differs) → suggest the base pattern + qualifier, OR
-- the span doesn't support the proposed structure, OR
-- the proposal is a pure numeric value / single equation / method NAME (not a
-  relation between entities), OR
-- it's too paper-specific to generalize.
+SCOPE OF THIS GATE (critical — division of labor with later pruning):
+This gate judges ONLY "is this an INSTANCE VARIANT of an existing pattern,
+or a genuinely NEW RELATION KIND?" — a structural KIND judgment (family-aware:
+different family = different KIND = accept). It does NOT judge "is this too
+paper-specific / too niche to generalize" — that is a RECURRENCE/pruning
+concern (judged across many papers, not from one). The later merge/retire
+pruning step cleans noise patterns that slip through here.
 
-Accept (valid=true) ONLY if the span supports a distinct NEW RELATION KIND the
-schema lacks (a kind not expressible as existing-pattern + qualifier).
-Multi-input dependencies ARE distinct from single-input IF the arity/role
-structure is genuinely different AND not just a qualified instance — but a
-dependency-with-extra-condition-role is still an INSTANCE VARIANT of dependency.
+Reject (valid=false) ONLY if clearly an INSTANCE VARIANT (same relation KIND
+as an existing pattern, only form/condition/qualifier differs) → suggest the
+base pattern + qualifier.
+
+Accept (valid=true) if:
+- the relation KIND is genuinely new (not expressible as existing-pattern +
+  qualifier), OR
+- UNCERTAIN whether it's a variant or new kind. When uncertain, ACCEPT
+  (bias toward accept — a false-accept is recoverable by later pruning;
+  a false-reject loses a real relation type irreversibly). The pruning step
+  (merge/retire across papers) handles noise that slips through.
+
+Do NOT reject for: "too paper-specific", "niche", "rare", "only seen here" —
+those are NOT variant judgments, they're recurrence judgments out of scope here.
+A proposal is a pure numeric value / method NAME (not a relation) → reject
+(not a relation at all).
 
 IMPORTANT — do NOT conflate:
   * REJECT: "X is defined as 0.5" (value, no relation).
