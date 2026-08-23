@@ -296,7 +296,9 @@ class HGBlackboard:
 
 def _call(prompt: str, llm: str, max_tokens: int = 8192) -> str | None:
     if llm == "deepseek":
-        return call_llm(prompt, model="deepseek-chat", max_tokens=max_tokens)
+        # legacy 'deepseek' alias -> DeepSeek-V4-Flash via Paratera (not
+        # deepseek-chat official — that was the low-quality baseline).
+        return call_paratera(prompt, model="DeepSeek-V4-Flash", max_tokens=max_tokens)
     return call_paratera(prompt, model=llm, max_tokens=max_tokens)
 
 

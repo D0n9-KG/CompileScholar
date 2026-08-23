@@ -96,7 +96,8 @@ def call_paratera(prompt: str, model: str = "Kimi-K2.6", max_tokens: int = 4000,
     )
     for attempt in range(2):
         try:
-            raw = urllib.request.urlopen(req, context=_CTX, timeout=90).read()
+            # reasoning models (DeepSeek-V4-Flash etc) are slow — long timeout.
+            raw = urllib.request.urlopen(req, context=_CTX, timeout=300).read()
             return json.loads(raw)["choices"][0]["message"]["content"]
         except Exception:
             if attempt == 1:
