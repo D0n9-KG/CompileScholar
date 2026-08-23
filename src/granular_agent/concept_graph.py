@@ -321,9 +321,20 @@ class ConceptGraph:
                                        year, sec)
                 nid2concept[(t, surf)] = c.concept_id
 
-        # 3. ingest each rich-topology edge as an n-ary ConceptHyperedge
+        # 3. ingest each rich-topology edge as an n-ary ConceptHyperedge.
+        # For evolution edges, preserve the SPECIFIC subtype (extends/improves/
+        # compares/replaces/adapts/background) as kind — not generic 'evolution'
+        # — so eval can match gold evolution_edges.type. The subtype is in the
+        # rich edge's pattern_type (infer_rich sets kind='evolution' but
+        # pattern_type carries the verb).
         for re_ in rich_edges:
             kind = re_["kind"]
+            if kind == "evolution":
+                pt = re_.get("pattern_type", "")
+                # pattern_type is the verb (extends/improves/...) per schema seed
+                if pt in ("extends", "improves", "compares", "replaces",
+                          "adapts", "background"):
+                    kind = pt  # specific subtype, eval-alignable
             ev = re_.get("evidence", "")
             sec = re_.get("section", "")
             cids = []
