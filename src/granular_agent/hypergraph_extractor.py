@@ -294,7 +294,7 @@ class HGBlackboard:
         return "Predecessor extracts:\n" + "\n".join(parts) if parts else ""
 
 
-def _call(prompt: str, llm: str, max_tokens: int = 8192) -> str | None:
+def _call(prompt: str, llm: str, max_tokens: int = 16384) -> str | None:
     if llm == "deepseek":
         # legacy 'deepseek' alias -> DeepSeek-V4-Flash via Paratera (not
         # deepseek-chat official — that was the low-quality baseline).
