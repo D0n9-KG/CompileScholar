@@ -73,16 +73,24 @@ matching pattern_type from the schema. The common families:
   * claim        (reports / claim_relation) — "we find that ...", "results show ...", "X outperforms Y", "X is associated with Y"
   * constitutive_law — a quantitative/formal law "output = f(input1, input2, ...)" (use when a formula or formal relation is stated)
   * evolution    (extends / improves / compares / replaces / adapts / background) — a
-    cross-METHOD evolution relation STATED in the text: "X extends/generalizes Y",
-    "X improves Y's accuracy / resolves Y's limitation", "X compared with Y",
-    "X replaces Y", "X adapts Y to ...", "X builds on / is inspired by Y", "based on
-    Y, we propose X". These are METHOD→METHOD (or PHENOMENON→PHENOMENON) relations
-    the text explicitly states. ONLY extract what the text says — do NOT infer a
-    relation the text does not state (inference is a downstream agent's job, not
-    extraction). Each evolution edge connects the two METHODS (n-ary if >2 are
-    compared) with the relation verb as pattern_type (extends/improves/compares/
-    replaces/adapts/background) and the verbatim text as evidence_span.
-    "X uses Y as background/motivation" → background (X METHOD, Y METHOD/PHENOMENON).
+    cross-METHOD (or PHENOMENON) evolution relation. Extract BOTH what the text
+    STATES and what it IMPLIES (you read the source text; a relation that is
+    expressed indirectly still counts as extraction, not inference). Examples:
+    EXPLICIT: "X extends/generalizes Y", "X improves Y's accuracy", "X compared with Y".
+    IMPLIED (still extract — the text points to it, just not with the verb directly):
+      "X resolves/overcomes Y's limitation" or "X provides the solution to [issues
+      that Y has]" → improves (X METHOD, Y METHOD)
+      "X is built on / inspired by / based on Y", "we extend Y to ..." → extends
+      "X deviates from / as an alternative to Y" → compares
+      "X replaces the [Y] approach" → replaces
+      "X adapts Y to [new scenario]" → adapts
+      "drawing on Y as background / motivated by Y" → background
+    Do NOT invent a relation that the text gives NO evidence for at all (not even
+    implied) — THAT is inference (a downstream agent's job). But if the text's
+    wording points to an evolution relation (even implicitly), extract it with the
+    matching type and the verbatim wording as evidence_span. Connect the METHODS
+    (n-ary if >2 are compared); pattern_type = the verb (extends/improves/compares/
+    replaces/adapts/background). "X uses Y as background/motivation" → background.
 METHOD-PARAMETER N-ARY EDGES (critical for rich topology): when a section discusses
 a method/model AND the parameters/quantities it uses, connect them in ONE n-ary hyperedge.
 E.g. "the NGF model uses fluidity g and cooperativity length ξ" → ONE arity-3 edge:
