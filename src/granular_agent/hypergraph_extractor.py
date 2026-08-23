@@ -91,6 +91,22 @@ matching pattern_type from the schema. The common families:
     matching type and the verbatim wording as evidence_span. Connect the METHODS
     (n-ary if >2 are compared); pattern_type = the verb (extends/improves/compares/
     replaces/adapts/background). "X uses Y as background/motivation" → background.
+    DECISION PATHS (distinguish extends/improves/compares — the easy-to-confuse ones):
+      path1 - does B fail/have a limitation in some regime/situation, and A handles it?
+              → improves (e.g. μ(I) local rheology fails near yield; nonlocal handles → improves)
+      path1b - does A derive a more accurate parameter/coefficient from first principles,
+              improving B's empirical/phenomenological parameter? → improves
+              (first-principles vs phenomenological = improves, NOT compares)
+      path2 - is A a direct extension/generalization of B (adds nonlocal term/gradient/new
+              parameter, or generalizes B to a new regime)? → extends
+              (I-gradient = nonlocal extension of μ(I); ext-kinetic = dense ext of kinetic)
+      path3 - do A and B have DIFFERENT modeling forms/origins but overlapping scope
+              (both model the same phenomenon, different mechanisms, each pros/cons)?
+              → compares (Gray size-segregation vs Tripathi density-segregation)
+              (ONLY compares if A,B are PARALLEL different-mechanism; if A improves B's
+              accuracy/scope → improves NOT compares)
+      path4 - no modeling-form/scope relation at all → do NOT extract (not evolution).
+    When unsure between improves/extends: improves = solves a limitation; extends = generalizes scope.
 METHOD-PARAMETER N-ARY EDGES (critical for rich topology): when a section discusses
 a method/model AND the parameters/quantities it uses, connect them in ONE n-ary hyperedge.
 E.g. "the NGF model uses fluidity g and cooperativity length ξ" → ONE arity-3 edge:
@@ -183,6 +199,14 @@ Rules:
       METHOD — if it is not, the extraction is WRONG.
       If unsure whether something is a METHOD vs PROPERTY: it is METHOD only if it names a
       mathematical MODEL of material behavior (constitutive relation, flow rule, scaling law).
+      METHOD NAMING (critical for cross-paper alignment — vague names break it): emit the
+      CANONICAL name a field uses for the method, NOT a descriptive phrase or sentence.
+      GOOD: "μ(I) rheology", "nonlocal granular fluidity (NGF)", "kinetic theory",
+            "I-gradient model", "cosserat continuum".
+      BAD (descriptive phrases that won't align across papers): "nonlocal model",
+            "more comprehensive rheology", "a model for dense flows", "the theory".
+      If the paper gives a named method (acronym or proper noun), use that name. If it only
+      describes, emit the SHORTEST noun phrase that names the method (not a full clause).
     * PARAMETER — named physical quantities/constants/coefficients that appear in equations
       (e.g. μ, I, d, P, τ, g, ρ_s, T, A, ξ, μ_s, b, ν). Distinguish from generic PROPERTY:
       a PARAMETER is a specific named symbol/constant in a law, while PROPERTY is a
