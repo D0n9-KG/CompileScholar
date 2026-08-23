@@ -1684,7 +1684,8 @@ def run_retire(meta: MetaHypergraph, instance: InstanceHypergraph,
 # nodes. Idempotent. See DECISION_rich_topo_consolidation.md.
 _TOOL_RE = re.compile(
     r'^(experiments?|discrete particle simulations?|numerical simulations?|'
-    r'(finite|discrete) (element|difference) method|particle-image velocimetry|PIV|'
+    r'molecular dynamics (simulations?)?|'
+    r'(finite|discrete) (element|difference) method|particle-imag(?:e|ing) velocimetry|PIV|'
     r'MRI|X-ray (tomography|CT|imaging)|contact dynamics|DEM\b|CFD|direct simulation|'
     r'rheometer|laser sheet|image processing system|front tracking|high-speed camera|'
     r'particle tracking|digital image correlation|tomography|photogrammetry)$', re.I)
