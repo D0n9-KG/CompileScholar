@@ -1566,6 +1566,111 @@ def run_retire(meta: MetaHypergraph, instance: InstanceHypergraph,
     return applied
 
 
+# ---- deterministic instance consolidation (post-extraction cleanup) -------
+# Verified on 5 ARFM papers: METHOD labels were garbage-heavy (tools,
+# geometries, equation refs, paper titles, generic phrases) and the same
+# method had duplicate surfaces (NGF x5). These deterministic rules clean
+# METHOD labels and merge duplicate method surfaces so rich-topology edges
+# (method_parameter / method_phenomenon / method_regime) carry real method
+# nodes. Idempotent. See DECISION_rich_topo_consolidation.md.
+_TOOL_RE = re.compile(
+    r'^(experiments?|discrete particle simulations?|numerical simulations?|'
+    r'(finite|discrete) (element|difference) method|particle-image velocimetry|PIV|'
+    r'MRI|X-ray (tomography|CT|imaging)|contact dynamics|DEM\b|CFD|direct simulation|'
+    r'rheometer|laser sheet|image processing system|front tracking|high-speed camera|'
+    r'particle tracking|digital image correlation|tomography|photogrammetry)$', re.I)
+_GEO_RE = re.compile(
+    r'^(plane shear|annular (shear|couette)|heap flow|rotating drum|silo flow?|'
+    r'chute|inclined plane|couette flow|hopper flow?|annular shear flow|'
+    r'(simple|pure) shear|3d annular|cylindrical couette|ring shear)$', re.I)
+_GROUP_RE = re.compile(r'GDR\s*MiDi', re.I)
+_GENERIC_RE = re.compile(
+    r'^(unified framework|future model(\s+for.+)?|constitutive equations|'
+    r'the equations|a model for.+|model for (dense|granular).+|'
+    r'theoretical (approaches?|model|framework)|empirical fit(\s?\d)?|'
+    r'empirical (law|relation|equation)s?|numerical (approach|method|model)|'
+    r'constitutive model|continuum model|theoretical approaches?)$', re.I)
+_EFFECT_RE = re.compile(
+    r'(Bagnold[- ]like|Janssen effect|constitutive law for.+|effective friction law for.+|'
+    r'profile$|velocity profile|dilatancy|Reynolds dilation)', re.I)
+_EQREF_RE = re.compile(r'^eq(uation|\.)?\s*\.?\s*\(?[\dabivx]+\)?\.?$', re.I)
+
+
+def _relabel(n, new):
+    if new == "drop":
+        n.labels = [l for l in n.labels if l != "METHOD"]
+    elif new in ("PROPERTY", "MATERIAL"):
+        n.labels = [l for l in n.labels if l != "METHOD"]
+        if new not in n.labels:
+            n.labels.append(new)
+
+
+def _norm_surface(s):
+    s = s.lower()
+    s = s.replace('μ', 'mu').replace('ξ', 'xi').replace('γ', 'g')
+    s = re.sub(r'[^a-z0-9]', '', s)
+    for suf in ('model', 'theory', 'approach', 'formulation', 'framework',
+                'relation', 'equations'):
+        s = s.replace(suf, '')
+    return s
+
+
+def consolidate_instance(instance: InstanceHypergraph) -> dict:
+    """Deterministic post-extraction cleanup (idempotent):
+    1. relabel garbage METHOD nodes (tools/geometries/generic/equation-refs/
+       long titles) -> PROPERTY/MATERIAL or drop METHOD.
+    2. merge duplicate METHOD surfaces (suffix variations); never merge
+       'local' with 'nonlocal'.
+    Mutates the instance in place. Returns a change summary."""
+    n_relabel = 0
+    for n in instance.nodes.values():
+        if "METHOD" not in n.labels:
+            continue
+        s = n.surface.strip()
+        if _GROUP_RE.search(s):
+            _relabel(n, "MATERIAL"); n_relabel += 1
+        elif _EQREF_RE.match(s):
+            _relabel(n, "drop"); n_relabel += 1
+        elif len(s) >= 36 and not re.search(r'(rheology|fluidity|kinetic|theory|model)$', s, re.I):
+            _relabel(n, "drop"); n_relabel += 1
+        elif _TOOL_RE.match(s):
+            _relabel(n, "PROPERTY"); n_relabel += 1
+        elif _GEO_RE.match(s):
+            _relabel(n, "PROPERTY"); n_relabel += 1
+        elif _EFFECT_RE.search(s):
+            _relabel(n, "PROPERTY"); n_relabel += 1
+        elif _GENERIC_RE.match(s):
+            _relabel(n, "drop"); n_relabel += 1
+    # dedup duplicate method surfaces
+    method_nodes = [(nid, n) for nid, n in instance.nodes.items() if "METHOD" in n.labels]
+    groups = {}
+    for nid, n in method_nodes:
+        groups.setdefault(_norm_surface(n.surface), []).append((nid, n.surface))
+    merged = {}
+    norms = list(groups.keys())
+    for i, ni in enumerate(norms):
+        for nj in norms:
+            if ni == nj or len(ni) < 4 or len(nj) < 4:
+                continue
+            if ('nonlocal' in ni) != ('nonlocal' in nj):
+                continue  # local vs nonlocal must NOT merge
+            if ni in nj or nj in ni:
+                canon_norm = ni if len(ni) <= len(nj) else nj
+                canon = groups[canon_norm][0][0]
+                for nidj, _ in groups[nj]:
+                    if nidj != canon:
+                        merged[nidj] = canon
+    n_dedup = 0
+    if merged:
+        for he in instance.hyperedges.values():
+            he.node_ids = [merged.get(x, x) for x in he.node_ids]
+        for nid in list(merged.keys()):
+            if nid in instance.nodes:
+                del instance.nodes[nid]
+        n_dedup = len(merged)
+    return {"relabeled": n_relabel, "deduped": n_dedup}
+
+
 def infer_rich_topology_direct(instance: InstanceHypergraph,
                                 paper_id: str, include_other: bool = False) -> list[dict]:
     """Read rich-topology edges DIRECTLY from instance hyperedges (no co-occurrence).

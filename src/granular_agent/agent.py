@@ -30,7 +30,7 @@ from granular_agent.hypergraph_extractor import extract_hypergraph
 from granular_agent.hypergraph_evolution import (
     EvolutionTrigger, run_split, run_merge, run_retire, run_rename,
     infer_pattern_dependencies, infer_pattern_constraints, infer_pattern_compositions,
-    infer_rich_topology_direct)
+    infer_rich_topology_direct, consolidate_instance)
 
 
 class GranularFlowAgent:
@@ -323,6 +323,7 @@ class GranularFlowAgent:
         cons = infer_pattern_constraints(self.meta_hg, inst, paper_id=paper_id)
         comp = infer_pattern_compositions(self.meta_hg, inst, paper_id=paper_id)
         violations = self.meta_hg.detect_constraint_violations(inst)
+        cons2 = consolidate_instance(inst)
         rich_topo = infer_rich_topology_direct(inst, paper_id=paper_id)
         result = {
             "paper_id": paper_id,
@@ -332,6 +333,7 @@ class GranularFlowAgent:
             "n_calls": res["n_calls"] + 1,  # +1 structure map
             "n_acc": len(acc),
             "n_rej": len(rej),
+            "consolidate": cons2,
             "cross_node": sorted(set(e.get("cross_node", 1) for e in acc)),
             "new_patterns": [e.get("type_id") for e in acc
                              if e.get("op") in ("add_pattern", "add_meta_node", "add_subclass", "split_meta_node")],
