@@ -120,6 +120,16 @@ class ConceptGraph:
     def add_relation(self, src: str, tgt: str, kind: str,
                      paper_id: str = "", evidence: str = "",
                      year: str = "") -> ConceptRelation:
+        """Add a relation, DEDUP by (src, tgt, kind): same key → accumulate
+        provenance onto existing edge (not duplicate). Different kinds (e.g.
+        extends vs contradicts — a conflict) are separate edges (see DESIGN 11)."""
+        if src == tgt:
+            return ConceptRelation(src_concept=src, tgt_concept=tgt, kind=kind)  # skip self-loop
+        for r in self.relations:
+            if r.src_concept == src and r.tgt_concept == tgt and r.kind == kind:
+                if paper_id:
+                    r.provenance.append({"paper_id": paper_id, "evidence": evidence, "year": year})
+                return r
         rel = ConceptRelation(src_concept=src, tgt_concept=tgt, kind=kind,
                               provenance=[{"paper_id": paper_id, "evidence": evidence, "year": year}]
                               if paper_id else [])
@@ -128,7 +138,8 @@ class ConceptGraph:
 
     def merge_concepts(self, into_id: str, merge_id: str) -> None:
         """Merge two Concepts (semantic near-synonyms, called by align_concepts).
-        Redirects relations, merges variants + provenance."""
+        Redirects relations, merges variants + provenance, removes self-loops
+        created by the merge."""
         if into_id == merge_id or merge_id not in self.concepts or into_id not in self.concepts:
             return
         keep = self.concepts[into_id]
@@ -141,6 +152,8 @@ class ConceptGraph:
                 r.src_concept = into_id
             if r.tgt_concept == merge_id:
                 r.tgt_concept = into_id
+        # remove self-loops created by the merge (src==tgt)
+        self.relations = [r for r in self.relations if r.src_concept != r.tgt_concept]
         # update surface index
         for s in drop.surfaces():
             self._surface2concept[s.strip().lower()] = into_id
@@ -148,6 +161,53 @@ class ConceptGraph:
 
     def concepts_by_type(self, type_: str) -> list[Concept]:
         return [c for c in self.concepts.values() if c.type == type_ and not c.deprecated]
+
+    def ingest_instance(self, inst, year: str = "") -> None:
+        """Accumulate one paper's InstanceHypergraph into the concept graph.
+
+        For each node (typed): get_or_create a Concept with provenance
+        (surface + paper_id + evidence + year + section-from-nid-prefix).
+        For each hyperedge: add a ConceptRelation (kind = pattern_type) with
+        provenance. PARAMETER/NUMERIC use surface/symbol (no LLM alignment —
+        that's only METHOD/PHENOMENON via align_concepts).
+
+        inst: InstanceHypergraph (or dict with 'nodes'/'hyperedges').
+        year: paper year (for time-order signals in P2 emergence).
+        """
+        # accept dict or InstanceHypergraph
+        nodes = inst.nodes if hasattr(inst, "nodes") else inst["nodes"]
+        hyperedges = inst.hyperedges if hasattr(inst, "hyperedges") else inst["hyperedges"]
+        paper_id = getattr(inst, "paper_id", "") or inst.get("paper_id", "")
+
+        def _section(nid: str) -> str:
+            # nid like 'n5c2_n3' — section encoded in prefix before '_'
+            return nid.split("_")[0] if "_" in nid else nid
+
+        # node -> concept_id map (per this paper)
+        nid2concept = {}
+        for nid, n in nodes.items():
+            labels = n.labels if hasattr(n, "labels") else n.get("labels", [])
+            if not labels:
+                continue
+            # pick the most specific type (first non-THING label)
+            t = next((l for l in labels if l != "THING"), labels[0])
+            surface = n.surface if hasattr(n, "surface") else n.get("surface", "")
+            ev = n.evidence_span if hasattr(n, "evidence_span") else n.get("evidence_span", "")
+            c = self.get_or_create(t, surface, paper_id, ev, year, _section(nid))
+            nid2concept[nid] = c.concept_id
+
+        # hyperedges -> relations
+        for he in hyperedges.values():
+            pt = he.pattern_type if hasattr(he, "pattern_type") else he.get("pattern_type", "")
+            nids = he.node_ids if hasattr(he, "node_ids") else he.get("node_ids", [])
+            ev = he.evidence_span if hasattr(he, "evidence_span") else he.get("evidence_span", "")
+            cids = [nid2concept.get(n) for n in nids]
+            cids = [c for c in cids if c]
+            # emit pairwise relations for the hyperedge (n-ary → all pairs)
+            # kind = pattern_type (references T-box); P2 will refine rich-topology kind
+            for i, a in enumerate(cids):
+                for b in cids[i+1:]:
+                    self.add_relation(a, b, pt, paper_id, ev, year)
 
     def to_dict(self) -> dict:
         return {
