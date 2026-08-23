@@ -79,6 +79,8 @@ class GranularFlowAgent:
         # surface-only merge — see concept_graph.py + DESIGN_full.md.
         from granular_agent.concept_graph import ConceptGraph
         self.concept_graph = ConceptGraph()
+        # per-paper instances (kept for save; InstanceCorpus no longer used)
+        self.hg_instances: dict[str, Any] = {}
 
     def register_hook(self, event: str, handler):
         """Register an event hook."""
@@ -395,12 +397,12 @@ class GranularFlowAgent:
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
         self.hg_results.append(result)
-        # accumulate into the cross-paper instance corpus (instance bridge)
-        self.hg_corpus.add_paper(inst)
         # accumulate into the A-box concept hypergraph (n-ary, with provenance).
-        # year parsed from paper_id for P2 time-order emergence signals.
+        # Replaces InstanceCorpus surface-only merge. year parsed from paper_id
+        # for P2 time-order emergence signals.
         import re as _re
         _ym = _re.search(r'(\d{4})', paper_id)
+        self.hg_instances[paper_id] = inst  # keep for save (InstanceCorpus removed)
         self.concept_graph.ingest_instance(inst, year=_ym.group(1) if _ym else "")
         print(f"  [hypergraph] {paper_id}: {res['n_nodes']} nodes / {res['n_hyperedges']} he / "
               f"{len(acc)} acc / {len(rej)} rej | cross_node={result['cross_node']} | "
@@ -436,24 +438,21 @@ class GranularFlowAgent:
         with open(os.path.join(output_dir, "meta_hypergraph.json"), "w", encoding="utf-8") as f:
             json.dump(self.meta_hg.to_dict(), f, ensure_ascii=False, indent=2)
         # per-paper instances (each a full InstanceHypergraph.to_dict)
-        for pid, inst in self.hg_corpus.papers.items():
+        for pid, inst in self.hg_instances.items():
             with open(os.path.join(output_dir, f"instance_{pid}.json"), "w", encoding="utf-8") as f:
                 json.dump(inst.to_dict(), f, ensure_ascii=False, indent=2)
-        # corpus index: cross-paper merged nodes + per-paper summary
+        # A-box: concept hypergraph (n-ary, cross-paper aligned)
+        with open(os.path.join(output_dir, "concept_graph.json"), "w", encoding="utf-8") as f:
+            json.dump(self.concept_graph.to_dict(), f, ensure_ascii=False, indent=2)
         corpus_summary = {
-            "n_papers": self.hg_corpus.n_papers(),
-            "n_merged_nodes": self.hg_corpus.n_merged_nodes(),
-            "n_cross_paper_nodes": len(self.hg_corpus.cross_paper_nodes()),
-            "cross_paper_nodes": [n.surface for n in self.hg_corpus.cross_paper_nodes()][:50],
+            "n_papers": len(self.hg_instances),
+            "n_concepts": len(self.concept_graph.concepts),
+            "n_hyperedges": len(self.concept_graph.hyperedges),
             "per_paper": self.hg_results,
         }
         with open(os.path.join(output_dir, "corpus_index.json"), "w", encoding="utf-8") as f:
             json.dump(corpus_summary, f, ensure_ascii=False, indent=2)
-        # A-box: concept hypergraph (n-ary, cross-paper aligned)
-        with open(os.path.join(output_dir, "concept_graph.json"), "w", encoding="utf-8") as f:
-            json.dump(self.concept_graph.to_dict(), f, ensure_ascii=False, indent=2)
-        print(f"  [hypergraph] saved meta (full-field) + {self.hg_corpus.n_papers()} instances "
-              f"+ corpus ({corpus_summary['n_cross_paper_nodes']} cross-paper nodes) "
+        print(f"  [hypergraph] saved meta (full-field) + {len(self.hg_instances)} instances "
               f"+ concept-graph ({len(self.concept_graph.concepts)} concepts, "
               f"{len(self.concept_graph.hyperedges)} hyperedges) to {output_dir}", flush=True)
 

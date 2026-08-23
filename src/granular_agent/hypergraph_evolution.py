@@ -1747,5 +1747,6 @@ def infer_rich_topology_direct(instance: InstanceHypergraph,
             "n_distinct_types": n_distinct_types,
             "evidence": (he.evidence_span or "")[:80],
             "paper_id": paper_id,
+            "section": (he.eid.split("_")[0] if he.eid and "_" in he.eid else (he.eid or "")),
         })
     return edges

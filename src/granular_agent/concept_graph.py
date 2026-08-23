@@ -302,6 +302,7 @@ class ConceptGraph:
         for re_ in rich_edges:
             kind = re_["kind"]
             ev = re_.get("evidence", "")
+            sec = re_.get("section", "")
             cids = []
             for nd in re_["nodes"]:
                 surf = nd["surface"]
@@ -311,7 +312,8 @@ class ConceptGraph:
                 if cid:
                     cids.append(cid)
             if len(cids) >= 2:
-                self.add_hyperedge(cids, kind, paper_id=paper_id, evidence=ev, year=year)
+                self.add_hyperedge(cids, kind, paper_id=paper_id,
+                                   evidence=ev, year=year, section=sec)
 
     # ---- cross-paper semantic alignment (C2) ----
     def align_concepts(self, llm_fn, type_filter=("METHOD", "PHENOMENON"),
