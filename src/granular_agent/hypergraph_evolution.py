@@ -1681,7 +1681,8 @@ _GEO_RE = re.compile(
     r'^(plane shear|annular (shear|couette)|heap flow|rotating drum|silo flow?|'
     r'chute|inclined plane|couette flow|hopper flow?|annular shear flow|'
     r'(simple|pure) shear|3d annular|cylindrical couette|ring shear)$', re.I)
-_GROUP_RE = re.compile(r'GDR\s*MiDi', re.I)
+# (GDR MiDi group-name relabel REMOVED — was a hard paper-specific overfit;
+#  the extract prompt shows it as an example only.)
 _GENERIC_RE = re.compile(
     r'^(unified framework|future model(\s+for.+)?|constitutive equations|'
     r'the equations|a model for.+|model for (dense|granular).+|'
@@ -1721,29 +1722,38 @@ def _norm_surface(s):
     return s
 
 
-def consolidate_instance(instance: InstanceHypergraph) -> dict:
+def consolidate_instance(instance: InstanceHypergraph, domain: str = "") -> dict:
     """Deterministic post-extraction cleanup (idempotent):
-    1. relabel garbage METHOD nodes (tools/geometries/generic/equation-refs/
-       long titles) -> PROPERTY/MATERIAL or drop METHOD.
+    1. relabel garbage METHOD nodes (generic/equation-refs/long titles ALWAYS;
+       granular-flow-specific tools/geometries/effects ONLY when domain matches)
+       -> PROPERTY/MATERIAL or drop METHOD.
     2. merge duplicate METHOD surfaces (suffix variations); never merge
        'local' with 'nonlocal'.
-    Mutates the instance in place. Returns a change summary."""
+    Mutates the instance in place. Returns a change summary.
+
+    Domain gating: _TOOL_RE/_GEO_RE/_EFFECT_RE are granular-flow vocabulary
+    (MRI/PIV, plane shear/heap flow, Bagnold/Janssen). Running them on non-
+    granular domains would be overfitting (no match = no-op, but principled to
+    gate). _GENERIC_RE/_EQREF_RE/_LONG_TITLE_RE are generic scientific vocab
+    (unified framework/Eq. refs/sentence-titles) — run always. NOTE: 'GDR MiDi'
+    research-group-name relabel was REMOVED (hard paper-specific overfit) — the
+    extract prompt now shows it as an example only, not a hard rule.
+    """
+    is_granular = (domain or "").lower().startswith("granular")
     n_relabel = 0
     for n in instance.nodes.values():
         if "METHOD" not in n.labels:
             continue
         s = n.surface.strip()
-        if _GROUP_RE.search(s):
-            _relabel(n, "MATERIAL"); n_relabel += 1
-        elif _EQREF_RE.match(s):
+        if _EQREF_RE.match(s):
             _relabel(n, "drop"); n_relabel += 1
         elif _LONG_TITLE_RE.match(s):
             _relabel(n, "drop"); n_relabel += 1
-        elif _TOOL_RE.match(s):
+        elif is_granular and _TOOL_RE.match(s):
             _relabel(n, "PROPERTY"); n_relabel += 1
-        elif _GEO_RE.match(s):
+        elif is_granular and _GEO_RE.match(s):
             _relabel(n, "PROPERTY"); n_relabel += 1
-        elif _EFFECT_RE.search(s):
+        elif is_granular and _EFFECT_RE.search(s):
             _relabel(n, "PROPERTY"); n_relabel += 1
         elif _GENERIC_RE.match(s):
             _relabel(n, "drop"); n_relabel += 1

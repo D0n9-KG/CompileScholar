@@ -42,12 +42,17 @@ class GranularFlowAgent:
 
     def __init__(self, worktree: str = "C:/Users/D0n9/Desktop/LogicKG-benchmark",
                  llms: list[str] = None,
-                 self_evolution_enabled: bool = True):
+                 self_evolution_enabled: bool = True,
+                 domain: str = "granular flow physics"):
         self.worktree = worktree
         self.schema_manager = SchemaManager(worktree)
         self.llms = llms or ["deepseek"]
         self.extractor = Extractor(self.schema_manager, llms=self.llms)
         self.self_evolution_enabled = self_evolution_enabled
+        # domain (NOT a paper-specific special case — a parameter callers pass;
+        # gates domain-specific cleanup regexes so non-granular inputs aren't
+        # overfit-cleaned). Default is granular-flow (the current pilot domain).
+        self.domain = domain
 
         # Hook registry (event-driven triggers)
         self.hooks = {
@@ -347,7 +352,7 @@ class GranularFlowAgent:
         cons = infer_pattern_constraints(self.meta_hg, inst, paper_id=paper_id)
         comp = infer_pattern_compositions(self.meta_hg, inst, paper_id=paper_id)
         violations = self.meta_hg.detect_constraint_violations(inst)
-        cons2 = consolidate_instance(inst)
+        cons2 = consolidate_instance(inst, domain=self.domain)
         rich_topo = infer_rich_topology_direct(inst, paper_id=paper_id)
         result = {
             "paper_id": paper_id,
@@ -405,7 +410,8 @@ class GranularFlowAgent:
         import re as _re
         _ym = _re.search(r'(\d{4})', paper_id)
         self.hg_instances[paper_id] = inst  # keep for save (InstanceCorpus removed)
-        self.concept_graph.ingest_instance(inst, year=_ym.group(1) if _ym else "")
+        self.concept_graph.ingest_instance(inst, year=_ym.group(1) if _ym else "",
+                                          domain=self.domain)
         print(f"  [hypergraph] {paper_id}: {res['n_nodes']} nodes / {res['n_hyperedges']} he / "
               f"{len(acc)} acc / {len(rej)} rej | cross_node={result['cross_node']} | "
               f"v{pre_v}->{self.meta_hg.version} ({len(self.meta_hg.patterns)} patterns) | "

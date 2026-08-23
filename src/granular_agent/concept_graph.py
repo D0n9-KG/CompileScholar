@@ -277,7 +277,7 @@ class ConceptGraph:
     def concepts_by_type(self, type_: str):
         return [c for c in self.concepts.values() if c.type == type_ and not c.deprecated]
 
-    def ingest_instance(self, inst, year: str = "") -> None:
+    def ingest_instance(self, inst, year: str = "", domain: str = "") -> None:
         """Accumulate one paper's instance into the concept hypergraph.
 
         Does NOT use raw pattern_type. Runs consolidate_instance +
@@ -286,6 +286,7 @@ class ConceptGraph:
         then ingests those as n-ary ConceptHyperedges (no pairwise split).
 
         inst: InstanceHypergraph (or dict). year: for P2 time-order signals.
+        domain: passed to consolidate_instance (gates granular-specific cleanup).
         """
         from granular_agent.hypergraph_evolution import (
             consolidate_instance, infer_rich_topology_direct)
@@ -298,7 +299,7 @@ class ConceptGraph:
             return nid.split("_")[0] if "_" in nid else nid
 
         # 1. consolidate + infer rich-topology (correct kinds)
-        consolidate_instance(inst)
+        consolidate_instance(inst, domain=domain)
         rich_edges = infer_rich_topology_direct(inst, paper_id=paper_id)
         # fallback: if all edges classify as "other" (param↔param only), the
         # paper would contribute ZERO concepts. Re-run including "other" so
