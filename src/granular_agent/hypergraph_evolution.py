@@ -1828,11 +1828,18 @@ def infer_rich_topology_direct(instance: InstanceHypergraph,
         # when the text states the relation (NOT inferred — inference is downstream).
         _evo_types = {"extends", "improves", "compares", "replaces", "adapts", "background"}
         if he.pattern_type in _evo_types or any(t in he.pattern_type for t in _evo_types):
-            # only count as evolution if it connects 2+ METHODS or 2+ PHENOMENA
-            # (a compares-edge METHOD↔METHOD). Mixed-type evolution stays n-ary.
-            method_count = sum(1 for nd in nodes if "METHOD" in nd["labels"])
-            phenom_count = sum(1 for nd in nodes if "PHENOMENON" in nd["labels"])
-            if method_count >= 2 or phenom_count >= 2:
+            # count as evolution if it connects 2+ entities of the SAME type
+            # (any type: METHOD/PHENOMENON/PARAMETER/REGIME/MATERIAL/NUMERIC —
+            # evolution is type-agnostic per DESIGN, not METHOD-only). Mixed-type
+            # evolution edges (e.g. METHOD + PHENOMENON) stay n-ary.
+            from collections import Counter as _C
+            _type_counts = _C()
+            for nd in nodes:
+                for l in nd["labels"]:
+                    if l != "THING":
+                        _type_counts[l] += 1
+            same_type_pair = any(c >= 2 for c in _type_counts.values())
+            if same_type_pair:
                 kind = "evolution"
             else:
                 kind = "nary"  # evolution edge but mixed types → n-ary
