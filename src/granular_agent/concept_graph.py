@@ -160,48 +160,29 @@ class ConceptGraph:
     def get_or_create(self, type_: str, surface: str, paper_id: str,
                       evidence: str = "", year: str = "",
                       section: str = "") -> Concept:
-        """First-pass alignment:
-        - PARAMETER/NUMERIC with extractable symbol → align by SYMBOL
-          ('inertial number I' ~ 'I' merge by symbol 'I')
-        - PARAMETER/NUMERIC with NO symbol (function-like 'V_surf(y)',
-          'h_max', '|γ̇|') → fall back to surface-string (not 'always new')
-        - other types → exact-surface lookup
-        LLM semantic alignment (merge near-synonyms) in align_concepts, not here.
+        """First-pass alignment: EXACT-SURFACE lookup for ALL types (including
+        PARAMETER/NUMERIC). No symbol-table matching here.
+
+        Rationale (DESIGN rules_vs_llm_boundary B2): a hardcoded physics symbol
+        set (_SYMBOL_RE: μ/I/d/P/...) caused WRONG merges in non-physics domains
+        ('T'=temperature merged with 'T'=target, 'n'=refractive-index with 'n'=
+        sample-size). Symbol extraction is domain-specific, not universal.
+
+        Cross-paper PARAMETER alignment (e.g. 'inertial number I' ~ 'I') is done
+        by align_concepts (LLM semantic judgment, domain-agnostic) — same as
+        METHOD/PHENOMENON. The symbol is recorded on the Concept (if extractable)
+        as an attribute for LLM alignment context, but does NOT drive merging.
         """
-        if type_ in ("PARAMETER", "NUMERIC"):
-            sym = _extract_symbol(surface)
-            if sym:  # symbol-based alignment
-                if sym in self._symbol2concept:
-                    cid = self._symbol2concept[sym]
-                    self.concepts[cid].add_variant(surface, paper_id, evidence, year, section)
-                    return self.concepts[cid]
-                cid = self._new_id(type_)
-                c = Concept(concept_id=cid, type=type_, symbol=sym)
-                c.add_variant(surface, paper_id, evidence, year, section)
-                self.concepts[cid] = c
-                self._symbol2concept[sym] = cid
-                return c
-            # no symbol extractable → fall back to surface-string (avoids
-            # creating a new concept every ingest for 'V_surf(y)'-like surfaces)
-            key = _norm_surface(surface)
-            cid = self._surface2concept.get(key)
-            if cid and cid in self.concepts:
-                self.concepts[cid].add_variant(surface, paper_id, evidence, year, section)
-                return self.concepts[cid]
-            cid = self._new_id(type_)
-            c = Concept(concept_id=cid, type=type_, symbol="")
-            c.add_variant(surface, paper_id, evidence, year, section)
-            self.concepts[cid] = c
-            self._surface2concept[key] = cid
-            return c
-        # non-symbol types: exact-surface lookup
         key = _norm_surface(surface)
         cid = self._surface2concept.get(key)
         if cid and cid in self.concepts:
             self.concepts[cid].add_variant(surface, paper_id, evidence, year, section)
             return self.concepts[cid]
+        # new concept — record symbol (for align_concepts context) but don't
+        # align by it
+        sym = _extract_symbol(surface) if type_ in ("PARAMETER", "NUMERIC") else ""
         cid = self._new_id(type_)
-        c = Concept(concept_id=cid, type=type_)
+        c = Concept(concept_id=cid, type=type_, symbol=sym)
         c.add_variant(surface, paper_id, evidence, year, section)
         self.concepts[cid] = c
         self._surface2concept[key] = cid
@@ -351,20 +332,30 @@ class ConceptGraph:
                                    evidence=ev, year=year, section=sec)
 
     # ---- cross-paper semantic alignment (C2) ----
-    def align_concepts(self, llm_fn, type_filter=("METHOD", "PHENOMENON"),
+    def align_concepts(self, llm_fn, type_filter=("METHOD", "PHENOMENON", "PARAMETER"),
                        batch_size: int = 20) -> int:
         """LLM semantic alignment: batch concept surfaces per type, ask LLM
         which are the SAME concept (near-synonyms). Merge each group into one
         (keep = the concept with most surface_variants; tie-break by id).
 
-        Only METHOD/PHENOMENON (noisy naming). PARAMETER/NUMERIC use symbol
-        matching (in get_or_create)."""
+        Covers METHOD/PHENOMENON/PARAMETER (noisy-naming, cross-paper synonyms
+        common). PARAMETER alignment is now LLM (not the old _SYMBOL_RE rule —
+        that rule was domain-overfit, wrong-merged in non-physics). The LLM
+        judges 'inertial number I' ~ 'I' by semantics, domain-agnostic."""
         n_merged = 0
         for t in type_filter:
             concepts = [c for cid, c in self.concepts.items()
                         if c.type == t and not c.deprecated]
-            items = [(c.concept_id, c.surfaces()[0] if c.surfaces() else "")
-                     for c in concepts if c.surfaces()]
+            # for PARAMETER/NUMERIC, include the symbol (if any) as context
+            # for the LLM — it helps judge 'inertial number I' ~ 'I' by seeing
+            # both share symbol I. LLM still judges semantically (not rule).
+            items = []
+            for c in concepts:
+                if not c.surfaces():
+                    continue
+                surf = c.surfaces()[0]
+                sym = c.symbol if getattr(c, "symbol", "") else ""
+                items.append((c.concept_id, surf, sym))
             if len(items) < 2:
                 continue
             for i in range(0, len(items), batch_size):
@@ -429,13 +420,22 @@ _ALIGN_PROMPT = """下面是抽取出的多个{type_label}实体(每个有一个
 
 
 def _llm_align_batch(items, type_label, llm_fn):
-    """items: list[(concept_id, surface)]. Returns list of groups
+    """items: list[(concept_id, surface, symbol)]. Returns list of groups
     (each a list of concept_ids). Uses INDEX-based mapping so the LLM
-    returning index numbers (not raw ids) still maps correctly."""
-    type_map = {"METHOD": "建模方法", "PHENOMENON": "物理现象"}
+    returning index numbers (not raw ids) still maps correctly.
+    For PARAMETER/NUMERIC, the symbol (if any) is shown to the LLM as context
+    — it helps judge 'inertial number I' ~ 'I' (both share symbol I), but the
+    LLM judges semantically (same concept), not by rule."""
+    type_map = {"METHOD": "建模方法", "PHENOMENON": "物理现象", "PARAMETER": "物理参数", "NUMERIC": "数值量"}
     tl = type_map.get(type_label, type_label)
-    # present items with a stable numeric index the LLM can refer to
-    idx_items = "\n".join(f"{i}: {surf}" for i, (_, surf) in enumerate(items))
+    # present items with index + surface (+symbol if any, as context)
+    idx_items = []
+    for i, (_, surf, sym) in enumerate(items):
+        if sym:
+            idx_items.append(f"{i}: {surf} [symbol: {sym}]")
+        else:
+            idx_items.append(f"{i}: {surf}")
+    idx_items = "\n".join(idx_items)
     prompt = _ALIGN_PROMPT.format(type_label=tl, items=idx_items).replace(
         "id1, id2", "index1, index2").replace("id3", "index3")
     try:
@@ -444,6 +444,7 @@ def _llm_align_batch(items, type_label, llm_fn):
         obj = parse_json_response(resp) or {}
         groups = obj.get("groups", [])
         out = []
+        ids = [cid for cid, _, _ in items]
         for g in groups:
             # g may be list of int indices OR strings; map to concept_ids
             cids = []
@@ -453,8 +454,7 @@ def _llm_align_batch(items, type_label, llm_fn):
                     if 0 <= idx < len(items):
                         cids.append(items[idx][0])
                 except (ValueError, TypeError):
-                    # maybe returned the id directly
-                    if x in [cid for cid, _ in items]:
+                    if x in ids:
                         cids.append(x)
             out.append(cids)
         return out
