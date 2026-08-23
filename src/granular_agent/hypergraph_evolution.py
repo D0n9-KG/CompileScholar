@@ -531,7 +531,8 @@ Output ONLY JSON: {{"valid": true/false, "reason": "one short sentence: is this 
     out = {"valid": valid, "reason": reason, "proposal": proposal}
     if not valid and base and base in meta.patterns:
         out["suggested_alternative"] = base
-        out["suggested_qualifier_value"] = pid[len(base):].strip("_-") if pid.startswith(base) else ""
+        _pid = (proposal.get("pattern_id", "") or "").strip()
+        out["suggested_qualifier_value"] = _pid[len(base):].strip("_-") if _pid.startswith(base) else ""
     return out
 
 
