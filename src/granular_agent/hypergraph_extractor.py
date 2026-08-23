@@ -60,10 +60,13 @@ EXTRACT DIVERSE RELATION TYPES (critical — do NOT default everything to "influ
 A section usually expresses several DISTINCT kinds of relations; capture each with the
 matching pattern_type from the schema. The common families:
   * definition   (defines) — "X is defined as Y", "we refer to Z as ...", "X denotes ...",
-    "X is among the most ...", "X is a type of Y", "X is classified into A, B, C" (classification = defines, NOT composed_of)
+    "X is among the most ...", "X is a type of Y", "X is classified into A, B, C" (classification = defines, NOT composed_of).
+    "X can be viewed as Y" or "X is analogous to Y" is a CLAIM (analogy), NOT defines.
   * composition  (composed_of) — "X consists of Y and Z", "X is composed of ...",
     "the model is A + B + C" — ONLY structural/constitutive composition (parts that make up a whole).
     "X is divided into A, B, C" or "X includes types A, B, C" is classification → use defines, NOT composed_of.
+    "X has control parameters W, Q" is NOT composition (control params are not structural parts) → use influences.
+    "we test X by doing experiments" is NOT composition (testing is not structural) → use measures or claim_relation.
   * dependency   (influences) — "X affects/depends on/scales with Y", "X improves Y"
     (a genuine causal/functional dependence, NOT a mere co-listing or classification — those are composed_of / defines)
   * measure      (uses_method / measures) — "we use method M to evaluate X", "M is applied to X", "X was measured by M"
@@ -132,13 +135,17 @@ Rules:
   MUST be nodes AND wired into the relevant hyperedge. A section stating quantitative
   results with zero NUMERIC nodes is WRONG.
 - NODE LABELING (critical for rich topology — do NOT default everything to PROPERTY):
-    * METHOD — a named scientific modeling approach/theory/law/model (e.g. "μ(I) rheology",
-      "kinetic theory", "nonlocal granular fluidity", "DEM", "RFT").
-      A method is what the paper proposes/uses/reviews as a MODELING approach.
-      NOT a research group name (e.g. "GDR MiDi" is NOT a method).
-      NOT an experiment type (e.g. "numerical simulation", "experiments" are NOT methods —
-      they are experimental procedures. Only label a node METHOD if it refers to a specific
-      named model/theory/rheology/constitutive relation).
+    * METHOD — ONLY a named scientific modeling approach/theory/law/model that the paper
+      PROPOSES or REVIEWS as a constitutive relation / rheology / continuum theory.
+      Examples: "μ(I) rheology", "kinetic theory", "nonlocal granular fluidity", "DEM", "RFT".
+      METHOD is for the MODEL itself, not the procedure of using it.
+      NOT a research group name (e.g. "GDR MiDi" → MATERIAL or PROPERTY).
+      NOT an experiment type: "numerical simulation", "experiments", "finite difference method",
+      "particle-image velocimetry", "erosion method" → these are EXPERIMENTAL TOOLS, label as
+      PROPERTY (they are procedures, not models/theories). Only a specific named constitutive
+      relation/rheology/theory counts as METHOD.
+      If unsure whether something is a METHOD vs PROPERTY: it is METHOD only if it names a
+      mathematical MODEL of material behavior (constitutive relation, flow rule, scaling law).
     * PARAMETER — named physical quantities/constants/coefficients that appear in equations
       (e.g. μ, I, d, P, τ, g, ρ_s, T, A, ξ, μ_s, b, ν). Distinguish from generic PROPERTY:
       a PARAMETER is a specific named symbol/constant in a law, while PROPERTY is a
