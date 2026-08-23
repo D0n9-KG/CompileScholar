@@ -828,7 +828,8 @@ class MetaHypergraph:
         return [e.dst for e in self.meta_edges
                 if e.relation == rel and e.src == pattern_id]
 
-    def detect_constraint_violations(self, instance: "InstanceHypergraph") -> list[dict]:
+    def detect_constraint_violations(self, instance: "InstanceHypergraph",
+                                     domain: str = "") -> list[dict]:
         """Schema constraint-violation detection (REDESIGN v2 — the富拓扑's
         real value, DIAL-KG can't do this). Deterministic (graph reachability,
         no LLM). Independent of depends_on edges (detects the gap directly).
@@ -847,18 +848,28 @@ class MetaHypergraph:
         σ stress / τ shear stress / P pressure / v velocity / h depth /
         φ friction angle / θ angle) — these are field-wide vocabulary, not
         paper-specific constants. Real violations are paper-specific constants
-        (e.g. μ_s base friction, b slope, I_0 scaling) the schema must define."""
-        UNIVERSAL_PHYSICS_SYMBOLS = {
+        (e.g. μ_s base friction, b slope, I_0 scaling) the schema must define.
+
+        DOMAIN-GATED (2026-08-15, anti-overfit): the universal-symbol whitelist
+        is granular-flow vocabulary (μ/d/I/σ/τ...). In non-physics domains 'n'
+        (sample size), 'k' (class count), 'T' (target) are NOT universal — they
+        are paper-specific params the schema SHOULD require defined. Suppressing
+        those would hide real violations. The whitelist runs ONLY when domain
+        starts with 'granular'; other domains get NO whitelist (every NUMERIC
+        referenced-but-undefined is a violation). Domain passed by caller."""
+        _GRANULAR_UNIVERSAL = {
             "d", "ρ", "ρ_s", "g", "i", "σ", "τ", "p", "v", "h", "φ", "θ",
             "γ", "γ̇", "μ", "n", "e", "k", "λ", "l", "t", "x", "y", "z",
             # also full-word forms (extractor may emit surface as word)
             "diameter", "density", "gravity", "stress", "shear stress",
             "pressure", "velocity", "depth", "angle", "time",
         }
+        _is_granular = (domain or "").lower().startswith("granular")
         def _is_universal(surface: str) -> bool:
+            if not _is_granular:
+                return False  # no whitelist in non-physics domains
             s = surface.strip().lower()
-            # single-letter or listed universal symbol -> not a paper-specific constant
-            if s in UNIVERSAL_PHYSICS_SYMBOLS:
+            if s in _GRANULAR_UNIVERSAL:
                 return True
             # multi-char with subscript (μ_s, I_0, b_1) -> paper-specific, NOT universal
             return False

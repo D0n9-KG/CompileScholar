@@ -351,7 +351,7 @@ class GranularFlowAgent:
         deps = infer_pattern_dependencies(self.meta_hg, inst, paper_id=paper_id)
         cons = infer_pattern_constraints(self.meta_hg, inst, paper_id=paper_id)
         comp = infer_pattern_compositions(self.meta_hg, inst, paper_id=paper_id)
-        violations = self.meta_hg.detect_constraint_violations(inst)
+        violations = self.meta_hg.detect_constraint_violations(inst, domain=self.domain)
         cons2 = consolidate_instance(inst, domain=self.domain)
         rich_topo = infer_rich_topology_direct(inst, paper_id=paper_id)
         result = {
