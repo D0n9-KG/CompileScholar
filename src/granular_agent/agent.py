@@ -288,15 +288,23 @@ class GranularFlowAgent:
 
         return results
 
-    def process_paper_hypergraph(self, paper_id: str) -> dict:
+    def process_paper_hypergraph(self, paper_id: str, arm: str = "full") -> dict:
         """Process one paper through the DEEP self-evolution hypergraph path.
 
         Uses the shared meta-hypergraph + trigger (cross-paper evolution):
         patterns added by earlier papers are available to this one, and
         structural-mismatch recurrence accumulates across papers. The
         meta-hypergraph is mutated in place.
+
+        arm (ablation): 'full' (default, evolve+propagate+repair),
+        'add_only' (evolve+propagate, skip repair), 'no_intra_dag'
+        (evolve, no propagation, repair), 'frozen' (no evolve).
+        Mirrors .research_tmp/corpus_driver.py so ablation arms run through
+        the agent main flow, not a shadow.
         """
         llm = self.llms[0] if self.llms else "deepseek"
+        evolve = arm in ("full", "add_only", "no_intra_dag")
+        propagate = arm in ("full", "add_only")
         blocks = load_paper_blocks(paper_id)
         if not blocks:
             return {"paper_id": paper_id, "error": "no_text", "n_nodes": 0, "n_hyperedges": 0}
@@ -307,17 +315,24 @@ class GranularFlowAgent:
         pre_v = self.meta_hg.version
         pre_patterns = set(self.meta_hg.patterns_ids())
         res = extract_hypergraph(smap, blocks, self.meta_hg, llm=llm, paper_id=paper_id,
-                                 trigger=self.hg_trigger)
+                                 trigger=self.hg_trigger, evolve=evolve,
+                                 propagate_intra_dag=propagate)
         acc = [e for e in res["evolutions"] if not e.get("rejected")]
         rej = [e for e in res["evolutions"] if e.get("rejected")]
         # pattern-level repair: split over-wide patterns (deterministic trigger,
         # LLM names only), merge near-dup (DIAL-KG op, cited), retire orphans.
         # These mutate the shared meta_hg + re-attribute this paper's instance.
+        # Only full + no_intra_dag run repair (add_only skips; frozen has no
+        # evolution so nothing to repair) — mirrors corpus_driver arm logic.
         inst = res["instance"]
         pre_repair_v = self.meta_hg.version
-        splits = run_split(self.meta_hg, inst, paper_id=paper_id, llm=llm)
-        merges = run_merge(self.meta_hg, inst, paper_id=paper_id, llm=llm)
-        retires = run_retire(self.meta_hg, inst, paper_id=paper_id)
+        if arm in ("full", "no_intra_dag"):
+            splits = run_split(self.meta_hg, inst, paper_id=paper_id, llm=llm)
+            merges = run_merge(self.meta_hg, inst, paper_id=paper_id, llm=llm)
+            retires = run_retire(self.meta_hg, inst, paper_id=paper_id)
+            renames = run_rename(self.meta_hg, llm=llm)
+        else:
+            splits, merges, retires, renames = [], [], [], []
         renames = run_rename(self.meta_hg, llm=llm)
         deps = infer_pattern_dependencies(self.meta_hg, inst, paper_id=paper_id)
         cons = infer_pattern_constraints(self.meta_hg, inst, paper_id=paper_id)
