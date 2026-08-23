@@ -25,7 +25,7 @@ from granular_agent import grounding as grounding_mod
 from granular_agent.gap_discovery import active_gap_scan, validate_gap
 from granular_agent.qa_generator import generate_qa
 from granular_agent.llm_client import call_llm, parse_json_response
-from granular_agent.hypergraph_schema import seed_meta_hypergraph, InstanceCorpus, MetaHypergraph
+from granular_agent.hypergraph_schema import seed_meta_hypergraph, MetaHypergraph
 from granular_agent.hypergraph_extractor import extract_hypergraph
 from granular_agent.hypergraph_evolution import (
     EvolutionTrigger, run_split, run_merge, run_retire, run_rename,
@@ -73,13 +73,14 @@ class GranularFlowAgent:
         # paper's InstanceHypergraph + merges nodes by surface so cross-paper
         # downstream (QA/retrieval/conflict) works — the shared meta alone
         # was only a schema bridge, this is the instance bridge.
-        self.hg_corpus = InstanceCorpus()
         # A-box: cross-paper concept hypergraph (n-ary, accumulated across
         # papers with LLM semantic alignment). Replaces InstanceCorpus
         # surface-only merge — see concept_graph.py + DESIGN_full.md.
+        # (InstanceCorpus class remains in hypergraph_schema only because the
+        # corpus_driver shadow still uses it; both deleted together in P2+.)
         from granular_agent.concept_graph import ConceptGraph
         self.concept_graph = ConceptGraph()
-        # per-paper instances (kept for save; InstanceCorpus no longer used)
+        # per-paper instances (kept for save)
         self.hg_instances: dict[str, Any] = {}
 
     def register_hook(self, event: str, handler):
@@ -339,8 +340,9 @@ class GranularFlowAgent:
             retires = run_retire(self.meta_hg, inst, paper_id=paper_id)
             renames = run_rename(self.meta_hg, llm=llm)
         else:
+            # add_only/frozen: skip repair (split/merge/retire/rename are
+            # pattern-maintenance ops, frozen arm runs NO evolution ops).
             splits, merges, retires, renames = [], [], [], []
-        renames = run_rename(self.meta_hg, llm=llm)
         deps = infer_pattern_dependencies(self.meta_hg, inst, paper_id=paper_id)
         cons = infer_pattern_constraints(self.meta_hg, inst, paper_id=paper_id)
         comp = infer_pattern_compositions(self.meta_hg, inst, paper_id=paper_id)

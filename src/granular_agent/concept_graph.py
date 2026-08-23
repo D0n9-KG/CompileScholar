@@ -91,19 +91,37 @@ class ConceptHyperedge:
 
 # greek + latin single-symbol tokens used in granular-flow equations
 _SYMBOL_RE = re.compile(
-    r'\b(μ|μ_s|μ_d|μ_eff|I|d|P|τ|g|ρ|ρ_s|ξ|ν|η|κ|T|A|B|b|ℓ|θ|ϕ|φ|γ̇|Γ|e|p|s|t|v|n|k|c|f)\b'
+    r'\b(μ_s|μ_d|μ_eff|μ|I|d|P|τ|g|ρ_s|ρ|ξ|ν|η|κ|T|A|B|b|ℓ|θ|ϕ|φ|γ|Γ|e|p|s|t|v|n|k|c|f)\b'
 )
+# γ̇ (gamma-dot, shear rate) has a combining mark that breaks \b word boundaries;
+# granular flow uses γ̇ heavily — handle explicitly before the regex.
+_GAMMA_DOT = "γ̇"
 
 # normalization map for common surface-level symbol variants
 _GREEK = {'mu': 'μ', 'rho': 'ρ', 'tau': 'τ', 'xi': 'ξ', 'nu': 'ν', 'eta': 'η',
           'kappa': 'κ', 'theta': 'θ', 'phi': 'φ', 'gamma': 'γ', 'Gamma': 'Γ', 'ell': 'ℓ'}
 
+# law-name patterns: 'μ(I)'/'mu(I)'/'μ(I) rheology' is a LAW (METHOD), NOT the
+# parameter μ. Symbol extraction must NOT return μ for these (would merge the
+# law with the friction-coefficient parameter). Per DESIGN C3 disambiguation.
+_LAW_NAME_RE = re.compile(r'\b(mu|μ)\s*\(\s*I\s*\)', re.I)
+
 
 def _extract_symbol(surface: str) -> str:
     """Extract a parameter/numeric symbol token from a surface mention.
     e.g. 'inertial number I' -> 'I', 'friction coefficient μ' -> 'μ',
-    'μ_s' -> 'μ_s', 'cooperativity length ξ' -> 'ξ'. Returns '' if none."""
+    'μ_s' -> 'μ_s', 'cooperativity length ξ' -> 'ξ', 'γ̇' -> 'γ̇'.
+    Returns '' if none, OR if the surface is a law-name like 'μ(I) rheology'
+    (law = METHOD, not the parameter μ — DESIGN C3 disambiguation, so the
+    law does not merge with friction coefficient μ via symbol)."""
     s = surface.strip()
+    # γ̇ first (combining mark defeats \b)
+    if _GAMMA_DOT in s:
+        return _GAMMA_DOT
+    # law-name (μ(I)) — NOT a parameter symbol; caller should treat as METHOD
+    # (returns '' so get_or_create falls back to surface, no symbol merge)
+    if _LAW_NAME_RE.search(s):
+        return ""
     # exact symbol match (handles greek letters and latin singles)
     m = _SYMBOL_RE.search(s)
     if m:
@@ -282,20 +300,25 @@ class ConceptGraph:
         # 1. consolidate + infer rich-topology (correct kinds)
         consolidate_instance(inst)
         rich_edges = infer_rich_topology_direct(inst, paper_id=paper_id)
+        # fallback: if all edges classify as "other" (param↔param only), the
+        # paper would contribute ZERO concepts. Re-run including "other" so
+        # the paper still ingests its labeled nodes (no silent skip).
+        if not rich_edges:
+            rich_edges = infer_rich_topology_direct(inst, paper_id=paper_id,
+                                                     include_other=True)
 
-        # 2. align each node mentioned in rich edges to a Concept
-        # collect all node surfaces + labels from rich edges (these are the
-        # concept-bearing nodes; nodes not in any rich edge are not ingested)
+        # 2. align each node mentioned in rich edges to a Concept (with
+        # provenance: surface + paper_id + evidence + year + section — section
+        # now carried per rich edge from infer_rich_topology_direct).
         nid2concept = {}
-        # build surface->concept via get_or_create for nodes appearing in rich edges
         for re_ in rich_edges:
+            sec = re_.get("section", "")
             for nd in re_["nodes"]:
                 surf = nd["surface"]
                 labels = nd.get("labels", [])
                 t = next((l for l in labels if l != "THING"), (labels[0] if labels else "PROPERTY"))
-                # use node nid as proxy for section (rich edge doesn't carry nid;
-                # evidence_span is the provenance text)
-                c = self.get_or_create(t, surf, paper_id, re_.get("evidence", ""), year, "")
+                c = self.get_or_create(t, surf, paper_id, re_.get("evidence", ""),
+                                       year, sec)
                 nid2concept[(t, surf)] = c.concept_id
 
         # 3. ingest each rich-topology edge as an n-ary ConceptHyperedge
