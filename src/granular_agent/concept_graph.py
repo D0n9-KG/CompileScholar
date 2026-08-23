@@ -1,24 +1,26 @@
-"""A-box: cross-paper Concept Graph (the knowledge graph itself).
+"""A-box: cross-paper Concept HYPERGRAPH (the instance-layer knowledge graph).
 
-Per DESIGN_full.md section 3 (A-box). The ConceptGraph accumulates concrete
-concept entities (methods/phenomena/parameters/...) across papers, with
-cross-paper semantic alignment (LLM, batched) so the same method mentioned in
-different papers merges into one Concept — the alignment anchor that the
-InstanceCorpus surface-merge was too weak to provide.
+Per DESIGN_full.md section 3 (A-box). The ConceptGraph is an n-ary hypergraph
+(multi-endpoint edges, NOT pairwise-binary) — this is the innovation: laws
+(I=γ̇d/√(P/ρ)) stay ONE n-ary hyperedge [law, I, γ̇, d, P, ρ], not 10
+pairwise edges. Binary would lose the n-ary structure that is our selling point.
 
-This is the A-box (instance layer). The T-box (schema/MetaHypergraph) defines
-types + relation patterns; ConceptGraph holds concrete entities + relations
-referencing those types/patterns.
+- Concept: concrete entity (method/phenomenon/parameter/regime/material/numeric)
+  with surface_variants provenance (per-paper surface+evidence+year+section).
+- ConceptHyperedge: n-ary edge (node_ids list + roles + kind) with provenance.
+  kind = rich-topology kind (method_parameter/captures/composition/nary/
+  law_parameter/method_regime) from infer_rich_topology_direct, NOT raw
+  pattern_type. Emergence (P2) adds evolution kinds here.
+- Cross-paper alignment: LLM batched for METHOD/PHENOMENON (noisy naming);
+  PARAMETER/NUMERIC use SYMBOL matching (μ/I/d not surface — 'inertial number I'
+  and 'I' merge by symbol). Symbol ambiguity (μ friction vs μ(I) law) via LLM.
 
-Provenance: every Concept records surface_variants (per-paper surface +
-evidence + year + section), every ConceptRelation records source papers +
-evidence — so any concept/edge traces back to source-paper original text.
-
-Emergence (P2) reads structure signals from this graph to surface evolution
-relation candidates — NOT done here (P1 = data structure + accumulation +
-alignment only).
+T-box (schema/MetaHypergraph) defines types + patterns; A-box references them.
+Emergence (P2) reads structure signals (temporal/citation/content) from this
+hypergraph to surface evolution relation candidates.
 """
 from __future__ import annotations
+import re
 import json
 from dataclasses import dataclass, field, asdict
 from typing import Any
@@ -36,17 +38,17 @@ class SurfaceVariant:
 
 @dataclass
 class Concept:
-    """A concrete concept entity in the cross-paper graph (A-box)."""
+    """A concrete concept entity in the cross-paper hypergraph (A-box)."""
     concept_id: str
-    type: str                                   # METHOD/PHENOMENON/PARAMETER/REGIME/MATERIAL/NUMERIC (T-box type)
+    type: str
     surface_variants: list[SurfaceVariant] = field(default_factory=list)
     source_papers: list[str] = field(default_factory=list)
-    year_range: tuple[str, str] = ("", "")      # (min, max) year
+    year_range: tuple[str, str] = ("", "")
     deprecated: bool = False
-    canonical_name: str = ""                    # optional, set when stable
+    canonical_name: str = ""
+    symbol: str = ""  # for PARAMETER/NUMERIC: extracted symbol (μ/I/d/...) for alignment
 
-    def add_variant(self, surface: str, paper_id: str, evidence: str = "",
-                    year: str = "", section: str = "") -> None:
+    def add_variant(self, surface, paper_id, evidence="", year="", section=""):
         self.surface_variants.append(SurfaceVariant(surface, paper_id, evidence, year, section))
         if paper_id and paper_id not in self.source_papers:
             self.source_papers.append(paper_id)
@@ -55,57 +57,127 @@ class Concept:
             if years:
                 self.year_range = (min(years), max(years))
 
-    def surfaces(self) -> list[str]:
-        """All distinct surfaces (for alignment/lookup)."""
+    def surfaces(self):
         seen = []
         for v in self.surface_variants:
             if v.surface and v.surface not in seen:
                 seen.append(v.surface)
         return seen
 
-    def to_dict(self) -> dict:
+    def to_dict(self):
         d = asdict(self)
         d["year_range"] = list(self.year_range)
         return d
 
 
 @dataclass
-class ConceptRelation:
-    """A concrete relation between two Concepts (A-box)."""
-    src_concept: str
-    tgt_concept: str
-    kind: str                                    # T-box pattern (constitutive_law/method_parameter/extends/...)
-    provenance: list[dict] = field(default_factory=list)  # [{paper_id, evidence, year}]
+class ConceptHyperedge:
+    """An n-ary edge in the concept hypergraph (A-box). Multi-endpoint.
+
+    kind = rich-topology kind (from infer_rich_topology_direct) or evolution
+    kind (added by P2 emergence). NOT raw pattern_type.
+    """
+    he_id: str
+    node_ids: list[str] = field(default_factory=list)  # concept_ids (n-ary, order matters for roles)
+    node_roles: list[str] = field(default_factory=list)
+    kind: str = ""
+    provenance: list[dict] = field(default_factory=list)  # [{paper_id, evidence, year, section}]
     emergence_signals: dict[str, Any] = field(default_factory=dict)  # P2 fills
     confidence: float = 0.0
 
-    def to_dict(self) -> dict:
+    def to_dict(self):
         return asdict(self)
 
 
+# greek + latin single-symbol tokens used in granular-flow equations
+_SYMBOL_RE = re.compile(
+    r'\b(μ|μ_s|μ_d|μ_eff|I|d|P|τ|g|ρ|ρ_s|ξ|ν|η|κ|T|A|B|b|ℓ|θ|ϕ|φ|γ̇|Γ|e|p|s|t|v|n|k|c|f)\b'
+)
+
+# normalization map for common surface-level symbol variants
+_GREEK = {'mu': 'μ', 'rho': 'ρ', 'tau': 'τ', 'xi': 'ξ', 'nu': 'ν', 'eta': 'η',
+          'kappa': 'κ', 'theta': 'θ', 'phi': 'φ', 'gamma': 'γ', 'Gamma': 'Γ', 'ell': 'ℓ'}
+
+
+def _extract_symbol(surface: str) -> str:
+    """Extract a parameter/numeric symbol token from a surface mention.
+    e.g. 'inertial number I' -> 'I', 'friction coefficient μ' -> 'μ',
+    'μ_s' -> 'μ_s', 'cooperativity length ξ' -> 'ξ'. Returns '' if none."""
+    s = surface.strip()
+    # exact symbol match (handles greek letters and latin singles)
+    m = _SYMBOL_RE.search(s)
+    if m:
+        return m.group(1)
+    # spelled-out greek ('mu', 'rho'...) -> greek letter
+    low = s.lower()
+    for word, letter in _GREEK.items():
+        if re.search(r'\b' + word + r'\b', low):
+            return letter
+    return ""
+
+
+def _norm_surface(s: str) -> str:
+    """normalize surface for first-pass exact-surface lookup."""
+    return s.strip().lower()
+
+
 class ConceptGraph:
-    """Cross-paper concept graph (A-box). Accumulates concepts + relations
-    across papers with semantic alignment. Replaces InstanceCorpus surface-merge."""
+    """Cross-paper n-ary concept hypergraph (A-box). Accumulates concepts +
+    n-ary hyperedges across papers with semantic/symbol alignment."""
 
     def __init__(self):
         self.concepts: dict[str, Concept] = {}
-        self.relations: list[ConceptRelation] = []
+        self.hyperedges: list[ConceptHyperedge] = []
         self._next_id = 0
-        # surface -> concept_id index for fast first-pass lookup (exact surface)
-        self._surface2concept: dict[str, str] = {}
+        # first-pass lookup indices
+        self._surface2concept: dict[str, str] = {}   # norm surface -> concept_id
+        self._symbol2concept: dict[str, str] = {}    # symbol -> concept_id (PARAMETER/NUMERIC)
 
     def _new_id(self, type_: str) -> str:
         self._next_id += 1
         prefix = {"METHOD": "M", "PHENOMENON": "F", "PARAMETER": "P",
-                   "REGIME": "R", "MATERIAL": "MAT", "NUMERIC": "N"}.get(type_, "C")
+                  "REGIME": "R", "MATERIAL": "MAT", "NUMERIC": "N"}.get(type_, "C")
         return f"C{prefix}{self._next_id:04d}"
 
     def get_or_create(self, type_: str, surface: str, paper_id: str,
                       evidence: str = "", year: str = "",
                       section: str = "") -> Concept:
-        """First-pass: exact-surface lookup, else create. LLM semantic
-        alignment (merge near-synonyms) happens in align_concepts, not here."""
-        key = surface.strip().lower()
+        """First-pass alignment:
+        - PARAMETER/NUMERIC with extractable symbol → align by SYMBOL
+          ('inertial number I' ~ 'I' merge by symbol 'I')
+        - PARAMETER/NUMERIC with NO symbol (function-like 'V_surf(y)',
+          'h_max', '|γ̇|') → fall back to surface-string (not 'always new')
+        - other types → exact-surface lookup
+        LLM semantic alignment (merge near-synonyms) in align_concepts, not here.
+        """
+        if type_ in ("PARAMETER", "NUMERIC"):
+            sym = _extract_symbol(surface)
+            if sym:  # symbol-based alignment
+                if sym in self._symbol2concept:
+                    cid = self._symbol2concept[sym]
+                    self.concepts[cid].add_variant(surface, paper_id, evidence, year, section)
+                    return self.concepts[cid]
+                cid = self._new_id(type_)
+                c = Concept(concept_id=cid, type=type_, symbol=sym)
+                c.add_variant(surface, paper_id, evidence, year, section)
+                self.concepts[cid] = c
+                self._symbol2concept[sym] = cid
+                return c
+            # no symbol extractable → fall back to surface-string (avoids
+            # creating a new concept every ingest for 'V_surf(y)'-like surfaces)
+            key = _norm_surface(surface)
+            cid = self._surface2concept.get(key)
+            if cid and cid in self.concepts:
+                self.concepts[cid].add_variant(surface, paper_id, evidence, year, section)
+                return self.concepts[cid]
+            cid = self._new_id(type_)
+            c = Concept(concept_id=cid, type=type_, symbol="")
+            c.add_variant(surface, paper_id, evidence, year, section)
+            self.concepts[cid] = c
+            self._surface2concept[key] = cid
+            return c
+        # non-symbol types: exact-surface lookup
+        key = _norm_surface(surface)
         cid = self._surface2concept.get(key)
         if cid and cid in self.concepts:
             self.concepts[cid].add_variant(surface, paper_id, evidence, year, section)
@@ -117,162 +189,195 @@ class ConceptGraph:
         self._surface2concept[key] = cid
         return c
 
-    def add_relation(self, src: str, tgt: str, kind: str,
-                     paper_id: str = "", evidence: str = "",
-                     year: str = "") -> ConceptRelation:
-        """Add a relation, DEDUP by (src, tgt, kind): same key → accumulate
-        provenance onto existing edge (not duplicate). Different kinds (e.g.
-        extends vs contradicts — a conflict) are separate edges (see DESIGN 11)."""
-        if src == tgt:
-            return ConceptRelation(src_concept=src, tgt_concept=tgt, kind=kind)  # skip self-loop
-        for r in self.relations:
-            if r.src_concept == src and r.tgt_concept == tgt and r.kind == kind:
+    def add_hyperedge(self, node_ids: list[str], kind: str, roles: list[str] = None,
+                      paper_id: str = "", evidence: str = "", year: str = "",
+                      section: str = "") -> ConceptHyperedge:
+        """Add an n-ary hyperedge. DEDUP by (frozenset(node_ids), kind):
+        same nodes+kind → accumulate provenance (not duplicate). Skips empty/
+        single-node 'edges' (not a relation). Self-loops (all same id) skipped."""
+        node_ids = [n for n in node_ids if n]
+        if len(node_ids) < 2:
+            return None
+        if len(set(node_ids)) == 1:
+            return None  # self-loop
+        key = (frozenset(node_ids), kind)
+        for he in self.hyperedges:
+            if (frozenset(he.node_ids), he.kind) == key:
                 if paper_id:
-                    r.provenance.append({"paper_id": paper_id, "evidence": evidence, "year": year})
-                return r
-        rel = ConceptRelation(src_concept=src, tgt_concept=tgt, kind=kind,
-                              provenance=[{"paper_id": paper_id, "evidence": evidence, "year": year}]
-                              if paper_id else [])
-        self.relations.append(rel)
-        return rel
+                    he.provenance.append({"paper_id": paper_id, "evidence": evidence,
+                                          "year": year, "section": section})
+                return he
+        he = ConceptHyperedge(he_id=f"H{self._next_he()}", node_ids=node_ids,
+                               node_roles=roles or [], kind=kind,
+                               provenance=[{"paper_id": paper_id, "evidence": evidence,
+                                            "year": year, "section": section}]
+                               if paper_id else [])
+        self.hyperedges.append(he)
+        return he
+
+    _he_counter = 0
+
+    def _next_he(self) -> int:
+        ConceptGraph._he_counter += 1
+        return ConceptGraph._he_counter
 
     def merge_concepts(self, into_id: str, merge_id: str) -> None:
         """Merge two Concepts (semantic near-synonyms, called by align_concepts).
-        Redirects relations, merges variants + provenance, removes self-loops
-        created by the merge."""
+        Redirects hyperedge node_ids, dedups resulting duplicate/self-loop edges."""
         if into_id == merge_id or merge_id not in self.concepts or into_id not in self.concepts:
             return
         keep = self.concepts[into_id]
         drop = self.concepts[merge_id]
         for v in drop.surface_variants:
             keep.add_variant(v.surface, v.paper_id, v.evidence, v.year, v.section)
-        # redirect relations
-        for r in self.relations:
-            if r.src_concept == merge_id:
-                r.src_concept = into_id
-            if r.tgt_concept == merge_id:
-                r.tgt_concept = into_id
-        # remove self-loops created by the merge (src==tgt)
-        self.relations = [r for r in self.relations if r.src_concept != r.tgt_concept]
-        # update surface index
+        if drop.symbol and not keep.symbol:
+            keep.symbol = drop.symbol
+        # redirect hyperedge endpoints
+        for he in self.hyperedges:
+            he.node_ids = [into_id if n == merge_id else n for n in he.node_ids]
+        # dedup: after redirect, edges with same (frozenset, kind) collapse; self-loops drop
+        seen = {}
+        new_edges = []
+        for he in self.hyperedges:
+            if len(set(he.node_ids)) < 2:
+                continue  # self-loop after merge
+            key = (frozenset(he.node_ids), he.kind)
+            if key in seen:
+                # merge provenance into existing
+                seen[key].provenance.extend(he.provenance)
+                continue
+            seen[key] = he
+            new_edges.append(he)
+        self.hyperedges = new_edges
+        # update indices
         for s in drop.surfaces():
-            self._surface2concept[s.strip().lower()] = into_id
+            self._surface2concept[_norm_surface(s)] = into_id
+        if drop.symbol:
+            self._symbol2concept[drop.symbol] = into_id
         del self.concepts[merge_id]
 
-    def concepts_by_type(self, type_: str) -> list[Concept]:
+    def concepts_by_type(self, type_: str):
         return [c for c in self.concepts.values() if c.type == type_ and not c.deprecated]
 
     def ingest_instance(self, inst, year: str = "") -> None:
-        """Accumulate one paper's InstanceHypergraph into the concept graph.
+        """Accumulate one paper's instance into the concept hypergraph.
 
-        For each node (typed): get_or_create a Concept with provenance
-        (surface + paper_id + evidence + year + section-from-nid-prefix).
-        For each hyperedge: add a ConceptRelation (kind = pattern_type) with
-        provenance. PARAMETER/NUMERIC use surface/symbol (no LLM alignment —
-        that's only METHOD/PHENOMENON via align_concepts).
+        Does NOT use raw pattern_type. Runs consolidate_instance +
+        infer_rich_topology_direct to get rich-topology edges (correct kind:
+        method_parameter/captures/composition/nary/law_parameter/method_regime),
+        then ingests those as n-ary ConceptHyperedges (no pairwise split).
 
-        inst: InstanceHypergraph (or dict with 'nodes'/'hyperedges').
-        year: paper year (for time-order signals in P2 emergence).
+        inst: InstanceHypergraph (or dict). year: for P2 time-order signals.
         """
+        from granular_agent.hypergraph_evolution import (
+            consolidate_instance, infer_rich_topology_direct)
         # accept dict or InstanceHypergraph
-        nodes = inst.nodes if hasattr(inst, "nodes") else inst["nodes"]
-        hyperedges = inst.hyperedges if hasattr(inst, "hyperedges") else inst["hyperedges"]
-        paper_id = getattr(inst, "paper_id", "") or inst.get("paper_id", "")
+        is_obj = hasattr(inst, "nodes")
+        nodes = inst.nodes if is_obj else inst["nodes"]
+        paper_id = (getattr(inst, "paper_id", "") if is_obj else inst.get("paper_id", "")) or ""
 
         def _section(nid: str) -> str:
-            # nid like 'n5c2_n3' — section encoded in prefix before '_'
             return nid.split("_")[0] if "_" in nid else nid
 
-        # node -> concept_id map (per this paper)
+        # 1. consolidate + infer rich-topology (correct kinds)
+        consolidate_instance(inst)
+        rich_edges = infer_rich_topology_direct(inst, paper_id=paper_id)
+
+        # 2. align each node mentioned in rich edges to a Concept
+        # collect all node surfaces + labels from rich edges (these are the
+        # concept-bearing nodes; nodes not in any rich edge are not ingested)
         nid2concept = {}
-        for nid, n in nodes.items():
-            labels = n.labels if hasattr(n, "labels") else n.get("labels", [])
-            if not labels:
-                continue
-            # pick the most specific type (first non-THING label)
-            t = next((l for l in labels if l != "THING"), labels[0])
-            surface = n.surface if hasattr(n, "surface") else n.get("surface", "")
-            ev = n.evidence_span if hasattr(n, "evidence_span") else n.get("evidence_span", "")
-            c = self.get_or_create(t, surface, paper_id, ev, year, _section(nid))
-            nid2concept[nid] = c.concept_id
+        # build surface->concept via get_or_create for nodes appearing in rich edges
+        for re_ in rich_edges:
+            for nd in re_["nodes"]:
+                surf = nd["surface"]
+                labels = nd.get("labels", [])
+                t = next((l for l in labels if l != "THING"), (labels[0] if labels else "PROPERTY"))
+                # use node nid as proxy for section (rich edge doesn't carry nid;
+                # evidence_span is the provenance text)
+                c = self.get_or_create(t, surf, paper_id, re_.get("evidence", ""), year, "")
+                nid2concept[(t, surf)] = c.concept_id
 
-        # hyperedges -> relations
-        for he in hyperedges.values():
-            pt = he.pattern_type if hasattr(he, "pattern_type") else he.get("pattern_type", "")
-            nids = he.node_ids if hasattr(he, "node_ids") else he.get("node_ids", [])
-            ev = he.evidence_span if hasattr(he, "evidence_span") else he.get("evidence_span", "")
-            cids = [nid2concept.get(n) for n in nids]
-            cids = [c for c in cids if c]
-            # emit pairwise relations for the hyperedge (n-ary → all pairs)
-            # kind = pattern_type (references T-box); P2 will refine rich-topology kind
-            for i, a in enumerate(cids):
-                for b in cids[i+1:]:
-                    self.add_relation(a, b, pt, paper_id, ev, year)
-
-    def to_dict(self) -> dict:
-        return {
-            "n_concepts": len(self.concepts),
-            "n_relations": len(self.relations),
-            "concepts": {cid: c.to_dict() for cid, c in self.concepts.items()},
-            "relations": [r.to_dict() for r in self.relations],
-        }
-
-    @classmethod
-    def from_dict(cls, d: dict) -> "ConceptGraph":
-        cg = cls()
-        for cid, cd in d.get("concepts", {}).items():
-            c = Concept(concept_id=cid, type=cd["type"], deprecated=cd.get("deprecated", False),
-                        canonical_name=cd.get("canonical_name", ""))
-            for v in cd.get("surface_variants", []):
-                c.add_variant(v["surface"], v.get("paper_id", ""),
-                              v.get("evidence", ""), v.get("year", ""), v.get("section", ""))
-            cg.concepts[cid] = c
-            for s in c.surfaces():
-                cg._surface2concept[s.strip().lower()] = cid
-        for r in d.get("relations", []):
-            cg.relations.append(ConceptRelation(
-                src_concept=r["src_concept"], tgt_concept=r["tgt_concept"],
-                kind=r["kind"], provenance=r.get("provenance", []),
-                emergence_signals=r.get("emergence_signals", {}),
-                confidence=r.get("confidence", 0.0)))
-        cg._next_id = len(cg.concepts)
-        return cg
+        # 3. ingest each rich-topology edge as an n-ary ConceptHyperedge
+        for re_ in rich_edges:
+            kind = re_["kind"]
+            ev = re_.get("evidence", "")
+            cids = []
+            for nd in re_["nodes"]:
+                surf = nd["surface"]
+                labels = nd.get("labels", [])
+                t = next((l for l in labels if l != "THING"), (labels[0] if labels else "PROPERTY"))
+                cid = nid2concept.get((t, surf))
+                if cid:
+                    cids.append(cid)
+            if len(cids) >= 2:
+                self.add_hyperedge(cids, kind, paper_id=paper_id, evidence=ev, year=year)
 
     # ---- cross-paper semantic alignment (C2) ----
     def align_concepts(self, llm_fn, type_filter=("METHOD", "PHENOMENON"),
                        batch_size: int = 20) -> int:
-        """LLM semantic alignment: for each type, batch its concept surfaces
-        and ask LLM which are the SAME concept (near-synonyms surface-string
-        miss). Merge each LLM-identified group into one.
+        """LLM semantic alignment: batch concept surfaces per type, ask LLM
+        which are the SAME concept (near-synonyms). Merge each group into one
+        (keep = the concept with most surface_variants; tie-break by id).
 
-        Replaces InstanceCorpus surface-only merge (which missed
-        'non-local rheology' ~ 'I-gradient' synonyms).
-
-        llm_fn(prompt) -> response text. Returns number of merges done.
-        Only aligns METHOD/PHENOMENON (the noisy-naming types); PARAMETER/
-        NUMERIC use symbol matching elsewhere."""
+        Only METHOD/PHENOMENON (noisy naming). PARAMETER/NUMERIC use symbol
+        matching (in get_or_create)."""
         n_merged = 0
         for t in type_filter:
             concepts = [c for cid, c in self.concepts.items()
                         if c.type == t and not c.deprecated]
-            # collect (concept_id, representative surface) — first surface per concept
             items = [(c.concept_id, c.surfaces()[0] if c.surfaces() else "")
                      for c in concepts if c.surfaces()]
             if len(items) < 2:
                 continue
             for i in range(0, len(items), batch_size):
                 batch = items[i:i+batch_size]
-                merges = _llm_align_batch(batch, t, llm_fn)
-                # merges: list of groups (each a list of concept_ids that are the same)
-                for group in merges:
+                groups = _llm_align_batch(batch, t, llm_fn)
+                for group in groups:
                     if len(group) < 2:
                         continue
-                    keep = group[0]
-                    for dup in group[1:]:
-                        if dup in self.concepts and keep in self.concepts:
-                            self.merge_concepts(keep, dup)
+                    # keep = concept with most variants (stable, not arbitrary)
+                    cands = [self.concepts[g] for g in group if g in self.concepts]
+                    if len(cands) < 2:
+                        continue
+                    keep = max(cands, key=lambda c: (len(c.surface_variants), -ord(c.concept_id[-1])))
+                    for dup in cands:
+                        if dup.concept_id != keep.concept_id:
+                            self.merge_concepts(keep.concept_id, dup.concept_id)
                             n_merged += 1
         return n_merged
+
+    def to_dict(self):
+        return {
+            "n_concepts": len(self.concepts),
+            "n_hyperedges": len(self.hyperedges),
+            "concepts": {cid: c.to_dict() for cid, c in self.concepts.items()},
+            "hyperedges": [he.to_dict() for he in self.hyperedges],
+        }
+
+    @classmethod
+    def from_dict(cls, d):
+        cg = cls()
+        for cid, cd in d.get("concepts", {}).items():
+            c = Concept(concept_id=cid, type=cd["type"], deprecated=cd.get("deprecated", False),
+                        canonical_name=cd.get("canonical_name", ""), symbol=cd.get("symbol", ""))
+            for v in cd.get("surface_variants", []):
+                c.add_variant(v["surface"], v.get("paper_id", ""),
+                              v.get("evidence", ""), v.get("year", ""), v.get("section", ""))
+            cg.concepts[cid] = c
+            for s in c.surfaces():
+                cg._surface2concept[_norm_surface(s)] = cid
+            if c.symbol:
+                cg._symbol2concept[c.symbol] = cid
+        for he in d.get("hyperedges", []):
+            cg.hyperedges.append(ConceptHyperedge(
+                he_id=he["he_id"], node_ids=he.get("node_ids", []),
+                node_roles=he.get("node_roles", []), kind=he.get("kind", ""),
+                provenance=he.get("provenance", []),
+                emergence_signals=he.get("emergence_signals", {}),
+                confidence=he.get("confidence", 0.0)))
+        cg._next_id = len(cg.concepts)
+        return cg
 
 
 _ALIGN_PROMPT = """下面是抽取出的多个{type_label}实体(每个有一个代表性surface, 来自不同论文).
@@ -287,16 +392,34 @@ _ALIGN_PROMPT = """下面是抽取出的多个{type_label}实体(每个有一个
 
 
 def _llm_align_batch(items, type_label, llm_fn):
+    """items: list[(concept_id, surface)]. Returns list of groups
+    (each a list of concept_ids). Uses INDEX-based mapping so the LLM
+    returning index numbers (not raw ids) still maps correctly."""
     type_map = {"METHOD": "建模方法", "PHENOMENON": "物理现象"}
     tl = type_map.get(type_label, type_label)
-    item_str = "\n".join(f"{cid}: {surf}" for cid, surf in items)
+    # present items with a stable numeric index the LLM can refer to
+    idx_items = "\n".join(f"{i}: {surf}" for i, (_, surf) in enumerate(items))
+    prompt = _ALIGN_PROMPT.format(type_label=tl, items=idx_items).replace(
+        "id1, id2", "index1, index2").replace("id3", "index3")
     try:
         from granular_agent.llm_client import parse_json_response
-        resp = llm_fn(_ALIGN_PROMPT.format(type_label=tl, items=item_str))
+        resp = llm_fn(prompt)
         obj = parse_json_response(resp) or {}
         groups = obj.get("groups", [])
-        # map back to concept_ids (items[i][0] is the concept_id)
-        id2idx = {cid: i for i, (cid, _) in enumerate(items)}
-        return [[g for g in group if g in id2idx] for group in groups]
+        out = []
+        for g in groups:
+            # g may be list of int indices OR strings; map to concept_ids
+            cids = []
+            for x in g:
+                try:
+                    idx = int(x)
+                    if 0 <= idx < len(items):
+                        cids.append(items[idx][0])
+                except (ValueError, TypeError):
+                    # maybe returned the id directly
+                    if x in [cid for cid, _ in items]:
+                        cids.append(x)
+            out.append(cids)
+        return out
     except Exception:
         return []
