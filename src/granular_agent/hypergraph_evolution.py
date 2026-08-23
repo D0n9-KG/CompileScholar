@@ -434,9 +434,9 @@ def validate_proposal(proposal: dict, meta: MetaHypergraph,
 
     # ---- LLM distinctness / necessity check (one call, batched per proposal) ----
     # Keep this cheap: only fire if the deterministic gate passed.
-    check_prompt = f"""A schema-evolution proposal for a {domain} knowledge hypergraph. Judge if it is a DISTINCT, generalizable structural addition.
+    check_prompt = f"""A schema-evolution proposal for a {domain} knowledge hypergraph. Judge if it is a DISTINCT NEW RELATION TYPE, or an INSTANCE VARIANT of an existing pattern.
 
-Current schema:
+Current schema patterns:
 {meta.to_prompt()}
 
 Proposal:
@@ -445,27 +445,83 @@ Proposal:
 Verbatim evidence span from the paper:
 "{evidence}"
 
-DUPLICATE RULE (critical): a proposal is a near-duplicate ONLY if an existing pattern has the SAME role-structure (same number of roles AND matching types). A proposal with a DIFFERENT role-structure is a DISTINCT relation — e.g. a multi-input dependency (one output depends on 3+ inputs) is NOT a duplicate of a single-input dependency pattern, even if semantically similar. Do NOT reject different-structure proposals as duplicates.
+INSTANCE-VARIANT RULE (critical, anti-schema-bloat): a proposal is an INSTANCE
+VARIANT (NOT a new relation type) if it is a SPECIALIZATION/FLAVOR of an
+existing pattern — the relation KIND is the same, only the specific form/
+condition/qualifier differs. Examples of INSTANCE VARIANTS (reject, use base
+pattern + qualifier):
+  - 'influences_threshold_condition' is a variant of 'influences' (threshold is
+    a qualifier/condition on the dependency, not a new relation kind)
+  - 'constitutive_law_scaling_relation' / '_product_with_derivative' /
+    '_dimensionless_ratio' are variants of 'constitutive_law' (mathematical
+    form is a qualifier, not a new relation kind)
+  - 'compares_model_predictions' / 'compares_contradicts' are variants of
+    'compares' (what's compared / contrast flavor is a qualifier)
+  - 'defines_dimensionless_parameter' is a variant of 'defines' (dimensionless
+    is a qualifier on what's defined)
 
-Reject ONLY if:
+DISTINCT-NEW-KIND RULE (critical, do NOT over-reject): a proposal is a
+DISTINCT NEW TYPE if the RELATION KIND is genuinely different from any existing
+pattern — different KINDS are NOT variants even if conceptually related:
+  - 'causally_prevents' (causal prevention) is NOT a variant of 'influences'
+    (functional dependence) — causation vs dependence are different KINDS;
+    negative causation is still causation, a different kind than dependence
+  - 'extends'/'improves'/'compares' (method evolution) vs 'influences'
+    (quantity dependence) are different KINDS
+  - a TEMPORAL relation (X before/after Y) vs a DEPENDENCY (X depends on Y)
+    are different KINDS
+The KIND test: would a scientist say these are the SAME relation category
+with a flavor difference, or TWO different relation categories? Same category
++ flavor = variant; two categories = distinct new kind.
+
+Reject (valid=false) if:
+- the proposal is an INSTANCE VARIANT of an existing pattern (same relation
+  kind, only form/condition differs) → suggest the base pattern + qualifier, OR
 - the span doesn't support the proposed structure, OR
-- the proposal is a pure numeric value / single equation / modeling-method NAME (NOT a relation between entities), OR
-- an existing pattern with the SAME role-structure already covers it, OR
+- the proposal is a pure numeric value / single equation / method NAME (not a
+  relation between entities), OR
 - it's too paper-specific to generalize.
 
-IMPORTANT — do NOT conflate these two:
-  * REJECT: "X is defined as 0.5" / "the learning rate is 0.4" (a value assignment, no relation).
-  * ACCEPT: "Informer is the model composed of ProbSparse attention and a distilling layer" / "X is composed of Y and Z" / "a relation is universal if it holds under any input distribution" — these are DEFINITIONAL/COMPOSITIONAL RELATIONS (one entity is defined BY / composed OF others). They ARE relations between entities and should be accepted as new patterns (e.g. defines_composition, identified_with), not rejected as "definitions".
+Accept (valid=true) ONLY if the span supports a distinct NEW RELATION KIND the
+schema lacks (a kind not expressible as existing-pattern + qualifier).
+Multi-input dependencies ARE distinct from single-input IF the arity/role
+structure is genuinely different AND not just a qualified instance — but a
+dependency-with-extra-condition-role is still an INSTANCE VARIANT of dependency.
 
-Accept if the span supports a distinct, generalizable relation the schema lacks (including multi-input/joint dependencies AND definitional/compositional relations).
+IMPORTANT — do NOT conflate:
+  * REJECT: "X is defined as 0.5" (value, no relation).
+  * ACCEPT: "Informer is composed of ProbSparse + distilling" (a genuine
+    composition relation — but use existing 'composed_of', not a new pattern,
+    unless the composition KIND is structurally new).
 
-Output ONLY JSON: {{"valid": true/false, "reason": "one short sentence citing the span and the role-structure judgment"}}"""
+Output ONLY JSON: {{"valid": true/false, "reason": "one short sentence: is this a NEW relation KIND or an INSTANCE VARIANT of <which pattern>?", "base_pattern": "<existing pattern_id if variant, else null>"}}"""
     raw = _call(check_prompt, llm, max_tokens=300)
     res = parse_json_response(raw)
     if not isinstance(res, dict):
         return {"valid": False, "reason": "LLM check unparseable", "proposal": proposal}
-    return {"valid": bool(res.get("valid", False)),
-            "reason": res.get("reason", ""), "proposal": proposal}
+    valid = bool(res.get("valid", False))
+    reason = res.get("reason", "")
+    base = res.get("base_pattern")
+    # FAMILY GUARD (override LLM over-merging): if the LLM says "variant of
+    # base_pattern" but base and proposal are in DIFFERENT families, they are
+    # different relation KINDS (dependency vs causal vs evolution...) — NOT a
+    # variant. LLM tends to over-merge conceptually-related-but-different kinds
+    # (e.g. 'causally_prevents' causal family -> 'influences' dependency family).
+    # Different family => force valid (accept as new kind). Same family => trust
+    # the variant judgment.
+    if not valid and base and base in meta.patterns:
+        base_fam = meta.patterns[base].family
+        prop_fam = proposal.get("family", "")
+        if prop_fam and base_fam and prop_fam != base_fam:
+            valid = True
+            reason = (f"different relation KIND (families {prop_fam} vs {base_fam}) "
+                      f"— not a variant of {base}; LLM over-merge overridden")
+            base = None
+    out = {"valid": valid, "reason": reason, "proposal": proposal}
+    if not valid and base and base in meta.patterns:
+        out["suggested_alternative"] = base
+        out["suggested_qualifier_value"] = pid[len(base):].strip("_-") if pid.startswith(base) else ""
+    return out
 
 
 def apply_proposal(meta: MetaHypergraph, proposal: dict, paper_id: str) -> str | None:
