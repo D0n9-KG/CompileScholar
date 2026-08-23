@@ -234,6 +234,30 @@ def _near_dup(a: str, b: str) -> bool:
     return False
 
 
+def _is_instance_variant(pid: str, base_pid: str) -> bool:
+    """Is `pid` an INSTANCE VARIANT of `base_pid` (not a new relation type)?
+    e.g. 'compares_contradicts' is a variant of 'compares' (the contradicts
+    flavor should be a qualifier, not a new pattern).
+    'constitutive_law_product_with_derivative' is a variant of
+    'constitutive_law' (mathematical form = qualifier, not new type).
+    Rule: base_pid is a prefix of pid (separator _ or camelCase boundary) and
+    the remaining suffix is a non-trivial modifier (>=3 chars). This catches
+    LLM-minted subtypes that bloat the schema without adding relation types.
+    Guard: base must be reasonably specific (len>=4) to avoid 's' matching
+    'single_X' etc.; and pid must be strictly longer than base."""
+    if not base_pid or len(base_pid) < 4:
+        return False
+    if pid == base_pid or len(pid) <= len(base_pid):
+        return False
+    # exact underscore-prefix: compares_xxx, constitutive_law_xxx
+    if pid.startswith(base_pid + "_"):
+        return True
+    # camelCase boundary: comparesContradicts vs compares
+    if base_pid[-1].islower() and pid[len(base_pid):len(base_pid)+1].isupper():
+        return True
+    return False
+
+
 # ---- P3 semantic dedup (embedding) for pattern proposals ----
 # Token matching misses near-synonyms like depends_on_property ~ affects_property
 # (different tokens, same relation). Embedding cosine catches them.
@@ -362,6 +386,24 @@ def validate_proposal(proposal: dict, meta: MetaHypergraph,
             if _role_sig(ex_pat) == new_sig and _near_dup(pid, ex_pid):
                 return {"valid": False, "reason": f"near-duplicate pattern '{ex_pid}'",
                         "suggested_alternative": ex_pid, "proposal": proposal}
+        # P3 instance-variant gate: a proposal like 'compares_contradicts' or
+        # 'constitutive_law_product_with_derivative' is NOT a new relation TYPE —
+        # it's an INSTANCE VARIANT of an existing pattern (compares /
+        # constitutive_law) with the variant carried as a qualifier. Same role
+        # structure + pid starts with an existing pattern_id as prefix (separated
+        # by _ or CamelCase) → reject, suggest the base pattern + qualifier.
+        # This stops LLM from minting a new pattern_type for every mathematical
+        # form / comparison flavor (schema bloat root cause).
+        for ex_pid, ex_pat in meta.patterns.items():
+            if ex_pat.deprecated or ex_pid == pid:
+                continue
+            if _role_sig(ex_pat) == new_sig and _is_instance_variant(pid, ex_pid):
+                return {"valid": False,
+                        "reason": f"'{pid}' is an instance variant of '{ex_pid}' "
+                                  f"(same role structure, variant should be a qualifier)",
+                        "suggested_alternative": ex_pid,
+                        "suggested_qualifier_value": pid[len(ex_pid):].strip("_-"),
+                        "proposal": proposal}
         # P3 semantic dedup (catches near-synonyms token matching misses)
         sem = _semantic_near_dup_pattern(pid, proposal.get("description", ""),
                                           proposal.get("role_slots", []),
