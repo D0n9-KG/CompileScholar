@@ -1594,6 +1594,14 @@ _EFFECT_RE = re.compile(
     r'(Bagnold[- ]like|Janssen effect|constitutive law for.+|effective friction law for.+|'
     r'profile$|velocity profile|dilatancy|Reynolds dilation)', re.I)
 _EQREF_RE = re.compile(r'^eq(uation|\.)?\s*\.?\s*\(?[\dabivx]+\)?\.?$', re.I)
+# Long surfaces are dropped as METHOD ONLY when they look like a sentence/paper-title,
+# NOT a descriptive method phrase. A descriptive noun phrase like "gradient expansion
+# of the yield parameter" (39 chars) is a real method concept — keep it. Only drop when
+# the surface contains a verb/connective pattern typical of a full sentence or title.
+_LONG_TITLE_RE = re.compile(
+    r'^(.+\s(.of|from|into|towards|using|by|via|based on|in order to|allows|enables|shows|predicts|describes|proposes|introduces)\s.+'
+    r'|.+(stopping|arrest|flow|flows|media|materials?)\s(down|in|on|across|through)\s.+)$',
+    re.I)
 
 
 def _relabel(n, new):
@@ -1631,7 +1639,7 @@ def consolidate_instance(instance: InstanceHypergraph) -> dict:
             _relabel(n, "MATERIAL"); n_relabel += 1
         elif _EQREF_RE.match(s):
             _relabel(n, "drop"); n_relabel += 1
-        elif len(s) >= 36 and not re.search(r'(rheology|fluidity|kinetic|theory|model)$', s, re.I):
+        elif _LONG_TITLE_RE.match(s):
             _relabel(n, "drop"); n_relabel += 1
         elif _TOOL_RE.match(s):
             _relabel(n, "PROPERTY"); n_relabel += 1
