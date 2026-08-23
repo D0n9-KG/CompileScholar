@@ -1744,8 +1744,13 @@ def consolidate_instance(instance: InstanceHypergraph, domain: str = "") -> dict
         s = n.surface.strip()
         if _EQREF_RE.match(s):
             _relabel(n, "drop"); n_relabel += 1
-        elif _LONG_TITLE_RE.match(s):
-            _relabel(n, "drop"); n_relabel += 1
+        # (_LONG_TITLE_RE REMOVED — it mis-killed real method concepts like
+        # 'gradient expansion of the yield parameter' (39 chars, real method
+        # M6). Judging 'is this surface a method or a paper title' is a semantic
+        # task, not a rule. Source-prompt treatment (#3) and align_concepts LLM
+        # handle this; for now long-titled METHOD nodes are kept rather than
+        # risk false kills. Trade-off accepted: stop known false-kills > tolerate
+        # occasional paper-title METHOD that align_concepts/eval absorbs.)
         elif is_granular and _TOOL_RE.match(s):
             _relabel(n, "PROPERTY"); n_relabel += 1
         elif is_granular and _GEO_RE.match(s):
