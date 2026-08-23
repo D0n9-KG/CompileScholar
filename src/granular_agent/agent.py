@@ -74,6 +74,11 @@ class GranularFlowAgent:
         # downstream (QA/retrieval/conflict) works — the shared meta alone
         # was only a schema bridge, this is the instance bridge.
         self.hg_corpus = InstanceCorpus()
+        # A-box: cross-paper concept hypergraph (n-ary, accumulated across
+        # papers with LLM semantic alignment). Replaces InstanceCorpus
+        # surface-only merge — see concept_graph.py + DESIGN_full.md.
+        from granular_agent.concept_graph import ConceptGraph
+        self.concept_graph = ConceptGraph()
 
     def register_hook(self, event: str, handler):
         """Register an event hook."""
@@ -392,6 +397,11 @@ class GranularFlowAgent:
         self.hg_results.append(result)
         # accumulate into the cross-paper instance corpus (instance bridge)
         self.hg_corpus.add_paper(inst)
+        # accumulate into the A-box concept hypergraph (n-ary, with provenance).
+        # year parsed from paper_id for P2 time-order emergence signals.
+        import re as _re
+        _ym = _re.search(r'(\d{4})', paper_id)
+        self.concept_graph.ingest_instance(inst, year=_ym.group(1) if _ym else "")
         print(f"  [hypergraph] {paper_id}: {res['n_nodes']} nodes / {res['n_hyperedges']} he / "
               f"{len(acc)} acc / {len(rej)} rej | cross_node={result['cross_node']} | "
               f"v{pre_v}->{self.meta_hg.version} ({len(self.meta_hg.patterns)} patterns) | "
@@ -402,8 +412,20 @@ class GranularFlowAgent:
 
     def process_batch_hypergraph(self, paper_ids: list[str]) -> list[dict]:
         """Run the hypergraph path over a batch. Meta + trigger persist across
-        papers (cross-paper deep evolution). Returns per-paper results."""
-        return [self.process_paper_hypergraph(pid) for pid in paper_ids]
+        papers (cross-paper deep evolution). After all papers ingested into
+        the A-box, run one LLM semantic alignment pass (merge near-synonym
+        concepts surface-string missed). Returns per-paper results."""
+        results = [self.process_paper_hypergraph(pid) for pid in paper_ids]
+        # one LLM alignment pass over the accumulated concept graph
+        try:
+            llm = self.llms[0] if self.llms else "deepseek"
+            from granular_agent.llm_client import call_paratera
+            n_merged = self.concept_graph.align_concepts(
+                lambda p: call_paratera(p, model="GLM-5-Turbo", max_tokens=3000, temperature=0.0))
+            print(f"  [concept-graph] LLM alignment: merged {n_merged} near-synonym concepts", flush=True)
+        except Exception as e:
+            print(f"  [concept-graph] alignment failed: {e!r}", flush=True)
+        return results
 
     def save_hypergraph_results(self, output_dir: str):
         """Save hypergraph instances + evolved meta-hypergraph (FULL field,
@@ -427,8 +449,13 @@ class GranularFlowAgent:
         }
         with open(os.path.join(output_dir, "corpus_index.json"), "w", encoding="utf-8") as f:
             json.dump(corpus_summary, f, ensure_ascii=False, indent=2)
+        # A-box: concept hypergraph (n-ary, cross-paper aligned)
+        with open(os.path.join(output_dir, "concept_graph.json"), "w", encoding="utf-8") as f:
+            json.dump(self.concept_graph.to_dict(), f, ensure_ascii=False, indent=2)
         print(f"  [hypergraph] saved meta (full-field) + {self.hg_corpus.n_papers()} instances "
-              f"+ corpus ({corpus_summary['n_cross_paper_nodes']} cross-paper nodes) to {output_dir}", flush=True)
+              f"+ corpus ({corpus_summary['n_cross_paper_nodes']} cross-paper nodes) "
+              f"+ concept-graph ({len(self.concept_graph.concepts)} concepts, "
+              f"{len(self.concept_graph.hyperedges)} hyperedges) to {output_dir}", flush=True)
 
     def save_meta(self, path: str):
         """Save JUST the evolved meta-hypergraph (full-field, round-trippable)
