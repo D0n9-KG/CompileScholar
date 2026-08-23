@@ -1720,7 +1720,22 @@ def infer_rich_topology_direct(instance: InstanceHypergraph,
         n_distinct_types = sum([has_method, has_param, has_phenom, has_regime, has_numeric])
 
         # determine kind
-        if "constitutive_law" in he.pattern_type:
+        # evolution relations FIRST: extends/improves/compares/replaces/adapts/
+        # background between METHODS (or PHENOMENA). These are cross-method
+        # evolution relations the text states — distinct from intra-section
+        # structure (law/definition/composition). Extracted by extract_hypergraph
+        # when the text states the relation (NOT inferred — inference is downstream).
+        _evo_types = {"extends", "improves", "compares", "replaces", "adapts", "background"}
+        if he.pattern_type in _evo_types or any(t in he.pattern_type for t in _evo_types):
+            # only count as evolution if it connects 2+ METHODS or 2+ PHENOMENA
+            # (a compares-edge METHOD↔METHOD). Mixed-type evolution stays n-ary.
+            method_count = sum(1 for nd in nodes if "METHOD" in nd["labels"])
+            phenom_count = sum(1 for nd in nodes if "PHENOMENON" in nd["labels"])
+            if method_count >= 2 or phenom_count >= 2:
+                kind = "evolution"
+            else:
+                kind = "nary"  # evolution edge but mixed types → n-ary
+        elif "constitutive_law" in he.pattern_type:
             kind = "law_parameter"
         elif "composed_of" in he.pattern_type:
             kind = "composition"

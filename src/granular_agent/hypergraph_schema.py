@@ -1233,6 +1233,26 @@ def seed_meta_hypergraph() -> MetaHypergraph:
         description="a discourse relation between >=2 claims/approaches (supports/contrasts/extends/...)",
         role_slots=[{"role": "from", "type": T, "repeatable": True}, {"role": "to", "type": T, "repeatable": True}],
         allowed_qualifiers=["relation_type", "applies_in_regime", "method", "evidence_strength", "cited_from"])
+    # evolution family: cross-METHOD (or PHENOMENON) relations STATED in the
+    # text — extends/improves/compares/replaces/adapts/background. These are
+    # the relations the text explicitly states (NOT inferred — inference is a
+    # downstream agent's job). Each connects 2+ METHODS/PHENOMENA; the relation
+    # verb IS the pattern_id. Extracted when text says "X extends Y" etc.
+    _evo_family = "evolution"
+    _evo_slots = [{"role": "from", "type": T, "repeatable": True},
+                  {"role": "to", "type": T, "repeatable": True}]
+    _evo_qual = ["relation_type", "cited_from", "evidence_strength", "method"]
+    for _eid, _desc in [
+        ("extends", "X generalizes/extends Y (X METHOD/PHENOMENON -> Y)"),
+        ("improves", "X improves Y's accuracy/applicability, resolving Y's limitation"),
+        ("compares", "X is compared with Y"),
+        ("replaces", "X replaces Y"),
+        ("adapts", "X adapts Y to a new scenario"),
+        ("background", "X uses Y as background/motivation"),
+    ]:
+        m.patterns[_eid] = MetaHyperedgePattern(
+            pattern_id=_eid, family=_evo_family, description=_desc,
+            role_slots=_evo_slots, allowed_qualifiers=_evo_qual)
     # each seed pattern is the root of its top-level family — add_pattern
     # attaches new same-family patterns IS-A this root.
     m.family_roots = {p.family: p.pattern_id for p in m.patterns.values()}

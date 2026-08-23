@@ -380,7 +380,7 @@ class GranularFlowAgent:
                     "total": len(rich_topo),
                     "by_kind": {k: sum(1 for e in rich_topo if e["kind"] == k) for k in
                                 ["law_parameter", "method_parameter", "method_phenomenon",
-                                 "method_regime", "composition", "definition", "nary"]},
+                                 "method_regime", "composition", "definition", "nary", "evolution"]},
                     "edges": rich_topo[:30],
                 },
             },

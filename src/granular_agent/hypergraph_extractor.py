@@ -72,6 +72,17 @@ matching pattern_type from the schema. The common families:
   * measure      (uses_method / measures) — "we use method M to evaluate X", "M is applied to X", "X was measured by M"
   * claim        (reports / claim_relation) — "we find that ...", "results show ...", "X outperforms Y", "X is associated with Y"
   * constitutive_law — a quantitative/formal law "output = f(input1, input2, ...)" (use when a formula or formal relation is stated)
+  * evolution    (extends / improves / compares / replaces / adapts / background) — a
+    cross-METHOD evolution relation STATED in the text: "X extends/generalizes Y",
+    "X improves Y's accuracy / resolves Y's limitation", "X compared with Y",
+    "X replaces Y", "X adapts Y to ...", "X builds on / is inspired by Y", "based on
+    Y, we propose X". These are METHOD→METHOD (or PHENOMENON→PHENOMENON) relations
+    the text explicitly states. ONLY extract what the text says — do NOT infer a
+    relation the text does not state (inference is a downstream agent's job, not
+    extraction). Each evolution edge connects the two METHODS (n-ary if >2 are
+    compared) with the relation verb as pattern_type (extends/improves/compares/
+    replaces/adapts/background) and the verbatim text as evidence_span.
+    "X uses Y as background/motivation" → background (X METHOD, Y METHOD/PHENOMENON).
 METHOD-PARAMETER N-ARY EDGES (critical for rich topology): when a section discusses
 a method/model AND the parameters/quantities it uses, connect them in ONE n-ary hyperedge.
 E.g. "the NGF model uses fluidity g and cooperativity length ξ" → ONE arity-3 edge:
