@@ -76,8 +76,14 @@ METHOD-PARAMETER N-ARY EDGES (critical for rich topology): when a section discus
 a method/model AND the parameters/quantities it uses, connect them in ONE n-ary hyperedge.
 E.g. "the NGF model uses fluidity g and cooperativity length ξ" → ONE arity-3 edge:
 [NGF model(METHOD) — uses → g(PARAMETER), ξ(PARAMETER)].
+MANDATORY for named laws: a constitutive_law edge whose law is a NAMED MODEL (μ(I) rheology,
+kinetic theory, NGF, μ(I), local rheology, etc.) MUST include that METHOD node as a member
+of the hyperedge alongside its parameters — NOT a parameters-only edge. E.g. the law
+"I = γ̇ d / sqrt(P/ρ)" belonging to μ(I) rheology is ONE edge:
+[μ(I) rheology(METHOD) — defines → I(PARAM), γ̇(PARAM), d(PARAM), P(PARAM), ρ(PARAM)].
 Do NOT split method and its parameters into separate edges — the method→parameter
-connection is what the rich topology needs.
+connection is what the rich topology needs. An all-PARAMETER constitutive_law edge with no
+METHOD node is WRONG (it severs the law from the method that owns it).
 Pick the pattern_type that matches the RELATION SEMANTICS, not the surface verb. A paper's
 core contribution usually appears as a DEFINITION (what they propose), a COMPOSITION (what
 it's made of), and CLAIMS (what they show) — extract all three, not just "influences".
@@ -141,9 +147,21 @@ Rules:
       METHOD is for the MODEL itself, not the procedure of using it.
       NOT a research group name (e.g. "GDR MiDi" → MATERIAL or PROPERTY).
       NOT an experiment type: "numerical simulation", "experiments", "finite difference method",
-      "particle-image velocimetry", "erosion method" → these are EXPERIMENTAL TOOLS, label as
+      "particle-image velocimetry", "erosion method", "discrete particle simulations",
+      "MRI", "X-ray tomography", "PIV" → these are EXPERIMENTAL TOOLS, label as
       PROPERTY (they are procedures, not models/theories). Only a specific named constitutive
       relation/rheology/theory counts as METHOD.
+      NOT a flow geometry / experimental setup: "plane shear", "annular shear", "heap flow",
+      "rotating drum", "silo", "chute", "inclined plane", "couette flow", "hopper" → these
+      are GEOMETRIES, label as PROPERTY or REGIME (the regime part), never METHOD.
+      NOT a generic phrase: "constitutive equations", "unified framework", "future model",
+      "a model for X", "the equations" → do NOT emit as a METHOD node at all; if a real
+      named model is meant, emit THAT named model instead (e.g. "μ(I) rheology").
+      LAW-NAME DISAMBIGUATION: a law written as "μ(I)", "μ(I) rheology", "local rheology",
+      "inertial rheology" is a METHOD (it names a constitutive law). The bare friction
+      coefficient "μ" or "μ_s" is a PARAMETER. When you see "μ(I)" treat it as the METHOD
+      (the law), NOT as the parameter μ. A paper's central constitutive law MUST be labeled
+      METHOD — if it is not, the extraction is WRONG.
       If unsure whether something is a METHOD vs PROPERTY: it is METHOD only if it names a
       mathematical MODEL of material behavior (constitutive relation, flow rule, scaling law).
     * PARAMETER — named physical quantities/constants/coefficients that appear in equations
