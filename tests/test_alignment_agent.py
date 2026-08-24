@@ -91,16 +91,22 @@ _seed_concept(kb2, "M1", "METHOD", "μ(I) rheology", "p1", "granular")
 _seed_concept(kb2, "M2", "METHOD", "mu-I-rheology", "p2", "granular")  # same concept diff surface
 agent2 = AlignmentAgent(kb2, llm_define=_define_llm, llm_judge=_judge_llm,
                         domain_default="granular")
+n_before = len(kb2.abox.concepts)
 report = agent2.align()
 check("Canonicalize: candidate group found (mock returns [M1,M2])", report.n_candidates >= 1)
-# the group routes through align_merge -> 5-outcome. same concept-set (no existing
-# same_concept edge) -> INSERT (first time) or MERGE if identical node-set.
-# Both M1+M2 as a new same_concept edge -> INSERT (no existing edge to merge into).
-check("Canonicalize: routed via 5-outcome (insert/merge/relate/conflict)",
-      report.n_insert + report.n_merge + report.n_relate + report.n_conflict >= 1)
+# BLOCKER B1 fix: the same-concept group真合并 Concept objects — abox.concepts
+# SHRINKS (M2 merged into M1, dropped). Previously align_merge only added a
+# same_concept label edge and concepts never merged (n stayed 2). (m1 mock
+# returns [M1,M2] so M2 merges into M1.)
+check("B1 fix: Concept真合并 (abox.concepts shrinks after align)",
+      len(kb2.abox.concepts) < n_before and "M2" not in kb2.abox.concepts)
+check("B1 fix: M1 kept (the keep concept)", "M1" in kb2.abox.concepts)
+check("B1 fix: M1 absorbed M2's surface variants",
+      any("mu-I-rheology" in s for s in kb2.abox.concepts["M1"].surfaces()))
+check("Canonicalize: group merged (n_merge>=1)", report.n_merge >= 1)
 # the alignment write must be in the ledger (kernel transaction, not direct merge)
 check("Canonicalize: align_merge entry in ledger (kernel transaction)",
-      any(m.get("op") == Op.ALIGN_MERGE for e in kb2.ledger for m in e.get("mutations", [])))
+      any(m.get("op") == Op.ALIGN_CONCEPT_MERGE for e in kb2.ledger for m in e.get("mutations", [])))
 
 # ===========================================================================
 # 3. Same-domain filter (DecentMem): cross-domain concepts don't merge
@@ -160,8 +166,8 @@ check("align_new: report has merges detail (see content)",
 # ===========================================================================
 # 7. ledger replayability (align_merge writes are in ledger)
 # ===========================================================================
-check("ledger has align_merge entries (replayable)",
-      any(m.get("op") == Op.ALIGN_MERGE for e in kb6.ledger for m in e.get("mutations", [])))
+check("ledger has align_concept_merge entries (replayable)",
+      any(m.get("op") == Op.ALIGN_CONCEPT_MERGE for e in kb6.ledger for m in e.get("mutations", [])))
 
 print()
 print(f"{'ALL PASS' if not fail else 'FAILURES: ' + str(fail)}  ({len(fail)} fail)")

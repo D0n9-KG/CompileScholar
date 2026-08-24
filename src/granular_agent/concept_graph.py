@@ -453,13 +453,19 @@ _ALIGN_PROMPT = """下面是抽取出的多个{type_label}实体(每个有一个
 """
 
 
-def _llm_align_batch(items, type_label, llm_fn):
+def _llm_align_batch(items, type_label, llm_fn, max_tokens: int = 2000):
     """items: list[(concept_id, surface, symbol)]. Returns list of groups
     (each a list of concept_ids). Uses INDEX-based mapping so the LLM
     returning index numbers (not raw ids) still maps correctly.
     For PARAMETER/NUMERIC, the symbol (if any) is shown to the LLM as context
     — it helps judge 'inertial number I' ~ 'I' (both share symbol I), but the
-    LLM judges semantically (same concept), not by rule."""
+    LLM judges semantically (same concept), not by rule.
+
+    llm_fn signature: accepts (prompt, max_tokens) OR (prompt) — we try the
+    2-arg form first, fall back to 1-arg. (B2 fix: AlignmentAgent passes a
+    2-arg llm_judge; the legacy align_concepts passes a 1-arg llm_fn. Both work.)
+    Errors are surfaced (printed) rather than silently returning [] — a silent
+    [] (signature mismatch / parse fail) previously masked BLOCKER-level bugs."""
     type_map = {"METHOD": "方法", "PHENOMENON": "现象", "PARAMETER": "参数", "NUMERIC": "数值量"}
     tl = type_map.get(type_label, type_label)
     # present items with index + surface (+symbol if any, as context)
@@ -474,7 +480,11 @@ def _llm_align_batch(items, type_label, llm_fn):
         "id1, id2", "index1, index2").replace("id3", "index3")
     try:
         from granular_agent.llm_client import parse_json_response
-        resp = llm_fn(prompt)
+        # B2 fix: support both 2-arg (prompt, max_tokens) and 1-arg (prompt) llm_fn
+        try:
+            resp = llm_fn(prompt, max_tokens)
+        except TypeError:
+            resp = llm_fn(prompt)
         obj = parse_json_response(resp) or {}
         groups = obj.get("groups", [])
         out = []
@@ -492,5 +502,9 @@ def _llm_align_batch(items, type_label, llm_fn):
                         cids.append(x)
             out.append(cids)
         return out
-    except Exception:
+    except Exception as e:
+        # surface the error instead of silently returning [] (m3 fix — a silent
+        # [] previously masked BLOCKER-level bugs: signature mismatch, parse
+        # fail, LLM outage all looked like "0 candidate groups").
+        print(f"  [_llm_align_batch] error: {type(e).__name__}: {e}", flush=True)
         return []

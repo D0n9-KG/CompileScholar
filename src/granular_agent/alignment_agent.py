@@ -225,53 +225,46 @@ class AlignmentAgent:
 
     def _route_group(self, cands: list[Concept], domain: str,
                      report: AlignmentReport) -> None:
-        """Route a candidate same-concept group through the kernel's align_merge
-        5-outcome. The group is LLM-judged to be "same concept" — so the expected
-        outcome is MERGE. But the kernel decides by n-ary node-set subset relation
-        (Challenge B): if the candidate's concept-set is identical/subset of an
-        existing edge's -> merge; partial overlap -> relate; no overlap -> insert.
-        For concept alignment, the "edge" is a synthetic same-concept edge built
-        from the group; we propose align_merge with the group's concept_ids."""
+        """Route a candidate same-concept group through the kernel's
+        ALIGN_CONCEPT_MERGE op — the CONCEPT-LEVEL merge path (Step 4 BLOCKER
+        B1 fix). This真合并 Concept objects (redirect hyperedge endpoints /
+        union surfaces / drop merged concepts), so abox.concepts shrinks.
+
+        Honest design (fixed): the 5-outcome align_merge is EDGE-level (judges
+        by edge node-set subset relation, only unions edge provenance — never
+        merges Concepts). Concept alignment is a different operation: the LLM
+        judged the group same-concept, so we MERGE the Concept objects via the
+        dedicated ALIGN_CONCEPT_MERGE op (aligner contract, kernel-validated,
+        ledger-recorded). We do NOT pretend the edge 5-outcome covers concept
+        merging — that was the名实不符 BLOCKER: concepts never merged.
+
+        5-outcome (insert/merge/relate/conflict/reject) stays for EDGE
+        alignment (align_merge) when that path is used; concept alignment uses
+        this dedicated op. (See DECISION-alignment-agent-form update.)"""
         if len(cands) < 2:
             return
-        # keep = concept with most variants (stable, like legacy align_concepts)
-        keep = max(cands, key=lambda c: (len(c.surface_variants), -ord(c.concept_id[-1])))
-        # propose an align_merge: the group as a "same-concept" n-ary edge. The
-        # kernel routes it (insert/merge/relate/conflict/reject). Most same-
-        # concept groups will MERGE (identical concept-set -> merge, union
-        # provenance); a group partially overlapping an existing edge -> relate.
-        node_ids = [c.concept_id for c in cands]
+        # keep = concept with most variants; tiebreak by SMALLEST concept_id
+        # (stable, predictable — keeps the earliest-created concept; m1 fix
+        # replaced the fragile -ord(last-char) tiebreak).
+        keep = max(cands, key=lambda c: (len(c.surface_variants),
+                                         tuple(-ord(ch) for ch in c.concept_id)))
+        merge_ids = [c.concept_id for c in cands if c.concept_id != keep.concept_id]
+        if not merge_ids:
+            return
         result = self.kb.commit([Mutation(
-            op=Op.ALIGN_MERGE, target=f"align_{keep.concept_id}",
+            op=Op.ALIGN_CONCEPT_MERGE, target=keep.concept_id,
             proposer_role=Role.ALIGNER, domain=domain,
             evidence=f"same-concept group: {', '.join(c.surfaces()[0] for c in cands if c.surfaces())}",
             rationale="LLM-judged same concept (canonicalize)",
-            payload={"new_edge": {
-                "node_ids": node_ids,
-                "kind": "same_concept",
-                "roles": ["same"] * len(node_ids),
-                "provenance": {"paper_id": "aligner", "evidence": "canonicalize",
-                               "year": "", "section": ""}}})])
+            payload={"merge_ids": merge_ids})])
         if not result.ok:
-            # align_merge validate failed (shouldn't — concepts exist); count reject
             report.n_reject += 1
             return
-        if result.routed:
-            outcome = result.routed[0]["outcome"]
-            if outcome == Outcome.MERGE:
-                report.n_merge += 1
-                report.merges.append({"keep": keep.concept_id,
-                                      "merged": [c.concept_id for c in cands
-                                                 if c.concept_id != keep.concept_id],
-                                      "outcome": outcome})
-            elif outcome == Outcome.INSERT:
-                report.n_insert += 1
-            elif outcome == Outcome.RELATE:
-                report.n_relate += 1
-            elif outcome == Outcome.CONFLICT:
-                report.n_conflict += 1
-            else:
-                report.n_reject += 1
+        # the concept merge is a single deterministic outcome (merged), not a
+        # 5-outcome route — count it as a merge and record which concepts merged.
+        report.n_merge += 1
+        report.merges.append({"keep": keep.concept_id, "merged": merge_ids,
+                              "outcome": "concept_merged"})
 
     # ===================================================================
     # end-to-end: Define + Canonicalize on new concepts

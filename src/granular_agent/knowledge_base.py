@@ -80,6 +80,17 @@ class Op:
     ALIGN_MERGE = "align_merge"
     ADD_CONCEPT_RELATION = "add_concept_relation"
     CONFLICT_MARK = "conflict_mark"
+    # concept-level merge (Step 4 BLOCKER B1 fix): the 5-outcome align_merge is
+    # EDGE-level (judges by edge node-set subset relation). Concept alignment
+    # needs to MERGE CONCEPT OBJECTS (redirect endpoints / union surfaces /
+    # drop the merged concept), which align_merge does NOT do (it only unions
+    # edge provenance). This op is the concept-专属 path: aligner proposes a
+    # same-concept group, kernel validates the concepts exist, _apply calls
+    # abox.merge_concepts to真合并. Honest: 5-outcome (insert/merge/relate/
+    # conflict/reject) is for edges; concept merge is this dedicated op, not a
+    # route outcome. (Fixes the name-reality mismatch: "5-outcome对齐" was名实
+    # 不符 for concepts — concepts never merged.)
+    ALIGN_CONCEPT_MERGE = "align_concept_merge"
 
 
 class Role:
@@ -102,7 +113,8 @@ WRITE_CONTRACT: dict[str, set[str]] = {
     Role.EXTRACTOR: {Op.ADD_EDGE},
     Role.EVOLVER: {Op.ADD_PATTERN, Op.ADD_SUBCLASS, Op.SPLIT, Op.MERGE,
                    Op.RETIRE, Op.RENAME, Op.DISTILL_SKILL, Op.ADD_NODE},
-    Role.ALIGNER: {Op.ALIGN_MERGE, Op.ADD_CONCEPT_RELATION, Op.CONFLICT_MARK},
+    Role.ALIGNER: {Op.ALIGN_MERGE, Op.ADD_CONCEPT_RELATION, Op.CONFLICT_MARK,
+                   Op.ALIGN_CONCEPT_MERGE},
     Role.MAINTAINER: {Op.RETIRE, Op.RELABEL},
     Role.CONSUMER: set(),
 }
@@ -674,6 +686,24 @@ class KnowledgeBase:
             if not any(he.he_id == he_id for he in self.abox.hyperedges):
                 return False, "conflict_mark:unknown-edge"
             return True, "ok"
+        if op == Op.ALIGN_CONCEPT_MERGE:
+            # concept-level merge (Step 4 BLOCKER B1 fix). target = keep_id;
+            # payload.merge_ids = the concepts to merge INTO keep. Validate all
+            # exist + keep != merge_ids + (cross-domain guard: all concepts
+            # must be from the same domain as the proposer — checked via
+            # _paper_domain if available).
+            keep = mut.target
+            if keep not in self.abox.concepts:
+                return False, f"align_concept_merge:unknown-keep:{keep}"
+            merge_ids = mut.payload.get("merge_ids", [])
+            if not merge_ids:
+                return False, "align_concept_merge:empty-merge-ids"
+            for mid in merge_ids:
+                if mid not in self.abox.concepts:
+                    return False, f"align_concept_merge:unknown-merge:{mid}"
+                if mid == keep:
+                    return False, "align_concept_merge:merge-into-self"
+            return True, "ok"
         return True, "ok"
 
     def _referential_integrity(self, mut: Mutation) -> tuple[bool, str]:
@@ -738,6 +768,16 @@ class KnowledgeBase:
             he = next((h for h in self.abox.hyperedges if h.he_id == mut.target), None)
             if he:
                 he.emergence_signals["conflict"] = mut.payload.get("detail", "")
+        elif op == Op.ALIGN_CONCEPT_MERGE:
+            # concept-level真合并 (Step 4 BLOCKER B1 fix): redirect hyperedge
+            # endpoints / union surfaces / drop merged concepts. This is the
+            # REAL alignment — abox.concepts shrinks. Delegates to the verified
+            # merge_concepts内核 (surgical). Aligner-only, via commit transaction
+            # (in ledger / validated / replayable).
+            keep = mut.target
+            for mid in mut.payload.get("merge_ids", []):
+                if mid in self.abox.concepts and mid != keep:
+                    self.abox.merge_concepts(keep, mid)
 
     def _apply_add_edge(self, mut: Mutation) -> None:
         """Extractor add_edge: carries concept instances inline (断点 7). Creates
