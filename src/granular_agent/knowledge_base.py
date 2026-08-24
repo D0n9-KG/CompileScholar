@@ -382,11 +382,26 @@ class KnowledgeBase:
 
     def replay_to(self, version: str) -> "KnowledgeBase":
         """Reconstruct a fresh KB at `version` by replaying the ledger from the
-        initial tbox/abox state. (Time-travel for ablation snapshots.)"""
+        initial tbox/abox state. (Time-travel for ablation snapshots.)
+
+        version is bumped ONLY by T-box writes (evolver ops); aligner A-box
+        writes (ALIGN_MERGE etc.) do NOT bump version. So multiple ledger
+        entries can share the same version. To time-travel to `version` we must
+        replay up to and INCLUDING the LAST entry whose post-commit version
+        equals `version` (not the first — the first would drop later same-
+        version aligner writes)."""
+        # find the last ledger entry whose post-commit version == target
+        last_idx = -1
+        for i, entry in enumerate(self.ledger):
+            res = entry.get("result", {})
+            if res.get("ok") and res.get("version") == version:
+                last_idx = i
         kb = KnowledgeBase(
             tbox=MetaHypergraph(), abox=ConceptGraph(), skills=SkillLibrary(),
             domain_ns=dict(self.domain_ns), judge_fn=self._judge_fn)
-        for entry in self.ledger:
+        for i, entry in enumerate(self.ledger):
+            if i > last_idx:
+                break
             muts = entry.get("mutations", [])
             res = entry.get("result", {})
             if not res.get("ok"):
@@ -396,9 +411,15 @@ class KnowledgeBase:
                     m = Mutation(**{k: mut[k] for k in mut if k in
                                     Mutation.__dataclass_fields__})
                     kb._apply(m)
+                    # ALIGN_MERGE writes its A-box changes in _route (not
+                    # _apply, which is a no-op for it). replay must call _route
+                    # too, or the replayed KB silently loses every aligner
+                    # edge (insert/merge/relate). ADD_CONCEPT_RELATION and
+                    # CONFLICT_MARK write in _apply already, so only the
+                    # ALIGN_MERGE path needs the route replay. (BLOCKER fix)
+                    if m.op == Op.ALIGN_MERGE and m.proposer_role == Role.ALIGNER:
+                        kb._route(m)
             kb.version = kb.tbox.version
-            if res.get("version") == version:
-                break
         return kb
 
     # ---- snapshot (consumer read, version-stamped) ----
@@ -480,16 +501,27 @@ class KnowledgeBase:
             if len(subs) < 2:
                 return False, "split:needs->=2-sub-patterns"
             parent_roles = {s.get("role") for s in parent.role_slots}
+            from granular_agent.hypergraph_schema import _role_sig
+            parent_sig = _role_sig(parent.role_slots)
             for sp in subs:
                 if sp.pattern_id in self.tbox.patterns:
                     return False, f"split:sub-collides:{sp.pattern_id}"
-                # Challenge C: sub role_slots must be a SUBSET of parent roles
-                # (no NEW role introduced; may drop optional roles). Stricter
-                # "equal sig" is the existing split_pattern behavior; the kernel
-                # gate enforces the design's "no new role" constraint.
+                # Challenge C: sub must NOT introduce a new role beyond the
+                # parent's (no new role). The kernel enforces this as an EXACT
+                # role-signature match with the parent (role-seq + type-seq
+                # identical), matching the underlying split_pattern's constraint
+                # (hypergraph_schema._role_sig). Split is a SEMANTIC boundary
+                # split (same role structure, different semantic sub-kind) —
+                # dropping a role changes arity = structural change, which is
+                # add_pattern's job, not split. (DECISION-split-role-signature)
+                # This keeps the kernel gate CONSISTENT with the underlying
+                # split_pattern so a kernel-passed split never reaches a silent
+                # None return at the bottom layer.
                 sub_roles = {s.get("role") for s in sp.role_slots}
                 if not sub_roles.issubset(parent_roles):
                     return False, "split:sub-introduces-new-role"
+                if _role_sig(sp.role_slots) != parent_sig:
+                    return False, "split:sub-role-signature-must-equal-parent"
             return True, "ok"
         if op == Op.MERGE:
             pids = mut.payload.get("pattern_ids", [])
@@ -510,6 +542,22 @@ class KnowledgeBase:
                 into_roles = {s.get("role") for s in into_pat.role_slots}
                 if not all_roles.issubset(into_roles):
                     return False, "merge:survivor-missing-roles-after-union"
+            else:
+                # `into` is a NEW pattern id — the underlying merge_patterns
+                # will clone role_slots from pattern_ids[0] (the donor). If the
+                # donor doesn't cover all union roles, the survivor dangles.
+                # Require the caller to declare into_role_slots covering the
+                # union, OR ensure the donor (pattern_ids[0]) covers all roles.
+                into_decl = mut.payload.get("into_role_slots")
+                if into_decl is not None:
+                    decl_roles = {s.get("role") for s in into_decl}
+                    if not all_roles.issubset(decl_roles):
+                        return False, "merge:new-into-missing-union-roles"
+                else:
+                    donor = self.tbox.patterns.get(pids[0])
+                    donor_roles = {s.get("role") for s in donor.role_slots} if donor else set()
+                    if not all_roles.issubset(donor_roles):
+                        return False, "merge:new-into-needs-into_role_slots-or-full-union-donor"
             # taxonomy guard: refuse abstract-parent + concrete-leaf merge
             abstractions = [p for p in pids if self.tbox.patterns[p].is_abstract]
             concretes = [p for p in pids if not self.tbox.patterns[p].is_abstract]

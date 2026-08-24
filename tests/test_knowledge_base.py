@@ -186,6 +186,23 @@ r = kb.commit([Mutation(op=Op.SPLIT, target="measures", proposer_role=Role.EVOLV
 check("split: subs keeping parent roles accepted (Challenge C)", r.ok is True)
 check("split: parent becomes abstract (IS-A taxonomy kept)",
       kb.tbox.patterns["measures"].is_abstract is True)
+# 6b-bis. split: sub that DROPS an optional role (subset but != exact sig)
+# rejected (kernel gate must match underlying split_pattern's exact-signature
+# constraint, or the kernel passes and the bottom layer silently returns None).
+# (BLOCKER #2 fix — was a silent mismatch before)
+kb = _kb()
+parent_m = kb.tbox.patterns["measures"]
+drop_role_sub = MetaHyperedgePattern(pattern_id="meas_drop", family="measure",
+    role_slots=[{"role":"object","type":"THING"}],   # drops 'instrument'
+    allowed_qualifiers=list(parent_m.allowed_qualifiers))
+keep_sub = MetaHyperedgePattern(pattern_id="meas_keep", family="measure",
+    role_slots=[dict(s) for s in parent_m.role_slots],
+    allowed_qualifiers=list(parent_m.allowed_qualifiers))
+r = kb.commit([Mutation(op=Op.SPLIT, target="measures", proposer_role=Role.EVOLVER,
+                evidence="drop-role split",
+                payload={"sub_patterns":[drop_role_sub, keep_sub]})])
+check("split: sub dropping a role (subset != exact) rejected (BLOCKER#2 fix)", r.ok is False
+      and "sub-role-signature-must-equal-parent" in r.rejected[0]["reason"])
 
 # 6c. merge: survivor missing roles after union rejected
 kb = _kb()
@@ -207,6 +224,31 @@ r = kb.commit([Mutation(op=Op.MERGE, target="m_c", proposer_role=Role.EVOLVER,
                 payload={"pattern_ids":["m_a","m_b"], "into":"m_c"})])
 check("merge: survivor missing roles after union rejected (Challenge C)", r.ok is False
       and "survivor-missing-roles-after-union" in r.rejected[0]["reason"])
+# 6c-bis. merge into a NEW id: must declare into_role_slots covering the union
+# (or the donor pattern_ids[0] must cover all roles). (MAJOR #1 fix)
+kb = _kb()
+p1 = MetaHyperedgePattern(pattern_id="m_a2", family="claim",
+    role_slots=[{"role":"from","type":"THING"},{"role":"to","type":"THING"}],
+    allowed_qualifiers=["relation_type"])
+p2 = MetaHyperedgePattern(pattern_id="m_b2", family="claim",
+    role_slots=[{"role":"from","type":"THING"},{"role":"parameter","type":"THING"}],
+    allowed_qualifiers=["relation_type"])
+kb.tbox.add_pattern(p1); kb.tbox.add_pattern(p2)
+# into new id 'm_new', donor m_a2 lacks 'parameter' -> reject (no into_role_slots)
+r = kb.commit([Mutation(op=Op.MERGE, target="m_new", proposer_role=Role.EVOLVER,
+                evidence="merge into new",
+                payload={"pattern_ids":["m_a2","m_b2"], "into":"m_new"})])
+check("merge into new id: donor missing union roles -> rejected (MAJOR#1 fix)", r.ok is False
+      and "new-into-needs-into_role_slots-or-full-union-donor" in r.rejected[0]["reason"])
+# with into_role_slots declaring all union roles -> accepted
+r = kb.commit([Mutation(op=Op.MERGE, target="m_new2", proposer_role=Role.EVOLVER,
+                evidence="merge into new declared",
+                payload={"pattern_ids":["m_a2","m_b2"], "into":"m_new2",
+                         "into_role_slots":[{"role":"from","type":"THING"},
+                                            {"role":"to","type":"THING"},
+                                            {"role":"parameter","type":"THING"}]})])
+check("merge into new id: declared into_role_slots covering union -> accepted",
+      r.ok is True)
 
 # 6d. retire: active A-box edge referencing pattern -> rejected (T-box<->A-box RI)
 kb = _kb()
@@ -301,6 +343,18 @@ r = kb5.commit([_am_mut(["M2", "Q1"], "method_parameter", ["method", "param"], "
 check("5-outcome: judge can decide CONFLICT on no-overlap same-kind", r.ok and
       r.routed[0]["outcome"] == Outcome.CONFLICT)
 
+# 7e-bis. judge can return REJECT (lawful discard) — the 5th outcome, untested
+kb5b = _kb()
+_seed_concepts(kb5b, ["M1", "P1", "M2", "Q1"])
+kb5b.abox.add_hyperedge(["M1", "P1"], kind="method_parameter", paper_id="p1", evidence="x")
+kb5b.set_judge(lambda ctx: Outcome.REJECT)  # judge: drop (e.g. duplicate / noise)
+r = kb5b.commit([_am_mut(["M2", "Q1"], "method_parameter", ["method", "param"], "drop")])
+check("5-outcome: judge can decide REJECT (lawful discard, 5th outcome)", r.ok and
+      r.routed[0]["outcome"] == Outcome.REJECT)
+# REJECT must NOT add a new hyperedge (lawful discard, no data fabrication)
+check("REJECT adds no new method_parameter edge", r.ok and
+      len([he for he in kb5b.abox.hyperedges if he.kind == "method_parameter"]) == 1)
+
 # 7f. extractor add_edge does NOT enter 5-outcome (断点 2)
 kb6 = _kb()
 r = kb6.commit([Mutation(op=Op.ADD_EDGE, target="e1", proposer_role=Role.EXTRACTOR,
@@ -385,6 +439,48 @@ check("replay_to time-travel: at pre-retire version, pattern not deprecated",
       kb_replay.tbox.patterns.get("tmp_pat") and
       kb_replay.tbox.patterns["tmp_pat"].deprecated is False)
 check("replay_to: version matches target", kb_replay.version == v_after_add)
+
+# 10-bis. replay_to must RECONSTRUCT aligner A-box writes (BLOCKER #1 fix):
+# ALIGN_MERGE writes in _route, not _apply. replay must call _route or the
+# replayed KB silently loses every aligner edge. Build: existing edge + one
+# ALIGN_MERGE (subset -> MERGE to superset) + one ALIGN_MERGE (no-overlap INSERT).
+# Then replay to the version AFTER both aligner commits and assert both A-box
+# writes are present in the replayed KB.
+kb = _kb()
+_seed_concepts(kb, ["M1", "P1", "P2", "P3", "M2", "Q1"])
+# seed edge via an aligner mutation too (so it lives in the ledger and replay
+# can reconstruct it — directly calling add_hyperedge bypasses the ledger and
+# would make replay lose the seed edge)
+r0 = kb.commit([_am_mut(["M1", "P1"], "method_parameter", ["method", "param"], "seed", paper="p1")])
+check("replay test setup: seed aligner commit ok", r0.ok is True)
+# aligner commit 1: subset -> MERGE to superset (adds P2,P3)
+r1 = kb.commit([_am_mut(["M1", "P1", "P2", "P3"], "method_parameter",
+                        ["method", "param", "param", "param"], "subset-merge")])
+check("replay test setup: aligner merge commit ok", r1.ok is True)
+v_after_merge = kb.version
+# aligner commit 2: no-overlap -> INSERT (adds M2,Q1 edge)
+r2 = kb.commit([_am_mut(["M2", "Q1"], "method_parameter", ["method", "param"], "insert")])
+check("replay test setup: aligner insert commit ok", r2.ok is True)
+v_after_insert = kb.version
+n_edges_now = len([he for he in kb.abox.hyperedges if he.kind == "method_parameter"])
+# replay to v_after_insert: must have BOTH the merged-superset edge AND the inserted edge
+kb_replay = kb.replay_to(v_after_insert)
+n_edges_replay = len([he for he in kb_replay.abox.hyperedges
+                      if he.kind == "method_parameter"])
+check("replay_to reconstructs aligner A-box writes (BLOCKER#1 fix)",
+      n_edges_replay == n_edges_now and n_edges_replay >= 2)
+check("replay_to: merged superset edge present (P2/P3 not lost)",
+      any({"P2", "P3"}.issubset(set(he.node_ids))
+           for he in kb_replay.abox.hyperedges if he.kind == "method_parameter"))
+check("replay_to: inserted no-overlap edge present (M2/Q1 not lost)",
+      any({"M2", "Q1"}.issubset(set(he.node_ids))
+           for he in kb_replay.abox.hyperedges if he.kind == "method_parameter"))
+# NOTE: aligner ops do NOT bump the schema version (version is T-box only),
+# so two aligner commits at the same schema version cannot be distinguished
+# by replay_to(version) — A-box time-travel WITHIN a single schema version
+# would need a commit-sequence anchor, which is out of Step-1 scope. The
+# v_after_merge == v_after_insert case (same version) is therefore not
+# asserted here; schema-level time-travel (v_after_add above) IS asserted.
 
 # ===========================================================================
 # 11. snapshot (consumer read, version-stamped)
