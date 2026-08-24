@@ -93,31 +93,34 @@ matching pattern_type from the schema. The common families:
     matching type and the verbatim wording as evidence_span. Connect the METHODS
     (n-ary if >2 are compared); pattern_type = the verb (extends/improves/compares/
     replaces/adapts/background). "X uses Y as background/motivation" → background.
-    DECISION PATHS (distinguish extends/improves/compares — the easy-to-confuse ones):
+    DECISION PATHS (distinguish extends/improves/compares — the easy-to-confuse ones;
+    the principle is domain-general, the named examples are illustrative only):
       path1 - does B fail/have a limitation in some regime/situation, and A handles it?
-              → improves (e.g. μ(I) local rheology fails near yield; nonlocal handles → improves)
+              → improves (e.g. a local model that fails near a regime boundary, and a
+              nonlocal/higher-order model that resolves it → improves)
       path1b - does A derive a more accurate parameter/coefficient from first principles,
               improving B's empirical/phenomenological parameter? → improves
               (first-principles vs phenomenological = improves, NOT compares)
-      path2 - is A a direct extension/generalization of B (adds nonlocal term/gradient/new
+      path2 - is A a direct extension/generalization of B (adds a term/gradient/new
               parameter, or generalizes B to a new regime)? → extends
-              (I-gradient = nonlocal extension of μ(I); ext-kinetic = dense ext of kinetic)
+              (a higher-order/nonlocal extension of a base model → extends)
       path3 - do A and B have DIFFERENT modeling forms/origins but overlapping scope
               (both model the same phenomenon, different mechanisms, each pros/cons)?
-              → compares (Gray size-segregation vs Tripathi density-segregation)
+              → compares (two parallel mechanisms for the same phenomenon, differing in
+              what they assume)
               (ONLY compares if A,B are PARALLEL different-mechanism; if A improves B's
               accuracy/scope → improves NOT compares)
       path4 - no modeling-form/scope relation at all → do NOT extract (not evolution).
     When unsure between improves/extends: improves = solves a limitation; extends = generalizes scope.
 METHOD-PARAMETER N-ARY EDGES (critical for rich topology): when a section discusses
 a method/model AND the parameters/quantities it uses, connect them in ONE n-ary hyperedge.
-E.g. "the NGF model uses fluidity g and cooperativity length ξ" → ONE arity-3 edge:
-[NGF model(METHOD) — uses → g(PARAMETER), ξ(PARAMETER)].
-MANDATORY for named laws: a constitutive_law edge whose law is a NAMED MODEL (μ(I) rheology,
-kinetic theory, NGF, μ(I), local rheology, etc.) MUST include that METHOD node as a member
-of the hyperedge alongside its parameters — NOT a parameters-only edge. E.g. the law
-"I = γ̇ d / sqrt(P/ρ)" belonging to μ(I) rheology is ONE edge:
-[μ(I) rheology(METHOD) — defines → I(PARAM), γ̇(PARAM), d(PARAM), P(PARAM), ρ(PARAM)].
+E.g. "the model M uses parameters p1 and p2" → ONE arity-3 edge:
+[M(METHOD) — uses → p1(PARAMETER), p2(PARAMETER)].
+MANDATORY for named laws: a constitutive_law edge whose law is a NAMED MODEL (a rheology,
+a kinetics, a neural architecture, a scaling law, etc.) MUST include that METHOD node as
+a member of the hyperedge alongside its parameters — NOT a parameters-only edge. E.g. a law
+"y = f(x1, x2, x3)" belonging to a named model M is ONE edge:
+[M(METHOD) — defines → y(PARAM), x1(PARAM), x2(PARAM), x3(PARAM)].
 Do NOT split method and its parameters into separate edges — the method→parameter
 connection is what the rich topology needs. An all-PARAMETER constitutive_law edge with no
 METHOD node is WRONG (it severs the law from the method that owns it).
@@ -179,47 +182,49 @@ Rules:
   results with zero NUMERIC nodes is WRONG.
 - NODE LABELING (critical for rich topology — do NOT default everything to PROPERTY):
     * METHOD — ONLY a named scientific modeling approach/theory/law/model that the paper
-      PROPOSES or REVIEWS as a constitutive relation / rheology / continuum theory.
-      Examples: "μ(I) rheology", "kinetic theory", "nonlocal granular fluidity", "DEM", "RFT".
+      PROPOSES or REVIEWS as a model of some phenomenon (a constitutive relation / rheology /
+      continuum theory / neural architecture / kinetic scheme / estimator, etc.).
       METHOD is for the MODEL itself, not the procedure of using it.
-      NOT a research group name (e.g. "GDR MiDi" → MATERIAL or PROPERTY).
-      NOT an experiment type: "numerical simulation", "experiments", "finite difference method",
-      "particle-image velocimetry", "erosion method", "discrete particle simulations",
-      "MRI", "X-ray tomography", "PIV" → these are EXPERIMENTAL TOOLS, label as
-      PROPERTY (they are procedures, not models/theories). Only a specific named constitutive
-      relation/rheology/theory counts as METHOD.
-      NOT a flow geometry / experimental setup: "plane shear", "annular shear", "heap flow",
-      "rotating drum", "silo", "chute", "inclined plane", "couette flow", "hopper" → these
-      are GEOMETRIES, label as PROPERTY or REGIME (the regime part), never METHOD.
+      NOT a research group/consortium name → PROPERTY.
+      NOT a measurement tool/procedure: "numerical simulation", "experiments", "finite
+      difference", "particle-image velocimetry", "MRI", "X-ray tomography", "PIV",
+      "spectrometry", "assay", "benchmark" → these are TOOLS/PROCEDURES, label as
+      PROPERTY (they are not models). Only a specific named model counts as METHOD.
+      NOT an experimental setup/geometry/configuration: "plane shear", "annular shear",
+      "rotating drum", "silo", "chute", "hopper", "petri dish", "reactor", "test set" →
+      these are SETUPS, label as PROPERTY or REGIME (the regime part), never METHOD.
       NOT a generic phrase: "constitutive equations", "unified framework", "future model",
       "a model for X", "the equations" → do NOT emit as a METHOD node at all; if a real
-      named model is meant, emit THAT named model instead (e.g. "μ(I) rheology").
-      LAW-NAME DISAMBIGUATION: a law written as "μ(I)", "μ(I) rheology", "local rheology",
-      "inertial rheology" is a METHOD (it names a constitutive law). The bare friction
-      coefficient "μ" or "μ_s" is a PARAMETER. When you see "μ(I)" treat it as the METHOD
-      (the law), NOT as the parameter μ. A paper's central constitutive law MUST be labeled
+      named model is meant, emit THAT named model instead.
+      LAW-NAME DISAMBIGUATION (principle, any domain): a model named by a formula or proper
+      noun — "μ(I) rheology", "local rheology", "inertial rheology", "Arrhenius kinetics",
+      "Transformer" — is a METHOD (it names a model). A bare symbol that model CONTAINS
+      ("μ", "μ_s", "E_a") is a PARAMETER. When you see a law-name, treat it as the METHOD
+      (the model), NOT as its bare parameter. A paper's central model MUST be labeled
       METHOD — if it is not, the extraction is WRONG.
       If unsure whether something is a METHOD vs PROPERTY: it is METHOD only if it names a
-      mathematical MODEL of material behavior (constitutive relation, flow rule, scaling law).
+      mathematical/scientific MODEL of behavior (constitutive relation, flow rule, scaling
+      law, network architecture, kinetic scheme, estimator).
       METHOD NAMING (critical for cross-paper alignment — vague names break it): emit the
       CANONICAL name a field uses for the method, NOT a descriptive phrase or sentence.
-      GOOD: "μ(I) rheology", "nonlocal granular fluidity (NGF)", "kinetic theory",
-            "I-gradient model", "cosserat continuum".
+      GOOD (illustrative, not rules): "μ(I) rheology", "kinetic theory", "Transformer",
+      "BERT", "Arrhenius kinetics", "maximum-likelihood phylogenetics".
       BAD (descriptive phrases that won't align across papers): "nonlocal model",
-            "more comprehensive rheology", "a model for dense flows", "the theory".
+      "a better architecture", "a model for dense flows", "the theory".
       If the paper gives a named method (acronym or proper noun), use that name. If it only
       describes, emit the SHORTEST noun phrase that names the method (not a full clause).
-    * PARAMETER — named physical quantities/constants/coefficients that appear in equations
-      (e.g. μ, I, d, P, τ, g, ρ_s, T, A, ξ, μ_s, b, ν). Distinguish from generic PROPERTY:
-      a PARAMETER is a specific named symbol/constant in a law, while PROPERTY is a
-      generic physical quantity (stress, velocity, shear rate).
-    * PHENOMENON — a physical effect/behavior that methods aim to capture or fail in
-      (e.g. nonlocal creep, thin-body strengthening, secondary rheology, segregation,
-      hopper clogging, rate independence). Not a method, not a parameter.
-    * REGIME — a flow regime (quasi-static, dense, gaseous/collisional).
-    * MATERIAL — a granular material or substance.
+    * PARAMETER — named quantities/constants/coefficients that appear in equations
+      (e.g. μ, I, d, P, τ, learning rate, rate constant k, activation energy E_a). Distinguish
+      from generic PROPERTY: a PARAMETER is a specific named symbol/constant in a law/model,
+      while PROPERTY is a generic quantity (stress, velocity, loss, accuracy).
+    * PHENOMENON — an effect/behavior that methods aim to capture or fail in
+      (e.g. nonlocal creep, secondary rheology, segregation, clogging, overfitting,
+      allosteric regulation). Not a method, not a parameter.
+    * REGIME — an operational regime/condition (quasi-static, dense, gaseous/collisional for
+      physics; training/inference for ML; aerobic/anaerobic for bio).
+    * MATERIAL — a material or substance (a granular material, a chemical reagent, a cell line).
     * NUMERIC — a numeric value.
-    * PROPERTY — ONLY use for generic physical quantities not fitting the above.
+    * PROPERTY — ONLY use for generic quantities not fitting the above.
   A node can carry MULTIPLE labels (e.g. a method that is also a parameter: ["METHOD","PARAMETER"]).
   This labeling is what lets the schema link method↔parameter↔phenomenon relations directly
   from hyperedge structure — without it, all entities collapse to PROPERTY and the rich
@@ -519,9 +524,9 @@ Task: identify all SCIENTIFIC ENTITIES mentioned in the text. For each, give:
 - surface: the entity name/term AS WRITTEN in the text (verbatim, not paraphrased)
 - evidence_span: a verbatim phrase from the text where the entity appears
 
-Entities include: modeling methods/theories/laws, physical parameters/symbols,
-phenomena/effects, flow regimes, materials, measured values. Do NOT label them
-yet (step 2 does that) — just find and name them.
+Entities include: modeling methods/theories/laws, parameters/symbols, phenomena/effects,
+regimes/conditions, materials/substances, measured values, metrics, tasks. Do NOT label
+them yet (step 2 does that) — just find and name them.
 
 Output JSON: {{"nodes":[{{"nid":"n1","surface":"...","evidence_span":"..."}}]}}
 
@@ -529,11 +534,12 @@ Rules:
 - surface MUST be a verbatim copy from the text (exact string).
 - One entity per node. If the same entity is mentioned multiple times, emit once.
 - Include numbers/constants as nodes too (with surface like "0.38" and evidence).
-- A research group name (e.g. "GDR MiDi") is an entity but label it as a group
-  (step 2 will handle it). Examples (illustrative, not rules):
-  METHOD: "μ(I) rheology", "kinetic theory", "nonlocal granular fluidity"
-  PARAMETER: "inertial number I", "friction coefficient μ", "grain diameter d"
-  PHENOMENON: "nonlocal creep", "segregation", "hopper clogging"
+- A research group/consortium name is an entity but is NOT a method (step 2 labels it).
+  Examples (illustrative, not rules — the principle is: a named scientific MODEL counts,
+  a group/tool/setup name does not):
+  METHOD: "μ(I) rheology", "Transformer", "maximum-likelihood phylogenetics", "Arrhenius kinetics"
+  PARAMETER: "inertial number I", "learning rate", "rate constant k", "activation energy E_a"
+  PHENOMENON: "nonlocal creep", "overfitting", "allosteric regulation", "autocatalysis"
 """
 
 
@@ -544,23 +550,33 @@ Below are entities extracted from the text. Assign each a label (ONE primary typ
 {nodes_json}
 
 Label options (pick the BEST fit for each):
-- METHOD: a NAMED scientific modeling approach/theory/law/rheology that models
-  material behavior. Examples: "μ(I) rheology", "kinetic theory", "NGF model".
-  NOT: experiment tools (MRI, PIV, simulations), geometries (plane shear, hop flow),
-  generic phrases ("a model for X", "constitutive equations"), research groups.
-  If it names a mathematical MODEL of behavior → METHOD.
-- PARAMETER: a named physical quantity/symbol/constant in equations (μ, I, d, P, τ).
-  NOT: generic quantities (stress, velocity) → PROPERTY instead.
-- PHENOMENON: a physical effect/behavior (nonlocal creep, segregation, clogging).
-- REGIME: a flow regime (quasi-static, dense, inertial/collisional).
-- MATERIAL: a granular material/substance (glass beads, sand).
-- NUMERIC: a specific numerical value (0.38, 55d).
-- PROPERTY: generic physical quantity not fitting above (stress, velocity, shear rate).
+- METHOD: a NAMED scientific modeling approach/theory/law/model that models
+  some phenomenon's behavior. Examples (illustrative, not rules): "μ(I) rheology",
+  "kinetic theory", "Transformer", "CNN", "Arrhenius kinetics", "maximum-likelihood".
+  NOT: measurement tools/procedures (microscopes, PIV/MRI, simulations, assays,
+  benchmarks, spectrometers), experimental setups/geometries (plane shear, rotating
+  drum, petri dish, reactor), generic phrases ("a model for X", "the equations",
+  "a framework"), research groups. If it names a mathematical/scientific MODEL of
+  behavior → METHOD.
+- PARAMETER: a named quantity/symbol/constant in equations (μ, I, learning rate,
+  rate constant k, activation energy E_a). NOT: generic quantities (stress, velocity,
+  loss) → PROPERTY instead.
+- PHENOMENON: an effect/behavior methods aim to capture or fail in (nonlocal creep,
+  overfitting, allosteric regulation, autocatalysis).
+- REGIME: an operational regime/condition (dense/quasi-static for physics,
+  training/inference for ML, aerobic/anaerobic for bio).
+- MATERIAL: a material/substance/sample (granular material, chemical reagent, cell line).
+- NUMERIC: a specific numerical value (0.38, 26.8%).
+- PROPERTY: a generic quantity/metric not fitting the above (stress, velocity, accuracy).
 
-Key disambiguations:
-- "μ(I)" / "μ(I) rheology" / "local rheology" = METHOD (the law). Bare "μ" = PARAMETER.
-- "particle-image velocimetry" / "simulations" / "experiments" = PROPERTY (tools, not methods).
-- "plane shear" / "heap flow" / "rotating drum" = PROPERTY (geometries, not methods).
+Key disambiguations (principle, applied to any domain):
+- A LAW-NAME (a model named by a formula or proper noun) is a METHOD; a bare symbol
+  it contains is a PARAMETER. E.g. "μ(I) rheology" / "local rheology" = METHOD, but the
+  bare "μ" = PARAMETER. Likewise "Arrhenius kinetics" = METHOD, but "E_a" = PARAMETER.
+- A measurement tool/procedure (PIV, MRI, simulations, assays, benchmarks) = PROPERTY,
+  not METHOD. The model it produces/applies is the METHOD; the instrument is not.
+- An experimental setup/geometry/configuration (plane shear, rotating drum, petri dish,
+  reactor) = PROPERTY, not METHOD.
 
 Output JSON: {{"labels":[{{"nid":"n1","labels":["METHOD"]}},...]}}
 """
@@ -593,10 +609,25 @@ Task: identify n-ary hyperedges connecting entities. Each hyperedge:
   claim_relation: from, to
   extends/improves/compares/replaces/adapts/background: from, to
   If you need a role not in this list, pick the closest one. Do NOT invent role
-  names like 'subject', 'condition', 'method', 'analogy', 'function' — use the
-  listed roles.
+  names like 'condition', 'method', 'analogy', 'function', 'parameter_set' — use the
+  listed roles ('subject' is valid for defines; it is listed, not invented).
 - evidence_span: verbatim text supporting this relation
-- qualifiers: optional {{"key":"value"}} (e.g. relation_type, method, cited_from)
+- qualifiers: optional {{"key":"value"}}. A qualifier key is accepted ONLY if the
+  pattern_type declares it — adding a key the pattern does not declare is rejected.
+  Per-pattern allowed keys:
+    constitutive_law: applies_in_regime, function_form, parameters, method, evidence_strength, cited_from
+    influences: dependency_type, applies_in_regime, method, evidence_strength, cited_from
+    defines: relation_type, method, evidence_strength, cited_from
+    composed_of: relation_type, method, evidence_strength, cited_from
+    measures: condition, applies_in_regime, method, evidence_strength, cited_from
+    claim_relation: relation_type, applies_in_regime, method, evidence_strength, cited_from
+    extends/improves/compares/replaces/adapts/background: relation_type, cited_from, evidence_strength, method
+  Enum values (REQUIRED — a free-text value for an enum key is rejected):
+    method: experiment | simulation | theory | review
+    evidence_strength: measured | derived | hypothesized | assumed
+    cited_from: this_work | prior_art | definition
+    dependency_type: monotonic | derivation | analogy | composition
+  relation_type / function_form / parameters / condition / applies_in_regime: free-text (short tag/phrase).
 
 Rules:
 - evidence_span MUST be verbatim from the text.
@@ -604,14 +635,10 @@ Rules:
   When a sentence lists PARALLEL entities in the same relation to the same other entity,
   they MUST all be nodes of ONE hyperedge, NOT split into separate edges.
 - A named method that OWNS a law must be IN the law's hyperedge (not separate).
-- composed_of = ONLY structural composition (parts of a whole). "Experiment setup with
-  2-m-long plane" is NOT composition (it's experimental description). "Model A consists
-  of components B and C" IS composition.
+- composed_of = ONLY structural composition (parts of a whole). "An experimental setup
+  with a 2-m-long apparatus" is NOT composition (it's experimental description). "Model A
+  consists of components B and C" IS composition.
 - extends/improves/compares = method-to-method evolution (A builds on/improves/compares B).
-- qualifiers: only use keys from this set: relation_type, method, cited_from,
-  evidence_strength, applies_in_regime, function_form, parameters, condition.
-  For method: experiment/simulation/theory/review. For evidence_strength:
-  derived/measured/assumed/claimed. For cited_from: this_work/cited/external.
 
 Output JSON: {{"hyperedges":[{{"eid":"e1","pattern_type":"...","node_ids":["n1","n2"],
 "node_roles":["output","input"],"evidence_span":"...","qualifiers":{{}}}}]}}

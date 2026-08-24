@@ -409,7 +409,7 @@ class ConceptGraph:
 
 
 _ALIGN_PROMPT = """下面是抽取出的多个{type_label}实体(每个有一个代表性surface, 来自不同论文).
-判断哪些是【同一个概念】(近义/同义/只是表述不同, 如 "non-local rheology" 和 "I-gradient model" 是同一个方法).
+判断哪些是【同一个概念】(近义/同义/只是表述不同, 如同一方法在不同论文里用了不同名).
 只把确属同一概念的归一组; 不同概念不要合并; 不确定的不合并.
 
 {type_label}列表(id: surface):
@@ -426,7 +426,7 @@ def _llm_align_batch(items, type_label, llm_fn):
     For PARAMETER/NUMERIC, the symbol (if any) is shown to the LLM as context
     — it helps judge 'inertial number I' ~ 'I' (both share symbol I), but the
     LLM judges semantically (same concept), not by rule."""
-    type_map = {"METHOD": "建模方法", "PHENOMENON": "物理现象", "PARAMETER": "物理参数", "NUMERIC": "数值量"}
+    type_map = {"METHOD": "方法", "PHENOMENON": "现象", "PARAMETER": "参数", "NUMERIC": "数值量"}
     tl = type_map.get(type_label, type_label)
     # present items with index + surface (+symbol if any, as context)
     idx_items = []
