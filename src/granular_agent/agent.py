@@ -363,6 +363,8 @@ class GranularFlowAgent:
             "n_nodes": res["n_nodes"],
             "n_hyperedges": res["n_hyperedges"],
             "validation_failures": res["validation_failures"],
+            "failed_edges": res.get("failed_edges", []),  # full rejected-edge detail
+            "evolutions_detail": res.get("evolutions", []),  # full proposal list w/ accept/reject+reason
             "n_calls": res["n_calls"] + 1,  # +1 structure map
             "n_acc": len(acc),
             "n_rej": len(rej),
@@ -439,6 +441,165 @@ class GranularFlowAgent:
             print(f"  [concept-graph] LLM alignment: merged {n_merged} near-synonym concepts", flush=True)
         except Exception as e:
             print(f"  [concept-graph] alignment failed: {e!r}", flush=True)
+        return results
+
+    # ===================================================================
+    # Step 7: process_paper_via_kernel — the KB-backed (底座读写者) pipeline.
+    # NEW path (parallel to process_paper_hypergraph above). Routes every write
+    # through the KnowledgeBase (Step 1) via the four builder agents (Step 2-5):
+    # ExtractionAgent (add_edge → KB validate) → EvolutionAgent (evolver Mutation
+    # → KB commit, schema并进) → AlignmentAgent (align_concept_merge → KB,真合并)
+    # → MaintenanceAgent (rich topology + utility prune → KB retire). The KB
+    # shares self.meta_hg / self.concept_graph (same objects) so this path and
+    # the legacy path operate on the same evolving schema/A-box — but THIS path
+    # is transactional (ledger / validate / replay), the legacy path is not.
+    # The legacy process_paper_hypergraph is KEPT for ablation对照 + eval
+    # continuity (surgical: don't break the running pipeline). (DECISION: 重组
+    # 为底座读写者, not a second parallel pipeline — same KB objects, transactional.)
+    # ===================================================================
+    def _get_kernel(self):
+        """Lazy-build the KnowledgeBase wrapping self.meta_hg / self.concept_graph.
+        Same objects (not copies) so the KB's commits mutate the agent's evolving
+        schema/A-box directly. Caches on self._kb."""
+        if getattr(self, "_kb", None) is None:
+            from granular_agent.knowledge_base import KnowledgeBase
+            self._kb = KnowledgeBase(
+                tbox=self.meta_hg, abox=self.concept_graph,
+                domain_ns={"global": True, "granular": True, "ml": True,
+                           "molecular": True})
+        return self._kb
+
+    def _kernel_llm_extract(self, prompt, max_tokens=8000):
+        from granular_agent.llm_client import call_paratera
+        llm = self.llms[0] if self.llms else "DeepSeek-V4-Flash"
+        if llm == "deepseek":
+            return call_llm(prompt, model="deepseek-chat", max_tokens=max_tokens)
+        return call_paratera(prompt, model=llm, max_tokens=max_tokens, enable_thinking=False)
+
+    def _kernel_llm_verify(self, prompt, max_tokens=4000):
+        # verifier ≠ extraction model (avoid self-endorsement). Use deepseek-chat
+        # for verify even when extract uses V4-Flash.
+        return call_llm(prompt, model="deepseek-chat", max_tokens=max_tokens)
+
+    def process_paper_via_kernel(self, paper_id: str, arm: str = "full") -> dict:
+        """KB-backed pipeline (Step 7): run the four builder agents on each
+        section of a paper, writing through KnowledgeBase.commit. Returns a
+        report per section + aggregate. arm mirrors process_paper_hypergraph
+        (full/add_only/no_intra_dag/frozen) — frozen skips evolution+align."""
+        from granular_agent.extraction_agent import ExtractionAgent
+        from granular_agent.evolution_agent import EvolutionAgent
+        from granular_agent.alignment_agent import AlignmentAgent, AlignmentReport
+        from granular_agent.maintenance_agent import MaintenanceAgent
+        from granular_agent.structure_mapper import section_text_for_node
+
+        kb = self._get_kernel()
+        llm = self.llms[0] if self.llms else "DeepSeek-V4-Flash"
+        blocks = load_paper_blocks(paper_id, corpus_dir=self.corpus_dir)
+        if not blocks:
+            return {"paper_id": paper_id, "error": "no_text", "n_nodes": 0, "n_hyperedges": 0}
+        smap = map_structure(paper_id, blocks, llm=llm, domain=self.domain)
+        if not smap or not smap.get("dag", {}).get("nodes"):
+            return {"paper_id": paper_id, "error": "structure_map_failed"}
+
+        ext = ExtractionAgent(kb, llm_extract=self._kernel_llm_extract,
+                              llm_verify=self._kernel_llm_verify, domain_default=self.domain)
+        evo = EvolutionAgent(kb, llm=self._kernel_llm_verify, domain_default=self.domain)
+        align = AlignmentAgent(kb, llm_define=self._kernel_llm_verify,
+                               llm_judge=self._kernel_llm_verify, domain_default=self.domain)
+        maint = MaintenanceAgent(kb, llm=None, domain_default=self.domain)
+
+        pre_v = kb.version
+        section_reports = []
+        for node in smap["dag"]["nodes"]:
+            nid = node.get("id", "")
+            sec_text = section_text_for_node(node, smap.get("sections", []), blocks)
+            if not sec_text or len(sec_text) < 80:
+                continue
+            discourse = node.get("section", nid)
+            # Stage 1: extract (plan-execute-verify-fix-commit → KB)
+            ext_rep = ext.extract_section(sec_text, discourse, nid, paper_id,
+                                          year="", section=discourse)
+            # Stage 2: evolve — feed this section's validation failures (edges the
+            # verifier dropped or that didn't match a pattern) to the evolver.
+            # The extractor already dropped bad edges at commit (kernel validate),
+            # so here we surface the verifier's dropped + reextract edges as
+            # potential schema gaps (cross-node recurrence accumulates across
+            # sections — a real gap recurs at >1 node and gets accepted).
+            if arm != "frozen":
+                # failed_edges: edges the verifier dropped/drop'd (would-be
+                # patterns the schema lacks). Reconstruct as (Hyperedge, reason)
+                # for the evolver's trigger.
+                from granular_agent.hypergraph_schema import Hyperedge
+                failing = []
+                for ke in ext_rep.get("kept_edges", []):
+                    pass  # kept edges already committed; failures are in fix_stats
+                # the verifier's dropped edges aren't returned as Hyperedge objs
+                # (fixer drops them); for now feed cross_node via the section's
+                # node_id so recurring gaps accumulate. Honest: a richer failure
+                # feed would reconstruct the dropped Hyperedges — reserved.
+                if ext_rep.get("n_raw_edges", 0) > ext_rep.get("n_kept_edges", 0):
+                    # there were drops -> potential schema gap; record a synthetic
+                    # trigger so cross-node recurrence can fire (cross_node>=2
+                    # across sections accepts a real gap).
+                    he_fail = Hyperedge(eid=f"{nid}_fail", pattern_type="_unknown",
+                                        node_ids=["a", "b"], node_roles=["x", "y"],
+                                        evidence_span=sec_text[:120])
+                    evo.propose_validate_failures([(he_fail, "no-matching-meta-pattern")],
+                                                  node_id=nid, paper_id=paper_id, domain=self.domain)
+                evo_rep = evo.drain()
+            else:
+                evo_rep = None
+            section_reports.append({"node_id": nid, "extract": ext_rep,
+                                    "evolve": evo_rep.__dict__ if evo_rep else None})
+
+        # Stage 3: align — Define + Canonicalize on the new concepts ingested
+        if arm != "frozen":
+            try:
+                align_rep = align.align_new(domain=self.domain)
+            except Exception as e:
+                align_rep = AlignmentReport()
+                print(f"  [kernel] align failed: {e!r}", flush=True)
+        else:
+            align_rep = None
+
+        # Stage 4: maintenance — rich topology read (on-demand view) + the
+        # maintainer's prune is run at batch end (not per-paper) to avoid
+        # retiring patterns mid-batch that later papers need.
+        n_concepts = len(kb.abox.concepts)
+        n_hyperedges = len(kb.abox.hyperedges)
+        result = {
+            "paper_id": paper_id,
+            "pipeline": "kernel",
+            "n_sections": len(section_reports),
+            "n_concepts": n_concepts,
+            "n_hyperedges": n_hyperedges,
+            "version_before": pre_v,
+            "version_after": kb.version,
+            "section_reports": section_reports,
+            "align": (align_rep.__dict__ if align_rep else None),
+            "total_patterns_after": len(kb.tbox.patterns),
+            "ledger_entries": len(kb.ledger),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+        self.hg_results.append(result)
+        print(f"  [kernel] {paper_id}: {len(section_reports)} sections | "
+              f"{n_concepts} concepts / {n_hyperedges} hyperedges | "
+              f"v{pre_v}->{kb.version} ({len(kb.tbox.patterns)} patterns) | "
+              f"ledger={len(kb.ledger)}", flush=True)
+        return result
+
+    def process_batch_via_kernel(self, paper_ids: list[str]) -> list[dict]:
+        """KB-backed batch: run process_paper_via_kernel per paper (meta+A-box
+        persist via the shared KB), then a final maintenance prune (utility)
+        + rich-topology snapshot. Returns per-paper results."""
+        results = [self.process_paper_via_kernel(pid) for pid in paper_ids]
+        from granular_agent.maintenance_agent import MaintenanceAgent
+        kb = self._get_kernel()
+        maint = MaintenanceAgent(kb, llm=None, domain_default=self.domain)
+        # final utility prune: retire patterns with zero A-box usage (freq < 1).
+        # honest: frequency-only (citation/evolution contribution reserved).
+        prune = maint.prune_by_utility(domain=self.domain, min_frequency=1)
+        print(f"  [kernel-batch] final prune: retired {prune.n_retired} unused patterns", flush=True)
         return results
 
     def save_hypergraph_results(self, output_dir: str):
