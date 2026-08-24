@@ -296,11 +296,11 @@ class HGBlackboard:
 
 def _call(prompt: str, llm: str, max_tokens: int = 16384) -> str | None:
     if llm == "deepseek":
-        # legacy 'deepseek' alias -> DeepSeek-V4-Flash via Paratera (thinking
-        # OFF — reasoning eats max_tokens + slows; extraction needs full content)
-        return call_paratera(prompt, model="DeepSeek-V4-Flash",
-                             max_tokens=max_tokens, enable_thinking=False)
-    # V4-Flash or other reasoning models: thinking off for extraction
+        # deepseek-chat (official API) — best extraction quality found so far
+        # (V4-Flash tested, worse: slow + low output + reasoning overhead even
+        # with thinking off). deepseek-chat follows extraction prompt better.
+        return call_llm(prompt, model="deepseek-chat", max_tokens=max_tokens)
+    # reasoning models (V4-Flash/R1) with thinking off — for gate/judge use
     if "V4-Flash" in llm or "R1" in llm or "Thinking" in llm:
         return call_paratera(prompt, model=llm, max_tokens=max_tokens,
                              enable_thinking=False)
