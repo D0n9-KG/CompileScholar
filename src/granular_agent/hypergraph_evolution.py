@@ -43,7 +43,7 @@ from granular_agent.hypergraph_schema import (
     MetaHypergraph, MetaHyperedgePattern, Hyperedge, InstanceHypergraph,
     TOP_LEVEL_FAMILIES, QUALIFIER_REGISTRY,
 )
-from granular_agent.llm_client import call_llm, call_paratera, parse_json_response
+from granular_agent.llm_client import call_llm, call_paratera, call_cst, _is_cst_model, parse_json_response
 from granular_agent.llm_client import embed_batch, cosine_sim
 from granular_agent.grounding import _tokens
 
@@ -198,8 +198,9 @@ def evolution_probe(failing_hes: list[Hyperedge], meta: MetaHypergraph,
 
 def _call(prompt: str, llm: str, max_tokens: int = 4000) -> str | None:
     if llm == "deepseek":
-        # deepseek-chat for extraction/evolution (V4-Flash tested, worse).
         return call_llm(prompt, model="deepseek-chat", max_tokens=max_tokens)
+    if _is_cst_model(llm):
+        return call_cst(prompt, model=llm, max_tokens=max_tokens)
     if "V4-Flash" in llm or "R1" in llm or "Thinking" in llm:
         return call_paratera(prompt, model=llm, max_tokens=max_tokens,
                              enable_thinking=False)

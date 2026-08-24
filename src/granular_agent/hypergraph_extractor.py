@@ -22,7 +22,7 @@ import unicodedata
 from typing import Any
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from granular_agent.llm_client import call_llm, call_paratera, parse_json_response
+from granular_agent.llm_client import call_llm, call_paratera, call_cst, _is_cst_model, parse_json_response
 from granular_agent.structure_mapper import topo_order, section_text_for_node
 from granular_agent.hypergraph_schema import (
     MetaHypergraph, Hyperedge, HGNode, InstanceHypergraph,
@@ -296,10 +296,9 @@ class HGBlackboard:
 
 def _call(prompt: str, llm: str, max_tokens: int = 16384) -> str | None:
     if llm == "deepseek":
-        # deepseek-chat (official API) — best extraction quality found so far
-        # (V4-Flash tested, worse: slow + low output + reasoning overhead even
-        # with thinking off). deepseek-chat follows extraction prompt better.
         return call_llm(prompt, model="deepseek-chat", max_tokens=max_tokens)
+    if _is_cst_model(llm):
+        return call_cst(prompt, model=llm, max_tokens=max_tokens)
     # reasoning models (V4-Flash/R1) with thinking off — for gate/judge use
     if "V4-Flash" in llm or "R1" in llm or "Thinking" in llm:
         return call_paratera(prompt, model=llm, max_tokens=max_tokens,

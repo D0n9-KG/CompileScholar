@@ -163,6 +163,45 @@ def cosine_sim(a: list[float], b: list[float]) -> float:
     return dot / (na * nb) if na and nb else 0.0
 
 
+# ---- CST (CSTCloud) provider — OpenAI-compatible API ----
+_CST_MODELS = {"qwen3.5", "gpt-oss-120b", "deepseek-v4-flash", "minimax-m27",
+               "S1-Base-Lite", "S1-Base-Pro", "S1-Base-Ultra"}
+
+
+def _is_cst_model(model: str) -> bool:
+    return model.lower() in _CST_MODELS
+
+
+def call_cst(prompt: str, model: str = "qwen3.5", max_tokens: int = 4000,
+             temperature: float = 0.0) -> str | None:
+    """Call CSTCloud API (qwen3.5 / gpt-oss-120b / deepseek-v4-flash etc).
+    OpenAI-compatible. enable_thinking not sent (CST models ignore it)."""
+    key = ENV.get("CST_API_KEY")
+    base = ENV.get("CST_BASE_URL", "").rstrip("/")
+    if not key:
+        return None
+    payload = {
+        "model": model,
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+    }
+    body = json.dumps(payload).encode()
+    req = urllib.request.Request(
+        base + "/chat/completions",
+        data=body,
+        headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+    )
+    for attempt in range(2):
+        try:
+            raw = urllib.request.urlopen(req, context=_CTX, timeout=120).read()
+            return json.loads(raw)["choices"][0]["message"]["content"]
+        except Exception:
+            if attempt == 1:
+                return None
+    return None
+
+
 def parse_json_response(text: str | None) -> Any:
     """Parse JSON from LLM response, handling markdown fences and extra text."""
     if not text:
