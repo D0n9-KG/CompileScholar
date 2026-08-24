@@ -601,11 +601,17 @@ Task: identify n-ary hyperedges connecting entities. Each hyperedge:
 Rules:
 - evidence_span MUST be verbatim from the text.
 - n-ary: connect ALL related entities in ONE edge (a law with 3 params = 1 edge, not 3).
+  When a sentence lists PARALLEL entities in the same relation to the same other entity,
+  they MUST all be nodes of ONE hyperedge, NOT split into separate edges.
 - A named method that OWNS a law must be IN the law's hyperedge (not separate).
 - composed_of = ONLY structural composition (parts of a whole). "Experiment setup with
   2-m-long plane" is NOT composition (it's experimental description). "Model A consists
   of components B and C" IS composition.
 - extends/improves/compares = method-to-method evolution (A builds on/improves/compares B).
+- qualifiers: only use keys from this set: relation_type, method, cited_from,
+  evidence_strength, applies_in_regime, function_form, parameters, condition.
+  For method: experiment/simulation/theory/review. For evidence_strength:
+  derived/measured/assumed/claimed. For cited_from: this_work/cited/external.
 
 Output JSON: {{"hyperedges":[{{"eid":"e1","pattern_type":"...","node_ids":["n1","n2"],
 "node_roles":["output","input"],"evidence_span":"...","qualifiers":{{}}}}]}}

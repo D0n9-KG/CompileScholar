@@ -1712,13 +1712,9 @@ _EFFECT_RE = re.compile(
     r'profile$|velocity profile|dilatancy|Reynolds dilation)', re.I)
 _EQREF_RE = re.compile(r'^eq(uation|\.)?\s*\.?\s*\(?[\dabivx]+\)?\.?$', re.I)
 # Long surfaces are dropped as METHOD ONLY when they look like a sentence/paper-title,
-# NOT a descriptive method phrase. A descriptive noun phrase like "gradient expansion
-# of the yield parameter" (39 chars) is a real method concept — keep it. Only drop when
-# the surface contains a verb/connective pattern typical of a full sentence or title.
-_LONG_TITLE_RE = re.compile(
-    r'^(.+\s(.of|from|into|towards|using|by|via|based on|in order to|allows|enables|shows|predicts|describes|proposes|introduces)\s.+'
-    r'|.+(stopping|arrest|flow|flows|media|materials?)\s(down|in|on|across|through)\s.+)$',
-    re.I)
+# (_LONG_TITLE_RE REMOVED — mis-killed real method concepts like
+# 'gradient expansion of the yield parameter'. Semantic title-judgment is LLM's
+# job, not a rule. Kept no trace — if needed again, use LLM.)
 
 
 def _relabel(n, new):
@@ -1728,13 +1724,6 @@ def _relabel(n, new):
         n.labels = [l for l in n.labels if l != "METHOD"]
         if new not in n.labels:
             n.labels.append(new)
-
-
-def _norm_surface(s):
-    # (REMOVED — was the suffix-stripping synonym-merge key for consolidate
-    # dedup. Synonym merging is now LLM (align_concepts). Kept as a no-op stub
-    # in case other modules import it; concept_graph has its own _norm_surface.)
-    return s.lower().strip()
 
 
 def consolidate_instance(instance: InstanceHypergraph, domain: str = "") -> dict:

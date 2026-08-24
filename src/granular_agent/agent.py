@@ -86,8 +86,6 @@ class GranularFlowAgent:
         # A-box: cross-paper concept hypergraph (n-ary, accumulated across
         # papers with LLM semantic alignment). Replaces InstanceCorpus
         # surface-only merge — see concept_graph.py + DESIGN_full.md.
-        # (InstanceCorpus class remains in hypergraph_schema only because the
-        # corpus_driver shadow still uses it; both deleted together in P2+.)
         from granular_agent.concept_graph import ConceptGraph
         self.concept_graph = ConceptGraph()
         # per-paper instances (kept for save)
@@ -334,7 +332,8 @@ class GranularFlowAgent:
         pre_patterns = set(self.meta_hg.patterns_ids())
         res = extract_hypergraph(smap, blocks, self.meta_hg, llm=llm, paper_id=paper_id,
                                  trigger=self.hg_trigger, evolve=evolve,
-                                 propagate_intra_dag=propagate)
+                                 propagate_intra_dag=propagate,
+                                 domain=self.domain)
         acc = [e for e in res["evolutions"] if not e.get("rejected")]
         rej = [e for e in res["evolutions"] if e.get("rejected")]
         # pattern-level repair: split over-wide patterns (deterministic trigger,
