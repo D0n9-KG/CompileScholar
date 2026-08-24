@@ -583,8 +583,18 @@ Task: identify n-ary hyperedges connecting entities. Each hyperedge:
   claim_relation (discourse: X vs Y), extends/improves/compares (method A evolves B).
   Use existing pattern names when they fit; propose a new one only if none fit.
 - node_ids: which entities participate (by nid, in order)
-- node_roles: role of each node (output/input, cause/effect, whole/component,
-  from/to, subject/object, etc.)
+- node_roles: role of each node — MUST use ONLY these role names, matching the
+  pattern_type's expected roles:
+  constitutive_law: output, input, parameter, coefficient, exponent
+  influences: source, target, cause, effect
+  defines: subject, definition, object
+  composed_of: whole, component
+  measures: object, instrument
+  claim_relation: from, to
+  extends/improves/compares/replaces/adapts/background: from, to
+  If you need a role not in this list, pick the closest one. Do NOT invent role
+  names like 'subject', 'condition', 'method', 'analogy', 'function' — use the
+  listed roles.
 - evidence_span: verbatim text supporting this relation
 - qualifiers: optional {{"key":"value"}} (e.g. relation_type, method, cited_from)
 
