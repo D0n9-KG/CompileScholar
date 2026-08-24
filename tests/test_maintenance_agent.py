@@ -65,9 +65,13 @@ check("Ambiguous: flagged edge has both method_parameter+method_phenomenon",
 # ===========================================================================
 kb3 = _kb()
 # add an A-box edge using 'measures' so it has frequency 1; other patterns unused
+# pass pattern_type="measures" (the T-box ref) so prune counts it correctly.
+# (BLOCKER fix: previously tests used kind=pattern_type, masking the real-pipeline
+# mismatch where kind is a rich-topology label, NOT the T-box pattern_id.)
 kb3.abox.concepts["c1"] = Concept(concept_id="c1", type="PROPERTY")
 kb3.abox.concepts["c2"] = Concept(concept_id="c2", type="PROPERTY")
-kb3.abox.add_hyperedge(["c1", "c2"], kind="measures", paper_id="p1", evidence="x")
+kb3.abox.add_hyperedge(["c1", "c2"], kind="measures", paper_id="p1", evidence="x",
+                        pattern_type="measures")
 agent3 = MaintenanceAgent(kb3, llm=None, domain_default="granular")
 # prune patterns with frequency < 1 (i.e. unused patterns retire)
 report = agent3.prune_by_utility(domain="granular", min_frequency=1)
@@ -80,6 +84,28 @@ check("SEDM prune: retire is soft-delete (deprecated, not removed)",
           if p in kb3.tbox.patterns))
 check("SEDM prune: retire entry in ledger (kernel transaction, recoverable)",
       any(m.get("op") == Op.RETIRE for e in kb3.ledger for m in e.get("mutations", [])))
+
+# 3b. BLOCKER fix real-path: an A-box edge with kind=rich-topology-label
+# (method_parameter) but pattern_type=T-box-ref (constitutive_law) — exactly
+# the real pipeline shape (ingest_instance stores kind=rich kind, pattern_type
+# =raw). prune must count by pattern_type, so constitutive_law (in use) is NOT
+# retired. Before the fix, prune used kind -> mismatched T-box pattern_id ->
+# wrongly retired in-use constitutive_law.
+kb3b = _kb()
+kb3b.abox.concepts["c1"] = Concept(concept_id="c1", type="METHOD")
+kb3b.abox.concepts["c2"] = Concept(concept_id="c2", type="PARAMETER")
+# kind=method_parameter (rich-topology label), pattern_type=constitutive_law (T-box)
+kb3b.abox.add_hyperedge(["c1", "c2"], kind="method_parameter", paper_id="p1",
+                         evidence="law uses param", pattern_type="constitutive_law")
+agent3b = MaintenanceAgent(kb3b, llm=None, domain_default="granular")
+report3b = agent3b.prune_by_utility(domain="granular", min_frequency=1)
+check("BLOCKER fix: constitutive_law NOT retired (counted by pattern_type, in use)",
+      not kb3b.tbox.patterns["constitutive_law"].deprecated)
+check("BLOCKER fix: in-use pattern not in retired list",
+      "constitutive_law" not in [r["target"] for r in report3b.retired])
+# unused patterns (no A-box edge with their pattern_type) still retire
+check("BLOCKER fix: unused patterns still retired (frequency=0)",
+      report3b.n_retired >= 1)
 
 # ===========================================================================
 # 4. Decay reaper (断点 13): honest降级 — no-op

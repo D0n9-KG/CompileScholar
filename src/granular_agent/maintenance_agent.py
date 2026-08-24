@@ -109,10 +109,19 @@ class MaintenanceAgent:
     def _kinds_for_edge(self, edge: dict) -> list[str]:
         """Which rich-topology kinds this edge could be classified as (for
         ambiguous flagging). Direct read picks one; this checks if others
-        also fit (role overlap)."""
+        also fit (role overlap).
+
+        Honest scope (MAJOR fix): only the method_* kinds can overlap (a
+        METHOD+PARAMETER+PHENOMENON edge is both method_parameter and
+        method_phenomenon). The other kinds are determined by pattern_type and
+        are mutually exclusive (law_parameter only for constitutive_law,
+        composition only for composed_of, definition only for defines, nary for
+        >=3 distinct types) — they can't co-occur as 'ambiguous' in a meaningful
+        way. So we check the 3 method_* overlaps; law/composition/definition/
+        nary are pattern_type-determined (no ambiguity to flag)."""
         # the direct read already set 'kind'; we check if the node-type combo
         # also fits other kinds (e.g. a METHOD+PARAMETER+PHENOMENON edge is both
-        # method_parameter and method_phenomenon). Honest: simple type-set check.
+        # method_parameter and method_phenomenon).
         labels = set()
         for nd in edge.get("nodes", []):
             labels.update(nd.get("labels", []))
@@ -140,9 +149,8 @@ class MaintenanceAgent:
             if not touched:
                 continue
             kinds = self._kinds_for_edge({"nodes": [
-                {"labels": [self.kb.abox.concepts[c].type]
-                 for c in [cid] if cid in self.kb.abox.concepts}
-                for cid in he.node_ids]})
+                {"labels": [self.kb.abox.concepts[cid].type]}
+                for cid in he.node_ids if cid in self.kb.abox.concepts]})
             view.edges.append({
                 "kind": he.kind, "node_ids": list(he.node_ids),
                 "evidence": (he.provenance[0].get("evidence", "") if he.provenance else ""),
@@ -170,12 +178,19 @@ class MaintenanceAgent:
         for now; the interface accepts min_citations for later."""
         domain = domain or self.domain_default
         report = MaintenanceReport()
-        # utility = number of A-box hyperedges with kind == pattern_id
-        # (rich-topology kinds like method_parameter aren't T-box patterns, so
-        # only retire T-box patterns that are unused / low-use)
+        # utility = number of A-box hyperedges referencing this T-box pattern,
+        # counted by he.pattern_type (the raw T-box ref) — NOT he.kind (the
+        # rich-topology classification). (BLOCKER fix: previously used he.kind
+        # which is a rich-topology label like method_parameter/law_parameter,
+        # mismatching T-box pattern_id like constitutive_law/defines — this
+        # wrongly retired in-use patterns. pattern_type is the T-box reference.)
         usage: dict[str, int] = {}
         for he in self.kb.abox.hyperedges:
-            usage[he.kind] = usage.get(he.kind, 0) + 1
+            pt = he.pattern_type or he.kind  # fall back to kind only if no
+            # pattern_type recorded (legacy edges); honest: kind is a poor proxy
+            # but better than skipping the edge entirely.
+            if pt:
+                usage[pt] = usage.get(pt, 0) + 1
         for pid, pat in list(self.kb.tbox.patterns.items()):
             if pat.deprecated:
                 continue

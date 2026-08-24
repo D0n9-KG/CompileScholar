@@ -88,6 +88,13 @@ class ConceptHyperedge:
     node_ids: list[str] = field(default_factory=list)  # concept_ids (n-ary, order matters for roles)
     node_roles: list[str] = field(default_factory=list)
     kind: str = ""
+    # raw pattern_type the instance hyperedge carried (from the extractor). kind
+    # is the rich-topology classification; pattern_type is the T-box reference
+    # (constitutive_law/defines/extends/...). prune_by_utility (Step 5) needs
+    # pattern_type — NOT kind — to count T-box pattern usage frequency (BLOCKER
+    # fix: previously used kind which is a rich-topology label, mismatching T-box
+    # pattern_id and wrongly retiring in-use patterns).
+    pattern_type: str = ""
     provenance: list[dict] = field(default_factory=list)  # [{paper_id, evidence, year, section}]
     emergence_signals: dict[str, Any] = field(default_factory=dict)  # P2 fills
     confidence: float = 0.0
@@ -203,10 +210,17 @@ class ConceptGraph:
 
     def add_hyperedge(self, node_ids: list[str], kind: str, roles: list[str] = None,
                       paper_id: str = "", evidence: str = "", year: str = "",
-                      section: str = "") -> ConceptHyperedge:
+                      section: str = "", pattern_type: str = "") -> ConceptHyperedge:
         """Add an n-ary hyperedge. DEDUP by (frozenset(node_ids), kind):
         same nodes+kind → accumulate provenance (not duplicate). Skips empty/
-        single-node 'edges' (not a relation). Self-loops (all same id) skipped."""
+        single-node 'edges' (not a relation). Self-loops (all same id) skipped.
+
+        pattern_type: the raw T-box pattern_type the instance hyperedge carried
+        (constitutive_law/defines/extends/...). Stored SEPARATELY from kind
+        (rich-topology classification) so prune_by_utility can count T-box
+        pattern usage frequency correctly. (BLOCKER fix — previously only kind
+        was stored, mismatching T-box pattern_id in prune.)
+        """
         node_ids = [n for n in node_ids if n]
         if len(node_ids) < 2:
             return None
@@ -218,9 +232,11 @@ class ConceptGraph:
                 if paper_id:
                     he.provenance.append({"paper_id": paper_id, "evidence": evidence,
                                           "year": year, "section": section})
+                if pattern_type and not he.pattern_type:
+                    he.pattern_type = pattern_type
                 return he
         he = ConceptHyperedge(he_id=f"H{self._next_he()}", node_ids=node_ids,
-                               node_roles=roles or [], kind=kind,
+                               node_roles=roles or [], kind=kind, pattern_type=pattern_type,
                                provenance=[{"paper_id": paper_id, "evidence": evidence,
                                             "year": year, "section": section}]
                                if paper_id else [])
@@ -324,12 +340,12 @@ class ConceptGraph:
         # pattern_type carries the verb).
         for re_ in rich_edges:
             kind = re_["kind"]
+            pt_raw = re_.get("pattern_type", "")
             if kind == "evolution":
-                pt = re_.get("pattern_type", "")
                 # pattern_type is the verb (extends/improves/...) per schema seed
-                if pt in ("extends", "improves", "compares", "replaces",
+                if pt_raw in ("extends", "improves", "compares", "replaces",
                           "adapts", "background"):
-                    kind = pt  # specific subtype, eval-alignable
+                    kind = pt_raw  # specific subtype, eval-alignable
             ev = re_.get("evidence", "")
             sec = re_.get("section", "")
             cids = []
@@ -341,8 +357,11 @@ class ConceptGraph:
                 if cid:
                     cids.append(cid)
             if len(cids) >= 2:
+                # pass pattern_type (raw T-box ref) so prune_by_utility can count
+                # T-box pattern usage correctly (BLOCKER fix).
                 self.add_hyperedge(cids, kind, paper_id=paper_id,
-                                   evidence=ev, year=year, section=sec)
+                                   evidence=ev, year=year, section=sec,
+                                   pattern_type=pt_raw)
 
     # ---- cross-paper semantic alignment (C2) ----
     def align_concepts(self, llm_fn, type_filter=("METHOD", "PHENOMENON", "PARAMETER"),
@@ -415,6 +434,7 @@ class ConceptGraph:
             cg.hyperedges.append(ConceptHyperedge(
                 he_id=he["he_id"], node_ids=he.get("node_ids", []),
                 node_roles=he.get("node_roles", []), kind=he.get("kind", ""),
+                pattern_type=he.get("pattern_type", ""),
                 provenance=he.get("provenance", []),
                 emergence_signals=he.get("emergence_signals", {}),
                 confidence=he.get("confidence", 0.0)))
