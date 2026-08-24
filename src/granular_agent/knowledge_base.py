@@ -270,6 +270,11 @@ class KnowledgeBase:
         self.domain_ns: dict[str, bool] = domain_ns or {"global": True, "granular": True,
                                                          "ml": True, "molecular": True}
         self.ledger: list[dict] = []                 # [{mutation, result, version_diff}]
+        # paper_id -> domain map: the extractor records domain on each add_edge,
+        # and _apply_add_edge updates this so the aligner (Step 4) can filter
+        # same-domain concepts (DecentMem 防混域 — cross-domain concepts don't
+        # merge). Honest: populated lazily as papers ingest; empty until then.
+        self._paper_domain: dict[str, str] = {}
         self.version: str = self.tbox.version
         # the aligner's ambiguous-5-outcome judge (MUST be != extraction model).
         # If None, ambiguous -> insert (data-preserving) + flagged in route detail.
@@ -741,6 +746,11 @@ class KnowledgeBase:
         payload = mut.payload
         concepts = payload.get("concepts", [])
         kind = payload.get("kind", "")
+        # record paper→domain (aligner same-domain filter, Step 4)
+        prov0 = payload.get("provenance", {})
+        pid0 = prov0.get("paper_id", "")
+        if pid0 and mut.domain:
+            self._paper_domain[pid0] = mut.domain
         roles = payload.get("roles", [])
         prov = payload.get("provenance", {})
         paper_id = prov.get("paper_id", mut.domain)
