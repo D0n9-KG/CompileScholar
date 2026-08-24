@@ -470,10 +470,12 @@ class GranularFlowAgent:
         return self._kb
 
     def _kernel_llm_extract(self, prompt, max_tokens=8000):
+        # extractor LLM = self.llms[0] (default DeepSeek-V4-Flash via Paratera,
+        # thinking disabled). (MA2 fix: removed a dead `if llm == "deepseek"`
+        # branch that never triggered since llms holds model names like
+        # "DeepSeek-V4-Flash", not the literal "deepseek".)
         from granular_agent.llm_client import call_paratera
         llm = self.llms[0] if self.llms else "DeepSeek-V4-Flash"
-        if llm == "deepseek":
-            return call_llm(prompt, model="deepseek-chat", max_tokens=max_tokens)
         return call_paratera(prompt, model=llm, max_tokens=max_tokens, enable_thinking=False)
 
     def _kernel_llm_verify(self, prompt, max_tokens=4000):
@@ -526,26 +528,30 @@ class GranularFlowAgent:
             # potential schema gaps (cross-node recurrence accumulates across
             # sections — a real gap recurs at >1 node and gets accepted).
             if arm != "frozen":
-                # failed_edges: edges the verifier dropped/drop'd (would-be
-                # patterns the schema lacks). Reconstruct as (Hyperedge, reason)
-                # for the evolver's trigger.
+                # MA1 fix: feed the REAL dropped edges (from the extractor's
+                # fixer) to the evolver as schema-gap triggers — NOT a synthetic
+                # Hyperedge. The dropped_edges carry pattern_type + evidence +
+                # node_ids/roles + reason (verbatim/type/role). A recurring gap
+                # (same pattern_type dropped across >=2 sections) accumulates
+                # cross_node and the conservative gate accepts it -> schema并进
+                # actually fires. The previous合成 trigger (pattern_type=
+                # "_unknown", node_ids=["a","b"], evidence=sec_text[:120]) was a
+                # fake signal that cross_node gate correctly rejected (cross=1)
+                # so schema evolution never happened in single-paper runs.
                 from granular_agent.hypergraph_schema import Hyperedge
-                failing = []
-                for ke in ext_rep.get("kept_edges", []):
-                    pass  # kept edges already committed; failures are in fix_stats
-                # the verifier's dropped edges aren't returned as Hyperedge objs
-                # (fixer drops them); for now feed cross_node via the section's
-                # node_id so recurring gaps accumulate. Honest: a richer failure
-                # feed would reconstruct the dropped Hyperedges — reserved.
-                if ext_rep.get("n_raw_edges", 0) > ext_rep.get("n_kept_edges", 0):
-                    # there were drops -> potential schema gap; record a synthetic
-                    # trigger so cross-node recurrence can fire (cross_node>=2
-                    # across sections accepts a real gap).
-                    he_fail = Hyperedge(eid=f"{nid}_fail", pattern_type="_unknown",
-                                        node_ids=["a", "b"], node_roles=["x", "y"],
-                                        evidence_span=sec_text[:120])
-                    evo.propose_validate_failures([(he_fail, "no-matching-meta-pattern")],
-                                                  node_id=nid, paper_id=paper_id, domain=self.domain)
+                failing: list = []
+                for de in ext_rep.get("dropped_edges", []):
+                    he_fail = Hyperedge(
+                        eid=de.get("edge_id", f"{nid}_drop"),
+                        pattern_type=de.get("pattern_type", ""),
+                        node_ids=de.get("node_ids", []) or ["a", "b"],
+                        node_roles=de.get("node_roles", []) or ["x", "y"],
+                        evidence_span=de.get("evidence_span", ""))
+                    reason = de.get("reason", "no-matching-meta-pattern")
+                    failing.append((he_fail, reason))
+                if failing:
+                    evo.propose_validate_failures(failing, node_id=nid,
+                                                  paper_id=paper_id, domain=self.domain)
                 evo_rep = evo.drain()
             else:
                 evo_rep = None

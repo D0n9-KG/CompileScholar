@@ -178,7 +178,7 @@ edges4 = [
     Hyperedge(eid="e3", pattern_type="background", node_ids=["n1", "n4"], node_roles=["from", "to"]),
     Hyperedge(eid="e4", pattern_type="defines", node_ids=["n5", "n6"], node_roles=["subject", "definition"]),
 ]
-kept, stats = agent4.fix(edges4, v4, [], SECTION, plan)
+kept, stats, _ = agent4.fix(edges4, v4, [], SECTION, plan)
 check("fixer: keep kept", stats["keep"] == 1 and kept[0].eid == "e1")
 check("fixer: retype changes pattern_type", stats["retype"] == 1
       and kept[1].pattern_type == "improves")
@@ -194,14 +194,14 @@ v4b = [Verdict(edge_id="e1", fix="keep")]  # LLM says keep
 edges4b = [Hyperedge(eid="e1", pattern_type="extends", node_ids=["n1", "n2"],
                      node_roles=["from", "to"],
                      evidence_span="this phrase is NOT in the section text")]
-kept_b, stats_b = agent4.fix(edges4b, v4b, [], SECTION, plan)
+kept_b, stats_b, _ = agent4.fix(edges4b, v4b, [], SECTION, plan)
 check("fixer: deterministic verbatim gate drops non-substring evidence (rule over LLM)",
       stats_b["dropped_nonverbatim"] == 1 and len(kept_b) == 0)
 # a truly verbatim evidence is kept
 edges4c = [Hyperedge(eid="e1", pattern_type="extends", node_ids=["n1", "n2"],
                      node_roles=["from", "to"],
                      evidence_span="We extend the μ(I) rheology")]
-kept_c, stats_c = agent4.fix(edges4c, v4b, [], SECTION, plan)
+kept_c, stats_c, _ = agent4.fix(edges4c, v4b, [], SECTION, plan)
 check("fixer: verbatim substring evidence kept", stats_c["keep"] == 1 and len(kept_c) == 1)
 
 # 4c. retype to a pattern NOT in tbox is dropped (B3 safety in fixer)
@@ -209,7 +209,7 @@ v4d = [Verdict(edge_id="e1", fix="retype:nonexistent_pattern")]
 edges4d = [Hyperedge(eid="e1", pattern_type="compares", node_ids=["n1", "n2"],
                      node_roles=["from", "to"],
                      evidence_span="We extend the μ(I) rheology")]
-kept_d, stats_d = agent4.fix(edges4d, v4d, [], SECTION, plan)
+kept_d, stats_d, _ = agent4.fix(edges4d, v4d, [], SECTION, plan)
 check("fixer: retype to non-tbox pattern -> drop (B3 safety)",
       stats_d["drop"] == 1 and len(kept_d) == 0)
 
@@ -222,14 +222,14 @@ v4e = [Verdict(edge_id="e1", fix="keep")]  # LLM says keep
 edges4e = [Hyperedge(eid="e1", pattern_type="defines", node_ids=["n1", "n2"],
                      node_roles=["from", "to"],
                      evidence_span="We extend the μ(I) rheology")]
-kept_e, stats_e = agent4.fix(edges4e, v4e, [], SECTION, plan)
+kept_e, stats_e, _ = agent4.fix(edges4e, v4e, [], SECTION, plan)
 check("role gate: defines with from/to roles DROPPED (no remap, no downgrade)",
       stats_e["dropped_bad_role"] == 1 and len(kept_e) == 0)
 # correct roles -> kept
 edges4f = [Hyperedge(eid="e1", pattern_type="defines", node_ids=["n1", "n2"],
                      node_roles=["subject", "definition"],
                      evidence_span="We extend the μ(I) rheology")]
-kept_f, stats_f = agent4.fix(edges4f, v4e, [], SECTION, plan)
+kept_f, stats_f, _ = agent4.fix(edges4f, v4e, [], SECTION, plan)
 check("role gate: defines with correct subject/definition roles kept",
       stats_f["keep"] == 1 and len(kept_f) == 1)
 

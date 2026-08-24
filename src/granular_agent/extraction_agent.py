@@ -289,7 +289,7 @@ class ExtractionAgent:
     # ---- fixer ----
     def fix(self, edges: list[Hyperedge], verdicts: list[Verdict],
             nodes: list[HGNode], section_text: str, plan: Plan
-            ) -> tuple[list[Hyperedge], dict]:
+            ) -> tuple[list[Hyperedge], dict, list[dict]]:
         """Apply verdicts. keep -> keep; retype:X -> change pattern_type;
         reextract -> drop (one-shot reextract is a future refinement; for now
         reextract is treated as drop-with-note to avoid unbounded re-extraction
@@ -314,11 +314,32 @@ class ExtractionAgent:
         We DROP the edge (bad role = bad structure, won't commit). This is the
         structural role gate; the LLM still judges type_correct semantically.
         The executor is expected to emit correct roles (per _STEP3_PROMPT); when
-        it doesn't, the edge is dropped here rather than committed wrong."""
+        it doesn't, the edge is dropped here rather than committed wrong.
+
+        Returns (kept, stats, dropped_edges). dropped_edges carries the REAL
+        failed edges (pattern_type + evidence + node_ids/roles + reason) so the
+        evolver (Step 3/7) can feed them as schema-gap triggers — NOT a synthetic
+        trigger. (MA1 fix: the evolver's failure feed was a合成 Hyperedge; real
+        dropped edges are the true signal for schema evolution.)"""
         stats = {"keep": 0, "retype": 0, "reextract_as_drop": 0, "drop": 0,
                  "dropped_nonverbatim": 0, "dropped_bad_role": 0}
         kept: list[Hyperedge] = []
+        dropped_edges: list[dict] = []
         vmap = {v.edge_id: v for v in verdicts}
+
+        def _record_drop(he: Hyperedge, reason: str, v: Verdict | None):
+            """Record a dropped edge for the evolver's failure feed (real
+            schema-gap signal, not synthetic)."""
+            dropped_edges.append({
+                "edge_id": he.eid,
+                "pattern_type": he.pattern_type,
+                "evidence_span": he.evidence_span,
+                "node_ids": list(he.node_ids),
+                "node_roles": list(he.node_roles),
+                "reason": reason,
+                "verifier_note": (v.note if v else ""),
+            })
+
         for he in edges:
             v = vmap.get(he.eid)
             # DETERMINISTIC verbatim gate (rule, overrides LLM verdict)
@@ -327,6 +348,7 @@ class ExtractionAgent:
                 # evidence is paraphrase / hallucinated / truncated -> drop,
                 # regardless of what the LLM verifier said.
                 stats["dropped_nonverbatim"] += 1
+                _record_drop(he, "non-verbatim-evidence", v)
                 continue
             if v is None:
                 pass  # keep
@@ -339,6 +361,7 @@ class ExtractionAgent:
                 # so it's flagged in stats (don't silently smuggle bad data).
                 if new_pt not in self.kb.tbox.patterns:
                     stats["drop"] += 1
+                    _record_drop(he, f"retype-to-unknown-pattern:{new_pt}", v)
                     continue
                 he.pattern_type = new_pt
             elif v.fix == "reextract":
@@ -346,20 +369,23 @@ class ExtractionAgent:
                 # drop with note. The kept-edge quality bar is preserved (only
                 # keep + retype survive).
                 stats["reextract_as_drop"] += 1
+                _record_drop(he, "verifier-reextract", v)
                 continue
             else:  # drop
                 stats["drop"] += 1
+                _record_drop(he, f"verifier-drop:{v.fix}", v)
                 continue
             # ---- passed verdict; now DETERMINISTIC role gate (rule) ----
             if not self._role_ok(he):
                 stats["dropped_bad_role"] += 1
+                _record_drop(he, "bad-role-not-in-pattern", v)
                 continue
             kept.append(he)
             if v is None or v.fix == "keep":
                 stats["keep"] += 1
             else:
                 stats["retype"] += 1
-        return kept, stats
+        return kept, stats, dropped_edges
 
     def _role_ok(self, he: Hyperedge) -> bool:
         """Deterministic role gate (rule, not LLM): every role the edge uses
@@ -435,7 +461,7 @@ class ExtractionAgent:
         plan = self.plan(section_text, discourse_role)
         nodes, edges = self.execute(section_text, plan, node_id, predecessor_summary)
         verdicts = self.verify(edges, nodes, section_text, plan.domain)
-        kept, fstats = self.fix(edges, verdicts, nodes, section_text, plan)
+        kept, fstats, dropped_edges = self.fix(edges, verdicts, nodes, section_text, plan)
         n_committed, rejected = self.commit_edges(kept, nodes, plan, paper_id, year, section)
         return {
             "node_id": node_id, "domain": plan.domain,
@@ -449,6 +475,9 @@ class ExtractionAgent:
             "n_rejected": len(rejected),
             "rejected": rejected,
             "plan": plan,
+            # REAL dropped edges (pattern_type + evidence + reason) for the
+            # evolver's failure feed — NOT a synthetic trigger. (MA1 fix)
+            "dropped_edges": dropped_edges,
             "kept_edges": [{"pattern_type": he.pattern_type,
                             "roles": list(he.node_roles),
                             "evidence": he.evidence_span[:80]}
