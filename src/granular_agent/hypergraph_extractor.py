@@ -500,6 +500,221 @@ def _chunk_text(text: str, thresh: int = CHUNK_THRESH) -> list[str]:
     return [c for c in chunks if c.strip()]
 
 
+# ============================================================================
+# MULTI-STEP EXTRACTION (vs old single-pass 21K-char prompt)
+# Problem: 21K-char EXTRACT_HG_PROMPT -> deepseek-chat doesn't fully follow
+# fine-grained rules (PIV excluded, composed_of boundary, label correctness).
+# Fix: split into 3 short focused prompts — each does ONE thing, LLM follows
+# better (short-context instruction adherence).
+# ============================================================================
+
+_STEP1_PROMPT = """You are extracting ENTITIES from a {domain} paper section ({section_name}).
+
+Text (section chunk):
+{section_text}
+
+Task: identify all SCIENTIFIC ENTITIES mentioned in the text. For each, give:
+- nid: short id (n1, n2, ...)
+- surface: the entity name/term AS WRITTEN in the text (verbatim, not paraphrased)
+- evidence_span: a verbatim phrase from the text where the entity appears
+
+Entities include: modeling methods/theories/laws, physical parameters/symbols,
+phenomena/effects, flow regimes, materials, measured values. Do NOT label them
+yet (step 2 does that) — just find and name them.
+
+Output JSON: {{"nodes":[{{"nid":"n1","surface":"...","evidence_span":"..."}}]}}
+
+Rules:
+- surface MUST be a verbatim copy from the text (exact string).
+- One entity per node. If the same entity is mentioned multiple times, emit once.
+- Include numbers/constants as nodes too (with surface like "0.38" and evidence).
+- A research group name (e.g. "GDR MiDi") is an entity but label it as a group
+  (step 2 will handle it). Examples (illustrative, not rules):
+  METHOD: "μ(I) rheology", "kinetic theory", "nonlocal granular fluidity"
+  PARAMETER: "inertial number I", "friction coefficient μ", "grain diameter d"
+  PHENOMENON: "nonlocal creep", "segregation", "hopper clogging"
+"""
+
+
+_STEP2_PROMPT = """You are labeling ENTITY TYPES for a {domain} paper.
+
+Below are entities extracted from the text. Assign each a label (ONE primary type):
+
+{nodes_json}
+
+Label options (pick the BEST fit for each):
+- METHOD: a NAMED scientific modeling approach/theory/law/rheology that models
+  material behavior. Examples: "μ(I) rheology", "kinetic theory", "NGF model".
+  NOT: experiment tools (MRI, PIV, simulations), geometries (plane shear, hop flow),
+  generic phrases ("a model for X", "constitutive equations"), research groups.
+  If it names a mathematical MODEL of behavior → METHOD.
+- PARAMETER: a named physical quantity/symbol/constant in equations (μ, I, d, P, τ).
+  NOT: generic quantities (stress, velocity) → PROPERTY instead.
+- PHENOMENON: a physical effect/behavior (nonlocal creep, segregation, clogging).
+- REGIME: a flow regime (quasi-static, dense, inertial/collisional).
+- MATERIAL: a granular material/substance (glass beads, sand).
+- NUMERIC: a specific numerical value (0.38, 55d).
+- PROPERTY: generic physical quantity not fitting above (stress, velocity, shear rate).
+
+Key disambiguations:
+- "μ(I)" / "μ(I) rheology" / "local rheology" = METHOD (the law). Bare "μ" = PARAMETER.
+- "particle-image velocimetry" / "simulations" / "experiments" = PROPERTY (tools, not methods).
+- "plane shear" / "heap flow" / "rotating drum" = PROPERTY (geometries, not methods).
+
+Output JSON: {{"labels":[{{"nid":"n1","labels":["METHOD"]}},...]}}
+"""
+
+
+_STEP3_PROMPT = """You are identifying RELATIONSHIPS (hyperedges) between labeled entities
+from a {domain} paper section ({section_name}).
+
+Labeled entities:
+{labeled_nodes}
+
+Section text (for context on how entities relate):
+{section_text}
+
+Task: identify n-ary hyperedges connecting entities. Each hyperedge:
+- eid: short id (e1, e2, ...)
+- pattern_type: the relation type. Common ones: constitutive_law (formula:
+  output=f(inputs+params)), influences (X depends on Y), defines (X is defined as Y),
+  composed_of (X consists of Y,Z), measures (X measured by Y),
+  claim_relation (discourse: X vs Y), extends/improves/compares (method A evolves B).
+  Use existing pattern names when they fit; propose a new one only if none fit.
+- node_ids: which entities participate (by nid, in order)
+- node_roles: role of each node (output/input, cause/effect, whole/component,
+  from/to, subject/object, etc.)
+- evidence_span: verbatim text supporting this relation
+- qualifiers: optional {{"key":"value"}} (e.g. relation_type, method, cited_from)
+
+Rules:
+- evidence_span MUST be verbatim from the text.
+- n-ary: connect ALL related entities in ONE edge (a law with 3 params = 1 edge, not 3).
+- A named method that OWNS a law must be IN the law's hyperedge (not separate).
+- composed_of = ONLY structural composition (parts of a whole). "Experiment setup with
+  2-m-long plane" is NOT composition (it's experimental description). "Model A consists
+  of components B and C" IS composition.
+- extends/improves/compares = method-to-method evolution (A builds on/improves/compares B).
+
+Output JSON: {{"hyperedges":[{{"eid":"e1","pattern_type":"...","node_ids":["n1","n2"],
+"node_roles":["output","input"],"evidence_span":"...","qualifiers":{{}}}}]}}
+
+If no relations are found, output: {{"hyperedges":[]}}
+"""
+
+
+def _run_hg_node_multistep(node: dict, sections: list, blocks: list,
+                           schema_prompt: str, bb, llm: str, domain: str,
+                           meta=None, feedback_hint: str = ""):
+    """Multi-step extraction: 3 short focused LLM calls instead of 1 long.
+
+    step1: extract entity surfaces + evidence (no labels)
+    step2: label each entity (METHOD/PARAMETER/PHENOMENON/...)
+    step3: identify hyperedges (relations between labeled entities)
+
+    Returns same tuple as _run_hg_node: (nodes, edges, summary).
+    """
+    sec_text = section_text_for_node(node, sections, blocks)
+    if not sec_text:
+        print(f"  [multistep] {node.get('id','?')}: no sec_text", flush=True)
+        return [], [], ""
+    discourse_role = _discourse_for_node(node, sections)
+    predecessor = bb.predecessor_summary(node.get("deps", []))
+    chunks = _chunk_text(sec_text)
+    all_nodes: list[HGNode] = []
+    all_edges: list[Hyperedge] = []
+    summary = ""
+    print(f"  [multistep] {node.get('id','?')}: {len(chunks)} chunks, sec_text={len(sec_text)} chars", flush=True)
+
+    for ci, chunk in enumerate(chunks):
+        nid_prefix = f"{node['id']}c{ci}" if len(chunks) > 1 else node["id"]
+
+        # ---- step 1: extract entities (surface + evidence, no labels) ----
+        p1 = _STEP1_PROMPT.format(domain=domain,
+                                  section_name=node.get("section", ""),
+                                  section_text=chunk)
+        if predecessor:
+            p1 = p1 + "\n\nPredecessor context:\n" + predecessor
+        raw1 = _call(p1, llm, max_tokens=8192)
+        parsed1 = parse_json_response(raw1) or {}
+        raw_nodes = parsed1.get("nodes", []) or []
+        print(f"  [multistep] step1 raw1={'None' if not raw1 else str(len(raw1))+' chars'}, parsed nodes={len(raw_nodes)}", flush=True)
+        if not raw_nodes:
+            continue
+
+        # ---- step 2: label entities ----
+        # build compact node list for labeling (nid + surface + evidence)
+        nodes_for_label = [{"nid": n.get("nid", ""), "surface": n.get("surface", "")[:60],
+                            "evidence_span": n.get("evidence_span", "")[:80]}
+                           for n in raw_nodes if isinstance(n, dict)]
+        p2 = _STEP2_PROMPT.format(domain=domain,
+                                  nodes_json=json.dumps(nodes_for_label, ensure_ascii=False))
+        raw2 = _call(p2, llm, max_tokens=4096)
+        parsed2 = parse_json_response(raw2) or {}
+        labels = {item["nid"]: item.get("labels", [])
+                  for item in parsed2.get("labels", [])
+                  if isinstance(item, dict) and "nid" in item}
+
+        # build HGNodes with labels
+        nid_remap = {}  # LLM-local nid -> global nid
+        chunk_nodes = []
+        for n in raw_nodes:
+            if not isinstance(n, dict):
+                continue
+            local = str(n.get("nid", ""))
+            if not local:
+                continue
+            gid = f"{nid_prefix}_{local}"
+            nid_remap[local] = gid
+            lbl = labels.get(local, [])
+            if isinstance(lbl, str):
+                lbl = [lbl]
+            chunk_nodes.append(HGNode(
+                nid=gid, labels=[str(l) for l in lbl if l],
+                surface=str(n.get("surface", "")),
+                properties=n.get("properties", {}) if isinstance(n.get("properties"), dict) else {},
+                evidence_span=str(n.get("evidence_span", "")),
+            ))
+        all_nodes.extend(chunk_nodes)
+
+        # ---- step 3: identify hyperedges ----
+        labeled_for_prompt = [{"nid": n.nid,
+                                "labels": n.labels,
+                                "surface": n.surface[:40]}
+                               for n in chunk_nodes]
+        p3 = _STEP3_PROMPT.format(domain=domain,
+                                  section_name=node.get("section", ""),
+                                  labeled_nodes=json.dumps(labeled_for_prompt, ensure_ascii=False),
+                                  section_text=chunk)
+        if feedback_hint:
+            p3 = p3 + "\n\nFEEDBACK (high-order found weak cross-method relations — prioritize):\n" + feedback_hint
+        raw3 = _call(p3, llm, max_tokens=8192)
+        parsed3 = parse_json_response(raw3) or {}
+        raw_hes = parsed3.get("hyperedges", []) or []
+        for i, h in enumerate(raw_hes):
+            if not isinstance(h, dict):
+                continue
+            local_ids = h.get("node_ids", []) or []
+            gids = [nid_remap.get(str(x), f"{nid_prefix}_{x}") for x in local_ids]
+            roles = [str(r) for r in (h.get("node_roles", []) or [])]
+            quals = h.get("qualifiers", {}) if isinstance(h.get("qualifiers"), dict) else {}
+            quals = {str(k): str(v) for k, v in quals.items()}
+            all_edges.append(Hyperedge(
+                eid=f"{nid_prefix}_e{i}", pattern_type=str(h.get("pattern_type", "")),
+                node_ids=gids, node_roles=roles, qualifiers=quals,
+                evidence_span=str(h.get("evidence_span", "")),
+            ))
+
+        csum = parsed1.get("summary", "") or parsed3.get("summary", "")
+        if csum:
+            if not summary:
+                summary = csum
+            else:
+                summary = (summary + " " + csum)[:600]
+
+    return all_nodes, all_edges, summary
+
+
 def _run_hg_node(node: dict, sections: list, blocks: list, schema_prompt: str,
                  bb: HGBlackboard, llm: str, domain: str,
                  meta=None, use_retrieval=False,
@@ -692,9 +907,18 @@ def extract_hypergraph(structure_map: dict, blocks: list, meta: MetaHypergraph,
         # P4 forward propagation: re-fetch the (possibly evolved) schema prompt
         if propagate_intra_dag:
             schema_prompt = meta.to_prompt(include_topology=include_topology)
-        hg_nodes, hg_edges, summary = _run_hg_node(node, sections, blocks, schema_prompt, bb, llm, domain, meta,
-                                                    use_retrieval=False, feedback_hint=feedback_hint)
-        n_calls += 1
+        # multi-step extraction (3 short focused prompts) vs single-pass (21K prompt).
+        # Env HG_MULTISTEP=1 to enable. Default off (old single-pass still works).
+        _multistep = os.environ.get("HG_MULTISTEP", "").lower() in ("1", "true", "yes")
+        if _multistep:
+            hg_nodes, hg_edges, summary = _run_hg_node_multistep(
+                node, sections, blocks, schema_prompt, bb, llm, domain, meta,
+                feedback_hint=feedback_hint)
+            n_calls += 3  # 3 LLM calls per chunk (step1+2+3), not 1
+        else:
+            hg_nodes, hg_edges, summary = _run_hg_node(node, sections, blocks, schema_prompt, bb, llm, domain, meta,
+                                                        use_retrieval=False, feedback_hint=feedback_hint)
+            n_calls += 1
 
         # add nodes to the instance graph (dedup by SURFACE, cross-section):
         # the LLM re-extracts "granular materials"/"fabric" in each section

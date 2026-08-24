@@ -60,7 +60,7 @@ def call_llm(prompt: str, model: str = "deepseek-chat", max_tokens: int = 4000,
     # primary: 3 attempts with exponential backoff (2s, 6s)
     for attempt in range(3):
         try:
-            return _chat_once(url, key, body, timeout=45)
+            return _chat_once(url, key, body, timeout=120)
         except Exception as e:
             last_err = e
             if attempt < 2:
