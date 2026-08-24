@@ -697,7 +697,11 @@ def _run_hg_node_multistep(node: dict, sections: list, blocks: list,
             if not isinstance(h, dict):
                 continue
             local_ids = h.get("node_ids", []) or []
-            gids = [nid_remap.get(str(x), f"{nid_prefix}_{x}") for x in local_ids]
+            # step3 receives ALREADY-PREFIXED nids (n.nid = "n1_n1" etc from
+            # labeled_for_prompt). No remap needed — pass through directly.
+            # (nid_remap was for step1's local nids, but step3 uses the
+            # global nids we built. Using nid_remap would double-prefix.)
+            gids = [str(x) for x in local_ids]
             roles = [str(r) for r in (h.get("node_roles", []) or [])]
             quals = h.get("qualifiers", {}) if isinstance(h.get("qualifiers"), dict) else {}
             quals = {str(k): str(v) for k, v in quals.items()}
