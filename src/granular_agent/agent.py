@@ -47,7 +47,7 @@ class GranularFlowAgent:
                  corpus_dir: str = ""):
         self.worktree = worktree
         self.schema_manager = SchemaManager(worktree)
-        self.llms = llms or ["qwen3.5"]
+        self.llms = llms or ["DeepSeek-V4-Flash"]
         self.extractor = Extractor(self.schema_manager, llms=self.llms)
         self.self_evolution_enabled = self_evolution_enabled
         # domain (NOT a paper-specific special case — a parameter callers pass;
@@ -114,7 +114,7 @@ class GranularFlowAgent:
         if not blocks:
             return {"atoms": [], "gaps": [], "error": "no_text", "n_calls": 0}
 
-        llm = self.llms[0] if self.llms else "qwen3.5"
+        llm = self.llms[0] if self.llms else "DeepSeek-V4-Flash"
 
         # Phase 0: structure mapping (1 call, full text in context)
         smap = map_structure(paper_id, blocks, llm=llm, domain=self.domain)
@@ -320,7 +320,7 @@ class GranularFlowAgent:
         Mirrors .research_tmp/corpus_driver.py so ablation arms run through
         the agent main flow, not a shadow.
         """
-        llm = self.llms[0] if self.llms else "qwen3.5"
+        llm = self.llms[0] if self.llms else "DeepSeek-V4-Flash"
         evolve = arm in ("full", "add_only", "no_intra_dag")
         propagate = arm in ("full", "add_only")
         blocks = load_paper_blocks(paper_id, corpus_dir=self.corpus_dir)
@@ -433,7 +433,7 @@ class GranularFlowAgent:
         results = [self.process_paper_hypergraph(pid) for pid in paper_ids]
         # one LLM alignment pass over the accumulated concept graph
         try:
-            llm = self.llms[0] if self.llms else "qwen3.5"
+            llm = self.llms[0] if self.llms else "DeepSeek-V4-Flash"
             from granular_agent.llm_client import call_paratera
             n_merged = self.concept_graph.align_concepts(
                 lambda p: call_paratera(p, model="GLM-5-Turbo", max_tokens=3000, temperature=0.0))

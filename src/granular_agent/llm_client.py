@@ -81,8 +81,10 @@ def call_paratera(prompt: str, model: str = "Kimi-K2.6", max_tokens: int = 4000,
     """Call Paratera API (Kimi/GLM/Qwen/DeepSeek).
 
     enable_thinking: for reasoning models (DeepSeek-V4-Flash etc), set False
-    to suppress reasoning_content (which eats max_tokens budget + slows). None
-    = don't send the param (model default)."""
+    to suppress reasoning_content via the CORRECT DeepSeek API param:
+    {"thinking": {"type": "disabled"}} (verified: reasoning_tokens=0, 1s
+    response. The old 'enable_thinking' param name did NOT work — it left
+    reasoning on, eating max_tokens + slowing 67x)."""
     key = ENV.get("PARATERA_API_KEY")
     base = ENV.get("PARATERA_BASE_URL", "").rstrip("/")
     if not key:
@@ -93,8 +95,9 @@ def call_paratera(prompt: str, model: str = "Kimi-K2.6", max_tokens: int = 4000,
         "temperature": temperature,
         "max_tokens": max_tokens,
     }
-    if enable_thinking is not None:
-        payload["enable_thinking"] = enable_thinking
+    if enable_thinking is False:
+        # correct param per DeepSeek official docs (api-docs.deepseek.com)
+        payload["thinking"] = {"type": "disabled"}
     body = json.dumps(payload).encode()
     req = urllib.request.Request(
         base + "/chat/completions",
@@ -103,7 +106,7 @@ def call_paratera(prompt: str, model: str = "Kimi-K2.6", max_tokens: int = 4000,
     )
     for attempt in range(2):
         try:
-            raw = urllib.request.urlopen(req, context=_CTX, timeout=300).read()
+            raw = urllib.request.urlopen(req, context=_CTX, timeout=120).read()
             return json.loads(raw)["choices"][0]["message"]["content"]
         except Exception:
             if attempt == 1:

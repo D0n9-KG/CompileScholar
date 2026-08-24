@@ -296,13 +296,15 @@ class HGBlackboard:
 
 def _call(prompt: str, llm: str, max_tokens: int = 16384) -> str | None:
     if llm == "deepseek":
+        # deepseek-chat (official API) — fast, decent quality
         return call_llm(prompt, model="deepseek-chat", max_tokens=max_tokens)
-    if _is_cst_model(llm):
-        return call_cst(prompt, model=llm, max_tokens=max_tokens)
-    # reasoning models (V4-Flash/R1) with thinking off — for gate/judge use
     if "V4-Flash" in llm or "R1" in llm or "Thinking" in llm:
+        # DeepSeek-V4-Flash via Paratera, thinking.type=disabled (correct param,
+        # verified: reasoning_tokens=0, 1s response, content normal JSON)
         return call_paratera(prompt, model=llm, max_tokens=max_tokens,
                              enable_thinking=False)
+    if _is_cst_model(llm):
+        return call_cst(prompt, model=llm, max_tokens=max_tokens)
     return call_paratera(prompt, model=llm, max_tokens=max_tokens)
 
 
@@ -690,6 +692,7 @@ def _run_hg_node_multistep(node: dict, sections: list, blocks: list,
         raw3 = _call(p3, llm, max_tokens=8192)
         parsed3 = parse_json_response(raw3) or {}
         raw_hes = parsed3.get("hyperedges", []) or []
+        print(f"  [multistep] step3 raw3={'None' if not raw3 else str(len(raw3))+' chars'}, parsed hes={len(raw_hes)}", flush=True)
         for i, h in enumerate(raw_hes):
             if not isinstance(h, dict):
                 continue
