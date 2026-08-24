@@ -323,6 +323,19 @@ class KnowledgeBase:
         if not mutations:
             return CommitResult(ok=True, version=self.version)
 
+        # fill base_version (CAS record) for mutations committed directly
+        # (evolver/aligner commit bypasses propose(); propose() does this too).
+        # Also stamp the pre-commit version for an accurate ledger version_diff.
+        v_before = self.version
+        for mut in mutations:
+            if not mut.base_version:
+                mut.base_version = v_before
+            if not mut.mutation_id:
+                self._mid_counter += 1
+                mut.mutation_id = f"mut_{self._mid_counter:06d}"
+            if not mut.timestamp:
+                mut.timestamp = _now()
+
         validated: list[Mutation] = []
         rejected: list[dict] = []
         # ---- Phase 1: validate (atomic) ----
