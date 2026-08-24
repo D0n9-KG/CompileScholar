@@ -303,12 +303,22 @@ class ExtractionAgent:
         the evidence_span is not a substring of section_text, force fix=drop
         (overriding keep/retype). This is the structural gate the LLM can't be
         trusted with. The LLM still judges type_correct/relation_exists (real
-        semantic judgment); verbatim is a string check = rule, not LLM."""
+        semantic judgment); verbatim is a string check = rule, not LLM.
+
+        DETERMINISTIC ROLE POST-CHECK (same 铁律): a kept edge's node_roles
+        must be declared by its pattern_type's role_slots (a 'defines' edge
+        carrying composed_of's roles whole/component = wrong structure). The
+        real-run showed the executor sometimes emits from/to for every pattern
+        regardless of the pattern's declared roles. We do NOT remap wrong roles
+        to right ones (that would be a downgrade — smuggling bad structure in).
+        We DROP the edge (bad role = bad structure, won't commit). This is the
+        structural role gate; the LLM still judges type_correct semantically.
+        The executor is expected to emit correct roles (per _STEP3_PROMPT); when
+        it doesn't, the edge is dropped here rather than committed wrong."""
         stats = {"keep": 0, "retype": 0, "reextract_as_drop": 0, "drop": 0,
-                 "dropped_nonverbatim": 0}
+                 "dropped_nonverbatim": 0, "dropped_bad_role": 0}
         kept: list[Hyperedge] = []
         vmap = {v.edge_id: v for v in verdicts}
-        dropped_nonverbatim: list[str] = []
         for he in edges:
             v = vmap.get(he.eid)
             # DETERMINISTIC verbatim gate (rule, overrides LLM verdict)
@@ -317,15 +327,11 @@ class ExtractionAgent:
                 # evidence is paraphrase / hallucinated / truncated -> drop,
                 # regardless of what the LLM verifier said.
                 stats["dropped_nonverbatim"] += 1
-                dropped_nonverbatim.append(he.eid)
                 continue
             if v is None:
-                kept.append(he)
-                stats["keep"] += 1
-                continue
-            if v.fix == "keep":
-                kept.append(he)
-                stats["keep"] += 1
+                pass  # keep
+            elif v.fix == "keep":
+                pass  # keep
             elif v.fix.startswith("retype:"):
                 new_pt = v.fix.split(":", 1)[1].strip()
                 # B3 safety: retype to a pattern NOT in the tbox is invalid —
@@ -335,16 +341,38 @@ class ExtractionAgent:
                     stats["drop"] += 1
                     continue
                 he.pattern_type = new_pt
-                kept.append(he)
-                stats["retype"] += 1
             elif v.fix == "reextract":
                 # honest: one-shot reextract not implemented (would risk loops);
                 # drop with note. The kept-edge quality bar is preserved (only
                 # keep + retype survive).
                 stats["reextract_as_drop"] += 1
+                continue
             else:  # drop
                 stats["drop"] += 1
+                continue
+            # ---- passed verdict; now DETERMINISTIC role gate (rule) ----
+            if not self._role_ok(he):
+                stats["dropped_bad_role"] += 1
+                continue
+            kept.append(he)
+            if v is None or v.fix == "keep":
+                stats["keep"] += 1
+            else:
+                stats["retype"] += 1
         return kept, stats
+
+    def _role_ok(self, he: Hyperedge) -> bool:
+        """Deterministic role gate (rule, not LLM): every role the edge uses
+        must be declared by its pattern_type's role_slots. A pattern not in the
+        tbox -> fail (will be caught by kernel B3 anyway, but fail here too so
+        it's flagged in stats). We do NOT remap — wrong roles = wrong structure
+        = drop, not commit-and-remap (that's a downgrade)."""
+        pat = self.kb.tbox.patterns.get(he.pattern_type)
+        if pat is None:
+            return False
+        declared = {s.get("role") for s in pat.role_slots}
+        used = {r for r in he.node_roles}
+        return used.issubset(declared)
 
     # ---- commit to KB (add_edge Mutation, validate only, no route 断点 2) ----
     def commit_edges(self, edges: list[Hyperedge], nodes: list[HGNode],

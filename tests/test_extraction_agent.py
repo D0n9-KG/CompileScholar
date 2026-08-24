@@ -213,6 +213,26 @@ kept_d, stats_d = agent4.fix(edges4d, v4d, [], SECTION, plan)
 check("fixer: retype to non-tbox pattern -> drop (B3 safety)",
       stats_d["drop"] == 1 and len(kept_d) == 0)
 
+# 4d. DETERMINISTIC role gate (rule, no downgrade/remap): a 'defines' edge
+# carrying from/to roles (composed_of/extends roles, NOT defines' subject/
+# definition) is DROPPED — wrong role = wrong structure = drop, NOT remapped to
+# correct roles (remap would smuggle bad structure in = downgrade). The real
+# run showed the executor emits from/to for every pattern; this gate drops it.
+v4e = [Verdict(edge_id="e1", fix="keep")]  # LLM says keep
+edges4e = [Hyperedge(eid="e1", pattern_type="defines", node_ids=["n1", "n2"],
+                     node_roles=["from", "to"],
+                     evidence_span="We extend the μ(I) rheology")]
+kept_e, stats_e = agent4.fix(edges4e, v4e, [], SECTION, plan)
+check("role gate: defines with from/to roles DROPPED (no remap, no downgrade)",
+      stats_e["dropped_bad_role"] == 1 and len(kept_e) == 0)
+# correct roles -> kept
+edges4f = [Hyperedge(eid="e1", pattern_type="defines", node_ids=["n1", "n2"],
+                     node_roles=["subject", "definition"],
+                     evidence_span="We extend the μ(I) rheology")]
+kept_f, stats_f = agent4.fix(edges4f, v4e, [], SECTION, plan)
+check("role gate: defines with correct subject/definition roles kept",
+      stats_f["keep"] == 1 and len(kept_f) == 1)
+
 # ===========================================================================
 # 5. commit_edges: add_edge Mutation, domain carried, concepts inline, NO route
 # ===========================================================================
