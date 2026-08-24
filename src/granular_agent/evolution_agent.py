@@ -217,7 +217,26 @@ class EvolutionAgent:
                 llm="deepseek", instance=None)
             return proposals or []
         if kind in ("self_split", "self_merge", "self_retire", "self_rename"):
-            return [src.payload] if src.payload else []
+            # detect_*_triggers output carries `representatives` (cluster evidence
+            # strings) but NOT `evidence_span` — validate_proposal requires a
+            # non-empty evidence_span (BLOCKER B1 fix: without this, ALL
+            # self_split/merge/retire/rename paths were silently rejected as
+            # "no verbatim evidence span"). split/merge/retire are STRUCTURAL
+            # triggers (fired by instance clustering, not a single text span),
+            # so the evidence is the joined representatives (or the rationale).
+            p = dict(src.payload) if src.payload else {}
+            if not p.get("evidence_span"):
+                reps = p.get("representatives") or []
+                if reps:
+                    p["evidence_span"] = "; ".join(reps[:3])
+                elif p.get("rationale"):
+                    p["evidence_span"] = p["rationale"]
+                else:
+                    # structural op with no text evidence — use the op itself as
+                    # the audit trail (the gate needs *something* non-empty; the
+                    # real evidence is the clustering that fired the trigger).
+                    p["evidence_span"] = f"structural {kind} on {p.get('pattern_id','')}"
+            return [p]
         if kind == "consumer_feedback":
             pid = src.payload.get("pattern_id", "")
             issues = src.payload.get("issues", [])
@@ -250,12 +269,30 @@ class EvolutionAgent:
         and consumer-feedback weighting."""
         op = proposal.get("op", "")
         # the verified validate_proposal gate (evidence + near-dup + distinctness)
-        v = hev.validate_proposal(proposal, self.kb.tbox,
-                                  domain=src.domain or self.domain_default, llm="deepseek")
-        if not v.get("valid"):
-            proposal["rejected_reason"] = v.get("reason", "")
-            proposal["suggested_alternative"] = v.get("suggested_alternative", "")
-            return None, "reject"
+        # — applied to GROWTH ops (add_pattern/add_meta_node/add_subclass) from
+        # evolution_probe, which uses the legacy op-name space validate_proposal
+        # recognizes. SELF-TRIGGERED ops (split/merge/retire/rename, kernel Op
+        # name space) SKIP validate_proposal: (a) detect_*_triggers already
+        # determined them via clustering (not one-off text proposals needing
+        # near-dup/distinctness LLM check), (b) validate_proposal doesn't
+        # recognize kernel op names (split vs split_meta_node) so it would
+        # reject them as "unknown op" — the kernel's own _schema_constraint
+        # (IS-A/family/role invariant) is the real gate for these. We DO
+        # require evidence (injected by _probe from representatives).
+        is_self_op = src.kind in ("self_split", "self_merge",
+                                  "self_retire", "self_rename")
+        if is_self_op:
+            if not (proposal.get("evidence_span") or "").strip():
+                proposal["rejected_reason"] = "no-evidence"
+                return None, "reject"
+            # skip validate_proposal; the kernel gates schema correctness
+        else:
+            v = hev.validate_proposal(proposal, self.kb.tbox,
+                                      domain=src.domain or self.domain_default, llm="deepseek")
+            if not v.get("valid"):
+                proposal["rejected_reason"] = v.get("reason", "")
+                proposal["suggested_alternative"] = v.get("suggested_alternative", "")
+                return None, "reject"
         # recurring crystallize: a GROWTH op (add_pattern/add_meta_node/add_subclass)
         # is accepted only if the gap recurred across >= CONSERVATIVE_CROSS_NODE
         # nodes (委托现有 gate semantics). validate_failure sources carry
@@ -408,12 +445,27 @@ class EvolutionAgent:
                         allowed_qualifiers=list(parent.allowed_qualifiers),
                         family=parent.family))
             return out
-        # delegate naming to the verified内核 (surgical)
+        # delegate naming to the verified内核 (surgical). name_split_subpatterns
+        # returns list[dict] with pattern_id (no MetaHyperedgePattern objects);
+        # convert to patterns that INHERIT the parent's exact role_slots (kernel
+        # exact-sig constraint, Step1 BLOCKER#2 fix) + allowed_qualifiers + family.
         try:
-            return hev.name_split_subpatterns(parent, proposal.get("trigger", proposal),
-                                              llm="deepseek") or []
+            named = hev.name_split_subpatterns(parent, proposal.get("trigger", proposal),
+                                                llm="deepseek") or []
         except Exception:
-            return []
+            named = []
+        out = []
+        for s in named:
+            if isinstance(s, MetaHyperedgePattern):
+                out.append(s)
+            elif isinstance(s, dict) and s.get("pattern_id"):
+                out.append(MetaHyperedgePattern(
+                    pattern_id=s["pattern_id"],
+                    description=s.get("description", ""),
+                    role_slots=[dict(r) for r in parent.role_slots],  # exact sig inherit
+                    allowed_qualifiers=list(parent.allowed_qualifiers),
+                    family=parent.family))
+        return out
 
     # ===================================================================
     # skill distiller (断点 5 loop close): crystallize -> distill_skill op

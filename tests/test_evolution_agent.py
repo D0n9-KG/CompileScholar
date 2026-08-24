@@ -248,6 +248,39 @@ r9 = agent9.drain()
 check("governance: no-evidence proposal rejected by validate内核",
       r9.n_rejected >= 1)
 
-print()
-print(f"{'ALL PASS' if not fail else 'FAILURES: ' + str(fail)}  ({len(fail)} fail)")
-sys.exit(1 if fail else 0)
+# ===========================================================================
+# 10. B2 fix: self_split through REAL validate_proposal (not mocked) — the
+# Step2-B1 前科: mock validate_proposal hid that self_* paths had no evidence_span
+# and were silently rejected. This test uses the real validate_proposal.
+# ===========================================================================
+# restore real validate_proposal for this test (un-mock)
+import importlib
+hev_real = importlib.reload(importlib.import_module("granular_agent.hypergraph_evolution"))
+real_validate = hev_real.validate_proposal
+# patch the agent's hev module reference to the REAL validate_proposal
+import granular_agent.evolution_agent as ea_mod
+saved_validate = hev.validate_proposal
+hev.validate_proposal = real_validate
+try:
+    kb10 = _kb()
+    agent10 = EvolutionAgent(kb10, llm=agent_llm, domain_default="granular")
+    # self_split with representatives (real detect_split_triggers output shape)
+    # but NO evidence_span — B1 fix injects evidence from representatives.
+    split_payload = {"op": "split", "pattern_id": "measures",
+                     "representatives": ["measured stress via device A",
+                                         "measured strain via device B"],
+                     "rationale": "two distinct measurement clusters",
+                     "method": "embedding", "cluster_sizes": [3, 3]}
+    src10 = TriggerSource(kind="self_split", domain="granular", payload=split_payload)
+    # verify _probe injects evidence_span from representatives (B1)
+    probed = agent10._probe(src10)
+    check("B1: _probe injects evidence_span from representatives",
+          len(probed) == 1 and "measured stress" in probed[0].get("evidence_span", ""))
+    agent10.propose_trigger(src10)
+    r10 = agent10.drain()
+    # the proposal must NOT be rejected for "no verbatim evidence span" (B1)
+    no_evidence_reject = any("no verbatim evidence span" in rej["reason"] for rej in r10.rejected)
+    check("B1: self_split NOT rejected for missing evidence_span (real validate_proposal)",
+          not no_evidence_reject)
+finally:
+    hev.validate_proposal = saved_validate  # restore mock for any later tests
