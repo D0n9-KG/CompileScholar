@@ -198,10 +198,11 @@ def evolution_probe(failing_hes: list[Hyperedge], meta: MetaHypergraph,
 
 def _call(prompt: str, llm: str, max_tokens: int = 4000) -> str | None:
     if llm == "deepseek":
-        # legacy: deepseek = DeepSeek-V4-Flash via Paratera (not deepseek-chat
-        # official — that was the低质量 baseline). New default passes the model
-        # name directly.
-        return call_paratera(prompt, model="DeepSeek-V4-Flash", max_tokens=max_tokens)
+        return call_paratera(prompt, model="DeepSeek-V4-Flash",
+                             max_tokens=max_tokens, enable_thinking=False)
+    if "V4-Flash" in llm or "R1" in llm or "Thinking" in llm:
+        return call_paratera(prompt, model=llm, max_tokens=max_tokens,
+                             enable_thinking=False)
     return call_paratera(prompt, model=llm, max_tokens=max_tokens)
 
 

@@ -77,18 +77,25 @@ def call_llm(prompt: str, model: str = "deepseek-chat", max_tokens: int = 4000,
 
 
 def call_paratera(prompt: str, model: str = "Kimi-K2.6", max_tokens: int = 4000,
-                  temperature: float = 0.0) -> str | None:
-    """Call Paratera API (Kimi/GLM/Qwen)."""
+                  temperature: float = 0.0, enable_thinking: bool = None) -> str | None:
+    """Call Paratera API (Kimi/GLM/Qwen/DeepSeek).
+
+    enable_thinking: for reasoning models (DeepSeek-V4-Flash etc), set False
+    to suppress reasoning_content (which eats max_tokens budget + slows). None
+    = don't send the param (model default)."""
     key = ENV.get("PARATERA_API_KEY")
     base = ENV.get("PARATERA_BASE_URL", "").rstrip("/")
     if not key:
         return None
-    body = json.dumps({
+    payload = {
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
         "temperature": temperature,
         "max_tokens": max_tokens,
-    }).encode()
+    }
+    if enable_thinking is not None:
+        payload["enable_thinking"] = enable_thinking
+    body = json.dumps(payload).encode()
     req = urllib.request.Request(
         base + "/chat/completions",
         data=body,
@@ -96,7 +103,6 @@ def call_paratera(prompt: str, model: str = "Kimi-K2.6", max_tokens: int = 4000,
     )
     for attempt in range(2):
         try:
-            # reasoning models (DeepSeek-V4-Flash etc) are slow — long timeout.
             raw = urllib.request.urlopen(req, context=_CTX, timeout=300).read()
             return json.loads(raw)["choices"][0]["message"]["content"]
         except Exception:
