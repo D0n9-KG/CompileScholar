@@ -476,6 +476,33 @@ class KnowledgeBase:
         Honest scope: IS-A tree completeness + family归属 + role_slots invariant
         + runtime invariant. NOT 2608.18104's consumer-contract modeling."""
         op = mut.op
+        if op == Op.ADD_EDGE:
+            # extractor add_edge: kind (pattern_type) MUST be a known ACTIVE
+            # T-box pattern. A new pattern_type the schema doesn't know must go
+            # through the evolver's add_pattern op FIRST (then add_edge), not
+            # be smuggled in as an add_edge. Rejecting unknown/deprecated kinds
+            # here is what makes the verifier's retype fix safe: a retype to a
+            # non-existent pattern is rejected at the kernel, not silently
+            # committed as bad data. (BLOCKER B3 fix — the DECISION's claim
+            # "retype to a non-existent pattern is rejected" was previously
+            # false because ADD_EDGE had no schema-constraint branch.)
+            kind = mut.payload.get("kind", "")
+            pat = self.tbox.patterns.get(kind)
+            if pat is None:
+                return False, f"add_edge:unknown-pattern-type:{kind}"
+            if pat.deprecated:
+                return False, f"add_edge:pattern-deprecated:{kind}"
+            # role compatibility: every role the edge uses must be declared by
+            # the pattern's role_slots (a defines edge using whole/component
+            # roles = composed_of's roles misattributed to defines). This is a
+            # deterministic structural check (rule, not LLM). Catches the
+            # real-run failure where a 'defines' edge carried composed_of roles.
+            declared = {s.get("role") for s in pat.role_slots}
+            used = {r for r in mut.payload.get("roles", [])}
+            extra = used - declared
+            if extra:
+                return False, f"add_edge:role-not-in-pattern:{sorted(extra)}<-{kind}"
+            return True, "ok"
         if op == Op.ADD_PATTERN:
             pat: MetaHyperedgePattern = mut.payload.get("pattern")
             if pat is None:
@@ -707,17 +734,35 @@ class KnowledgeBase:
         evidence = prov.get("evidence", mut.evidence)
         year = prov.get("year", "")
         section = prov.get("section", "")
+        # provenance first-class fields (M4): cited_from / method /
+        # evidence_strength lifted out of qualifiers by the extractor, carried
+        # onto the ConceptHyperedge.provenance entry (design行17 一等公民).
+        prov_cited_from = prov.get("cited_from", "")
+        prov_method = prov.get("method", "")
+        prov_strength = prov.get("evidence_strength", "")
         cids: list[str] = []
         for c in concepts:
             conc = self.abox.get_or_create(c.get("type", "PROPERTY"),
                                            c.get("surface", ""),
                                            paper_id, c.get("evidence", evidence),
-                                           year, section)
+                                           year, section,
+                                           central=bool(c.get("central", False)))
             cids.append(conc.concept_id)
         # need >=2 distinct concepts for a real n-ary edge
         if len(set(cids)) >= 2:
-            self.abox.add_hyperedge(cids, kind, roles=roles, paper_id=paper_id,
-                                    evidence=evidence, year=year, section=section)
+            he = self.abox.add_hyperedge(cids, kind, roles=roles, paper_id=paper_id,
+                                         evidence=evidence, year=year, section=section)
+            # attach the first-class provenance fields onto the edge's provenance
+            # entry (ConceptHyperedge.provenance is a list of per-paper dicts;
+            # the entry just added is the last one).
+            if he is not None and he.provenance:
+                pe = he.provenance[-1]
+                if prov_cited_from:
+                    pe["cited_from"] = prov_cited_from
+                if prov_method:
+                    pe["method"] = prov_method
+                if prov_strength:
+                    pe["evidence_strength"] = prov_strength
 
     def _apply_add_concept_relation(self, mut: Mutation) -> None:
         """A 'relate' outcome's body: add an n-ary edge that RELATES (not merges)
@@ -884,7 +929,8 @@ def _now() -> str:
 def _as_pattern(p) -> MetaHyperedgePattern:
     """Coerce a dict (ledger round-trip) or a MetaHyperedgePattern to the
     dataclass. The ledger stores mutations via asdict, so nested patterns become
-    dicts; replay_to / from_dict must reconstruct them before _apply."""
+    dicts; replay_to / from_dict must reconstruct them before _apply. Preserves
+    semantic_boundary (M1 fix — was dropped on ledger round-trip)."""
     if isinstance(p, MetaHyperedgePattern):
         return p
     if isinstance(p, dict):
@@ -893,7 +939,8 @@ def _as_pattern(p) -> MetaHyperedgePattern:
             role_slots=[dict(s) for s in p.get("role_slots", [])],
             allowed_qualifiers=list(p.get("allowed_qualifiers", [])),
             deprecated=p.get("deprecated", False), is_abstract=p.get("is_abstract", False),
-            split_from=p.get("split_from", ""), family=p.get("family", ""))
+            split_from=p.get("split_from", ""), family=p.get("family", ""),
+            semantic_boundary=p.get("semantic_boundary", ""))
     raise TypeError(f"cannot coerce {type(p)} to MetaHyperedgePattern")
 
 

@@ -71,6 +71,11 @@ check("planner: relation_outline populated", len(plan.relation_outline) == 2)
 check("planner: paper_anchor populated", "μ(I)" in plan.paper_anchor)
 check("to_prompt renders semantic_boundary for seed patterns (schema-in-context fix)",
       "boundary:" in kb.tbox.to_prompt())
+# M3 fix: ALL 12 seed patterns (incl. the 6 evolution verbs) have a boundary —
+# improves/compares confusion was the worst type-confusion source in P0.
+for _eid in ("extends", "improves", "compares", "replaces", "adapts", "background"):
+    check(f"M3: evolution pattern '{_eid}' has semantic_boundary",
+          kb.tbox.patterns[_eid].semantic_boundary != "")
 
 # ===========================================================================
 # 2. executor: delegates to core (mocked), skill hint injected
@@ -182,6 +187,32 @@ check("fixer: reextract honestly drops-with-note (not unbounded loop)",
       stats["reextract_as_drop"] == 1 and not any(he.eid == "e4" for he in kept))
 check("fixer: kept only keep+retype (quality bar)", len(kept) == 2)
 
+# 4b. DETERMINISTIC verbatim post-check (rule, overrides LLM verifier): even
+# if the LLM says "keep", an evidence_span NOT in the section text is dropped.
+# (real-run failure: verifier kept a non-verbatim evidence)
+v4b = [Verdict(edge_id="e1", fix="keep")]  # LLM says keep
+edges4b = [Hyperedge(eid="e1", pattern_type="extends", node_ids=["n1", "n2"],
+                     node_roles=["from", "to"],
+                     evidence_span="this phrase is NOT in the section text")]
+kept_b, stats_b = agent4.fix(edges4b, v4b, [], SECTION, plan)
+check("fixer: deterministic verbatim gate drops non-substring evidence (rule over LLM)",
+      stats_b["dropped_nonverbatim"] == 1 and len(kept_b) == 0)
+# a truly verbatim evidence is kept
+edges4c = [Hyperedge(eid="e1", pattern_type="extends", node_ids=["n1", "n2"],
+                     node_roles=["from", "to"],
+                     evidence_span="We extend the μ(I) rheology")]
+kept_c, stats_c = agent4.fix(edges4c, v4b, [], SECTION, plan)
+check("fixer: verbatim substring evidence kept", stats_c["keep"] == 1 and len(kept_c) == 1)
+
+# 4c. retype to a pattern NOT in tbox is dropped (B3 safety in fixer)
+v4d = [Verdict(edge_id="e1", fix="retype:nonexistent_pattern")]
+edges4d = [Hyperedge(eid="e1", pattern_type="compares", node_ids=["n1", "n2"],
+                     node_roles=["from", "to"],
+                     evidence_span="We extend the μ(I) rheology")]
+kept_d, stats_d = agent4.fix(edges4d, v4d, [], SECTION, plan)
+check("fixer: retype to non-tbox pattern -> drop (B3 safety)",
+      stats_d["drop"] == 1 and len(kept_d) == 0)
+
 # ===========================================================================
 # 5. commit_edges: add_edge Mutation, domain carried, concepts inline, NO route
 # ===========================================================================
@@ -214,6 +245,66 @@ check("commit_edges: extractor NOT routed (断点2, no 5-outcome)", len(last_res
 edges_bad = [Hyperedge(eid="e9", pattern_type="extends", node_ids=["n1"], node_roles=["from"])]
 n_comm_bad, rej_bad = agent5.commit_edges(edges_bad, nodes5, plan5, "p1")
 check("commit_edges: <2 concepts -> not committed (referential integrity)", n_comm_bad == 0)
+
+# 5b. B3 fix: add_edge with a pattern_type NOT in the tbox -> kernel rejects
+# (a retype to a non-existent pattern must be caught at the kernel, not
+# silently committed as bad data). DECISION had claimed this; B3 makes it true.
+edges_unknown = [Hyperedge(eid="e_unk", pattern_type="analogy_not_in_schema",
+                           node_ids=["n1", "n2"], node_roles=["from", "to"],
+                           evidence_span="We extend the μ(I) rheology")]
+n_comm_unk, rej_unk = agent5.commit_edges(edges_unknown, nodes5, plan5, "p1")
+check("B3: add_edge unknown pattern_type -> kernel rejects (bad data blocked)",
+      n_comm_unk == 0 and "unknown-pattern-type" in rej_unk[0]["reason"])
+
+# 5b2. B3 role-check: a 'defines' edge carrying composed_of's roles (whole/
+# component) is rejected — roles must match the pattern's declared role_slots.
+# (real-run failure: defines edge had whole/component roles)
+edges_wrong_role = [Hyperedge(eid="e_wr", pattern_type="defines",
+                              node_ids=["n1", "n2"], node_roles=["whole", "component"],
+                              evidence_span="We extend the μ(I) rheology")]
+n_comm_wr, rej_wr = agent5.commit_edges(edges_wrong_role, nodes5, plan5, "p1")
+check("B3: add_edge with roles not in pattern -> kernel rejects",
+      n_comm_wr == 0 and "role-not-in-pattern" in rej_wr[0]["reason"])
+
+# 5c. B2 fix: central entities from the plan are marked central on the Concept
+kb5c = _kb()
+agent5c = _MockAgent(kb5c, llm_extract=planner_llm, llm_verify=verify_llm,
+                     domain_default="granular")
+# planner returns a plan whose central_entities include "μ(I) rheology"
+plan5c = agent5c.plan(SECTION, "method")
+nodes5c = [HGNode(nid="n1", labels=["METHOD"], surface="μ(I) rheology",
+                  evidence_span="the μ(I) rheology"),
+           HGNode(nid="n2", labels=["METHOD"], surface="local rheology",
+                  evidence_span="local rheology")]
+# only commit edges so central-matching runs
+agent5c.commit_edges(edges5, nodes5c, plan5c, "p1", "2020")
+central_concepts = [c for c in kb5c.abox.concepts.values() if c.central]
+non_central = [c for c in kb5c.abox.concepts.values() if not c.central]
+check("B2: central entity from plan marked central=True on Concept",
+      len(central_concepts) == 1 and central_concepts[0].surfaces()[0].lower().startswith("μ(i) rheology"))
+check("B2: non-central concept stays central=False", len(non_central) == 1)
+
+# 5d. M4 fix: provenance first-class fields (cited_from/method/evidence_strength)
+# lifted from qualifiers onto ConceptHyperedge.provenance
+kb5d = _kb()
+agent5d = _MockAgent(kb5d, llm_extract=planner_llm, llm_verify=verify_llm,
+                     domain_default="granular")
+plan5d = Plan(domain="granular", expected_patterns=["extends"])
+edges5d = [Hyperedge(eid="e1", pattern_type="extends", node_ids=["n1", "n2"],
+                     node_roles=["from", "to"],
+                     evidence_span="We extend the μ(I) rheology",
+                     qualifiers={"cited_from": "this_work", "method": "theory",
+                                 "evidence_strength": "derived",
+                                 "relation_type": "generalization"})]
+agent5d.commit_edges(edges5d, nodes5, plan5d, "p1", "2020")
+he5d = kb5d.abox.hyperedges[0]
+prov_entry = he5d.provenance[-1] if he5d.provenance else {}
+check("M4: cited_from lifted to provenance (first-class)", prov_entry.get("cited_from") == "this_work")
+check("M4: method lifted to provenance (first-class)", prov_entry.get("method") == "theory")
+check("M4: evidence_strength lifted to provenance (first-class)",
+      prov_entry.get("evidence_strength") == "derived")
+check("M4: business qualifier relation_type stays in qualifiers (not provenance)",
+      he5d.kind == "extends")  # kind unchanged; qualifiers retained on edge via add_hyperedge
 
 # ===========================================================================
 # 6. skill injection NOT triggered when no skill for (domain, pattern)

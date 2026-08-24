@@ -1106,6 +1106,33 @@ def seed_meta_hypergraph() -> MetaHypergraph:
     _evo_slots = [{"role": "from", "type": T, "repeatable": True},
                   {"role": "to", "type": T, "repeatable": True}]
     _evo_qual = ["relation_type", "cited_from", "evidence_strength", "method"]
+    # semantic_boundary for each evolution verb (M3 fix — these 6 were missing and
+    # P0 showed improves-vs-compares is the worst type-confusion source). Each
+    # boundary says WHEN this verb applies vs its confusables, so the extractor
+    # + verifier pick the right evolution verb, not a discourse claim_relation.
+    _evo_boundary = {
+        "extends": "X GENERALIZES Y (X extends Y's scope/regime/params; X is a direct "
+                   "technical extension of Y). NOT improves (X need not be more accurate, "
+                   "just broader), NOT background (X is a direct technical inheritance, "
+                   "not a motivation citation), NOT claim_relation (this is method-to-method).",
+        "improves": "X RESOLVES a limitation of Y (X is more accurate/applicable BECAUSE "
+                    "it fixes something Y fails at; first-principles vs phenomenological = "
+                    "improves). NOT compares (X is NOT a parallel different-mechanism "
+                    "alternative; X builds on Y and is better), NOT extends (X is better "
+                    "not just broader).",
+        "compares": "A and B are PARALLEL different-mechanism alternatives with overlapping "
+                    "scope (both model the same phenomenon, different assumptions, each "
+                    "pros/cons). NOT improves (neither fixes the other's limitation), NOT "
+                    "extends (neither generalizes the other).",
+        "replaces": "X SUBSTITUTES Y outright (X is used INSTEAD of Y; Y is retired). "
+                    "NOT improves (replaces = Y is gone, improves = Y still used + X better).",
+        "adapts": "X PORTS Y to a NEW scenario/regime/domain Y wasn't designed for "
+                  "(adaptation of Y's mechanism). NOT extends (adapts = new scenario, "
+                  "extends = broader scope within same setting).",
+        "background": "X cites Y as MOTIVATION/prior context only (Y inspired X but X is "
+                      "NOT a direct technical extension/inheritance of Y). NOT extends "
+                      "(no direct technical lineage), NOT improves (no limitation fix).",
+    }
     for _eid, _desc in [
         ("extends", "X generalizes/extends Y (X METHOD/PHENOMENON -> Y)"),
         ("improves", "X improves Y's accuracy/applicability, resolving Y's limitation"),
@@ -1116,7 +1143,8 @@ def seed_meta_hypergraph() -> MetaHypergraph:
     ]:
         m.patterns[_eid] = MetaHyperedgePattern(
             pattern_id=_eid, family=_evo_family, description=_desc,
-            role_slots=_evo_slots, allowed_qualifiers=_evo_qual)
+            role_slots=_evo_slots, allowed_qualifiers=_evo_qual,
+            semantic_boundary=_evo_boundary[_eid])
     # each seed pattern is the root of its top-level family — add_pattern
     # attaches new same-family patterns IS-A this root.
     m.family_roots = {p.family: p.pattern_id for p in m.patterns.values()}

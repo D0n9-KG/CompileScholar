@@ -47,6 +47,13 @@ class Concept:
     deprecated: bool = False
     canonical_name: str = ""
     symbol: str = ""  # for PARAMETER/NUMERIC: extracted symbol (μ/I/d/...) for alignment
+    # central (v2 design supplement section 4): True if the planner marked this
+    # surface as a central entity of the section/paper (the 2-6 entities it's
+    # ABOUT). Drives aligner/consumer priority (core vs secondary). Set by the
+    # extractor via get_or_create(central=True) when the surface matches a
+    # Plan.central_entities entry.
+    central: bool = False
+    definition: str = ""  # concept definition (Step 4 aligner Define phase fills)
 
     def add_variant(self, surface, paper_id, evidence="", year="", section=""):
         self.surface_variants.append(SurfaceVariant(surface, paper_id, evidence, year, section))
@@ -159,7 +166,7 @@ class ConceptGraph:
 
     def get_or_create(self, type_: str, surface: str, paper_id: str,
                       evidence: str = "", year: str = "",
-                      section: str = "") -> Concept:
+                      section: str = "", central: bool = False) -> Concept:
         """First-pass alignment: EXACT-SURFACE lookup for ALL types (including
         PARAMETER/NUMERIC). No symbol-table matching here.
 
@@ -172,17 +179,23 @@ class ConceptGraph:
         by align_concepts (LLM semantic judgment, domain-agnostic) — same as
         METHOD/PHENOMENON. The symbol is recorded on the Concept (if extractable)
         as an attribute for LLM alignment context, but does NOT drive merging.
+
+        central (v2 design supplement section 4): if True and the concept is
+        new (or existing but not yet marked central), mark it central. The
+        extractor passes central=True for surfaces matching Plan.central_entities.
         """
         key = _norm_surface(surface)
         cid = self._surface2concept.get(key)
         if cid and cid in self.concepts:
             self.concepts[cid].add_variant(surface, paper_id, evidence, year, section)
+            if central:
+                self.concepts[cid].central = True
             return self.concepts[cid]
         # new concept — record symbol (for align_concepts context) but don't
         # align by it
         sym = _extract_symbol(surface) if type_ in ("PARAMETER", "NUMERIC") else ""
         cid = self._new_id(type_)
-        c = Concept(concept_id=cid, type=type_, symbol=sym)
+        c = Concept(concept_id=cid, type=type_, symbol=sym, central=central)
         c.add_variant(surface, paper_id, evidence, year, section)
         self.concepts[cid] = c
         self._surface2concept[key] = cid
@@ -388,7 +401,8 @@ class ConceptGraph:
         cg = cls()
         for cid, cd in d.get("concepts", {}).items():
             c = Concept(concept_id=cid, type=cd["type"], deprecated=cd.get("deprecated", False),
-                        canonical_name=cd.get("canonical_name", ""), symbol=cd.get("symbol", ""))
+                        canonical_name=cd.get("canonical_name", ""), symbol=cd.get("symbol", ""),
+                        central=cd.get("central", False), definition=cd.get("definition", ""))
             for v in cd.get("surface_variants", []):
                 c.add_variant(v["surface"], v.get("paper_id", ""),
                               v.get("evidence", ""), v.get("year", ""), v.get("section", ""))

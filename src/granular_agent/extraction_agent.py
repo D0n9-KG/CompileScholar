@@ -124,6 +124,8 @@ Output JSON: {{"domain":"...","central_entities":[{{"surface":"...","type":"..."
 
 _VERIFY_PROMPT = """You are CRITIQUING extracted hyperedges from a {domain} paper section.
 
+{schema_prompt}
+
 Section text (the ground truth):
 {section_text}
 
@@ -133,13 +135,18 @@ Edges to verify (each has pattern_type, node surfaces+roles, qualifiers, evidenc
 For EACH edge judge (be strict — a wrong edge is worse than a dropped one):
 - verbatim_in_source: is the evidence_span an EXACT substring of the section text?
   (paraphrase / summary / invented = false)
-- type_correct: is pattern_type the RIGHT one per the schema's semantic boundary?
-  (e.g. an "X depends on Y" prose = influences, NOT constitutive_law; "X is part of Y"
-  = composed_of, NOT influences; "X is defined as Y" = defines, NOT influences)
+- type_correct: is pattern_type the RIGHT one per the schema patterns + their
+  [boundary: ...] notes ABOVE? Use the boundary notes to disambiguate the
+  confusable families (e.g. influences = functional dependence NOT co-listing;
+  composed_of = structural parts NOT classification; defines = definitional identity
+  NOT structural part-of; extends/improves/compares = method-to-method evolution NOT
+  a discourse claim). If the relation is real but the pattern_type is wrong, fix=retype.
 - relation_exists: does the section actually state this relation (not inferred)?
 - fix: "keep" if all good; "retype:<correct_pattern_id>" if the relation is real but
-  mistyped; "reextract" if evidence is real but the edge structure is wrong; "drop" if
-  the relation is not in the text (inferred / hallucinated / paraphrase evidence).
+  mistyped — the <correct_pattern_id> MUST be one of the schema patterns listed above
+  (do NOT retype to a pattern not in the schema); "reextract" if evidence is real but
+  the edge structure is wrong; "drop" if the relation is not in the text (inferred /
+  hallucinated / paraphrase evidence).
 
 Output JSON: {{"verdicts":[{{"edge_id":"...","verbatim_in_source":true,"type_correct":true,
 "relation_exists":true,"fix":"keep","note":"..."}}]}}
@@ -221,18 +228,22 @@ class ExtractionAgent:
     def _execute_core(self, section_text: str, plan: Plan, node_id: str,
                       schema_prompt: str, predecessor_summary: str
                       ) -> tuple[list[HGNode], list[Hyperedge]]:
-        """Default: delegate to hypergraph_extractor._run_hg_node_multistep.
+        """Default: delegate to hypergraph_extractor._run_hg_node_multistep
+        (the verified multi-step core), constructing the sections/blocks in the
+        EXACT format section_text_for_node expects: sections=[{name, block_range}],
+        blocks=[{index, text}], node={id, section=<name>}. (BLOCKER B1 fix —
+        the prior {id,text}+empty-blocks construction made section_text_for_node
+        return "" and the real LLM extracted 0 edges; mock tests masked it.)
+
         Override (mock) in tests."""
         from granular_agent.hypergraph_extractor import _run_hg_node_multistep, HGBlackboard
         bb = HGBlackboard()
         if predecessor_summary:
             bb.add(node_id, predecessor_summary)
-        # _run_hg_node_multistep signature: (node, sections, blocks, schema_prompt,
-        #   bb, llm, domain, meta, feedback_hint). We pass a minimal node +
-        #   synthesize sections/blocks from section_text.
-        node = {"id": node_id, "section": plan.domain}
-        sections = [{"id": node_id, "text": section_text}]
-        blocks = []
+        sec_name = node_id   # section name == node id (one section per call)
+        node = {"id": node_id, "section": sec_name}
+        sections = [{"name": sec_name, "block_range": [0, 1]}]
+        blocks = [{"index": 0, "text": section_text}]
         nodes, edges, _summary = _run_hg_node_multistep(
             node, sections, blocks, schema_prompt, bb,
             llm="deepseek", domain=plan.domain, meta=self.kb.tbox)
@@ -256,7 +267,8 @@ class ExtractionAgent:
                 "evidence_span": he.evidence_span,
             })
         p = _VERIFY_PROMPT.format(
-            domain=domain, section_text=section_text,
+            domain=domain, schema_prompt=self.kb.tbox.to_prompt(),
+            section_text=section_text,
             edges_json=json.dumps(edges_for_prompt, ensure_ascii=False))
         raw = self.llm_verify(p, 4000)
         obj = _parse_json(raw) or {}
@@ -282,12 +294,31 @@ class ExtractionAgent:
         reextract -> drop (one-shot reextract is a future refinement; for now
         reextract is treated as drop-with-note to avoid unbounded re-extraction
         loops — honest scope, not a downgrade of the keep/retype/drop path);
-        drop -> remove. Returns (kept_edges, stats)."""
-        stats = {"keep": 0, "retype": 0, "reextract_as_drop": 0, "drop": 0}
+        drop -> remove.
+
+        DETERMINISTIC VERBATIM POST-CHECK (铁律: structure/deterministic ->
+        rule): the LLM verifier can be lenient on verbatim (real-run showed it
+        kept an evidence that was NOT a source substring). So after the LLM
+        verdict, we RE-CHECK verbatim_in_source as an exact substring rule: if
+        the evidence_span is not a substring of section_text, force fix=drop
+        (overriding keep/retype). This is the structural gate the LLM can't be
+        trusted with. The LLM still judges type_correct/relation_exists (real
+        semantic judgment); verbatim is a string check = rule, not LLM."""
+        stats = {"keep": 0, "retype": 0, "reextract_as_drop": 0, "drop": 0,
+                 "dropped_nonverbatim": 0}
         kept: list[Hyperedge] = []
         vmap = {v.edge_id: v for v in verdicts}
+        dropped_nonverbatim: list[str] = []
         for he in edges:
             v = vmap.get(he.eid)
+            # DETERMINISTIC verbatim gate (rule, overrides LLM verdict)
+            ev = (he.evidence_span or "").strip()
+            if ev and ev not in section_text:
+                # evidence is paraphrase / hallucinated / truncated -> drop,
+                # regardless of what the LLM verifier said.
+                stats["dropped_nonverbatim"] += 1
+                dropped_nonverbatim.append(he.eid)
+                continue
             if v is None:
                 kept.append(he)
                 stats["keep"] += 1
@@ -297,6 +328,12 @@ class ExtractionAgent:
                 stats["keep"] += 1
             elif v.fix.startswith("retype:"):
                 new_pt = v.fix.split(":", 1)[1].strip()
+                # B3 safety: retype to a pattern NOT in the tbox is invalid —
+                # the kernel would reject it at commit anyway; drop here instead
+                # so it's flagged in stats (don't silently smuggle bad data).
+                if new_pt not in self.kb.tbox.patterns:
+                    stats["drop"] += 1
+                    continue
                 he.pattern_type = new_pt
                 kept.append(he)
                 stats["retype"] += 1
@@ -318,6 +355,9 @@ class ExtractionAgent:
         through validate only — NO 5-outcome route (断点 2). Returns
         (n_committed, rejected)."""
         nid2node = {n.nid: n for n in nodes}
+        # central surfaces from the plan — concepts matching these get central=True
+        central_surfaces = {_norm(c.get("surface", ""))
+                            for c in plan.central_entities if isinstance(c, dict)}
         mutations: list[Mutation] = []
         for he in edges:
             concepts = []
@@ -326,9 +366,20 @@ class ExtractionAgent:
                 if n is None:
                     continue
                 concepts.append({"surface": n.surface, "type": (n.labels[0] if n.labels else "PROPERTY"),
-                                 "role": role, "evidence": n.evidence_span})
+                                 "role": role, "evidence": n.evidence_span,
+                                 "central": _norm(n.surface) in central_surfaces})
             if len(concepts) < 2:
                 continue
+            # provenance first-class fields (M4 fix): lift cited_from /
+            # method / evidence_strength OUT of qualifiers into the provenance
+            # sub-structure (design行17: Hyperedge.provenance 一等公民). The
+            # remaining qualifiers carry only relation-specific business keys
+            # (relation_type/dependency_type/applies_in_regime/function_form/...).
+            quals = dict(he.qualifiers)
+            prov_extra = {}
+            for fk in ("cited_from", "method", "evidence_strength"):
+                if fk in quals:
+                    prov_extra[fk] = quals.pop(fk)
             mutations.append(Mutation(
                 op=Op.ADD_EDGE, target=he.eid, proposer_role=Role.EXTRACTOR,
                 domain=plan.domain, evidence=he.evidence_span,
@@ -336,9 +387,9 @@ class ExtractionAgent:
                 payload={"kind": he.pattern_type,
                          "roles": list(he.node_roles),
                          "concepts": concepts,
-                         "qualifiers": dict(he.qualifiers),
+                         "qualifiers": quals,
                          "provenance": {"paper_id": paper_id, "year": year,
-                                        "section": section}}))
+                                        "section": section, **prov_extra}}))
         if not mutations:
             return 0, []
         result = self.kb.commit(mutations)
@@ -383,3 +434,12 @@ def _parse_json(raw: str | None) -> dict:
         return {}
     from granular_agent.llm_client import parse_json_response
     return parse_json_response(raw) or {}
+
+
+def _norm(s: str) -> str:
+    """Normalize a surface for central-matching: NFKC + lowercase + collapse."""
+    if not s:
+        return ""
+    import unicodedata, re
+    s = unicodedata.normalize("NFKC", s.lower())
+    return re.sub(r"[\s\-_]+", " ", s).strip(" .,;:()")
