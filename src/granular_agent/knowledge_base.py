@@ -811,10 +811,17 @@ class KnowledgeBase:
                                            year, section,
                                            central=bool(c.get("central", False)))
             cids.append(conc.concept_id)
-        # need >=2 distinct concepts for a real n-ary edge
+        # need >=2 distinct concepts for a real n-ary edge.
+        # pattern_type: the extractor's add_edge payload carries kind=pattern_type
+        # (the raw T-box ref, e.g. constitutive_law/extends/...). Stored SEPARATELY
+        # from the rich-topology `kind` classification so prune_by_utility (Step 5)
+        # can count T-box pattern usage by pattern_type (not kind, which mismatches
+        # T-box pattern_id). (P0 fix: previously pattern_type was never passed,
+        # all kernel edges had pattern_type="" → prune_by_utility broke.)
         if len(set(cids)) >= 2:
             he = self.abox.add_hyperedge(cids, kind, roles=roles, paper_id=paper_id,
-                                         evidence=evidence, year=year, section=section)
+                                         evidence=evidence, year=year, section=section,
+                                         pattern_type=kind)
             # attach the first-class provenance fields onto the edge's provenance
             # entry (ConceptHyperedge.provenance is a list of per-paper dicts;
             # the entry just added is the last one).

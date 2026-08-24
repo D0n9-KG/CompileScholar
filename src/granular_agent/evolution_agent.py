@@ -146,8 +146,17 @@ class EvolutionAgent:
     """
 
     # recurring crystallize threshold (委托现有 CONSERVATIVE_CROSS_NODE; the
-    # agent surfaces cross_node in the report so the gate is auditable)
+    # agent surfaces cross_node in the report so the gate is auditable).
+    # Gate mirrors the legacy run_evolution_loop (hypergraph_evolution.py:600):
+    # accept growth if cross_node>=2 OR cumulative>=5. The cumulative path is
+    # what lets a SINGLE section's repeated failures (same signature, >=5 times)
+    # trigger evolution — without it, a single-section paper (map_structure
+    # producing 1 node) never evolves (real-run: ML_DQN 1 section, 21 dropped
+    # edges, version 0.1->0.1, evolver ops=0). Legacy evolves single-section
+    # via cumulative; new pipeline must too. (Not a downgrade — aligning to the
+    # verified legacy gate semantics.)
     CONSERVATIVE_CROSS_NODE = 2
+    CONSERVATIVE_CUMULATIVE = 5
 
     def __init__(self, kb: KnowledgeBase, llm: Callable[[str, int], str | None],
                  domain_default: str = "global"):
@@ -210,11 +219,30 @@ class EvolutionAgent:
         if kind in ("validate_failure", "recurring_mismatch"):
             if not failing_hes:
                 return []
-            distinct = [he for he, _ in failing_hes]
+            # P0 audit fix: build an instance from the dropped edges' node_surfaces
+            # so evolution_probe sees real surfaces+labels (instance=None made the
+            # LLM see only role:nid, weakening proposals to 0). The dropped edges
+            # carry node_surfaces (surface+labels per endpoint) from the extractor.
+            from granular_agent.hypergraph_schema import InstanceHypergraph, HGNode
+            inst = InstanceHypergraph(paper_id=src.paper_id or src.node_id or "p")
+            distinct = []
+            for entry in failing_hes:
+                if isinstance(entry, tuple) and len(entry) == 3:
+                    he, _reason, node_surfaces = entry
+                else:
+                    he, _reason = entry[:2]
+                    node_surfaces = None
+                distinct.append(he)
+                if node_surfaces:
+                    for nid, ns in zip(he.node_ids, node_surfaces):
+                        if nid and nid not in inst.nodes:
+                            inst.add_node(HGNode(nid=nid,
+                                labels=ns.get("labels", []) or ["PROPERTY"],
+                                surface=ns.get("surface", "")))
             proposals = hev.evolution_probe(
                 distinct, self.kb.tbox, src.paper_id or src.node_id or "p",
                 domain=src.domain or self.domain_default,
-                llm="deepseek", instance=None)
+                llm="deepseek", instance=inst if inst.nodes else None)
             return proposals or []
         if kind in ("self_split", "self_merge", "self_retire", "self_rename"):
             # detect_*_triggers output carries `representatives` (cluster evidence
@@ -302,10 +330,14 @@ class EvolutionAgent:
         is_growth = op in ("add_pattern", "add_meta_node", "add_subclass")
         if is_growth and src.kind in ("validate_failure", "recurring_mismatch"):
             cross = src.payload.get("cross_node", 1)
-            if cross < self.CONSERVATIVE_CROSS_NODE:
+            cumulative = src.payload.get("cumulative", 1)
+            # mirror legacy gate (hypergraph_evolution.py:633): cross>=2 OR
+            # cumulative>=5. cumulative lets single-section recurring fire.
+            if not (cross >= self.CONSERVATIVE_CROSS_NODE
+                    or cumulative >= self.CONSERVATIVE_CUMULATIVE):
                 proposal["rejected_reason"] = (
-                    f"conservative gate: growth needs cross_node>={self.CONSERVATIVE_CROSS_NODE}, "
-                    f"got {cross} (real gap recurses and is accepted later)")
+                    f"conservative gate: growth needs cross_node>={self.CONSERVATIVE_CROSS_NODE} "
+                    f"OR cumulative>={self.CONSERVATIVE_CUMULATIVE}, got cross={cross} cumul={cumulative}")
                 return None, "reject"
         # HITL: a new top-level FAMILY (not just a new pattern in an existing
         # family) is a big enough ontological move to flag for human review.
@@ -499,20 +531,43 @@ class EvolutionAgent:
     # propose_validate_failures: the extractor's validate failures enter queue
     # ===================================================================
 
-    def propose_validate_failures(self, failing_hes: list[tuple[Hyperedge, str]],
+    def propose_validate_failures(self, failing: list,
                                   node_id: str, paper_id: str,
                                   domain: str = "") -> None:
-        """The extractor's validate failures (edges that didn't match any
-        pattern) enter the unified queue. Records cross-node recurrence so
-        governance's conservative gate has the signal (委托 EvolutionTrigger)."""
+        """The extractor's dropped edges (failed validate / bad verbatim / bad
+        role / retype-unknown) enter the unified queue. `failing` is a list of
+        EITHER (Hyperedge, reason) tuples (legacy) OR dropped_edge dicts (with
+        node_surfaces, preferred — lets the probe see real node surfaces).
+
+        Records cross-node + cumulative recurrence so governance's gate has
+        both signals. cumulative is the single-section path: same signature
+        failing >=5 times in one node triggers evolution (legacy gate semantics)."""
         domain = domain or self.domain_default
+        # normalize to (Hyperedge, reason, node_surfaces)
+        norm: list[tuple] = []
+        for item in failing:
+            if isinstance(item, tuple) and len(item) == 2:
+                he, reason = item
+                norm.append((he, reason, None))
+            elif isinstance(item, dict):
+                he = Hyperedge(
+                    eid=item.get("edge_id", ""), pattern_type=item.get("pattern_type", ""),
+                    node_ids=list(item.get("node_ids", [])),
+                    node_roles=list(item.get("node_roles", [])),
+                    evidence_span=item.get("evidence_span", ""))
+                norm.append((he, item.get("reason", "dropped"), item.get("node_surfaces")))
+            else:
+                continue
         cross = 1
-        for he, reason in failing_hes:
+        cumulative = 1
+        for he, reason, _surfs in norm:
             sig, _ = self.trigger.record(he, reason, node_id)
             cross = max(cross, self.trigger.cross_node_count(sig))
+            cumulative = max(cumulative, self.trigger.cumulative_count(sig))
         self.propose_trigger(TriggerSource(
             kind="validate_failure",
-            payload={"cross_node": cross, "failing_hes": failing_hes},
+            payload={"cross_node": cross, "cumulative": cumulative,
+                     "failing": norm},
             domain=domain, paper_id=paper_id, node_id=node_id))
 
     # ===================================================================
@@ -527,7 +582,7 @@ class EvolutionAgent:
         sources = list(self._queue)
         self._queue.clear()
         for src in sources:
-            failing_hes = src.payload.get("failing_hes") if src.kind in (
+            failing_hes = src.payload.get("failing") if src.kind in (
                 "validate_failure", "recurring_mismatch") else None
             proposals = self._probe(src, failing_hes)
             report.n_proposed += len(proposals)

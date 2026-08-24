@@ -329,13 +329,25 @@ class ExtractionAgent:
 
         def _record_drop(he: Hyperedge, reason: str, v: Verdict | None):
             """Record a dropped edge for the evolver's failure feed (real
-            schema-gap signal, not synthetic)."""
+            schema-gap signal, not synthetic). Carries node SURFACES + labels
+            so the evolver can build an instance for evolution_probe (P0 audit
+            fix: probe instance=None made LLM see only role:nid, weakening
+            proposals to 0)."""
+            nid2node = {n.nid: n for n in nodes}
+            node_surfaces = []
+            for nid in he.node_ids:
+                n = nid2node.get(nid)
+                if n:
+                    node_surfaces.append({"surface": n.surface, "labels": list(n.labels)})
+                else:
+                    node_surfaces.append({"surface": "", "labels": []})
             dropped_edges.append({
                 "edge_id": he.eid,
                 "pattern_type": he.pattern_type,
                 "evidence_span": he.evidence_span,
                 "node_ids": list(he.node_ids),
                 "node_roles": list(he.node_roles),
+                "node_surfaces": node_surfaces,
                 "reason": reason,
                 "verifier_note": (v.note if v else ""),
             })

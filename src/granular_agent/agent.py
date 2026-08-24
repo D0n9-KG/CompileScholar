@@ -538,17 +538,11 @@ class GranularFlowAgent:
                 # "_unknown", node_ids=["a","b"], evidence=sec_text[:120]) was a
                 # fake signal that cross_node gate correctly rejected (cross=1)
                 # so schema evolution never happened in single-paper runs.
-                from granular_agent.hypergraph_schema import Hyperedge
-                failing: list = []
-                for de in ext_rep.get("dropped_edges", []):
-                    he_fail = Hyperedge(
-                        eid=de.get("edge_id", f"{nid}_drop"),
-                        pattern_type=de.get("pattern_type", ""),
-                        node_ids=de.get("node_ids", []) or ["a", "b"],
-                        node_roles=de.get("node_roles", []) or ["x", "y"],
-                        evidence_span=de.get("evidence_span", ""))
-                    reason = de.get("reason", "no-matching-meta-pattern")
-                    failing.append((he_fail, reason))
+                # feed the REAL dropped_edge dicts (carry pattern_type + evidence
+                # + node_ids/roles + node_surfaces + reason) to the evolver. The
+                # evolver builds an instance from node_surfaces so evolution_probe
+                # sees real surfaces (P0 audit fix: instance=None → 0 proposals).
+                failing = list(ext_rep.get("dropped_edges", []))
                 if failing:
                     evo.propose_validate_failures(failing, node_id=nid,
                                                   paper_id=paper_id, domain=self.domain)
@@ -568,9 +562,23 @@ class GranularFlowAgent:
         else:
             align_rep = None
 
-        # Stage 4: maintenance — rich topology read (on-demand view) + the
-        # maintainer's prune is run at batch end (not per-paper) to avoid
-        # retiring patterns mid-batch that later papers need.
+        # Stage 4: maintenance — rich topology (the most-stable selling point,
+        # memory:富拓扑直读 win最稳). P0 audit fix: the kernel path never called
+        # infer_rich_topology_direct, so富拓扑 kinds were LOST. Run it on the
+        # A-box here (per-paper) via MaintenanceAgent.infer_rich_topology_for_abox
+        # (adapts ConceptGraph→InstanceHypergraph, delegates to verified内核).
+        # Results recorded in report; the A-box hyperedges keep their raw
+        # pattern_type (for prune_by_utility) and the富拓扑 view is on-demand
+        # via snapshot_rich_topology.
+        rt_edges = []
+        try:
+            rt_edges = maint.infer_rich_topology_for_abox(paper_id=paper_id)
+        except Exception as e:
+            print(f"  [kernel] rich topology failed: {e!r}", flush=True)
+        rt_by_kind = {}
+        for e in rt_edges:
+            k = e.get("kind", "")
+            rt_by_kind[k] = rt_by_kind.get(k, 0) + 1
         n_concepts = len(kb.abox.concepts)
         n_hyperedges = len(kb.abox.hyperedges)
         result = {
@@ -585,6 +593,7 @@ class GranularFlowAgent:
             "align": (align_rep.__dict__ if align_rep else None),
             "total_patterns_after": len(kb.tbox.patterns),
             "ledger_entries": len(kb.ledger),
+            "rich_topology": {"total": len(rt_edges), "by_kind": rt_by_kind},
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
         self.hg_results.append(result)

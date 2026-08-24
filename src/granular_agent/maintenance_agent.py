@@ -106,6 +106,43 @@ class MaintenanceAgent:
                 e["ambiguous_kinds"] = kinds
         return edges
 
+    def infer_rich_topology_for_abox(self, paper_id: str = "") -> list[dict]:
+        """Rich-topology direct read on the KB's A-box (ConceptGraph). The kernel
+        path (process_paper_via_kernel) accumulates edges into the A-box but
+        never ran the rich-topology classification — so the富拓扑 kinds
+        (law_parameter/method_parameter/method_phenomenon/...) that are the
+        "most stable selling point" (memory) were LOST in the new pipeline
+        (audit P0: kernel doesn't call infer_rich_topology_direct). This adapts
+        the A-box ConceptGraph → a synthetic InstanceHypergraph so the verified
+        infer_rich_topology_direct内核 reads it (surgical — no logic rewrite),
+        and commits the classified edges back into the A-box as rich-topology
+        hyperedges (kind = rich classification, pattern_type = raw T-box ref).
+
+        ConceptGraph.hyperedges is a list of ConceptHyperedge (node_ids=concept_ids,
+        kind=pattern_type-from-extractor). We build an InstanceHypergraph whose
+        nodes are the A-box Concepts (label = concept.type) so the direct-read
+        node-type classification works."""
+        from granular_agent.hypergraph_schema import InstanceHypergraph, Hyperedge, HGNode
+        inst = InstanceHypergraph(paper_id=paper_id)
+        # add each A-box concept as a node (label = its type)
+        for cid, c in self.kb.abox.concepts.items():
+            if c.deprecated:
+                continue
+            inst.add_node(HGNode(nid=cid, labels=[c.type] if c.type else ["PROPERTY"],
+                                 surface=c.surfaces()[0] if c.surfaces() else ""))
+        # add each A-box hyperedge as an instance hyperedge (pattern_type = he.pattern_type)
+        he_counter = 0
+        for he in self.kb.abox.hyperedges:
+            if not he.pattern_type:
+                continue  # skip edges without a T-box ref (legacy)
+            he_counter += 1
+            inst.add_hyperedge(Hyperedge(
+                eid=f"rt_{he_counter}", pattern_type=he.pattern_type,
+                node_ids=list(he.node_ids), node_roles=list(he.node_roles),
+                evidence_span=(he.provenance[0].get("evidence", "") if he.provenance else "")))
+        # delegate to the verified direct-read内核 (surgical)
+        return self.infer_rich_topology(inst, paper_id=paper_id)
+
     def _kinds_for_edge(self, edge: dict) -> list[str]:
         """Which rich-topology kinds this edge could be classified as (for
         ambiguous flagging). Direct read picks one; this checks if others
