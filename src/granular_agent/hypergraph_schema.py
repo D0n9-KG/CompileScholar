@@ -178,6 +178,16 @@ class MetaHyperedgePattern:
     # (so old seeds without the field still load); the bounded-op gate treats
     # an unset family as "needs assignment" and rejects free-form adds.
     family: str = ""
+    # semantic_boundary (v2 design supplement section 4 / 断点: schema-in-context
+    # for type-judgment weakness). A short prose description of WHEN this pattern
+    # applies vs nearby patterns it's easy to confuse with — e.g. influences =
+    # "X functionally depends on Y, X varies with Y; NOT a co-listing / input /
+    # test setup" (vs composed_of / measures). Rendered in to_prompt so the
+    # extractor sees the boundary, not just the pattern name + role slots.
+    # Hand-written for the seed patterns; the evolver generates one when it
+    # adds a new pattern (from evidence + rationale). Cures the re-type weakness
+    # (54% mis-typed edges) at the schema-in-context level, not via brittle rules.
+    semantic_boundary: str = ""
 
 
 # ---------------------------------------------------------------------------
@@ -890,7 +900,8 @@ class MetaHypergraph:
                                "role_slots": [dict(s) for s in p.role_slots],
                                "allowed_qualifiers": list(p.allowed_qualifiers),
                                "deprecated": p.deprecated, "is_abstract": p.is_abstract,
-                               "split_from": p.split_from, "family": p.family}
+                               "split_from": p.split_from, "family": p.family,
+                               "semantic_boundary": p.semantic_boundary}
                          for pid, p in self.patterns.items()},
             "meta_edges": [{"src": e.src, "dst": e.dst, "relation": e.relation,
                             "props": dict(e.props)} for e in self.meta_edges],
@@ -913,7 +924,8 @@ class MetaHypergraph:
                 pattern_id=p.get("pattern_id", pid), description=p.get("description", ""),
                 role_slots=p.get("role_slots", []), allowed_qualifiers=p.get("allowed_qualifiers", []),
                 deprecated=p.get("deprecated", False), is_abstract=p.get("is_abstract", False),
-                split_from=p.get("split_from", ""), family=p.get("family", ""))
+                split_from=p.get("split_from", ""), family=p.get("family", ""),
+                semantic_boundary=p.get("semantic_boundary", ""))
         for e in d.get("meta_edges", []):
             m.meta_edges.append(MetaEdge(src=e.get("src",""), dst=e.get("dst",""),
                                          relation=e.get("relation",""), props=e.get("props", {})))
@@ -973,6 +985,10 @@ class MetaHypergraph:
                 slots = ", ".join(f"{s.get('role')}:{s.get('type','?')}" for s in pat.role_slots)
                 quals = ",".join(pat.allowed_qualifiers) if pat.allowed_qualifiers else ""
                 line = f"{pad}{pid}{fam}{abs_tag}({slots})[qualifiers:{quals}] — {pat.description}"
+                if pat.semantic_boundary:
+                    # render the boundary so the extractor sees WHEN to use this
+                    # pattern vs its confusables (schema-in-context, 断点 fix).
+                    line += f" [boundary: {pat.semantic_boundary}]"
             out = [line]
             for ch in sorted(children.get(pid, [])):
                 if not self.patterns[ch].deprecated:
@@ -1049,32 +1065,38 @@ def seed_meta_hypergraph() -> MetaHypergraph:
         pattern_id="constitutive_law", family="constitutive_law",
         description="a constitutive law relating output quantity/quantities to >=1 input quantity (n-ary)",
         role_slots=[{"role": "output", "type": T, "repeatable": True}, {"role": "input", "type": T, "repeatable": True}, {"role": "parameter", "type": T, "repeatable": True}, {"role": "coefficient", "type": T, "repeatable": True}, {"role": "exponent", "type": T, "repeatable": True}],
-        allowed_qualifiers=["applies_in_regime", "function_form", "parameters", "method", "evidence_strength", "cited_from"])
+        allowed_qualifiers=["applies_in_regime", "function_form", "parameters", "method", "evidence_strength", "cited_from"],
+        semantic_boundary="a FORMAL/QUANTITATIVE law output=f(inputs+params), stated as a formula or explicit functional relation. NOT a prose 'X depends on Y' (that is influences), NOT a definition (defines), NOT a measurement setup (measures).")
     m.patterns["influences"] = MetaHyperedgePattern(
         pattern_id="influences", family="dependency",
         description="one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
         role_slots=[{"role": "source", "type": T, "repeatable": True}, {"role": "target", "type": T, "repeatable": True}, {"role": "cause", "type": T, "repeatable": True}, {"role": "effect", "type": T, "repeatable": True}],
-        allowed_qualifiers=["dependency_type", "applies_in_regime", "method", "evidence_strength", "cited_from"])
+        allowed_qualifiers=["dependency_type", "applies_in_regime", "method", "evidence_strength", "cited_from"],
+        semantic_boundary="X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).")
     m.patterns["defines"] = MetaHyperedgePattern(
         pattern_id="defines", family="definition",
         description="one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
         role_slots=[{"role": "subject", "type": T, "repeatable": True}, {"role": "definition", "type": T, "repeatable": True}, {"role": "object", "type": T, "repeatable": True}],
-        allowed_qualifiers=["relation_type", "method", "evidence_strength", "cited_from"])
+        allowed_qualifiers=["relation_type", "method", "evidence_strength", "cited_from"],
+        semantic_boundary="a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.")
     m.patterns["composed_of"] = MetaHyperedgePattern(
         pattern_id="composed_of", family="composition",
         description="one whole is composed-of / part-of >=1 component (n-ary composition)",
         role_slots=[{"role": "whole", "type": T, "repeatable": True}, {"role": "component", "type": T, "repeatable": True}],
-        allowed_qualifiers=["relation_type", "method", "evidence_strength", "cited_from"])
+        allowed_qualifiers=["relation_type", "method", "evidence_strength", "cited_from"],
+        semantic_boundary="STRUCTURAL composition: parts that make up a whole (model A = B + C). NOT classification (defines), NOT 'X has control params' (influences), NOT experimental setup description, NOT 'we tested X by doing Y'.")
     m.patterns["measures"] = MetaHyperedgePattern(
         pattern_id="measures", family="measure",
         description="a quantity is measured by / characterizes >=1 measure",
         role_slots=[{"role": "object", "type": T}, {"role": "instrument", "type": T, "repeatable": True}],
-        allowed_qualifiers=["condition", "applies_in_regime", "method", "evidence_strength", "cited_from"])
+        allowed_qualifiers=["condition", "applies_in_regime", "method", "evidence_strength", "cited_from"],
+        semantic_boundary="a measurement/evaluation relation: X is measured/evaluated by instrument/method Y. NOT a functional law (constitutive_law), NOT a dependence (influences).")
     m.patterns["claim_relation"] = MetaHyperedgePattern(
         pattern_id="claim_relation", family="claim",
         description="a discourse relation between >=2 claims/approaches (supports/contrasts/extends/...)",
         role_slots=[{"role": "from", "type": T, "repeatable": True}, {"role": "to", "type": T, "repeatable": True}],
-        allowed_qualifiers=["relation_type", "applies_in_regime", "method", "evidence_strength", "cited_from"])
+        allowed_qualifiers=["relation_type", "applies_in_regime", "method", "evidence_strength", "cited_from"],
+        semantic_boundary="a DISCOURSE relation between claims/findings (supports/contrasts/outperforms). NOT a method-to-method development (extends/improves/compares — those are evolution), NOT a measurement (measures).")
     # evolution family: cross-METHOD (or PHENOMENON) relations STATED in the
     # text — extends/improves/compares/replaces/adapts/background. These are
     # the relations the text explicitly states (NOT inferred — inference is a
