@@ -1,10 +1,10 @@
-"""Step 7 smoke: process_paper_via_kernel wires the 4 builder agents through
-the KnowledgeBase on a paper's section DAG.
+"""Kernel pipeline smoke: process_paper_via_kernel wires the 4 builder agents
+through the KnowledgeBase on a paper's section DAG.
 
 Mocks map_structure (returns a fixed 1-section DAG) + load_paper_blocks +
 the LLM (extractor multistep + verifier + aligner). Verifies the KB-backed
-pipeline runs end-to-end and the ledger records the writes (the key difference
-from the legacy process_paper_hypergraph which mutates meta directly).
+pipeline runs end-to-end and the ledger records the writes (transactional,
+not direct mutate).
 
 Not a real-LLM test (the section text is synthetic; the extractor's multistep
 core is exercised with a mock LLM returning canned JSON).
@@ -68,10 +68,6 @@ def _mock_extract_llm(prompt, max_tokens=8000):
     return ""
 
 
-# bypass SchemaManager (needs a worktree schema file) — patch __init__ to noop
-agent_mod.SchemaManager.__init__ = lambda self, *a, **k: setattr(self, "_current", None)
-agent_mod.Extractor.__init__ = lambda self, *a, **k: None
-
 agent = GranularFlowAgent(domain="granular", llms=["DeepSeek-V4-Flash"])
 # patch the LLM methods to the mock
 agent._kernel_llm_extract = _mock_extract_llm
@@ -91,9 +87,12 @@ check("ledger has add_edge writes (extractor went through KB)", has_add_edge)
 # the KB shares meta_hg / concept_graph (same objects, not copies)
 check("KB shares agent's meta_hg (same object)", kb.tbox is agent.meta_hg)
 check("KB shares agent's concept_graph (same object)", kb.abox is agent.concept_graph)
-# legacy process_paper_hypergraph still present (ablation对照 retained)
-check("legacy process_paper_hypergraph retained (ablation对照)",
-      hasattr(agent, "process_paper_hypergraph"))
+# 单管线原则 (B+ rebuild 2026-08-25): legacy paths physically archived under
+# legacy/ — they must NOT exist on the agent anymore.
+check("legacy paths removed (单管线原则)",
+      not any(hasattr(agent, m) for m in
+              ["process_paper", "process_batch", "process_paper_hypergraph",
+               "process_batch_hypergraph", "save_hypergraph_results", "save_results"]))
 
 print()
 print(f"{'ALL PASS' if not fail else 'FAILURES: ' + str(fail)}  ({len(fail)} fail)")
