@@ -677,7 +677,12 @@ def _run_hg_node_multistep(node: dict, sections: list, blocks: list,
     summary = ""
     print(f"  [multistep] {node.get('id','?')}: {len(chunks)} chunks, sec_text={len(sec_text)} chars", flush=True)
 
-    for ci, chunk in enumerate(chunks):
+    # chunk-level concurrency: chunks are independent text segments, so step1→2→3
+    # per chunk can run in parallel. max_workers=4 (API rate-limit safe). Within
+    # a chunk, step1→2→3 stays serial (step2 needs step1's entities, step3 needs
+    # step2's labels). This is the biggest perf win: 4 chunks 4x→~1x wall-clock.
+    def _process_chunk(ci_chunk):
+        ci, chunk = ci_chunk
         nid_prefix = f"{node['id']}c{ci}" if len(chunks) > 1 else node["id"]
 
         # ---- step 1: extract entities (surface + evidence, no labels) ----
@@ -689,22 +694,18 @@ def _run_hg_node_multistep(node: dict, sections: list, blocks: list,
         raw1 = _call(p1, llm, max_tokens=8192)
         parsed1 = parse_json_response(raw1) or {}
         raw_nodes = parsed1.get("nodes", []) or []
-        # long-chunk retry: if step1 parsed 0 nodes (LLM drifted to prose /
-        # parse failed), retry ONCE with a stricter prompt (JSON-only, smaller
-        # max_tokens). A whole chunk lost = 25% paper content dropped (audit).
         if not raw_nodes and raw1:
             p1_retry = p1 + "\n\nIMPORTANT: output ONLY valid JSON (no prose, no explanation). " \
                        "{\"nodes\":[{\"nid\":\"n1\",\"surface\":\"...\",\"evidence_span\":\"...\"}]}"
             raw1b = _call(p1_retry, llm, max_tokens=4096)
             parsed1 = parse_json_response(raw1b) or {}
             raw_nodes = parsed1.get("nodes", []) or []
-            print(f"  [multistep] step1 RETRY raw1b={'None' if not raw1b else str(len(raw1b))+' chars'}, parsed nodes={len(raw_nodes)}", flush=True)
-        print(f"  [multistep] step1 raw1={'None' if not raw1 else str(len(raw1))+' chars'}, parsed nodes={len(raw_nodes)}", flush=True)
+            print(f"  [multistep] c{ci} step1 RETRY parsed nodes={len(raw_nodes)}", flush=True)
+        print(f"  [multistep] c{ci} step1 parsed nodes={len(raw_nodes)}", flush=True)
         if not raw_nodes:
-            continue
+            return [], [], ""
 
         # ---- step 2: label entities ----
-        # build compact node list for labeling (nid + surface + evidence)
         nodes_for_label = [{"nid": n.get("nid", ""), "surface": n.get("surface", "")[:60],
                             "evidence_span": n.get("evidence_span", "")[:80]}
                            for n in raw_nodes if isinstance(n, dict)]
@@ -712,16 +713,12 @@ def _run_hg_node_multistep(node: dict, sections: list, blocks: list,
                                   nodes_json=json.dumps(nodes_for_label, ensure_ascii=False))
         raw2 = _call(p2, llm, max_tokens=4096)
         parsed2 = parse_json_response(raw2) or {}
-        # tolerate LLM returning a list instead of {"labels":[...]} (long-chunk
-        # drift): if parsed2 is a list of label dicts, use it directly.
         label_items = parsed2.get("labels", []) if isinstance(parsed2, dict) else (
             parsed2 if isinstance(parsed2, list) else [])
         labels = {item["nid"]: item.get("labels", [])
                   for item in label_items
                   if isinstance(item, dict) and "nid" in item}
 
-        # build HGNodes with labels
-        nid_remap = {}  # LLM-local nid -> global nid
         chunk_nodes = []
         for n in raw_nodes:
             if not isinstance(n, dict):
@@ -730,7 +727,6 @@ def _run_hg_node_multistep(node: dict, sections: list, blocks: list,
             if not local:
                 continue
             gid = f"{nid_prefix}_{local}"
-            nid_remap[local] = gid
             lbl = labels.get(local, [])
             if isinstance(lbl, str):
                 lbl = [lbl]
@@ -740,12 +736,9 @@ def _run_hg_node_multistep(node: dict, sections: list, blocks: list,
                 properties=n.get("properties", {}) if isinstance(n.get("properties"), dict) else {},
                 evidence_span=str(n.get("evidence_span", "")),
             ))
-        all_nodes.extend(chunk_nodes)
 
         # ---- step 3: identify hyperedges ----
-        labeled_for_prompt = [{"nid": n.nid,
-                                "labels": n.labels,
-                                "surface": n.surface[:40]}
+        labeled_for_prompt = [{"nid": n.nid, "labels": n.labels, "surface": n.surface[:40]}
                                for n in chunk_nodes]
         p3 = _STEP3_PROMPT.format(domain=domain,
                                   section_name=node.get("section", ""),
@@ -756,41 +749,50 @@ def _run_hg_node_multistep(node: dict, sections: list, blocks: list,
         raw3 = _call(p3, llm, max_tokens=8192)
         parsed3 = parse_json_response(raw3) or {}
         raw_hes = parsed3.get("hyperedges", []) or []
-        # long-chunk retry: if step3 parsed 0 edges (LLM drifted to prose),
-        # retry ONCE with JSON-only stricter prompt. Cures the "raw3=28k chars,
-        # parsed 0 edges" hole (a whole chunk's relations lost).
         if not raw_hes and raw3:
             p3_retry = p3 + "\n\nIMPORTANT: output ONLY valid JSON, no prose. " \
                        "{\"hyperedges\":[{\"eid\":\"e1\",\"pattern_type\":\"...\",\"node_ids\":[\"n1\"],\"node_roles\":[\"r\"],\"evidence_span\":\"...\",\"qualifiers\":{}}]}"
             raw3b = _call(p3_retry, llm, max_tokens=4096)
             parsed3 = parse_json_response(raw3b) or {}
             raw_hes = parsed3.get("hyperedges", []) or []
-            print(f"  [multistep] step3 RETRY raw3b={'None' if not raw3b else str(len(raw3b))+' chars'}, parsed hes={len(raw_hes)}", flush=True)
-        print(f"  [multistep] step3 raw3={'None' if not raw3 else str(len(raw3))+' chars'}, parsed hes={len(raw_hes)}", flush=True)
+            print(f"  [multistep] c{ci} step3 RETRY parsed hes={len(raw_hes)}", flush=True)
+        print(f"  [multistep] c{ci} step3 parsed hes={len(raw_hes)}", flush=True)
+
+        chunk_edges = []
         for i, h in enumerate(raw_hes):
             if not isinstance(h, dict):
                 continue
             local_ids = h.get("node_ids", []) or []
-            # step3 receives ALREADY-PREFIXED nids (n.nid = "n1_n1" etc from
-            # labeled_for_prompt). No remap needed — pass through directly.
-            # (nid_remap was for step1's local nids, but step3 uses the
-            # global nids we built. Using nid_remap would double-prefix.)
             gids = [str(x) for x in local_ids]
             roles = [str(r) for r in (h.get("node_roles", []) or [])]
             quals = h.get("qualifiers", {}) if isinstance(h.get("qualifiers"), dict) else {}
             quals = {str(k): str(v) for k, v in quals.items()}
-            all_edges.append(Hyperedge(
+            chunk_edges.append(Hyperedge(
                 eid=f"{nid_prefix}_e{i}", pattern_type=str(h.get("pattern_type", "")),
                 node_ids=gids, node_roles=roles, qualifiers=quals,
                 evidence_span=str(h.get("evidence_span", "")),
             ))
-
         csum = parsed1.get("summary", "") or parsed3.get("summary", "")
-        if csum:
-            if not summary:
-                summary = csum
-            else:
-                summary = (summary + " " + csum)[:600]
+        return chunk_nodes, chunk_edges, csum
+
+    # run chunks concurrently (max 4 workers — API rate-limit safe)
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    max_workers = min(4, len(chunks))
+    with ThreadPoolExecutor(max_workers=max_workers) as pool:
+        futures = {pool.submit(_process_chunk, (ci, chunk)): ci for ci, chunk in enumerate(chunks)}
+        for future in as_completed(futures):
+            ci = futures[future]
+            try:
+                cnodes, cedges, csum = future.result()
+                all_nodes.extend(cnodes)
+                all_edges.extend(cedges)
+                if csum:
+                    if not summary:
+                        summary = csum
+                    else:
+                        summary = (summary + " " + csum)[:600]
+            except Exception as e:
+                print(f"  [multistep] chunk {ci} failed: {e!r}", flush=True)
 
     return all_nodes, all_edges, summary
 
