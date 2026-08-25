@@ -33,6 +33,38 @@ from granular_agent.hypergraph_evolution import (
     infer_rich_topology_direct, consolidate_instance)
 
 
+def _locate_chapter_text(sec_name: str, full_text: str, all_headings: list) -> str:
+    """Fallback when map_structure cut sections but missed a DAG node's section:
+    locate the chapter heading in the full text + slice to the NEXT heading.
+    Deterministic rule (string locate), not LLM. Returns "" if the heading
+    isn't found (caller then falls back to full_text). Honest: this is a
+    band-aid for map_structure's section切分 failure — the real fix is upstream
+    in map_structure's LLM, but this keeps the paper from extracting 0 concepts."""
+    if not sec_name or not full_text:
+        return ""
+    import re as _re
+    # try to find the heading as a line/phrase in the text (case-insensitive)
+    # common heading forms: "1. Introduction", "Introduction", "1 Introduction"
+    pat = r"(?:^|\n)\s*(?:\d+\.?\s*)?" + _re.escape(sec_name) + r"\s*(?:\n|\.|$)"
+    m = _re.search(pat, full_text, _re.IGNORECASE | _re.MULTILINE)
+    if not m:
+        # looser: just find the name anywhere
+        m = _re.search(_re.escape(sec_name), full_text, _re.IGNORECASE)
+    if not m:
+        return ""
+    start = m.start()
+    # find the NEXT heading after this one (slice to it)
+    end = len(full_text)
+    for h in all_headings:
+        if h == sec_name or not h:
+            continue
+        hm = _re.search(r"(?:^|\n)\s*(?:\d+\.?\s*)?" + _re.escape(h) + r"\s*(?:\n|\.|$)",
+                        full_text[start + 1:], _re.IGNORECASE | _re.MULTILINE)
+        if hm:
+            end = min(end, start + 1 + hm.start())
+    return full_text[start:end].strip()
+
+
 class GranularFlowAgent:
     """Self-evolving schema extraction agent for granular flow literature.
 
@@ -533,9 +565,39 @@ class GranularFlowAgent:
         from granular_agent.structure_mapper import topo_order
         from granular_agent.hypergraph_extractor import HGBlackboard
         bb = HGBlackboard()
-        for node in topo_order(smap["dag"]):
+        # Fallback for map_structure section切分失败: if the DAG has nodes whose
+        # section names don't all map to a sliced section (map_structure's LLM cut
+        # only 1 section but identified N chapter headings), section_text_for_node
+        # returns "" for the missing ones -> whole chapters dropped (BIO: 7 DAG
+        # nodes, 1 section -> 0 concepts). Fallback: synthesize per-node text by
+        # locating the chapter HEADING in the full text + slicing to the next
+        # heading (deterministic rule, not LLM). If even that fails, fall back to
+        # the full text as ONE section (like the 1-section case) so the paper
+        # still extracts (no silent 0-concept result).
+        full_text = full_text_from_blocks(blocks)
+        dag_nodes = topo_order(smap["dag"])
+        # build a name->text map for every DAG node's section, filling missing ones
+        node_texts: dict[str, str] = {}
+        for node in dag_nodes:
             nid = node.get("id", "")
+            sec_name = node.get("section", nid)
             sec_text = section_text_for_node(node, smap.get("sections", []), blocks)
+            if sec_text and len(sec_text) >= 80:
+                node_texts[nid] = sec_text
+                continue
+            # fallback A: locate the chapter heading in the full text, slice to next heading
+            fb = _locate_chapter_text(sec_name, full_text, [n.get("section","") for n in dag_nodes])
+            if fb and len(fb) >= 80:
+                node_texts[nid] = fb
+            else:
+                # fallback B (last resort): full text (no chapter split) — only use
+                # for the FIRST missing node so we don't extract the full text N times.
+                if not any(node_texts.values()):
+                    node_texts[nid] = full_text
+        # iterate the resolved texts (skip nodes with no text resolved)
+        for node in dag_nodes:
+            nid = node.get("id", "")
+            sec_text = node_texts.get(nid, "")
             if not sec_text or len(sec_text) < 80:
                 continue
             discourse = node.get("section", nid)
