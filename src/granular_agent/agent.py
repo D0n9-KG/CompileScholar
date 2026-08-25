@@ -655,14 +655,14 @@ class GranularFlowAgent:
         else:
             align_rep = None
 
-        # Stage 4: maintenance — rich topology (the most-stable selling point,
-        # memory:富拓扑直读 win最稳). P0 audit fix: the kernel path never called
-        # infer_rich_topology_direct, so富拓扑 kinds were LOST. Run it on the
-        # A-box here (per-paper) via MaintenanceAgent.infer_rich_topology_for_abox
-        # (adapts ConceptGraph→InstanceHypergraph, delegates to verified内核).
-        # Results recorded in report; the A-box hyperedges keep their raw
-        # pattern_type (for prune_by_utility) and the富拓扑 view is on-demand
-        # via snapshot_rich_topology.
+        # 优化: build_abox_instance ONCE, share across rich_topology + active_repair
+        # + T-box拓扑. Must be BEFORE all consumers.
+        inst_abox = None
+        try:
+            inst_abox = maint._build_abox_instance(paper_id)
+        except Exception as e:
+            print(f"  [kernel] build_abox_instance failed: {e!r}", flush=True)
+        # rich topology (最稳卖点) — share inst_abox
         rt_edges = []
         try:
             rt_edges = maint.infer_rich_topology_for_abox(paper_id=paper_id, inst=inst_abox)
@@ -672,17 +672,7 @@ class GranularFlowAgent:
         for e in rt_edges:
             k = e.get("kind", "")
             rt_by_kind[k] = rt_by_kind.get(k, 0) + 1
-        # 真漏 fix #9: active repair — detect split/merge/rename triggers on the
-        # current A-box (as a synthetic InstanceHypergraph) + feed them to the
-        # evolver's self_* path. Legacy did this via run_split/run_merge/run_rename
-        # proactively; the kernel path only reacted to validate-failures (missed
-        # pattern-over-wide detection). Delegates to detect_*_triggers内核.
-        # 优化: build_abox_instance once, share across active_repair + T-box拓扑
-        # (之前调了2次_build_abox_instance重复构造InstanceHypergraph)
-        inst_abox = None
-        try:
-            inst_abox = maint._build_abox_instance(paper_id)
-        except Exception as e:
+        # active repair detect (split/merge/rename) — share inst_abox
             print(f"  [kernel] build_abox_instance failed: {e!r}", flush=True)
         # active repair detect (split/merge/rename)
         active_repair = {"split": 0, "merge": 0, "rename": 0}
