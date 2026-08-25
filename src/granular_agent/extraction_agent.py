@@ -147,48 +147,49 @@ _VERIFY_PROMPT = """You are CRITIQUING extracted hyperedges from a {domain} pape
 Section text (the ground truth):
 {section_text}
 
-Edges to verify (each has pattern_type, node surfaces+roles, qualifiers, evidence_span):
+Edges to verify (each has pattern_type + the pattern's description/boundary/allowed
+roles, node surfaces+roles, qualifiers, evidence_span):
 {edges_json}
 
-For EACH edge judge (be strict — a wrong edge is worse than a dropped one):
-- verbatim_in_source: is the evidence_span an EXACT substring of the section text?
-  (paraphrase / summary / invented = false)
-- evidence_quote: quote the CONTINUOUS span of the section text that this edge's
-  evidence corresponds to, VERBATIM from the section (copy it exactly, <=200 chars).
-  This makes every kept edge LOCATABLE in the source (the hypergraph must be
-  explainable/可溯源 — no edge without a source position). If the evidence is
-  paraphrased/invented and has no continuous source span, set evidence_quote="".
-  The fixer will substring-check your quote against the source; a quote that
-  isn't actually in the source means the edge is not locatable -> dropped.
-- type_correct: is pattern_type the RIGHT one per the schema patterns + their
-  [boundary: ...] notes ABOVE? Use the boundary notes to disambiguate the
-  confusable families (e.g. influences = functional dependence NOT co-listing;
-  composed_of = structural parts NOT classification; defines = definitional identity
-  NOT structural part-of; extends/improves/compares = method-to-method evolution NOT
-  a discourse claim). If the relation is real but the pattern_type is wrong, fix=retype.
-- relation_exists: does the section actually state this relation (not inferred)?
-- role_correct: are the node_roles the RIGHT ones for this pattern_type? COMPARE
-  each node's role against the edge's `allowed_roles` (the pattern's declared roles,
-  given per-edge). A role NOT in allowed_roles = wrong -> role_correct=false. Also
-  judge SEMANTIC correctness: each node's role must match what it IS in the relation
-  (e.g. a 'measures' edge: the thing being measured = object, the instrument doing
-  the measuring = instrument). If a role is mislabeled (e.g. 'from/to' used on a
-  'measures' edge where it should be 'object/instrument'), judge role_correct=false.
-  IMPORTANT: if role_correct=false, you MUST either (a) fix=rolefix:<r1>,<r2>,...
-  listing the corrected role for EACH node in order (each MUST be in allowed_roles),
-  OR (b) fix=drop if the roles are so wrong the edge can't be repaired. Do NOT
-  return role_correct=false with fix=keep — that leaves a bad-role edge the rule
-  gate drops whole (coverage loss). Either repair or drop.
-- fix: "keep" if all good; "retype:<correct_pattern_id>" if the relation is real but
-  mistyped — the <correct_pattern_id> MUST be one of the schema patterns listed above
-  (do NOT retype to a pattern not in the schema); "rolefix:<r1>,<r2>,..." if the relation
-  + pattern are right but the ROLES are mislabeled (list the corrected role per node in
-  order, each MUST be a declared role of the pattern); "reextract" if evidence is real
-  but the edge structure is wrong; "drop" if the relation is not in the text (inferred /
-  hallucinated / paraphrase evidence).
+For EACH edge answer THREE mandatory checks (be strict — a wrong edge is worse
+than a dropped one):
 
-Output JSON: {{"verdicts":[{{"edge_id":"...","verbatim_in_source":true,"type_correct":true,
-"relation_exists":true,"role_correct":true,"evidence_quote":"the continuous source span, verbatim, <=200 chars","fix":"keep","note":"..."}}]}}
+CHECK 1 — EVIDENCE SUPPORT: does the evidence_span sentence actually STATE this
+relation? Reject if it (a) merely describes a setup/baseline without a result,
+(b) states a DIFFERENT relation than the edge claims, (c) only implies/adjacent-to
+the fact. relation_exists=false → fix=drop.
+
+CHECK 2 — SLOT BINDING: is each node really the thing its role claims, IN THIS
+SENTENCE? winner really outperformed the loser; the METHOD slot really holds a
+named method (not a field/benchmark); component really is a component of method.
+If the binding is wrong, fix=drop (a relation with a wrong participant is a
+wrong edge — do NOT keep it for the relation alone).
+
+CHECK 3 — POLARITY/DIRECTION: does the sentence's direction match the roles?
+'A comparable to B' / 'A achieves 75% of B' is NOT outperforms(A,B).
+'A fails where B works' inverts winner/loser. Polarity mismatch → fix=drop
+(or rolefix if ONLY the role order is swapped and the participants are right).
+
+Also:
+- verbatim_in_source: is evidence_span an EXACT substring of the section text?
+- evidence_quote: quote the CONTINUOUS source span the edge's evidence
+  corresponds to, VERBATIM, <=200 chars. If the evidence is paraphrased/invented
+  with no continuous source span, set evidence_quote="" (the fixer substring-
+  checks your quote; a quote not in the source = not locatable = dropped).
+- type_correct: is pattern_type right per the pattern's own [boundary: ...]
+  note given per-edge? If the relation is real but the pattern wrong →
+  fix=retype:<pattern_id from the schema above>.
+- An edge carrying "_competition_review" in qualifiers is a flagged pattern-
+  competition case (its pattern's boundary says NOT-X yet an X-typed edge was
+  extracted from the same sentence) — scrutinize it extra hard.
+- fix: "keep" if ALL THREE checks pass; "retype:<id>" (id from schema);
+  "rolefix:<r1>,<r2>,..." if relation+pattern right but role ORDER mislabeled
+  (each MUST be in allowed_roles); "reextract" if evidence real but structure
+  wrong; "drop" otherwise. Never return a failed check with fix=keep.
+
+Output JSON: {{"verdicts":[{{"edge_id":"...","evidence_support":true,"slot_binding":true,
+"polarity_ok":true,"verbatim_in_source":true,"type_correct":true,"relation_exists":true,
+"role_correct":true,"evidence_quote":"the continuous source span, verbatim, <=200 chars","fix":"keep","note":"..."}}]}}
 """
 
 
@@ -281,18 +282,123 @@ class ExtractionAgent:
         return self._execute_core(section_text, plan, node_id, schema_prompt,
                                   predecessor_summary)
 
+    def _deterministic_gate(self, edges: list[Hyperedge], nodes: list[HGNode]
+                            ) -> tuple[list[Hyperedge], list[dict]]:
+        """Rule layer (B+ rewrite): structural/deterministic checks per edge,
+        BEFORE the LLM verifier. Rules guard STRUCTURE (the LLM guards
+        semantics — the established rules-vs-LLM division):
+
+        1. binding-locality: every node SURFACE (LaTeX-normalized) must appear
+           inside that edge's evidence_span. Kills cross-sentence substitution
+           (probe edge 2: loser taken from a different sentence) and category-
+           binding (probe edge 1: loser='reinforcement learning' while the
+           evidence says 'all previous algorithms') — both would die here.
+        2. role-legality: roles ⊆ pattern's declared role_slots (was in fixer;
+           moved earlier so bad-role edges never reach the verifier).
+        3. slot-type guard: a role_slot declaring type=METHOD rejects a node
+           labeled as a field/category (killed deterministically only when the
+           TYPE says so; type errors on genuinely-method surfaces go to the
+           verifier).
+        4. pattern-competition flag: an edge whose pattern's semantic_boundary
+           says 'NOT X' while the evidence ALSO produced an X-typed edge on the
+           same sentence → mark for the verifier's forced re-look (flag in
+           qualifiers._competition_review; verifier sees it, not auto-drop).
+
+        Returns (passing edges, dropped records for the evolver feed)."""
+        nid2node = {n.nid: n for n in nodes}
+        passing, dropped = [], []
+        # competition map: normalized evidence sentence -> set of pattern types
+        from collections import defaultdict
+        ev_types: dict[str, set] = defaultdict(set)
+        for he in edges:
+            ev_types[_normalize_latex(he.evidence_span)[:400]].add(he.pattern_type)
+
+        for he in edges:
+            pat = self.kb.tbox.patterns.get(he.pattern_type)
+            # --- 2. role legality (pattern must exist too) ---
+            if pat is None:
+                dropped.append(self._gate_drop(he, nid2node, "gate:unknown-pattern"))
+                continue
+            declared = {s.get("role") for s in pat.role_slots}
+            if not set(he.node_roles).issubset(declared):
+                dropped.append(self._gate_drop(he, nid2node, "gate:illegal-role"))
+                continue
+            # --- 1. binding locality ---
+            ev_norm = _normalize_latex(he.evidence_span)
+            bad_binding = False
+            for nid, role in zip(he.node_ids, he.node_roles):
+                nd = nid2node.get(nid)
+                if nd is None:
+                    bad_binding = True
+                    break
+                surf_norm = _normalize_latex(nd.surface)
+                if surf_norm and surf_norm not in ev_norm:
+                    bad_binding = True
+                    break
+            if bad_binding:
+                dropped.append(self._gate_drop(he, nid2node, "gate:binding-not-local"))
+                continue
+            # --- 3. slot-type guard ---
+            slot_types = {s.get("role"): s.get("type") for s in pat.role_slots}
+            type_bad = False
+            for nid, role in zip(he.node_ids, he.node_roles):
+                nd = nid2node.get(nid)
+                want = slot_types.get(role)
+                if (nd is not None and want and want.endswith("METHOD")
+                        and nd.labels and "METHOD" not in nd.labels
+                        and "PARAMETER" not in nd.labels):
+                    # a METHOD slot holding a non-method node (e.g. PROPERTY
+                    # benchmark/field names) — the pattern wants a method here
+                    type_bad = True
+                    break
+            if type_bad:
+                dropped.append(self._gate_drop(he, nid2node, "gate:slot-type-mismatch"))
+                continue
+            # --- 4. pattern competition flag (verifier sees it, no drop) ---
+            key = _normalize_latex(he.evidence_span)[:400]
+            others = ev_types.get(key, set()) - {he.pattern_type}
+            if pat.semantic_boundary and others:
+                import re as _re
+                m = _re.search(r"NOT\s+([a-z_]+)", pat.semantic_boundary)
+                if m and m.group(1) in others:
+                    he.qualifiers = dict(he.qualifiers) if he.qualifiers else {}
+                    he.qualifiers["_competition_review"] = ",".join(sorted(others))
+            passing.append(he)
+        return passing, dropped
+
+    def _gate_drop(self, he: Hyperedge, nid2node: dict, reason: str) -> dict:
+        """Dropped-edge record in the fixer's _record_drop format (the evolver
+        expects node_surfaces as [{surface, labels}] dicts — P0 audit fix)."""
+        node_surfaces = []
+        for nid in he.node_ids:
+            n = nid2node.get(nid)
+            if n:
+                node_surfaces.append({"surface": n.surface, "labels": list(n.labels)})
+            else:
+                node_surfaces.append({"surface": "", "labels": []})
+        return {
+            "edge_id": he.eid,
+            "pattern_type": he.pattern_type,
+            "evidence_span": he.evidence_span,
+            "node_ids": list(he.node_ids),
+            "node_roles": list(he.node_roles),
+            "node_surfaces": node_surfaces,
+            "reason": reason,
+            "verifier_note": "",
+        }
+
     def _execute_core(self, section_text: str, plan: Plan, node_id: str,
                       schema_prompt: str, predecessor_summary: str
                       ) -> tuple[list[HGNode], list[Hyperedge]]:
-        """Default: delegate to hypergraph_extractor._run_hg_node_multistep
-        (the verified multi-step core), constructing the sections/blocks in the
-        EXACT format section_text_for_node expects: sections=[{name, block_range}],
-        blocks=[{index, text}], node={id, section=<name>}. (BLOCKER B1 fix —
-        the prior {id,text}+empty-blocks construction made section_text_for_node
-        return "" and the real LLM extracted 0 edges; mock tests masked it.)
+        """Default: delegate to hypergraph_extractor._run_hg_node_joint
+        (the B+ rewrite: one call per chunk, entities+types+edges together so
+        binding happens in sentence context), constructing the sections/blocks
+        in the EXACT format section_text_for_node expects:
+        sections=[{name, block_range}], blocks=[{index, text}],
+        node={id, section=<name>}. (BLOCKER B1 fix retained.)
 
         Override (mock) in tests."""
-        from granular_agent.hypergraph_extractor import _run_hg_node_multistep, HGBlackboard
+        from granular_agent.hypergraph_extractor import _run_hg_node_joint, HGBlackboard
         bb = HGBlackboard()
         if predecessor_summary:
             bb.add(node_id, predecessor_summary)
@@ -300,7 +406,7 @@ class ExtractionAgent:
         node = {"id": node_id, "section": sec_name}
         sections = [{"name": sec_name, "block_range": [0, 1]}]
         blocks = [{"index": 0, "text": section_text}]
-        nodes, edges, _summary = _run_hg_node_multistep(
+        nodes, edges, _summary = _run_hg_node_joint(
             node, sections, blocks, schema_prompt, bb,
             llm=self.executor_model, domain=plan.domain, meta=self.kb.tbox)
         return nodes, edges
@@ -322,14 +428,22 @@ class ExtractionAgent:
             # rule gate. The allowed_roles list is deterministic (from schema),
             # presented per-edge so the LLM can compare edge.roles vs allowed.
             allowed_roles = [s.get("role") for s in pat.role_slots] if pat else []
+            # per-edge pattern definition + boundary (B+ rewrite: the three
+            # mandatory checks judge against THIS pattern's semantics, not a
+            # generic sense of the type name)
             edges_for_prompt.append({
                 "edge_id": he.eid,
                 "pattern_type": he.pattern_type,
+                "pattern_desc": (pat.description[:200] if pat else ""),
+                "pattern_boundary": (pat.semantic_boundary[:300] if pat else ""),
                 "allowed_roles": allowed_roles,   # this pattern's declared roles
                 "nodes": [{"surface": nid2surface.get(nid, nid),
                            "role": r}
                           for nid, r in zip(he.node_ids, he.node_roles)],
-                "qualifiers": he.qualifiers,
+                "qualifiers": {k: v for k, v in he.qualifiers.items()
+                               if not k.startswith("_")} if he.qualifiers else {},
+                "competition_review": he.qualifiers.get("_competition_review", "")
+                                      if he.qualifiers else "",
                 "evidence_span": he.evidence_span,
             })
         p = _VERIFY_PROMPT.format(
@@ -676,8 +790,13 @@ class ExtractionAgent:
         extraction result, not just a pass/fail number."""
         plan = self.plan(section_text, discourse_role)
         nodes, edges = self.execute(section_text, plan, node_id, predecessor_summary)
+        # deterministic rule gate (B+ rewrite): reject structurally-invalid
+        # edges BEFORE the LLM verifier (cheap first, and the rule layer is
+        # where binding-locality actually lives — a prompt can only ask)
+        edges, gate_dropped = self._deterministic_gate(edges, nodes)
         verdicts = self.verify(edges, nodes, section_text, plan.domain)
         kept, fstats, dropped_edges = self.fix(edges, verdicts, nodes, section_text, plan)
+        dropped_edges = gate_dropped + dropped_edges
         n_committed, rejected = self.commit_edges(kept, nodes, plan, paper_id, year, section)
         return {
             "node_id": node_id, "domain": plan.domain,

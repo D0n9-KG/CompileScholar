@@ -521,338 +521,148 @@ def _chunk_text(text: str, thresh: int = CHUNK_THRESH) -> list[str]:
 # better (short-context instruction adherence).
 # ============================================================================
 
-_STEP1_PROMPT = """You are extracting ENTITIES from a {domain} paper section ({section_name}).
+_JOINT_PROMPT = """You are extracting a SCIENTIFIC KNOWLEDGE HYPERGRAPH from ONE chunk of a {domain} paper section ({section_name}).
 
-Text (section chunk):
-{section_text}
-
-Task: identify all SCIENTIFIC ENTITIES mentioned in the text. For each, give:
-- nid: short id (n1, n2, ...)
-- surface: the entity name/term AS WRITTEN in the text (verbatim, not paraphrased)
-- evidence_span: a verbatim phrase from the text where the entity appears
-
-Entities include: modeling methods/theories/laws, parameters/symbols, phenomena/effects,
-regimes/conditions, materials/substances, measured values, metrics, tasks. Do NOT label
-them yet (step 2 does that) — just find and name them.
-
-Output JSON: {{"nodes":[{{"nid":"n1","surface":"...","evidence_span":"..."}}]}}
-
-Rules:
-- surface MUST be a verbatim copy from the text (exact string).
-- One entity per node. If the same entity is mentioned multiple times, emit once.
-- Include numbers/constants as nodes too (with surface like "0.38" and evidence).
-- A research group/consortium name is an entity but is NOT a method (step 2 labels it).
-  Examples (illustrative, not rules — the principle is: a named scientific MODEL counts,
-  a group/tool/setup name does not):
-  METHOD: "μ(I) rheology", "Transformer", "maximum-likelihood phylogenetics", "Arrhenius kinetics"
-  PARAMETER: "inertial number I", "learning rate", "rate constant k", "activation energy E_a"
-  PHENOMENON: "nonlocal creep", "overfitting", "allosteric regulation", "autocatalysis"
-"""
-
-
-_STEP2_PROMPT = """You are labeling ENTITY TYPES for a {domain} paper.
-
-Below are entities extracted from the text. Assign each a label (ONE primary type):
-
-{nodes_json}
-
-Label options (pick the BEST fit for each):
-- METHOD: a NAMED scientific modeling approach/theory/law/model that models
-  some phenomenon's behavior. Examples (illustrative, not rules): "μ(I) rheology",
-  "kinetic theory", "Transformer", "CNN", "Arrhenius kinetics", "maximum-likelihood".
-  NOT: measurement tools/procedures (microscopes, PIV/MRI, simulations, assays,
-  benchmarks, spectrometers), experimental setups/geometries (plane shear, rotating
-  drum, petri dish, reactor), generic phrases ("a model for X", "the equations",
-  "a framework"), research groups. If it names a mathematical/scientific MODEL of
-  behavior → METHOD.
-- PARAMETER: a named quantity/symbol/constant in equations (μ, I, learning rate,
-  rate constant k, activation energy E_a). NOT: generic quantities (stress, velocity,
-  loss) → PROPERTY instead.
-- PHENOMENON: an effect/behavior methods aim to capture or fail in (nonlocal creep,
-  overfitting, allosteric regulation, autocatalysis).
-- REGIME: an operational regime/condition (dense/quasi-static for physics,
-  training/inference for ML, aerobic/anaerobic for bio).
-- MATERIAL: a material/substance/sample (granular material, chemical reagent, cell line).
-- NUMERIC: a specific numerical value (0.38, 26.8%).
-- PROPERTY: a generic quantity/metric not fitting the above (stress, velocity, accuracy).
-
-Key disambiguations (principle, applied to any domain):
-- A LAW-NAME (a model named by a formula or proper noun) is a METHOD; a bare symbol
-  it contains is a PARAMETER. E.g. "μ(I) rheology" / "local rheology" = METHOD, but the
-  bare "μ" = PARAMETER. Likewise "Arrhenius kinetics" = METHOD, but "E_a" = PARAMETER.
-- A measurement tool/procedure (PIV, MRI, simulations, assays, benchmarks) = PROPERTY,
-  not METHOD. The model it produces/applies is the METHOD; the instrument is not.
-- An experimental setup/geometry/configuration (plane shear, rotating drum, petri dish,
-  reactor) = PROPERTY, not METHOD.
-
-Output JSON: {{"labels":[{{"nid":"n1","labels":["METHOD"]}},...]}}
-"""
-
-
-_STEP3_PROMPT = """You are identifying RELATIONSHIPS (hyperedges) between labeled entities
-from a {domain} paper section ({section_name}).
-
-Schema patterns (the CURRENT schema — prefer these pattern_types):
+Schema patterns (the CURRENT schema — pick pattern_type from here; [boundary: ...] tells you WHEN each applies — it is the decision criterion, not decoration):
 {schema_prompt}
 
-Labeled entities:
-{labeled_nodes}
-
-Section text (for context on how entities relate):
+Section chunk text:
 {section_text}
 
-Task: identify n-ary hyperedges connecting entities. Each hyperedge:
-- eid: short id (e1, e2, ...)
-- pattern_type: the relation type. FIRST pick from the schema patterns above
-  (their [boundary: ...] notes tell you WHEN each applies); the schema is the
-  live, evolving vocabulary — a pattern listed there is ALWAYS preferable to
-  inventing a name. Only if NO schema pattern fits, use a common one
-  (constitutive_law / influences / defines / composed_of / measures /
-  claim_relation / extends / improves / compares — note these are SEPARATE
-  pattern names, never write them joined with slashes) or propose a new one
-  with a clean snake_case name.
-- node_ids: which entities participate (by nid, in order)
-- node_roles: role of each node — for a schema pattern, use the roles DECLARED
-  in its role_slots above (they override the defaults listed below). Otherwise
-  use these defaults, matching the pattern_type's expected roles:
-  constitutive_law: output, input, parameter, coefficient, exponent
-  influences: source, target, cause, effect
-  defines: subject, definition, object
-  composed_of: whole, component
-  measures: object, instrument
-  claim_relation: from, to
-  extends / improves / compares / replaces / adapts / background: from, to
-  If you need a role not in this list, pick the closest one. Do NOT invent role
-  names like 'condition', 'method', 'analogy', 'function', 'parameter_set' — use the
-  listed roles ('subject' is valid for defines; it is listed, not invented).
-- evidence_span: verbatim text supporting this relation
-- qualifiers: optional {{"key":"value"}}. A qualifier key is accepted ONLY if the
-  pattern_type declares it — adding a key the pattern does not declare is rejected.
-  Per-pattern allowed keys:
-    constitutive_law: applies_in_regime, function_form, parameters, method, evidence_strength, cited_from
-    influences: dependency_type, applies_in_regime, method, evidence_strength, cited_from
-    defines: relation_type, method, evidence_strength, cited_from
-    composed_of: relation_type, method, evidence_strength, cited_from
-    measures: condition, applies_in_regime, method, evidence_strength, cited_from
-    claim_relation: relation_type, applies_in_regime, method, evidence_strength, cited_from
-    extends/improves/compares/replaces/adapts/background: relation_type, cited_from, evidence_strength, method
-  Enum values (REQUIRED — a free-text value for an enum key is rejected):
-    method: experiment | simulation | theory | review
-    evidence_strength: measured | derived | hypothesized | assumed
-    cited_from: this_work | prior_art | definition
-    dependency_type: monotonic | derivation | analogy | composition
-  relation_type / function_form / parameters / condition / applies_in_regime: free-text (short tag/phrase).
+Task: in ONE pass, extract the entities AND the n-ary hyperedges connecting them, reading each sentence and binding participants AS you read it.
 
-Rules:
-- evidence_span MUST be verbatim from the text.
-- n-ary: connect ALL related entities in ONE edge (a law with 3 params = 1 edge, not 3).
-  When a sentence lists PARALLEL entities in the same relation to the same other entity,
-  they MUST all be nodes of ONE hyperedge, NOT split into separate edges.
-- A named method that OWNS a law must be IN the law's hyperedge (not separate).
-- composed_of = ONLY structural composition (parts of a whole). "An experimental setup
-  with a 2-m-long apparatus" is NOT composition (it's experimental description). "Model A
-  consists of components B and C" IS composition.
-- extends/improves/compares = method-to-method evolution (A builds on/improves/compares B).
+Output JSON:
+{{"nodes":[{{"nid":"n1","surface":"...","type":"METHOD","evidence_span":"verbatim phrase where the entity appears"}}],
+ "hyperedges":[{{"eid":"e1","pattern_type":"...","node_ids":["n1","n2"],"node_roles":["...","..."],"evidence_span":"...","qualifiers":{{}}}}]}}
 
-Output JSON: {{"hyperedges":[{{"eid":"e1","pattern_type":"...","node_ids":["n1","n2"],
-"node_roles":["output","input"],"evidence_span":"...","qualifiers":{{}}}}]}}
+Entity types (pick the best fit per entity):
+- METHOD: a NAMED scientific modeling approach/theory/law/model (μ(I) rheology, Transformer, DQN, Arrhenius kinetics). NOT measurement tools/procedures, NOT setups, NOT benchmarks, NOT a whole research field (reinforcement learning is a FIELD, not a method instance).
+- PARAMETER: a named quantity/symbol in equations (μ, learning rate, E_a). NOT generic quantities (stress, accuracy) → PROPERTY.
+- PHENOMENON: an effect/behavior (overfitting, nonlocal creep).
+- REGIME: an operational condition (dense/quasi-static, training/inference).
+- MATERIAL: a substance/sample/cell line.
+- NUMERIC: a specific value (0.38, 75%).
+- PROPERTY: a generic quantity/metric/benchmark/task that fits none of the above (Atari 2600, game score, accuracy).
 
-If no relations are found, output: {{"hyperedges":[]}}
+HARD RULES (a post-check rejects violations — a rule-violating edge is a wasted edge):
+1. An edge's evidence_span = the MINIMAL CONTINUOUS sentence(s) from the text that STATE this relation. Copy VERBATIM.
+2. EVERY node of an edge must have its surface LITERALLY PRESENT inside that edge's evidence_span. Bind participants from the SAME sentence that states the relation — NEVER substitute an entity from a different sentence, and NEVER generalize ("these 6 games" must not become "49 games").
+3. The evidence sentence must STATE the relation (not imply it, not describe a setup). A sentence that only describes what a baseline IS does not support a comparison edge; a sentence that only says what was done does not support a result edge.
+4. POLARITY: bind roles to match the sentence's direction exactly. 'A outperforms B' → winner=A, loser=B. 'A is comparable to B' or 'A achieves 75% of B' is NOT outperforming. 'A fails where B works' reverses the roles.
+5. n-ary: parallel participants in one sentence go into ONE edge — a comparison with a task and a metric is ONE edge with 4 nodes (method A, method B, task, metric), not separate edges.
+6. node_roles MUST be exactly the roles DECLARED for that pattern_type in the schema above (the schema's role slots override anything else you remember).
+7. qualifiers: only keys the pattern declares. Enum values only for enum keys (method: experiment|simulation|theory|review; evidence_strength: measured|derived|hypothesized|assumed; cited_from: this_work|prior_art|definition).
+8. Prefer a schema pattern over inventing a new pattern_type. New pattern names (only if nothing fits): clean snake_case, never slash-joined compounds.
+
+If nothing extractable, output {{"nodes":[],"hyperedges":[]}}.
 """
 
 
-def _run_hg_node_multistep(node: dict, sections: list, blocks: list,
-                           schema_prompt: str, bb, llm: str, domain: str,
-                           meta=None, feedback_hint: str = ""):
-    """Multi-step extraction: 3 short focused LLM calls instead of 1 long.
+def _run_hg_node_joint(node: dict, sections: list, blocks: list,
+                       schema_prompt: str, bb, llm: str, domain: str,
+                       meta=None, feedback_hint: str = "") -> tuple[list[HGNode], list[Hyperedge], str]:
+    """JOINT extraction (B+ rewrite, 2026-08-25): ONE LLM call per chunk
+    extracts entities + types + hyperedges together, so binding happens in
+    sentence context (the three-step decomposition bound entities to roles
+    from a decontextualized list — the probe's slot-binding failure mode).
 
-    step1: extract entity surfaces + evidence (no labels)
-    step2: label each entity (METHOD/PARAMETER/PHENOMENON/...)
-    step3: identify hyperedges (relations between labeled entities)
-
-    Returns same tuple as _run_hg_node: (nodes, edges, summary).
-    """
+    Deterministic post-checks (binding-locality etc.) live in
+    ExtractionAgent's rule gate, not here — this function is the LLM call +
+    parse. Returns (nodes, edges, summary) like the old runners."""
     sec_text = section_text_for_node(node, sections, blocks)
     if not sec_text:
-        print(f"  [multistep] {node.get('id','?')}: no sec_text", flush=True)
+        print(f"  [joint] {node.get('id','?')}: no sec_text", flush=True)
         return [], [], ""
-    discourse_role = _discourse_for_node(node, sections)
     predecessor = bb.predecessor_summary(node.get("deps", []))
     chunks = _chunk_text(sec_text)
     all_nodes: list[HGNode] = []
     all_edges: list[Hyperedge] = []
     summary = ""
-    print(f"  [multistep] {node.get('id','?')}: {len(chunks)} chunks, sec_text={len(sec_text)} chars", flush=True)
+    print(f"  [joint] {node.get('id','?')}: {len(chunks)} chunks, sec_text={len(sec_text)} chars", flush=True)
 
-    # chunk-level concurrency: chunks are independent text segments, so step1→2→3
-    # per chunk can run in parallel. max_workers=4 (API rate-limit safe). Within
-    # a chunk, step1→2→3 stays serial (step2 needs step1's entities, step3 needs
-    # step2's labels). This is the biggest perf win: 4 chunks 4x→~1x wall-clock.
     def _process_chunk(ci_chunk):
         ci, chunk = ci_chunk
         nid_prefix = f"{node['id']}c{ci}" if len(chunks) > 1 else node["id"]
-
-        # ---- step 1: extract entities (surface + evidence, no labels) ----
-        p1 = _STEP1_PROMPT.format(domain=domain,
-                                  section_name=node.get("section", ""),
-                                  section_text=chunk)
+        p = _JOINT_PROMPT.format(domain=domain,
+                                 section_name=node.get("section", ""),
+                                 schema_prompt=schema_prompt,
+                                 section_text=chunk)
         if predecessor:
-            p1 = p1 + "\n\nPredecessor context:\n" + predecessor
-        raw1 = _call(p1, llm, max_tokens=8192)
-        parsed1 = parse_json_response(raw1) or {}
-        raw_nodes = parsed1.get("nodes", []) or []
-        if not raw_nodes and raw1:
-            p1_retry = p1 + "\n\nIMPORTANT: output ONLY valid JSON (no prose, no explanation). " \
-                       "{\"nodes\":[{\"nid\":\"n1\",\"surface\":\"...\",\"evidence_span\":\"...\"}]}"
-            raw1b = _call(p1_retry, llm, max_tokens=4096)
-            parsed1 = parse_json_response(raw1b) or {}
-            raw_nodes = parsed1.get("nodes", []) or []
-            print(f"  [multistep] c{ci} step1 RETRY parsed nodes={len(raw_nodes)}", flush=True)
-        print(f"  [multistep] c{ci} step1 parsed nodes={len(raw_nodes)}", flush=True)
-        if not raw_nodes:
-            return [], [], ""
+            p = p + "\n\nPredecessor context:\n" + predecessor
+        if feedback_hint:
+            p = p + "\n\nFEEDBACK (prioritize):\n" + feedback_hint
+        raw = _call(p, llm, max_tokens=12288)
+        parsed = parse_json_response(raw) or {}
+        if not parsed and raw:
+            p_retry = p + "\n\nIMPORTANT: output ONLY valid JSON, no prose."
+            raw2 = _call(p_retry, llm, max_tokens=8192)
+            parsed = parse_json_response(raw2) or {}
+            print(f"  [joint] c{ci} RETRY parsed nodes={len(parsed.get('nodes',[]) or [])} "
+                  f"hes={len(parsed.get('hyperedges',[]) or [])}", flush=True)
 
-        # ---- step 2: label entities ----
-        nodes_for_label = [{"nid": n.get("nid", ""), "surface": n.get("surface", "")[:60],
-                            "evidence_span": n.get("evidence_span", "")[:80]}
-                           for n in raw_nodes if isinstance(n, dict)]
-        p2 = _STEP2_PROMPT.format(domain=domain,
-                                  nodes_json=json.dumps(nodes_for_label, ensure_ascii=False))
-        raw2 = _call(p2, llm, max_tokens=4096)
-        parsed2 = parse_json_response(raw2) or {}
-        label_items = parsed2.get("labels", []) if isinstance(parsed2, dict) else (
-            parsed2 if isinstance(parsed2, list) else [])
-        labels = {item["nid"]: item.get("labels", [])
-                  for item in label_items
-                  if isinstance(item, dict) and "nid" in item}
-
-        chunk_nodes = []
-        for n in raw_nodes:
+        # --- nodes ---
+        chunk_nodes: list[HGNode] = []
+        local2gid: dict[str, str] = {}
+        for n in (parsed.get("nodes", []) or []):
             if not isinstance(n, dict):
                 continue
             local = str(n.get("nid", ""))
-            if not local:
+            if not local or not n.get("surface"):
                 continue
+            labels = n.get("type") or n.get("labels") or []
+            if isinstance(labels, str):
+                labels = [labels]
             gid = f"{nid_prefix}_{local}"
-            lbl = labels.get(local, [])
-            if isinstance(lbl, str):
-                lbl = [lbl]
+            local2gid[local] = gid
             chunk_nodes.append(HGNode(
-                nid=gid, labels=[str(l) for l in lbl if l],
+                nid=gid,
+                labels=[str(l).upper() for l in labels if l],
                 surface=str(n.get("surface", "")),
-                properties=n.get("properties", {}) if isinstance(n.get("properties"), dict) else {},
                 evidence_span=str(n.get("evidence_span", "")),
             ))
 
-        # ---- step 3: identify hyperedges ----
-        labeled_for_prompt = [{"nid": n.nid, "labels": n.labels, "surface": n.surface[:40]}
-                               for n in chunk_nodes]
-        p3 = _STEP3_PROMPT.format(domain=domain,
-                                  section_name=node.get("section", ""),
-                                  schema_prompt=schema_prompt,
-                                  labeled_nodes=json.dumps(labeled_for_prompt, ensure_ascii=False),
-                                  section_text=chunk)
-        if feedback_hint:
-            p3 = p3 + "\n\nFEEDBACK (high-order found weak cross-method relations — prioritize):\n" + feedback_hint
-        raw3 = _call(p3, llm, max_tokens=8192)
-        parsed3 = parse_json_response(raw3) or {}
-        raw_hes = parsed3.get("hyperedges", []) or []
-        if not raw_hes and raw3:
-            p3_retry = p3 + "\n\nIMPORTANT: output ONLY valid JSON, no prose. " \
-                       "{\"hyperedges\":[{\"eid\":\"e1\",\"pattern_type\":\"...\",\"node_ids\":[\"n1\"],\"node_roles\":[\"r\"],\"evidence_span\":\"...\",\"qualifiers\":{}}]}"
-            raw3b = _call(p3_retry, llm, max_tokens=4096)
-            parsed3 = parse_json_response(raw3b) or {}
-            raw_hes = parsed3.get("hyperedges", []) or []
-            print(f"  [multistep] c{ci} step3 RETRY parsed hes={len(raw_hes)}", flush=True)
-        print(f"  [multistep] c{ci} step3 parsed hes={len(raw_hes)}", flush=True)
-
-        chunk_edges = []
-        for i, h in enumerate(raw_hes):
+        # --- hyperedges (node_ids remapped local -> prefixed gid) ---
+        chunk_edges: list[Hyperedge] = []
+        for i, h in enumerate((parsed.get("hyperedges", []) or [])):
             if not isinstance(h, dict):
                 continue
-            local_ids = h.get("node_ids", []) or []
-            gids = [str(x) for x in local_ids]
+            gids = [local2gid.get(str(x), str(x)) for x in (h.get("node_ids", []) or [])]
             roles = [str(r) for r in (h.get("node_roles", []) or [])]
             quals = h.get("qualifiers", {}) if isinstance(h.get("qualifiers"), dict) else {}
             quals = {str(k): str(v) for k, v in quals.items()}
             chunk_edges.append(Hyperedge(
-                eid=f"{nid_prefix}_e{i}", pattern_type=str(h.get("pattern_type", "")),
+                eid=f"{nid_prefix}_e{i}",
+                pattern_type=str(h.get("pattern_type", "")),
                 node_ids=gids, node_roles=roles, qualifiers=quals,
                 evidence_span=str(h.get("evidence_span", "")),
             ))
-        csum = parsed1.get("summary", "") or parsed3.get("summary", "")
+        csum = str(parsed.get("summary", ""))[:300]
+        print(f"  [joint] c{ci} parsed nodes={len(chunk_nodes)} hes={len(chunk_edges)}", flush=True)
         return chunk_nodes, chunk_edges, csum
 
-    # run chunks concurrently (max 4 workers — API rate-limit safe)
-    from concurrent.futures import ThreadPoolExecutor, as_completed
-    max_workers = min(4, len(chunks))
-    with ThreadPoolExecutor(max_workers=max_workers) as pool:
-        futures = {pool.submit(_process_chunk, (ci, chunk)): ci for ci, chunk in enumerate(chunks)}
-        for future in as_completed(futures):
-            ci = futures[future]
-            try:
-                cnodes, cedges, csum = future.result()
-                all_nodes.extend(cnodes)
-                all_edges.extend(cedges)
-                if csum:
-                    if not summary:
-                        summary = csum
-                    else:
-                        summary = (summary + " " + csum)[:600]
-            except Exception as e:
-                print(f"  [multistep] chunk {ci} failed: {e!r}", flush=True)
+    # chunk-level concurrency (independent text segments). 8 workers — joint
+    # is 1 call/chunk (vs 3 in the old multistep), so the same API budget
+    # supports deeper parallelism.
+    if len(chunks) <= 1:
+        for ci_chunk in enumerate(chunks):
+            cn, ce, cs = _process_chunk(ci_chunk)
+            all_nodes.extend(cn); all_edges.extend(ce); summary = cs or summary
+    else:
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+        max_workers = min(8, len(chunks))
+        with ThreadPoolExecutor(max_workers=max_workers) as pool:
+            futures = {pool.submit(_process_chunk, (ci, chunk)): ci
+                       for ci, chunk in enumerate(chunks)}
+            for future in as_completed(futures):
+                try:
+                    cn, ce, cs = future.result()
+                    all_nodes.extend(cn); all_edges.extend(ce)
+                    if cs:
+                        summary = (summary + " " + cs)[:600] if summary else cs
+                except Exception as e:
+                    print(f"  [joint] chunk {futures[future]} failed: {e!r}", flush=True)
 
     return all_nodes, all_edges, summary
-
-
-def _run_hg_node(node: dict, sections: list, blocks: list, schema_prompt: str,
-                 bb: HGBlackboard, llm: str, domain: str,
-                 meta=None, use_retrieval=False,
-                 feedback_hint: str = "") -> tuple[list[HGNode], list[Hyperedge], str]:
-    sec_text = section_text_for_node(node, sections, blocks)
-    if not sec_text:
-        return [], [], ""
-    discourse_role = _discourse_for_node(node, sections)
-    predecessor = bb.predecessor_summary(node.get("deps", []))
-    chunks = _chunk_text(sec_text)
-    all_nodes: list[HGNode] = []
-    all_edges: list[Hyperedge] = []
-    summary = ""
-    for ci, chunk in enumerate(chunks):
-        nid_prefix = f"{node['id']}c{ci}" if len(chunks) > 1 else node["id"]
-        # retrieval-based schema: for THIS chunk, retrieve top-K relevant
-        # patterns instead of the full schema (prevents prompt bloat degrading
-        # extraction as the schema evolves). Falls back to full schema_prompt
-        # when the schema is small or embedding unavailable.
-        # DEFAULT OFF (use_retrieval=False): full schema preserves topology
-        # (dep/con/comp + IS-A connections), retrieval severs them. Only
-        # enable when schema > context-window limit.
-        if use_retrieval and meta is not None:
-            chunk_schema = _retrieved_schema_prompt(meta, chunk)
-        else:
-            chunk_schema = schema_prompt
-        prompt = EXTRACT_HG_PROMPT.format(
-            domain=domain, schema_prompt=chunk_schema,
-            discourse_role=discourse_role, predecessor_context=predecessor,
-            section_name=node.get("section", ""), section_text=chunk,
-        )
-        if feedback_hint:
-            # high-order feedback driving low-order extraction (goal step 3):
-            # appended AFTER the standard prompt so it biases toward
-            # extracting comparison/limitation/extension relations the high-order
-            # lift found missing. Does not alter the base prompt or schema.
-            prompt = prompt + "\n\nFEEDBACK (high-order lift found this paper's "
-            prompt = prompt + "cross-method relations weak — prioritize):\n" + feedback_hint
-        raw = _call(prompt, llm)
-        cnodes, cedges, csum = _parse_hg_response(raw, nid_prefix)
-        all_nodes.extend(cnodes)
-        all_edges.extend(cedges)
-        if not summary and csum:
-            summary = csum
-        elif csum:
-            summary = (summary + " " + csum)[:600]
-    return all_nodes, all_edges, summary
-
 
 def _discourse_for_node(node: dict, sections: list) -> str:
     sec = next((s for s in sections if s.get("name") == node.get("section")), None)
@@ -997,18 +807,13 @@ def extract_hypergraph(structure_map: dict, blocks: list, meta: MetaHypergraph,
         # P4 forward propagation: re-fetch the (possibly evolved) schema prompt
         if propagate_intra_dag:
             schema_prompt = meta.to_prompt(include_topology=include_topology)
-        # multi-step extraction (3 short focused prompts) vs single-pass (21K prompt).
-        # Env HG_MULTISTEP=1 to enable. Default off (old single-pass still works).
-        _multistep = os.environ.get("HG_MULTISTEP", "").lower() in ("1", "true", "yes")
-        if _multistep:
-            hg_nodes, hg_edges, summary = _run_hg_node_multistep(
-                node, sections, blocks, schema_prompt, bb, llm, domain, meta,
-                feedback_hint=feedback_hint)
-            n_calls += 3  # 3 LLM calls per chunk (step1+2+3), not 1
-        else:
-            hg_nodes, hg_edges, summary = _run_hg_node(node, sections, blocks, schema_prompt, bb, llm, domain, meta,
-                                                        use_retrieval=False, feedback_hint=feedback_hint)
-            n_calls += 1
+        # joint extraction (B+ rewrite): 1 LLM call per chunk — entities +
+        # types + hyperedges together, binding in sentence context
+        _sec = section_text_for_node(node, sections, blocks) or ""
+        hg_nodes, hg_edges, summary = _run_hg_node_joint(
+            node, sections, blocks, schema_prompt, bb, llm, domain, meta,
+            feedback_hint=feedback_hint)
+        n_calls += max(1, len(_chunk_text(_sec)))
 
         # add nodes to the instance graph (dedup by SURFACE, cross-section):
         # the LLM re-extracts "granular materials"/"fabric" in each section

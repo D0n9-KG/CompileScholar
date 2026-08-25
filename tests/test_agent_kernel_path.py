@@ -41,20 +41,18 @@ def _mock_map_structure(paper_id, blocks, llm="deepseek", domain=""):
 agent_mod.load_paper_blocks = _mock_load_blocks
 agent_mod.map_structure = _mock_map_structure
 
-# mock the extractor multistep LLM: step1 entities, step2 labels, step3 edges.
-# Return JSON the parse_json_response can handle, with a verbatim edge.
+# mock the joint-extraction LLM (B+ rewrite: ONE call returns nodes+types+edges
+# together). Output satisfies the binding-locality contract (every participant
+# surface inside the edge's evidence sentence).
 def _mock_extract_llm(prompt, max_tokens=8000):
     p = prompt.lower()
-    if "extracting entities" in p or "entities from" in p:
-        return ('{"nodes":[{"nid":"n1","surface":"μ(I) rheology","evidence_span":"the μ(I) rheology"},'
-                '{"nid":"n2","surface":"nonlocal model","evidence_span":"nonlocal flows"}],'
-                '"summary":"sec"}')
-    if "labeling entity types" in p:
-        return '{"labels":[{"nid":"n1","labels":["METHOD"]},{"nid":"n2","labels":["METHOD"]}]}'
-    if "relationships" in p or "hyperedges" in p:
-        return ('{"hyperedges":[{"eid":"e1","pattern_type":"extends",'
+    if "knowledge hypergraph" in p:
+        return ('{"nodes":[{"nid":"n1","surface":"μ(I) rheology","type":"METHOD","evidence_span":"the μ(I) rheology"},'
+                '{"nid":"n2","surface":"nonlocal flows","type":"PHENOMENON","evidence_span":"nonlocal flows"}],'
+                '"hyperedges":[{"eid":"e1","pattern_type":"extends",'
                 '"node_ids":["n1","n2"],"node_roles":["from","to"],'
-                '"evidence_span":"We extend the μ(I) rheology","qualifiers":{}}]}')
+                '"evidence_span":"We extend the μ(I) rheology to nonlocal flows","qualifiers":{}}],'
+                '"summary":"sec"}')
     # planner / verifier / aligner / define — return minimal valid JSON
     if "planning hypergraph" in p:
         return ('{"domain":"granular","central_entities":[{"surface":"μ(I) rheology","type":"METHOD"}],'

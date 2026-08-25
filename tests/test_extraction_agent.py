@@ -40,7 +40,8 @@ SECTION = ("We extend the μ(I) rheology (a local rheology) to nonlocal flows. "
           "The nonlocal creep phenomenon is captured by introducing a cooperativity "
           "length ξ. The model improves the local rheology, which fails near "
           "regime boundaries. We compare our nonlocal model with the gradient "
-          "model.")
+          "model. Our nonlocal model extends the μ(I) rheology and improves "
+          "the local rheology.")
 
 
 # ===========================================================================
@@ -98,7 +99,11 @@ class _MockAgent(ExtractionAgent):
         injected_skill["outline_seen"] = ("Planner's expected relations" in schema_prompt)
         # Skill block should NOT be present (removed — audit fix)
         injected_skill["no_skill_block"] = ("Extraction skills" not in schema_prompt)
-        # canned output: 2 nodes + 2 edges (one good, one with wrong type)
+        # canned output: 3 nodes + 3 edges. e1/e2 satisfy the B+ binding-
+        # locality contract (every participant surface inside the edge's
+        # evidence sentence); e3 VIOLATES it (n3 'local rheology' is not in
+        # its evidence sentence) so the deterministic gate drops it before
+        # the verifier — the gate's unit coverage.
         nodes = [
             HGNode(nid="n1", labels=["METHOD"], surface="nonlocal model", evidence_span="our nonlocal"),
             HGNode(nid="n2", labels=["METHOD"], surface="μ(I) rheology", evidence_span="the μ(I) rheology"),
@@ -106,10 +111,16 @@ class _MockAgent(ExtractionAgent):
         ]
         edges = [
             Hyperedge(eid="e1", pattern_type="extends", node_ids=["n1", "n2"],
-                      node_roles=["from", "to"], evidence_span="We extend the μ(I) rheology"),
-            # mistyped: should be 'improves' not 'compares'
+                      node_roles=["from", "to"],
+                      evidence_span="Our nonlocal model extends the μ(I) rheology"),
+            # mistyped: should be 'improves' not 'compares' (verifier catches)
             Hyperedge(eid="e2", pattern_type="compares", node_ids=["n1", "n3"],
-                      node_roles=["from", "to"], evidence_span="improves the local rheology"),
+                      node_roles=["from", "to"],
+                      evidence_span="Our nonlocal model extends the μ(I) rheology and improves the local rheology"),
+            # binding-locality violation: 'local rheology' not in this sentence
+            Hyperedge(eid="e3", pattern_type="background", node_ids=["n1", "n3"],
+                      node_roles=["from", "to"],
+                      evidence_span="We compare our nonlocal model with the gradient model"),
         ]
         return nodes, edges
 
@@ -122,7 +133,7 @@ check("executor: NO skill block in prompt (audit: skill injection removed)",
       injected_skill.get("no_skill_block"))
 check("executor: plan relation_outline injected as schema-in-context",
       injected_skill.get("outline_seen"))
-check("executor: returns nodes + edges (delegated core)", len(nodes) == 3 and len(edges) == 2)
+check("executor: returns nodes + edges (delegated core)", len(nodes) == 3 and len(edges) == 3)
 
 # ===========================================================================
 # 3. verifier: ≠ extraction model, per-edge verdict, re-type internalized
@@ -147,7 +158,7 @@ agent3 = _MockAgent(kb3, llm_extract=exec_llm, llm_verify=verify_llm,
                     domain_default="granular")
 # section text is the ground truth the verifier checks verbatim against
 verdicts = agent3.verify(edges, nodes, SECTION, "granular")
-check("verifier: one verdict per edge", len(verdicts) == 2)
+check("verifier: one verdict per edge", len(verdicts) == 3)
 check("verifier: e1 keep", verdicts[0].fix == "keep")
 check("verifier: e2 retype:improves (re-type INTERNALIZED)", verdicts[1].fix == "retype:improves")
 check("verifier: type_correct flag captures mistype", verdicts[1].type_correct is False)
@@ -402,11 +413,17 @@ agent7 = _MockAgent(kb7, llm_extract=exec_llm, llm_verify=verify_llm,
 agent7.llm_extract = planner_llm
 report = agent7.extract_section(SECTION, "method", "sec1", "p1", year="2020")
 check("e2e: report has domain", report["domain"] == "granular")
+# e3 died at the deterministic gate (binding-locality); e1/e2 survive to verify
 check("e2e: report has raw/kept edge counts", report["n_raw_edges"] == 2)
 check("e2e: report has fix_stats", "keep" in report["fix_stats"])
 check("e2e: report has committed count", report["n_committed"] >= 1)
 check("e2e: report has kept_edges detail (see content not just number)",
       len(report["kept_edges"]) >= 1 and "pattern_type" in report["kept_edges"][0])
+# B+ rule layer: the locality-violating edge is dropped with its gate reason
+gate_drops = [d for d in report["dropped_edges"]
+              if str(d.get("reason", "")).startswith("gate:")]
+check("e2e: binding-locality violation dropped by the gate (rule layer)",
+      any(d.get("reason") == "gate:binding-not-local" for d in gate_drops))
 
 print()
 print(f"{'ALL PASS' if not fail else 'FAILURES: ' + str(fail)}  ({len(fail)} fail)")
