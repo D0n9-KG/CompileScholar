@@ -36,7 +36,7 @@ Edge under judgment:
 
 Judge THREE checks independently:
 1. EVIDENCE_SUPPORT: does the evidence text STATE this exact relation? (a sentence describing a setup/baseline without a result does NOT support a comparison edge; 'comparable to' does NOT state outperforming)
-2. SLOT_BINDING: is each node really what its role claims, per this sentence? (the winner really won; a METHOD slot holds a named method, not a field like 'reinforcement learning')
+2. SLOT_BINDING: is each node really what its role claims, per this sentence? (the winner really won; a node bound to a role must be the thing the SENTENCE puts there). IMPORTANT: faithful-to-source beats precision — if the source sentence refers to a vague aggregate ("all previous algorithms", "best existing methods"), an edge binding that aggregate is CORRECT extraction; do not fail it for lacking specificity the source does not provide.
 3. POLARITY: does the direction/polarity of the sentence match the roles?
 
 Output JSON (one object):
@@ -79,7 +79,7 @@ def judge_edges(dirname):
             'desc': (pat.get('description') or '')[:200],
             'boundary': (pat.get('semantic_boundary') or '')[:300],
             'nodes': [(r, surface(n)) for n, r in zip(he.get('node_ids', []), he.get('node_roles', []))],
-            'ev': ev_n[:400],
+            'ev': ev_n[:1200],   # was 400 — truncation hid support sentences from the judge (arbitration found 6/6 long-evidence edges failed)
             'ctx_before': ctx_before[-160:], 'ctx_after': ctx_after[:160],
         })
 
