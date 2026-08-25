@@ -167,13 +167,18 @@ For EACH edge judge (be strict — a wrong edge is worse than a dropped one):
   NOT structural part-of; extends/improves/compares = method-to-method evolution NOT
   a discourse claim). If the relation is real but the pattern_type is wrong, fix=retype.
 - relation_exists: does the section actually state this relation (not inferred)?
-- role_correct: are the node_roles the RIGHT ones for this pattern_type? Each node's
-  role must match what it IS in the relation (per the pattern's declared roles above).
-  E.g. a 'measures' edge: the thing being measured = object, the instrument doing the
-  measuring = instrument. If a node's role is mislabeled (e.g. 'from/to' used on a
-  'measures' edge where it should be 'object/instrument'), judge role_correct=false and
-  fix=rolefix:<correct_role_1>,<correct_role_2>,... listing the correct role for EACH
-  node in order. The corrected roles MUST be from the pattern's declared role_slots.
+- role_correct: are the node_roles the RIGHT ones for this pattern_type? COMPARE
+  each node's role against the edge's `allowed_roles` (the pattern's declared roles,
+  given per-edge). A role NOT in allowed_roles = wrong -> role_correct=false. Also
+  judge SEMANTIC correctness: each node's role must match what it IS in the relation
+  (e.g. a 'measures' edge: the thing being measured = object, the instrument doing
+  the measuring = instrument). If a role is mislabeled (e.g. 'from/to' used on a
+  'measures' edge where it should be 'object/instrument'), judge role_correct=false.
+  IMPORTANT: if role_correct=false, you MUST either (a) fix=rolefix:<r1>,<r2>,...
+  listing the corrected role for EACH node in order (each MUST be in allowed_roles),
+  OR (b) fix=drop if the roles are so wrong the edge can't be repaired. Do NOT
+  return role_correct=false with fix=keep — that leaves a bad-role edge the rule
+  gate drops whole (coverage loss). Either repair or drop.
 - fix: "keep" if all good; "retype:<correct_pattern_id>" if the relation is real but
   mistyped — the <correct_pattern_id> MUST be one of the schema patterns listed above
   (do NOT retype to a pattern not in the schema); "rolefix:<r1>,<r2>,..." if the relation
@@ -306,9 +311,19 @@ class ExtractionAgent:
         nid2surface = {n.nid: n.surface for n in nodes}
         edges_for_prompt = []
         for he in edges:
+            pat = self.kb.tbox.patterns.get(he.pattern_type)
+            # give the verifier the pattern's DECLARED role_slots so it can judge
+            # role correctness by direct对照 (not guessing from a long schema
+            # prompt). Without this, the verifier judged role_correct=true on
+            # bad-role edges (e.g. from/to on 'influences' which declares
+            # source/target/cause/effect) — 28 edges误判 then dropped by the
+            # rule gate. The allowed_roles list is deterministic (from schema),
+            # presented per-edge so the LLM can compare edge.roles vs allowed.
+            allowed_roles = [s.get("role") for s in pat.role_slots] if pat else []
             edges_for_prompt.append({
                 "edge_id": he.eid,
                 "pattern_type": he.pattern_type,
+                "allowed_roles": allowed_roles,   # this pattern's declared roles
                 "nodes": [{"surface": nid2surface.get(nid, nid),
                            "role": r}
                           for nid, r in zip(he.node_ids, he.node_roles)],
@@ -554,14 +569,23 @@ class ExtractionAgent:
         if not ev:
             return None
         n_sec = _normalize_latex(section_text)
-        # (A) evidence normalized substring
         n_ev = _normalize_latex(ev)
+        # (A) rule: full normalized substring (strict — whole evidence is in source)
         if n_ev and n_ev in n_sec:
-            # map back to an approximate offset in the raw section (find the
-            # raw text around where the normalized ev starts). Cheap: find the
-            # first ~30 normalized chars in the raw (lowercased whitespace-folded).
             return self._raw_offset(ev, section_text)
-        # (B) LLM quote substring
+        # (A2) rule: a long CONTIGUOUS prefix of the evidence is in the source
+        # (>=40 normalized chars). This rescues真边 where the LLM truncated at
+        # a footnote/citation marker (network16 → evidence stopped before "16",
+        # so the full sentence isn't an exact substring, but its prefix IS).
+        # The prefix must be CONTIGUOUS and long (40 chars) — a改写's first few
+        # words might match, but 40 contiguous chars won't (改写 diverges fast),
+        # so this stays strict (not token-coverage-loose). Records the prefix's
+        # offset → still可溯源 (the prefix IS a real source span).
+        if n_ev and len(n_ev) >= 40:
+            prefix = n_ev[:60]
+            if prefix in n_sec:
+                return self._raw_offset(ev[:60], section_text)
+        # (B) LLM quote: the verifier quoted the real source span (LaTeX-normalized)
         if v and v.evidence_quote:
             n_q = _normalize_latex(v.evidence_quote)
             if n_q and n_q in n_sec:
