@@ -484,7 +484,7 @@ def _parse_hg_response(raw: str | None, node_id: str) -> tuple[list[HGNode], lis
     return nodes, hes, summary
 
 
-CHUNK_THRESH = 6000  # over-long sections (>6k chars) drown one LLM call —
+CHUNK_THRESH = 4000  # over-long sections (>4k chars) drown one LLM call —
                      # Discussion/Results can be 23k chars -> 0 edges. Chunk on
                      # sentence boundaries into ~6k pieces, multiple calls,
                      # merge. (the cross-chunk surface dedup handles node reuse.)
@@ -689,6 +689,16 @@ def _run_hg_node_multistep(node: dict, sections: list, blocks: list,
         raw1 = _call(p1, llm, max_tokens=8192)
         parsed1 = parse_json_response(raw1) or {}
         raw_nodes = parsed1.get("nodes", []) or []
+        # long-chunk retry: if step1 parsed 0 nodes (LLM drifted to prose /
+        # parse failed), retry ONCE with a stricter prompt (JSON-only, smaller
+        # max_tokens). A whole chunk lost = 25% paper content dropped (audit).
+        if not raw_nodes and raw1:
+            p1_retry = p1 + "\n\nIMPORTANT: output ONLY valid JSON (no prose, no explanation). " \
+                       "{\"nodes\":[{\"nid\":\"n1\",\"surface\":\"...\",\"evidence_span\":\"...\"}]}"
+            raw1b = _call(p1_retry, llm, max_tokens=4096)
+            parsed1 = parse_json_response(raw1b) or {}
+            raw_nodes = parsed1.get("nodes", []) or []
+            print(f"  [multistep] step1 RETRY raw1b={'None' if not raw1b else str(len(raw1b))+' chars'}, parsed nodes={len(raw_nodes)}", flush=True)
         print(f"  [multistep] step1 raw1={'None' if not raw1 else str(len(raw1))+' chars'}, parsed nodes={len(raw_nodes)}", flush=True)
         if not raw_nodes:
             continue
@@ -742,6 +752,16 @@ def _run_hg_node_multistep(node: dict, sections: list, blocks: list,
         raw3 = _call(p3, llm, max_tokens=8192)
         parsed3 = parse_json_response(raw3) or {}
         raw_hes = parsed3.get("hyperedges", []) or []
+        # long-chunk retry: if step3 parsed 0 edges (LLM drifted to prose),
+        # retry ONCE with JSON-only stricter prompt. Cures the "raw3=28k chars,
+        # parsed 0 edges" hole (a whole chunk's relations lost).
+        if not raw_hes and raw3:
+            p3_retry = p3 + "\n\nIMPORTANT: output ONLY valid JSON, no prose. " \
+                       "{\"hyperedges\":[{\"eid\":\"e1\",\"pattern_type\":\"...\",\"node_ids\":[\"n1\"],\"node_roles\":[\"r\"],\"evidence_span\":\"...\",\"qualifiers\":{}}]}"
+            raw3b = _call(p3_retry, llm, max_tokens=4096)
+            parsed3 = parse_json_response(raw3b) or {}
+            raw_hes = parsed3.get("hyperedges", []) or []
+            print(f"  [multistep] step3 RETRY raw3b={'None' if not raw3b else str(len(raw3b))+' chars'}, parsed hes={len(raw_hes)}", flush=True)
         print(f"  [multistep] step3 raw3={'None' if not raw3 else str(len(raw3))+' chars'}, parsed hes={len(raw_hes)}", flush=True)
         for i, h in enumerate(raw_hes):
             if not isinstance(h, dict):

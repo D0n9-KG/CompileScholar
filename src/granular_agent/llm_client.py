@@ -206,10 +206,25 @@ def call_cst(prompt: str, model: str = "qwen3.5", max_tokens: int = 4000,
 
 
 def parse_json_response(text: str | None) -> Any:
-    """Parse JSON from LLM response, handling markdown fences and extra text."""
+    """Parse JSON from LLM response, handling markdown fences and extra text.
+
+    Long-chunk fix: the old greedy `(\[.*\]|\{.*\})` matched the FIRST `{` to
+    the LAST `}` — on long LLM outputs (which drift into prose with stray
+    braces) it grabbed a huge span full of non-JSON → json.loads failed → 0
+    nodes/edges parsed (a whole chunk lost). This now extracts the FIRST
+    BALANCED JSON object/array (counting brace depth, respecting strings), so
+    even if the LLM wraps JSON in prose, the first real JSON object is found."""
     if not text:
         return None
     text = re.sub(r"```json|```", "", text, flags=re.S)
+    # find the first balanced { ... } or [ ... ] (string-aware, depth-counted)
+    obj = _extract_first_json(text)
+    if obj is not None:
+        try:
+            return json.loads(obj)
+        except Exception:
+            pass
+    # fallback: old greedy regex (last resort, may fail on long prose)
     m = re.search(r"(\[.*\]|\{.*\})", text, re.S)
     if not m:
         return None
@@ -217,3 +232,47 @@ def parse_json_response(text: str | None) -> Any:
         return json.loads(m.group(0))
     except Exception:
         return None
+
+
+def _extract_first_json(text: str) -> str | None:
+    """Extract the first balanced JSON object/array from text (string-aware,
+    depth-counted). Returns the substring or None. Handles LLM output that
+    drifts into prose with stray braces — grabs only the first complete {…} or
+    […] block, not a greedy first-{ to last-} span."""
+    start = -1
+    depth = 0
+    in_str = False
+    esc = False
+    open_ch = ""
+    close_ch = ""
+    for i, ch in enumerate(text):
+        if in_str:
+            if esc:
+                esc = False
+            elif ch == "\\":
+                esc = True
+            elif ch == '"':
+                in_str = False
+            continue
+        if ch == '"':
+            in_str = True
+            continue
+        if ch in "{[":
+            if depth == 0:
+                start = i
+                open_ch = ch
+                close_ch = "}" if ch == "{" else "]"
+            depth += 1
+        elif ch in "}]":
+            if depth > 0:
+                depth -= 1
+                if depth == 0 and start >= 0:
+                    candidate = text[start:i + 1]
+                    # only return if the closing matches the opening type
+                    if ch == close_ch:
+                        return candidate
+                    # mismatched (e.g. opened { closed ]) — reset, keep scanning
+                    start = -1
+                    open_ch = ""
+                    close_ch = ""
+    return None

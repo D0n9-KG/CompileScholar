@@ -19,7 +19,7 @@ import os, sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from granular_agent.extraction_agent import ExtractionAgent, Plan, Verdict
-from granular_agent.knowledge_base import KnowledgeBase, Mutation, Op, Role, Skill
+from granular_agent.knowledge_base import KnowledgeBase, Mutation, Op, Role
 from granular_agent.hypergraph_schema import (
     seed_meta_hypergraph, Hyperedge, HGNode,
 )
@@ -81,11 +81,7 @@ for _eid in ("extends", "improves", "compares", "replaces", "adapts", "backgroun
 # 2. executor: delegates to core (mocked), skill hint injected
 # ===========================================================================
 kb2 = _kb()
-# install a skill for (granular, extends) — should be injected into executor
-kb2.skills.add(Skill(skill_id="s_ext", domain="granular", pattern="extends",
-                     extraction_hint="connect the generalizing method as 'from', the base as 'to'",
-                     stability_score=0.75))
-
+# (Skill injection removed — audit: dead code, bloated prompt. No skill installed.)
 injected_skill = {"seen": False}
 
 
@@ -94,16 +90,14 @@ def exec_llm(prompt, max_tokens):
 
 
 class _MockAgent(ExtractionAgent):
-    """Override _execute_core to capture the schema_prompt (verify skill injection)
-    and return canned nodes/edges without calling the real extractor."""
+    """Override _execute_core to capture the schema_prompt (verify relation_outline
+    injection) and return canned nodes/edges without calling the real extractor.
+    (Skill injection REMOVED — audit: dead code bloating the prompt.)"""
     def _execute_core(self, section_text, plan, node_id, schema_prompt, predecessor_summary):
-        # verify the skill hint was injected into the schema_prompt
-        if "Extraction skills" in schema_prompt and "s_ext" not in schema_prompt:
-            # the hint text (not the id) should be present
-            if "generalizing method" in schema_prompt:
-                injected_skill["seen"] = True
         # verify plan.relation_outline was injected as schema-in-context
         injected_skill["outline_seen"] = ("Planner's expected relations" in schema_prompt)
+        # Skill block should NOT be present (removed — audit fix)
+        injected_skill["no_skill_block"] = ("Extraction skills" not in schema_prompt)
         # canned output: 2 nodes + 2 edges (one good, one with wrong type)
         nodes = [
             HGNode(nid="n1", labels=["METHOD"], surface="nonlocal model", evidence_span="our nonlocal"),
@@ -124,7 +118,8 @@ agent2 = _MockAgent(kb2, llm_extract=planner_llm, llm_verify=lambda p, m: "{}",
                     domain_default="granular")
 plan2 = agent2.plan(SECTION, "method")
 nodes, edges = agent2.execute(SECTION, plan2, "sec1")
-check("executor: skill hint injected when skill exists (断点5 use)", injected_skill["seen"])
+check("executor: NO skill block in prompt (audit: skill injection removed)",
+      injected_skill.get("no_skill_block"))
 check("executor: plan relation_outline injected as schema-in-context",
       injected_skill.get("outline_seen"))
 check("executor: returns nodes + edges (delegated core)", len(nodes) == 3 and len(edges) == 2)
@@ -394,7 +389,7 @@ agent6 = _MockAgentNoSkill(kb6, llm_extract=exec_llm, llm_verify=lambda p, m: "{
                            domain_default="granular")
 plan6 = agent6.plan(SECTION, "method")
 agent6.execute(SECTION, plan6, "sec1")
-check("executor: NO skill block when SkillLibrary has no matching skill",
+check("executor: no skill block (audit: injection removed, prompt clean)",
       injected2["seen"] is False)
 
 # ===========================================================================

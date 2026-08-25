@@ -53,7 +53,7 @@ from granular_agent.hypergraph_schema import (
     MetaHypergraph, Hyperedge, HGNode, InstanceHypergraph,
 )
 from granular_agent.knowledge_base import (
-    KnowledgeBase, Mutation, Op, Role, Skill,
+    KnowledgeBase, Mutation, Op, Role,
 )
 
 # The verified multi-step core lives in hypergraph_extractor; we reuse it as
@@ -244,32 +244,27 @@ class ExtractionAgent:
     def execute(self, section_text: str, plan: Plan, node_id: str,
                 predecessor_summary: str = "") -> tuple[list[HGNode], list[Hyperedge]]:
         """Run the verified multi-step core (entities→types→relations) as the
-        executor's internal implementation. Injects the Skill Library hint for
-        each expected pattern. Returns (nodes, edges).
+        executor's internal implementation. Returns (nodes, edges).
 
         Surgical: delegates to hypergraph_extractor._run_hg_node_multistep (the
-        verified core), NOT a rewrite. The plan drives schema-in-context via the
-        skill hints appended to the schema prompt."""
-        # skill injection: gather extraction_hints for the plan's expected patterns
-        skill_hints = []
-        for pid in plan.expected_patterns:
-            sk = self.kb.skills.lookup(plan.domain, pid)
-            if sk:
-                skill_hints.append(f"- {pid}: {sk.extraction_hint}")
-        skill_block = ""
-        if skill_hints:
-            skill_block = ("\n\nExtraction skills (crystallized from prior extractions "
-                           "of this domain+pattern — follow these hints):\n"
-                           + "\n".join(skill_hints))
-        # build the schema prompt WITH the skill hints + plan's relation outline
-        # so the executor sees schema-in-context (not blind).
+        verified core), NOT a rewrite. The plan drives schema-in-context via
+        the relation outline appended to the schema prompt.
+
+        (Skill injection REMOVED — audit: SkillLibrary was dead code, distill_skill
+        never triggered (stability never reached 0.6 on single/少篇 runs), and
+        injecting skill_hints would only bloat the prompt (the very thing P1-B
+        fixed). No validated benefit —砍 to keep the prompt clean. Honest: not a
+        selling point until multi-篇 runs prove a benefit; the mutable-memory
+        selling point is carried by concept真合并 + KB transactional, not this.)"""
+        # build the schema prompt WITH the plan's relation outline so the
+        # executor sees schema-in-context (not blind).
         # P1-B fix: use _retrieved_schema_prompt (top-K retrieval, compact) instead
         # of full to_prompt(). Long sections + full schema blew the LLM context
         # (audit: long-chunk 0-parse). relation_outline only on short chunks
         # (it bloats prompt; plan made it from a 4k preview, misaligned with a
         # long full chunk — P1 audit: relation_outline引导弱 + 膨胀).
         from granular_agent.hypergraph_extractor import _retrieved_schema_prompt
-        schema_prompt = _retrieved_schema_prompt(self.kb.tbox, section_text) + skill_block
+        schema_prompt = _retrieved_schema_prompt(self.kb.tbox, section_text)
         if plan.relation_outline and len(section_text) < 6000:
             schema_prompt += ("\n\nPlanner's expected relations (use as a guide, "
                               "extract what the text actually supports):\n"

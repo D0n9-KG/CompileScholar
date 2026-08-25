@@ -55,7 +55,7 @@ from granular_agent.hypergraph_schema import (
     MetaHypergraph, MetaHyperedgePattern, Hyperedge, InstanceHypergraph,
 )
 from granular_agent.knowledge_base import (
-    KnowledgeBase, Mutation, Op, Role, Skill,
+    KnowledgeBase, Mutation, Op, Role,
 )
 # Use module-attribute access (hev.X) rather than `from hev import X` so that
 # test patches (hev.evolution_probe = mock) take effect — `from import` binds
@@ -498,34 +498,6 @@ class EvolutionAgent:
                     allowed_qualifiers=list(parent.allowed_qualifiers),
                     family=parent.family))
         return out
-
-    # ===================================================================
-    # skill distiller (断点 5 loop close): crystallize -> distill_skill op
-    # ===================================================================
-
-    def distill_skill(self, domain: str, pattern_id: str,
-                     extraction_hint: str, stability_score: float,
-                     provenance_papers: list[str] | None = None) -> tuple[bool, str]:
-        """Crystallize a recurring (domain, pattern) extraction mode into a Skill
-        via the distill_skill op (evolver write contract). The kernel gates on
-        stability >= 0.6 (Step 1). This closes the loop Step 2 left open: the
-        extraction modes the extractor collected are committed to the 4th-layer
-        Skill Library so future extraction sees the hint."""
-        if stability_score < KnowledgeBase.SKILL_CRYSTALLIZE_STABILITY:
-            return False, f"stability<{KnowledgeBase.SKILL_CRYSTALLIZE_STABILITY}"
-        skill = Skill(skill_id=f"sk_{domain}_{pattern_id}_{abs(hash(extraction_hint))%10000}",
-                      domain=domain, pattern=pattern_id,
-                      extraction_hint=extraction_hint,
-                      stability_score=stability_score,
-                      provenance_papers=provenance_papers or [])
-        result = self.kb.commit([Mutation(
-            op=Op.DISTILL_SKILL, target=skill.skill_id, proposer_role=Role.EVOLVER,
-            domain=domain, evidence=extraction_hint[:200],
-            rationale=f"crystallized {domain}/{pattern_id} extraction mode",
-            payload={"skill": skill})])
-        if not result.ok:
-            return False, f"kernel-rejected:{result.rejected[0]['reason'] if result.rejected else '?'}"
-        return True, "committed"
 
     # ===================================================================
     # propose_validate_failures: the extractor's validate failures enter queue

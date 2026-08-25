@@ -161,6 +161,21 @@ r4b = agent4.drain()
 check("crystallize: cross_node=2 growth accepted", r4b.n_accepted >= 1)
 check("crystallize: pattern added after recurrence", "test_new_pat" in kb4.tbox.patterns)
 
+# 4b. cumulative gate: same signature failing >=5 times in ONE node triggers
+# growth even with cross_node=1 (legacy gate semantics, single-section path).
+# Without this, a single-section paper (map_structure=1 node) never evolves.
+kb4c = _kb()
+agent4c = EvolutionAgent(kb4c, llm=agent_llm, domain_default="granular")
+# 5 failures with the same signature in the SAME node -> cumulative>=5
+for _ in range(5):
+    agent4c.propose_validate_failures([(he_fail, "no-matching-meta-pattern")],
+                                      node_id="solo", paper_id="p1", domain="granular")
+r4c = agent4c.drain()
+check("cumulative gate: single-node cumulative>=5 growth accepted (legacy-aligned)",
+      r4c.n_accepted >= 1)
+check("cumulative gate: pattern added via cumulative path",
+      "test_new_pat" in kb4c.tbox.patterns)
+
 # ===========================================================================
 # 5. HITL flagging: new top-level family flagged (reserved interface)
 # ===========================================================================
@@ -197,27 +212,12 @@ check("SAGE: recurring consumer feedback enqueued a trigger",
           for s in agent6._queue))
 
 # ===========================================================================
-# 7. distill_skill: crystallize -> distill_skill op committed via kernel (断点5)
+# 7. distill_skill: REMOVED (audit: dead code, no caller, loop not closed on
+# single/少篇 runs; injecting skill_hints bloated the prompt — P1-B's enemy).
+# SkillLibrary/Skill class + Op.DISTILL_SKILL kept in kernel as reserved (机制
+# written right, but NOT wired into the pipeline — honest降级, not a selling
+# point until multi-篇 proves a benefit). evolution_agent.distill_skill deleted.
 # ===========================================================================
-kb7 = _kb()
-agent7 = EvolutionAgent(kb7, llm=agent_llm, domain_default="granular")
-# below threshold -> rejected (kernel gate)
-ok_low, _ = agent7.distill_skill("granular", "measures", "hint", 0.4, ["p1"])
-check("distill_skill: stability<0.6 rejected", ok_low is False)
-# pattern not in tbox -> rejected (kernel gate)
-ok_bad, _ = agent7.distill_skill("granular", "nonexistent_pattern", "hint", 0.8, ["p1"])
-check("distill_skill: pattern not in tbox rejected", ok_bad is False)
-# valid -> committed via distill_skill op (evolver contract)
-ok_good, detail = agent7.distill_skill("granular", "measures",
-                                         "mention the device and the measured quantity",
-                                         0.75, ["p1", "p2"])
-check("distill_skill: valid skill committed via distill_skill op (断点5 loop)",
-      ok_good is True and "committed" in detail)
-check("distill_skill: SkillLibrary lookup works after commit",
-      kb7.skills.lookup("granular", "measures") is not None)
-check("distill_skill: ledger has DISTILL_SKILL entry",
-      any(m.get("op") == Op.DISTILL_SKILL for entry in kb7.ledger
-          for m in entry.get("mutations", [])))
 
 # ===========================================================================
 # 8. schema并进 propagation: schema_for_extraction re-fetches evolved prompt
