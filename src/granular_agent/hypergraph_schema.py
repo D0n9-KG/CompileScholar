@@ -1222,5 +1222,49 @@ def seed_meta_hypergraph_general() -> MetaHypergraph:
         role_slots=[{"role": "from", "type": T, "repeatable": True}, {"role": "to", "type": T, "repeatable": True},
                     {"role": "parameter", "type": T, "repeatable": True}, {"role": "condition", "type": T, "repeatable": True}],
         allowed_qualifiers=["relation_type", "applies_in_regime", "method", "evidence_strength", "cited_from"])
+    # evolution family — 真漏 fix: seed_meta_hypergraph_general was MISSING the
+    # 6 evolution verb patterns (extends/improves/compares/replaces/adapts/
+    # background) that seed_meta_hypergraph (physics) has. ml-domain papers (DQN:
+    # "outperforms"/"compared with") extract extends/compares edges -> kernel B3
+    # rejected them (pattern not in tbox) -> dropped_bad_role (verifier couldn't
+    # judge role either, no allowed_roles to compare) -> coverage loss. Add them
+    # here (same as the physics seed) so cross-domain evolution is extractable.
+    _evo_family = "evolution"
+    _evo_slots = [{"role": "from", "type": T, "repeatable": True},
+                  {"role": "to", "type": T, "repeatable": True}]
+    _evo_qual = ["relation_type", "cited_from", "evidence_strength", "method"]
+    _evo_boundary = {
+        "extends": "X GENERALIZES Y (X extends Y's scope/regime/params; X is a direct "
+                   "technical extension of Y). NOT improves (X need not be more accurate, "
+                   "just broader), NOT background (X is a direct technical inheritance, "
+                   "not a motivation citation), NOT claim_relation (this is method-to-method).",
+        "improves": "X RESOLVES a limitation of Y (X is more accurate/applicable BECAUSE "
+                    "it fixes something Y fails at). NOT compares (X is NOT a parallel "
+                    "different-mechanism alternative; X builds on Y and is better), NOT "
+                    "extends (X is better not just broader).",
+        "compares": "A and B are PARALLEL different-mechanism alternatives with overlapping "
+                    "scope (both model the same phenomenon, different assumptions). NOT "
+                    "improves (neither fixes the other), NOT extends (neither generalizes).",
+        "replaces": "X SUBSTITUTES Y outright (X is used INSTEAD of Y; Y is retired). "
+                    "NOT improves (replaces = Y is gone, improves = Y still used + X better).",
+        "adapts": "X PORTS Y to a NEW scenario/regime/domain Y wasn't designed for "
+                  "(adaptation of Y's mechanism). NOT extends (adapts = new scenario, "
+                  "extends = broader scope within same setting).",
+        "background": "X cites Y as MOTIVATION/prior context only (Y inspired X but X is "
+                      "NOT a direct technical extension/inheritance of Y). NOT extends "
+                      "(no direct technical lineage), NOT improves (no limitation fix).",
+    }
+    for _eid, _desc in [
+        ("extends", "X generalizes/extends Y (X METHOD/PHENOMENON -> Y)"),
+        ("improves", "X improves Y's accuracy/applicability, resolving Y's limitation"),
+        ("compares", "X is compared with Y"),
+        ("replaces", "X replaces Y"),
+        ("adapts", "X adapts Y to a new scenario"),
+        ("background", "X uses Y as background/motivation"),
+    ]:
+        m.patterns[_eid] = MetaHyperedgePattern(
+            pattern_id=_eid, family=_evo_family, description=_desc,
+            role_slots=_evo_slots, allowed_qualifiers=_evo_qual,
+            semantic_boundary=_evo_boundary[_eid])
     m.family_roots = {p.family: p.pattern_id for p in m.patterns.values()}
     return m
