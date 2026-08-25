@@ -1,4 +1,12 @@
-"""LLM client: wraps DeepSeek + Paratera APIs for extraction and embedding."""
+"""LLM client: wraps DeepSeek + Paratera APIs for extraction and embedding.
+
+Provenance (D3 fix): every call is recorded in CALL_LOG (module-level list)
+and, if env LLM_CALL_LOG gives a path, appended as one JSONL line per call:
+{ts, run_id, provider, model, ok, latency_ms, prompt_tokens, completion_tokens,
+ attempt, fallback_for}. The DeepSeek->GLM-5-Turbo silent fallback is now
+VISIBLE in the log (fallback_for="deepseek-chat") and can be disabled entirely
+with env LLM_ALLOW_FALLBACK=0 (scientific runs want a single model).
+"""
 
 from __future__ import annotations
 
@@ -6,7 +14,9 @@ import json
 import os
 import re
 import ssl
+import time
 import urllib.request
+from datetime import datetime, timezone
 from typing import Any
 
 _CTX = ssl.create_default_context()
@@ -27,64 +37,126 @@ def load_env(path: str = "C:/Users/D0n9/Desktop/LogicKG/.env") -> dict:
 
 ENV = load_env()
 
+# ---- call provenance (D3) ----
+RUN_ID = os.environ.get("LLM_RUN_ID") or datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+CALL_LOG: list[dict] = []
+
+
+def _log_call(provider: str, model: str, ok: bool, latency_ms: float,
+              usage: dict | None = None, attempt: int = 0,
+              fallback_for: str = "") -> None:
+    rec = {
+        "ts": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "run_id": RUN_ID,
+        "provider": provider,
+        "model": model,
+        "ok": ok,
+        "latency_ms": round(latency_ms),
+        "prompt_tokens": (usage or {}).get("prompt_tokens"),
+        "completion_tokens": (usage or {}).get("completion_tokens"),
+        "attempt": attempt,
+        "fallback_for": fallback_for,
+    }
+    CALL_LOG.append(rec)
+    path = os.environ.get("LLM_CALL_LOG")
+    if path:
+        try:
+            with open(path, "a", encoding="utf-8") as f:
+                f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+        except Exception:
+            pass  # logging must never kill the call
+
+
+def call_log_summary() -> dict:
+    """Aggregate the in-memory CALL_LOG: per (provider, model) call count,
+    tokens, and fallback count. For run-end provenance reports."""
+    agg: dict[tuple, dict] = {}
+    for r in CALL_LOG:
+        k = (r["provider"], r["model"])
+        a = agg.setdefault(k, {"calls": 0, "ok": 0, "prompt_tokens": 0,
+                               "completion_tokens": 0, "fallback": 0})
+        a["calls"] += 1
+        a["ok"] += 1 if r["ok"] else 0
+        a["prompt_tokens"] += r["prompt_tokens"] or 0
+        a["completion_tokens"] += r["completion_tokens"] or 0
+        if r["fallback_for"]:
+            a["fallback"] += 1
+    return {"run_id": RUN_ID, "total_calls": len(CALL_LOG),
+            "by_model": {f"{p}/{m}": v for (p, m), v in sorted(agg.items())}}
+
 
 def _chat_once(url, key, body, timeout):
-    """Single HTTP POST to an OpenAI-compat chat endpoint. Raises on any failure."""
+    """Single HTTP POST to an OpenAI-compat chat endpoint. Returns
+    (content, usage). Raises on any failure."""
     req = urllib.request.Request(
         url, data=body,
         headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
     )
     raw = urllib.request.urlopen(req, context=_CTX, timeout=timeout).read()
-    return json.loads(raw)["choices"][0]["message"]["content"]
+    resp = json.loads(raw)
+    return resp["choices"][0]["message"]["content"], resp.get("usage") or {}
 
 
 def call_llm(prompt: str, model: str = "deepseek-chat", max_tokens: int = 4000,
-             temperature: float = 0.0) -> str | None:
+             temperature: float = 0.0, seed: int | None = None) -> str | None:
     """Call DeepSeek chat API with exponential-backoff retry + Paratera fallback.
 
     deepseek intermittently hangs at socket level (TCP connected, server never
     replies) — a short per-call timeout + 3 backoff retries on the primary,
     then one shot at the Paratera fallback model (GLM-5-Turbo) so a single
-    hung section can't stall the whole extraction."""
+    hung section can't stall the whole extraction. The fallback is logged
+    (fallback_for) and disabled when env LLM_ALLOW_FALLBACK=0."""
     key = ENV.get("DEEPSEEK_API_KEY")
     if not key:
         raise RuntimeError("no DEEPSEEK_API_KEY")
-    body = json.dumps({
+    payload = {
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
         "temperature": temperature,
         "max_tokens": max_tokens,
-    }).encode()
+    }
+    if seed is not None:
+        payload["seed"] = seed
+    body = json.dumps(payload).encode()
     url = "https://api.deepseek.com/v1/chat/completions"
     last_err = None
-    # primary: 3 attempts with exponential backoff (2s, 6s)
+    # primary: 3 attempts with exponential backoff (2s, 4s)
     for attempt in range(3):
+        t0 = time.time()
         try:
-            return _chat_once(url, key, body, timeout=120)
+            content, usage = _chat_once(url, key, body, timeout=120)
+            _log_call("deepseek", model, True, (time.time() - t0) * 1000, usage, attempt)
+            return content
         except Exception as e:
             last_err = e
+            _log_call("deepseek", model, False, (time.time() - t0) * 1000,
+                      None, attempt)
             if attempt < 2:
-                import time
                 time.sleep(2 * (attempt + 1))
-    # fallback: Paratera GLM-5-Turbo (same prompt, one shot)
-    fb = call_paratera(prompt, model="GLM-5-Turbo", max_tokens=max_tokens,
-                       temperature=temperature)
-    if fb is not None:
-        return fb
+    # fallback: Paratera GLM-5-Turbo (same prompt, one shot) — logged + switchable
+    if os.environ.get("LLM_ALLOW_FALLBACK", "1") != "0":
+        fb = call_paratera(prompt, model="GLM-5-Turbo", max_tokens=max_tokens,
+                           temperature=temperature, fallback_for=model)
+        if fb is not None:
+            return fb
     # both failed
     print(f"  [llm] all retries + fallback failed: {last_err}", flush=True)
     return None
 
 
 def call_paratera(prompt: str, model: str = "Kimi-K2.6", max_tokens: int = 4000,
-                  temperature: float = 0.0, enable_thinking: bool = None) -> str | None:
+                  temperature: float = 0.0, enable_thinking: bool = None,
+                  seed: int | None = None, fallback_for: str = "") -> str | None:
     """Call Paratera API (Kimi/GLM/Qwen/DeepSeek).
 
     enable_thinking: for reasoning models (DeepSeek-V4-Flash etc), set False
     to suppress reasoning_content via the CORRECT DeepSeek API param:
     {"thinking": {"type": "disabled"}} (verified: reasoning_tokens=0, 1s
     response. The old 'enable_thinking' param name did NOT work — it left
-    reasoning on, eating max_tokens + slowing 67x)."""
+    reasoning on, eating max_tokens + slowing 67x).
+
+    fallback_for: set when this call serves as another provider's fallback
+    (provenance marker, logged per call)."""
     key = ENV.get("PARATERA_API_KEY")
     base = ENV.get("PARATERA_BASE_URL", "").rstrip("/")
     if not key:
@@ -95,6 +167,8 @@ def call_paratera(prompt: str, model: str = "Kimi-K2.6", max_tokens: int = 4000,
         "temperature": temperature,
         "max_tokens": max_tokens,
     }
+    if seed is not None:
+        payload["seed"] = seed
     if enable_thinking is False:
         # correct param per DeepSeek official docs (api-docs.deepseek.com)
         payload["thinking"] = {"type": "disabled"}
@@ -105,10 +179,16 @@ def call_paratera(prompt: str, model: str = "Kimi-K2.6", max_tokens: int = 4000,
         headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
     )
     for attempt in range(2):
+        t0 = time.time()
         try:
             raw = urllib.request.urlopen(req, context=_CTX, timeout=120).read()
-            return json.loads(raw)["choices"][0]["message"]["content"]
+            resp = json.loads(raw)
+            _log_call("paratera", model, True, (time.time() - t0) * 1000,
+                      resp.get("usage") or {}, attempt, fallback_for)
+            return resp["choices"][0]["message"]["content"]
         except Exception:
+            _log_call("paratera", model, False, (time.time() - t0) * 1000,
+                      None, attempt, fallback_for)
             if attempt == 1:
                 return None
     return None
@@ -176,7 +256,7 @@ def _is_cst_model(model: str) -> bool:
 
 
 def call_cst(prompt: str, model: str = "qwen3.5", max_tokens: int = 4000,
-             temperature: float = 0.0) -> str | None:
+             temperature: float = 0.0, seed: int | None = None) -> str | None:
     """Call CSTCloud API (qwen3.5 / gpt-oss-120b / deepseek-v4-flash etc).
     OpenAI-compatible. enable_thinking not sent (CST models ignore it)."""
     key = ENV.get("CST_API_KEY")
@@ -189,6 +269,8 @@ def call_cst(prompt: str, model: str = "qwen3.5", max_tokens: int = 4000,
         "temperature": temperature,
         "max_tokens": max_tokens,
     }
+    if seed is not None:
+        payload["seed"] = seed
     body = json.dumps(payload).encode()
     req = urllib.request.Request(
         base + "/chat/completions",
@@ -196,10 +278,16 @@ def call_cst(prompt: str, model: str = "qwen3.5", max_tokens: int = 4000,
         headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
     )
     for attempt in range(2):
+        t0 = time.time()
         try:
             raw = urllib.request.urlopen(req, context=_CTX, timeout=120).read()
-            return json.loads(raw)["choices"][0]["message"]["content"]
+            resp = json.loads(raw)
+            _log_call("cst", model, True, (time.time() - t0) * 1000,
+                      resp.get("usage") or {}, attempt)
+            return resp["choices"][0]["message"]["content"]
         except Exception:
+            _log_call("cst", model, False, (time.time() - t0) * 1000,
+                      None, attempt)
             if attempt == 1:
                 return None
     return None
