@@ -40,7 +40,21 @@ both-pass 23.8% 离 70% 很远。但三层证据说明这不是同一层的问�
 
 ### 4. 每篇 321-511s（<10min），其中 DQN 511s 因 10 sections——效率项在 DQN 类长文上接近边界
 
-## 给用户的判断材料（不替用户决定）
+## 终裁与重评更新（2026-08-25 深夜追加）
+
+**20 条 judge-fail 边人工终裁**（子代理逐条对照原文）：
+- **JUDGE 过严 35% / 真错 65%**（绑定 30% + pattern 类型 25% + 方向 5% + 证据 5%）
+- 三个可修根因浮出：① judge prompt 的 "named method" 硬要求直接制造泛指误杀；② evidence 截断 400 字，6/6 长证据边全因 judge 看不见支撑句而 fail（评估侧实锤 bug）；③ influences 方向语义歧义（desc 双读 vs boundary 单读，pass 边两种约定并存——schema 设计层问题）
+
+**judge 侧两修后重评**（faithful-to-source 判据 + 截断 1200）：
+
+| 口径 | 修前 | 修后 |
+|---|---|---|
+| both-pass | 23.8% | **29.3%**（53/181） |
+| either-pass | 38.1% | **51.9%** |
+
+**剩余真错的构成**（终裁外推）：绑定纪律（时间状语当实体/研究者当 instrument/属性当被测量）是最大头，全部是 executor 槽位约束可修的；"真错-pattern"5/5 均为关系真类型错（verifier 的 retype 通道可修）。
+
 
 **管线当前状态**：架构正确、机制全通（抽取→gate→fail-closed verify→演化→采纳）、无编造无重复、高保真边子集质量高（43 条双满分边）。语义正确率的进一步提高有两条已知路径但都需要投入：a) influences/claim_relation 的判据精修（本轮数据里真错集中处）；b) 槽位 perfectionism 的口径问题（这条可能根本不是管线问题而是 judge 口径问题——需要人工抽 20 条 judge-fail 边终裁）。
 
