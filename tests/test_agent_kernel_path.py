@@ -58,7 +58,13 @@ def _mock_extract_llm(prompt, max_tokens=8000):
         return ('{"domain":"granular","central_entities":[{"surface":"μ(I) rheology","type":"METHOD"}],'
                 '"expected_patterns":["extends"],"relation_outline":[],"paper_anchor":"x"}')
     if "critiquing" in p:
-        return '{"verdicts":[{"edge_id":"e1","verbatim_in_source":true,"type_correct":true,"relation_exists":true,"fix":"keep"}]}'
+        # verdict for EVERY edge in the batch (fail-closed verifier drops
+        # edges without a verdict — a partial mock would drop the rest)
+        import re as _re
+        ids = _re.findall(r'"edge_id":\s*"([^"]+)"', p)
+        vs = ",".join(f'{{"edge_id":"{i}","verbatim_in_source":true,"type_correct":true,'
+                      f'"relation_exists":true,"fix":"keep"}}' for i in ids)
+        return '{"verdicts":[' + vs + ']}'
     if "definitions" in p:
         return '{"definitions":[]}'
     if "same concept" in p or "groups" in p:

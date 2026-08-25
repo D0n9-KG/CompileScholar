@@ -421,8 +421,21 @@ class ExtractionAgent:
     # ---- verifier ----
     def verify(self, edges: list[Hyperedge], nodes: list[HGNode],
                section_text: str, domain: str) -> list[Verdict]:
+        """Verify in BATCHES (a 29-edge prompt blew the response budget and the
+        whole call 400'd — then the old fail-open default keep'd every edge:
+        the Run-2 acceptance diagnosis). Batches of 8 edges keep the response
+        bounded; per-batch LLM failure → fail-CLOSED (fix=drop for that batch's
+        edges) — an unverified edge must never silently enter the A-box."""
         if not edges:
             return []
+        out: list[Verdict] = []
+        for i in range(0, len(edges), 8):
+            batch = edges[i:i + 8]
+            out.extend(self._verify_batch(batch, nodes, section_text, domain))
+        return out
+
+    def _verify_batch(self, edges: list[Hyperedge], nodes: list[HGNode],
+                      section_text: str, domain: str) -> list[Verdict]:
         nid2surface = {n.nid: n.surface for n in nodes}
         edges_for_prompt = []
         for he in edges:
@@ -461,9 +474,19 @@ class ExtractionAgent:
         obj = _parse_json(raw) or {}
         verdicts = []
         by_id = {v.get("edge_id"): v for v in obj.get("verdicts", []) if isinstance(v, dict)}
+        # fail-closed: an edge the verifier did NOT return a verdict for (call
+        # failed / truncated / id mismatch) gets fix=drop, NOT keep. The old
+        # default let an entire failed batch silently through (Run-2 diagnosis:
+        # 29/29 keep on a HTTP-400'd call).
         for he in edges:
-            v = by_id.get(he.eid, {})
-            fix = str(v.get("fix", "keep")).strip() or "keep"
+            v = by_id.get(he.eid)
+            if v is None:
+                verdicts.append(Verdict(edge_id=he.eid, fix="drop",
+                                        note="verifier-no-verdict (fail-closed)"))
+                continue
+            fix = str(v.get("fix", "")).strip()
+            if fix not in ("keep", "reextract") and not fix.startswith(("retype:", "rolefix:")):
+                fix = "drop"   # unrecognized/empty fix value is not a pass
             verdicts.append(Verdict(
                 edge_id=he.eid,
                 verbatim_in_source=bool(v.get("verbatim_in_source", True)),
