@@ -158,7 +158,8 @@ class GranularFlowAgent:
             return {"paper_id": paper_id, "error": "structure_map_failed"}
 
         ext = ExtractionAgent(kb, llm_extract=self._kernel_llm_extract,
-                              llm_verify=self._kernel_llm_verify, domain_default=self.domain)
+                              llm_verify=self._kernel_llm_verify, domain_default=self.domain,
+                              executor_model=llm)
         evo = EvolutionAgent(kb, llm=self._kernel_llm_verify, domain_default=self.domain)
         align = AlignmentAgent(kb, llm_define=self._kernel_llm_verify,
                                llm_judge=self._kernel_llm_verify, domain_default=self.domain)

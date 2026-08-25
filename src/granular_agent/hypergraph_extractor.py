@@ -592,6 +592,9 @@ Output JSON: {{"labels":[{{"nid":"n1","labels":["METHOD"]}},...]}}
 _STEP3_PROMPT = """You are identifying RELATIONSHIPS (hyperedges) between labeled entities
 from a {domain} paper section ({section_name}).
 
+Schema patterns (the CURRENT schema — prefer these pattern_types):
+{schema_prompt}
+
 Labeled entities:
 {labeled_nodes}
 
@@ -600,21 +603,25 @@ Section text (for context on how entities relate):
 
 Task: identify n-ary hyperedges connecting entities. Each hyperedge:
 - eid: short id (e1, e2, ...)
-- pattern_type: the relation type. Common ones: constitutive_law (formula:
-  output=f(inputs+params)), influences (X depends on Y), defines (X is defined as Y),
-  composed_of (X consists of Y,Z), measures (X measured by Y),
-  claim_relation (discourse: X vs Y), extends/improves/compares (method A evolves B).
-  Use existing pattern names when they fit; propose a new one only if none fit.
+- pattern_type: the relation type. FIRST pick from the schema patterns above
+  (their [boundary: ...] notes tell you WHEN each applies); the schema is the
+  live, evolving vocabulary — a pattern listed there is ALWAYS preferable to
+  inventing a name. Only if NO schema pattern fits, use a common one
+  (constitutive_law / influences / defines / composed_of / measures /
+  claim_relation / extends / improves / compares — note these are SEPARATE
+  pattern names, never write them joined with slashes) or propose a new one
+  with a clean snake_case name.
 - node_ids: which entities participate (by nid, in order)
-- node_roles: role of each node — MUST use ONLY these role names, matching the
-  pattern_type's expected roles:
+- node_roles: role of each node — for a schema pattern, use the roles DECLARED
+  in its role_slots above (they override the defaults listed below). Otherwise
+  use these defaults, matching the pattern_type's expected roles:
   constitutive_law: output, input, parameter, coefficient, exponent
   influences: source, target, cause, effect
   defines: subject, definition, object
   composed_of: whole, component
   measures: object, instrument
   claim_relation: from, to
-  extends/improves/compares/replaces/adapts/background: from, to
+  extends / improves / compares / replaces / adapts / background: from, to
   If you need a role not in this list, pick the closest one. Do NOT invent role
   names like 'condition', 'method', 'analogy', 'function', 'parameter_set' — use the
   listed roles ('subject' is valid for defines; it is listed, not invented).
@@ -742,6 +749,7 @@ def _run_hg_node_multistep(node: dict, sections: list, blocks: list,
                                for n in chunk_nodes]
         p3 = _STEP3_PROMPT.format(domain=domain,
                                   section_name=node.get("section", ""),
+                                  schema_prompt=schema_prompt,
                                   labeled_nodes=json.dumps(labeled_for_prompt, ensure_ascii=False),
                                   section_text=chunk)
         if feedback_hint:

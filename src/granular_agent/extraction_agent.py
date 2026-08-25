@@ -207,11 +207,18 @@ class ExtractionAgent:
     def __init__(self, kb: KnowledgeBase,
                  llm_extract: Callable[[str, int], str | None],
                  llm_verify: Callable[[str, int], str | None],
-                 domain_default: str = "global"):
+                 domain_default: str = "global",
+                 executor_model: str = "deepseek"):
         self.kb = kb
         self.llm_extract = llm_extract
         self.llm_verify = llm_verify
         self.domain_default = domain_default
+        # executor model NAME (routed by hypergraph_extractor._call). W2 fix:
+        # _execute_core used to hardcode llm="deepseek" (official deepseek-chat),
+        # silently bypassing the configured provider (Paratera V4-Flash) —
+        # planner ran on V4-Flash while the actual edge-typing calls ran on
+        # deepseek-chat. Model provenance requires the caller to pin this.
+        self.executor_model = executor_model
 
     # ---- planner ----
     def plan(self, section_text: str, discourse_role: str,
@@ -295,7 +302,7 @@ class ExtractionAgent:
         blocks = [{"index": 0, "text": section_text}]
         nodes, edges, _summary = _run_hg_node_multistep(
             node, sections, blocks, schema_prompt, bb,
-            llm="deepseek", domain=plan.domain, meta=self.kb.tbox)
+            llm=self.executor_model, domain=plan.domain, meta=self.kb.tbox)
         return nodes, edges
 
     # ---- verifier ----
