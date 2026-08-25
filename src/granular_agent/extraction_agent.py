@@ -411,6 +411,10 @@ class ExtractionAgent:
                 "node_surfaces": node_surfaces,
                 "reason": reason,
                 "verifier_note": (v.note if v else ""),
+                # verdict摘要 — 存进bundle, 不重跑就能查verifier怎么判的(rolefix根因排查用)
+                "verifier_role_correct": (v.role_correct if v else None),
+                "verifier_type_correct": (v.type_correct if v else None),
+                "verifier_fix": (v.fix if v else ""),
             })
 
         for he in edges:
