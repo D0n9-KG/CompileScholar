@@ -84,6 +84,10 @@ class GranularFlowAgent:
         # T-box: cross-paper meta-hypergraph (schema). Shared across papers so
         # patterns added by earlier papers are available to later ones.
         self.meta_hg = seed_meta_hypergraph()
+        # seed pattern ids at init — _save_kernel_bundle reports only patterns
+        # added AFTER these as new (evolution-added). Callers that replace
+        # meta_hg (e.g. injection probes) must reset this themselves.
+        self._initial_seed_pats = set(self.meta_hg.patterns.keys())
         # A-box: cross-paper concept hypergraph (n-ary, accumulated across
         # papers with LLM semantic alignment) — see concept_graph.py.
         from granular_agent.concept_graph import ConceptGraph
