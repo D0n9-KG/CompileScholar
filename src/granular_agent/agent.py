@@ -661,20 +661,20 @@ class GranularFlowAgent:
         try:
             inst_abox = maint._build_abox_instance(paper_id)
         except Exception as e:
-            print(f"  [kernel] build_abox_instance failed: {e!r}", flush=True)
+            # GBK-safe print: repr(e) may contain unicode (−, μ...) that crashes
+            # the Windows GBK console and kills the whole pipeline.
+            print("  [kernel] build_abox_instance failed: " + repr(e).encode("ascii", "replace").decode(), flush=True)
         # rich topology (最稳卖点) — share inst_abox
         rt_edges = []
         try:
             rt_edges = maint.infer_rich_topology_for_abox(paper_id=paper_id, inst=inst_abox)
         except Exception as e:
-            print(f"  [kernel] rich topology failed: {e!r}", flush=True)
+            print("  [kernel] rich topology failed: " + repr(e).encode("ascii", "replace").decode(), flush=True)
         rt_by_kind = {}
         for e in rt_edges:
             k = e.get("kind", "")
             rt_by_kind[k] = rt_by_kind.get(k, 0) + 1
         # active repair detect (split/merge/rename) — share inst_abox
-            print(f"  [kernel] build_abox_instance failed: {e!r}", flush=True)
-        # active repair detect (split/merge/rename)
         active_repair = {"split": 0, "merge": 0, "rename": 0}
         if arm != "frozen" and inst_abox is not None:
             try:
