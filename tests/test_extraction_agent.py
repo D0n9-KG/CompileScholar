@@ -108,6 +108,7 @@ class _MockAgent(ExtractionAgent):
             HGNode(nid="n1", labels=["METHOD"], surface="nonlocal model", evidence_span="our nonlocal"),
             HGNode(nid="n2", labels=["METHOD"], surface="μ(I) rheology", evidence_span="the μ(I) rheology"),
             HGNode(nid="n3", labels=["METHOD"], surface="local rheology", evidence_span="local rheology"),
+            HGNode(nid="n5", labels=["PARAMETER"], surface="cooperativity length", evidence_span="a cooperativity length"),
         ]
         edges = [
             Hyperedge(eid="e1", pattern_type="extends", node_ids=["n1", "n2"],
@@ -117,8 +118,10 @@ class _MockAgent(ExtractionAgent):
             Hyperedge(eid="e2", pattern_type="compares", node_ids=["n1", "n3"],
                       node_roles=["from", "to"],
                       evidence_span="Our nonlocal model extends the μ(I) rheology and improves the local rheology"),
-            # binding-locality violation: 'local rheology' not in this sentence
-            Hyperedge(eid="e3", pattern_type="background", node_ids=["n1", "n3"],
+            # binding-locality violation under the RELAXED rule too: n5's
+            # surface lives 2 sentences away from this evidence (the ±1 window
+            # doesn't reach it) — the gate's unit coverage
+            Hyperedge(eid="e3", pattern_type="background", node_ids=["n1", "n5"],
                       node_roles=["from", "to"],
                       evidence_span="We compare our nonlocal model with the gradient model"),
         ]
@@ -133,7 +136,7 @@ check("executor: NO skill block in prompt (audit: skill injection removed)",
       injected_skill.get("no_skill_block"))
 check("executor: plan relation_outline injected as schema-in-context",
       injected_skill.get("outline_seen"))
-check("executor: returns nodes + edges (delegated core)", len(nodes) == 3 and len(edges) == 3)
+check("executor: returns nodes + edges (delegated core)", len(nodes) == 4 and len(edges) == 3)
 
 # ===========================================================================
 # 3. verifier: ≠ extraction model, per-edge verdict, re-type internalized

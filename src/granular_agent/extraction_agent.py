@@ -282,7 +282,8 @@ class ExtractionAgent:
         return self._execute_core(section_text, plan, node_id, schema_prompt,
                                   predecessor_summary)
 
-    def _deterministic_gate(self, edges: list[Hyperedge], nodes: list[HGNode]
+    def _deterministic_gate(self, edges: list[Hyperedge], nodes: list[HGNode],
+                            section_text: str = ""
                             ) -> tuple[list[Hyperedge], list[dict]]:
         """Rule layer (B+ rewrite): structural/deterministic checks per edge,
         BEFORE the LLM verifier. Rules guard STRUCTURE (the LLM guards
@@ -323,16 +324,22 @@ class ExtractionAgent:
             if not set(he.node_roles).issubset(declared):
                 dropped.append(self._gate_drop(he, nid2node, "gate:illegal-role"))
                 continue
-            # --- 1. binding locality ---
-            ev_norm = _normalize_latex(he.evidence_span)
+            # --- 1. binding locality (±1 sentence window + plural tolerance) ---
+            # Gate audit (2026-08-25, 38-drop audit): 66% of strict-span drops
+            # were false kills — evidence span chosen too narrow (participant
+            # verbatim in the adjacent sentence), anaphora ("this algorithm"),
+            # or singular/plural surface. Relaxed per the pre-registered
+            # contingency: participant surface must appear in the evidence OR
+            # its ±1-sentence window, with light plural folding. The LLM
+            # verifier still judges binding SEMANTICS; this rule only
+            # guarantees locality.
             bad_binding = False
             for nid, role in zip(he.node_ids, he.node_roles):
                 nd = nid2node.get(nid)
                 if nd is None:
                     bad_binding = True
                     break
-                surf_norm = _normalize_latex(nd.surface)
-                if surf_norm and surf_norm not in ev_norm:
+                if not _binding_local(nd.surface, he.evidence_span, section_text):
                     bad_binding = True
                     break
             if bad_binding:
@@ -793,7 +800,7 @@ class ExtractionAgent:
         # deterministic rule gate (B+ rewrite): reject structurally-invalid
         # edges BEFORE the LLM verifier (cheap first, and the rule layer is
         # where binding-locality actually lives — a prompt can only ask)
-        edges, gate_dropped = self._deterministic_gate(edges, nodes)
+        edges, gate_dropped = self._deterministic_gate(edges, nodes, section_text)
         verdicts = self.verify(edges, nodes, section_text, plan.domain)
         kept, fstats, dropped_edges = self.fix(edges, verdicts, nodes, section_text, plan)
         dropped_edges = gate_dropped + dropped_edges
@@ -856,9 +863,64 @@ _GREEK_MAP = {
 }
 
 
+_QUOTE_MAP = {"\u2018": "", "\u2019": "", "\u201c": "", "\u201d": "",
+              "\u2013": "-", "\u2014": "-"}
+
+
+def _evidence_window(evidence: str, section_text: str) -> str:
+    """The evidence span EXPANDED to its \u00b11 sentence window (both normalized).
+    Gate audit: most locality false-kills had the participant verbatim in an
+    adjacent sentence \u2014 the LLM quotes a narrow span but the binding is local.
+    Returns just the normalized evidence if it can't be located."""
+    st_n = _normalize_latex(section_text)
+    ev_n = _normalize_latex(evidence)
+    if not ev_n or not st_n:
+        return ev_n
+    probe = ev_n[:80] if len(ev_n) > 80 else ev_n
+    pos = st_n.find(probe)
+    if pos < 0 and len(ev_n) > 40:
+        pos = st_n.find(ev_n[:40])
+    if pos < 0:
+        return ev_n
+    sents = [m for m in re.finditer(r"[^.!?]+[.!?]?", st_n)]
+    idx = next((i for i, m in enumerate(sents) if m.start() <= pos < m.end()), None)
+    if idx is None:
+        return ev_n
+    lo, hi = max(0, idx - 1), min(len(sents), idx + 2)
+    return "".join(m.group(0) for m in sents[lo:hi])
+
+
+def _binding_local(surface: str, evidence: str, section_text: str) -> bool:
+    """Deterministic binding-locality: the node surface (normalized) appears
+    in the evidence span, or in its \u00b11-sentence window, with light
+    singular/plural folding on the surface's last word (gate audit case:
+    'loss functions' vs 'optimize the loss function')."""
+    surf_n = _normalize_latex(surface)
+    if not surf_n:
+        return True
+    ev_n = _normalize_latex(evidence)
+    if surf_n in ev_n:
+        return True
+    win = _evidence_window(evidence, section_text)
+    if surf_n in win:
+        return True
+    toks = surf_n.rsplit(" ", 1)
+    if len(toks) == 2 and len(toks[1]) > 3:
+        last = toks[1]
+        if last.endswith("s") and not last.endswith("ss"):
+            if (toks[0] + " " + last[:-1]) in win:
+                return True
+        elif not last.endswith("s"):
+            if (toks[0] + " " + last + "s") in win:
+                return True
+    return False
+
+
 def _normalize_latex(s: str) -> str:
     """Normalize LaTeX surface for verbatim substring matching: NFKC unicode +
-    Greek command map (\\gamma→γ) + strip math env ($ \\( \\) \\[ \\]) + strip
+    curly-quote/dash folding (NFKC does NOT convert U+2018/2019 — gate audit
+    found ‘end-to-end’ failing locality on the closing ’ alone) + Greek
+    command map (\\gamma→γ) + strip math env ($ \\( \\) \\[ \\]) + strip
     bare commands (\\frac \\text) + strip braces + fold whitespace + lowercase.
     Symmetric on evidence and section. (P1-A fix; honest: rare symbols not in
     _GREEK_MAP stay as the bare letter after _LATEX_CMD strips the backslash-
@@ -866,6 +928,8 @@ def _normalize_latex(s: str) -> str:
     if not s:
         return ""
     s = unicodedata.normalize("NFKC", s)
+    for q, r in _QUOTE_MAP.items():
+        s = s.replace(q, r)
     for name, g in _GREEK_MAP.items():
         s = re.sub(rf"\\{name}\b", g, s)
     s = _LATEX_ENV.sub(" ", s)
