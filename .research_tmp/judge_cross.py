@@ -8,9 +8,23 @@ import json, os, sys
 sys.path.insert(0, 'src')
 
 BASE = os.path.join('.research_tmp', 'runs', 'kernel_v2')
-PAPER_TEXT = open('.research_tmp/probe_dqn_fulltext.txt', encoding='utf-8').read()
+def _paper_text_for(dirname: str) -> str:
+    """Fulltext for a bundle: DQN probe text if it's the DQN paper, else
+    reconstruct from MINERU_BASE content_list."""
+    if 'PPR_24493BE6E8C2' in dirname:
+        return open('.research_tmp/probe_dqn_fulltext.txt', encoding='utf-8').read()
+    import re as _re
+    m = _re.search(r'(PPR_[A-Z0-9]+)', dirname)
+    if not m:
+        raise ValueError(f"no PPR id in dirname {dirname}")
+    ppr = m.group(1)
+    p = f"C:/Users/D0n9/Desktop/science_evo/data/upstream/remote_mineru/mineru_2355/papers/{ppr}/content_list.json"
+    cl = json.load(open(p, encoding="utf-8"))
+    return "\n\n".join(str(it.get("text", "")).strip() for it in cl
+                       if it.get("type") == "text" and it.get("text")
+                       and len(it["text"].strip()) >= 10)
 
-_JUDGE_PROMPT = """You are a STRICT semantic judge for knowledge-hypergraph edges extracted from the DQN paper (Nature 2015, deep Q-learning on Atari games).
+_JUDGE_PROMPT = """You are a STRICT semantic judge for knowledge-hypergraph edges extracted from a scientific paper (the source text excerpts are given below).
 
 Edge under judgment:
 - pattern_type: {pt}
@@ -47,7 +61,7 @@ def judge_edges(dirname):
 
     # find context around evidence in the paper text (normalized whitespace)
     import re
-    norm_text = re.sub(r'\s+', ' ', PAPER_TEXT)
+    norm_text = re.sub(r'\s+', ' ', _paper_text_for(dirname))
 
     edges = []
     for he in cg['hyperedges']:
