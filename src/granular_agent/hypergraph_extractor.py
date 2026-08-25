@@ -712,8 +712,12 @@ def _run_hg_node_multistep(node: dict, sections: list, blocks: list,
                                   nodes_json=json.dumps(nodes_for_label, ensure_ascii=False))
         raw2 = _call(p2, llm, max_tokens=4096)
         parsed2 = parse_json_response(raw2) or {}
+        # tolerate LLM returning a list instead of {"labels":[...]} (long-chunk
+        # drift): if parsed2 is a list of label dicts, use it directly.
+        label_items = parsed2.get("labels", []) if isinstance(parsed2, dict) else (
+            parsed2 if isinstance(parsed2, list) else [])
         labels = {item["nid"]: item.get("labels", [])
-                  for item in parsed2.get("labels", [])
+                  for item in label_items
                   if isinstance(item, dict) and "nid" in item}
 
         # build HGNodes with labels
