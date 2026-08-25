@@ -167,6 +167,9 @@ class GranularFlowAgent:
 
         pre_v = kb.version
         section_reports = []
+        if arm not in ("full", "add_only", "no_intra_dag", "frozen"):
+            raise ValueError(f"unknown arm {arm!r} — valid: full/add_only/no_intra_dag/frozen")
+        deferred_failures: list[tuple[str, dict]] = []   # no_intra_dag batch mode
         # 真漏 fix #1+#2: process DAG in TOPOLOGICAL order (deps before dependents)
         # + pass predecessor_summary (a section sees its dependency sections'
         # summaries — cross-section context: Results can see Method's concepts).
@@ -228,11 +231,13 @@ class GranularFlowAgent:
             bb.add(nid, plan_summary)
             # Stage 2: evolve — feed this section's validation failures (edges the
             # verifier dropped or that didn't match a pattern) to the evolver.
-            # The extractor already dropped bad edges at commit (kernel validate),
-            # so here we surface the verifier's dropped + reextract edges as
-            # potential schema gaps (cross-node recurrence accumulates across
-            # sections — a real gap recurs at >1 node and gets accepted).
-            if arm != "frozen":
+            # arm semantics (D2 fix — the arms used to be no-ops):
+            #   full/add_only: per-section in-loop drain (schema evolves DURING
+            #     the paper; later sections see the evolved schema)
+            #   no_intra_dag: proposals accumulate, drained ONCE at paper end
+            #     (batch evolution — the in-loop timing axis's control arm)
+            #   frozen: no evolution at all (static schema)
+            if arm in ("full", "add_only"):
                 # MA1 fix: feed the REAL dropped edges (from the extractor's
                 # fixer) to the evolver as schema-gap triggers — NOT a synthetic
                 # Hyperedge. The dropped_edges carry pattern_type + evidence +
@@ -252,10 +257,22 @@ class GranularFlowAgent:
                     evo.propose_validate_failures(failing, node_id=nid,
                                                   paper_id=paper_id, domain=self.domain)
                 evo_rep = evo.drain()
+            elif arm == "no_intra_dag":
+                deferred_failures.extend(
+                    (nid, de) for de in ext_rep.get("dropped_edges", []))
+                evo_rep = None
             else:
                 evo_rep = None
             section_reports.append({"node_id": nid, "extract": ext_rep,
                                     "evolve": evo_rep.__dict__ if evo_rep else None})
+
+        # no_intra_dag: single batch evolution at paper end (control arm for
+        # the in-loop timing axis — schema does NOT evolve during the paper)
+        if arm == "no_intra_dag" and deferred_failures:
+            for nid, de in deferred_failures:
+                evo.propose_validate_failures([de], node_id=nid,
+                                              paper_id=paper_id, domain=self.domain)
+            evo.drain()
 
         # Stage 3: align — Define + Canonicalize on the new concepts ingested
         if arm != "frozen":
@@ -286,9 +303,11 @@ class GranularFlowAgent:
         for e in rt_edges:
             k = e.get("kind", "")
             rt_by_kind[k] = rt_by_kind.get(k, 0) + 1
-        # active repair detect (split/merge/rename) — share inst_abox
+        # active repair detect (split/merge/rename) — share inst_abox.
+        # add_only skips repair (evolve-only arm: patterns may accumulate
+        # duplicates that full's repair would merge — that's the arm's point)
         active_repair = {"split": 0, "merge": 0, "rename": 0}
-        if arm != "frozen" and inst_abox is not None:
+        if arm in ("full", "no_intra_dag") and inst_abox is not None:
             try:
                 from granular_agent.hypergraph_evolution import (
                     detect_split_triggers, detect_merge_triggers, detect_rename_triggers)
