@@ -1,0 +1,1403 @@
+{
+  "summary": {
+    "GLM-5-Turbo": {
+      "pass": 12,
+      "total": 37,
+      "rate": 0.324
+    },
+    "qwen3.5": {
+      "pass": 20,
+      "total": 37,
+      "rate": 0.541
+    },
+    "agreement": "27/37",
+    "both_pass": "11/37",
+    "either_pass": "21/37"
+  },
+  "edges": [
+    {
+      "pt": "measures",
+      "desc": "a quantity is measured by / characterizes >=1 measure",
+      "boundary": "a measurement/evaluation relation: X is measured/evaluated by instrument/method Y. NOT a functional law (constitutive_law), NOT a dependence (influences).",
+      "nodes": [
+        [
+          "object",
+          "concentration"
+        ],
+        [
+          "instrument",
+          "sampling method"
+        ]
+      ],
+      "ev": "The progress of mixing is followed by a sampling and assaying technique which allows quite accurate determination of concentration with minimal disturbance of the charge.",
+      "ctx_before": "essions for the kinetics of the process have been derived. An experimental system has been devised for studying the mixing of essentially identical components. ",
+      "ctx_after": " Excellent agreement is obtained when comparing the experimental data to the theoretical predictions. INTRODUCTION THE MIXING or blending of particulate solids "
+    },
+    {
+      "pt": "claim_relation",
+      "desc": "a discourse relation between >=2 claims/approaches (supports/contrasts/extends/...)",
+      "boundary": "a DISCOURSE relation between claims/findings (supports/contrasts/outperforms). NOT a method-to-method development (extends/improves/compares — those are evolution), NOT a measurement (measures).",
+      "nodes": [
+        [
+          "from",
+          "experimental data"
+        ],
+        [
+          "to",
+          "theoretical predictions"
+        ]
+      ],
+      "ev": "Excellent agreement is obtained when comparing the experimental data to the theoretical predictions.",
+      "ctx_before": "s of mixing is followed by a sampling and assaying technique which allows quite accurate determination of concentration with minimal disturbance of the charge. ",
+      "ctx_after": " INTRODUCTION THE MIXING or blending of particulate solids is a key step in many industrial processes. This is particularly so in the preparation of ceramic com"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "degree of mixedness"
+        ],
+        [
+          "object",
+          "fundamental state of a system"
+        ]
+      ],
+      "ev": "The degree of mixedness is a fundamental state of a system",
+      "ctx_before": " is important to distinguish between the mixing process and the degree of mixedness which has been achieved in a particular system at any stage in the process. ",
+      "ctx_after": " and is completely independent of the means by which it is achieved, i.e. it does not depend on the process of mixing. In any mixing process there are two funda"
+    },
+    {
+      "pt": "background",
+      "desc": "X uses Y as background/motivation",
+      "boundary": "X cites Y as MOTIVATION/prior context only (Y inspired X but X is NOT a direct technical extension/inheritance of Y). NOT extends (no direct technical lineage), NOT improves (no limitation fix).",
+      "nodes": [
+        [
+          "from",
+          "macromixing"
+        ],
+        [
+          "to",
+          "DANCKWERTS [1]"
+        ]
+      ],
+      "ev": "A similar consideration was made by DANCKWERTS [1]",
+      "ctx_before": "nents must be brought together, and (2) individual particles must diffuse across boundaries between regions rich in one component into regions rich in another. ",
+      "ctx_after": ". These two independent mechanisms will be referred to as “macromixing” and “micromixing,” respectively. A mixing operation can proceed by the macro-mixing mech"
+    },
+    {
+      "pt": "composed_of",
+      "desc": "one whole is composed-of / part-of >=1 component (n-ary composition)",
+      "boundary": "STRUCTURAL composition: parts that make up a whole (model A = B + C). NOT classification (defines), NOT 'X has control params' (influences), NOT experimental setup description, NOT 'we tested X by doing Y'.",
+      "nodes": [
+        [
+          "whole",
+          "macromixing"
+        ],
+        [
+          "component",
+          "diffusion"
+        ],
+        [
+          "component",
+          "breaking up of aggregates"
+        ]
+      ],
+      "ev": "these are in fact combinations of effects which involve both diffusion and the breaking up of aggregates",
+      "ctx_before": "are often encountered in the literature as referring to specific mechanisms by which mixing occurs in a particular system. However, it has become apparent that ",
+      "ctx_after": ". Review of the literature on the mixing of particulate solids reveals that either, experiments could not be designed to check the validity of theories of mixin"
+    },
+    {
+      "pt": "measures",
+      "desc": "a quantity is measured by / characterizes >=1 measure",
+      "boundary": "a measurement/evaluation relation: X is measured/evaluated by instrument/method Y. NOT a functional law (constitutive_law), NOT a dependence (influences).",
+      "nodes": [
+        [
+          "object",
+          "validity of the theory of diffusional mixing"
+        ],
+        [
+          "instrument",
+          "experimental system"
+        ]
+      ],
+      "ev": "used to obtain data with which the validity of the theory of diffusional mixing can be established",
+      "ctx_before": "eriments on an ideal system, in which any of the numerous variables associated with the mixing process can be held constant. Such a system has been devised and ",
+      "ctx_after": ". This paper presents part of a research programme in which the factors affecting mixing in an ideal system are being investigated. Distribution of particles wi"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "velocity of the particles"
+        ],
+        [
+          "target",
+          "mixer axis"
+        ]
+      ],
+      "ev": "the velocity of the particles due to the rotation of the mixer has no component parallel to the mixer axis",
+      "ctx_before": " affecting mixing in an ideal system are being investigated. Distribution of particles within the bed In a horizontal barrel mixer rotating about its own axis, ",
+      "ctx_after": ". Motion of the particles in the direction of the axis can only result from inter-particle collisions and will therefore be completely random [4]. Consequently,"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "Motion of the particles in the direction of the axis"
+        ],
+        [
+          "target",
+          "inter-particle collisions"
+        ]
+      ],
+      "ev": "Motion of the particles in the direction of the axis can only result from inter-particle collisions",
+      "ctx_before": "orizontal barrel mixer rotating about its own axis, the velocity of the particles due to the rotation of the mixer has no component parallel to the mixer axis. ",
+      "ctx_after": " and will therefore be completely random [4]. Consequently, the process can be considered as analogous to diffusion in gases, liquids, or solids, and Fick's sec"
+    },
+    {
+      "pt": "claim_relation",
+      "desc": "a discourse relation between >=2 claims/approaches (supports/contrasts/extends/...)",
+      "boundary": "a DISCOURSE relation between claims/findings (supports/contrasts/outperforms). NOT a method-to-method development (extends/improves/compares — those are evolution), NOT a measurement (measures).",
+      "nodes": [
+        [
+          "from",
+          "diffusion"
+        ],
+        [
+          "to",
+          "Fick's second law"
+        ]
+      ],
+      "ev": "the process can be considered as analogous to diffusion in gases, liquids, or solids, and Fick's second law should apply",
+      "ctx_before": " Motion of the particles in the direction of the axis can only result from inter-particle collisions and will therefore be completely random [4]. Consequently, ",
+      "ctx_after": ". Where $C(x, t)$ is the relative concentration of the mixture after time t (min) at a distance x (in.) from the original interface, $D^{*}$ is the diffusion co"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "C(x, t)"
+        ],
+        [
+          "definition",
+          "relative concentration of the mixture"
+        ],
+        [
+          "object",
+          "C(x, t)"
+        ],
+        [
+          "object",
+          "distance x"
+        ],
+        [
+          "object",
+          "original interface"
+        ]
+      ],
+      "ev": "Where $C(x, t)$ is the relative concentration of the mixture after time t (min) at a distance x (in.) from the original interface",
+      "ctx_before": " completely random [4]. Consequently, the process can be considered as analogous to diffusion in gases, liquids, or solids, and Fick's second law should apply. ",
+      "ctx_after": ", $D^{*}$ is the diffusion coefficient and has dimensions in $^{2}$ /min. In the case of an ideal system where the two diffusing components are identical, the d"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "diffusion coefficient"
+        ],
+        [
+          "target",
+          "concentration"
+        ],
+        [
+          "target",
+          "distance x"
+        ],
+        [
+          "target",
+          "C(x, t)"
+        ]
+      ],
+      "ev": "the diffusion coefficient can be assumed to be independent of concentration, i.e. independent of x and t",
+      "ctx_before": "rface, $D^{*}$ is the diffusion coefficient and has dimensions in $^{2}$ /min. In the case of an ideal system where the two diffusing components are identical, ",
+      "ctx_after": ", and Eq. (1) becomes Equation 2 can be written as where N is the “number of revolutions” of the mixer barrel. The diffusion coefficient D is now expressed in $"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "number of revolutions"
+        ],
+        [
+          "definition",
+          "number of revolutions"
+        ],
+        [
+          "object",
+          "mixer barrel"
+        ]
+      ],
+      "ev": "where N is the “number of revolutions” of the mixer barrel",
+      "ctx_before": "cal, the diffusion coefficient can be assumed to be independent of concentration, i.e. independent of x and t, and Eq. (1) becomes Equation 2 can be written as ",
+      "ctx_after": ". The diffusion coefficient D is now expressed in $in^{2}/rev$ . For the system being considered in the present work, Eq. (3) is subject to the following initia"
+    },
+    {
+      "pt": "claim_relation",
+      "desc": "a discourse relation between >=2 claims/approaches (supports/contrasts/extends/...)",
+      "boundary": "a DISCOURSE relation between claims/findings (supports/contrasts/outperforms). NOT a method-to-method development (extends/improves/compares — those are evolution), NOT a measurement (measures).",
+      "nodes": [
+        [
+          "from",
+          "Eq. (6)"
+        ],
+        [
+          "to",
+          "Eq. (4)"
+        ]
+      ],
+      "ev": "under these conditions it is equivalent to Eq. (4)",
+      "ctx_before": "m can be approximated by diffusion in an infinite cylinder, and Eq. (3) can be solved [6] to give: Eq. (6) will apply as long as $\\mathbf{C}(L / 2, N) = 1$ and ",
+      "ctx_after": ". For any mixer with constant loading, speed and particle characteristics, a family of curves is then generated for different numbers of revolutions (similar to"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "M_r"
+        ],
+        [
+          "target",
+          "sample size"
+        ]
+      ],
+      "ev": "$M_{r}$ is thus a function of the sample size only",
+      "ctx_before": "he components in the system. The variance of samples taken from a randomly mixed system is given by where P is the average number of particles per sample. Thus ",
+      "ctx_after": " and tends to unity as the sample size increases. The true variance $\\sigma^{2}(N)$ of particles within the bed at any number of revolutions N is given by, Subs"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "sampling method"
+        ],
+        [
+          "definition",
+          "direct measurement by visual counting of the number of particles of each type present"
+        ]
+      ],
+      "ev": "Because the sampling method is one of direct measurement by visual counting of the number of particles of each type present",
+      "ctx_before": " mainly upon the number of particles taken or observed in each sample. For a sample size of 500 particles, the sensitivity is ±0·2 per cent (i.e. ±1 particle). ",
+      "ctx_after": ", the accuracy is within ±1 per cent and the precision is quite high. RESULTS AND DISCUSSION The theory of diffusional mixing as presented in the previous secti"
+    },
+    {
+      "pt": "measures",
+      "desc": "a quantity is measured by / characterizes >=1 measure",
+      "boundary": "a measurement/evaluation relation: X is measured/evaluated by instrument/method Y. NOT a functional law (constitutive_law), NOT a dependence (influences).",
+      "nodes": [
+        [
+          "object",
+          "accuracy"
+        ],
+        [
+          "instrument",
+          "sampling method"
+        ]
+      ],
+      "ev": "the accuracy is within ±1 per cent",
+      "ctx_before": " ±0·2 per cent (i.e. ±1 particle). Because the sampling method is one of direct measurement by visual counting of the number of particles of each type present, ",
+      "ctx_after": " and the precision is quite high. RESULTS AND DISCUSSION The theory of diffusional mixing as presented in the previous section can be summarized as follows to a"
+    },
+    {
+      "pt": "measures",
+      "desc": "a quantity is measured by / characterizes >=1 measure",
+      "boundary": "a measurement/evaluation relation: X is measured/evaluated by instrument/method Y. NOT a functional law (constitutive_law), NOT a dependence (influences).",
+      "nodes": [
+        [
+          "object",
+          "precision"
+        ],
+        [
+          "instrument",
+          "sampling method"
+        ]
+      ],
+      "ev": "the precision is quite high",
+      "ctx_before": "use the sampling method is one of direct measurement by visual counting of the number of particles of each type present, the accuracy is within ±1 per cent and ",
+      "ctx_after": ". RESULTS AND DISCUSSION The theory of diffusional mixing as presented in the previous section can be summarized as follows to allow comparison with experimenta"
+    },
+    {
+      "pt": "composed_of",
+      "desc": "one whole is composed-of / part-of >=1 component (n-ary composition)",
+      "boundary": "STRUCTURAL composition: parts that make up a whole (model A = B + C). NOT classification (defines), NOT 'X has control params' (influences), NOT experimental setup description, NOT 'we tested X by doing Y'.",
+      "nodes": [
+        [
+          "whole",
+          "mixer"
+        ],
+        [
+          "component",
+          "lucite tube"
+        ],
+        [
+          "component",
+          "lucite end flanges"
+        ]
+      ],
+      "ev": "The mixer used in this study was formed from a 4-in. dia. lucite tube, 16 in. long, fitted with 8-in. dia. lucite end flanges.",
+      "ctx_before": "tions to the same more general Eq. (15) which itself applies over the whole range of N until a random mixture is obtained. EXPERIMENTAL Equipment and materials ",
+      "ctx_after": " The tube was split so that the upper portion could be removed for loading and sampling. The end flanges were accurately machined to insure that, when the mixer"
+    },
+    {
+      "pt": "composed_of",
+      "desc": "one whole is composed-of / part-of >=1 component (n-ary composition)",
+      "boundary": "STRUCTURAL composition: parts that make up a whole (model A = B + C). NOT classification (defines), NOT 'X has control params' (influences), NOT experimental setup description, NOT 'we tested X by doing Y'.",
+      "nodes": [
+        [
+          "whole",
+          "particle counting apparatus"
+        ],
+        [
+          "component",
+          "petrographic microscope"
+        ],
+        [
+          "component",
+          "projection lamp"
+        ],
+        [
+          "component",
+          "glass screen"
+        ]
+      ],
+      "ev": "The particle counting apparatus was a petrographic microscope, projection lamp, and glass screen.",
+      "ctx_before": " chamber and needle are attached, can be raised and lowered through the sampling template so that sampling at any depth within the bed of particle is possible. ",
+      "ctx_after": " critical speed. Observations were made at 50, 250, 600, 1000, 2000, 4000, 7000, 10,000, 20,000, 30,000, 50,000 and 100,000 rev. For sampling purposes, the mixe"
+    },
+    {
+      "pt": "measures",
+      "desc": "a quantity is measured by / characterizes >=1 measure",
+      "boundary": "a measurement/evaluation relation: X is measured/evaluated by instrument/method Y. NOT a functional law (constitutive_law), NOT a dependence (influences).",
+      "nodes": [
+        [
+          "object",
+          "degree of mixedness"
+        ],
+        [
+          "instrument",
+          "fifteen mean values of concentration"
+        ]
+      ],
+      "ev": "Thus at each number of revolutions of the mixer, the degree of mixedness was determined from the fifteen mean values of concentration along the mixer.",
+      "ctx_before": "thirteen possible locations on each section, two were chosen at random. The mean of these two samples was taken to represent the concentration at that section. ",
+      "ctx_after": " After each mixing period, one section (at a distance 4 in. from the original interface) was sampled from all thirteen positions. In this same way the possibili"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "density"
+        ],
+        [
+          "target",
+          "kinetics of mixing"
+        ]
+      ],
+      "ev": "effects due to differences in density, particle shape, or surface roughness would not influence the kinetics of mixing.",
+      "ctx_before": "ntal study of pure diffusional mixing, it was necessary to use components A and Diffusional mixing in an ideal system B that were essentially identical so that ",
+      "ctx_after": " To satisfy this requirement, two lots of glass beads, Cataflex \"202\" beads and \"yellow flash\" beads obtained from Microbeads, Inc., Jackson, Mississippi, were "
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "particle shape"
+        ],
+        [
+          "target",
+          "kinetics of mixing"
+        ]
+      ],
+      "ev": "effects due to differences in density, particle shape, or surface roughness would not influence the kinetics of mixing.",
+      "ctx_before": "ntal study of pure diffusional mixing, it was necessary to use components A and Diffusional mixing in an ideal system B that were essentially identical so that ",
+      "ctx_after": " To satisfy this requirement, two lots of glass beads, Cataflex \"202\" beads and \"yellow flash\" beads obtained from Microbeads, Inc., Jackson, Mississippi, were "
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "surface roughness"
+        ],
+        [
+          "target",
+          "kinetics of mixing"
+        ]
+      ],
+      "ev": "effects due to differences in density, particle shape, or surface roughness would not influence the kinetics of mixing.",
+      "ctx_before": "ntal study of pure diffusional mixing, it was necessary to use components A and Diffusional mixing in an ideal system B that were essentially identical so that ",
+      "ctx_after": " To satisfy this requirement, two lots of glass beads, Cataflex \"202\" beads and \"yellow flash\" beads obtained from Microbeads, Inc., Jackson, Mississippi, were "
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions, each pros/cons). NOT improves (neither fixes the other's limitation), NOT extends (neither generalizes the other).",
+      "nodes": [
+        [
+          "from",
+          "observed or sample variance, $\\sigma_{NS}^{2}$"
+        ],
+        [
+          "to",
+          "expected random variance, $\\sigma_{rS}^{2}$"
+        ]
+      ],
+      "ev": "The observed or sample variance, $\\sigma_{NS}^{2}$ , of the assays across the section at a given number of revolutions, is compared with the expected random variance, $\\sigma_{rS}^{2}$ , based on the mean composition of that section",
+      "ctx_before": "see Fig. 3) on which all thirteen samples were taken, a sample variance and a random variance, based on the mean concentration of the section, were calculated. ",
+      "ctx_after": ". The differences between the observed and random variances are shown in Table 2. Thus there is no systematic variation in concentration perpendicular to the mi"
+    },
+    {
+      "pt": "predicts_relationship",
+      "desc": "A model/equation predicts a specific functional relationship between variables, often expressed as a plot yielding a particular curve or slope",
+      "boundary": "Use when a method explicitly predicts a property’s value or trend (e.g., slope, curve), not when it merely measures, defines, or co-lists that property.",
+      "nodes": [
+        [
+          "source",
+          "Eq. (4)"
+        ],
+        [
+          "target",
+          "relative concentrations"
+        ]
+      ],
+      "ev": "From Eq. (4) it is possible to predict the relative concentrations of the two components at any point in the mixer, after any number of revolutions",
+      "ctx_before": " these approaches to the coefficient evaluated by the four methods outlined above are compared in Table 3. The values agree very closely. 3. Kinetics of mixing ",
+      "ctx_after": ". In Fig. (8), the experimental data are shown superimposed on the theoretical concentration curves calculated using the average value of the diffusion coeffici"
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions, each pros/cons). NOT improves (neither fixes the other's limitation), NOT extends (neither generalizes the other).",
+      "nodes": [
+        [
+          "from",
+          "experimental data"
+        ],
+        [
+          "to",
+          "theoretical concentration curves"
+        ]
+      ],
+      "ev": "the experimental data are shown superimposed on the theoretical concentration curves",
+      "ctx_before": "om Eq. (4) it is possible to predict the relative concentrations of the two components at any point in the mixer, after any number of revolutions. In Fig. (8), ",
+      "ctx_after": " calculated using the average value of the diffusion coefficient for several different numbers of revolutions of the mixer. It can be seen that the agreement be"
+    },
+    {
+      "pt": "claim_relation",
+      "desc": "a discourse relation between >=2 claims/approaches (supports/contrasts/extends/...)",
+      "boundary": "a DISCOURSE relation between claims/findings (supports/contrasts/outperforms). NOT a method-to-method development (extends/improves/compares — those are evolution), NOT a measurement (measures).",
+      "nodes": [
+        [
+          "from",
+          "theory"
+        ],
+        [
+          "to",
+          "experiment"
+        ]
+      ],
+      "ev": "the agreement between theory and experiment is excellent",
+      "ctx_before": "entration curves calculated using the average value of the diffusion coefficient for several different numbers of revolutions of the mixer. It can be seen that ",
+      "ctx_after": ". Although the mixing process is completely described by Eq. (4), the kinetics of the process are shown more clearly in terms of the degree of mixedness $M_{N}$"
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions, each pros/cons). NOT improves (neither fixes the other's limitation), NOT extends (neither generalizes the other).",
+      "nodes": [
+        [
+          "from",
+          "experimental data"
+        ],
+        [
+          "to",
+          "these predictions"
+        ]
+      ],
+      "ev": "the experimental data are compared with these predictions and very good agreement is obtained",
+      "ctx_before": "fficient are given in Figs. 6 and 7. (c) Comparison of experimental determinations of the diffusion coefficients. The values of the diffusion In Figs. 9 and 10 ",
+      "ctx_after": ". GENERAL DISCUSSION The aim of the present investigation was to develop a general theory of diffusional mixing of solids and to test the validity of the theory"
+    },
+    {
+      "pt": "approximates_phenomenon",
+      "desc": "A system or model is approximated by a simplified physical scenario or idealized phenomenon",
+      "boundary": "Use when a model/system is explicitly replaced by an idealized scenario for analysis, NOT when describing a causal mechanism or a mere analogy.",
+      "nodes": [
+        [
+          "system",
+          "real mixer"
+        ],
+        [
+          "approximation",
+          "infinite barrel mixer"
+        ]
+      ],
+      "ev": "However a real mixer approximates this restriction very closely in the early stages of mixing",
+      "ctx_before": "arify this reflection concept, as follows: the process of mixing described by the theory culminating in Eq. (25), strictly applies to an infinite barrel mixer. ",
+      "ctx_after": " and so Fig. 9 as predicted by Eq. (25) describes the kinetics of mixing for the first few thousand revolutions, for the present system. As soon as the kinetics"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "finite length of the mixer"
+        ],
+        [
+          "target",
+          "kinetics of mixing"
+        ]
+      ],
+      "ev": "As soon as the kinetics of mixing are influenced by the finite length of the mixer",
+      "ctx_before": " early stages of mixing and so Fig. 9 as predicted by Eq. (25) describes the kinetics of mixing for the first few thousand revolutions, for the present system. ",
+      "ctx_after": ", the analysis culminating in Eq. (26) must be applied in order to describe the process. This is shown in Fig. 10. Because an odd number of samples was taken ea"
+    },
+    {
+      "pt": "measures",
+      "desc": "a quantity is measured by / characterizes >=1 measure",
+      "boundary": "a measurement/evaluation relation: X is measured/evaluated by instrument/method Y. NOT a functional law (constitutive_law), NOT a dependence (influences).",
+      "nodes": [
+        [
+          "object",
+          "concentration"
+        ],
+        [
+          "instrument",
+          "sampling probe"
+        ]
+      ],
+      "ev": "slight inaccuracies in the location of the sampling probe will result in large deviations of the sample concentration",
+      "ctx_before": " of each component for all numbers of revolutions. For low numbers of revolutions, the concentration gradient at this point is extremely steep (see Fig. 8) and ",
+      "ctx_after": " from the expected value of 0·5. If the bed were sampled in its unmixed state, and the original interface entirely missed by the sampling probe (an event not at"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "parameters of the mixer and the solids"
+        ],
+        [
+          "target",
+          "kinetics of mixing"
+        ]
+      ],
+      "ev": "investigate the effects of those parameters of the mixer and the solids that influence the kinetics",
+      "ctx_before": "fficient calculated from these data is high (Table 3). Further work is in progress in which the theory and experimental system described above is being used to ",
+      "ctx_after": " of the mixing process. SUMMARY AND CONCLUSIONS A general theory has been developed to describe the diffusional mixing of identical solids in a horizontal barre"
+    },
+    {
+      "pt": "constitutive_law",
+      "desc": "a constitutive law relating output quantity/quantities to >=1 input quantity (n-ary)",
+      "boundary": "a FORMAL/QUANTITATIVE law output=f(inputs+params), stated as a formula or explicit functional relation. NOT a prose 'X depends on Y' (that is influences), NOT a definition (defines), NOT a measurement setup (measures).",
+      "nodes": [
+        [
+          "output",
+          "degree of mixedness"
+        ],
+        [
+          "input",
+          "square root of the number of revolutions"
+        ]
+      ],
+      "ev": "It has been shown mathematically that in the early stages of the process, the degree of mixedness increases linearly with the square root of the number of revolutions of the mixer.",
+      "ctx_before": "ND CONCLUSIONS A general theory has been developed to describe the diffusional mixing of identical solids in a horizontal barrel mixer rotating about its axis. ",
+      "ctx_after": " In the later stages of the process, the degree of mixedness as a function of the number of revolutions of the mixer is described by an exponential relationship"
+    },
+    {
+      "pt": "constitutive_law",
+      "desc": "a constitutive law relating output quantity/quantities to >=1 input quantity (n-ary)",
+      "boundary": "a FORMAL/QUANTITATIVE law output=f(inputs+params), stated as a formula or explicit functional relation. NOT a prose 'X depends on Y' (that is influences), NOT a definition (defines), NOT a measurement setup (measures).",
+      "nodes": [
+        [
+          "output",
+          "degree of mixedness"
+        ],
+        [
+          "input",
+          "number of revolutions"
+        ],
+        [
+          "parameter",
+          "exponential relationship"
+        ]
+      ],
+      "ev": "In the later stages of the process, the degree of mixedness as a function of the number of revolutions of the mixer is described by an exponential relationship.",
+      "ctx_before": "hematically that in the early stages of the process, the degree of mixedness increases linearly with the square root of the number of revolutions of the mixer. ",
+      "ctx_after": " An experimental system has been devised which approximates very closely to the ideal case of identical components, yet for assaying purposes the components can"
+    },
+    {
+      "pt": "approximates_phenomenon",
+      "desc": "A system or model is approximated by a simplified physical scenario or idealized phenomenon",
+      "boundary": "Use when a model/system is explicitly replaced by an idealized scenario for analysis, NOT when describing a causal mechanism or a mere analogy.",
+      "nodes": [
+        [
+          "system",
+          "experimental system"
+        ],
+        [
+          "approximation",
+          "ideal case of identical components"
+        ]
+      ],
+      "ev": "An experimental system has been devised which approximates very closely to the ideal case of identical components, yet for assaying purposes the components can be distinguished quite readily.",
+      "ctx_before": "n the later stages of the process, the degree of mixedness as a function of the number of revolutions of the mixer is described by an exponential relationship. ",
+      "ctx_after": " This system has been used to test the validity of the theoretical relationships, and excellent agreement has been obtained between theory and experiment. Solut"
+    },
+    {
+      "pt": "measures",
+      "desc": "a quantity is measured by / characterizes >=1 measure",
+      "boundary": "a measurement/evaluation relation: X is measured/evaluated by instrument/method Y. NOT a functional law (constitutive_law), NOT a dependence (influences).",
+      "nodes": [
+        [
+          "object",
+          "theoretical concentration curves"
+        ],
+        [
+          "instrument",
+          "experimental system"
+        ]
+      ],
+      "ev": "This system has been used to test the validity of the theoretical relationships, and excellent agreement has been obtained between theory and experiment.",
+      "ctx_before": "devised which approximates very closely to the ideal case of identical components, yet for assaying purposes the components can be distinguished quite readily. ",
+      "ctx_after": " Solution of Fick's second law Initial condition The following initial condition exists in the system which is to be considered This condition can be simplified"
+    },
+    {
+      "pt": "composed_of",
+      "desc": "one whole is composed-of / part-of >=1 component (n-ary composition)",
+      "boundary": "STRUCTURAL composition: parts that make up a whole (model A = B + C). NOT classification (defines), NOT 'X has control params' (influences), NOT experimental setup description, NOT 'we tested X by doing Y'.",
+      "nodes": [
+        [
+          "whole",
+          "general solution"
+        ],
+        [
+          "component",
+          "G_n"
+        ],
+        [
+          "component",
+          "Fourier's series expansion"
+        ]
+      ],
+      "ev": "This condition cannot be satisfied in general by any one of the $G_{n}$ , but since the original Eq. (35) is linear, it is permissible to use, as a trial function, the sum of all of the $G_{n}$ . Then, for $0 < x \\leqslant L / 2$ . When $N = 0$ , Eq. (44) becomes, This is of the form of a Fourier's series expansion for a constant;",
+      "ctx_before": "fferential Eq. (35) becomes, for $n = 1,2,\\ldots$ Applying the initial condition (since the system is symmetrical about $x = 0$ we need consider $x > 0$ only), ",
+      "ctx_after": " $A_{n}$ can then be evaluated using the relation, Substituting the relation for $A_{n}$ given by Eq. (46) into Eq. (44) yields, But, since $C(x, N) = G(x, N) +"
+    }
+  ],
+  "glm": [
+    {
+      "i": 0,
+      "pt": "measures",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states that a sampling and assaying technique allows the determination of concentration, correctly b"
+    },
+    {
+      "i": 1,
+      "pt": "claim_relation",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states 'excellent agreement' between the experimental data and theoretical predictions, correctl"
+    },
+    {
+      "i": 2,
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states 'The degree of mixedness is a fundamental state of a system', perfectly matching the defi"
+    },
+    {
+      "i": 3,
+      "pt": "background",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence span mentions 'a similar consideration' but does not contain the word 'macromixing', making the binding of "
+    },
+    {
+      "i": 4,
+      "pt": "composed_of",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The evidence span refers to 'these' as combinations of diffusion and breaking up of aggregates, but it does not explicit"
+    },
+    {
+      "i": 5,
+      "pt": "measures",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states the system is used to obtain data to establish the validity, correctly binding the corefe"
+    },
+    {
+      "i": 6,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence explicitly negates a relationship ('has no component parallel to'), so it does not state an 'influences' de"
+    },
+    {
+      "i": 7,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text states that motion results from collisions (collisions cause motion), but the edge incorrectly binds motion as "
+    },
+    {
+      "i": 8,
+      "pt": "claim_relation",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence states an analogy and asserts that a law applies to a process, which is not a discourse relation (supports/"
+    },
+    {
+      "i": 9,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The subject 'C(x, t)' is incorrectly bound to the 'object' role, and spatial parameters ('distance x', 'original interfa"
+    },
+    {
+      "i": 10,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence explicitly states the diffusion coefficient is *independent* of concentration, x, and t, which is the exact"
+    },
+    {
+      "i": 11,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The subject of the definition is 'N', not 'number of revolutions', which is actually the definition itself."
+    },
+    {
+      "i": 12,
+      "pt": "claim_relation",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "Mathematical equivalence is not a discourse relation like supports/contrasts/outperforms."
+    },
+    {
+      "i": 13,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states M_r is a function of the sample size, perfectly matching the pattern's defined 'X depends"
+    },
+    {
+      "i": 14,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text states the method 'is one of' a category of methods, which is an instance-of/classification relation, not a str"
+    },
+    {
+      "i": 15,
+      "pt": "measures",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence span only states the accuracy value and completely omits the sampling method, failing to state the measurem"
+    },
+    {
+      "i": 16,
+      "pt": "measures",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence text only states the precision is high, without mentioning the sampling method or establishing a measuremen"
+    },
+    {
+      "i": 17,
+      "pt": "composed_of",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states the mixer was formed from a lucite tube and fitted with lucite end flanges, correctly bin"
+    },
+    {
+      "i": 18,
+      "pt": "composed_of",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states the apparatus was composed of the three listed components, correctly binding the whole an"
+    },
+    {
+      "i": 19,
+      "pt": "measures",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states the degree of mixedness was determined from the fifteen mean values, correctly binding th"
+    },
+    {
+      "i": 20,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The evidence explicitly states that density would NOT influence the kinetics of mixing, negating both the existence of t"
+    },
+    {
+      "i": 21,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The evidence explicitly states that particle shape would NOT influence the kinetics of mixing, directly contradicting th"
+    },
+    {
+      "i": 22,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The evidence explicitly states that surface roughness would NOT influence the kinetics of mixing, directly contradicting"
+    },
+    {
+      "i": 23,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "Observed and expected variances are components of a single statistical test, not parallel alternative models with differ"
+    },
+    {
+      "i": 24,
+      "pt": "predicts_relationship",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states that Eq. (4) predicts the relative concentrations, correctly binding the equation as the "
+    },
+    {
+      "i": 25,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "Experimental data and theoretical curves represent a validation/evaluation setup, not parallel alternative mechanisms wi"
+    },
+    {
+      "i": 26,
+      "pt": "claim_relation",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence states a measurement of agreement between theory and experiment, not a discourse relation like supports or "
+    },
+    {
+      "i": 27,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence describes a theory-vs-experiment validation comparison, not a comparison of parallel different-mechanism al"
+    },
+    {
+      "i": 28,
+      "pt": "approximates_phenomenon",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The evidence span states the real mixer approximates a restriction, reversing the direction of the 'approximated by' rel"
+    },
+    {
+      "i": 29,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states that the kinetics of mixing are influenced by the finite length of the mixer, perfectly m"
+    },
+    {
+      "i": 30,
+      "pt": "measures",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence describes a dependence (inaccuracies in probe location influence concentration deviations), not a measureme"
+    },
+    {
+      "i": 31,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states that the parameters influence the kinetics, correctly binding the source and target with "
+    },
+    {
+      "i": 32,
+      "pt": "constitutive_law",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence describes the relationship in prose ('increases linearly with') rather than stating a formal/quantitative f"
+    },
+    {
+      "i": 33,
+      "pt": "constitutive_law",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence describes the relationship in prose rather than stating a formal/quantitative formula or explicit functiona"
+    },
+    {
+      "i": 34,
+      "pt": "approximates_phenomenon",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states the experimental system approximates the ideal case, with perfect role alignment."
+    },
+    {
+      "i": 35,
+      "pt": "measures",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The text states the system tests 'theoretical relationships', not 'theoretical concentration curves', and testing validi"
+    },
+    {
+      "i": 36,
+      "pt": "composed_of",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text states a 'trial function' is the sum of G_n and takes the form of a Fourier's series, not that a 'general solut"
+    }
+  ],
+  "qwen": [
+    {
+      "i": 0,
+      "pt": "measures",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states the technique determines concentration, aligning perfectly with the measure pattern and node "
+    },
+    {
+      "i": 1,
+      "pt": "claim_relation",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text describes a validation measurement (agreement between data and theory) which is explicitly excluded from the cl"
+    },
+    {
+      "i": 2,
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence sentence explicitly asserts the definitional identity using the exact phrases bound to both slots."
+    },
+    {
+      "i": 3,
+      "pt": "background",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text links the consideration (defined as macromixing in context) to Danckwerts as prior work, satisfying background "
+    },
+    {
+      "i": 4,
+      "pt": "composed_of",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The text does not contain the term 'macromixing', referring only to 'mechanisms' and 'mixing' generally, so the specific"
+    },
+    {
+      "i": 5,
+      "pt": "measures",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states the system is used to obtain data to establish validity, satisfying the evaluation relation."
+    },
+    {
+      "i": 6,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text describes a geometric constraint (velocity orientation relative to axis), not a functional influence or causal "
+    },
+    {
+      "i": 7,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states axial motion results from (depends on) collisions, matching the pattern's 'depends on' allowa"
+    },
+    {
+      "i": 8,
+      "pt": "claim_relation",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text describes a physical analogy for law applicability, not a discourse relation between claims or approaches requi"
+    },
+    {
+      "i": 9,
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence text explicitly states the definitional identity between the symbol and its meaning, with all nodes faithfu"
+    },
+    {
+      "i": 10,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The evidence text explicitly states the diffusion coefficient is independent of concentration, directly contradicting th"
+    },
+    {
+      "i": 11,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text defines variable 'N', but the edge incorrectly asserts a definitional identity between 'number of revolutions' "
+    },
+    {
+      "i": 12,
+      "pt": "claim_relation",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "Evidence states mathematical equivalence between equations, not a discourse claim relation (supports/contrasts/outperfor"
+    },
+    {
+      "i": 13,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence text explicitly states M_r is a function of sample size, matching the dependence pattern and node bindings "
+    },
+    {
+      "i": 14,
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence text explicitly asserts the definitional identity between the sampling method and the measurement technique"
+    },
+    {
+      "i": 15,
+      "pt": "measures",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text states the sampling method *has* an accuracy property, not that it *measures* accuracy as an object."
+    },
+    {
+      "i": 16,
+      "pt": "measures",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "Text states the method has high precision as a quality attribute, not that it measures precision as a quantity."
+    },
+    {
+      "i": 17,
+      "pt": "composed_of",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence text explicitly states the mixer was formed from and fitted with the listed components, confirming the stru"
+    },
+    {
+      "i": 18,
+      "pt": "composed_of",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence sentence explicitly asserts the structural composition of the apparatus using the exact components listed w"
+    },
+    {
+      "i": 19,
+      "pt": "measures",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states mixedness is determined from concentration values, aligning with the measure pattern and slot"
+    },
+    {
+      "i": 20,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The evidence text explicitly negates the influence ('would not influence'), contradicting the positive polarity of the e"
+    },
+    {
+      "i": 21,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The text explicitly negates the influence ('would not influence'), contradicting the positive 'influences' edge type."
+    },
+    {
+      "i": 22,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The evidence text explicitly negates the influence ('would not influence'), contradicting the positive edge relation."
+    },
+    {
+      "i": 23,
+      "pt": "compares",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence text explicitly states the comparison relationship using the exact entities bound in the nodes with matchin"
+    },
+    {
+      "i": 24,
+      "pt": "predicts_relationship",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states Eq. (4) predicts relative concentrations, matching the edge semantics and node roles."
+    },
+    {
+      "i": 25,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "Relation is experimental validation, not comparison of parallel mechanism alternatives as defined by pattern boundary."
+    },
+    {
+      "i": 26,
+      "pt": "claim_relation",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states excellent agreement between the bound nodes, confirming a positive discourse relation wit"
+    },
+    {
+      "i": 27,
+      "pt": "compares",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence text explicitly states the comparison relation between the identified nodes."
+    },
+    {
+      "i": 28,
+      "pt": "approximates_phenomenon",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states the real mixer approximates the infinite barrel mixer restriction, validating the roles a"
+    },
+    {
+      "i": 29,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence text explicitly asserts the influence relationship with correct direction and entity binding."
+    },
+    {
+      "i": 30,
+      "pt": "measures",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "Evidence describes error propagation sensitivity rather than explicitly stating the measurement relation."
+    },
+    {
+      "i": 31,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly asserts via relative clause that the parameters influence the kinetics, matching the edge direction "
+    },
+    {
+      "i": 32,
+      "pt": "constitutive_law",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states a linear functional relationship between the degree of mixedness and the square root of r"
+    },
+    {
+      "i": 33,
+      "pt": "constitutive_law",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "Evidence is prose description not formal formula, and 'exponential relationship' is a function type not a quantitative p"
+    },
+    {
+      "i": 34,
+      "pt": "approximates_phenomenon",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states the experimental system approximates the ideal case, directly supporting the relation and"
+    },
+    {
+      "i": 35,
+      "pt": "measures",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The evidence states the system tests the validity of relationships, not that it measures the curves, violating the 'meas"
+    },
+    {
+      "i": 36,
+      "pt": "composed_of",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "Evidence describes a trial function (not general solution) where the sum of G_n takes the form of a Fourier series, rath"
+    }
+  ]
+}
