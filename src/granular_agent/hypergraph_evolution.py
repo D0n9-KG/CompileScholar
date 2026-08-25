@@ -479,6 +479,19 @@ The KIND test: would a scientist say these are the SAME relation category
 with a flavor difference, or TWO different relation categories? Same category
 + flavor = variant; two categories = distinct new kind.
 
+QUALIFIER-EXPRESSIBILITY TEST (apply before deciding): can the proposed
+relation be expressed as an EXISTING pattern + a qualifier/condition? If yes,
+it is a VARIANT — do not create a new pattern for what a qualifier can carry.
+  - "X schedules/anneals parameter p over time" → NOT a new pattern: it is an
+    existing dependency/law relation + a condition qualifier (the annealing is
+    HOW the relation holds, not a new relation kind)
+  - "X trains/optimizes model Y using method Z" → likely an existing
+    measure/influence relation + a method qualifier (instrument = qualifier)
+  - "X modifies Y by adding a component" → likely extends/improves + a
+    qualifier on what changed (mechanism-of-change = qualifier)
+Only if NO existing pattern + qualifier combination can express it is it a
+candidate new kind — then apply the KIND test above.
+
 SCOPE OF THIS GATE (critical — division of labor with later pruning):
 This gate judges ONLY "is this an INSTANCE VARIANT of an existing pattern,
 or a genuinely NEW RELATION KIND?" — a structural KIND judgment (family-aware:
@@ -487,9 +500,11 @@ paper-specific / too niche to generalize" — that is a RECURRENCE/pruning
 concern (judged across many papers, not from one). The later merge/retire
 pruning step cleans noise patterns that slip through here.
 
-Reject (valid=false) ONLY if clearly an INSTANCE VARIANT (same relation KIND
-as an existing pattern, only form/condition/qualifier differs) → suggest the
-base pattern + qualifier.
+Reject (valid=false) if it is an INSTANCE VARIANT — same relation KIND as an
+existing pattern, expressible as existing-pattern + qualifier/condition (see
+the QUALIFIER-EXPRESSIBILITY TEST above) → suggest the base pattern + qualifier.
+A relation whose novelty lies in HOW/WHEN/WHAT-CHANGED (mechanism, condition,
+schedule, instrument) rather than in the relation CATEGORY itself is a variant.
 
 Accept (valid=true) if:
 - the relation KIND is genuinely new (not expressible as existing-pattern +
