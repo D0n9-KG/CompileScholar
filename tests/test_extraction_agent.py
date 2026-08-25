@@ -187,17 +187,38 @@ check("fixer: reextract honestly drops-with-note (not unbounded loop)",
       stats["reextract_as_drop"] == 1 and not any(he.eid == "e4" for he in kept))
 check("fixer: kept only keep+retype (quality bar)", len(kept) == 2)
 
-# 4b. DETERMINISTIC verbatim post-check (rule, overrides LLM verifier): even
-# if the LLM says "keep", an evidence_span NOT in the section text is dropped.
-# (real-run failure: verifier kept a non-verbatim evidence)
-v4b = [Verdict(edge_id="e1", fix="keep")]  # LLM says keep
+# 4b. LOCATABILITY gate (replaces loose token-coverage): an evidence NOT in the
+# section AND not quotable by the LLM → NOT locatable → dropped (rule over LLM).
+# cures the改写-through hole (token coverage let word-overlap改写 pass).
+v4b = [Verdict(edge_id="e1", fix="keep", evidence_quote="")]  # LLM says keep but no quote
 edges4b = [Hyperedge(eid="e1", pattern_type="extends", node_ids=["n1", "n2"],
                      node_roles=["from", "to"],
                      evidence_span="this phrase is NOT in the section text")]
 kept_b, stats_b, _ = agent4.fix(edges4b, v4b, [], SECTION, plan)
-check("fixer: deterministic verbatim gate drops non-substring evidence (rule over LLM)",
-      stats_b["dropped_nonverbatim"] == 1 and len(kept_b) == 0)
-# a truly verbatim evidence is kept
+check("locability: non-substring evidence with no LLM quote dropped (not locatable)",
+      stats_b["dropped_nonlocatable"] == 1 and len(kept_b) == 0)
+# a truly verbatim evidence is kept (locatable via rule substring) + offset recorded
+edges4b2 = [Hyperedge(eid="e1", pattern_type="extends", node_ids=["n1", "n2"],
+                      node_roles=["from", "to"],
+                      evidence_span="We extend the μ(I) rheology")]
+kept_b2, stats_b2, _ = agent4.fix(edges4b2, v4b, [], SECTION, plan)
+check("locability: verbatim evidence kept + source offset recorded (可溯源)",
+      len(kept_b2) == 1 and kept_b2[0].qualifiers.get("_evidence_offset") is not None)
+# LLM改写 NOT locatable even if it quotes a fake span (quote not in source)
+v4b_fake = [Verdict(edge_id="e1", fix="keep",
+                    evidence_quote="this fake quote is also not in the section")]
+kept_b3, stats_b3, _ = agent4.fix(edges4b, v4b_fake, [], SECTION, plan)
+check("locability: LLM fake quote (not in source) -> dropped (改写 blocked)",
+      stats_b3["dropped_nonlocatable"] == 1 and len(kept_b3) == 0)
+# LLM quote rescues a LaTeX-normalized evidence (quote is the real source span)
+v4b_rescue = [Verdict(edge_id="e1", fix="keep",
+                      evidence_quote="We extend the μ(I) rheology")]  # quote = real source
+edges4b_rescue = [Hyperedge(eid="e1", pattern_type="extends", node_ids=["n1", "n2"],
+                            node_roles=["from", "to"],
+                            evidence_span="We extend the mu-I rheology")]  # LaTeX-normalized
+kept_b4, stats_b4, _ = agent4.fix(edges4b_rescue, v4b_rescue, [], SECTION, plan)
+check("locability: LLM quote rescues LaTeX-normalized evidence (real span found)",
+      len(kept_b4) == 1)
 edges4c = [Hyperedge(eid="e1", pattern_type="extends", node_ids=["n1", "n2"],
                      node_roles=["from", "to"],
                      evidence_span="We extend the μ(I) rheology")]

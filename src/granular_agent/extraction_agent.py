@@ -85,18 +85,27 @@ class Plan:
 class Verdict:
     """verifier output per edge. fix drives the fixer. re-type is INTERNALIZED
     here (type_correct + fix=retype:X), not a separate step. role-fix is also
-    INTERNALIZED (role_correct + fix=rolefix:<role1,role2,...>) — the LLM
-    verifier judges what role each node SHOULD have (semantic), and fixer
-    re-points the roles then RE-CHECKS the role gate (rule, structural). This
-    cures the bad-role coverage hole: a real edge with a wrong role name was
-    dropped whole by the rule gate (12/ML_DQN); now the LLM can repair the
-    role, the rule gate still blocks un-fixable bad structure (no downgrade)."""
+    INTERNALIZED (role_correct + fix=rolefix:<r1,r2,...>) — the LLM verifier
+    judges what role each node SHOULD have (semantic), and fixer re-points the
+    roles then RE-CHECKS the role gate (rule, structural). This cures the
+    bad-role coverage hole: a real edge with a wrong role name was dropped
+    whole by the rule gate (12/ML_DQN); now the LLM can repair the role, the
+    rule gate still blocks un-fixable bad structure (no downgrade).
+
+    evidence_quote: the LLM verifier quotes the CONTINUOUS source-text span the
+    evidence corresponds to (for locatability — every kept edge must be
+    locatable in the source so the hypergraph is explainable/可溯源). The fixer
+    uses it as a 2nd-chance substring (after the rule's LaTeX-normalized exact
+    check fails) — if neither the evidence nor the quote is a substring of the
+    source, the edge is NOT locatable → drop (LLM改写/拼接/编). This replaces
+    the loose token-coverage gate (which let改写 through on word overlap)."""
     edge_id: str
     verbatim_in_source: bool = True
     type_correct: bool = True
     relation_exists: bool = True
-    role_correct: bool = True   # LLM judges: are the node_roles correct for this relation?
-    fix: str = "keep"   # keep | retype:<pattern_id> | rolefix:<r1,r2,...> | reextract | drop
+    role_correct: bool = True
+    fix: str = "keep"
+    evidence_quote: str = ""   # LLM quotes the continuous source span (locatability)
     note: str = ""
 
 
@@ -144,6 +153,13 @@ Edges to verify (each has pattern_type, node surfaces+roles, qualifiers, evidenc
 For EACH edge judge (be strict — a wrong edge is worse than a dropped one):
 - verbatim_in_source: is the evidence_span an EXACT substring of the section text?
   (paraphrase / summary / invented = false)
+- evidence_quote: quote the CONTINUOUS span of the section text that this edge's
+  evidence corresponds to, VERBATIM from the section (copy it exactly, <=200 chars).
+  This makes every kept edge LOCATABLE in the source (the hypergraph must be
+  explainable/可溯源 — no edge without a source position). If the evidence is
+  paraphrased/invented and has no continuous source span, set evidence_quote="".
+  The fixer will substring-check your quote against the source; a quote that
+  isn't actually in the source means the edge is not locatable -> dropped.
 - type_correct: is pattern_type the RIGHT one per the schema patterns + their
   [boundary: ...] notes ABOVE? Use the boundary notes to disambiguate the
   confusable families (e.g. influences = functional dependence NOT co-listing;
@@ -167,7 +183,7 @@ For EACH edge judge (be strict — a wrong edge is worse than a dropped one):
   hallucinated / paraphrase evidence).
 
 Output JSON: {{"verdicts":[{{"edge_id":"...","verbatim_in_source":true,"type_correct":true,
-"relation_exists":true,"role_correct":true,"fix":"keep","note":"..."}}]}}
+"relation_exists":true,"role_correct":true,"evidence_quote":"the continuous source span, verbatim, <=200 chars","fix":"keep","note":"..."}}]}}
 """
 
 
@@ -317,6 +333,7 @@ class ExtractionAgent:
                 relation_exists=bool(v.get("relation_exists", True)),
                 role_correct=bool(v.get("role_correct", True)),
                 fix=fix,
+                evidence_quote=str(v.get("evidence_quote", "")),
                 note=str(v.get("note", ""))))
         return verdicts
 
@@ -356,7 +373,7 @@ class ExtractionAgent:
         trigger. (MA1 fix: the evolver's failure feed was a合成 Hyperedge; real
         dropped edges are the true signal for schema evolution.)"""
         stats = {"keep": 0, "retype": 0, "rolefix": 0, "reextract_as_drop": 0,
-                 "drop": 0, "dropped_nonverbatim": 0, "dropped_bad_role": 0}
+                 "drop": 0, "dropped_nonlocatable": 0, "dropped_bad_role": 0}
         kept: list[Hyperedge] = []
         dropped_edges: list[dict] = []
         vmap = {v.edge_id: v for v in verdicts}
@@ -398,11 +415,32 @@ class ExtractionAgent:
             # (rescue rate) + known脏边 (false-pass rate) before trusting; the
             # gate logs verdict so it's auditable. Not a downgrade: bad-role edges
             # still dropped by _role_ok; only verbatim is relaxed for LaTeX.
+            # LOCATABILITY gate (replaces the loose token-coverage gate).
+            # Every kept edge must be LOCATABLE in the source (可溯源 → explainable
+            # hypergraph). Two-stage:
+            # (A) RULE (structural/deterministic): LaTeX-normalized substring of
+            #     the evidence in the section. If命中 → locatable, record offset.
+            # (B) LLM (semantic): if (A) misses, the verifier quoted the source
+            #     span (evidence_quote). Substring-check the QUOTE — if the quote
+            #     is actually in the source, the edge is locatable (the LLM found
+            #     the real span the evidence points to, e.g. a LaTeX-normalized
+            #     version). If neither the evidence nor the quote is a source
+            #     substring → NOT locatable → drop (LLM改写/拼接/编).
+            # This cures the token-coverage hole (it let改写 through on word
+            # overlap: 'hippocampus may support the physical realization...' —
+            # words matched but content was invented). Locatability is structural
+            # (a real span exists) + LLM (finds it), not word-counting.
             ev = (he.evidence_span or "").strip()
-            if ev and not self._verbatim_ok(ev, section_text):
-                stats["dropped_nonverbatim"] += 1
-                _record_drop(he, "non-verbatim-evidence", v)
+            loc_offset = self._locate_evidence(ev, v, section_text)
+            if ev and loc_offset is None:
+                stats["dropped_nonlocatable"] = stats.get("dropped_nonlocatable", 0) + 1
+                _record_drop(he, "evidence-not-locatable", v)
                 continue
+            # record the source offset on the edge for可溯源 (kept edges carry
+            # where in the source their evidence lives).
+            if loc_offset is not None:
+                he.qualifiers = dict(he.qualifiers) if he.qualifiers else {}
+                he.qualifiers["_evidence_offset"] = str(loc_offset)
             if v is None:
                 pass  # keep
             elif v.fix == "keep":
@@ -493,37 +531,60 @@ class ExtractionAgent:
         used = {r for r in he.node_roles}
         return used.issubset(declared)
 
-    def _verbatim_ok(self, ev: str, section_text: str) -> bool:
-        """Deterministic verbatim gate, dual-rule (P1-A fix).
-        (A) LaTeX-normalized substring: strip $/\\cmd/{}/math-env + Greek map
-        (\\gamma→γ) + whitespace fold on BOTH evidence and section, then substring.
-        Rescues真边 where the LLM mildly normalized LaTeX (c→γ, $...$ stripped).
-        (B) content-token coverage: >=70% of evidence's实词 (len>=3, non-stopword)
-        must appear in the normalized section, AND >=2 of the first 3 实词 must hit.
-        Blocks LLM hallucination/paraphrase that fuzzy substring alone would pass.
-        Honest: 0.70 / 2-of-3 are经验值 — validate against gold真边 (rescue) +
-        known脏边 (false-pass) before trusting. Logs nothing yet — caller records
-        the drop reason so it's auditable."""
+    def _locate_evidence(self, ev: str, v: "Verdict | None", section_text: str):
+        """Locatability gate (replaces the loose token-coverage _verbatim_ok).
+        Returns the source offset of the evidence, or None if NOT locatable.
+
+        (A) RULE (structural): LaTeX-normalized substring of the evidence in the
+            section.命中 → return the offset in the ORIGINAL section (map back
+            from normalized). This rescues真边 where the LLM mildly normalized
+            LaTeX (c→γ, $...$ stripped) — the evidence IS in the source, just
+            surface-different.
+        (B) LLM (semantic): if (A) misses, the verifier quoted the source span
+            (evidence_quote). Substring-check the QUOTE (LaTeX-normalized) — if
+            it's actually in the source, the edge is locatable (the LLM found
+            the real span). Return its offset. If the quote isn't in the source
+            either, the LLM didn't find a real span → NOT locatable → None.
+
+        This cures the token-coverage hole (let改写 through on word overlap —
+        'hippocampus may support the physical realization...' words matched but
+        content was invented). Locatability is structural (a real span exists) +
+        LLM (finds it), not word-counting. Every kept edge ends up with a
+        source offset → the hypergraph is可溯源/explainable."""
         if not ev:
-            return False
-        n_ev = _normalize_latex(ev)
+            return None
         n_sec = _normalize_latex(section_text)
-        # (A) normalized substring
+        # (A) evidence normalized substring
+        n_ev = _normalize_latex(ev)
         if n_ev and n_ev in n_sec:
-            return True
-        # (B) content-token coverage (anti-hallucination)
-        import re as _re
-        _STOP = {"the","and","for","with","that","this","from","are","was","were",
-                 "is","of","in","to","a","an","on","by","as","at","be","it","its",
-                 "we","our","not","but","or","which","can","all","each","than"}
-        ev_tokens = [t for t in _re.findall(r"[a-z0-9]{3,}", n_ev) if t not in _STOP]
-        if not ev_tokens:
-            return False
-        sec_tokens = set(_re.findall(r"[a-z0-9]{3,}", n_sec))
-        hit = sum(1 for t in ev_tokens if t in sec_tokens)
-        coverage = hit / len(ev_tokens)
-        head_hit = sum(1 for t in ev_tokens[:3] if t in sec_tokens)
-        return coverage >= 0.70 and head_hit >= 2
+            # map back to an approximate offset in the raw section (find the
+            # raw text around where the normalized ev starts). Cheap: find the
+            # first ~30 normalized chars in the raw (lowercased whitespace-folded).
+            return self._raw_offset(ev, section_text)
+        # (B) LLM quote substring
+        if v and v.evidence_quote:
+            n_q = _normalize_latex(v.evidence_quote)
+            if n_q and n_q in n_sec:
+                return self._raw_offset(v.evidence_quote, section_text)
+        return None
+
+    def _raw_offset(self, needle: str, haystack: str) -> int:
+        """Find an approximate raw offset of needle in haystack (for溯源).
+        Tries exact, then whitespace-folded lowercase. Returns -1 if not found
+        (shouldn't happen — caller already confirmed normalized substring)."""
+        if not needle:
+            return -1
+        pos = haystack.find(needle)
+        if pos >= 0:
+            return pos
+        # whitespace-folded lowercase (matches the normalized substring)
+        h = re.sub(r"\s+", " ", haystack).lower()
+        n = re.sub(r"\s+", " ", needle).lower()
+        pos = h.find(n)
+        if pos < 0:
+            return -1
+        # approximate: count raw chars up to this folded position
+        return pos
 
     # ---- commit to KB (add_edge Mutation, validate only, no route 断点 2) ----
     def commit_edges(self, edges: list[Hyperedge], nodes: list[HGNode],
