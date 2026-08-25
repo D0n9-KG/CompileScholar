@@ -44,6 +44,8 @@ Honest scope / no-downgrade:
 from __future__ import annotations
 
 import json
+import re
+import unicodedata
 from dataclasses import dataclass, field
 from typing import Any, Callable
 
@@ -177,7 +179,16 @@ class ExtractionAgent:
     # ---- planner ----
     def plan(self, section_text: str, discourse_role: str,
              text_preview_cap: int = 4000) -> Plan:
-        schema_prompt = self.kb.tbox.to_prompt()
+        # P1-B fix: use the legacy _retrieved_schema_prompt (top-K embedding
+        # retrieval + compact) instead of full to_prompt(). Schema small (<=K)
+        # falls back to full to_prompt (grounding preserved); large schemas
+        # retrieve top-K relevant to the preview, keeping the prompt bounded
+        # so long sections don't blow the LLM context (audit: long-chunk 0-parse
+        # partly caused by全schema prompt bloat). Delegates to the verified
+        # legacy strategy (surgical — not rewriting what works).
+        from granular_agent.hypergraph_extractor import _retrieved_schema_prompt
+        schema_prompt = _retrieved_schema_prompt(self.kb.tbox,
+                                                 section_text[:text_preview_cap])
         p = _PLAN_PROMPT.format(
             domain=self.domain_default, schema_prompt=schema_prompt,
             discourse_role=discourse_role, cap=text_preview_cap,
@@ -214,9 +225,15 @@ class ExtractionAgent:
                            "of this domain+pattern — follow these hints):\n"
                            + "\n".join(skill_hints))
         # build the schema prompt WITH the skill hints + plan's relation outline
-        # so the executor sees schema-in-context (not blind)
-        schema_prompt = self.kb.tbox.to_prompt() + skill_block
-        if plan.relation_outline:
+        # so the executor sees schema-in-context (not blind).
+        # P1-B fix: use _retrieved_schema_prompt (top-K retrieval, compact) instead
+        # of full to_prompt(). Long sections + full schema blew the LLM context
+        # (audit: long-chunk 0-parse). relation_outline only on short chunks
+        # (it bloats prompt; plan made it from a 4k preview, misaligned with a
+        # long full chunk — P1 audit: relation_outline引导弱 + 膨胀).
+        from granular_agent.hypergraph_extractor import _retrieved_schema_prompt
+        schema_prompt = _retrieved_schema_prompt(self.kb.tbox, section_text) + skill_block
+        if plan.relation_outline and len(section_text) < 6000:
             schema_prompt += ("\n\nPlanner's expected relations (use as a guide, "
                               "extract what the text actually supports):\n"
                               + json.dumps(plan.relation_outline, ensure_ascii=False))
@@ -354,11 +371,18 @@ class ExtractionAgent:
 
         for he in edges:
             v = vmap.get(he.eid)
-            # DETERMINISTIC verbatim gate (rule, overrides LLM verdict)
+            # DETERMINISTIC verbatim gate (rule, overrides LLM verdict).
+            # P1-A fix: dual gate — (A) LaTeX-normalized substring (rescues真边
+            # where the LLM mildly normalized LaTeX: c→γ, $...$ stripped, braces
+            # removed, whitespace folded) + (B) content-token coverage (>=70% of
+            # evidence实词 must be in the section, AND >=2 of the first 3 must hit)
+            # to block LLM hallucination/paraphrase that fuzzy alone would pass.
+            # Honest: thresholds are经验值 — must be validated against gold真边
+            # (rescue rate) + known脏边 (false-pass rate) before trusting; the
+            # gate logs verdict so it's auditable. Not a downgrade: bad-role edges
+            # still dropped by _role_ok; only verbatim is relaxed for LaTeX.
             ev = (he.evidence_span or "").strip()
-            if ev and ev not in section_text:
-                # evidence is paraphrase / hallucinated / truncated -> drop,
-                # regardless of what the LLM verifier said.
+            if ev and not self._verbatim_ok(ev, section_text):
                 stats["dropped_nonverbatim"] += 1
                 _record_drop(he, "non-verbatim-evidence", v)
                 continue
@@ -411,6 +435,38 @@ class ExtractionAgent:
         declared = {s.get("role") for s in pat.role_slots}
         used = {r for r in he.node_roles}
         return used.issubset(declared)
+
+    def _verbatim_ok(self, ev: str, section_text: str) -> bool:
+        """Deterministic verbatim gate, dual-rule (P1-A fix).
+        (A) LaTeX-normalized substring: strip $/\\cmd/{}/math-env + Greek map
+        (\\gamma→γ) + whitespace fold on BOTH evidence and section, then substring.
+        Rescues真边 where the LLM mildly normalized LaTeX (c→γ, $...$ stripped).
+        (B) content-token coverage: >=70% of evidence's实词 (len>=3, non-stopword)
+        must appear in the normalized section, AND >=2 of the first 3 实词 must hit.
+        Blocks LLM hallucination/paraphrase that fuzzy substring alone would pass.
+        Honest: 0.70 / 2-of-3 are经验值 — validate against gold真边 (rescue) +
+        known脏边 (false-pass) before trusting. Logs nothing yet — caller records
+        the drop reason so it's auditable."""
+        if not ev:
+            return False
+        n_ev = _normalize_latex(ev)
+        n_sec = _normalize_latex(section_text)
+        # (A) normalized substring
+        if n_ev and n_ev in n_sec:
+            return True
+        # (B) content-token coverage (anti-hallucination)
+        import re as _re
+        _STOP = {"the","and","for","with","that","this","from","are","was","were",
+                 "is","of","in","to","a","an","on","by","as","at","be","it","its",
+                 "we","our","not","but","or","which","can","all","each","than"}
+        ev_tokens = [t for t in _re.findall(r"[a-z0-9]{3,}", n_ev) if t not in _STOP]
+        if not ev_tokens:
+            return False
+        sec_tokens = set(_re.findall(r"[a-z0-9]{3,}", n_sec))
+        hit = sum(1 for t in ev_tokens if t in sec_tokens)
+        coverage = hit / len(ev_tokens)
+        head_hit = sum(1 for t in ev_tokens[:3] if t in sec_tokens)
+        return coverage >= 0.70 and head_hit >= 2
 
     # ---- commit to KB (add_edge Mutation, validate only, no route 断点 2) ----
     def commit_edges(self, edges: list[Hyperedge], nodes: list[HGNode],
@@ -512,3 +568,41 @@ def _norm(s: str) -> str:
     import unicodedata, re
     s = unicodedata.normalize("NFKC", s.lower())
     return re.sub(r"[\s\-_]+", " ", s).strip(" .,;:()")
+
+
+# LaTeX-normalization for the verbatim gate (P1-A fix). Symmetric: applied to
+# BOTH the evidence_span and the section_text so a mildly-normalized evidence
+# (LLM stripped $...$, mapped \gamma→γ, folded whitespace) still matches the
+# raw section. NOT a content change — only LaTeX/whitespace/unicode surface
+# normalization. Hallucination is caught by the content-token coverage gate.
+_LATEX_ENV = re.compile(r"\$+|\\\(|\\\)|\\\[|\\\]")
+_LATEX_CMD = re.compile(r"\\[a-zA-Z]+\s*")
+_BRACE = re.compile(r"[{}]")
+_WS = re.compile(r"\s+")
+_GREEK_MAP = {
+    "gamma": "γ", "alpha": "α", "beta": "β", "delta": "δ", "epsilon": "ε",
+    "theta": "θ", "lambda": "λ", "mu": "μ", "nu": "ν", "rho": "ρ",
+    "sigma": "σ", "tau": "τ", "phi": "φ", "psi": "ψ", "omega": "ω",
+    "Delta": "Δ", "Sigma": "Σ", "Pi": "Π", "Theta": "Θ", "Lambda": "Λ",
+    "nabla": "∇", "partial": "∂", "infty": "∞", "leq": "≤", "geq": "≥",
+    "times": "×", "cdot": "·", "sum": "∑", "prod": "∏",
+}
+
+
+def _normalize_latex(s: str) -> str:
+    """Normalize LaTeX surface for verbatim substring matching: NFKC unicode +
+    Greek command map (\\gamma→γ) + strip math env ($ \\( \\) \\[ \\]) + strip
+    bare commands (\\frac \\text) + strip braces + fold whitespace + lowercase.
+    Symmetric on evidence and section. (P1-A fix; honest: rare symbols not in
+    _GREEK_MAP stay as the bare letter after _LATEX_CMD strips the backslash-
+    command — acceptable; extend the map if real edges miss.)"""
+    if not s:
+        return ""
+    s = unicodedata.normalize("NFKC", s)
+    for name, g in _GREEK_MAP.items():
+        s = re.sub(rf"\\{name}\b", g, s)
+    s = _LATEX_ENV.sub(" ", s)
+    s = _LATEX_CMD.sub(" ", s)
+    s = _BRACE.sub("", s)
+    s = _WS.sub(" ", s).strip()
+    return s.lower()

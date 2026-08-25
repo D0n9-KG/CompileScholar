@@ -413,7 +413,14 @@ def _render_patterns_compact(meta, keep_ids):
         fam = f"<{pat.family}>" if pat.family else ""
         abs_tag = " (abstract)" if pat.is_abstract else ""
         desc = (pat.description or "")[:120]
-        lines.append(f"- {pid}{fam}{abs_tag}: {desc}")
+        line = f"- {pid}{fam}{abs_tag}: {desc}"
+        # P1-B fix: render semantic_boundary in compact mode too (truncated) so
+        # the extractor/verifier sees the disambiguation hint for confusable
+        # patterns even under retrieval+compact. Without it, retrieval severs
+        # the schema-in-context signal Step 2 added (boundary cures type weakness).
+        if pat.semantic_boundary:
+            line += f" [b: {pat.semantic_boundary[:100]}]"
+        lines.append(line)
     # topology edges among kept patterns (IS-A + dep/con/comp)
     topo = []
     for e in meta.meta_edges:
