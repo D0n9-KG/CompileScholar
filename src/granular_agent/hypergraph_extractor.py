@@ -535,6 +535,23 @@ Output JSON:
 {{"nodes":[{{"nid":"n1","surface":"...","type":"METHOD","evidence_span":"verbatim phrase where the entity appears"}}],
  "hyperedges":[{{"eid":"e1","pattern_type":"...","node_ids":["n1","n2"],"node_roles":["...","..."],"evidence_span":"...","qualifiers":{{}}}}]}}
 
+PATTERN-SELECTION CRITERIA (the highest-error types — apply these tests before committing to a pattern_type):
+- influences ONLY means X functionally DEPENDS on Y / X varies with Y in a law or
+  mechanism ("the value of Q depends on the discount factor"). A sentence that
+  STATES A PROPERTY ("the task is partially observed"), a TEMPORAL CONDITION
+  ("feedback is received after N steps"), an OBSERVATION LIMIT ("impossible to
+  understand X from Y"), a DEFINITION ("X is Y"), or an ASSUMPTION ("sequences
+  are assumed to terminate") is NOT an influences edge — properties/conditions/
+  limits are not functional dependencies. When unsure, do NOT emit the edge.
+- composed_of ONLY means structural parts of a whole ("DQN consists of a replay
+  buffer and a target network"). "X combines/combines the ideas of paradigm A
+  and B" is lineage/derivation, not structural composition; a preprocessing
+  pipeline step's substeps are composition, a taxonomy merge is not.
+- defines ONLY means definitional identity ("X is defined as Y", "we call X the
+  Y"). "selected by", "chosen by", "obtained from" are not definitions.
+- ablation/disable-and-measure statements go to an ablation-like pattern if the
+  schema has one, never to composed_of.
+
 Entity types (pick the best fit per entity):
 - METHOD: a NAMED scientific modeling approach/theory/law/model (μ(I) rheology, Transformer, DQN, Arrhenius kinetics). NOT measurement tools/procedures, NOT setups, NOT benchmarks, NOT a whole research field (reinforcement learning is a FIELD, not a method instance).
 - PARAMETER: a named quantity/symbol in equations (μ, learning rate, E_a). NOT generic quantities (stress, accuracy) → PROPERTY.
