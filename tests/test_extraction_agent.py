@@ -233,6 +233,36 @@ kept_f, stats_f, _ = agent4.fix(edges4f, v4e, [], SECTION, plan)
 check("role gate: defines with correct subject/definition roles kept",
       stats_f["keep"] == 1 and len(kept_f) == 1)
 
+# 4d-bis. ROLE-FIX (bad-role cure): a 'measures' edge with WRONG roles (from/to
+# instead of object/instrument) — without rolefix the rule gate drops it whole
+# (coverage hole). WITH rolefix, the LLM verifier gives corrected roles; fixer
+# re-points them; the rule gate RE-CHECKS (passes, declared roles); edge survives.
+# rule守 structure (no downgrade: bad roles never committed); LLM守 semantic
+# (judges correct roles). cures the 12-edge coverage loss on ML_DQN.
+v4rf = [Verdict(edge_id="e1", fix="rolefix:object,instrument", role_correct=False)]
+edges4rf = [Hyperedge(eid="e1", pattern_type="measures", node_ids=["n1", "n2"],
+                      node_roles=["from", "to"],  # wrong roles (measures wants object/instrument)
+                      evidence_span="We extend the μ(I) rheology")]
+kept_rf, stats_rf, _ = agent4.fix(edges4rf, v4rf, [], SECTION, plan)
+check("rolefix: LLM-repaired roles survive the rule gate (bad-role cured)",
+      len(kept_rf) == 1 and kept_rf[0].node_roles == ["object", "instrument"])
+check("rolefix: counted in stats", stats_rf.get("rolefix", 0) == 1)
+# LLM gives an INVALID rolefix (role not in pattern) -> rule gate still drops (no downgrade)
+v4rf_bad = [Verdict(edge_id="e1", fix="rolefix:bogus_role,another_fake", role_correct=False)]
+kept_rf2, stats_rf2, _ = agent4.fix(edges4rf, v4rf_bad, [], SECTION, plan)
+check("rolefix: invalid roles still dropped (rule gate守 structure, no downgrade)",
+      len(kept_rf2) == 0 and stats_rf2.get("drop", 0) >= 1)
+# LLM doesn't issue rolefix (missed it) but roles wrong -> rule gate drops whole
+# (auditable as verifier-missed-bad-role — a verifier-quality signal)
+v4miss = [Verdict(edge_id="e1", fix="keep", role_correct=True)]  # verifier missed the bad role
+edges4miss = [Hyperedge(eid="e1", pattern_type="measures", node_ids=["n1", "n2"],
+                        node_roles=["from", "to"],  # wrong roles (fresh object — rolefix test mutates)
+                        evidence_span="We extend the μ(I) rheology")]
+kept_miss, stats_miss, dropped_miss = agent4.fix(edges4miss, v4miss, [], SECTION, plan)
+check("role gate: verifier-missed-bad-role dropped (rule守 structure, not silently kept)",
+      len(kept_miss) == 0 and stats_miss.get("dropped_bad_role", 0) >= 1
+      and len(dropped_miss) >= 1)
+
 # ===========================================================================
 # 5. commit_edges: add_edge Mutation, domain carried, concepts inline, NO route
 # ===========================================================================

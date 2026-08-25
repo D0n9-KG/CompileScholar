@@ -84,12 +84,19 @@ class Plan:
 @dataclass
 class Verdict:
     """verifier output per edge. fix drives the fixer. re-type is INTERNALIZED
-    here (type_correct + fix=retype:X), not a separate step."""
+    here (type_correct + fix=retype:X), not a separate step. role-fix is also
+    INTERNALIZED (role_correct + fix=rolefix:<role1,role2,...>) — the LLM
+    verifier judges what role each node SHOULD have (semantic), and fixer
+    re-points the roles then RE-CHECKS the role gate (rule, structural). This
+    cures the bad-role coverage hole: a real edge with a wrong role name was
+    dropped whole by the rule gate (12/ML_DQN); now the LLM can repair the
+    role, the rule gate still blocks un-fixable bad structure (no downgrade)."""
     edge_id: str
     verbatim_in_source: bool = True
     type_correct: bool = True
     relation_exists: bool = True
-    fix: str = "keep"   # keep | retype:<pattern_id> | reextract | drop
+    role_correct: bool = True   # LLM judges: are the node_roles correct for this relation?
+    fix: str = "keep"   # keep | retype:<pattern_id> | rolefix:<r1,r2,...> | reextract | drop
     note: str = ""
 
 
@@ -144,14 +151,23 @@ For EACH edge judge (be strict — a wrong edge is worse than a dropped one):
   NOT structural part-of; extends/improves/compares = method-to-method evolution NOT
   a discourse claim). If the relation is real but the pattern_type is wrong, fix=retype.
 - relation_exists: does the section actually state this relation (not inferred)?
+- role_correct: are the node_roles the RIGHT ones for this pattern_type? Each node's
+  role must match what it IS in the relation (per the pattern's declared roles above).
+  E.g. a 'measures' edge: the thing being measured = object, the instrument doing the
+  measuring = instrument. If a node's role is mislabeled (e.g. 'from/to' used on a
+  'measures' edge where it should be 'object/instrument'), judge role_correct=false and
+  fix=rolefix:<correct_role_1>,<correct_role_2>,... listing the correct role for EACH
+  node in order. The corrected roles MUST be from the pattern's declared role_slots.
 - fix: "keep" if all good; "retype:<correct_pattern_id>" if the relation is real but
   mistyped — the <correct_pattern_id> MUST be one of the schema patterns listed above
-  (do NOT retype to a pattern not in the schema); "reextract" if evidence is real but
-  the edge structure is wrong; "drop" if the relation is not in the text (inferred /
+  (do NOT retype to a pattern not in the schema); "rolefix:<r1>,<r2>,..." if the relation
+  + pattern are right but the ROLES are mislabeled (list the corrected role per node in
+  order, each MUST be a declared role of the pattern); "reextract" if evidence is real
+  but the edge structure is wrong; "drop" if the relation is not in the text (inferred /
   hallucinated / paraphrase evidence).
 
 Output JSON: {{"verdicts":[{{"edge_id":"...","verbatim_in_source":true,"type_correct":true,
-"relation_exists":true,"fix":"keep","note":"..."}}]}}
+"relation_exists":true,"role_correct":true,"fix":"keep","note":"..."}}]}}
 """
 
 
@@ -299,6 +315,7 @@ class ExtractionAgent:
                 verbatim_in_source=bool(v.get("verbatim_in_source", True)),
                 type_correct=bool(v.get("type_correct", True)),
                 relation_exists=bool(v.get("relation_exists", True)),
+                role_correct=bool(v.get("role_correct", True)),
                 fix=fix,
                 note=str(v.get("note", ""))))
         return verdicts
@@ -338,8 +355,8 @@ class ExtractionAgent:
         evolver (Step 3/7) can feed them as schema-gap triggers — NOT a synthetic
         trigger. (MA1 fix: the evolver's failure feed was a合成 Hyperedge; real
         dropped edges are the true signal for schema evolution.)"""
-        stats = {"keep": 0, "retype": 0, "reextract_as_drop": 0, "drop": 0,
-                 "dropped_nonverbatim": 0, "dropped_bad_role": 0}
+        stats = {"keep": 0, "retype": 0, "rolefix": 0, "reextract_as_drop": 0,
+                 "drop": 0, "dropped_nonverbatim": 0, "dropped_bad_role": 0}
         kept: list[Hyperedge] = []
         dropped_edges: list[dict] = []
         vmap = {v.edge_id: v for v in verdicts}
@@ -400,6 +417,28 @@ class ExtractionAgent:
                     _record_drop(he, f"retype-to-unknown-pattern:{new_pt}", v)
                     continue
                 he.pattern_type = new_pt
+            elif v.fix.startswith("rolefix:"):
+                # role-fix (bad-role cure): the LLM verifier judged the relation +
+                # pattern are right but the ROLES are mislabeled, and gave the
+                # corrected role per node. Re-point the roles, then the role gate
+                # (rule) RE-CHECKS them — if the LLM's corrected roles are in the
+                # pattern's declared role_slots, the edge survives (cures the
+                # coverage hole where a real edge was dropped whole for a wrong role
+                # name). If the LLM's roles are STILL not in the pattern (it
+                # hallucinated a role not in the pattern), drop (rule守 structure,
+                # no downgrade). Corrected roles MUST be declared by the pattern.
+                roles_str = v.fix.split(":", 1)[1].strip()
+                new_roles = [r.strip() for r in roles_str.split(",") if r.strip()]
+                pat = self.kb.tbox.patterns.get(he.pattern_type)
+                declared = {s.get("role") for s in pat.role_slots} if pat else set()
+                if (pat and len(new_roles) == len(he.node_roles)
+                        and all(r in declared for r in new_roles)):
+                    he.node_roles = new_roles
+                else:
+                    # LLM gave wrong count / unknown role -> can't fix, drop
+                    stats["drop"] += 1
+                    _record_drop(he, f"rolefix-invalid:{roles_str}", v)
+                    continue
             elif v.fix == "reextract":
                 # honest: one-shot reextract not implemented (would risk loops);
                 # drop with note. The kept-edge quality bar is preserved (only
@@ -412,15 +451,33 @@ class ExtractionAgent:
                 _record_drop(he, f"verifier-drop:{v.fix}", v)
                 continue
             # ---- passed verdict; now DETERMINISTIC role gate (rule) ----
+            # if rolefix was applied above, the roles are the LLM-corrected ones;
+            # the rule gate RE-CHECKS them. If they pass -> keep (cured). If the
+            # executor's roles were wrong AND the verifier didn't issue a rolefix
+            # (missed it), the rule gate drops the edge whole — record as
+            # "verifier-missed-bad-role" so it's auditable (a verifier-quality
+            # signal, not a gate-too-strict). This is honest: the rule gate
+            # can't invent the right role (that's semantic = LLM job); if the
+            # LLM didn't fix it, the edge can't be committed with bad structure.
             if not self._role_ok(he):
                 stats["dropped_bad_role"] += 1
-                _record_drop(he, "bad-role-not-in-pattern", v)
+                if v and v.fix.startswith("rolefix:"):
+                    reason = "rolefix-still-bad"  # LLM tried but roles not in pattern
+                elif v and not v.role_correct:
+                    reason = "bad-role-verifier-flagged-unfixed"
+                else:
+                    reason = "verifier-missed-bad-role"
+                _record_drop(he, reason, v)
                 continue
             kept.append(he)
             if v is None or v.fix == "keep":
                 stats["keep"] += 1
-            else:
+            elif v.fix.startswith("retype:"):
                 stats["retype"] += 1
+            elif v.fix.startswith("rolefix:"):
+                stats["rolefix"] += 1  # already counted above, but ensure
+            else:
+                stats["keep"] += 1
         return kept, stats, dropped_edges
 
     def _role_ok(self, he: Hyperedge) -> bool:
