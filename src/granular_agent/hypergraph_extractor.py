@@ -535,6 +535,18 @@ Output JSON:
 {{"nodes":[{{"nid":"n1","surface":"...","type":"METHOD","evidence_span":"verbatim phrase where the entity appears"}}],
  "hyperedges":[{{"eid":"e1","pattern_type":"...","node_ids":["n1","n2"],"node_roles":["...","..."],"evidence_span":"...","qualifiers":{{}}}}]}}
 
+SLOT-BINDING DISCIPLINE (what may and may not occupy a node slot — post-checks reject violations):
+- A node must be the THING the sentence puts in that role. Time/position/repetition adverbials
+  ("after 15–20 revolutions", "at short times", "near the wall") are NOT entities — never node slots.
+- PERSON/RESEARCHER names are never METHOD/INSTRUMENT nodes (a person may author a method; the
+  method is the method).
+- An ATTRIBUTE of a thing ("the accuracy of X") is not the thing itself: a measures edge's object
+  is the QUANTITY the method measures, not a property of the method.
+- A context the definition lives in (the MDP, the model, the experiment) is not the DEFINED entity;
+  bind the entity actually being defined ("we define X as Y": subject=X).
+- When the sentence names a vague aggregate ("all previous algorithms"), bind that aggregate
+  faithfully — do not substitute or invent a specific name.
+
 PATTERN-SELECTION CRITERIA (the highest-error types — apply these tests before committing to a pattern_type):
 - influences ONLY means X functionally DEPENDS on Y / X varies with Y in a law or
   mechanism ("the value of Q depends on the discount factor"). A sentence that

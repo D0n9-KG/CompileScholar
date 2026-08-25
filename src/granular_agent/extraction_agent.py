@@ -345,6 +345,10 @@ class ExtractionAgent:
             if bad_binding:
                 dropped.append(self._gate_drop(he, nid2node, "gate:binding-not-local"))
                 continue
+            # --- 1b. slot discipline (adverbials/person names are not entities) ---
+            if not _slot_discipline_ok(he, nid2node):
+                dropped.append(self._gate_drop(he, nid2node, "gate:slot-discipline"))
+                continue
             # --- 3. slot-type guard ---
             slot_types = {s.get("role"): s.get("type") for s in pat.role_slots}
             type_bad = False
@@ -913,6 +917,37 @@ def _evidence_window(evidence: str, section_text: str) -> str:
     return "".join(m.group(0) for m in sents[lo:hi])
 
 
+# adverbial/person surfaces that must NOT occupy entity slots (arbitration
+# findings: time/position/repetition adverbials and researcher names were
+# bound as cause/instrument nodes)
+_NOT_ENTITY_RE = re.compile(
+    r"^((after|before|during|at|near|within|over|throughout|for)\s+)?(the\s+)?(first|last|next)?\s*\d+[–-]?\d*\s*"
+    r"(revolutions?|steps?|frames?|times?|minutes?|hours?|seconds?|iterations?|epochs?)\b"
+    r"|^(at|near|within)\s+(short|long|late|early)\s+times?\b"
+    r"|^(et al\.?|and [A-Z][a-z]+)$", re.IGNORECASE)
+# capitalized personal-name pattern "X. Surname" / "Surname1 Surname2"
+_PERSON_RE = re.compile(r"^[A-Z][a-z]+(\s+[A-Z]\.)?\s+[A-Z][a-z]+$")
+
+
+def _slot_discipline_ok(he: Hyperedge, nid2node: dict) -> bool:
+    """Deterministic slot-discipline gate: adverbial phrases and person names
+    may not occupy node slots (rule layer — structural, no semantics)."""
+    for nid in he.node_ids:
+        nd = nid2node.get(nid)
+        if nd is None:
+            return False
+        s = (nd.surface or "").strip()
+        if not s:
+            return False
+        if _NOT_ENTITY_RE.search(s):
+            return False
+        if _PERSON_RE.match(s) and "METHOD" not in nd.labels and "PROPERTY" not in nd.labels:
+            # person names only pass when explicitly labeled non-entity roles
+            # (they shouldn't be nodes at all; if the LLM typed one as METHOD
+            # e.g. "Drahun and Bridgwater" as instrument — reject)
+            if "PERSON" in (nd.labels or []):
+                return False
+    return True
 def _binding_local(surface: str, evidence: str, section_text: str) -> bool:
     """Deterministic binding-locality: the node surface (normalized) appears
     in the evidence span, or in its \u00b11-sentence window, with light
