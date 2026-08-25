@@ -123,25 +123,33 @@ class MaintenanceAgent:
         nodes are the A-box Concepts (label = concept.type) so the direct-read
         node-type classification works."""
         from granular_agent.hypergraph_schema import InstanceHypergraph, Hyperedge, HGNode
+        inst = self._build_abox_instance(paper_id)
+        # delegate to the verified direct-read内核 (surgical)
+        return self.infer_rich_topology(inst, paper_id=paper_id)
+
+    def _build_abox_instance(self, paper_id: str = "") -> "InstanceHypergraph":
+        """Build a synthetic InstanceHypergraph from the KB's A-box (ConceptGraph)
+        so the verified内核 (infer_rich_topology_direct / detect_*_triggers) can
+        read it. Shared by infer_rich_topology_for_abox + the active repair detect
+        (真漏 fix #9). ConceptGraph.hyperedges is a list of ConceptHyperedge
+        (node_ids=concept_ids, kind=pattern_type-from-extractor)."""
+        from granular_agent.hypergraph_schema import InstanceHypergraph, Hyperedge, HGNode
         inst = InstanceHypergraph(paper_id=paper_id)
-        # add each A-box concept as a node (label = its type)
         for cid, c in self.kb.abox.concepts.items():
             if c.deprecated:
                 continue
             inst.add_node(HGNode(nid=cid, labels=[c.type] if c.type else ["PROPERTY"],
                                  surface=c.surfaces()[0] if c.surfaces() else ""))
-        # add each A-box hyperedge as an instance hyperedge (pattern_type = he.pattern_type)
         he_counter = 0
         for he in self.kb.abox.hyperedges:
             if not he.pattern_type:
-                continue  # skip edges without a T-box ref (legacy)
+                continue
             he_counter += 1
             inst.add_hyperedge(Hyperedge(
                 eid=f"rt_{he_counter}", pattern_type=he.pattern_type,
                 node_ids=list(he.node_ids), node_roles=list(he.node_roles),
                 evidence_span=(he.provenance[0].get("evidence", "") if he.provenance else "")))
-        # delegate to the verified direct-read内核 (surgical)
-        return self.infer_rich_topology(inst, paper_id=paper_id)
+        return inst
 
     def _kinds_for_edge(self, edge: dict) -> list[str]:
         """Which rich-topology kinds this edge could be classified as (for

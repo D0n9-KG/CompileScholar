@@ -489,7 +489,7 @@ class GranularFlowAgent:
         report per section + aggregate. arm mirrors process_paper_hypergraph
         (full/add_only/no_intra_dag/frozen) — frozen skips evolution+align."""
         from granular_agent.extraction_agent import ExtractionAgent
-        from granular_agent.evolution_agent import EvolutionAgent
+        from granular_agent.evolution_agent import EvolutionAgent, TriggerSource
         from granular_agent.alignment_agent import AlignmentAgent, AlignmentReport
         from granular_agent.maintenance_agent import MaintenanceAgent
         from granular_agent.structure_mapper import section_text_for_node
@@ -499,6 +499,17 @@ class GranularFlowAgent:
         blocks = load_paper_blocks(paper_id, corpus_dir=self.corpus_dir)
         if not blocks:
             return {"paper_id": paper_id, "error": "no_text", "n_nodes": 0, "n_hyperedges": 0}
+        # 真漏 fix #6: extract paper-level metadata (title/authors/doi/year/venue)
+        # into the KB so every hyperedge is可溯源 to the paper identity (edge ->
+        # evidence offset -> paper_id -> title/authors/year). The legacy pipeline
+        # did this via _extract_metadata; the kernel path dropped it, breaking
+        # paper-level provenance. Delegates to the verified _extract_metadata内核.
+        import re as _re
+        _ym = _re.search(r'(\d{4})', paper_id)
+        from granular_agent.hypergraph_extractor import _extract_metadata
+        kb._paper_meta[paper_id] = _extract_metadata(blocks, paper_id)
+        if _ym and not kb._paper_meta[paper_id].get("year"):
+            kb._paper_meta[paper_id]["year"] = _ym.group(1)
         smap = map_structure(paper_id, blocks, llm=llm, domain=self.domain)
         if not smap or not smap.get("dag", {}).get("nodes"):
             return {"paper_id": paper_id, "error": "structure_map_failed"}
@@ -512,15 +523,35 @@ class GranularFlowAgent:
 
         pre_v = kb.version
         section_reports = []
-        for node in smap["dag"]["nodes"]:
+        # 真漏 fix #1+#2: process DAG in TOPOLOGICAL order (deps before dependents)
+        # + pass predecessor_summary (a section sees its dependency sections'
+        # summaries — cross-section context: Results can see Method's concepts).
+        # Legacy did this via topo_order(dag) + HGBlackboard; the kernel path
+        # iterated smap["dag"]["nodes"] in raw order with no predecessor context,
+        # breaking multi-section协同. Delegates to the verified topo_order +
+        # HGBlackboard内核 (surgical).
+        from granular_agent.structure_mapper import topo_order
+        from granular_agent.hypergraph_extractor import HGBlackboard
+        bb = HGBlackboard()
+        for node in topo_order(smap["dag"]):
             nid = node.get("id", "")
             sec_text = section_text_for_node(node, smap.get("sections", []), blocks)
             if not sec_text or len(sec_text) < 80:
                 continue
             discourse = node.get("section", nid)
+            # predecessor context: this section's dependency sections' summaries
+            # (deps resolved by topo_order first). Lets Results see Method's terms.
+            predecessor = bb.predecessor_summary(node.get("deps", []))
             # Stage 1: extract (plan-execute-verify-fix-commit → KB)
             ext_rep = ext.extract_section(sec_text, discourse, nid, paper_id,
-                                          year="", section=discourse)
+                                          year="", section=discourse,
+                                          predecessor_summary=predecessor)
+            # record this section's summary on the blackboard for dependents
+            plan_summary = (ext_rep.get("plan", {}).get("paper_anchor", "")
+                            if isinstance(ext_rep.get("plan"), dict) else "")
+            if not plan_summary:
+                plan_summary = discourse
+            bb.add(nid, plan_summary)
             # Stage 2: evolve — feed this section's validation failures (edges the
             # verifier dropped or that didn't match a pattern) to the evolver.
             # The extractor already dropped bad edges at commit (kernel validate),
@@ -579,11 +610,60 @@ class GranularFlowAgent:
         for e in rt_edges:
             k = e.get("kind", "")
             rt_by_kind[k] = rt_by_kind.get(k, 0) + 1
+        # 真漏 fix #9: active repair — detect split/merge/rename triggers on the
+        # current A-box (as a synthetic InstanceHypergraph) + feed them to the
+        # evolver's self_* path. Legacy did this via run_split/run_merge/run_rename
+        # proactively; the kernel path only reacted to validate-failures (missed
+        # pattern-over-wide detection). Delegates to detect_*_triggers内核.
+        active_repair = {"split": 0, "merge": 0, "rename": 0}
+        if arm != "frozen":
+            try:
+                inst_for_repair = maint._build_abox_instance(paper_id)
+                from granular_agent.hypergraph_evolution import (
+                    detect_split_triggers, detect_merge_triggers, detect_rename_triggers)
+                triggers = []
+                for t in detect_split_triggers(kb.tbox, inst_for_repair, llm=llm):
+                    triggers.append(TriggerSource(kind="self_split", domain=self.domain,
+                        payload=t, paper_id=paper_id))
+                for t in detect_merge_triggers(kb.tbox):
+                    triggers.append(TriggerSource(kind="self_merge", domain=self.domain,
+                        payload=t, paper_id=paper_id))
+                for t in detect_rename_triggers(kb.tbox):
+                    triggers.append(TriggerSource(kind="self_rename", domain=self.domain,
+                        payload=t, paper_id=paper_id))
+                for ts in triggers:
+                    evo.propose_trigger(ts)
+                if triggers:
+                    rep = evo.drain()
+                    active_repair = {"split": sum(1 for a in rep.accepted if a["op"] == "split"),
+                                     "merge": sum(1 for a in rep.accepted if a["op"] == "merge"),
+                                     "rename": sum(1 for a in rep.accepted if a["op"] == "rename")}
+            except Exception as e:
+                print(f"  [kernel] active repair detect failed: {e!r}", flush=True)
+        # 真漏 fix #10/#11: schema-layer富拓扑 (T-box dependencies/constraints/
+        # compositions) + constraint-violation detection. Legacy computed these
+        # per-paper; the kernel path dropped them (memory: a DIAL-KG-can't-do
+        # differentiator — schema constraint violations detectable). Delegates to
+        # the verified infer_*内核. Used for the 'rich_topology' T-box section +
+        # a schema-quality signal (violations = undefined params referenced).
+        tbox_topo = {"dependencies": 0, "constraints": 0, "compositions": 0, "violations": 0}
+        try:
+            inst_t = maint._build_abox_instance(paper_id)
+            from granular_agent.hypergraph_evolution import (
+                infer_pattern_dependencies, infer_pattern_constraints,
+                infer_pattern_compositions)
+            tbox_topo["dependencies"] = len(infer_pattern_dependencies(kb.tbox, inst_t, paper_id=paper_id))
+            tbox_topo["constraints"] = len(infer_pattern_constraints(kb.tbox, inst_t, paper_id=paper_id))
+            tbox_topo["compositions"] = len(infer_pattern_compositions(kb.tbox, inst_t, paper_id=paper_id))
+            tbox_topo["violations"] = len(kb.tbox.detect_constraint_violations(inst_t, domain=self.domain))
+        except Exception as e:
+            print(f"  [kernel] T-box topology failed: {e!r}", flush=True)
         n_concepts = len(kb.abox.concepts)
         n_hyperedges = len(kb.abox.hyperedges)
         result = {
             "paper_id": paper_id,
             "pipeline": "kernel",
+            "paper_meta": kb._paper_meta.get(paper_id, {}),   # 可溯源论文级
             "n_sections": len(section_reports),
             "n_concepts": n_concepts,
             "n_hyperedges": n_hyperedges,
@@ -594,6 +674,8 @@ class GranularFlowAgent:
             "total_patterns_after": len(kb.tbox.patterns),
             "ledger_entries": len(kb.ledger),
             "rich_topology": {"total": len(rt_edges), "by_kind": rt_by_kind},
+            "active_repair": active_repair,   # 真漏 fix #9: split/merge/rename detect
+            "tbox_topology": tbox_topo,        # 真漏 fix #10/#11: T-box富拓扑+violations
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
         self.hg_results.append(result)

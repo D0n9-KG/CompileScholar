@@ -287,6 +287,12 @@ class KnowledgeBase:
         # same-domain concepts (DecentMem 防混域 — cross-domain concepts don't
         # merge). Honest: populated lazily as papers ingest; empty until then.
         self._paper_domain: dict[str, str] = {}
+        # paper_id -> metadata (title/authors/doi/year/venue): for可溯源 at the
+        # paper level — every hyperedge carries paper_id, this map resolves it
+        # to the full paper identity so a query going edge->evidence->paper can
+        # surface title/authors/year without a separate join. (真漏 fix #6:
+        # legacy _extract_metadata was dropped in the kernel path.)
+        self._paper_meta: dict[str, dict] = {}
         self.version: str = self.tbox.version
         # the aligner's ambiguous-5-outcome judge (MUST be != extraction model).
         # If None, ambiguous -> insert (data-preserving) + flagged in route detail.
