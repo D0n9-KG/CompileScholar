@@ -106,24 +106,19 @@ class MaintenanceAgent:
                 e["ambiguous_kinds"] = kinds
         return edges
 
-    def infer_rich_topology_for_abox(self, paper_id: str = "") -> list[dict]:
-        """Rich-topology direct read on the KB's A-box (ConceptGraph). The kernel
-        path (process_paper_via_kernel) accumulates edges into the A-box but
-        never ran the rich-topology classification — so the富拓扑 kinds
-        (law_parameter/method_parameter/method_phenomenon/...) that are the
-        "most stable selling point" (memory) were LOST in the new pipeline
-        (audit P0: kernel doesn't call infer_rich_topology_direct). This adapts
-        the A-box ConceptGraph → a synthetic InstanceHypergraph so the verified
-        infer_rich_topology_direct内核 reads it (surgical — no logic rewrite),
-        and commits the classified edges back into the A-box as rich-topology
-        hyperedges (kind = rich classification, pattern_type = raw T-box ref).
-
-        ConceptGraph.hyperedges is a list of ConceptHyperedge (node_ids=concept_ids,
-        kind=pattern_type-from-extractor). We build an InstanceHypergraph whose
-        nodes are the A-box Concepts (label = concept.type) so the direct-read
-        node-type classification works."""
+    def infer_rich_topology_for_abox(self, paper_id: str = "",
+                                      inst: "InstanceHypergraph | None" = None) -> list[dict]:
+        """Rich-topology direct read on the KB's A-box. If `inst` is provided
+        (already built by caller), reuse it — avoids a 3rd _build_abox_instance
+        (perf: active_repair + T-box + rich_topology all need the same inst;
+        sharing one across all three saves 2 reconstructions). Adapts the A-box
+        ConceptGraph to a synthetic InstanceHypergraph so the verified
+        infer_rich_topology_direct reads it (surgical, no logic rewrite).
+        ConceptGraph.hyperedges: list of ConceptHyperedge (node_ids=concept_ids,
+        kind=pattern_type). Nodes = A-box Concepts (label=concept.type)."""
         from granular_agent.hypergraph_schema import InstanceHypergraph, Hyperedge, HGNode
-        inst = self._build_abox_instance(paper_id)
+        if inst is None:
+            inst = self._build_abox_instance(paper_id)
         # delegate to the verified direct-read内核 (surgical)
         return self.infer_rich_topology(inst, paper_id=paper_id)
 
