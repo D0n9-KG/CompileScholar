@@ -39,6 +39,8 @@ def main():
     run_id = f"{args.tag}_{args.arm}_{int(time.time())}" if args.tag else \
         f"{args.arm}_{int(time.time())}"
     os.environ["LLM_RUN_ID"] = run_id
+    if args.seed is not None:
+        os.environ["LLM_SEED"] = str(args.seed)
     # per-paper call log inside each bundle dir is set below (needs the dir)
 
     agent = GranularFlowAgent(domain=args.domain, llms=[args.model])

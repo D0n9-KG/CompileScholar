@@ -42,6 +42,18 @@ RUN_ID = os.environ.get("LLM_RUN_ID") or datetime.now(timezone.utc).strftime("%Y
 CALL_LOG: list[dict] = []
 
 
+def _env_seed() -> int | None:
+    """Default seed from env LLM_SEED (set by run_kernel --seed). Explicit
+    per-call seed argument takes precedence. NOTE: whether the provider
+    actually honors `seed` is unverified — two same-seed runs must be
+    compared before claiming reproducibility."""
+    v = os.environ.get("LLM_SEED")
+    try:
+        return int(v) if v not in (None, "") else None
+    except ValueError:
+        return None
+
+
 def _log_call(provider: str, model: str, ok: bool, latency_ms: float,
               usage: dict | None = None, attempt: int = 0,
               fallback_for: str = "") -> None:
@@ -115,6 +127,8 @@ def call_llm(prompt: str, model: str = "deepseek-chat", max_tokens: int = 4000,
         "temperature": temperature,
         "max_tokens": max_tokens,
     }
+    if seed is None:
+        seed = _env_seed()
     if seed is not None:
         payload["seed"] = seed
     body = json.dumps(payload).encode()
@@ -167,6 +181,8 @@ def call_paratera(prompt: str, model: str = "Kimi-K2.6", max_tokens: int = 4000,
         "temperature": temperature,
         "max_tokens": max_tokens,
     }
+    if seed is None:
+        seed = _env_seed()
     if seed is not None:
         payload["seed"] = seed
     if enable_thinking is False:
@@ -269,6 +285,8 @@ def call_cst(prompt: str, model: str = "qwen3.5", max_tokens: int = 4000,
         "temperature": temperature,
         "max_tokens": max_tokens,
     }
+    if seed is None:
+        seed = _env_seed()
     if seed is not None:
         payload["seed"] = seed
     body = json.dumps(payload).encode()
