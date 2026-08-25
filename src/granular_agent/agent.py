@@ -745,7 +745,43 @@ class GranularFlowAgent:
               f"{n_concepts} concepts / {n_hyperedges} hyperedges | "
               f"v{pre_v}->{kb.version} ({len(kb.tbox.patterns)} patterns) | "
               f"ledger={len(kb.ledger)}", flush=True)
+        # Save full bundle — 超图 + schema + 事务日志 + dropped(带verdict) +
+        # 富拓扑. 跑完自动存, 不靠临时脚本. 后面断点重续/工程化也用这些.
+        # 这是知识超图抽取+schema演化项目的基本工程: 跑完超图和schema必须存.
+        try:
+            self._save_kernel_bundle(paper_id, result, kb)
+        except Exception as e:
+            print(f"  [kernel] bundle save failed: {e!r}", flush=True)
         return result
+
+    def _save_kernel_bundle(self, paper_id: str, result: dict, kb) -> str:
+        """Save the full extraction + evolution result to disk so it can be
+        inspected/audited/resumed without re-running. Path:
+        {self.worktree}/kernel_bundle/{paper_id}/ (or .research_tmp/runs/kernel_v2/).
+        Stores: kept_edges / dropped_edges(with verifier verdict) / new_patterns /
+        ledger / concept_graph(A-box) / meta_snapshot(T-box evolved schema) /
+        rich_topology / result(summary+fix_stats+paper_meta+tbox_topology)."""
+        import json as _json
+        out_dir = os.path.join(".research_tmp", "runs", "kernel_v2", paper_id)
+        os.makedirs(out_dir, exist_ok=True)
+        kept = [ke for s in result["section_reports"] for ke in s.get("extract", {}).get("kept_edges", [])]
+        dropped = [de for s in result["section_reports"] for de in s.get("extract", {}).get("dropped_edges", [])]
+        seed_pats = getattr(self, "_initial_seed_pats", set())
+        new_pats = {pid: {"desc": p.description, "boundary": p.semantic_boundary,
+                          "family": p.family, "role_slots": [dict(s) for s in p.role_slots]}
+                    for pid, p in kb.tbox.patterns.items() if pid not in seed_pats}
+        _w = lambda name, data: open(os.path.join(out_dir, name), "w", encoding="utf-8").write(
+            _json.dumps(data, ensure_ascii=False, indent=2, default=str))
+        _w("kept_edges.json", kept)
+        _w("dropped_edges.json", dropped)
+        _w("new_patterns.json", new_pats)
+        _w("ledger.json", kb.ledger)
+        _w("concept_graph.json", kb.abox.to_dict())
+        _w("meta_snapshot.json", kb.tbox.to_dict())
+        _w("rich_topology.json", result.get("rich_topology", {}))
+        _w("result.json", {k: v for k, v in result.items() if k != "section_reports"})
+        print(f"  [kernel] bundle saved -> {out_dir}/", flush=True)
+        return out_dir
 
     def process_batch_via_kernel(self, paper_ids: list[str]) -> list[dict]:
         """KB-backed batch: run process_paper_via_kernel per paper (meta+A-box
