@@ -179,6 +179,9 @@ Also:
 - type_correct: is pattern_type right per the pattern's own [boundary: ...]
   note given per-edge? If the relation is real but the pattern wrong →
   fix=retype:<pattern_id from the schema above>.
+- An edge carrying "_math_binding_review" has formula-structured node surfaces
+  (LaTeX/greek/operators) — judge its slot binding SEMANTICALLY (does the
+  formula in the evidence denote what the role claims), not by string matching.
 - An edge carrying "_competition_review" in qualifiers is a flagged pattern-
   competition case (its pattern's boundary says NOT-X yet an X-typed edge was
   extracted from the same sentence) — scrutinize it extra hard.
@@ -334,14 +337,21 @@ class ExtractionAgent:
             # verifier still judges binding SEMANTICS; this rule only
             # guarantees locality.
             bad_binding = False
+            math_review = False
             for nid, role in zip(he.node_ids, he.node_roles):
                 nd = nid2node.get(nid)
                 if nd is None:
                     bad_binding = True
                     break
+                if _is_math_surface(nd.surface):
+                    math_review = True   # verifier judges math bindings semantically
+                    continue
                 if not _binding_local(nd.surface, he.evidence_span, section_text):
                     bad_binding = True
                     break
+            if math_review:
+                he.qualifiers = dict(he.qualifiers) if he.qualifiers else {}
+                he.qualifiers["_math_binding_review"] = "1"
             if bad_binding:
                 dropped.append(self._gate_drop(he, nid2node, "gate:binding-not-local"))
                 continue
@@ -948,6 +958,21 @@ def _slot_discipline_ok(he: Hyperedge, nid2node: dict) -> bool:
             if "PERSON" in (nd.labels or []):
                 return False
     return True
+# math-surface signals: a LaTeX command, a super/subscript marker, or a
+# greek letter (formulas always carry at least one; plain English surfaces
+# carry none — operators alone are NOT a signal, they appear in prose too)
+_MATH_SURFACE_RE = re.compile("\\\\|[\^\_]|[\u03b1-\u03c9\u0391-\u03a9]")
+
+
+def _is_math_surface(surface: str) -> bool:
+    """A surface carrying formula structure (LaTeX commands, superscripts,
+    greek, operators). Rule-based substring matching against evidence is a
+    losing game for these (sqrt/spacing/superscript normalizations compound);
+    they are routed to the LLM verifier's semantic binding check instead
+    (rule-for-structure, LLM-for-semantics — the project's iron law)."""
+    return bool(_MATH_SURFACE_RE.search(surface or ""))
+
+
 def _binding_local(surface: str, evidence: str, section_text: str) -> bool:
     """Deterministic binding-locality: the node surface (normalized) appears
     in the evidence span, or in its \u00b11-sentence window, with light
@@ -991,7 +1016,18 @@ def _normalize_latex(s: str) -> str:
     for name, g in _GREEK_MAP.items():
         s = re.sub(rf"\\{name}\b", g, s)
     s = _LATEX_ENV.sub(" ", s)
+    # sqrt and superscript/subscript BEFORE command stripping: \sqrt{N}→√n and
+    # σ^2 vs σ² (NFKC folds ² to 2) must land on the same string from both the
+    # LLM's unicode surface and the source's LaTeX form (gate-audit case:
+    # 'σ²(N) vs √N' failed locality against '$\sigma^{2}(N)$ vs $\sqrt{N}$')
+    s = re.sub(r"\\sqrt\s*\\{([^{}]*)\\}", r"√\1", s)
+    s = re.sub(r"\\sqrt", "√", s)
     s = _LATEX_CMD.sub(" ", s)
     s = _BRACE.sub("", s)
+    # drop math delimiters ^ and _ (σ^2 → σ2 == σ² after NFKC; also kills the
+    # stray '-7µ/6' dash artifacts from stacked fractions)
+    s = re.sub(r"\s*([*+=<>])\s*", r"\1", s)
+    s = re.sub(r"\s*-\s*", "-", s)
+    s = re.sub(r"[\^_]", "", s)
     s = _WS.sub(" ", s).strip()
     return s.lower()
