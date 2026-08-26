@@ -1,0 +1,2098 @@
+[
+  {
+    "edge_id": "n1_e6",
+    "pattern_type": "compares",
+    "evidence_span": "Finally, the analysis is repeated using a simpler kinetic model.",
+    "node_ids": [
+      "n1_n1",
+      "n1_n11"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "revised Enskog theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "simpler kinetic model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1_e7",
+    "pattern_type": "validates_with",
+    "evidence_span": "Excellent agreement is obtained with the results from the revised Enskog equation.",
+    "node_ids": [
+      "n1_n1",
+      "n1_n12"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "revised Enskog theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "revised Enskog equation",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c1_e0",
+    "pattern_type": "extends",
+    "evidence_span": "extend this analysis to the revised Enskog kinetic theory",
+    "node_ids": [
+      "n2c1_n1",
+      "n2c1_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Chapman-Enskog solution to the Boltzmann equation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Revised Enskog kinetic theory (RET)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c1_e1",
+    "pattern_type": "extends",
+    "evidence_span": "the Chapman-Enskog method can be applied to obtain the Navier-Stokes hydrodynamic equations",
+    "node_ids": [
+      "n2c1_n2",
+      "n2c1_n3"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Revised Enskog kinetic theory (RET)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Navier-Stokes hydrodynamic equations",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c1_e2",
+    "pattern_type": "improves",
+    "evidence_span": "extend this analysis to the revised Enskog kinetic theory for a description of hydrodynamics and transport at higher densities",
+    "node_ids": [
+      "n2c1_n2",
+      "n2c1_n1"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Revised Enskog kinetic theory (RET)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Chapman-Enskog solution to the Boltzmann equation",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c1_e3",
+    "pattern_type": "compares",
+    "evidence_span": "comparing predicted transport properties with those obtained directly from the RET via Monte Carlo simulation",
+    "node_ids": [
+      "n2c1_n4",
+      "n2c1_n5"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "transport coefficients",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "Monte Carlo simulation",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c1_e4",
+    "pattern_type": "validates_with",
+    "evidence_span": "a quantitative test of the hydrodynamic description within the context of kinetic theory is possible by comparing predicted transport properties with those obtained directly from the RET via Monte Carlo simulation",
+    "node_ids": [
+      "n2c1_n2",
+      "n2c1_n5"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Revised Enskog kinetic theory (RET)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Monte Carlo simulation",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c1_e6",
+    "pattern_type": "influences",
+    "evidence_span": "viscosity dependence on both the density and restitution coefficient",
+    "node_ids": [
+      "n2c1_n4",
+      "n2c1_n7"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "transport coefficients",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "density",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c1_e7",
+    "pattern_type": "background",
+    "evidence_span": "For a low density system these problems have been addressed using the Boltzmann kinetic equation",
+    "node_ids": [
+      "n2c1_n2",
+      "n2c1_n8"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Revised Enskog kinetic theory (RET)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Boltzmann kinetic equation",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e0",
+    "pattern_type": "extends",
+    "evidence_span": "The objective here is to extend this analysis to the revised Enskog kinetic theory \\(RET! for a description of hydrodynamics and transport at higher densities.",
+    "node_ids": [
+      "n2c0_n4",
+      "n2c0_n8"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Chapman-Enskog solution to the Boltzmann equation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Revised Enskog kinetic theory (RET)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e1",
+    "pattern_type": "extends",
+    "evidence_span": "the Chapman-Enskog method can be applied to obtain the Navier-Stokes hydrodynamic equations and the associated transport coefficients.",
+    "node_ids": [
+      "n2c0_n8",
+      "n2c0_n10"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Revised Enskog kinetic theory (RET)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Navier-Stokes hydrodynamic equations",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e2",
+    "pattern_type": "improves",
+    "evidence_span": "The objective here is to extend this analysis to the revised Enskog kinetic theory \\(RET! for a description of hydrodynamics and transport at higher densities.",
+    "node_ids": [
+      "n2c0_n8",
+      "n2c0_n4"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Revised Enskog kinetic theory (RET)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Chapman-Enskog solution to the Boltzmann equation",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e3",
+    "pattern_type": "compares",
+    "evidence_span": "Preliminary comparisons with direct Monte Carlo simulation of the Boltzmann equation indicate the results are quite accurate, even for strong dissipation @2#.",
+    "node_ids": [
+      "n2c0_n5",
+      "n2c0_n7"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "transport coefficients",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "direct Monte Carlo simulation of the Boltzmann equation",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e4",
+    "pattern_type": "validates_with",
+    "evidence_span": "a quantitative test of the hydrodynamic description within the context of kinetic theory is possible by comparing predicted transport properties with those obtained directly from the RET via Monte Carlo simulation.",
+    "node_ids": [
+      "n2c0_n8",
+      "n2c0_n14"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Revised Enskog kinetic theory (RET)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Monte Carlo simulation",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e8",
+    "pattern_type": "background",
+    "evidence_span": "For a low density system these problems have been addressed using the Boltzmann kinetic equation modified to account for inelastic binary collisions.",
+    "node_ids": [
+      "n2c0_n8",
+      "n2c0_n3"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Revised Enskog kinetic theory (RET)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Boltzmann kinetic equation",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e10",
+    "pattern_type": "compares",
+    "evidence_span": "In Sec. V the corresponding results from a simple kinetic model are obtained and compared with those from the RET.",
+    "node_ids": [
+      "n2c0_n23",
+      "n2c0_n8"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "simple kinetic model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Revised Enskog kinetic theory (RET)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e1",
+    "pattern_type": "defines",
+    "evidence_span": "The oneparticle distribution function $f ( \\mathbf { r } , \\mathbf { v } , t )$ is determined from @4# where $J _ { E }$ is the Enskog collision operator",
+    "node_ids": [
+      "n3c0_n3",
+      "n3c0_n4"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "one-particle distribution function f(r,v,t)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "Enskog collision operator",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e2",
+    "pattern_type": "defines",
+    "evidence_span": "$\\chi [ \\mathbf { r } , \\mathbf { r } + \\pmb { \\sigma } | n ( t ) ]$ is the equilibrium pair correlation function at contact as a functional of the nonequilibrium density field $n ( { \\bf r } , t )$",
+    "node_ids": [
+      "n3c0_n7",
+      "n3c0_n8"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "equilibrium pair correlation function at contact",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "nonequilibrium density field n(r,t)",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e3",
+    "pattern_type": "influences",
+    "evidence_span": "The cooling rate $\\zeta$ is proportional to $( 1 - \\alpha ^ { 2 } )$ and is due to dissipative collisions",
+    "node_ids": [
+      "n3c0_n13",
+      "n3c0_n6"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "cooling rate ζ",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "coefficient of restitution",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e4",
+    "pattern_type": "composed_of",
+    "evidence_span": "$\\mathsf { P } \\mathrm { = } \\mathsf { P } ^ { k } \\mathrm { + } \\mathsf { P } ^ { c }$",
+    "node_ids": [
+      "n3c0_n14",
+      "n3c0_n16",
+      "n3c0_n17"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "pressure tensor P(r,t)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "kinetic contributions",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional transfer contributions",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e5",
+    "pattern_type": "composed_of",
+    "evidence_span": "$\\mathbf { q } = \\mathbf { q } ^ { k } + \\mathbf { q } ^ { c }$",
+    "node_ids": [
+      "n3c0_n15",
+      "n3c0_n16",
+      "n3c0_n17"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "heat flux q(r,t)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "kinetic contributions",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional transfer contributions",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e6",
+    "pattern_type": "defines",
+    "evidence_span": "$\\mathbf { V } { = } \\mathbf { v } { - } \\mathbf { U } ( \\mathbf { r } , t )$ is the peculiar velocity and $\\mathbf { G } = \\frac { 1 } { 2 } ( \\mathbf { V } _ { 1 } + \\mathbf { V } _ { 2 } )$ is the velocity of center of mass",
+    "node_ids": [
+      "n3c0_n18",
+      "n3c0_n19"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "peculiar velocity V",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "velocity of center of mass G",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e8",
+    "pattern_type": "applies_method_to",
+    "evidence_span": "This is done in the next section using the Chapman-Enskog method",
+    "node_ids": [
+      "n3c0_n22",
+      "n3c0_n1"
+    ],
+    "node_roles": [
+      "method",
+      "subject"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Chapman-Enskog method",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "RET kinetic equation",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e9",
+    "pattern_type": "defines",
+    "evidence_span": "The Chapman-Enskog method @12# assumes the existence of a “normal” solution such that all space and time dependence of the distribution function occurs through the hydrodynamic fields",
+    "node_ids": [
+      "n3c0_n23",
+      "n3c0_n24"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "normal solution",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "uniformity parameter",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e11",
+    "pattern_type": "compares",
+    "evidence_span": "The collision operator \\~14! can be recognized as the Boltzmann operator for inelastic collisions multiplied by this factor $\\chi .$",
+    "node_ids": [
+      "n3c0_n4",
+      "n3c0_n25"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Enskog collision operator",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Boltzmann operator for inelastic collisions",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e12",
+    "pattern_type": "applies_method_to",
+    "evidence_span": "a very good approximation can be obtained from an expansion in Sonine polynomials",
+    "node_ids": [
+      "n3c0_n26",
+      "n3c0_n3"
+    ],
+    "node_roles": [
+      "method",
+      "subject"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Sonine polynomials",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "one-particle distribution function f(r,v,t)",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e13",
+    "pattern_type": "defines",
+    "evidence_span": "where $p$ is the hydrostatic pressure The dimensionless density $n ^ { * } = n \\sigma ^ { 3 }$ has been introduced",
+    "node_ids": [
+      "n3c0_n27",
+      "n3c0_n28"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "hydrostatic pressure p",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "dimensionless density n*",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e14",
+    "pattern_type": "defines",
+    "evidence_span": "$\\mathcal { L }$ is the linearized collision operator Here $\\mathcal { Q } = 1 - \\mathcal { P } ,$ , where $\\mathcal { P }$ is the projection operator",
+    "node_ids": [
+      "n3c0_n29",
+      "n3c0_n30"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "linearized collision operator L",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "projection operator P",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c1_e6",
+    "pattern_type": "discussed_in",
+    "evidence_span": "The details of the calculations are given in Appendixes C and D",
+    "node_ids": [
+      "n3c1_n14",
+      "n3c1_n17"
+    ],
+    "node_roles": [
+      "topic",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "heat and momentum fluxes",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "Appendixes C and D",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c1_e20",
+    "pattern_type": "defines",
+    "evidence_span": "kappa_0 = 15 k_B eta_0 / 4 m and eta_0 = 5 m^(1/2) / 16 sigma^2 (pi beta)^(1/2) are the low density values of the thermal conductivity and the shear viscosity in the elastic limit",
+    "node_ids": [
+      "n3c1_n45",
+      "n3c1_n48"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "eta_0",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "low density values of the shear viscosity",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c1_e22",
+    "pattern_type": "influences",
+    "evidence_span": "c*(alpha) vanishes if f^(0) is replaced by the Maxwellian distribution",
+    "node_ids": [
+      "n3c1_n52",
+      "n3c1_n54"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "constant c*(alpha)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Maxwellian distribution",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c1_e23",
+    "pattern_type": "defines",
+    "evidence_span": "it is a measure of the deviation of the reference state from that for a gas with elastic collisions",
+    "node_ids": [
+      "n3c1_n52",
+      "n3c1_n55"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "constant c*(alpha)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "measure of the deviation of the reference state",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e0",
+    "pattern_type": "composed_of",
+    "evidence_span": "a brief review of the RET kinetic equation and associated conservation laws are presented",
+    "node_ids": [
+      "n3c0_n1",
+      "n3c0_n2"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "RET kinetic equation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "conservation laws",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states a review of two topics, not a structural composition. The relation is a co-listing of parallel items, not a part-whole composition. The pattern boundary explicitly excludes co-listing.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e7",
+    "pattern_type": "extends",
+    "evidence_span": "provide the basis for developing a hydrodynamic description. The latter follows from a representation of P(r,t), q(r,t), and $\\zeta ( \\mathbf { r } , t )$ as explicit functionals of the hydrodynamic fields and their gradients. The resulting closed set of equations constitutes the hydrodynamics for the RET",
+    "node_ids": [
+      "n3c0_n20",
+      "n3c0_n21"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "hydrodynamic description",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "hydrodynamics for the RET",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a derivation process: the hydrodynamic description is derived from the balance equations, not an extension of the hydrodynamics for the RET. The relation is a derivation, not a generalization or extension.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e10",
+    "pattern_type": "defines",
+    "evidence_span": "it is convenient to introduce a formal expansion parameter  referred to as the uniformity parameter",
+    "node_ids": [
+      "n3c0_n24",
+      "n3c0_n24"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "uniformity parameter",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "uniformity parameter",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence introduces a parameter and names it, but the edge has the same surface for both subject and definition roles, which is a self-referential definition. The relation is a naming, not a definitional identity with distinct entities.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e15",
+    "pattern_type": "defines",
+    "evidence_span": "the linear operator $\\kappa [ X ]$ is defined by",
+    "node_ids": [
+      "n3c0_n31",
+      "n3c0_n31"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "linear operator κ[X]",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "linear operator κ[X]",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the operator is defined, but the edge has the same surface for both subject and definition roles, which is a self-referential definition. The relation is a naming, not a definitional identity with distinct entities.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c1_e0",
+    "pattern_type": "defines",
+    "evidence_span": "gives the integral equations to determine A(V), B(V), C_ij(V), and (V)",
+    "node_ids": [
+      "n3c1_n1",
+      "n3c1_n2",
+      "n3c1_n3",
+      "n3c1_n4"
+    ],
+    "node_roles": [
+      "subject",
+      "object",
+      "object",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "integral equations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "A(V)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "B(V)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "C_ij(V)",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states that the integral equations determine the functions, not that the functions define the equations. The relation is a determination, not a definitional identity.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c1_e1",
+    "pattern_type": "influences",
+    "evidence_span": "zeta^(1,1)(f^(1)) is a scalar and therefore couples only to D",
+    "node_ids": [
+      "n3c1_n6",
+      "n3c1_n5"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "zeta^(1,1)(f^(1))",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "D",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states a coupling relation, not a functional dependence. The relation is a coupling, not an influence or dependence.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c1_e2",
+    "pattern_type": "influences",
+    "evidence_span": "The lowest order distribution f^(0) is a functional of the exact nonequilibrium fields",
+    "node_ids": [
+      "n3c1_n7",
+      "n3c1_n8"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "lowest order distribution f^(0)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "exact nonequilibrium fields",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states a functional dependence, but the edge has the source and target roles reversed. The distribution is a functional of the fields, so the fields should be the source and the distribution the target.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c1_e3",
+    "pattern_type": "influences",
+    "evidence_span": "This implies that f^(1) lies entirely in the orthogonal subspace",
+    "node_ids": [
+      "n3c1_n9",
+      "n3c1_n10"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "f^(1)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "orthogonal subspace",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states a spatial containment relation, not a functional dependence. The relation is a containment, not an influence or dependence.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c1_e4",
+    "pattern_type": "discussed_in",
+    "evidence_span": "These ''solubility conditions'' are proved in Appendix B",
+    "node_ids": [
+      "n3c1_n12",
+      "n3c1_n13"
+    ],
+    "node_roles": [
+      "topic",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "solubility conditions",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "Appendix B",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly states that the solubility conditions are proved in Appendix B, which fits the discussed_in pattern (topic covered in a source).",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3c1_e7",
+    "pattern_type": "defines",
+    "evidence_span": "where eta is the shear viscosity",
+    "node_ids": [
+      "n3c1_n18",
+      "n3c1_n19"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "eta",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "shear viscosity",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly defines eta as the shear viscosity, which fits the defines pattern.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3c1_e8",
+    "pattern_type": "defines",
+    "evidence_span": "mu is an additional transport coefficient not present for elastic collisions",
+    "node_ids": [
+      "n3c1_n22",
+      "n3c1_n23"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mu",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "additional transport coefficient",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly defines mu as an additional transport coefficient, which fits the defines pattern.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3c1_e10",
+    "pattern_type": "discussed_in",
+    "evidence_span": "The dimensionless integrals I_gamma(alpha) and I_kappa(alpha) in Eqs. (39) and (40)",
+    "node_ids": [
+      "n3c1_n29",
+      "n3c1_n30"
+    ],
+    "node_roles": [
+      "topic",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "dimensionless integrals I_gamma(alpha) and I_kappa(alpha)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "Eqs. (39) and (40)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states that the integrals are in the equations, which fits the discussed_in pattern (topic covered in a source).",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3c1_e11",
+    "pattern_type": "measures",
+    "evidence_span": "the cooling rate zeta can be calculated first order in the gradients from Eqs. (29) and (30)",
+    "node_ids": [
+      "n3c1_n31",
+      "n3c1_n32"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "cooling rate zeta",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "Eqs. (29) and (30)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states that the cooling rate is calculated from the equations, which fits the measures pattern (object evaluated by instrument/method).",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3c1_e12",
+    "pattern_type": "defines",
+    "evidence_span": "The distribution function f = f^(0) + f^(1) with f^(0) given by the solution to Eq. (19) and f^(1) given by Eq. (31) is exact to this order in the gradients",
+    "node_ids": [
+      "n3c1_n34",
+      "n3c1_n35",
+      "n3c1_n36"
+    ],
+    "node_roles": [
+      "subject",
+      "object",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "distribution function f = f^(0) + f^(1)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Eq. (19)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Eq. (31)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states that the distribution function is defined by the equations, which fits the defines pattern.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3c1_e13",
+    "pattern_type": "influences",
+    "evidence_span": "The distribution function f = f^(0) + f^(1) with f^(0) given by the solution to Eq. (19) and f^(1) given by Eq. (31) is exact to this order in the gradients, as are the fluxes (37)",
+    "node_ids": [
+      "n3c1_n34",
+      "n3c1_n37"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "distribution function f = f^(0) + f^(1)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "fluxes (37)",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence explicitly states that the distribution function is exact to this order, as are the fluxes, indicating a direct dependence of the fluxes on the distribution function.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3c1_e14",
+    "pattern_type": "influences",
+    "evidence_span": "These results require solution to the linear equations (32)-(34)",
+    "node_ids": [
+      "n3c1_n34",
+      "n3c1_n38"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "distribution function f = f^(0) + f^(1)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "linear equations (32)-(34)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence explicitly states that the results (which include the distribution function) require the solution to the linear equations, indicating a dependency.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3c1_e17",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "kappa_0 = 15 k_B eta_0 / 4 m",
+    "node_ids": [
+      "n3c1_n43",
+      "n3c1_n44",
+      "n3c1_n45",
+      "n3c1_n46"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "input",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "kappa_0",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "k_B",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "eta_0",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "m",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence is a direct formula, which is a formal constitutive law. The roles are correctly assigned: kappa_0 is the output, and k_B, eta_0, and m are inputs.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3c1_e18",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "eta_0 = 5 m^(1/2) / 16 sigma^2 (pi beta)^(1/2)",
+    "node_ids": [
+      "n3c1_n45",
+      "n3c1_n50",
+      "n3c1_n51",
+      "n3c1_n46"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "input",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "eta_0",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "sigma",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "beta",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "m",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence is a direct formula, which is a formal constitutive law. The roles are correctly assigned: eta_0 is the output, and sigma, beta, and m are inputs.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3c1_e19",
+    "pattern_type": "defines",
+    "evidence_span": "kappa_0 = 15 k_B eta_0 / 4 m and eta_0 = 5 m^(1/2) / 16 sigma^2 (pi beta)^(1/2) are the low density values of the thermal conductivity and the shear viscosity in the elastic limit",
+    "node_ids": [
+      "n3c1_n43",
+      "n3c1_n47"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "kappa_0",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "low density values of the thermal conductivity",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence explicitly defines kappa_0 and eta_0 as the low-density values, which is a definitional identity. The roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3c1_e21",
+    "pattern_type": "influences",
+    "evidence_span": "The constant c*(alpha) is related to the fourth moment of f^(0)",
+    "node_ids": [
+      "n3c1_n52",
+      "n3c1_n53"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "constant c*(alpha)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "fourth moment of f^(0)",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence explicitly states a relationship between the constant and the fourth moment, which is a dependency relation. The roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n4c0_e0",
+    "pattern_type": "defines",
+    "evidence_span": "It is useful to represent these quantities as an expansion in a complete set of polynomials and generate approximations by truncating the expansion.",
+    "node_ids": [
+      "n4c0_n1",
+      "n4c0_n2"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Sonine polynomial expansion",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "A, B, and C_ij",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e1",
+    "pattern_type": "predicts",
+    "evidence_span": "To evaluate the kinetic parts of the transport coefficients the forms ~48!–~50! can be used",
+    "node_ids": [
+      "n4c0_n1",
+      "n4c0_n3"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Sonine polynomial expansion",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "transport coefficients",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e2",
+    "pattern_type": "validates_with",
+    "evidence_span": "Comparison of this prediction with direct Monte Carlo simulation of the kinetic equation shows a very good agreement",
+    "node_ids": [
+      "n4c0_n1",
+      "n4c0_n4"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Sonine polynomial expansion",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "direct Monte Carlo simulation",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e3",
+    "pattern_type": "contrasts_with",
+    "evidence_span": "In general, Lun’s results show important quantitative discrepancies with those derived here.",
+    "node_ids": [
+      "n4c0_n6",
+      "n4c0_n5"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "current method",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Lun et al. method",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e4",
+    "pattern_type": "compares",
+    "evidence_span": "In general, Lun’s results show important quantitative discrepancies with those derived here.",
+    "node_ids": [
+      "n4c0_n7",
+      "n4c0_n8"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Lun et al. results",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "current results",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e6",
+    "pattern_type": "influences",
+    "evidence_span": "The transport coefficients for granular flow of dense, weakly inelastic hard spheres were studied by Lun et al. @5# by using an approximate moment method to solve the Enskog kinetic equation.",
+    "node_ids": [
+      "n4c0_n10",
+      "n4c0_n3"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "n* (density)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "transport coefficients",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e5",
+    "pattern_type": "influences",
+    "evidence_span": "The transport coefficients for granular flow of dense, weakly inelastic hard spheres were studied by Lun et al. @5# by using an approximate moment method to solve the Enskog kinetic equation.",
+    "node_ids": [
+      "n4c0_n9",
+      "n4c0_n3"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "α (dissipation)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "transport coefficients",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a study by Lun et al., not a derived functional dependence of transport coefficients on α. It is a setup/baseline description, not a statement of the claimed relation. The relation does not exist in this sentence.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e7",
+    "pattern_type": "composed_of",
+    "evidence_span": "The transport coefficients have been reduced by η _ 0 and κ _ 0 . . The cooling rate ζ and the frequencies ν _ η and ν _ κ = ν _ μ have been reduced by the characteristic collision frequency ν _ 0 = p ^ k / η _ 0 . The resulting dimensionless variables are",
+    "node_ids": [
+      "n4c0_n3",
+      "n4c0_n11"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "transport coefficients",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "η*, κ*, μ*",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence describes a normalization/reduction process, not a structural composition. The dimensionless variables are not components of the transport coefficients; they are normalized versions. The relation is not composed_of.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n8_e5",
+    "pattern_type": "validates_with",
+    "evidence_span": "With this change the results of Ref. [7] agree with the first two terms on the right side of Eq. (F1).",
+    "node_ids": [
+      "n8_n8",
+      "n8_n1"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Goldshtein and Shapiro",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "cooling rate",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e7",
+    "pattern_type": "defines",
+    "evidence_span": "with the definition",
+    "node_ids": [
+      "n8_n5",
+      "n8_n10"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "c_D",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Eq. (F4)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e1",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "The contribution ζ^(0) can be evaluated easily by using the first Sonine approximation to f^(0)",
+    "node_ids": [
+      "n8_n2",
+      "n8_n4"
+    ],
+    "node_roles": [
+      "output",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "ζ^(0)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "f^(0)",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states ζ^(0) is evaluated using the Sonine approximation to f^(0), which is a formal functional relation. The roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n8_e2",
+    "pattern_type": "influences",
+    "evidence_span": "Dimensional analysis requires that ζ^(0) and ν_γ are proportional to T^(1/2)",
+    "node_ids": [
+      "n8_n2",
+      "n8_n7"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "ζ^(0)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "T",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states ζ^(0) is proportional to T^(1/2), which is a functional dependence. The roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n8_e3",
+    "pattern_type": "influences",
+    "evidence_span": "Dimensional analysis requires that ζ^(0) and ν_γ are proportional to T^(1/2)",
+    "node_ids": [
+      "n8_n6",
+      "n8_n7"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "ν_γ",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "T",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states ν_γ is proportional to T^(1/2), which is a functional dependence. The roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n8_e4",
+    "pattern_type": "influences",
+    "evidence_span": "Therefore c_D ∝ T^(-1/2)",
+    "node_ids": [
+      "n8_n5",
+      "n8_n7"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "c_D",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "T",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states c_D is proportional to T^(-1/2), which is a functional dependence. The roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n8_e6",
+    "pattern_type": "deviates_from",
+    "evidence_span": "an error was made in the expression for c*",
+    "node_ids": [
+      "n8_n8",
+      "n8_n9"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Goldshtein and Shapiro",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "c*",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states an error was made in the expression for c*, but it does not state that Goldshtein and Shapiro deviate from c*. The relation is not explicitly stated. The edge is dropped.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  }
+]

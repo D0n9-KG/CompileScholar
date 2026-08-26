@@ -1,0 +1,1975 @@
+[
+  {
+    "edge_id": "n1c1_e0",
+    "pattern_type": "alternative_expression",
+    "evidence_span": "with $T _ { E }$ replaced by the number average kinetic temperature $( T _ { K } = [ ( 1 - f ) m _ { L } u _ { L } ^ { 2 } + f m _ { H } u _ { H } ^ { 2 } ] / 2 )$",
+    "node_ids": [
+      "n1c1_n2",
+      "n1c1_n3"
+    ],
+    "node_roles": [
+      "original",
+      "alternative"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "T_E",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "number average kinetic temperature",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c1_e4",
+    "pattern_type": "relates_to",
+    "evidence_span": "the equilibrium number fraction profile, $f ( y )$ , is simply related to the effective temperature profile $( T _ { E } ( y ) )$",
+    "node_ids": [
+      "n1c1_n19",
+      "n1c1_n21"
+    ],
+    "node_roles": [
+      "quantity",
+      "related_quantity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "f(y)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "T_E(y)",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c1_e5",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "$\\xi = 6 \\pi \\eta a ,$",
+    "node_ids": [
+      "n1c1_n23",
+      "n1c1_n24",
+      "n1c1_n25"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "xi",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "eta",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "a",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c1_e6",
+    "pattern_type": "analogous_to",
+    "evidence_span": "Estimating the friction coefficient as $\\xi = 6 \\pi \\eta a ,$ by analogy to Stokes flow of a sphere",
+    "node_ids": [
+      "n1c1_n23",
+      "n1c1_n26"
+    ],
+    "node_roles": [
+      "entity",
+      "analog"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "xi",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Stokes flow",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c1_e7",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "$( T _ { E } = \\xi D )$",
+    "node_ids": [
+      "n1c1_n30",
+      "n1c1_n23",
+      "n1c1_n11"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "T_E",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "xi",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "D",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c1_e8",
+    "pattern_type": "defines",
+    "evidence_span": "the fluctuation-dissipation relation definition of the effective temperature $( T _ { E } = \\xi D )$",
+    "node_ids": [
+      "n1c1_n30",
+      "n1c1_n29"
+    ],
+    "node_roles": [
+      "defined",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "T_E",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "effective temperature",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c1_e12",
+    "pattern_type": "regime_transition",
+    "evidence_span": "The flow is in the rolling regime and comprises a dense flowing surface layer and a fixed bed that rotates with the cylinder.",
+    "node_ids": [
+      "n1c1_n40",
+      "n1c1_n41",
+      "n1c1_n42"
+    ],
+    "node_roles": [
+      "regime",
+      "regime",
+      "regime"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "rolling regime",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "dense flowing surface layer",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "fixed bed",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c1_e14",
+    "pattern_type": "captures_phenomenon",
+    "evidence_span": "At steady state, achieved after about 30 cylinder rotations, the mixture segregates radially in the cylinder with the steel particles in the central core.",
+    "node_ids": [
+      "n1c1_n43",
+      "n1c1_n44"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "steady state",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "steel particles in the central core",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:slot-type-mismatch",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c1_e16",
+    "pattern_type": "applies_method_to",
+    "evidence_span": "The images are analyzed using computer codes to detect the particles.",
+    "node_ids": [
+      "n1c1_n50",
+      "n1c1_n51"
+    ],
+    "node_roles": [
+      "method",
+      "subject"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "computer codes",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "image analysis",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c1_e17",
+    "pattern_type": "applies_method_to",
+    "evidence_span": "The glass and steel particles are identified separately in the images by their intensity on the gray scale (figs. 1b,c) and are tracked individually using image analysis.",
+    "node_ids": [
+      "n1c1_n51",
+      "n1c1_n37"
+    ],
+    "node_roles": [
+      "method",
+      "subject"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "image analysis",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "glass particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e1",
+    "pattern_type": "influences",
+    "evidence_span": "we show that granular segregation is determined by the effective temperature defined by the fluctuation-dissipation relation.",
+    "node_ids": [
+      "n1c0_n3",
+      "n1c0_n2"
+    ],
+    "node_roles": [
+      "influencer",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "effective temperature",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "granular segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e2",
+    "pattern_type": "defines",
+    "evidence_span": "we show that granular segregation is determined by the effective temperature defined by the fluctuation-dissipation relation.",
+    "node_ids": [
+      "n1c0_n3",
+      "n1c0_n4"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "effective temperature",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "fluctuation-dissipation relation",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e3",
+    "pattern_type": "validates_with",
+    "evidence_span": "The description has no fitted parameters and is validated by experiments.",
+    "node_ids": [
+      "n1c0_n5",
+      "n1c0_n6"
+    ],
+    "node_roles": [
+      "validated",
+      "validator"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "description",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "experiments",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e4",
+    "pattern_type": "contrasts_with",
+    "evidence_span": "In contrast to the Gibbs-Boltzmann formalism in which energy is conserved and all configurations with a fixed energy are equally probable, in the new thermodynamics volume is conserved and all jammed configurations are equally probable.",
+    "node_ids": [
+      "n1c0_n8",
+      "n1c0_n9"
+    ],
+    "node_roles": [
+      "contrasted",
+      "contrasted"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Gibbs-Boltzmann formalism",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "new thermodynamics",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e5",
+    "pattern_type": "defines",
+    "evidence_span": "Experimental measurements of the temperature arising from the new thermodynamics (compactivity) have only recently been made for periodically perturbed fixed bed systems [17,18].",
+    "node_ids": [
+      "n1c0_n10",
+      "n1c0_n9"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "compactivity",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "new thermodynamics",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e6",
+    "pattern_type": "predicts",
+    "evidence_span": "the theory predicts the existence of two temperatures: the normal kinetic temperature $\\left( T _ { K } \\right)$ and the effective temperature $\\left( T _ { E } \\right)$ T obtained from a fluctuation-dissipation Trelation [21].",
+    "node_ids": [
+      "n1c0_n11",
+      "n1c0_n12",
+      "n1c0_n13"
+    ],
+    "node_roles": [
+      "predictor",
+      "predicted",
+      "predicted"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mode coupling theory for glassy systems",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "normal kinetic temperature",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "effective temperature",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e7",
+    "pattern_type": "influences",
+    "evidence_span": "The effective temperature arises from the conformational entropy of the system.",
+    "node_ids": [
+      "n1c0_n13",
+      "n1c0_n14"
+    ],
+    "node_roles": [
+      "influencer",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "effective temperature",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "conformational entropy",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e8",
+    "pattern_type": "agrees_with",
+    "evidence_span": "The equivalence of the two approaches and consequently of the compactivity and the effective temperature has been demonstrated recently by theory [25] and numerical simulations [26] of granular shear flows very near random close packing of the particles.",
+    "node_ids": [
+      "n1c0_n17",
+      "n1c0_n18"
+    ],
+    "node_roles": [
+      "agreeing",
+      "agreed_with"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "compactivity",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "effective temperature",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e9",
+    "pattern_type": "relates_to",
+    "evidence_span": "The connection between granular segregation and the compactivity was made early by Edwards and Mehta [27].",
+    "node_ids": [
+      "n1c0_n22",
+      "n1c0_n23"
+    ],
+    "node_roles": [
+      "related_entity",
+      "related_entity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "granular segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "compactivity",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e10",
+    "pattern_type": "defines",
+    "evidence_span": "The system of a single different density particle in a sheared bed considered by Song et al. [24] is a segregating system, though a very dilute one.",
+    "node_ids": [
+      "n1c0_n25",
+      "n1c0_n26"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "system of a single different density particle in a sheared bed",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "segregating system",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e11",
+    "pattern_type": "influences",
+    "evidence_span": "During flow, the higher-density particles sink in the layer while the lower-density particles rise, resulting in stratification.",
+    "node_ids": [
+      "n1c0_n29",
+      "n1c0_n30",
+      "n1c0_n31"
+    ],
+    "node_roles": [
+      "influencer",
+      "influencer",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "higher-density particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "lower-density particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "stratification",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e12",
+    "pattern_type": "influences",
+    "evidence_span": "However, diffusional mixing prevents complete separation.",
+    "node_ids": [
+      "n1c0_n32",
+      "n1c0_n33"
+    ],
+    "node_roles": [
+      "influencer",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "diffusional mixing",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "complete separation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e13",
+    "pattern_type": "influences",
+    "evidence_span": "A balance between mixing and segregation results in an equilibrium distribution of particles in the layer.",
+    "node_ids": [
+      "n1c0_n34",
+      "n1c0_n35"
+    ],
+    "node_roles": [
+      "influencer",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "balance between mixing and segregation",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "equilibrium distribution of particles",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e14",
+    "pattern_type": "defines",
+    "evidence_span": "The term equilibrium is used here in the sense of balances of local fluxes.",
+    "node_ids": [
+      "n1c0_n36",
+      "n1c0_n37"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "equilibrium",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "balances of local fluxes",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e15",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "The density of the effective medium is given by $\\rho _ { m } = [ f m _ { H } + ( 1 - f ) m _ { L } ] / V$ where $m _ { L }$ ρ f m fis the mass of the lighter particles, $f = n _ { H } / n$ is m f n /nthe number fraction of the heavy particles, H is the number density of heavy particles and  is the total nnumber density.",
+    "node_ids": [
+      "n1c0_n51",
+      "n1c0_n52",
+      "n1c0_n53",
+      "n1c0_n54",
+      "n1c0_n55"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "input",
+      "input",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "density of the effective medium",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "mass of the lighter particles",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "number fraction of the heavy particles",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "number density of heavy particles",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "total number density",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e17",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "Similarly, the velocity of the light particles is given by $v _ { L } = F _ { L } / \\xi _ { L }$ with $F _ { L } = - ( m _ { L } - \\rho _ { m } V )$ cos .",
+    "node_ids": [
+      "n1c0_n58",
+      "n1c0_n59"
+    ],
+    "node_roles": [
+      "output",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "velocity of the light particles",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "friction coefficient of the light particles",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e19",
+    "pattern_type": "influences",
+    "evidence_span": "The friction T /D Dcoefficient for both species is the same since the effective temperature of both species must be the same and so is the diffusivity; both assertions are verified below by measurements.",
+    "node_ids": [
+      "n1c0_n64",
+      "n1c0_n65",
+      "n1c0_n66"
+    ],
+    "node_roles": [
+      "influencer",
+      "influenced",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "friction coefficient for both species",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "effective temperature of both species",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "diffusivity",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e21",
+    "pattern_type": "defines",
+    "evidence_span": "By definition, the flux of the light particles is $J _ { L } ^ { s } = - J _ { H } ^ { s }$ .",
+    "node_ids": [
+      "n1c0_n69",
+      "n1c0_n67"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "flux of the light particles",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "segregation flux of the heavy particles",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e22",
+    "pattern_type": "influences",
+    "evidence_span": "The form of the segregation flux in eq. (2) is physically reasonable in various limits: the flux goes to zero when the masses of the two species are equal, when we have only one species $( f = 0 \\ \\mathrm { o r } \\ f = 1 )$ and when there is no f fgravitational force.",
+    "node_ids": [
+      "n1c0_n71",
+      "n1c0_n72",
+      "n1c0_n73",
+      "n1c0_n74"
+    ],
+    "node_roles": [
+      "influenced",
+      "influencer",
+      "influencer",
+      "influencer"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "flux",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "masses of the two species",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "one species",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "gravitational force",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e23",
+    "pattern_type": "influences",
+    "evidence_span": "The flux is inversely proportional to the effective temperature and directly proportional to the diffusivity.",
+    "node_ids": [
+      "n1c0_n75",
+      "n1c0_n76",
+      "n1c0_n77"
+    ],
+    "node_roles": [
+      "influenced",
+      "influencer",
+      "influencer"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "flux",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "effective temperature",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "diffusivity",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e24",
+    "pattern_type": "influences",
+    "evidence_span": "Equation (2) indicates that heavy particles will sink as they flow and light particles will rise, resulting in the spontaneous segregation of the flowing mixture.",
+    "node_ids": [
+      "n1c0_n78",
+      "n1c0_n79",
+      "n1c0_n80"
+    ],
+    "node_roles": [
+      "influencer",
+      "influencer",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "heavy particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "light particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "spontaneous segregation of the flowing mixture",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c1_e10",
+    "pattern_type": "applies_method_to",
+    "evidence_span": "Experiments are carried out in a quasi–two-dimensional rotating cylinder of diameter 32 cm and length 1 cm half-filled with a mixture of 2 mm spherical glass and steel particles",
+    "node_ids": [
+      "n1c1_n35",
+      "n1c1_n36"
+    ],
+    "node_roles": [
+      "method",
+      "subject"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "quasi–two-dimensional rotating cylinder",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "mixture of 2 mm spherical glass and steel particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes an experimental setup, not the application of a method to a subject. The rotating cylinder is the apparatus, not a method. The mixture is the material being studied, not a subject of a method application. This is a setup description, not an applies_method_to relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e11",
+    "pattern_type": "applies_method_to",
+    "evidence_span": "rotated at 3 rpm using a stepper motor",
+    "node_ids": [
+      "n1c1_n39",
+      "n1c1_n35"
+    ],
+    "node_roles": [
+      "method",
+      "subject"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "stepper motor",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "quasi–two-dimensional rotating cylinder",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a piece of equipment (stepper motor) used to rotate the cylinder. This is a description of the experimental apparatus, not the application of a method to a subject. The stepper motor is not a method, and the cylinder is not a subject of a method application.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e19",
+    "pattern_type": "applies_method_to",
+    "evidence_span": "The area of interest is divided into bins of length 40 mm (+20 mm to −20 mm from the center) in the flow direction ( -axis) and 2 mm (one particle diameter size) in the x-direction.",
+    "node_ids": [
+      "n1c1_n54",
+      "n1c1_n55"
+    ],
+    "node_roles": [
+      "method",
+      "subject"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "bins",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "number density",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes the setup of bins (a spatial discretization), not the application of a method to study a subject. 'Bins' is not a method, and 'number density' is not a subject being analyzed by the bins in this sentence. This is a setup description, not an applies_method_to relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e20",
+    "pattern_type": "applies_method_to",
+    "evidence_span": "Averaging is done over all the particles present yin the corresponding bin over all the images to obtain the number density, velocity and r.m.s. velocity profiles.",
+    "node_ids": [
+      "n1c1_n54",
+      "n1c1_n56"
+    ],
+    "node_roles": [
+      "method",
+      "subject"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "bins",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "velocity",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes the process of averaging to obtain profiles. 'Bins' is not a method, and 'velocity' is not a subject being studied by the bins. This is a data processing step, not an applies_method_to relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e21",
+    "pattern_type": "applies_method_to",
+    "evidence_span": "Averaging is done over all the particles present yin the corresponding bin over all the images to obtain the number density, velocity and r.m.s. velocity profiles.",
+    "node_ids": [
+      "n1c1_n54",
+      "n1c1_n57"
+    ],
+    "node_roles": [
+      "method",
+      "subject"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "bins",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "r.m.s. velocity profiles",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes the process of averaging to obtain profiles. 'Bins' is not a method, and 'r.m.s. velocity profiles' is not a subject being studied by the bins. This is a data processing step, not an applies_method_to relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c0_e18",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "We use the fluctuation-F m ρ V gβdissipation relation to obtain the friction coefficient in terms of the effective temperature $\\left( T _ { E } \\right)$ as $\\xi _ { H } = \\xi _ { L } = \\xi =$ $T _ { E } / D$ T ξ ξ ξ, where  is the diffusivity [20,25,29].",
+    "node_ids": [
+      "n1c0_n61",
+      "n1c0_n62",
+      "n1c0_n63"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "friction coefficient",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "effective temperature",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "diffusivity",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence provides a formal equation relating friction coefficient (output) to effective temperature and diffusivity (inputs), which is a constitutive law.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n2c0_e3",
+    "pattern_type": "defines",
+    "evidence_span": "The dynamic angle of repose β is obtained as the angle at which the y-component of the mean velocity is zero.",
+    "node_ids": [
+      "n2c0_n7",
+      "n2c0_n2"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "dynamic angle of repose β",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "τ_xy",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e5",
+    "pattern_type": "defines",
+    "evidence_span": "γ̇ = |d v_x / d y|",
+    "node_ids": [
+      "n2c0_n9",
+      "n2c0_n2"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "γ̇",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "τ_xy",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e6",
+    "pattern_type": "influences",
+    "evidence_span": "The shear rate (γ̇ = |d v_x / d y|), obtained by numerically differentiating the mean velocity profile, shows a maximum",
+    "node_ids": [
+      "n2c0_n10",
+      "n2c0_n2"
+    ],
+    "node_roles": [
+      "influenced_quantity",
+      "influencing_quantity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "shear rate",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "τ_xy",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e7",
+    "pattern_type": "influences",
+    "evidence_span": "The shear stress (τ_xy) increases nearly linearly with depth",
+    "node_ids": [
+      "n2c0_n11",
+      "n2c0_n2"
+    ],
+    "node_roles": [
+      "influenced_quantity",
+      "influencing_quantity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "shear stress",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "τ_xy",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e8",
+    "pattern_type": "influences",
+    "evidence_span": "The apparent viscosity (η = τ_xy / γ̇) increases sharply with depth",
+    "node_ids": [
+      "n2c0_n12",
+      "n2c0_n2"
+    ],
+    "node_roles": [
+      "influenced_quantity",
+      "influencing_quantity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "apparent viscosity",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "τ_xy",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e9",
+    "pattern_type": "defines",
+    "evidence_span": "inset (a) shows the mean squared displacement (Δy^2) of the particles with time (t) at different depths, from which the diffusivity is obtained as half the slope of the linear part of the graph.",
+    "node_ids": [
+      "n2c0_n13",
+      "n2c0_n14"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "diffusivity D",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "mean squared displacement Δy^2",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e10",
+    "pattern_type": "influences",
+    "evidence_span": "The diffusivity decreases with depth, but the diffusivities of the two species are the same, within experimental error.",
+    "node_ids": [
+      "n2c0_n13",
+      "n2c0_n10"
+    ],
+    "node_roles": [
+      "influenced_quantity",
+      "influencing_quantity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "diffusivity D",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "shear rate",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e12",
+    "pattern_type": "agrees_with",
+    "evidence_span": "T_E is same for both the species which implies that the two species are in thermal equilibrium with each other.",
+    "node_ids": [
+      "n2c0_n15",
+      "n2c0_n16"
+    ],
+    "node_roles": [
+      "entity_x",
+      "entity_y"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "effective temperature T_E",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "kinetic temperature T_K",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e13",
+    "pattern_type": "influences",
+    "evidence_span": "T_E increases with depth while T_K decreases with depth.",
+    "node_ids": [
+      "n2c0_n15",
+      "n2c0_n2"
+    ],
+    "node_roles": [
+      "influenced_quantity",
+      "influencing_quantity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "effective temperature T_E",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "τ_xy",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e14",
+    "pattern_type": "influences",
+    "evidence_span": "T_E increases with depth while T_K decreases with depth.",
+    "node_ids": [
+      "n2c0_n16",
+      "n2c0_n2"
+    ],
+    "node_roles": [
+      "influenced_quantity",
+      "influencing_quantity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "kinetic temperature T_K",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "τ_xy",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e15",
+    "pattern_type": "validates_with",
+    "evidence_span": "Figure 6 shows a plot of [f(1-f)]^-1 df/dy vs. 1/T_E to test eq. (3), where symbols with error bars are experimental measurements and the line is the prediction of the theory.",
+    "node_ids": [
+      "n2c0_n17",
+      "n2c0_n18"
+    ],
+    "node_roles": [
+      "validated_entity",
+      "validation_reference"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "eq. (3)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "eq. (4)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e16",
+    "pattern_type": "deviates_from",
+    "evidence_span": "the data in fig. 5 indicate that kinetic theory predictions, which are identical to eq. (3) but with T_E replaced by T_K, do not describe the experimental data",
+    "node_ids": [
+      "n2c0_n19",
+      "n2c0_n17"
+    ],
+    "node_roles": [
+      "entity_x",
+      "entity_y"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "kinetic theory predictions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "eq. (3)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e17",
+    "pattern_type": "validates_with",
+    "evidence_span": "A theory for density-difference–driven segregation of equal-size particles is presented and is validated by experimental measurements.",
+    "node_ids": [
+      "n2c0_n20",
+      "n2c0_n29"
+    ],
+    "node_roles": [
+      "validated_entity",
+      "validation_reference"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "theory for density-difference–driven segregation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "2 mm spherical glass (75% by volume) and steel (25% by volume) particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e18",
+    "pattern_type": "analogous_to",
+    "evidence_span": "We note the similarity of the approach presented here to that of Perrin [36] who determined the equilibrium profile of Brownian particles in a gravity field.",
+    "node_ids": [
+      "n2c0_n20",
+      "n2c0_n21"
+    ],
+    "node_roles": [
+      "entity_x",
+      "entity_y"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "theory for density-difference–driven segregation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Perrin [36]",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e19",
+    "pattern_type": "background",
+    "evidence_span": "Such a “barotropic” experiment was suggested by Berthier and Barrat [22] for sheared colloids.",
+    "node_ids": [
+      "n2c0_n22",
+      "n2c0_n20"
+    ],
+    "node_roles": [
+      "background",
+      "motivated_entity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Berthier and Barrat [22]",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "theory for density-difference–driven segregation",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e22",
+    "pattern_type": "captures_phenomenon",
+    "evidence_span": "The measured equilibrium number density profiles (fig. 3a) indicate stratification, with the glass particles above the steel particles",
+    "node_ids": [
+      "n2c0_n20",
+      "n2c0_n24"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "theory for density-difference–driven segregation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "stratification",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e23",
+    "pattern_type": "regime_transition",
+    "evidence_span": "Previous studies have shown that the nature of the flow is fluid-like above the maximum and solid-like below it",
+    "node_ids": [
+      "n2c0_n31",
+      "n2c0_n32"
+    ],
+    "node_roles": [
+      "initial_regime",
+      "final_regime"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "fluid-like",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "solid-like",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e24",
+    "pattern_type": "predicts",
+    "evidence_span": "the effective temperature profile can be obtained from eq. (3) from the measurements of f(y)",
+    "node_ids": [
+      "n2c0_n17",
+      "n2c0_n34"
+    ],
+    "node_roles": [
+      "predictor",
+      "predicted_quantity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "eq. (3)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "f(y)",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c1_e0",
+    "pattern_type": "applies_method_to",
+    "evidence_span": "the new thermodynamics for applications of practical interest related to granular materials and other systems",
+    "node_ids": [
+      "n2c1_n1",
+      "n2c1_n2",
+      "n2c1_n3"
+    ],
+    "node_roles": [
+      "method",
+      "subject",
+      "subject"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "new thermodynamics",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "granular materials",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "other systems",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence span is a concluding statement about the utility/promise of the theory, not a specific application of a method to a subject. The relation is not explicitly stated; it is a general claim about applicability. The 'method' slot holds 'new thermodynamics' which is a theory, not a method being applied in this sentence. The 'subject' slots are not the direct objects of an application action.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n2c0_e0",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "τ_xy = g sin β ∫_-y^0 ρ_b dy - (2 μ_w / b) g cos β ∫_-y^0 [∫_-y^0 ρ_b dy] dy",
+    "node_ids": [
+      "n2c0_n2",
+      "n2c0_n3",
+      "n2c0_n6"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "τ_xy",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "ρ_b",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "μ_w",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence span is a formal constitutive law relating shear stress (output) to bulk density and wall friction (inputs). The formula is explicitly stated, and the roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n2c0_e1",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "ρ_b = α (m_L N_L + m_H N_H)",
+    "node_ids": [
+      "n2c0_n3",
+      "n2c0_n4"
+    ],
+    "node_roles": [
+      "output",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "ρ_b",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "α",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence span is a formal constitutive law defining bulk density as a function of the normalizing factor and other inputs. The formula is explicitly stated, and the roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n2c0_e2",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "α = [n_b ω (R^2 - δ^2)] / [2 ∫_δ^0 (v_xL N_L + v_xH N_H) dy]",
+    "node_ids": [
+      "n2c0_n4",
+      "n2c0_n5"
+    ],
+    "node_roles": [
+      "output",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "α",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "n_b",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence span is a formal constitutive law defining the normalizing factor as a function of the number density and other inputs. The formula is explicitly stated, and the roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n2c0_e4",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "The apparent viscosity (η) of the mixture is obtained as η = τ_xy / γ̇",
+    "node_ids": [
+      "n2c0_n8",
+      "n2c0_n2",
+      "n2c0_n9"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "apparent viscosity η",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "τ_xy",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "γ̇",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence span is a formal constitutive law defining apparent viscosity as a function of shear stress and shear rate. The formula is explicitly stated, and the roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n2c0_e20",
+    "pattern_type": "captures_phenomenon",
+    "evidence_span": "A theory for density-difference–driven segregation of equal-size particles is presented",
+    "node_ids": [
+      "n2c0_n20",
+      "n2c0_n26"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "theory for density-difference–driven segregation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "density-difference–driven segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence span merely states that a theory is presented, not that it captures or reproduces the phenomenon. The relation is not explicitly stated; it is a description of the paper's content. The 'model' slot holds 'theory for density-difference–driven segregation' which is the subject of the sentence, not a model that is capturing a phenomenon in this specific statement.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n2c0_e21",
+    "pattern_type": "captures_phenomenon",
+    "evidence_span": "This thermal equilibrium is in the context of the fluctuation-dissipation relation.",
+    "node_ids": [
+      "n2c0_n23",
+      "n2c0_n25"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "fluctuation-dissipation relation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "thermal equilibrium",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence span states that thermal equilibrium is 'in the context of' the fluctuation-dissipation relation, which is a weaker claim than 'captures'. It does not explicitly state that the relation captures or reproduces the phenomenon. The relation is not explicitly stated; it is a contextual association.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  }
+]

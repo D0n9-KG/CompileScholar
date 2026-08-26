@@ -1,0 +1,3550 @@
+[
+  {
+    "edge_id": "n1_e1",
+    "pattern_type": "compares_model_to_data",
+    "evidence_span": "The self-diffusion coefficients obtained from the simulations are somewhat higher than the kinetic theory at high concentrations, but they are in agreement there with the experimental measurements of Bridgwater et al. (1985, Inst. Chem. Eng. Symp. Ser. 69, 171–191).",
+    "node_ids": [
+      "n1_n1",
+      "n1_n5"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "molecular dynamics simulations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Bridgwater et al. (1985)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1_e2",
+    "pattern_type": "compares_predictions",
+    "evidence_span": "The self-diffusion coefficients obtained from the simulations are somewhat higher than the kinetic theory at high concentrations",
+    "node_ids": [
+      "n1_n2",
+      "n1_n1",
+      "n1_n4",
+      "n1_n7"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "quantity",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "kinetic theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "molecular dynamics simulations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "self-diffusion coefficients",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "solids fraction",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1_e3",
+    "pattern_type": "deviates_from",
+    "evidence_span": "The self-diffusion coefficients obtained from the simulations are somewhat higher than the kinetic theory at high concentrations",
+    "node_ids": [
+      "n1_n1",
+      "n1_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "molecular dynamics simulations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "kinetic theory",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1_e4",
+    "pattern_type": "agrees_with",
+    "evidence_span": "they are in agreement there with the experimental measurements of Bridgwater et al. (1985, Inst. Chem. Eng. Symp. Ser. 69, 171–191)",
+    "node_ids": [
+      "n1_n1",
+      "n1_n5"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "molecular dynamics simulations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Bridgwater et al. (1985)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1_e5",
+    "pattern_type": "influences",
+    "evidence_span": "The wall slip velocity is found to decrease as the coefficient of restitution increases.",
+    "node_ids": [
+      "n1_n6",
+      "n1_n3"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "coefficient of restitution",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "wall slip velocities",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1_e7",
+    "pattern_type": "measures",
+    "evidence_span": "values of the wall slip velocities are determined for various mean solids concentrations and particle coefficients of restitution",
+    "node_ids": [
+      "n1_n3",
+      "n1_n1"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "wall slip velocities",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "molecular dynamics simulations",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e1",
+    "pattern_type": "background",
+    "evidence_span": "computer simulations of these flows",
+    "node_ids": [
+      "n2_n3",
+      "n2_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "computer simulations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "granular flows",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e2",
+    "pattern_type": "background",
+    "evidence_span": "experimental investigations",
+    "node_ids": [
+      "n2_n4",
+      "n2_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "experimental investigations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "granular flows",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e7",
+    "pattern_type": "influences",
+    "evidence_span": "difficulty of developing techniques to measure things like velocities",
+    "node_ids": [
+      "n2_n4",
+      "n2_n5"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "experimental investigations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "velocities",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3_e1",
+    "pattern_type": "applies_method_to",
+    "evidence_span": "using both 'hard' and 'soft' sphere models, for bounded as well as unbounded flows",
+    "node_ids": [
+      "n3_n3",
+      "n3_n2"
+    ],
+    "node_roles": [
+      "method",
+      "subject"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "hard sphere models",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "shear flows",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3_e2",
+    "pattern_type": "applies_method_to",
+    "evidence_span": "using both 'hard' and 'soft' sphere models, for bounded as well as unbounded flows",
+    "node_ids": [
+      "n3_n4",
+      "n3_n2"
+    ],
+    "node_roles": [
+      "method",
+      "subject"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "soft sphere models",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "shear flows",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3_e3",
+    "pattern_type": "compares",
+    "evidence_span": "using both 'hard' and 'soft' sphere models, for bounded as well as unbounded flows",
+    "node_ids": [
+      "n3_n3",
+      "n3_n4"
+    ],
+    "node_roles": [
+      "entity1",
+      "entity2"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "hard sphere models",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "soft sphere models",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3_e4",
+    "pattern_type": "influences",
+    "evidence_span": "The influence of gravity was neglected in the computations",
+    "node_ids": [
+      "n3_n5",
+      "n3_n1"
+    ],
+    "node_roles": [
+      "influencer",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "gravity",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "computational work",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4_e0",
+    "pattern_type": "defines",
+    "evidence_span": "all lengths were nondimensionalized by dividing by H",
+    "node_ids": [
+      "n4_n1",
+      "n4_n2"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "defining_entity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "lengths",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "H",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4_e1",
+    "pattern_type": "defines",
+    "evidence_span": "Velocities were nondimensionalized by U",
+    "node_ids": [
+      "n4_n3",
+      "n4_n4"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "defining_entity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Velocities",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "U",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4_e5",
+    "pattern_type": "influences",
+    "evidence_span": "the interior flow was driven by the 'rough' top and bottom walls",
+    "node_ids": [
+      "n4_n13",
+      "n4_n12"
+    ],
+    "node_roles": [
+      "influencer",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "top and bottom walls",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "interior flow",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4_e7",
+    "pattern_type": "influences",
+    "evidence_span": "the particle spacing increased as mean solids fraction was decreased",
+    "node_ids": [
+      "n4_n17",
+      "n4_n16"
+    ],
+    "node_roles": [
+      "influencer",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mean solids fraction",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "particle spacing",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4_e8",
+    "pattern_type": "influences",
+    "evidence_span": "the walls became effectively 'rougher'",
+    "node_ids": [
+      "n4_n16",
+      "n4_n19"
+    ],
+    "node_roles": [
+      "influencer",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "particle spacing",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "wall roughness",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5_e0",
+    "pattern_type": "compares",
+    "evidence_span": "Two smooth, inelastic particle models were considered. In the 'hard-sphere' model the inelasticity was characterized by a standard coefficient of restitution, e, which was independent of impact velocity. There the impacts were instantaneous, implying binary particle collisions; this permitted a computational algorithm that was simple and efficient. In the 'soft-sphere' model, the collisions were of finite duration, and thus this model permitted the possibility of multiple contacts.",
+    "node_ids": [
+      "n5_n1",
+      "n5_n2"
+    ],
+    "node_roles": [
+      "entity1",
+      "entity2"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "hard-sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "soft-sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5_e1",
+    "pattern_type": "extends",
+    "evidence_span": "In the 'soft-sphere' model, the collisions were of finite duration, and thus this model permitted the possibility of multiple contacts.",
+    "node_ids": [
+      "n5_n2",
+      "n5_n1"
+    ],
+    "node_roles": [
+      "extended_entity",
+      "base_entity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "soft-sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "hard-sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5_e2",
+    "pattern_type": "applies_method_to",
+    "evidence_span": "There are different ways to model the dissipation during finite period collisions, but we have used the so-called ratchet contact model of Walton and Braun (1985).",
+    "node_ids": [
+      "n5_n5",
+      "n5_n2"
+    ],
+    "node_roles": [
+      "method",
+      "subject"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "ratchet contact model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "soft-sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5_e3",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "One can determine the equivalent (constant) coefficient of restitution to be $e = \\sqrt{k_{1}/k_{2}}$ .",
+    "node_ids": [
+      "n5_n11",
+      "n5_n8",
+      "n5_n9"
+    ],
+    "node_roles": [
+      "output",
+      "input1",
+      "input2"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "e",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "k1",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "k2",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5_e4",
+    "pattern_type": "influences",
+    "evidence_span": "By modelling the compaction and recovery processes by means of linear springs of different constants $k_{1}$ and $k_{2}$ , respectively, such that $k_{1} < k_{2}$ , we can incorporate energy dissipation into the collision process.",
+    "node_ids": [
+      "n5_n8",
+      "n5_n9",
+      "n5_n10"
+    ],
+    "node_roles": [
+      "influencer",
+      "influencer",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "k1",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "k2",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "energy dissipation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5_e5",
+    "pattern_type": "captures_phenomenon",
+    "evidence_span": "There are different ways to model the dissipation during finite period collisions, but we have used the so-called ratchet contact model of Walton and Braun (1985).",
+    "node_ids": [
+      "n5_n5",
+      "n5_n10"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "ratchet contact model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "energy dissipation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5_e6",
+    "pattern_type": "defines",
+    "evidence_span": "The collision process can be divided into a compaction phase during which the distance between particle centers decreases and the contact forces increase to a maximum, and a recovery phase in which the centers move apart and the contact forces decrease to zero when the particles come apart.",
+    "node_ids": [
+      "n5_n6",
+      "n5_n7"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "defining_entity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "compaction phase",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "recovery phase",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5_e7",
+    "pattern_type": "studies_phenomenon",
+    "evidence_span": "There the impacts were instantaneous, implying binary particle collisions; this permitted a computational algorithm that was simple and efficient.",
+    "node_ids": [
+      "n5_n1",
+      "n5_n4"
+    ],
+    "node_roles": [
+      "method",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "hard-sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "binary particle collisions",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c1_e0",
+    "pattern_type": "compares",
+    "evidence_span": "results of the hard-sphere and soft-sphere models are almost identical",
+    "node_ids": [
+      "n6c1_n1",
+      "n6c1_n2"
+    ],
+    "node_roles": [
+      "entity1",
+      "entity2"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "hard-sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "soft-sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c1_e1",
+    "pattern_type": "influences",
+    "evidence_span": "If e is decreased, the energy dissipation increases",
+    "node_ids": [
+      "n6c1_n3",
+      "n6c1_n4"
+    ],
+    "node_roles": [
+      "influencer",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "restitution coefficient e",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "energy dissipation",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c1_e2",
+    "pattern_type": "influences",
+    "evidence_span": "energy dissipation in the interior result in a fluctuation energy flux",
+    "node_ids": [
+      "n6c1_n4",
+      "n6c1_n5"
+    ],
+    "node_roles": [
+      "influencer",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "energy dissipation",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "granular temperature",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c1_e3",
+    "pattern_type": "influences",
+    "evidence_span": "less active particles tend to gather there resulting in a maximum in the solids fraction",
+    "node_ids": [
+      "n6c1_n5",
+      "n6c1_n6"
+    ],
+    "node_roles": [
+      "influencer",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "granular temperature",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "solids fraction",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c1_e4",
+    "pattern_type": "applies_method_to",
+    "evidence_span": "A Verlet algorithm is then applied to compute the velocity variation",
+    "node_ids": [
+      "n6c1_n7",
+      "n6c1_n2"
+    ],
+    "node_roles": [
+      "method",
+      "subject"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Verlet algorithm",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "soft-sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e0",
+    "pattern_type": "contrasts_with",
+    "evidence_span": "For the soft-sphere model, the collisions are not instantaneous, and the binary collision assumption is no longer appropriate, and we cannot use the collisional list searching procedure.",
+    "node_ids": [
+      "n6c0_n1",
+      "n6c0_n2"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "hard-sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "soft-sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e1",
+    "pattern_type": "applies_method_to",
+    "evidence_span": "A Verlet algorithm is then applied to compute the velocity variation and spatial displacement of the particle.",
+    "node_ids": [
+      "n6c0_n4",
+      "n6c0_n2"
+    ],
+    "node_roles": [
+      "method",
+      "subject"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Verlet algorithm",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "soft-sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e2",
+    "pattern_type": "influences",
+    "evidence_span": "If e is decreased, the energy dissipation increases, and thus the distributions in Fig. 2b and Fig. 3b for e = 0.7 are more nonuniform than those in Fig. 2a and Fig. 3a based upon e = 0.9.",
+    "node_ids": [
+      "n6c0_n5",
+      "n6c0_n6"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "restitution coefficient e",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "energy dissipation",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e3",
+    "pattern_type": "influences",
+    "evidence_span": "The shear work at the walls and the energy dissipation in the interior result in a fluctuation energy flux inward toward the middle of the flow gap as may be seen in Figs. 2a and 2b.",
+    "node_ids": [
+      "n6c0_n6",
+      "n6c0_n7"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "energy dissipation",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "granular temperature",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e4",
+    "pattern_type": "influences",
+    "evidence_span": "A minimum value of granular temperature occurs in the middle of the gap; these less active particles tend to gather there resulting in a maximum in the solids fraction as may be seen in Figs. 3a and 3b.",
+    "node_ids": [
+      "n6c0_n7",
+      "n6c0_n8"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "granular temperature",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "solids fraction",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e5",
+    "pattern_type": "compares",
+    "evidence_span": "For the present case, where gravity was neglected, and fairly stiff springs were used in the soft-sphere model, the results of the hard-sphere and soft-sphere models are almost identical.",
+    "node_ids": [
+      "n6c0_n1",
+      "n6c0_n2"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "hard-sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "soft-sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e6",
+    "pattern_type": "deviates_from",
+    "evidence_span": "For cases where gravity is important and leads to enduring contacts, the hard-sphere model will experience computational difficulties and the soft-sphere model must be used.",
+    "node_ids": [
+      "n6c0_n1",
+      "n6c0_n2"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "hard-sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "soft-sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c1_e0",
+    "pattern_type": "deviates_from",
+    "evidence_span": "the computer simulations show a maximum in the slip velocities when ν is varied, but the kinetic theory results increase monotonically with ν",
+    "node_ids": [
+      "n7c1_n2",
+      "n7c1_n3"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "computer simulations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "kinetic theory results",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c1_e1",
+    "pattern_type": "defines",
+    "evidence_span": "the slip velocity was defined as the difference between the wall particle velocity and the velocity in the interior flow one particle diameter away from the wall",
+    "node_ids": [
+      "n7c1_n8",
+      "n7c1_n9",
+      "n7c1_n10"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "slip velocity",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "wall particle velocity",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "velocity in the interior flow one particle diameter away from the wall",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c1_e2",
+    "pattern_type": "defines",
+    "evidence_span": "not v = U - u(L/2) as described in Hanes et al. (1988)",
+    "node_ids": [
+      "n7c1_n8",
+      "n7c1_n11"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "slip velocity",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "v = U - u(L/2)",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c1_e3",
+    "pattern_type": "defines",
+    "evidence_span": "'slip' velocities defined in terms of the difference between the wall particle velocity, U_w, and the velocity in the adjacent layer, u_al, one particle diameter away from the wall",
+    "node_ids": [
+      "n7c1_n8",
+      "n7c1_n12",
+      "n7c1_n13"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "slip velocity",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "U_w",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "u_al",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c1_e4",
+    "pattern_type": "compares",
+    "evidence_span": "Results for linear curve fits to the velocity distributions are almost the same as those from the third-degree polynomial fits",
+    "node_ids": [
+      "n7c1_n14",
+      "n7c1_n15"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "linear curve fits",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "third-degree polynomial fits",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c1_e5",
+    "pattern_type": "agrees_with",
+    "evidence_span": "Agreement with the results from the kinetic theories is now much closer, at least for e = 0.9",
+    "node_ids": [
+      "n7c1_n2",
+      "n7c1_n3"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "computer simulations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "kinetic theory results",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c1_e6",
+    "pattern_type": "deviates_from",
+    "evidence_span": "For lower values of e, there are still significant differences",
+    "node_ids": [
+      "n7c1_n2",
+      "n7c1_n3"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "computer simulations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "kinetic theory results",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c1_e7",
+    "pattern_type": "influences",
+    "evidence_span": "the slip velocities, stresses, etc., are extremely sensitive to the wall particle spacing and properties",
+    "node_ids": [
+      "n7c1_n22",
+      "n7c1_n23"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "slip velocities, stresses, etc.",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "wall particle spacing and properties",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e0",
+    "pattern_type": "influences",
+    "evidence_span": "These ambiguities are of little consequence for cases in which the ratio of particle diameter to shear gap size is small",
+    "node_ids": [
+      "n7c0_n2",
+      "n7c0_n1"
+    ],
+    "node_roles": [
+      "influencer",
+      "influencee"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "ratio of particle diameter to shear gap size",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "slip velocity",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e3",
+    "pattern_type": "defines",
+    "evidence_span": "the slip velocity is defined as v = U - u(L/2)",
+    "node_ids": [
+      "n7c0_n7",
+      "n7c0_n6"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "v = U - u(L/2)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "interior flow velocity field u(y)",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e5",
+    "pattern_type": "influences",
+    "evidence_span": "It was found that for ‘rough’ walls with coefficients of restitution close to unity, the slip velocity (as just defined) was negative",
+    "node_ids": [
+      "n7c0_n9",
+      "n7c0_n7"
+    ],
+    "node_roles": [
+      "influencer",
+      "influencee"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "coefficients of restitution close to unity",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "v = U - u(L/2)",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e6",
+    "pattern_type": "deviates_from",
+    "evidence_span": "the interior flow shear rate was larger than the apparent shear rate 2U/L",
+    "node_ids": [
+      "n7c0_n10",
+      "n7c0_n11"
+    ],
+    "node_roles": [
+      "deviating_entity",
+      "reference_entity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "interior flow shear rate",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "apparent shear rate 2U/L",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e7",
+    "pattern_type": "agrees_with",
+    "evidence_span": "we point out that exactly the same behavior is found in the present numerical simulations.",
+    "node_ids": [
+      "n7c0_n12",
+      "n7c0_n10"
+    ],
+    "node_roles": [
+      "entity",
+      "compared_entity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "present numerical simulations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "interior flow shear rate",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e8",
+    "pattern_type": "improves",
+    "evidence_span": "Richman and Chou (1988) attempted to improve on the analysis of Jenkins and Richman (1986) in two ways.",
+    "node_ids": [
+      "n7c0_n13",
+      "n7c0_n14"
+    ],
+    "node_roles": [
+      "improving_entity",
+      "improved_entity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Richman and Chou (1988)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "analysis of Jenkins and Richman (1986)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e9",
+    "pattern_type": "replaces",
+    "evidence_span": "First they used a more exact particle velocity distribution function than the simple Maxwellian used by Jenkins and Richman.",
+    "node_ids": [
+      "n7c0_n15",
+      "n7c0_n16"
+    ],
+    "node_roles": [
+      "replacing_entity",
+      "replaced_entity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "more exact particle velocity distribution function",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "simple Maxwellian",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e10",
+    "pattern_type": "defines",
+    "evidence_span": "The 'slip velocity' in this case is defined as v=U-u(L/2-σ̄).",
+    "node_ids": [
+      "n7c0_n18",
+      "n7c0_n19"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "v=U-u(L/2-σ̄)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "velocity difference between particles in two different layers",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e11",
+    "pattern_type": "deviates_from",
+    "evidence_span": "in the interior shear flow, the mean velocities u(y) are different at different y-positions",
+    "node_ids": [
+      "n7c0_n20",
+      "n7c0_n21"
+    ],
+    "node_roles": [
+      "deviating_entity",
+      "reference_entity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mean velocities u(y)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "Taylor series expansions about y = L/2",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e12",
+    "pattern_type": "compares",
+    "evidence_span": "whether one does Taylor series expansions about y = L/2 or about y = L/2 - σ̄ should make little difference in the final solution for the interior velocity distribution.",
+    "node_ids": [
+      "n7c0_n21",
+      "n7c0_n22",
+      "n7c0_n23"
+    ],
+    "node_roles": [
+      "entity_a",
+      "entity_b",
+      "context"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Taylor series expansions about y = L/2",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Taylor series expansions about y = L/2 - σ̄",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "final solution for the interior velocity distribution",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e13",
+    "pattern_type": "deviates_from",
+    "evidence_span": "one can expect that these two slip velocity values will be different even though the interior velocity fields are almost identical.",
+    "node_ids": [
+      "n7c0_n24",
+      "n7c0_n25"
+    ],
+    "node_roles": [
+      "deviating_entity",
+      "reference_entity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "slip velocity values",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "interior velocity fields",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e14",
+    "pattern_type": "deviates_from",
+    "evidence_span": "this kind of 'repair' of the supposed defect of Jenkins and Richman in which the actual shear rate is greater than the apparent shear rate of 2U/L is only illusory.",
+    "node_ids": [
+      "n7c0_n26",
+      "n7c0_n27"
+    ],
+    "node_roles": [
+      "deviating_entity",
+      "reference_entity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "actual shear rate",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "apparent shear rate of 2U/L",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e15",
+    "pattern_type": "defines",
+    "evidence_span": "Although the slip velocity in Richman and Chou (1988) and Richman (1988) is initially defined as v = U - u(L/2 - σ̄)",
+    "node_ids": [
+      "n7c0_n28",
+      "n7c0_n18"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "slip velocity in Richman and Chou (1988) and Richman (1988)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "v=U-u(L/2-σ̄)",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e16",
+    "pattern_type": "defines",
+    "evidence_span": "it is permissible (in some places) to use approximations for the interior flow shear rate which involve v being expressed as v = U - u(L/2).",
+    "node_ids": [
+      "n7c0_n29",
+      "n7c0_n28"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "v = U - u(L/2)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "slip velocity in Richman and Chou (1988) and Richman (1988)",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e17",
+    "pattern_type": "deviates_from",
+    "evidence_span": "The slip velocities, which were previously defined in terms of the mean interior flow velocity u evaluated at y = (L/2 - σ̄). σ̄ ), are applied in their Fig. 4 at y = L / 2",
+    "node_ids": [
+      "n7c0_n31",
+      "n7c0_n32"
+    ],
+    "node_roles": [
+      "deviating_entity",
+      "reference_entity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "slip velocities",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "paper of Hanes et al. (1988)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e18",
+    "pattern_type": "extends",
+    "evidence_span": "The paper of Hanes et al. (1988) (which relies upon the previous work of Richman and Chou (1988)) defines the slip velocity as v = U - u(L/2)",
+    "node_ids": [
+      "n7c0_n32",
+      "n7c0_n33"
+    ],
+    "node_roles": [
+      "extending_entity",
+      "extended_entity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "paper of Hanes et al. (1988)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "previous work of Richman and Chou (1988)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e19",
+    "pattern_type": "defines",
+    "evidence_span": "The paper of Hanes et al. (1988) (which relies upon the previous work of Richman and Chou (1988)) defines the slip velocity as v = U - u(L/2)",
+    "node_ids": [
+      "n7c0_n34",
+      "n7c0_n32"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "v = U - u(L/2)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "paper of Hanes et al. (1988)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e20",
+    "pattern_type": "compares",
+    "evidence_span": "For (L/2σ-1)≫1 the difference between whether one takes v=U-u(L/2) or v=U-u(L/2-σ̄) is negligible.",
+    "node_ids": [
+      "n7c0_n36",
+      "n7c0_n37",
+      "n7c0_n35"
+    ],
+    "node_roles": [
+      "entity_a",
+      "entity_b",
+      "context"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "v=U-u(L/2)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "v=U-u(L/2-σ̄)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "(L/2σ-1)≫1",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e21",
+    "pattern_type": "compares",
+    "evidence_span": "But, for the present simulations, (L/2σ-1)≈2 and the two values for v are quite different.",
+    "node_ids": [
+      "n7c0_n36",
+      "n7c0_n37",
+      "n7c0_n38"
+    ],
+    "node_roles": [
+      "entity_a",
+      "entity_b",
+      "context"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "v=U-u(L/2)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "v=U-u(L/2-σ̄)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "(L/2σ-1)≈2",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e22",
+    "pattern_type": "compares_predictions",
+    "evidence_span": "Comparisons of the slip velocities from the present simulations with those predicted by the theories of Richman (1988) and Hanes et al. (1988) for the case of spherical particles will now be discussed.",
+    "node_ids": [
+      "n7c0_n40",
+      "n7c0_n41",
+      "n7c0_n42"
+    ],
+    "node_roles": [
+      "method_a",
+      "method_b",
+      "context"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "slip velocities from the present simulations",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "theories of Richman (1988) and Hanes et al. (1988)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "case of spherical particles",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e23",
+    "pattern_type": "deviates_from",
+    "evidence_span": "In most cases of the present simulations, the mean motions of particles near wall do not keep up with the moving wall particles and 'slip' occurs at the wall.",
+    "node_ids": [
+      "n7c0_n43",
+      "n7c0_n44"
+    ],
+    "node_roles": [
+      "deviating_entity",
+      "reference_entity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mean motions of particles near wall",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "moving wall particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e24",
+    "pattern_type": "deviates_from",
+    "evidence_span": "If we curve fit the mean velocities determined in the simulations for the various bins (y-positions), we find that generally these velocity distributions are not coincident with the apparent, simple shear velocity distribution based upon the wall particle velocities and the shear gap.",
+    "node_ids": [
+      "n7c0_n45",
+      "n7c0_n46"
+    ],
+    "node_roles": [
+      "deviating_entity",
+      "reference_entity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mean velocities determined in the simulations for the various bins (y-positions)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "apparent, simple shear velocity distribution",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e25",
+    "pattern_type": "defines",
+    "evidence_span": "We can define a ‘slip’ velocity, u_s , as follows.",
+    "node_ids": [
+      "n7c0_n49",
+      "n7c0_n53"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "slip velocity, u_s",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "u_s = U_w - u_w",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e26",
+    "pattern_type": "defines",
+    "evidence_span": "We extrapolate the curve fit of the computed velocity profile to the centers of the wall particles (cf., Figs. 4 and 5) and call that velocity u_w .",
+    "node_ids": [
+      "n7c0_n52",
+      "n7c0_n50"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "u_w",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "curve fit of the computed velocity profile",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e27",
+    "pattern_type": "defines",
+    "evidence_span": "The slip velocity is thus u_s = U_w - u_w where U_w is the velocity of the centers of the wall boundary particles.",
+    "node_ids": [
+      "n7c0_n53",
+      "n7c0_n54"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "u_s = U_w - u_w",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "U_w",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e28",
+    "pattern_type": "defines",
+    "evidence_span": "The slip velocity is thus u_s = U_w - u_w where U_w is the velocity of the centers of the wall boundary particles.",
+    "node_ids": [
+      "n7c0_n54",
+      "n7c0_n55"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "U_w",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "velocity of the centers of the wall boundary particles",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e29",
+    "pattern_type": "defines",
+    "evidence_span": "(In the computations, u_w is taken as the average of the magnitudes of the interior flow velocities extrapolated to the top and bottom walls.)",
+    "node_ids": [
+      "n7c0_n52",
+      "n7c0_n56"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "u_w",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "average of the magnitudes of the interior flow velocities extrapolated to the top and bottom walls",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e30",
+    "pattern_type": "agrees_with",
+    "evidence_span": "This definition of the slip velocity is the same as that in the analysis of Jenkins and Richman (1986).",
+    "node_ids": [
+      "n7c0_n57",
+      "n7c0_n58"
+    ],
+    "node_roles": [
+      "entity",
+      "compared_entity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "definition of the slip velocity",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "analysis of Jenkins and Richman (1986)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e31",
+    "pattern_type": "deviates_from",
+    "evidence_span": "It may be seen (cf., Figs. 4a and 5a) that the calculated velocity distributions are not perfectly linear and, for example, a third-degree polynomial also gives a reasonable curve fit.",
+    "node_ids": [
+      "n7c0_n59",
+      "n7c0_n60"
+    ],
+    "node_roles": [
+      "deviating_entity",
+      "reference_entity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "calculated velocity distributions",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "third-degree polynomial",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e32",
+    "pattern_type": "influences",
+    "evidence_span": "Hence, the slip velocities (cf., Figs. 8a and 8b) depend slightly on the curve fits we use for the interior velocity distributions.",
+    "node_ids": [
+      "n7c0_n62",
+      "n7c0_n61"
+    ],
+    "node_roles": [
+      "influencer",
+      "influencee"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "curve fits",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "slip velocities",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e33",
+    "pattern_type": "captures_phenomenon",
+    "evidence_span": "For example, Fig. 8a shows some negative slip velocities at high concentrations.",
+    "node_ids": [
+      "n7c0_n63",
+      "n7c0_n64"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "negative slip velocities",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "high concentrations",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:slot-type-mismatch",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e34",
+    "pattern_type": "effectively_becomes",
+    "evidence_span": "it can be understood when it is realized that at high concentrations particles occasionally can be ‘trapped’ in the space between the wall particles",
+    "node_ids": [
+      "n7c0_n65",
+      "n7c0_n66"
+    ],
+    "node_roles": [
+      "entity",
+      "result"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "space between the wall particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e35",
+    "pattern_type": "influences",
+    "evidence_span": "Comparing Figs. 4 and 5, it can be seen that the slip velocity is larger for the smaller value of the coefficient of restitution e.",
+    "node_ids": [
+      "n7c0_n69",
+      "n7c0_n68"
+    ],
+    "node_roles": [
+      "influencer",
+      "influencee"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "coefficient of restitution e",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "slip velocity",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e36",
+    "pattern_type": "influences",
+    "evidence_span": "Slip velocities were determined in the simulations for different values of e and ν",
+    "node_ids": [
+      "n7c0_n71",
+      "n7c0_n70"
+    ],
+    "node_roles": [
+      "influencer",
+      "influencee"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "e",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Slip velocities",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e37",
+    "pattern_type": "influences",
+    "evidence_span": "Slip velocities were determined in the simulations for different values of e and ν",
+    "node_ids": [
+      "n7c0_n72",
+      "n7c0_n70"
+    ],
+    "node_roles": [
+      "influencer",
+      "influencee"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "ν",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Slip velocities",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e38",
+    "pattern_type": "compares",
+    "evidence_span": "and the results are plotted in Fig. 8 together with the results from the kinetic theories of Richman (1988), and Hanes et al. (1988).",
+    "node_ids": [
+      "n7c0_n73",
+      "n7c0_n74"
+    ],
+    "node_roles": [
+      "entity_a",
+      "entity_b"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "results",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "results from the kinetic theories of Richman (1988), and Hanes et al. (1988)",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e39",
+    "pattern_type": "defines",
+    "evidence_span": "and we have used the definition of Bagnold (1954) that relates the mean spacing s to the solids fraction ν, i.e., ν/ν_m=(1+s/σ)^(-3)",
+    "node_ids": [
+      "n7c0_n75",
+      "n7c0_n77"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "particle wall spacing, s",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "ν/ν_m=(1+s/σ)^(-3)",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e40",
+    "pattern_type": "defines",
+    "evidence_span": "where the maximum possible solids fraction, ν_m was taken to be that for a hexagonal packing, i.e., ν_m=π/3√2=0.7406",
+    "node_ids": [
+      "n7c0_n78",
+      "n7c0_n80"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "maximum possible solids fraction, ν_m",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "ν_m=π/3√2=0.7406",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e41",
+    "pattern_type": "defines",
+    "evidence_span": "Figures 8a and 8b present simulation results for slip velocities defined as u_s=U_w-u_w .",
+    "node_ids": [
+      "n7c0_n81",
+      "n7c0_n53"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "simulation results for slip velocities defined as u_s=U_w-u_w",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "u_s = U_w - u_w",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e42",
+    "pattern_type": "agrees_with",
+    "evidence_span": "This definition of slip velocity is the one described in Hanes et al. (1988) and that which is utilized in the latter part of Richman (1988).",
+    "node_ids": [
+      "n7c0_n82",
+      "n7c0_n83"
+    ],
+    "node_roles": [
+      "entity",
+      "compared_entity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "definition of slip velocity",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "Hanes et al. (1988)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e43",
+    "pattern_type": "agrees_with",
+    "evidence_span": "This definition of slip velocity is the one described in Hanes et al. (1988) and that which is utilized in the latter part of Richman (1988).",
+    "node_ids": [
+      "n7c0_n82",
+      "n7c0_n84"
+    ],
+    "node_roles": [
+      "entity",
+      "compared_entity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "definition of slip velocity",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "latter part of Richman (1988)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e44",
+    "pattern_type": "agrees_with",
+    "evidence_span": "It may be observed that while the general trends of the slip velocity dependence on coefficient of restitution e from the molecular dynamics type simulations are similar to the kinetic theory results of Hanes et al.",
+    "node_ids": [
+      "n7c0_n85",
+      "n7c0_n87"
+    ],
+    "node_roles": [
+      "entity",
+      "compared_entity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "general trends of the slip velocity dependence on coefficient of restitution e",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "kinetic theory results of Hanes et al.",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e2",
+    "pattern_type": "composed_of",
+    "evidence_span": "The walls are made up of particles, the centers of which are located distances ±L/2 from the centerline of the flow",
+    "node_ids": [
+      "n7c0_n5",
+      "n7c0_n6"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "walls",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "interior flow velocity field u(y)",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that walls are made up of particles, not that walls are composed of the interior flow velocity field. The 'component' slot is incorrectly bound to 'interior flow velocity field u(y)', which is not a component of the walls. The relation is not composed_of; it describes the wall structure.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n8_e0",
+    "pattern_type": "defines",
+    "evidence_span": "the mean square particle displacement due to random walking $\\langle|R|^{2}\\rangle$ can be expressed in terms of the well known Einstein relation where $D$ is the coefficient of self-diffusion",
+    "node_ids": [
+      "n8_n1",
+      "n8_n2"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "defining_entity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mean square particle displacement $\\langle|R|^{2}\\rangle$",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "self-diffusion coefficient D",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e1",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "the mean square particle displacement due to random walking $\\langle|R|^{2}\\rangle$ can be expressed in terms of the well known Einstein relation where $D$ is the coefficient of self-diffusion",
+    "node_ids": [
+      "n8_n1",
+      "n8_n2",
+      "n8_n4"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mean square particle displacement $\\langle|R|^{2}\\rangle$",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "self-diffusion coefficient D",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "time",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e2",
+    "pattern_type": "defines",
+    "evidence_span": "where C = c - u is the particle velocity fluctuation, i.e., the difference between the instantaneous particle velocity c and the mean velocity u",
+    "node_ids": [
+      "n8_n5",
+      "n8_n6",
+      "n8_n7"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "defining_entity",
+      "defining_entity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "particle velocity fluctuation C",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "instantaneous particle velocity c",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "local mean velocity u(r)",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e4",
+    "pattern_type": "defines",
+    "evidence_span": "Hence, we can obtain an alternative form for the diffusion coefficient",
+    "node_ids": [
+      "n8_n2",
+      "n8_n8"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "defining_entity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "self-diffusion coefficient D",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "velocity autocorrelation function $\\langle\\boldsymbol{C}(0)\\cdot\\boldsymbol{C}(t)\\rangle$",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e5",
+    "pattern_type": "influences",
+    "evidence_span": "the mean square particle displacement due to random walking $\\langle|R|^{2}\\rangle$ can be expressed in terms of the well known Einstein relation where $D$ is the coefficient of self-diffusion",
+    "node_ids": [
+      "n8_n2",
+      "n8_n1"
+    ],
+    "node_roles": [
+      "influencer",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "self-diffusion coefficient D",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "mean square particle displacement $\\langle|R|^{2}\\rangle$",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e1",
+    "pattern_type": "relates_to",
+    "evidence_span": "The constant β is related to the average collisional change of particles' momentum",
+    "node_ids": [
+      "n9_n3",
+      "n9_n4"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "β",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "average collisional change of particles' momentum",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e2",
+    "pattern_type": "defines",
+    "evidence_span": "where β^(-1) can be regarded as a relaxation time",
+    "node_ids": [
+      "n9_n5",
+      "n9_n6"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "β^(-1)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "relaxation time",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e3",
+    "pattern_type": "defines",
+    "evidence_span": "A complete pair distribution function f^(2)(r1,c1;r2,c2;t) is defined such that is the probability of finding a pair of particles",
+    "node_ids": [
+      "n9_n7",
+      "n9_n8"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "complete pair distribution function f^(2)(r1,c1;r2,c2;t)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "probability of finding a pair of particles",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e4",
+    "pattern_type": "influences",
+    "evidence_span": "The ensemble average on the right-hand side of (4.10) can be expressed through the use of the complete pair distribution function f^(2)(r1,c1;r2,c2;t)",
+    "node_ids": [
+      "n9_n9",
+      "n9_n7"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "ensemble average on the right-hand side of (4.10)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "complete pair distribution function f^(2)(r1,c1;r2,c2;t)",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e5",
+    "pattern_type": "defines",
+    "evidence_span": "where T=<C^2>/3 is the granular temperature",
+    "node_ids": [
+      "n9_n10",
+      "n9_n11",
+      "n9_n12"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "T",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "<C^2>/3",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "granular temperature",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e6",
+    "pattern_type": "agrees_with",
+    "evidence_span": "If we take e = 1, corresponding to perfectly elastic particles, (4.13) reduces to the classical Chapman-Enskog result",
+    "node_ids": [
+      "n9_n13",
+      "n9_n14"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "(4.13)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "classical Chapman-Enskog result",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e7",
+    "pattern_type": "relates_to",
+    "evidence_span": "we can relate the granular temperature T to the shear rate through the Savage-Jeffrey parameter",
+    "node_ids": [
+      "n9_n15",
+      "n9_n16",
+      "n9_n17"
+    ],
+    "node_roles": [
+      "subject",
+      "object",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "granular temperature T",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "shear rate",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Savage-Jeffrey parameter",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c1_e0",
+    "pattern_type": "predicts",
+    "evidence_span": "The analytical and numerical predictions of the self-diffusion coefficients",
+    "node_ids": [
+      "n10c1_n1",
+      "n10c1_n3"
+    ],
+    "node_roles": [
+      "predictor",
+      "predicted_quantity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "analytical predictions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "self-diffusion coefficients",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c1_e1",
+    "pattern_type": "predicts",
+    "evidence_span": "The analytical and numerical predictions of the self-diffusion coefficients",
+    "node_ids": [
+      "n10c1_n2",
+      "n10c1_n3"
+    ],
+    "node_roles": [
+      "predictor",
+      "predicted_quantity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "numerical predictions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "self-diffusion coefficients",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c1_e2",
+    "pattern_type": "compares_predictions",
+    "evidence_span": "The analytical and numerical predictions of the self-diffusion coefficients as functions of solids fraction and coefficient of restitution are reasonably close to each other",
+    "node_ids": [
+      "n10c1_n1",
+      "n10c1_n2",
+      "n10c1_n3"
+    ],
+    "node_roles": [
+      "method_A",
+      "method_B",
+      "predicted_quantity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "analytical predictions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "numerical predictions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "self-diffusion coefficients",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c1_e3",
+    "pattern_type": "compares_model_to_data",
+    "evidence_span": "The analytical and numerical predictions of the self-diffusion coefficients as functions of solids fraction and coefficient of restitution are reasonably close to each other and similar to the few laboratory experiments that exist.",
+    "node_ids": [
+      "n10c1_n1",
+      "n10c1_n6",
+      "n10c1_n3"
+    ],
+    "node_roles": [
+      "model",
+      "experimental_data",
+      "compared_quantity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "analytical predictions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "laboratory experiments",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "self-diffusion coefficients",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c1_e4",
+    "pattern_type": "compares_model_to_data",
+    "evidence_span": "The analytical and numerical predictions of the self-diffusion coefficients as functions of solids fraction and coefficient of restitution are reasonably close to each other and similar to the few laboratory experiments that exist.",
+    "node_ids": [
+      "n10c1_n2",
+      "n10c1_n6",
+      "n10c1_n3"
+    ],
+    "node_roles": [
+      "model",
+      "experimental_data",
+      "compared_quantity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "numerical predictions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "laboratory experiments",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "self-diffusion coefficients",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c1_e5",
+    "pattern_type": "agrees_with",
+    "evidence_span": "The analytical and numerical predictions of the self-diffusion coefficients as functions of solids fraction and coefficient of restitution are reasonably close to each other and similar to the few laboratory experiments that exist.",
+    "node_ids": [
+      "n10c1_n1",
+      "n10c1_n6"
+    ],
+    "node_roles": [
+      "claim_X",
+      "claim_Y"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "analytical predictions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "laboratory experiments",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c1_e6",
+    "pattern_type": "agrees_with",
+    "evidence_span": "The analytical and numerical predictions of the self-diffusion coefficients as functions of solids fraction and coefficient of restitution are reasonably close to each other and similar to the few laboratory experiments that exist.",
+    "node_ids": [
+      "n10c1_n2",
+      "n10c1_n6"
+    ],
+    "node_roles": [
+      "claim_X",
+      "claim_Y"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "numerical predictions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "laboratory experiments",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c1_e7",
+    "pattern_type": "influences",
+    "evidence_span": "The analytical and numerical predictions of the self-diffusion coefficients as functions of solids fraction and coefficient of restitution",
+    "node_ids": [
+      "n10c1_n3",
+      "n10c1_n4"
+    ],
+    "node_roles": [
+      "dependent_quantity",
+      "independent_quantity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "self-diffusion coefficients",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "solids fraction",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c1_e8",
+    "pattern_type": "influences",
+    "evidence_span": "The analytical and numerical predictions of the self-diffusion coefficients as functions of solids fraction and coefficient of restitution",
+    "node_ids": [
+      "n10c1_n3",
+      "n10c1_n5"
+    ],
+    "node_roles": [
+      "dependent_quantity",
+      "independent_quantity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "self-diffusion coefficients",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "coefficient of restitution",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c0_e0",
+    "pattern_type": "applies_method_to",
+    "evidence_span": "Molecular dynamics type calculations of self-diffusion coefficients were performed with both 'hard-sphere' and 'soft-sphere' models for unbounded flows making use of the Lees-Edwards periodic boundary condition.",
+    "node_ids": [
+      "n10c0_n1",
+      "n10c0_n3",
+      "n10c0_n4"
+    ],
+    "node_roles": [
+      "method",
+      "subject",
+      "subject"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "molecular dynamics type calculations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "hard-sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "soft-sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c0_e1",
+    "pattern_type": "relates_to",
+    "evidence_span": "The diffusion coefficients were determined by calculating the velocity autocorrelation functions as in (4.4).",
+    "node_ids": [
+      "n10c0_n2",
+      "n10c0_n6"
+    ],
+    "node_roles": [
+      "quantity",
+      "quantity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "self-diffusion coefficients",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "velocity autocorrelation functions",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c0_e2",
+    "pattern_type": "relates_to",
+    "evidence_span": "The anisotropy of the diffusion coefficients is related to the anisotropy of the granular temperature.",
+    "node_ids": [
+      "n10c0_n9",
+      "n10c0_n10"
+    ],
+    "node_roles": [
+      "quantity",
+      "quantity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "anisotropy of the diffusion coefficients",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "anisotropy of the granular temperature",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c0_e3",
+    "pattern_type": "compares_predictions",
+    "evidence_span": "The trace of the self-diffusion coefficient tensor as given by (4.4) determined from the computer simulations is compared with the kinetic theory predictions (4.13) in Fig. 10b.",
+    "node_ids": [
+      "n10c0_n11",
+      "n10c0_n12",
+      "n10c0_n2"
+    ],
+    "node_roles": [
+      "method1",
+      "method2",
+      "property"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "kinetic theory predictions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "molecular dynamics simulations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "self-diffusion coefficients",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c0_e4",
+    "pattern_type": "deviates_from",
+    "evidence_span": "The self-diffusion coefficients produced by the kinetic theory analysis are lower than those calculated from the results of the molecular dynamics simulations.",
+    "node_ids": [
+      "n10c0_n11",
+      "n10c0_n12"
+    ],
+    "node_roles": [
+      "subject",
+      "reference"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "kinetic theory predictions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "molecular dynamics simulations",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c0_e5",
+    "pattern_type": "compares_model_to_data",
+    "evidence_span": "It is interesting to compare the experiments of Bridgwater et al. (1985) with the present results.",
+    "node_ids": [
+      "n10c0_n12",
+      "n10c0_n13"
+    ],
+    "node_roles": [
+      "model",
+      "data"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "molecular dynamics simulations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Bridgwater et al. (1985) experiments",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c0_e6",
+    "pattern_type": "agrees_with",
+    "evidence_span": "In this case, the experimental results are quite close to the values of self-diffusion coefficient obtained in the molecular dynamics computer simulations.",
+    "node_ids": [
+      "n10c0_n12",
+      "n10c0_n13"
+    ],
+    "node_roles": [
+      "subject",
+      "reference"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "molecular dynamics simulations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Bridgwater et al. (1985) experiments",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  }
+]

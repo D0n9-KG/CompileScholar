@@ -1,0 +1,817 @@
+[
+  {
+    "edge_id": "n1_e1",
+    "pattern_type": "obtained_from",
+    "evidence_span": "We take the initial motion of large particles as an indicator of segregation",
+    "node_ids": [
+      "n1_n3",
+      "n1_n2"
+    ],
+    "node_roles": [
+      "quantity",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "initial motion of large particles",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "segregation in a uniformly agitated system under gravity",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1_e2",
+    "pattern_type": "influences",
+    "evidence_span": "By incorporating the effects of two different granular temperatures, we show that, although the temperature differences can be significant with increasing differences in the mass or size of the particles, the segregation is not greatly affected",
+    "node_ids": [
+      "n1_n4",
+      "n1_n2"
+    ],
+    "node_roles": [
+      "influencer",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "two different granular temperatures",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "segregation in a uniformly agitated system under gravity",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1_e3",
+    "pattern_type": "influences",
+    "evidence_span": "the temperature differences can be significant with increasing differences in the mass or size of the particles",
+    "node_ids": [
+      "n1_n6",
+      "n1_n5"
+    ],
+    "node_roles": [
+      "influencer",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mass or size of the particles",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "temperature differences",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1_e4",
+    "pattern_type": "influences",
+    "evidence_span": "there is a small range in size and material density ratios where the initial direction of segregation from a well-mixed state is reversed due to nonequipartition",
+    "node_ids": [
+      "n1_n7",
+      "n1_n8"
+    ],
+    "node_roles": [
+      "influencer",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "size and material density ratios",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "initial direction of segregation",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1_e5",
+    "pattern_type": "predicts",
+    "evidence_span": "we show that, although the temperature differences can be significant with increasing differences in the mass or size of the particles, the segregation is not greatly affected",
+    "node_ids": [
+      "n1_n1",
+      "n1_n2"
+    ],
+    "node_roles": [
+      "method",
+      "predicted_quantity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "kinetic theory for binary mixtures of slightly inelastic, frictionless particles",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "segregation in a uniformly agitated system under gravity",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e0",
+    "pattern_type": "studies_phenomenon",
+    "evidence_span": "Jenkins and Yoon1 studied this problem in a binary mixture",
+    "node_ids": [
+      "n2_n1",
+      "n2_n2"
+    ],
+    "node_roles": [
+      "method",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Jenkins and Yoon",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e2",
+    "pattern_type": "relates_to",
+    "evidence_span": "Jenkins and Yoon1 derived an algebraic relation between the initial mean velocity of intruder particles with respect to the mean velocity of background particles and the ratios of particle radii and material densities",
+    "node_ids": [
+      "n2_n5",
+      "n2_n6"
+    ],
+    "node_roles": [
+      "quantity",
+      "related_quantity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "initial mean velocity of intruder particles",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "ratios of particle radii and material densities",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e3",
+    "pattern_type": "deviates_from",
+    "evidence_span": "each species achieved its own granular temperature, different from that of the other species",
+    "node_ids": [
+      "n2_n7",
+      "n2_n8"
+    ],
+    "node_roles": [
+      "deviating_entity",
+      "reference_entity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "each species achieved its own granular temperature",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "equipartition",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e4",
+    "pattern_type": "influences",
+    "evidence_span": "the ratio of these temperatures depended strongly on the ratio of material densities",
+    "node_ids": [
+      "n2_n9",
+      "n2_n10"
+    ],
+    "node_roles": [
+      "dependent_quantity",
+      "independent_quantity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "ratio of these temperatures",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "ratio of material densities",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e5",
+    "pattern_type": "compares_predictions",
+    "evidence_span": "we compare the predictions of the direction of segregation with different species temperatures to those with equipartition",
+    "node_ids": [
+      "n2_n11",
+      "n2_n12"
+    ],
+    "node_roles": [
+      "prediction_1",
+      "prediction_2"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "predictions of the direction of segregation with different species temperatures",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "predictions with equipartition",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e6",
+    "pattern_type": "extends",
+    "evidence_span": "in a fashion similar to Jenkins and Yoon",
+    "node_ids": [
+      "n2_n13",
+      "n2_n1"
+    ],
+    "node_roles": [
+      "extending_entity",
+      "extended_entity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "this work",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Jenkins and Yoon",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e7",
+    "pattern_type": "predicts",
+    "evidence_span": "a simple algebraic condition, obtained by considering the initial direction of segregation from a well-mixed state, provides an excellent indication of the direction of segregation in the steady state",
+    "node_ids": [
+      "n2_n14",
+      "n2_n15"
+    ],
+    "node_roles": [
+      "predicting_entity",
+      "predicted_quantity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "algebraic condition",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "direction of segregation in the steady state",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c1_e0",
+    "pattern_type": "agrees_with",
+    "evidence_span": "similar agreement between the algebraic criterion for the initial segregation and solutions for steady concentration profiles",
+    "node_ids": [
+      "n4c1_n1",
+      "n4c1_n2"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "algebraic criterion for the initial segregation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "solutions for steady concentration profiles",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c1_e1",
+    "pattern_type": "obtained_from",
+    "evidence_span": "solutions for steady concentration profiles in a simple boundary-value problem",
+    "node_ids": [
+      "n4c1_n2",
+      "n4c1_n3"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "solutions for steady concentration profiles",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "simple boundary-value problem",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5c1_e0",
+    "pattern_type": "phase_sequence",
+    "evidence_span": "Then, the upward segregation of B relative to A is diminished and the downward segregation is increased.",
+    "node_ids": [
+      "n5c1_n1",
+      "n5c1_n2"
+    ],
+    "node_roles": [
+      "preceding_phase",
+      "following_phase"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "upward segregation of B relative to A",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "downward segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5c0_e0",
+    "pattern_type": "predicts",
+    "evidence_span": "Using a simplified form of a revised Enskog theory12 that assumes equipartition, we determine the volume fractions of each species and employ their ratio, $\\nu _ { A } / \\nu _ { B } ,$ as a simple measure of segregation.",
+    "node_ids": [
+      "n5c0_n1",
+      "n5c0_n3"
+    ],
+    "node_roles": [
+      "predictor",
+      "predicted_quantity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "revised Enskog theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "ν_A/ν_B",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5c0_e1",
+    "pattern_type": "predicts_phenomenon",
+    "evidence_span": "Using a simplified form of a revised Enskog theory12 that assumes equipartition, we determine the volume fractions of each species and employ their ratio, $\\nu _ { A } / \\nu _ { B } ,$ as a simple measure of segregation.",
+    "node_ids": [
+      "n5c0_n1",
+      "n5c0_n4"
+    ],
+    "node_roles": [
+      "predictor",
+      "predicted_phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "revised Enskog theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "steady, fully developed flow of a binary mixture of spheres",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5c0_e3",
+    "pattern_type": "compares_model_to_data",
+    "evidence_span": "We see that there is very good agreement between Fig. 3, using the initial motion as the indicator, and Fig. 6, based on the solution of the boundary value problem.",
+    "node_ids": [
+      "n5c0_n6",
+      "n5c0_n7"
+    ],
+    "node_roles": [
+      "model",
+      "data"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "segregation diagram (Fig. 6)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "initial motion of large particles",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5c0_e4",
+    "pattern_type": "agrees_with",
+    "evidence_span": "We see that there is very good agreement between Fig. 3, using the initial motion as the indicator, and Fig. 6, based on the solution of the boundary value problem.",
+    "node_ids": [
+      "n5c0_n6",
+      "n5c0_n7"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "segregation diagram (Fig. 6)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "initial motion of large particles",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5c0_e5",
+    "pattern_type": "influences",
+    "evidence_span": "the influence of the failure of equipartition on the degree of segregation enters through the presence of $\\theta _ { B }$ in the denominator of the expression for R.",
+    "node_ids": [
+      "n5c0_n8",
+      "n5c0_n9"
+    ],
+    "node_roles": [
+      "influencer",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "failure of equipartition",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "degree of segregation",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5c0_e6",
+    "pattern_type": "relates_to",
+    "evidence_span": "nondimensional fluctuation velocity, $\\nu / U { \\equiv } ( 3 T / m _ { A B } ) ^ { 1 / 2 } / U$",
+    "node_ids": [
+      "n5c0_n10",
+      "n5c0_n11"
+    ],
+    "node_roles": [
+      "quantity",
+      "related_quantity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "nondimensional fluctuation velocity v/U",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "granular temperature T",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5c0_e2",
+    "pattern_type": "obtained_from",
+    "evidence_span": "we solve a boundary value problem for the steady, fully developed flow of a binary mixture of spheres sheared between two parallel bumpy walls, under gravity. Using a simplified form of a revised Enskog theory12 that assumes equipartition, we determine the volume fractions of each species and employ their ratio, $\\nu _ { A } / \\nu _ { B } ,$ as a simple measure of segregation.",
+    "node_ids": [
+      "n5c0_n3",
+      "n5c0_n5"
+    ],
+    "node_roles": [
+      "derived_quantity",
+      "source_quantity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "ν_A/ν_B",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "boundary value problem",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that ν_A/ν_B is employed as a measure of segregation, not that it is obtained from the boundary value problem. The boundary value problem is the method used to determine the volume fractions, but the ratio is defined as a measure, not derived from the problem itself. The source_quantity slot is incorrectly bound; the ratio is not obtained from the boundary value problem as a source.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": true,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6_e0",
+    "pattern_type": "influences",
+    "evidence_span": "the segregation under gravity of a dilute gas of larger particles in a uniformly agitated dense gas of smaller particles is not significantly influenced by the difference in temperatures of the two species",
+    "node_ids": [
+      "n6_n1",
+      "n6_n2"
+    ],
+    "node_roles": [
+      "subject",
+      "influencer"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "segregation under gravity of a dilute gas of larger particles in a uniformly agitated dense gas of smaller particles",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "difference in temperatures of the two species",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6_e1",
+    "pattern_type": "contrasts_with",
+    "evidence_span": "this is in contradiction to the results of Trujillo et al.",
+    "node_ids": [
+      "n6_n3",
+      "n6_n4"
+    ],
+    "node_roles": [
+      "subject",
+      "contrasted"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "our results",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Trujillo et al.",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6_e2",
+    "pattern_type": "extends",
+    "evidence_span": "our results can be extended to systems that involve more dissipative collisions",
+    "node_ids": [
+      "n6_n3",
+      "n6_n5"
+    ],
+    "node_roles": [
+      "subject",
+      "extension"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "our results",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "systems that involve more dissipative collisions",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6_e3",
+    "pattern_type": "obtained_from",
+    "evidence_span": "more complicated expressions for the partial pressures, as provided, for example, by Huilin et al.",
+    "node_ids": [
+      "n6_n6",
+      "n6_n7"
+    ],
+    "node_roles": [
+      "derived_quantity",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "more complicated expressions for the partial pressures",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Huilin et al.",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6_e4",
+    "pattern_type": "deviates_from",
+    "evidence_span": "our results for the dense system are very different from those of Brey et al.",
+    "node_ids": [
+      "n6_n3",
+      "n6_n8"
+    ],
+    "node_roles": [
+      "subject",
+      "deviated"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "our results",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Brey et al.",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6_e5",
+    "pattern_type": "influences",
+    "evidence_span": "the two temperatures have an important influence on the tracer segregation",
+    "node_ids": [
+      "n6_n9",
+      "n6_n10"
+    ],
+    "node_roles": [
+      "influencer",
+      "subject"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "two temperatures",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "tracer segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  }
+]

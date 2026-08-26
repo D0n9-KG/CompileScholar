@@ -1,0 +1,389 @@
+{
+  "closer_to": {
+    "desc": "X is closer to Y than to other alternatives (X is more similar to Y than to other approaches, indicating a degree of methodological proximity).",
+    "boundary": "Use when one method is explicitly positioned as more similar or proximal to another than to alternatives; not for general comparison, ranking, or shared-feature listing.",
+    "family": "claim",
+    "role_slots": [
+      {
+        "role": "from",
+        "type": "METHOD"
+      },
+      {
+        "role": "to",
+        "type": "METHOD"
+      }
+    ]
+  },
+  "validates_with": {
+    "desc": "X is validated/verified by comparison with Y (X's predictions or results are checked against Y, which could be experimental data or another theory).",
+    "boundary": "Use when one method’s output is explicitly checked against another method’s output or data; not for mere comparison, co-use, or one method generating the other.",
+    "family": "measure",
+    "role_slots": [
+      {
+        "role": "object",
+        "type": "METHOD"
+      },
+      {
+        "role": "instrument",
+        "type": "METHOD"
+      }
+    ]
+  },
+  "contrasts_with": {
+    "desc": "X contrasts with Y in terms of scope, assumptions, or applicability (X and Y have different strengths/weaknesses, often complementary).",
+    "boundary": "Use when two methods are explicitly compared as alternatives with trade-offs; NOT for simple co-occurrence, sequential use, or one method merely improving another.",
+    "family": "claim",
+    "role_slots": [
+      {
+        "role": "from",
+        "type": "METHOD"
+      },
+      {
+        "role": "to",
+        "type": "METHOD"
+      }
+    ]
+  },
+  "agrees_with": {
+    "desc": "X agrees with / is consistent with Y (X's predictions or values match Y's within some tolerance, often used for theory-theory or theory-experiment agreement).",
+    "boundary": "agrees_with applies when X and Y are explicitly compared for consistency, NOT when one causes, explains, or is merely associated with the other.",
+    "family": "claim",
+    "role_slots": [
+      {
+        "role": "from",
+        "type": "THING"
+      },
+      {
+        "role": "to",
+        "type": "THING"
+      }
+    ]
+  },
+  "deviates_from": {
+    "desc": "X deviates from / differs from Y (X's predictions or values diverge from Y's, often with a quantified or qualitative difference).",
+    "boundary": "Use when X and Y are explicitly compared as divergent, not when one causes, predicts, or merely differs in kind without stated deviation.",
+    "family": "claim",
+    "role_slots": [
+      {
+        "role": "from",
+        "type": "THING"
+      },
+      {
+        "role": "to",
+        "type": "THING"
+      }
+    ]
+  },
+  "compares_within_theory": {
+    "desc": "X compares with Y within the same theoretical framework or model, where X and Y are different stress components or predictions from the same theory.",
+    "boundary": "Applies when two properties are explicitly compared as alternatives or predictions within one theory, not when they are merely co-listed or linked by causal/derivational dependence.",
+    "family": "claim",
+    "role_slots": [
+      {
+        "role": "from",
+        "type": "PROPERTY"
+      },
+      {
+        "role": "to",
+        "type": "PROPERTY"
+      }
+    ]
+  },
+  "applies_method_to": {
+    "desc": "X applies method Y to study/analyze Z (a method is used on a system/material).",
+    "boundary": "Use when a method is explicitly applied to a subject; NOT when the subject is merely described, compared, or co-listed with other things.",
+    "family": "evolution",
+    "role_slots": [
+      {
+        "role": "method",
+        "type": "METHOD"
+      },
+      {
+        "role": "subject",
+        "type": "THING"
+      }
+    ]
+  },
+  "discussed_in": {
+    "desc": "X is discussed in / presented in Y (a topic is covered in a source or section).",
+    "boundary": "Use discussed_in only when the source explicitly presents or covers the topic as its subject; do not use for mere mentions, citations, or co-occurrence in the same text.",
+    "family": "claim",
+    "role_slots": [
+      {
+        "role": "topic",
+        "type": "THING"
+      },
+      {
+        "role": "source",
+        "type": "THING"
+      }
+    ]
+  },
+  "analogous_to": {
+    "desc": "X is analogous to / similar in nature to Y (X and Y share a qualitative similarity in behavior, mechanism, or form, often noted as a parallel or precedent).",
+    "boundary": "Use for qualitative parallels or precedents, NOT for causal, part-whole, or functional dependence relations.",
+    "family": "claim",
+    "role_slots": [
+      {
+        "role": "from",
+        "type": "THING"
+      },
+      {
+        "role": "to",
+        "type": "THING"
+      }
+    ]
+  },
+  "compares_predictions": {
+    "desc": "A method's predictions are compared with another method's predictions or with experimental data, often as a function of a parameter.",
+    "boundary": "Applies when predictions from two methods are explicitly compared, not when one method's prediction is merely evaluated against data or when methods are listed without comparison.",
+    "family": "claim",
+    "role_slots": [
+      {
+        "role": "from",
+        "type": "METHOD"
+      },
+      {
+        "role": "to",
+        "type": "METHOD"
+      },
+      {
+        "role": "quantity",
+        "type": "PROPERTY"
+      },
+      {
+        "role": "parameter",
+        "type": "PARAMETER"
+      }
+    ]
+  },
+  "predicts": {
+    "desc": "X (a theory/method) predicts / yields values of Y (a property or quantity).",
+    "boundary": "Use when a method/theory explicitly yields or forecasts property values; not for mere association, correlation, or co-occurrence of properties.",
+    "family": "dependency",
+    "role_slots": [
+      {
+        "role": "from",
+        "type": "METHOD"
+      },
+      {
+        "role": "to",
+        "type": "PROPERTY"
+      }
+    ]
+  },
+  "captures_phenomenon": {
+    "desc": "X (a model/method/theory) captures/describes/reproduces Y (a phenomenon or behavior), indicating that X successfully represents or accounts for Y's features.",
+    "boundary": "Use when a method/model explicitly explains or reproduces a phenomenon’s behavior; NOT for mere correlation, prediction, or listing of features.",
+    "family": "claim",
+    "role_slots": [
+      {
+        "role": "model",
+        "type": "METHOD"
+      },
+      {
+        "role": "phenomenon",
+        "type": "PHENOMENON"
+      }
+    ]
+  },
+  "compares_numeric_to_property": {
+    "desc": "A numeric value is compared to a property value (e.g., '9.13 is 20% less than the yield torque observed by...'). This is a comparison between a specific numeric measurement and a property's value, distinct from comparing two methods or two properties.",
+    "boundary": "Use when a number is explicitly compared to a property’s value, not when comparing two properties or two methods.",
+    "family": "claim",
+    "role_slots": [
+      {
+        "role": "from",
+        "type": "NUMERIC"
+      },
+      {
+        "role": "to",
+        "type": "PROPERTY"
+      }
+    ]
+  },
+  "compares_model_to_data": {
+    "desc": "A model's simulation results are compared to experimental data (e.g., 'Steady-state simulation results obtained using the NGF model... are included in Figs. 3 and 4'). This is a comparison between a model's output and data, distinct from comparing two methods or two properties.",
+    "boundary": "Applies when a model’s simulated output is explicitly compared to experimental data, not when comparing two methods, two properties, or two models’ outputs.",
+    "family": "claim",
+    "role_slots": [
+      {
+        "role": "from",
+        "type": "METHOD"
+      },
+      {
+        "role": "to",
+        "type": "METHOD"
+      }
+    ]
+  },
+  "approximates": {
+    "desc": "X approximates Y (X is a simplified or idealized version of Y, used as a stand-in for modeling purposes).",
+    "boundary": "Use for simplified stand-ins in modeling, not for exact equality, representation, or causal claims.",
+    "family": "claim",
+    "role_slots": [
+      {
+        "role": "from",
+        "type": "THING"
+      },
+      {
+        "role": "to",
+        "type": "THING"
+      }
+    ]
+  },
+  "regime_transition": {
+    "desc": "X transitions to / is characterized by Y, where X and Y are distinct regimes or states of a system, and the transition between them is governed by a parameter or condition.",
+    "boundary": "Use when a system changes from one regime to another due to a condition; NOT for static co-existence, mere correlation, or a single regime’s properties.",
+    "family": "dependency",
+    "role_slots": [
+      {
+        "role": "from",
+        "type": "REGIME"
+      },
+      {
+        "role": "to",
+        "type": "REGIME"
+      }
+    ]
+  },
+  "rationalizes": {
+    "desc": "X (a theory, model, or explanation) rationalizes / provides a coherent account of Y (experimental observations or data), indicating that X offers a conceptual framework that makes sense of Y.",
+    "boundary": "Use only when a method explicitly explains or makes sense of observed data; not for mere correlation, prediction, or when the method is just applied without providing a rationale.",
+    "family": "claim",
+    "role_slots": [
+      {
+        "role": "explanation",
+        "type": "METHOD"
+      },
+      {
+        "role": "phenomenon",
+        "type": "PHENOMENON"
+      }
+    ]
+  },
+  "predicts_phenomenon": {
+    "desc": "X (a theory/method) predicts / yields values or behaviors of Y (a phenomenon), where the prediction concerns the phenomenon's occurrence or characteristics.",
+    "boundary": "Predicts applies when a method/theory yields a phenomenon’s values or behavior; NOT when it merely explains, describes, or co-occurs with it.",
+    "family": "dependency",
+    "role_slots": [
+      {
+        "role": "from",
+        "type": "METHOD"
+      },
+      {
+        "role": "to",
+        "type": "PHENOMENON"
+      }
+    ]
+  },
+  "studies_phenomenon": {
+    "desc": "X (a method or investigation approach) studies/analyzes Y (a phenomenon or system), where X is the investigative tool and Y is the subject of investigation.",
+    "boundary": "Use when X is an investigative tool or method actively examining Y, not when X merely describes, causes, or co-occurs with Y.",
+    "family": "evolution",
+    "role_slots": [
+      {
+        "role": "method",
+        "type": "METHOD"
+      },
+      {
+        "role": "phenomenon",
+        "type": "PHENOMENON"
+      }
+    ]
+  },
+  "effectively_becomes": {
+    "desc": "X effectively becomes Y, where X is a physical entity or condition that takes on the characteristics of Y due to some process or interaction.",
+    "boundary": "Applies when X transforms into Y via a process or interaction, NOT when X merely has Y as an attribute, property, or static state.",
+    "family": "claim",
+    "role_slots": [
+      {
+        "role": "entity",
+        "type": "PROPERTY"
+      },
+      {
+        "role": "effective_state",
+        "type": "PROPERTY"
+      }
+    ]
+  },
+  "phase_sequence": {
+    "desc": "One phase or regime sequentially follows another in a process (e.g., compaction phase followed by recovery phase).",
+    "boundary": "phase_sequence applies when one regime temporally gives way to another in a process, NOT when regimes coexist, overlap, or are merely listed as simultaneous states.",
+    "family": "evolution",
+    "role_slots": [
+      {
+        "role": "first_phase",
+        "type": "REGIME"
+      },
+      {
+        "role": "second_phase",
+        "type": "REGIME"
+      }
+    ]
+  },
+  "relates_to": {
+    "desc": "X is mathematically related to Y via a known relation or formula, where X and Y are quantities or parameters connected by an established equation (e.g., Einstein relation connecting mean square displacement to diffusion coefficient).",
+    "boundary": "Use for explicit equations or formulas linking quantities; NOT for mere co-occurrence, correlation, or causal claims without a stated mathematical relation.",
+    "family": "dependency",
+    "role_slots": [
+      {
+        "role": "from",
+        "type": "THING"
+      },
+      {
+        "role": "to",
+        "type": "THING"
+      }
+    ]
+  },
+  "alternative_expression": {
+    "desc": "X can be expressed in an alternative form Y, where X and Y are equivalent formulations of the same quantity or concept.",
+    "boundary": "Use for equivalent reformulations of the same quantity or concept, not for causal, definitional, or part-whole relations.",
+    "family": "claim",
+    "role_slots": [
+      {
+        "role": "from",
+        "type": "THING"
+      },
+      {
+        "role": "to",
+        "type": "THING"
+      }
+    ]
+  },
+  "propagates_along": {
+    "desc": "X (a curve, wave, or entity) propagates along or through Y (a medium or region), with a specified direction or condition.",
+    "boundary": "Use when a thing moves or spreads through a medium over time; not for static containment, mere co-occurrence, or causal influence without propagation.",
+    "family": "evolution",
+    "role_slots": [
+      {
+        "role": "propagator",
+        "type": "THING"
+      },
+      {
+        "role": "medium",
+        "type": "THING"
+      },
+      {
+        "role": "condition",
+        "type": "REGIME"
+      }
+    ]
+  },
+  "generates": {
+    "desc": "One entity (e.g., a moving point) generates or produces another entity (e.g., a non-uniform section of a shock) as a consequence of its motion or behavior (e.g., 'the triple-point moves upstream... as it generates the non-uniform section of the third shock'). This is a causal production relation, distinct from influences (which is a functional dependence between quantities) and from composed_of (structural parts).",
+    "boundary": "Use generates only when one phenomenon causally produces another through motion or behavior, not for mere influence, co-occurrence, or part-whole composition.",
+    "family": "dependency",
+    "role_slots": [
+      {
+        "role": "producer",
+        "type": "PHENOMENON"
+      },
+      {
+        "role": "product",
+        "type": "PHENOMENON"
+      }
+    ]
+  }
+}

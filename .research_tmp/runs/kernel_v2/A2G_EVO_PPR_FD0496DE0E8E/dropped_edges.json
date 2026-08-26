@@ -1,0 +1,4813 @@
+[
+  {
+    "edge_id": "n1_e0",
+    "pattern_type": "predicts",
+    "evidence_span": "Time-dependent solutions for particle size segregation in shallow granular avalanches",
+    "node_ids": [
+      "n1_n1",
+      "n1_n2"
+    ],
+    "node_roles": [
+      "predictor",
+      "predicted"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Time-dependent solutions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "particle size segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1_e1",
+    "pattern_type": "captures_phenomenon",
+    "evidence_span": "Time-dependent solutions for particle size segregation in shallow granular avalanches",
+    "node_ids": [
+      "n1_n1",
+      "n1_n2"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Time-dependent solutions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "particle size segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence span is a title, not a statement of a relation. It does not state that 'Time-dependent solutions' captures or reproduces 'particle size segregation'. The title merely names the topic of the paper. The 'model' slot is not a model/method but a type of solution, and the 'phenomenon' slot is a process, not a phenomenon being captured. The relation is not stated in the evidence.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1_e2",
+    "pattern_type": "studies_phenomenon",
+    "evidence_span": "Time-dependent solutions for particle size segregation in shallow granular avalanches",
+    "node_ids": [
+      "n1_n1",
+      "n1_n3"
+    ],
+    "node_roles": [
+      "method",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Time-dependent solutions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "shallow granular avalanches",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence span is a title, not a statement of a relation. It does not state that 'Time-dependent solutions' studies or analyzes 'shallow granular avalanches'. The title merely names the topic of the paper. The 'method' slot is not a method but a type of solution, and the 'phenomenon' slot is a system, not a phenomenon being studied. The relation is not stated in the evidence.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n2_e0",
+    "pattern_type": "studies_phenomenon",
+    "evidence_span": "a recent theory is used to construct exact time-dependent two-dimensional solutions for the development of the particle-size distribution in inclined chute flows",
+    "node_ids": [
+      "n2_n1",
+      "n2_n4"
+    ],
+    "node_roles": [
+      "method",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "recent theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "particle-size segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e2",
+    "pattern_type": "influences",
+    "evidence_span": "grains of different sizes often separate out into inversely graded layers, with the large particles on top of the fines, by a process called kinetic sieving",
+    "node_ids": [
+      "n2_n5",
+      "n2_n4"
+    ],
+    "node_roles": [
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "kinetic sieving",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "particle-size segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e3",
+    "pattern_type": "regime_transition",
+    "evidence_span": "flow is initially homogeneously mixed and is fed at the inflow with homogeneous material of the same concentration. Concentration shocks develop during the flow and the particles eventually separate out into inversely-graded layers sufficiently far downstream",
+    "node_ids": [
+      "n2_n7",
+      "n2_n6"
+    ],
+    "node_roles": [
+      "initial_regime",
+      "final_regime"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "homogeneously mixed",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "inversely graded layers",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e4",
+    "pattern_type": "phase_sequence",
+    "evidence_span": "Concentration shocks develop during the flow and the particles eventually separate out into inversely-graded layers sufficiently far downstream. Sections with a monotonically decreasing shock height, between these layers, steepen and break in finite time",
+    "node_ids": [
+      "n2_n8",
+      "n2_n9"
+    ],
+    "node_roles": [
+      "initial_phase",
+      "final_phase"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Concentration shocks",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "breaking shocks",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e5",
+    "pattern_type": "predicts_phenomenon",
+    "evidence_span": "the particles eventually separate out into inversely-graded layers sufficiently far downstream",
+    "node_ids": [
+      "n2_n2",
+      "n2_n6"
+    ],
+    "node_roles": [
+      "method",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "exact time-dependent two-dimensional solutions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "inversely graded layers",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e6",
+    "pattern_type": "relates_to",
+    "evidence_span": "Concentration shocks develop during the flow",
+    "node_ids": [
+      "n2_n3",
+      "n2_n8"
+    ],
+    "node_roles": [
+      "quantity",
+      "quantity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "particle-size distribution",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "Concentration shocks",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e7",
+    "pattern_type": "phase_sequence",
+    "evidence_span": "shock waves, concentration expansions, non-centred expanding shock regions and breaking shocks develop",
+    "node_ids": [
+      "n2_n10",
+      "n2_n11",
+      "n2_n12",
+      "n2_n9"
+    ],
+    "node_roles": [
+      "initial_phase",
+      "intermediate_phase",
+      "intermediate_phase",
+      "final_phase"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "shock waves",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "concentration expansions",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "non-centred expanding shock regions",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "breaking shocks",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e8",
+    "pattern_type": "influences",
+    "evidence_span": "As the parameters are varied, non-linearity leads to fundamental topological changes in the solution",
+    "node_ids": [
+      "n2_n16",
+      "n2_n2"
+    ],
+    "node_roles": [
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "parameters",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "exact time-dependent two-dimensional solutions",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c1_e0",
+    "pattern_type": "validates_with",
+    "evidence_span": "One virtue of the two exact solutions is that they are a rigorous check that numerical solutions of the PDE capture accurately details of the segregation as it evolves.",
+    "node_ids": [
+      "n3c1_n1",
+      "n3c1_n2"
+    ],
+    "node_roles": [
+      "validated",
+      "validator"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "two exact solutions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "numerical solutions of the PDE",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e0",
+    "pattern_type": "influences",
+    "evidence_span": "There are a number of mechanisms that drive particle-size segregation, but the dominant one in shallow granular free-surface flows is that of kinetic sieving",
+    "node_ids": [
+      "n3c0_n2",
+      "n3c0_n1"
+    ],
+    "node_roles": [
+      "influenced",
+      "influencer"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "particle-size segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "kinetic sieving",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e1",
+    "pattern_type": "influences",
+    "evidence_span": "When a void opens up under a layer of grains, the small particles are more likely to fall into the gap, because they are more likely to fit into the available space.",
+    "node_ids": [
+      "n3c0_n3",
+      "n3c0_n4"
+    ],
+    "node_roles": [
+      "influencer",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "void space fluctuations",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "small particles falling into gaps",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e2",
+    "pattern_type": "influences",
+    "evidence_span": "The fines, therefore, percolate to the bottom of the flow and mass conservation dictates that there is a corresponding reverse flow of large particles towards the free surface.",
+    "node_ids": [
+      "n3c0_n5",
+      "n3c0_n6"
+    ],
+    "node_roles": [
+      "influencer",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "small particles percolating to bottom",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "reverse flow of large particles",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e3",
+    "pattern_type": "defines",
+    "evidence_span": "In geology this type of particle-size distribution is termed inverse-grading",
+    "node_ids": [
+      "n3c0_n7",
+      "n3c0_n8"
+    ],
+    "node_roles": [
+      "defined",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "inverse-grading",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "layer of 100% coarse grains on top of 100% fines",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e4",
+    "pattern_type": "influences",
+    "evidence_span": "the large particles tend to congregate at the front and resist the motion. This leads to an instability in which the large particles are pushed to the sides to form stationary lateral levees",
+    "node_ids": [
+      "n3c0_n9",
+      "n3c0_n10"
+    ],
+    "node_roles": [
+      "influencer",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "large particles congregating at front",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "stationary lateral levees",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e5",
+    "pattern_type": "influences",
+    "evidence_span": "that channel the flow and lead to significantly longer debris-flow run-out distances",
+    "node_ids": [
+      "n3c0_n11",
+      "n3c0_n12"
+    ],
+    "node_roles": [
+      "influencer",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "lateral levees",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "debris-flow run-out distances",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e6",
+    "pattern_type": "extends",
+    "evidence_span": "The resulting time-dependent segregation equation is considerably simpler and more general than that of Savage & Lun (1988)",
+    "node_ids": [
+      "n3c0_n13",
+      "n3c0_n14"
+    ],
+    "node_roles": [
+      "extended",
+      "extended_by"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Gray & Thornton (2005) segregation model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Savage & Lun (1988) model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e7",
+    "pattern_type": "improves",
+    "evidence_span": "It also had the disadvantage that the percolation fluxes were independent of gravity, even though gravity is the fundamental driving mechanism for the kinetic sieving process. Gray & Thornton (2005) used mixture theory to formulate mass and momentum balances for the large and small particles, which provided a natural way of introducing gravity into the theory.",
+    "node_ids": [
+      "n3c0_n13",
+      "n3c0_n14"
+    ],
+    "node_roles": [
+      "improved",
+      "improved_by"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Gray & Thornton (2005) segregation model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Savage & Lun (1988) model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e9",
+    "pattern_type": "predicts",
+    "evidence_span": "but is still able to quantitatively reproduce the concentration jumps observed in the laboratory experiments of Savage & Lun (1988) and Vallance & Savage (2000).",
+    "node_ids": [
+      "n3c0_n13",
+      "n3c0_n17"
+    ],
+    "node_roles": [
+      "predictor",
+      "predicted"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Gray & Thornton (2005) segregation model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "concentration jumps",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e10",
+    "pattern_type": "agrees_with",
+    "evidence_span": "but is still able to quantitatively reproduce the concentration jumps observed in the laboratory experiments of Savage & Lun (1988) and Vallance & Savage (2000).",
+    "node_ids": [
+      "n3c0_n13",
+      "n3c0_n18"
+    ],
+    "node_roles": [
+      "agreed",
+      "agreed_with"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Gray & Thornton (2005) segregation model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Savage & Lun (1988) experiments",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e11",
+    "pattern_type": "captures_phenomenon",
+    "evidence_span": "Gray & Thornton (2005) used mixture theory to formulate mass and momentum balances for the large and small particles, which provided a natural way of introducing gravity into the theory.",
+    "node_ids": [
+      "n3c0_n13",
+      "n3c0_n1"
+    ],
+    "node_roles": [
+      "capturer",
+      "captured"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Gray & Thornton (2005) segregation model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "kinetic sieving",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e12",
+    "pattern_type": "relates_to",
+    "evidence_span": "the fines carry less of the overburden pressure as they fall down through the gaps",
+    "node_ids": [
+      "n3c0_n15",
+      "n3c0_n19"
+    ],
+    "node_roles": [
+      "related",
+      "related_to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "segregation flux",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "overburden pressure",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e13",
+    "pattern_type": "studies_phenomenon",
+    "evidence_span": "Gray & Thornton (2005) used mixture theory to formulate mass and momentum balances for the large and small particles",
+    "node_ids": [
+      "n3c0_n13",
+      "n3c0_n2"
+    ],
+    "node_roles": [
+      "studier",
+      "studied"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Gray & Thornton (2005) segregation model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "particle-size segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e14",
+    "pattern_type": "background",
+    "evidence_span": "Sometimes it can be used to our advantage, such as in mineral separation technology",
+    "node_ids": [
+      "n3c0_n1",
+      "n3c0_n20"
+    ],
+    "node_roles": [
+      "background",
+      "motivated"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "kinetic sieving",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "mineral separation technology",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c1_e0",
+    "pattern_type": "relates_to",
+    "evidence_span": "The surface and basal boundary conditions therefore reduce to which is satisfied when either φ = 0 or φ = 1 at the surface and base.",
+    "node_ids": [
+      "n4c1_n1",
+      "n4c1_n2",
+      "n4c1_n3"
+    ],
+    "node_roles": [
+      "dependent",
+      "independent",
+      "independent"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "surface and basal boundary conditions",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "φ = 0",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "φ = 1",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e0",
+    "pattern_type": "defines",
+    "evidence_span": "Gray & Thornton’s (2005) theory introduces a volume fraction $\\phi$ of small particles per unit mixture volume",
+    "node_ids": [
+      "n4c0_n1",
+      "n4c0_n2"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Gray & Thornton's (2005) theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "volume fraction $\\phi$ of small particles per unit mixture volume",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e1",
+    "pattern_type": "defines",
+    "evidence_span": "$\\phi = 1$ corresponding to $1 0 0 \\%$ small particles and $\\phi = 0$ corresponding to 100% coarse particles.",
+    "node_ids": [
+      "n4c0_n2",
+      "n4c0_n3",
+      "n4c0_n4"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "volume fraction $\\phi$ of small particles per unit mixture volume",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "$\\phi = 1$",
+        "labels": [
+          "NUMERIC"
+        ]
+      },
+      {
+        "surface": "$\\phi = 0$",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e3",
+    "pattern_type": "alternative_expression",
+    "evidence_span": "A more complex theory, which accounts for the buoyancy effects of an interstitial fluid of a different density to the particles (Thornton, Gray & Hogg, 2005) leads to a similar formulation.",
+    "node_ids": [
+      "n4c0_n1",
+      "n4c0_n7"
+    ],
+    "node_roles": [
+      "original",
+      "alternative"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Gray & Thornton's (2005) theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "a more complex theory, which accounts for the buoyancy effects of an interstitial fluid of a different density to the particles (Thornton, Gray & Hogg, 2005)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e4",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "Within the avalanche the bulk pressure p is assumed to be hydrostatic through the depth $h ,$ , which is measured normal to the chute, i.e. where $\\rho$ is the bulk density, g is the constant of gravitational acceleration and ζ is the inclination angle of the chute.",
+    "node_ids": [
+      "n4c0_n8",
+      "n4c0_n9",
+      "n4c0_n10",
+      "n4c0_n11",
+      "n4c0_n12"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "input",
+      "input",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "the bulk pressure p",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "depth $h$",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "bulk density $\\rho$",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "constant of gravitational acceleration g",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "inclination angle ζ",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e5",
+    "pattern_type": "defines",
+    "evidence_span": "The bulk flow is assumed to be incompressible where $x , y , z$ are coordinates in the downslope, cross-slope and normal directions to the chute, with unit coordinate vectors $i , j , k$ , respectively, and velocity ${ \\textbf { \\em u } } =$ $u i + v j + w k$ .",
+    "node_ids": [
+      "n4c0_n13",
+      "n4c0_n14",
+      "n4c0_n15"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "the bulk flow",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "coordinates $x , y , z$",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "velocity ${ \\textbf { \\em u } } = u i + v j + w k$",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e7",
+    "pattern_type": "defines",
+    "evidence_span": "These profiles introduce shape factors into the momentum transport terms, which are equal to unity for plug flow and $4 / 3$ for simple shear.",
+    "node_ids": [
+      "n4c0_n18",
+      "n4c0_n19",
+      "n4c0_n20"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "shape factors",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "plug flow",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "simple shear",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e11",
+    "pattern_type": "defines",
+    "evidence_span": "The non-dimensional segregation number $S _ { r }$ is defined as where c is an inter-particle drag coefficient, the non-dimensional factor B determines the magnitude of the pressure perturbations that drive the flow and the avalanche has thickness $H ,$ length L and downslope velocity magnitude U.",
+    "node_ids": [
+      "n4c0_n28",
+      "n4c0_n29",
+      "n4c0_n30",
+      "n4c0_n31",
+      "n4c0_n32",
+      "n4c0_n33"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition",
+      "definition",
+      "definition",
+      "definition",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "the non-dimensional segregation number $S _ { r }$",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "c",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "the non-dimensional factor B",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "the avalanche thickness $H$",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "length L",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "downslope velocity magnitude U",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e12",
+    "pattern_type": "captures_phenomenon",
+    "evidence_span": "The large particle percolation equation (2.5) simply implies that the large particles move upwards, relative to the bulk, until they separate out into a pure coarse phase.",
+    "node_ids": [
+      "n4c0_n34",
+      "n4c0_n41"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "the large particle percolation equation (2.5)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "the separation of the particles into inversely graded layers",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e14",
+    "pattern_type": "defines",
+    "evidence_span": "Substituting the small particle percolation velocity (2.6) into the small particle mass balance equation together with the assumption that the downslope and cross-slope velocity components of the small particles are the same as those of the bulk flow yields a non-dimensional segregation equation for the volume fraction of small particles",
+    "node_ids": [
+      "n4c0_n37",
+      "n4c0_n38"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "a non-dimensional segregation equation for the volume fraction of small particles",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "the volume fraction of small particles",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e16",
+    "pattern_type": "captures_phenomenon",
+    "evidence_span": "Whilst the final term on the lefthand-side is responsible for the separation of the particles into inversely graded layers.",
+    "node_ids": [
+      "n4c0_n40",
+      "n4c0_n41"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "the final term on the left-hand-side",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "the separation of the particles into inversely graded layers",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e17",
+    "pattern_type": "predicts_phenomenon",
+    "evidence_span": "Gray & Thornton (2005) and Thornton, Gray & Hogg (2005) showed that sharp concentration jumps or shocks appear in steady-state flows.",
+    "node_ids": [
+      "n4c0_n24",
+      "n4c0_n42"
+    ],
+    "node_roles": [
+      "predictor",
+      "predicted_phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Gray & Thornton’s (2005) segregation theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "sharp concentration jumps or shocks",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e19",
+    "pattern_type": "defines",
+    "evidence_span": "$\\operatorname { L e t } \\ z \\ = \\ z ( x , y , t )$ be a shock surface, with spacetime normal $\\mathbf { N } = ( z _ { t } , z _ { x } , z _ { y } , - 1 )$ .",
+    "node_ids": [
+      "n4c0_n46",
+      "n4c0_n47"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "a shock surface $z = z ( x , y , t )$",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "spacetime normal $\\mathbf { N } = ( z _ { t } , z _ { x } , z _ { y } , - 1 )$",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e20",
+    "pattern_type": "defines",
+    "evidence_span": "Observe that equation equation (2.10) has the divergence form $\\mathrm { D i v } \\mathbf { G } = 0$ , where Div is the space-time divergence and Consequently, the normal component of G is continuous across the shock: N. $\\left[ \\left[ \\mathbf { G } \\right] \\right] =$ 0, where the jump bracket $[ [ f ] ] = f ^ { + } - f ^ { - }$ denotes the jump in a piecewise continuous function $f ( x , y , z , t )$ across the shock.",
+    "node_ids": [
+      "n4c0_n48",
+      "n4c0_n49"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "equation (2.10)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "the divergence form $\\mathrm { D i v } \\mathbf { G } = 0$",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e21",
+    "pattern_type": "defines",
+    "evidence_span": "Observe that equation equation (2.10) has the divergence form $\\mathrm { D i v } \\mathbf { G } = 0$ , where Div is the space-time divergence and Consequently, the normal component of G is continuous across the shock: N. $\\left[ \\left[ \\mathbf { G } \\right] \\right] =$ 0, where the jump bracket $[ [ f ] ] = f ^ { + } - f ^ { - }$ denotes the jump in a piecewise continuous function $f ( x , y , z , t )$ across the shock.",
+    "node_ids": [
+      "n4c0_n50",
+      "n4c0_n51"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "the normal component of G",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "the jump bracket $[ [ f ] ] = f ^ { + } - f ^ { - }$",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e22",
+    "pattern_type": "defines",
+    "evidence_span": "In the exact solutions derived in this paper, each shock $z = z _ { \\gamma } ( x , y , t )$ is given an integer subscript $\\gamma = 1 , 2 , 3 , \\dotsc$ to uniquely identify it.",
+    "node_ids": [
+      "n4c0_n53",
+      "n4c0_n54"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "each shock $z = z _ { \\gamma } ( x , y , t )$",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "the upper and lower boundaries of the avalanche, the surface $z = s ( x , y , t )$ and the bottom $z = b ( x , y )$",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e23",
+    "pattern_type": "defines",
+    "evidence_span": "The upper and lower boundaries of the avalanche, the surface $z = s ( x , y , t )$ and the bottom $z = b ( x , y )$ , are special cases of the jump conditions in which there is no normal flow of small particles across the boundary.",
+    "node_ids": [
+      "n4c0_n54",
+      "n4c0_n55"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "the upper and lower boundaries of the avalanche, the surface $z = s ( x , y , t )$ and the bottom $z = b ( x , y )$",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "the jump conditions",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e24",
+    "pattern_type": "defines",
+    "evidence_span": "It follows from (2.12) that the surface and basal boundary conditions are The square-bracketed term on the lefthand-side of these equations is zero, due to the kinematic boundary condition at the surface and base of the avalanche (e.g. Gray et al 1999; Gray et al 2003).",
+    "node_ids": [
+      "n4c0_n56",
+      "n4c0_n54"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "the surface and basal boundary conditions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "the upper and lower boundaries of the avalanche, the surface $z = s ( x , y , t )$ and the bottom $z = b ( x , y )$",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e2",
+    "pattern_type": "composed_of",
+    "evidence_span": "The large particles are of the same density and occupy a volume fraction $1 - \\phi$",
+    "node_ids": [
+      "n4c0_n5",
+      "n4c0_n6"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "large particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "volume fraction $1 - \\phi$",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence states that large particles occupy a volume fraction, which is a definitional/descriptive statement about the volume fraction, not a structural composition relation. The volume fraction is not a component of the large particles; it is a property of the mixture. This is a definitional identity (defines) or a property assignment, not composed_of.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e6",
+    "pattern_type": "applies_method_to",
+    "evidence_span": "In shallow granular free-surface flow models the bulk depth-averaged downslope and cross-slope velocities $( \\bar { u } , \\bar { v } )$ are computed as a function of space and time, using prescribed velocity profiles.",
+    "node_ids": [
+      "n4c0_n17",
+      "n4c0_n16"
+    ],
+    "node_roles": [
+      "method",
+      "subject"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "prescribed velocity profiles",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "the bulk depth-averaged downslope and cross-slope velocities $( \\bar { u } , \\bar { v } )$",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence describes a computation method, not an application of a method to study a subject. The 'prescribed velocity profiles' are used to compute the velocities, which is a functional dependence or a measurement/computation relation, not 'applies_method_to'. The subject is not being studied/analyzed; it is being computed.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e8",
+    "pattern_type": "applies_method_to",
+    "evidence_span": "The bulk three-dimensional velocity field ${ \\pmb u } ( { \\pmb x } , t )$ can be reconstructed from $( \\bar { u } , \\bar { v } )$ with a knowledge of the shape factors together with the incompressibility relation and the no normal velocity condition at the base to determine the bulk normal velocity",
+    "node_ids": [
+      "n4c0_n22",
+      "n4c0_n21"
+    ],
+    "node_roles": [
+      "method",
+      "subject"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "the incompressibility relation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "the bulk three-dimensional velocity field ${ \\pmb u } ( { \\pmb x } , t )$",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence describes a reconstruction process using the incompressibility relation as a tool. This is a methodological step, not an application of a method to study a subject. The velocity field is not being studied; it is being reconstructed. This is a definitional or procedural relation, not 'applies_method_to'.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e9",
+    "pattern_type": "applies_method_to",
+    "evidence_span": "The bulk three-dimensional velocity field ${ \\pmb u } ( { \\pmb x } , t )$ can be reconstructed from $( \\bar { u } , \\bar { v } )$ with a knowledge of the shape factors together with the incompressibility relation and the no normal velocity condition at the base to determine the bulk normal velocity",
+    "node_ids": [
+      "n4c0_n23",
+      "n4c0_n21"
+    ],
+    "node_roles": [
+      "method",
+      "subject"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "the no normal velocity condition at the base",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "the bulk three-dimensional velocity field ${ \\pmb u } ( { \\pmb x } , t )$",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "Same as n4c0_e8. The sentence describes a reconstruction process using the no normal velocity condition as a tool. This is a methodological step, not an application of a method to study a subject. The velocity field is not being studied; it is being reconstructed.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e10",
+    "pattern_type": "applies_method_to",
+    "evidence_span": "The key element of Gray & Thornton’s (2005) segregation theory is the use of the normal component of the constituent momentum balances to derive two equations that govern the percolation of the large and small particles.",
+    "node_ids": [
+      "n4c0_n24",
+      "n4c0_n25"
+    ],
+    "node_roles": [
+      "method",
+      "subject"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Gray & Thornton’s (2005) segregation theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "the normal component of the constituent momentum balances",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence states that the theory uses the momentum balances to derive equations. This is a definitional statement about the theory's key element, not an application of a method to study a subject. The momentum balances are not being studied; they are being used as a basis for derivation. This is a definitional or constitutive relation, not 'applies_method_to'.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e13",
+    "pattern_type": "applies_method_to",
+    "evidence_span": "Substituting the small particle percolation velocity (2.6) into the small particle mass balance equation together with the assumption that the downslope and cross-slope velocity components of the small particles are the same as those of the bulk flow yields a non-dimensional segregation equation for the volume fraction of small particles",
+    "node_ids": [
+      "n4c0_n35",
+      "n4c0_n36"
+    ],
+    "node_roles": [
+      "method",
+      "subject"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "the small particle percolation velocity (2.6)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "the small particle mass balance equation",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence describes a substitution process to derive an equation. This is a mathematical derivation step, not an application of a method to study a subject. The mass balance equation is not being studied; it is being used as a basis for derivation. This is a definitional or constitutive relation, not 'applies_method_to'.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e15",
+    "pattern_type": "captures_phenomenon",
+    "evidence_span": "The first four terms together with the bulk incompressibility (2.3) simply express the fact the volume fraction is advected passively with the flow.",
+    "node_ids": [
+      "n4c0_n39",
+      "n4c0_n38"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "the first four terms together with the bulk incompressibility (2.3)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "the volume fraction of small particles",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence states that the terms express a fact about advection. This is a definitional or descriptive statement about the terms, not a model capturing a phenomenon. The volume fraction is not a phenomenon; it is a quantity. The terms are not a model; they are components of an equation. This is a definitional or constitutive relation, not 'captures_phenomenon'.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e18",
+    "pattern_type": "applies_method_to",
+    "evidence_span": "A generalized time-dependent jump condition across such a shock can easily be derived from the divergence structure of (2.10).",
+    "node_ids": [
+      "n4c0_n45",
+      "n4c0_n44"
+    ],
+    "node_roles": [
+      "method",
+      "subject"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "the divergence structure of (2.10)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "a generalized time-dependent jump condition across such a shock",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence describes a derivation process. The divergence structure is used to derive the jump condition. This is a mathematical derivation step, not an application of a method to study a subject. The jump condition is not being studied; it is being derived. This is a definitional or constitutive relation, not 'applies_method_to'.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n5c1_e0",
+    "pattern_type": "influences",
+    "evidence_span": "The remaining parts of the shock are governed by the upstream motion of the triple-point",
+    "node_ids": [
+      "n5c1_n1",
+      "n5c1_n2"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "triple-point",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "third shock",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5c1_e1",
+    "pattern_type": "influences",
+    "evidence_span": "When there is shear, points that are higher up in the flow move faster downstream than those below them. As a result the central dynamic region of $z _ { 3 }$ steepens and eventually breaks",
+    "node_ids": [
+      "n5c1_n3",
+      "n5c1_n2"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "shear",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "third shock",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5c1_e2",
+    "pattern_type": "influences",
+    "evidence_span": "the breaking-time is singular when $\\alpha = 1$",
+    "node_ids": [
+      "n5c1_n5",
+      "n5c1_n4"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "α",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "breaking-time",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5c1_e3",
+    "pattern_type": "influences",
+    "evidence_span": "The breaking-time also tends to infinity as the initial concentration approaches either zero or unity",
+    "node_ids": [
+      "n5c1_n7",
+      "n5c1_n4"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "initial concentration",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "breaking-time",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5c1_e4",
+    "pattern_type": "influences",
+    "evidence_span": "the dynamic region of $z _ { 3 }$ is confined to a very narrow lateral band in which the velocities become increasingly close to one another",
+    "node_ids": [
+      "n5c1_n9",
+      "n5c1_n10"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "dynamic region of z3",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "velocities",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5c1_e5",
+    "pattern_type": "influences",
+    "evidence_span": "velocities become increasingly close to one another as φ0 approaches these limiting states",
+    "node_ids": [
+      "n5c1_n8",
+      "n5c1_n10"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "φ0",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "velocities",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5c1_e6",
+    "pattern_type": "influences",
+    "evidence_span": "The full parameter dependence of the breaking-time on α and $\\phi _ { 0 }$ is illustrated in Fig. 3",
+    "node_ids": [
+      "n5c1_n3",
+      "n5c1_n4"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "shear",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "breaking-time",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5c1_e7",
+    "pattern_type": "influences",
+    "evidence_span": "the third shock breaks prior to the steady triplepoint forming",
+    "node_ids": [
+      "n5c1_n2",
+      "n5c1_n11"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "third shock",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "steady triplepoint",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5c1_e8",
+    "pattern_type": "influences",
+    "evidence_span": "after the shock breaks a complex solution is formed",
+    "node_ids": [
+      "n5c1_n2",
+      "n5c1_n12"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "third shock",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "complex solution",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c1_e0",
+    "pattern_type": "influences",
+    "evidence_span": "Interaction with the no normal flux boundary condition (5.3) implies that shocks result from reflection at the boundary.",
+    "node_ids": [
+      "n6c1_n1",
+      "n6c1_n2",
+      "n6c1_n3"
+    ],
+    "node_roles": [
+      "influencer",
+      "influenced",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "no normal flux boundary condition (5.3)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "shocks",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "reflection at the boundary",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e0",
+    "pattern_type": "predicts_phenomenon",
+    "evidence_span": "The second problem also leads to shock wave-breaking and is the time-dependent version of Thornton, Gray & Hogg’s (2005) normally graded steady-state flows.",
+    "node_ids": [
+      "n6c0_n3",
+      "n6c0_n2"
+    ],
+    "node_roles": [
+      "predictor",
+      "predicted_phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "time-dependent version of Thornton, Gray & Hogg’s (2005) normally graded steady-state flows",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "shock wave-breaking",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e2",
+    "pattern_type": "defines",
+    "evidence_span": "a concentration discontinuity along z = z_r",
+    "node_ids": [
+      "n6c0_n7",
+      "n6c0_n8"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "concentration discontinuity",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "z_r",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e3",
+    "pattern_type": "applies_method_to",
+    "evidence_span": "Thornton, Gray & Hogg (2005) have performed numerical simulations of this problem",
+    "node_ids": [
+      "n6c0_n12",
+      "n6c0_n13",
+      "n6c0_n1"
+    ],
+    "node_roles": [
+      "method",
+      "method",
+      "subject"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Thornton, Gray & Hogg (2005)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "numerical simulations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "normally graded initial state",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e4",
+    "pattern_type": "predicts_phenomenon",
+    "evidence_span": "which indicate that there is a region adjacent to the inflow that rapidly attains steady-state",
+    "node_ids": [
+      "n6c0_n13",
+      "n6c0_n14"
+    ],
+    "node_roles": [
+      "predictor",
+      "predicted_phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "numerical simulations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "region adjacent to the inflow",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e5",
+    "pattern_type": "predicts_phenomenon",
+    "evidence_span": "a downstream region where the flow is time-dependent and laterally uniform",
+    "node_ids": [
+      "n6c0_n13",
+      "n6c0_n16"
+    ],
+    "node_roles": [
+      "predictor",
+      "predicted_phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "numerical simulations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "downstream region",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e6",
+    "pattern_type": "predicts_phenomenon",
+    "evidence_span": "a transition region between the two, where there is complex spatial and temporal behaviour",
+    "node_ids": [
+      "n6c0_n13",
+      "n6c0_n18"
+    ],
+    "node_roles": [
+      "predictor",
+      "predicted_phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "numerical simulations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "transition region",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e7",
+    "pattern_type": "defines",
+    "evidence_span": "The small particle concentration φ is equal to a constant φ_λ along the characteristic curve",
+    "node_ids": [
+      "n6c0_n23",
+      "n6c0_n24"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "small particle concentration φ",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "constant φ_λ",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e8",
+    "pattern_type": "defines",
+    "evidence_span": "(x_λ, ψ_λ) is the starting position in mapped coordinates",
+    "node_ids": [
+      "n6c0_n28",
+      "n6c0_n29"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "(x_λ, ψ_λ)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "mapped coordinates",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e9",
+    "pattern_type": "predicts_phenomenon",
+    "evidence_span": "Characteristic curves on which φ_λ > 1/2 propagate up through the avalanche",
+    "node_ids": [
+      "n6c0_n30",
+      "n6c0_n31"
+    ],
+    "node_roles": [
+      "predictor",
+      "predicted_phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "characteristic curves",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "φ_λ > 1/2",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e10",
+    "pattern_type": "predicts_phenomenon",
+    "evidence_span": "whilst curves with φ_λ < 1/2 propagate down towards the base of the flow",
+    "node_ids": [
+      "n6c0_n30",
+      "n6c0_n32"
+    ],
+    "node_roles": [
+      "predictor",
+      "predicted_phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "characteristic curves",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "φ_λ < 1/2",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e11",
+    "pattern_type": "defines",
+    "evidence_span": "at the inflow concentration discontinuity, which lies at z = z_r, or, ψ = ψ_r in mapped coordinates",
+    "node_ids": [
+      "n6c0_n33",
+      "n6c0_n34"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "inflow concentration discontinuity",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "ψ_r",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e12",
+    "pattern_type": "predicts_phenomenon",
+    "evidence_span": "the characteristics diverge from one another and a centred expansion fan is formed with concentration",
+    "node_ids": [
+      "n6c0_n33",
+      "n6c0_n35"
+    ],
+    "node_roles": [
+      "predictor",
+      "predicted_phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "inflow concentration discontinuity",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "centered expansion fan",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e13",
+    "pattern_type": "defines",
+    "evidence_span": "The characteristic curve ψ = ψ_r - x (on which φ = 0) lies along the lower boundary of the expansion fan",
+    "node_ids": [
+      "n6c0_n36",
+      "n6c0_n37"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "characteristic curve ψ = ψ_r - x",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "φ = 0",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e14",
+    "pattern_type": "composed_of",
+    "evidence_span": "The characteristic curve ψ = ψ_r - x (on which φ = 0) lies along the lower boundary of the expansion fan and separates it from a pure region of large particles",
+    "node_ids": [
+      "n6c0_n35",
+      "n6c0_n38",
+      "n6c0_n39"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "centered expansion fan",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "lower boundary",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "pure region of large particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e15",
+    "pattern_type": "defines",
+    "evidence_span": "It represents the trajectory of the first small particles percolating towards the base of the avalanche, which they reach at x_bottom = ψ_r",
+    "node_ids": [
+      "n6c0_n40",
+      "n6c0_n41"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "trajectory of the first small particles percolating towards the base",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "x_bottom = ψ_r",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e16",
+    "pattern_type": "defines",
+    "evidence_span": "Similarly, the curve ψ = ψ_r + x (on which φ = 1) separates the fan from a region of small particles above",
+    "node_ids": [
+      "n6c0_n42",
+      "n6c0_n43"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "curve ψ = ψ_r + x",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "φ = 1",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e17",
+    "pattern_type": "composed_of",
+    "evidence_span": "Similarly, the curve ψ = ψ_r + x (on which φ = 1) separates the fan from a region of small particles above",
+    "node_ids": [
+      "n6c0_n35",
+      "n6c0_n42",
+      "n6c0_n44"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "centered expansion fan",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "curve ψ = ψ_r + x",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "region of small particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e18",
+    "pattern_type": "defines",
+    "evidence_span": "represents the front of the first large particles that are being pushed up to the free-surface. They reach z = 1 at x_top = 1 - ψ_r",
+    "node_ids": [
+      "n6c0_n45",
+      "n6c0_n46",
+      "n6c0_n47"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "front of the first large particles being pushed up to the free-surface",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "z = 1",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "x_top = 1 - ψ_r",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e19",
+    "pattern_type": "predicts_phenomenon",
+    "evidence_span": "the no normal flux condition (5.3) implies that they separate out and a concentration shock is formed between the expansion fan and the pure phase",
+    "node_ids": [
+      "n6c0_n48",
+      "n6c0_n49"
+    ],
+    "node_roles": [
+      "predictor",
+      "predicted_phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "no normal flux condition (5.3)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "concentration shock",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e20",
+    "pattern_type": "defines",
+    "evidence_span": "The steady-state version of the jump condition (3.4) with φ^+ given by (5.7) and φ^- = 1 reduces to",
+    "node_ids": [
+      "n6c0_n51",
+      "n6c0_n52",
+      "n6c0_n53"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "steady-state version of the jump condition (3.4)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "φ^+",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "φ^- = 1",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e21",
+    "pattern_type": "defines",
+    "evidence_span": "This is a linear ODE that can easily be integrated subject to the initial condition that ψ = 0 at x = ψ_r to give the height of the bottom shock",
+    "node_ids": [
+      "n6c0_n54",
+      "n6c0_n55",
+      "n6c0_n56"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "linear ODE",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "initial condition that ψ = 0 at x = ψ_r",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "height of the bottom shock",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e22",
+    "pattern_type": "predicts_phenomenon",
+    "evidence_span": "An analogous upper shock forms as the large particles separate out into a pure phase",
+    "node_ids": [
+      "n6c0_n57",
+      "n6c0_n58"
+    ],
+    "node_roles": [
+      "predictor",
+      "predicted_phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "upper shock",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "upper and lower shocks",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e23",
+    "pattern_type": "predicts_phenomenon",
+    "evidence_span": "a third shock is formed between the inversely graded layers of large and small particles along the line",
+    "node_ids": [
+      "n6c0_n58",
+      "n6c0_n59"
+    ],
+    "node_roles": [
+      "predictor",
+      "predicted_phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "upper and lower shocks",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "third shock",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e25",
+    "pattern_type": "defines",
+    "evidence_span": "Sufficiently far downstream the lateral uniformity of the initial conditions implies that the solution is independent of the downslope coordinate x",
+    "node_ids": [
+      "n6c0_n63",
+      "n6c0_n64"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "unsteady laterally uniform problem",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "downslope coordinate x",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e26",
+    "pattern_type": "defines",
+    "evidence_span": "the expanded segregation equation (3.3) reduces to which, rather interestingly, is independent of the assumed velocity profile u(z)",
+    "node_ids": [
+      "n6c0_n65",
+      "n6c0_n66"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "expanded segregation equation (3.3)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "velocity profile u(z)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e27",
+    "pattern_type": "analogous_to",
+    "evidence_span": "Equation (5.13) has exactly the same form as the mapped steady-state problem (5.4) except that x is replaced by t and ψ is replaced by z",
+    "node_ids": [
+      "n6c0_n65",
+      "n6c0_n67"
+    ],
+    "node_roles": [
+      "entity",
+      "analog"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "expanded segregation equation (3.3)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "mapped steady-state problem (5.4)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e28",
+    "pattern_type": "defines",
+    "evidence_span": "an expansion fan centred at z = z_r within which the concentration is For small values of t, the expansion fan is confined to the interval |z - z_r| < t, the leading edges (where φ = 0, 1) moving with speed |2φ - 1| = 1",
+    "node_ids": [
+      "n6c0_n68",
+      "n6c0_n69",
+      "n6c0_n70"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "expansion fan centred at z = z_r",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "leading edges (where φ = 0, 1)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "speed |2φ - 1| = 1",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e29",
+    "pattern_type": "predicts_phenomenon",
+    "evidence_span": "After the leading edges hit the horizontal boundaries z = 0, 1, at times t_bottom = z_r and t_top = 1 - z_r",
+    "node_ids": [
+      "n6c0_n69",
+      "n6c0_n71"
+    ],
+    "node_roles": [
+      "predictor",
+      "predicted_phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "leading edges (where φ = 0, 1)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "horizontal boundaries z = 0, 1",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e30",
+    "pattern_type": "defines",
+    "evidence_span": "at times t_bottom = z_r and t_top = 1 - z_r",
+    "node_ids": [
+      "n6c0_n72",
+      "n6c0_n73"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "t_bottom = z_r",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "t_top = 1 - z_r",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e31",
+    "pattern_type": "defines",
+    "evidence_span": "the fan is contained in the interval z_1(t) < z < z_2(t) bounded by the two shocks",
+    "node_ids": [
+      "n6c0_n74",
+      "n6c0_n75"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "interval z_1(t) < z < z_2(t)",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "two shocks",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e32",
+    "pattern_type": "defines",
+    "evidence_span": "when the two shocks collide, at time t_3 = (√z_r + √(1 - z_r))^2, the fan disappears and the solution is a single stationary shock",
+    "node_ids": [
+      "n6c0_n76",
+      "n6c0_n77"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "t_3 = (√z_r + √(1 - z_r))^2",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "single stationary shock",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e33",
+    "pattern_type": "defines",
+    "evidence_span": "Expanding the derivatives in the segregation equation (3.3) yields a first order quasi-linear equation that governs the full problem",
+    "node_ids": [
+      "n6c0_n79",
+      "n6c0_n80"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "segregation equation (3.3)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "first order quasi-linear equation",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e34",
+    "pattern_type": "defines",
+    "evidence_span": "The method of characteristics implies that the concentration is equal to a constant φ_λ on characteristic curves (parameterized by λ) given by the subsidiary equations",
+    "node_ids": [
+      "n6c0_n81",
+      "n6c0_n82",
+      "n6c0_n83"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "method of characteristics",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "constant φ_λ",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "characteristic curves (parameterized by λ)",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e35",
+    "pattern_type": "defines",
+    "evidence_span": "where λ = z - (2φ_0 - 1)t",
+    "node_ids": [
+      "n6c0_n86",
+      "n6c0_n85"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "λ = z - (2φ_0 - 1)t",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "linear velocity field (4.14)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e36",
+    "pattern_type": "composed_of",
+    "evidence_span": "At t = 0 the line x = 0 separates the material that was initially in the chute from the material that subsequently enters the chute along x = 0",
+    "node_ids": [
+      "n6c0_n87",
+      "n6c0_n88",
+      "n6c0_n90"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "line x = 0",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "material initially in the chute",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "material entering the chute",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e37",
+    "pattern_type": "predicts_phenomenon",
+    "evidence_span": "Material initially in the chute is swept downstream, and experiences segregation in a time dependent expansion fan (5.14)",
+    "node_ids": [
+      "n6c0_n88",
+      "n6c0_n89"
+    ],
+    "node_roles": [
+      "predictor",
+      "predicted_phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "material initially in the chute",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "time dependent expansion fan (5.14)",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e38",
+    "pattern_type": "predicts_phenomenon",
+    "evidence_span": "material entering the chute is normally graded as it enters, and then begins to segregate in a steady expansion fan (5.7) centered at x = 0, z = z_r",
+    "node_ids": [
+      "n6c0_n90",
+      "n6c0_n91"
+    ],
+    "node_roles": [
+      "predictor",
+      "predicted_phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "material entering the chute",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "steady expansion fan (5.7)",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e39",
+    "pattern_type": "defines",
+    "evidence_span": "The interface between the two kinds of material points, those initially in the chute and those entering the chute, is a curve that we call the fan-interface; it is shown in the left panels of Fig.4",
+    "node_ids": [
+      "n6c0_n92",
+      "n6c0_n93"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "fan-interface",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "Fig.4",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e40",
+    "pattern_type": "defines",
+    "evidence_span": "Points in the interface are located by tracking the characteristics (5.21) with initial location x = 0. Thus, f(λ) ≡ 0",
+    "node_ids": [
+      "n6c0_n94",
+      "n6c0_n95"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "characteristics (5.21)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "f(λ) ≡ 0",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e41",
+    "pattern_type": "defines",
+    "evidence_span": "Within the time-dependent characteristic fan, φ_λ is given by (5.14), and the material on the time-dependent side of the fan-interface therefore lies along the straight line at time t",
+    "node_ids": [
+      "n6c0_n96",
+      "n6c0_n97"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "time-dependent characteristic fan",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "straight line",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e42",
+    "pattern_type": "defines",
+    "evidence_span": "the fan-interface (5.22) creates a continuous match between the steady-state and time-dependent fans",
+    "node_ids": [
+      "n6c0_n98",
+      "n6c0_n99",
+      "n6c0_n100"
+    ],
+    "node_roles": [
+      "defined_entity",
+      "definition",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "fan-interface (5.22)",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "steady-state fan (5.7)",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "time-dependent fan (5.14)",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e43",
+    "pattern_type": "composed_of",
+    "evidence_span": "The solution for small times, therefore, consists of steady-state fan (5.7) upstream of the interface (5.22) and a time-dependent fan (5.14) downstream of it, which expand with increasing time",
+    "node_ids": [
+      "n6c0_n78",
+      "n6c0_n99",
+      "n6c0_n100"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "full problem",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "steady-state fan (5.7)",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "time-dependent fan (5.14)",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e44",
+    "pattern_type": "composed_of",
+    "evidence_span": "Above and below the fan are pure regions of small and large particles, as shown in the left-hand panels of Fig. 4",
+    "node_ids": [
+      "n6c0_n78",
+      "n6c0_n101"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "full problem",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "pure regions of small and large particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e45",
+    "pattern_type": "predicts_phenomenon",
+    "evidence_span": "The fans continue to expand until the laterally uniform time-dependent sections intersect with the surface and base of the flow at times t_top and t_bottom",
+    "node_ids": [
+      "n6c0_n102",
+      "n6c0_n103",
+      "n6c0_n104"
+    ],
+    "node_roles": [
+      "predictor",
+      "predicted_phenomenon",
+      "predicted_phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "laterally uniform time-dependent sections",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "t_top",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "t_bottom",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e1",
+    "pattern_type": "composed_of",
+    "evidence_span": "Initially the avalanche is assumed to be normally graded, with a layer of small particles separated from a layer of large particles below by a concentration discontinuity along z = z_r",
+    "node_ids": [
+      "n6c0_n4",
+      "n6c0_n5",
+      "n6c0_n6"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "normally graded",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "layer of small particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "layer of large particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes the initial condition/setup of the avalanche, not a structural composition relation. 'Normally graded' is a state/condition, not a whole composed of layers. The sentence merely describes the initial configuration, not a compositional structure. This is a setup description, which the pattern boundary explicitly excludes.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6c0_e24",
+    "pattern_type": "applies_method_to",
+    "evidence_span": "This solution has been investigated by Thornton, Gray & Hogg (2005) for a range of linear and non-linear velocity profiles and values of the concentration discontinuity z_r",
+    "node_ids": [
+      "n6c0_n12",
+      "n6c0_n61",
+      "n6c0_n62"
+    ],
+    "node_roles": [
+      "method",
+      "method",
+      "subject"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Thornton, Gray & Hogg (2005)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "linear and non-linear velocity profiles",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "values of the concentration discontinuity z_r",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that a solution was investigated for a range of parameters, not that a method was applied to a subject. 'Thornton, Gray & Hogg (2005)' is a citation/reference, not a method. 'linear and non-linear velocity profiles' and 'values of the concentration discontinuity z_r' are parameters being varied, not subjects being studied. The sentence describes an investigation of a solution, not an application of a method to a subject.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7c1_e0",
+    "pattern_type": "propagates_along",
+    "evidence_span": "the triple-point moves upstream from its initial position as it generates the non-uniform section of the third shock, which is swept downstream.",
+    "node_ids": [
+      "n7c1_n1",
+      "n7c1_n2"
+    ],
+    "node_roles": [
+      "entity",
+      "medium"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "triple-point",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "non-uniform section of the third shock",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e1",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "The curve BC is governed by the shock condition",
+    "node_ids": [
+      "n7c0_n5",
+      "n7c0_n4"
+    ],
+    "node_roles": [
+      "law",
+      "output"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "shock condition",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "fully dynamic shock BC",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e4",
+    "pattern_type": "propagates_along",
+    "evidence_span": "These characteristic curves are sketched in Fig.5 using dashed arrowed lines; they emanate from the Article submitted to Royal Society dot-dash curve AC",
+    "node_ids": [
+      "n7c0_n10",
+      "n7c0_n11"
+    ],
+    "node_roles": [
+      "entity",
+      "medium"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "characteristic curves",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "dot-dash curve AC",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e5",
+    "pattern_type": "defines",
+    "evidence_span": "the dot-dash curve AC, which is defined by the trajectory of the intersection between the fan-interface CF and the laterally uniform shock CD.",
+    "node_ids": [
+      "n7c0_n11",
+      "n7c0_n12"
+    ],
+    "node_roles": [
+      "defined",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "dot-dash curve AC",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "trajectory of the intersection between the fan-interface CF and the laterally uniform shock CD",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e7",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "While we cannot write explicit formulae for (x1,z1)(t,to), the curve BC is easily generated numerically from the sequence of equations (5.28) to (5.32).",
+    "node_ids": [
+      "n7c0_n16",
+      "n7c0_n14",
+      "n7c0_n15"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "curve BC",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "downslope position x1(t,to) of the bottom shock",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "height z1(t,to) of the shock",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e8",
+    "pattern_type": "studies_phenomenon",
+    "evidence_span": "In simple shear the behaviour of the characteristic emanating from point A at (xbottom,0) is particularly interesting.",
+    "node_ids": [
+      "n7c0_n17",
+      "n7c0_n18"
+    ],
+    "node_roles": [
+      "method",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "simple shear",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "characteristic emanating from point A",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:slot-type-mismatch",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e9",
+    "pattern_type": "deviates_from",
+    "evidence_span": "point B can not move away from its initial position in simple-shear. As a consequence, it is not possible to generate a steady-state section of the lower shock, when α=0",
+    "node_ids": [
+      "n7c0_n19",
+      "n7c0_n20"
+    ],
+    "node_roles": [
+      "subject",
+      "other"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "point B",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "steady-state section of the lower shock",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e10",
+    "pattern_type": "composed_of",
+    "evidence_span": "There is a steady-state section EF, a fully dynamic curve FG and a laterally uniform time-dependent section GH",
+    "node_ids": [
+      "n7c0_n21",
+      "n7c0_n22",
+      "n7c0_n23",
+      "n7c0_n24"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "fully dynamic top shock",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "steady-state section EF",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "fully dynamic curve FG",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "laterally uniform time-dependent section GH",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e11",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "The fully dynamic curve FG is governed by the shock condition",
+    "node_ids": [
+      "n7c0_n26",
+      "n7c0_n23"
+    ],
+    "node_roles": [
+      "law",
+      "output"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "shock condition",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "fully dynamic curve FG",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e13",
+    "pattern_type": "propagates_along",
+    "evidence_span": "The shocks are initiated along the trajectory of point F",
+    "node_ids": [
+      "n7c0_n29",
+      "n7c0_n30"
+    ],
+    "node_roles": [
+      "entity",
+      "medium"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "characteristic curves",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "trajectory of point F",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e14",
+    "pattern_type": "propagates_along",
+    "evidence_span": "The expanding fan of characteristic curves emanating from EF",
+    "node_ids": [
+      "n7c0_n32",
+      "n7c0_n31"
+    ],
+    "node_roles": [
+      "entity",
+      "medium"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "expanding fan of characteristic curves",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "steady-state section of the upper shock EF",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e15",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "The current position of the fully dynamic part of the top shock is therefore",
+    "node_ids": [
+      "n7c0_n33",
+      "n7c0_n32"
+    ],
+    "node_roles": [
+      "output",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "fully dynamic part of the top shock",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "expanding fan of characteristic curves",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e16",
+    "pattern_type": "phase_sequence",
+    "evidence_span": "At time t3 the upper and lower time-dependent laterally uniform shocks meet to form a third laterally uniform shock z3",
+    "node_ids": [
+      "n7c0_n34",
+      "n7c0_n35"
+    ],
+    "node_roles": [
+      "preceding",
+      "following"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "upper and lower time-dependent laterally uniform shocks",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "third laterally uniform shock z3",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e17",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "The position of the triple-point between the three shocks (shown with ~a ⊕ ' in Fig.6) can be found by iterating to find the characteristic xotriple∈[xtop,xs(t)] whose corresponding shock position, given by (5.42), has the same height as the bottom shock (5.15)",
+    "node_ids": [
+      "n7c0_n36",
+      "n7c0_n37",
+      "n7c0_n38"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "triple-point between the three shocks",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "fully dynamic part of the upper shock",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "bottom shock",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e18",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "now form part of the third shock z3 which is governed by the conservation law (4.20)",
+    "node_ids": [
+      "n7c0_n39",
+      "n7c0_n40"
+    ],
+    "node_roles": [
+      "output",
+      "law"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "third shock z3",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "conservation law (4.20)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e3",
+    "pattern_type": "applies_method_to",
+    "evidence_span": "Using the linear velocity profile (4.14) and the inverse mapping (4.16), the first equation reduces to",
+    "node_ids": [
+      "n7c0_n8",
+      "n7c0_n9"
+    ],
+    "node_roles": [
+      "method",
+      "subject"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "linear velocity profile (4.14)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "inverse mapping (4.16)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the linear velocity profile and inverse mapping are used to reduce an equation. This is a mathematical substitution, not an application of a method to study a subject. The 'linear velocity profile' is not a method but a model/equation, and the 'inverse mapping' is a mathematical transformation. The relation is not 'applies_method_to'.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7c0_e6",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "Equation (5.27) and the constants (5.30) imply that at any given time t the downslope position x1(t,to) of the bottom shock that was initiated at time to. is given by solving for x1∈[xb(to),xb(t)] from the equation The corresponding height z1(t,to) of the shock is then given implicitly by",
+    "node_ids": [
+      "n7c0_n13",
+      "n7c0_n14",
+      "n7c0_n15"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "fully dynamic part of the shock BC",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "downslope position x1(t,to) of the bottom shock",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "height z1(t,to) of the shock",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a procedure for calculating the position and height of the shock, not a constitutive law relating output to input. The 'fully dynamic part of the shock BC' is not an output of a law; it is a curve being constructed. The downslope position and height are not inputs but the results of the calculation. This is a mathematical derivation, not a constitutive law.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n8c1_e0",
+    "pattern_type": "effectively_becomes",
+    "evidence_span": "an inversely graded layer is formed",
+    "node_ids": [
+      "n8c1_n1"
+    ],
+    "node_roles": [
+      "X"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "inversely graded layer",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8c0_e0",
+    "pattern_type": "influences",
+    "evidence_span": "This shows that for fixed $\\alpha ,$ , the fan-destruction time has a local maximum close to $z _ { r } = 1 / 2$ , whilst for fixed $z _ { r }$ the time $t _ { f a n }$ increases with increasing shear.",
+    "node_ids": [
+      "n8c0_n2",
+      "n8c0_n3",
+      "n8c0_n4",
+      "n8c0_n5"
+    ],
+    "node_roles": [
+      "dependent",
+      "independent",
+      "independent",
+      "independent"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "fan-destruction time",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "$z _ { r }$",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "$\\alpha$",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "shear",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8c0_e1",
+    "pattern_type": "relates_to",
+    "evidence_span": "In plug-flow $( \\alpha = 1 )$ the fan-destruction time $t _ { f a n } = t _ { 3 }$ , which is the same time that the upper and lower laterally uniform shocks initially meet.",
+    "node_ids": [
+      "n8c0_n6",
+      "n8c0_n7"
+    ],
+    "node_roles": [
+      "quantity",
+      "quantity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "plug-flow $( \\alpha = 1 )$",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "$t _ { 3 }$",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8c0_e5",
+    "pattern_type": "influences",
+    "evidence_span": "This is governed by the inviscid Burgers equation (4.20) and has the simple solution",
+    "node_ids": [
+      "n8c0_n18",
+      "n8c0_n17"
+    ],
+    "node_roles": [
+      "influencer",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "inviscid Burgers equation (4.20)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "new section of $z _ { 3 }$",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8c0_e7",
+    "pattern_type": "influences",
+    "evidence_span": "The parameter dependence of $t _ { s t e a d y }$ on α and $z _ { r }$ is illustrated in Fig. 8.",
+    "node_ids": [
+      "n8c0_n26",
+      "n8c0_n4",
+      "n8c0_n3"
+    ],
+    "node_roles": [
+      "dependent",
+      "independent",
+      "independent"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "parameter dependence of $t _ { s t e a d y }$",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "$\\alpha$",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "$z _ { r }$",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8c0_e8",
+    "pattern_type": "influences",
+    "evidence_span": "In simple shear point B does not move from its initial position because of the logarithmic singularity (5.34).",
+    "node_ids": [
+      "n8c0_n28",
+      "n8c0_n27"
+    ],
+    "node_roles": [
+      "influencer",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "logarithmic singularity (5.34)",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "simple shear",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8c0_e9",
+    "pattern_type": "influences",
+    "evidence_span": "As a result the steadystate fan does not develop and there is a logarithmic singularity in $t _ { s t e a d y }$ along the $\\alpha = 0$ .",
+    "node_ids": [
+      "n8c0_n30",
+      "n8c0_n31"
+    ],
+    "node_roles": [
+      "dependent",
+      "independent"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "logarithmic singularity in $t _ { s t e a d y }$",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "$\\alpha = 0$",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8c0_e10",
+    "pattern_type": "relates_to",
+    "evidence_span": "For plug-flow, the steady-state fan becomes fully developed at the same time the upper and lower laterally uniform shocks meet, i.e. $t _ { s t e a d y } = t _ { 3 }$ when $\\alpha = 1$ .",
+    "node_ids": [
+      "n8c0_n35",
+      "n8c0_n36"
+    ],
+    "node_roles": [
+      "quantity",
+      "quantity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "$t _ { s t e a d y } = t _ { 3 }$",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "$\\alpha = 1$",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8c0_e11",
+    "pattern_type": "influences",
+    "evidence_span": "Between these two extremes there is a maximum in $t _ { s t e a d y }$ , for each $\\alpha ,$ , that becomes progressively skewed to higher discontinuity heights $z _ { r }$ as α decreases.",
+    "node_ids": [
+      "n8c0_n37",
+      "n8c0_n4",
+      "n8c0_n38"
+    ],
+    "node_roles": [
+      "dependent",
+      "independent",
+      "independent"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "maximum in $t _ { s t e a d y }$",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "$\\alpha$",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "discontinuity heights $z _ { r }$",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8c0_e12",
+    "pattern_type": "influences",
+    "evidence_span": "For a small range of parameter values in the bottom lefthand corner of Fig. 8, i.e. for α and $z _ { r }$ small, the dynamic bottom shock develops a pronounced peak as shown in Fig. 9.",
+    "node_ids": [
+      "n8c0_n42",
+      "n8c0_n41"
+    ],
+    "node_roles": [
+      "dependent",
+      "independent"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "pronounced peak",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "small range of parameter values",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8c0_e13",
+    "pattern_type": "influences",
+    "evidence_span": "This can intersect with the steady top shock prior to $t _ { f a n }$ , dividing the fan in two, and changing the topology of the problem.",
+    "node_ids": [
+      "n8c0_n43",
+      "n8c0_n44",
+      "n8c0_n45"
+    ],
+    "node_roles": [
+      "influencer",
+      "influenced",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "steady top shock",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "fan",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "topology of the problem",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8c0_e14",
+    "pattern_type": "predicts_phenomenon",
+    "evidence_span": "Numerical simulations of a similar-cut off phenomenon by Thornton, Gray & Hogg (2005) suggest a detached section of $z _ { 3 }$ forms, which expands and merges with the rest of $z _ { 3 }$ as the enclosed part of the fan is destroyed.",
+    "node_ids": [
+      "n8c0_n46",
+      "n8c0_n47"
+    ],
+    "node_roles": [
+      "predictor",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Numerical simulations of a similar-cut off phenomenon by Thornton, Gray & Hogg (2005)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "detached section of $z _ { 3 }$",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8c0_e16",
+    "pattern_type": "influences",
+    "evidence_span": "As in the first problem in §4 the fully dynamic parts of the third shock z3 steepen and break in finite time $t _ { b r e a k }$ , which may be either before or after $t _ { s t e a d y }$ .",
+    "node_ids": [
+      "n8c0_n57",
+      "n8c0_n58"
+    ],
+    "node_roles": [
+      "influenced",
+      "influencer"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "fully dynamic parts of the third shock z3",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "finite time $t _ { b r e a k }$",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8c0_e17",
+    "pattern_type": "influences",
+    "evidence_span": "Although the subsequent breaking is complex, this region is swept downstream, and locally a steady-state is rapidly attained provided the logarithmic singularity in simple-shear is avoided.",
+    "node_ids": [
+      "n8c0_n62",
+      "n8c0_n61"
+    ],
+    "node_roles": [
+      "influencer",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "logarithmic singularity in simple-shear",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "steady-state",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8c0_e18",
+    "pattern_type": "propagates_along",
+    "evidence_span": "In this fully developed region, large particles enter from the lower left and move up through the expansion fan, before separating out, whilst the small particles enter from the upper left move down through the fan and separate into a pure phase.",
+    "node_ids": [
+      "n8c0_n65",
+      "n8c0_n66"
+    ],
+    "node_roles": [
+      "entity",
+      "medium"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "large particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "expansion fan",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8c0_e19",
+    "pattern_type": "propagates_along",
+    "evidence_span": "In this fully developed region, large particles enter from the lower left and move up through the expansion fan, before separating out, whilst the small particles enter from the upper left move down through the fan and separate into a pure phase.",
+    "node_ids": [
+      "n8c0_n67",
+      "n8c0_n68"
+    ],
+    "node_roles": [
+      "entity",
+      "medium"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "small particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "fan",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8c0_e2",
+    "pattern_type": "generates",
+    "evidence_span": "For the vast majority of parameter values the dynamic bottom shock and the steady-top shock first intersect for $t > t _ { f a n }$ to create another section of the third shock $z _ { 3 }$ .",
+    "node_ids": [
+      "n8c0_n8",
+      "n8c0_n9",
+      "n8c0_n10"
+    ],
+    "node_roles": [
+      "producer",
+      "producer",
+      "product"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "dynamic bottom shock",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "steady-top shock",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "third shock $z _ { 3 }$",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the intersection of the two shocks creates a new section of the third shock. The edge incorrectly assigns both shocks as 'producer' roles. The 'generates' pattern allows only one producer. The correct producer is the intersection event, not the two shocks individually. The edge has two producers, which violates the pattern's arity and slot binding.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": true,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n8c0_e3",
+    "pattern_type": "generates",
+    "evidence_span": "The fully dynamic part of the bottom shock generated by the characteristics $t _ { o } ~ \\in ~ [ t _ { b o t t o m } , t _ { o t r i p l e } ]$ continues to evolve as before.",
+    "node_ids": [
+      "n8c0_n14",
+      "n8c0_n15"
+    ],
+    "node_roles": [
+      "producer",
+      "product"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "fully dynamic part of the bottom shock",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "characteristics $t _ { o } ~ \\in ~ [ t _ { b o t t o m } , t _ { o t r i p l e } ]$",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the 'fully dynamic part of the bottom shock' is generated by the 'characteristics'. The edge has the roles reversed: it assigns 'fully dynamic part of the bottom shock' as the producer and 'characteristics' as the product. The sentence clearly indicates the characteristics are the producer and the shock part is the product. This is a polarity/direction mismatch.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": true,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n8c0_e4",
+    "pattern_type": "generates",
+    "evidence_span": "These points now generate a new section of $z _ { 3 }$ .",
+    "node_ids": [
+      "n8c0_n16",
+      "n8c0_n9",
+      "n8c0_n17"
+    ],
+    "node_roles": [
+      "producer",
+      "producer",
+      "product"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "part generated by the characteristics $t _ { o } \\in$ $[ t _ { o t r i p l e } , t _ { f a n } ]$",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "steady-top shock",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "new section of $z _ { 3 }$",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that 'These points' generate a new section. The edge incorrectly assigns 'part generated by the characteristics' and 'steady-top shock' as producers. The evidence does not mention the 'steady-top shock' as a producer, and the 'part generated by the characteristics' is the subject being described, not the producer. The producer is 'These points', which is not a node in the edge.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": true,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n8c0_e6",
+    "pattern_type": "generates",
+    "evidence_span": "The final point of this unsteady third shock is generated as point B reaches the steady-state triple-point (5.11) at $( x _ { s t e a d y } , \\psi _ { s t e a d y } )$ .",
+    "node_ids": [
+      "n8c0_n20",
+      "n8c0_n21",
+      "n8c0_n19"
+    ],
+    "node_roles": [
+      "producer",
+      "producer",
+      "product"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "point B",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "steady-state triple-point (5.11)",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "unsteady third shock",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the 'final point of this unsteady third shock' is generated as 'point B reaches the steady-state triple-point'. The edge incorrectly assigns both 'point B' and 'steady-state triple-point' as producers. The 'generates' pattern allows only one producer. The correct producer is the event of 'point B reaches the steady-state triple-point', not the two entities individually. The edge has two producers, violating the pattern's arity and slot binding.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": true,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n9_e0",
+    "pattern_type": "extends",
+    "evidence_span": "two exact solutions to the segregation theory of Gray & Thornton (2005) have been derived",
+    "node_ids": [
+      "n9_n1",
+      "n9_n2"
+    ],
+    "node_roles": [
+      "extension",
+      "base"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "exact solutions to the segregation theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "segregation theory of Gray & Thornton (2005)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e2",
+    "pattern_type": "influences",
+    "evidence_span": "The non-dimensional segregation number $S _ { r }$ determines the strength of the segregation",
+    "node_ids": [
+      "n9_n8",
+      "n9_n9"
+    ],
+    "node_roles": [
+      "influencer",
+      "influenced"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "non-dimensional segregation number S_r",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "strength of the segregation",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e3",
+    "pattern_type": "relates_to",
+    "evidence_span": "The resulting solutions are dependent only on the assumed velocity profile with depth",
+    "node_ids": [
+      "n9_n12",
+      "n9_n13"
+    ],
+    "node_roles": [
+      "quantity",
+      "related_quantity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "solutions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "assumed velocity profile with depth",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e4",
+    "pattern_type": "relates_to",
+    "evidence_span": "The resulting solutions are dependent only on the assumed velocity profile with depth and the boundary and initial conditions",
+    "node_ids": [
+      "n9_n12",
+      "n9_n14"
+    ],
+    "node_roles": [
+      "quantity",
+      "related_quantity"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "solutions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "boundary and initial conditions",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e10",
+    "pattern_type": "validates_with",
+    "evidence_span": "This not only provides important test cases for numerical shock-capturing methods to solve more general problems",
+    "node_ids": [
+      "n9_n1",
+      "n9_n15"
+    ],
+    "node_roles": [
+      "validated",
+      "validator"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "exact solutions to the segregation theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "numerical shock-capturing methods",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e11",
+    "pattern_type": "predicts",
+    "evidence_span": "yields implicit and explicit formulae for the key times and locations at which the behaviour of the solution fundamentally changes",
+    "node_ids": [
+      "n9_n1",
+      "n9_n16"
+    ],
+    "node_roles": [
+      "predictor",
+      "predicted"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "exact solutions to the segregation theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "key times and locations",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e12",
+    "pattern_type": "deviates_from",
+    "evidence_span": "in simple shear the logarithmic singularity in (5.34) prevents the formation of a steady-state lower shock. This is qualitatively different to solutions with slip at the base",
+    "node_ids": [
+      "n9_n17",
+      "n9_n20"
+    ],
+    "node_roles": [
+      "deviating",
+      "reference"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "simple shear",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "solutions with slip at the base",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e13",
+    "pattern_type": "generates",
+    "evidence_span": "the non-linearity leads to the pinching off of a section of the expansion fan",
+    "node_ids": [
+      "n9_n22",
+      "n9_n23"
+    ],
+    "node_roles": [
+      "generator",
+      "generated"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "non-linearity",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "pinching off of a section of the expansion fan",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  }
+]

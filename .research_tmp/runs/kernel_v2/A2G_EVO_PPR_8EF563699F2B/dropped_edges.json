@@ -1,0 +1,1280 @@
+[
+  {
+    "edge_id": "n1c0_e5",
+    "pattern_type": "deviates_from",
+    "evidence_span": "granular behavior in more general circumstances can be observed to deviate from the inertial rheology",
+    "node_ids": [
+      "n1c0_n19",
+      "n1c0_n7"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "granular behavior",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "inertial granular rheology",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e9",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "γ˙ = g μ",
+    "node_ids": [
+      "n1c0_n44",
+      "n1c0_n43",
+      "n1c0_n40"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "strain-rate",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "stress",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "g field",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e11",
+    "pattern_type": "compares",
+    "evidence_span": "we compare the predictions of this microscopic formula with the constitutive definition g = γ˙ / μ, as well as steady solutions of g from the PDE for granular fluidity",
+    "node_ids": [
+      "n1c0_n6",
+      "n1c0_n53",
+      "n1c0_n54"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "proposed microscopic formula",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "constitutive definition g = γ˙ / μ",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "steady solutions of g from the PDE",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e13",
+    "pattern_type": "influences",
+    "evidence_span": "the only other state variable affecting g is the packing fraction Φ",
+    "node_ids": [
+      "n1c0_n66",
+      "n1c0_n1"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Φ",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "granular fluidity",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e16",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "γ_n = -2 ln e √(m k_n / (π^2 + ln^2 e))",
+    "node_ids": [
+      "n1c0_n80",
+      "n1c0_n83"
+    ],
+    "node_roles": [
+      "output",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "γ_n",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "restitution coefficient e = 0.1",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c1_e0",
+    "pattern_type": "defines",
+    "evidence_span": "the confining pressure is chosen as $P _ { f } = 1$",
+    "node_ids": [
+      "n1c1_n2",
+      "n1c1_n1",
+      "n1c1_n3"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "$P _ { f }$",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "confining pressure",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "1",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "This is a simulation setup parameter assignment, not a definitional identity. The sentence states a value is chosen for a parameter, not that the parameter is defined as that value. The 'defines' pattern requires a definitional identity, not a parameter assignment.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e1",
+    "pattern_type": "defines",
+    "evidence_span": "$G _ { f }$ is fixed at $G _ { f } ~ = ~ 1$",
+    "node_ids": [
+      "n1c1_n5",
+      "n1c1_n10",
+      "n1c1_n6"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "$G _ { f }$",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Gravity",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "1",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "This is a simulation setup parameter assignment, not a definitional identity. The sentence states a value is fixed for a parameter, not that the parameter is defined as that value. The 'defines' pattern requires a definitional identity, not a parameter assignment.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e2",
+    "pattern_type": "defines",
+    "evidence_span": "inclined angles of $\\theta = 9 0 ^ { \\circ } , 7 5 ^ { \\circ } , 6 0 ^ { \\circ } , 4 5 ^ { \\circ }$ are simulated",
+    "node_ids": [
+      "n1c1_n8",
+      "n1c1_n7",
+      "n1c1_n9"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "$\\theta$",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "inclined angles",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "$9 0 ^ { \\circ } , 7 5 ^ { \\circ } , 6 0 ^ { \\circ } , 4 5 ^ { \\circ }$",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "This is a simulation setup description, not a definitional identity. The sentence states which angles are simulated, not that the angle is defined as those values. The 'defines' pattern requires a definitional identity, not a setup description.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e3",
+    "pattern_type": "defines",
+    "evidence_span": "Gravity is increased to $G _ { f } = 3$",
+    "node_ids": [
+      "n1c1_n10",
+      "n1c1_n5",
+      "n1c1_n11"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Gravity",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "$G _ { f }$",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "$G _ { f } = 3$",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "This is a simulation setup parameter assignment, not a definitional identity. The sentence states a value is increased to a new value, not that the parameter is defined as that value. The 'defines' pattern requires a definitional identity, not a parameter assignment.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e4",
+    "pattern_type": "defines",
+    "evidence_span": "the top wall is fixed in the x direction, $V _ { f } = 0$",
+    "node_ids": [
+      "n1c1_n12",
+      "n1c1_n13",
+      "n1c1_n14"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "top wall",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "x direction",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "$V _ { f } = 0$",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "This is a simulation setup description, not a definitional identity. The sentence states a boundary condition, not that the top wall is defined as the x direction. The 'defines' pattern requires a definitional identity, not a setup description.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e5",
+    "pattern_type": "measures",
+    "evidence_span": "We test fixed volume top-wall constraints for all chute cases.",
+    "node_ids": [
+      "n1c1_n15",
+      "n1c1_n16"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "fixed volume top-wall constraints",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "all chute cases",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "This is a simulation setup description, not a measurement relation. The sentence states a test is performed, not that a quantity is measured by an instrument. The 'measures' pattern requires a measurement/evaluation relation, not a setup description.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e6",
+    "pattern_type": "measures",
+    "evidence_span": "We also perform fixed top-wall pressure constraints in the $\\theta \\ : = \\ : 9 0 ^ { \\circ }$ chute case",
+    "node_ids": [
+      "n1c1_n17",
+      "n1c1_n18"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "fixed top-wall pressure constraints",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "$\\theta \\ : = \\ : 9 0 ^ { \\circ }$ chute case",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "This is a simulation setup description, not a measurement relation. The sentence states a test is performed, not that a quantity is measured by an instrument. The 'measures' pattern requires a measurement/evaluation relation, not a setup description.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e7",
+    "pattern_type": "compares",
+    "evidence_span": "the confining pressure is chosen to be the same as the mean pressure at the top wall in the corresponding fixed volume case",
+    "node_ids": [
+      "n1c1_n19",
+      "n1c1_n20",
+      "n1c1_n21"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "confining pressure",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "mean pressure at the top wall",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "corresponding fixed volume case",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "This is a simulation setup description, not a comparison relation. The sentence states a boundary condition is chosen to match another, not that two things are compared. The 'compares' pattern requires a comparison, not a setup description.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e17",
+    "pattern_type": "influences",
+    "evidence_span": "though quasi-monodisperse, the packing shows slight $( \\lesssim 1 0 \\% )$ spatial variation in d",
+    "node_ids": [
+      "n1c1_n67",
+      "n1c1_n65",
+      "n1c1_n66",
+      "n1c1_n67"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "spatial variation in d",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "packing",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "$( \\lesssim 1 0 \\% )$",
+        "labels": [
+          "NUMERIC"
+        ]
+      },
+      {
+        "surface": "spatial variation in d",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence describes a property of the packing (spatial variation in d), not a causal or scaling dependence between 'spatial variation in d' and 'packing'. The edge misinterprets a descriptive statement as an influence relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e18",
+    "pattern_type": "compares",
+    "evidence_span": "We plot normalized fluidity $g d / \\delta v$ against packing fraction Φ in FIG. 2 for all 20 flows simulated.",
+    "node_ids": [
+      "n1c1_n68",
+      "n1c1_n69",
+      "n1c1_n70",
+      "n1c1_n71"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "to",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "normalized fluidity $g d / \\delta v$",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "packing fraction Φ",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "FIG. 2",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "all 20 flows simulated",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence describes a plotting action, not a comparison between the two entities. The 'compares' pattern requires a side-by-side comparison of alternatives or theory-vs-experiment, which is not present here. The edge conflates a data visualization step with a comparison claim.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": true,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e19",
+    "pattern_type": "influences",
+    "evidence_span": "Each data point corresponds to a different z value",
+    "node_ids": [
+      "n1c1_n72",
+      "n1c1_n73",
+      "n1c1_n73",
+      "n1c1_n72"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Each data point",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "different z value",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "different z value",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Each data point",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence states a one-to-one correspondence between data points and z-values, which is a data organization detail, not a functional dependence or influence relation. The edge misinterprets a mapping as a causal dependency.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e21",
+    "pattern_type": "influences",
+    "evidence_span": "$F ( \\Phi )$ has a nearly constant behavior for low Φ values",
+    "node_ids": [
+      "n1c1_n82",
+      "n1c1_n83",
+      "n1c1_n83",
+      "n1c1_n82"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "$F ( \\Phi )$",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "low Φ values",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "low Φ values",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "$F ( \\Phi )$",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence describes the behavior of F(Φ) in a specific regime, not a causal or scaling dependence between F(Φ) and low Φ values. The edge misinterprets a description of a function's behavior as an influence relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e22",
+    "pattern_type": "influences",
+    "evidence_span": "which transitions into a roughly linear decrease at high values",
+    "node_ids": [
+      "n1c1_n82",
+      "n1c1_n85",
+      "n1c1_n85",
+      "n1c1_n84"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "$F ( \\Phi )$",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "high values",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "high values",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "linear decrease",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence describes a transition in the behavior of F(Φ), not a causal or scaling dependence between F(Φ) and high values. The edge misinterprets a description of a function's behavior as an influence relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e23",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "This behavior can be fit to a hyperbola√ F (Φ) = −(Φ−0.58)+ (Φ−0.58)2+1.54×10−4 $\\begin{array} { r } { F ( \\Phi ) = \\frac { - ( \\Phi - 0 . 5 8 ) + \\sqrt { ( \\Phi - 0 . 5 8 ) ^ { 2 } + 1 . 5 4 \\times 1 0 ^ { - 4 } } } { 0 . 0 4 8 } + 2 . 0 } \\end{array}$ 0.048",
+    "node_ids": [
+      "n1c1_n87",
+      "n1c1_n82",
+      "n1c1_n62",
+      "n1c1_n87",
+      "n1c1_n87"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter",
+      "coefficient",
+      "exponent"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "F (Φ) = −(Φ−0.58)+ (Φ−0.58)2+1.54×10−4 0.048 + 2.0",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "$F ( \\Phi )$",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Φ",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "F (Φ) = −(Φ−0.58)+ (Φ−0.58)2+1.54×10−4 0.048 + 2.0",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "F (Φ) = −(Φ−0.58)+ (Φ−0.58)2+1.54×10−4 0.048 + 2.0",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The formula is a constitutive law, but the slot binding is incorrect. The 'output' slot should be F(Φ), not the entire formula. The 'input' slot should be Φ, not F(Φ). The 'coefficient' and 'exponent' slots are incorrectly filled with the entire formula. The edge fails to correctly identify the components of the law.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": true,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e24",
+    "pattern_type": "influences",
+    "evidence_span": "which vanishes at $\\Phi = 0 . 6 3$, approximately random close packing.",
+    "node_ids": [
+      "n1c1_n87",
+      "n1c1_n88",
+      "n1c1_n88",
+      "n1c1_n89"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "F (Φ) = −(Φ−0.58)+ (Φ−0.58)2+1.54×10−4 0.048 + 2.0",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "$\\Phi = 0 . 6 3$",
+        "labels": [
+          "NUMERIC"
+        ]
+      },
+      {
+        "surface": "$\\Phi = 0 . 6 3$",
+        "labels": [
+          "NUMERIC"
+        ]
+      },
+      {
+        "surface": "random close packing",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the function F(Φ) vanishes at Φ=0.63, which is a property of the function, not a general dependence between two distinct quantities. The edge incorrectly binds the same surface 'Φ=0.63' to both the 'target' and 'cause' roles, and 'random close packing' is not an 'effect' of the function vanishing. This is a specific mathematical property, not a general 'influences' relation. The pattern 'influences' is too generic; this is better captured as a property of the constitutive law F(Φ).",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c0_e3",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "the inertial number I = γ˙ d / √(P / ρ_s)",
+    "node_ids": [
+      "n1c0_n11",
+      "n1c0_n12",
+      "n1c0_n13",
+      "n1c0_n14"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "inertial number I",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "γ˙",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "d",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "ρ_s",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence is a formal constitutive law: I = γ˙ d / √(P / ρ_s). The roles are correctly assigned: 'I' is the output, 'γ˙' is the input, and 'd' and 'ρ_s' are parameters. This fits the 'constitutive_law' pattern.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n1c0_e4",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "where μ_s is a static yield value, below which the system does not flow, μ_2 is an upper limit for μ at high rates, Δμ = μ_2 - μ_s, and I_0 is a dimensionless constant",
+    "node_ids": [
+      "n1c0_n8",
+      "n1c0_n15",
+      "n1c0_n16",
+      "n1c0_n17",
+      "n1c0_n18"
+    ],
+    "node_roles": [
+      "output",
+      "parameter",
+      "parameter",
+      "parameter",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "μ",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "μ_s",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "μ_2",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Δμ",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "I_0",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence describes a constitutive law for μ as a function of parameters μ_s, μ_2, Δμ, and I_0. The roles are correctly assigned: 'μ' is the output, and the others are parameters. This fits the 'constitutive_law' pattern.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n1c0_e14",
+    "pattern_type": "composed_of",
+    "evidence_span": "The particle interaction model contains elastic forces, damping effects, and Coulomb friction",
+    "node_ids": [
+      "n1c0_n73",
+      "n1c0_n74",
+      "n1c0_n75",
+      "n1c0_n76"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "particle interaction model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "elastic forces",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "damping effects",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "Coulomb friction",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly states the particle interaction model is composed of elastic forces, damping effects, and Coulomb friction. The whole and component roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n1c0_e15",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "k_t = 2/7 k_n",
+    "node_ids": [
+      "n1c0_n78",
+      "n1c0_n79"
+    ],
+    "node_roles": [
+      "output",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "k_n",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "k_t",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence is a formal quantitative law relating k_t to k_n. The output (k_t) and parameter (k_n) roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n1c0_e17",
+    "pattern_type": "influences",
+    "evidence_span": "k_n / P d^2 > 10^4 is kept, which ensures that the deformation of the particles is small enough to be in the hard particle regime",
+    "node_ids": [
+      "n1c0_n84",
+      "n1c0_n85"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "k_n / P d^2 > 10^4",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "hard particle regime",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states that the condition k_n / P d^2 > 10^4 ensures the system is in the hard particle regime. The source (condition) and target (regime) are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n1c0_e19",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "The time step is chosen as dt = √(m/(50k_n))",
+    "node_ids": [
+      "n1c0_n96",
+      "n1c0_n78"
+    ],
+    "node_roles": [
+      "output",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "dt",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "k_n",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence is a formal quantitative law relating dt to k_n. The output (dt) and parameter (k_n) roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n1c0_e20",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "The confining pressure at the top boundary is P_wall = P_f · P_0",
+    "node_ids": [
+      "n1c0_n102",
+      "n1c0_n103",
+      "n1c0_n104"
+    ],
+    "node_roles": [
+      "output",
+      "parameter",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "P_wall",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "P_f",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "P_0",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly states the formula P_wall = P_f · P_0, which is a formal quantitative relation. The roles are correctly assigned: P_wall is the output, P_f and P_0 are parameters. The relation is a constitutive law as it defines a functional relationship between quantities.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n1c0_e21",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "the gravity is G = G_f · g_0",
+    "node_ids": [
+      "n1c0_n105",
+      "n1c0_n106",
+      "n1c0_n107"
+    ],
+    "node_roles": [
+      "output",
+      "parameter",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "G",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "G_f",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "g_0",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly states the formula G = G_f · g_0, which is a formal quantitative relation. The roles are correctly assigned: G is the output, G_f and g_0 are parameters. The relation is a constitutive law as it defines a functional relationship between quantities.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n1c0_e22",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "the horizontal velocity of the top wall is V_wall = V_f · √(6P_0/πρ_s)",
+    "node_ids": [
+      "n1c0_n108",
+      "n1c0_n109",
+      "n1c0_n104",
+      "n1c0_n14"
+    ],
+    "node_roles": [
+      "output",
+      "parameter",
+      "parameter",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "V_wall",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "V_f",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "P_0",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "ρ_s",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly states the formula V_wall = V_f · √(6P_0/πρ_s), which is a formal quantitative relation. The roles are correctly assigned: V_wall is the output, V_f, P_0, and ρ_s are parameters. The relation is a constitutive law as it defines a functional relationship between quantities.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3c1_e0",
+    "pattern_type": "discussed_in",
+    "evidence_span": "This point is discussed in more depth next.",
+    "node_ids": [
+      "n3c1_n1"
+    ],
+    "node_roles": [
+      "topic"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "this point",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence sentence is a forward reference to future discussion, not a statement that a topic is discussed in a source. The 'topic' node 'this point' is a deictic reference to the preceding argument, not a named topic. The relation is not actually stated; it merely points ahead. The pattern 'discussed_in' requires the source to explicitly present the topic as its subject, which is not the case here.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e6",
+    "pattern_type": "deviates_from",
+    "evidence_span": "As plotted in FIG. 6c such an equation of state does not collapse out of the data from our many tests in inhomogeneous flows.",
+    "node_ids": [
+      "n4c0_n8",
+      "n4c0_n9"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "PVT equation of state",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "data from our many tests in inhomogeneous flows",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c1_e0",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "g = g(δv, Φ)",
+    "node_ids": [
+      "n4c1_n1",
+      "n4c1_n2",
+      "n4c1_n3"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "g",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "δv",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Φ",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence span is a direct statement of the hypothesized constitutive law. The roles are correctly assigned: g is the output, δv and Φ are the inputs. The qualifier 'hypothesized' correctly reflects the tentative nature of the relation.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  }
+]

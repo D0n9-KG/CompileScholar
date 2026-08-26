@@ -1,0 +1,1536 @@
+{
+  "version": "0.45",
+  "meta_nodes": {
+    "THING": {
+      "type_id": "THING",
+      "description": "root: any node type is-a THING",
+      "is_abstract": false
+    },
+    "MATERIAL": {
+      "type_id": "MATERIAL",
+      "description": "a granular material or substance",
+      "is_abstract": false
+    },
+    "METHOD": {
+      "type_id": "METHOD",
+      "description": "a named modeling approach/theory/law/model (e.g. μ(I) rheology, kinetic theory, NGF, DEM, RFT)",
+      "is_abstract": false
+    },
+    "PARAMETER": {
+      "type_id": "PARAMETER",
+      "description": "a named physical quantity/constant/coefficient in equations (e.g. μ, I, d, P, τ, g, ρ_s, T, A, ξ, μ_s, b)",
+      "is_abstract": false
+    },
+    "PHENOMENON": {
+      "type_id": "PHENOMENON",
+      "description": "a physical effect/behavior methods capture (e.g. nonlocal creep, thin-body strengthening, secondary rheology, segregation, clogging)",
+      "is_abstract": false
+    },
+    "PROPERTY": {
+      "type_id": "PROPERTY",
+      "description": "a generic physical property/quantity not fitting the above (kept for residual cases)",
+      "is_abstract": false
+    },
+    "NUMERIC": {
+      "type_id": "NUMERIC",
+      "description": "a numeric value / measured number",
+      "is_abstract": false
+    },
+    "REGIME": {
+      "type_id": "REGIME",
+      "description": "a flow regime (dense/quasi-static/inertial)",
+      "is_abstract": false
+    }
+  },
+  "patterns": {
+    "constitutive_law": {
+      "pattern_id": "constitutive_law",
+      "description": "a constitutive law relating output quantity/quantities to >=1 input quantity (n-ary)",
+      "role_slots": [
+        {
+          "role": "output",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "input",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "parameter",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "coefficient",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "exponent",
+          "type": "THING",
+          "repeatable": true
+        }
+      ],
+      "allowed_qualifiers": [
+        "applies_in_regime",
+        "function_form",
+        "parameters",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "constitutive_law",
+      "semantic_boundary": "a FORMAL/QUANTITATIVE law output=f(inputs+params), stated as a formula or explicit functional relation. NOT a prose 'X depends on Y' (that is influences), NOT a definition (defines), NOT a measurement setup (measures)."
+    },
+    "influences": {
+      "pattern_id": "influences",
+      "description": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "role_slots": [
+        {
+          "role": "source",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "target",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "cause",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "effect",
+          "type": "THING",
+          "repeatable": true
+        }
+      ],
+      "allowed_qualifiers": [
+        "dependency_type",
+        "applies_in_regime",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "dependency",
+      "semantic_boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of)."
+    },
+    "defines": {
+      "pattern_id": "defines",
+      "description": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "role_slots": [
+        {
+          "role": "subject",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "definition",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "object",
+          "type": "THING",
+          "repeatable": true
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "definition",
+      "semantic_boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition."
+    },
+    "composed_of": {
+      "pattern_id": "composed_of",
+      "description": "one whole is composed-of / part-of >=1 component (n-ary composition)",
+      "role_slots": [
+        {
+          "role": "whole",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "component",
+          "type": "THING",
+          "repeatable": true
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "composition",
+      "semantic_boundary": "STRUCTURAL composition: parts that make up a whole (model A = B + C). NOT classification (defines), NOT 'X has control params' (influences), NOT experimental setup description, NOT 'we tested X by doing Y'."
+    },
+    "measures": {
+      "pattern_id": "measures",
+      "description": "a quantity is measured by / characterizes >=1 measure",
+      "role_slots": [
+        {
+          "role": "object",
+          "type": "THING"
+        },
+        {
+          "role": "instrument",
+          "type": "THING",
+          "repeatable": true
+        }
+      ],
+      "allowed_qualifiers": [
+        "condition",
+        "applies_in_regime",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "measure",
+      "semantic_boundary": "a measurement/evaluation relation: X is measured/evaluated by instrument/method Y. NOT a functional law (constitutive_law), NOT a dependence (influences)."
+    },
+    "claim_relation": {
+      "pattern_id": "claim_relation",
+      "description": "a discourse relation between >=2 claims/approaches (supports/contrasts/extends/...)",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "to",
+          "type": "THING",
+          "repeatable": true
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "applies_in_regime",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "claim",
+      "semantic_boundary": "a DISCOURSE relation between claims/findings (supports/contrasts/outperforms). NOT a method-to-method development (extends/improves/compares — those are evolution), NOT a measurement (measures)."
+    },
+    "extends": {
+      "pattern_id": "extends",
+      "description": "X generalizes/extends Y (X METHOD/PHENOMENON -> Y)",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "to",
+          "type": "THING",
+          "repeatable": true
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "cited_from",
+        "evidence_strength",
+        "method"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "evolution",
+      "semantic_boundary": "X GENERALIZES Y (X extends Y's scope/regime/params; X is a direct technical extension of Y). NOT improves (X need not be more accurate, just broader), NOT background (X is a direct technical inheritance, not a motivation citation), NOT claim_relation (this is method-to-method)."
+    },
+    "improves": {
+      "pattern_id": "improves",
+      "description": "X improves Y's accuracy/applicability, resolving Y's limitation",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "to",
+          "type": "THING",
+          "repeatable": true
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "cited_from",
+        "evidence_strength",
+        "method"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "evolution",
+      "semantic_boundary": "X RESOLVES a limitation of Y (X is more accurate/applicable BECAUSE it fixes something Y fails at; first-principles vs phenomenological = improves). NOT compares (X is NOT a parallel different-mechanism alternative; X builds on Y and is better), NOT extends (X is better not just broader)."
+    },
+    "compares": {
+      "pattern_id": "compares",
+      "description": "X is compared with Y",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "to",
+          "type": "THING",
+          "repeatable": true
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "cited_from",
+        "evidence_strength",
+        "method"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "evolution",
+      "semantic_boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiments', 'in contrast with'), or (iii) equivalence/contrast of formulations ('equivalent', 'the same as', 'rather than'). NOT improves (neither fixes the other's limitation), NOT extends (neither generalizes the other)."
+    },
+    "replaces": {
+      "pattern_id": "replaces",
+      "description": "X replaces Y",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "to",
+          "type": "THING",
+          "repeatable": true
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "cited_from",
+        "evidence_strength",
+        "method"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "evolution",
+      "semantic_boundary": "X SUBSTITUTES Y outright (X is used INSTEAD of Y; Y is retired). NOT improves (replaces = Y is gone, improves = Y still used + X better)."
+    },
+    "adapts": {
+      "pattern_id": "adapts",
+      "description": "X adapts Y to a new scenario",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "to",
+          "type": "THING",
+          "repeatable": true
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "cited_from",
+        "evidence_strength",
+        "method"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "evolution",
+      "semantic_boundary": "X PORTS Y to a NEW scenario/regime/domain Y wasn't designed for (adaptation of Y's mechanism). NOT extends (adapts = new scenario, extends = broader scope within same setting)."
+    },
+    "background": {
+      "pattern_id": "background",
+      "description": "X uses Y as background/motivation",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "to",
+          "type": "THING",
+          "repeatable": true
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "cited_from",
+        "evidence_strength",
+        "method"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "evolution",
+      "semantic_boundary": "X cites Y as MOTIVATION/prior context only (Y inspired X but X is NOT a direct technical extension/inheritance of Y). NOT extends (no direct technical lineage), NOT improves (no limitation fix)."
+    },
+    "closer_to": {
+      "pattern_id": "closer_to",
+      "description": "X is closer to Y than to other alternatives (X is more similar to Y than to other approaches, indicating a degree of methodological proximity).",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "METHOD"
+        },
+        {
+          "role": "to",
+          "type": "METHOD"
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "cited_from",
+        "evidence_strength",
+        "method"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "claim",
+      "semantic_boundary": "Use when one method is explicitly positioned as more similar or proximal to another than to alternatives; not for general comparison, ranking, or shared-feature listing."
+    },
+    "validates_with": {
+      "pattern_id": "validates_with",
+      "description": "X is validated/verified by comparison with Y (X's predictions or results are checked against Y, which could be experimental data or another theory).",
+      "role_slots": [
+        {
+          "role": "object",
+          "type": "METHOD"
+        },
+        {
+          "role": "instrument",
+          "type": "METHOD"
+        }
+      ],
+      "allowed_qualifiers": [
+        "condition",
+        "applies_in_regime",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "measure",
+      "semantic_boundary": "Use when one method’s output is explicitly checked against another method’s output or data; not for mere comparison, co-use, or one method generating the other."
+    },
+    "contrasts_with": {
+      "pattern_id": "contrasts_with",
+      "description": "X contrasts with Y in terms of scope, assumptions, or applicability (X and Y have different strengths/weaknesses, often complementary).",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "METHOD"
+        },
+        {
+          "role": "to",
+          "type": "METHOD"
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "cited_from",
+        "evidence_strength",
+        "method"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "claim",
+      "semantic_boundary": "Use when two methods are explicitly compared as alternatives with trade-offs; NOT for simple co-occurrence, sequential use, or one method merely improving another."
+    },
+    "agrees_with": {
+      "pattern_id": "agrees_with",
+      "description": "X agrees with / is consistent with Y (X's predictions or values match Y's within some tolerance, often used for theory-theory or theory-experiment agreement).",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "THING"
+        },
+        {
+          "role": "to",
+          "type": "THING"
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "applies_in_regime",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "claim",
+      "semantic_boundary": "agrees_with applies when X and Y are explicitly compared for consistency, NOT when one causes, explains, or is merely associated with the other."
+    },
+    "deviates_from": {
+      "pattern_id": "deviates_from",
+      "description": "X deviates from / differs from Y (X's predictions or values diverge from Y's, often with a quantified or qualitative difference).",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "THING"
+        },
+        {
+          "role": "to",
+          "type": "THING"
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "applies_in_regime",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "claim",
+      "semantic_boundary": "Use when X and Y are explicitly compared as divergent, not when one causes, predicts, or merely differs in kind without stated deviation."
+    },
+    "compares_within_theory": {
+      "pattern_id": "compares_within_theory",
+      "description": "X compares with Y within the same theoretical framework or model, where X and Y are different stress components or predictions from the same theory.",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "PROPERTY"
+        },
+        {
+          "role": "to",
+          "type": "PROPERTY"
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "applies_in_regime",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "claim",
+      "semantic_boundary": "Applies when two properties are explicitly compared as alternatives or predictions within one theory, not when they are merely co-listed or linked by causal/derivational dependence."
+    },
+    "applies_method_to": {
+      "pattern_id": "applies_method_to",
+      "description": "X applies method Y to study/analyze Z (a method is used on a system/material).",
+      "role_slots": [
+        {
+          "role": "method",
+          "type": "METHOD"
+        },
+        {
+          "role": "subject",
+          "type": "THING"
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "cited_from",
+        "evidence_strength",
+        "method"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "evolution",
+      "semantic_boundary": "Use when a method is explicitly applied to a subject; NOT when the subject is merely described, compared, or co-listed with other things."
+    },
+    "discussed_in": {
+      "pattern_id": "discussed_in",
+      "description": "X is discussed in / presented in Y (a topic is covered in a source or section).",
+      "role_slots": [
+        {
+          "role": "topic",
+          "type": "THING"
+        },
+        {
+          "role": "source",
+          "type": "THING"
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "cited_from",
+        "evidence_strength",
+        "method"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "claim",
+      "semantic_boundary": "Use discussed_in only when the source explicitly presents or covers the topic as its subject; do not use for mere mentions, citations, or co-occurrence in the same text."
+    },
+    "analogous_to": {
+      "pattern_id": "analogous_to",
+      "description": "X is analogous to / similar in nature to Y (X and Y share a qualitative similarity in behavior, mechanism, or form, often noted as a parallel or precedent).",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "THING"
+        },
+        {
+          "role": "to",
+          "type": "THING"
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "applies_in_regime",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "claim",
+      "semantic_boundary": "Use for qualitative parallels or precedents, NOT for causal, part-whole, or functional dependence relations."
+    },
+    "compares_predictions": {
+      "pattern_id": "compares_predictions",
+      "description": "A method's predictions are compared with another method's predictions or with experimental data, often as a function of a parameter.",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "METHOD"
+        },
+        {
+          "role": "to",
+          "type": "METHOD"
+        },
+        {
+          "role": "quantity",
+          "type": "PROPERTY"
+        },
+        {
+          "role": "parameter",
+          "type": "PARAMETER"
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "applies_in_regime",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "claim",
+      "semantic_boundary": "Applies when predictions from two methods are explicitly compared, not when one method's prediction is merely evaluated against data or when methods are listed without comparison."
+    },
+    "predicts": {
+      "pattern_id": "predicts",
+      "description": "X (a theory/method) predicts / yields values of Y (a property or quantity).",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "METHOD"
+        },
+        {
+          "role": "to",
+          "type": "PROPERTY"
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "applies_in_regime",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "dependency",
+      "semantic_boundary": "Use when a method/theory explicitly yields or forecasts property values; not for mere association, correlation, or co-occurrence of properties."
+    },
+    "captures_phenomenon": {
+      "pattern_id": "captures_phenomenon",
+      "description": "X (a model/method/theory) captures/describes/reproduces Y (a phenomenon or behavior), indicating that X successfully represents or accounts for Y's features.",
+      "role_slots": [
+        {
+          "role": "model",
+          "type": "METHOD"
+        },
+        {
+          "role": "phenomenon",
+          "type": "PHENOMENON"
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "applies_in_regime",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "claim",
+      "semantic_boundary": "Use when a method/model explicitly explains or reproduces a phenomenon’s behavior; NOT for mere correlation, prediction, or listing of features."
+    },
+    "compares_numeric_to_property": {
+      "pattern_id": "compares_numeric_to_property",
+      "description": "A numeric value is compared to a property value (e.g., '9.13 is 20% less than the yield torque observed by...'). This is a comparison between a specific numeric measurement and a property's value, distinct from comparing two methods or two properties.",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "NUMERIC"
+        },
+        {
+          "role": "to",
+          "type": "PROPERTY"
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "applies_in_regime",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "claim",
+      "semantic_boundary": "Use when a number is explicitly compared to a property’s value, not when comparing two properties or two methods."
+    },
+    "compares_model_to_data": {
+      "pattern_id": "compares_model_to_data",
+      "description": "A model's simulation results are compared to experimental data (e.g., 'Steady-state simulation results obtained using the NGF model... are included in Figs. 3 and 4'). This is a comparison between a model's output and data, distinct from comparing two methods or two properties.",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "METHOD"
+        },
+        {
+          "role": "to",
+          "type": "METHOD"
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "applies_in_regime",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "claim",
+      "semantic_boundary": "Applies when a model’s simulated output is explicitly compared to experimental data, not when comparing two methods, two properties, or two models’ outputs."
+    },
+    "approximates": {
+      "pattern_id": "approximates",
+      "description": "X approximates Y (X is a simplified or idealized version of Y, used as a stand-in for modeling purposes).",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "THING"
+        },
+        {
+          "role": "to",
+          "type": "THING"
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "cited_from",
+        "evidence_strength",
+        "method"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "claim",
+      "semantic_boundary": "Use for simplified stand-ins in modeling, not for exact equality, representation, or causal claims."
+    },
+    "regime_transition": {
+      "pattern_id": "regime_transition",
+      "description": "X transitions to / is characterized by Y, where X and Y are distinct regimes or states of a system, and the transition between them is governed by a parameter or condition.",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "REGIME"
+        },
+        {
+          "role": "to",
+          "type": "REGIME"
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "applies_in_regime",
+        "method",
+        "evidence_strength",
+        "cited_from",
+        "transition_parameter"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "dependency",
+      "semantic_boundary": "Use when a system changes from one regime to another due to a condition; NOT for static co-existence, mere correlation, or a single regime’s properties."
+    },
+    "rationalizes": {
+      "pattern_id": "rationalizes",
+      "description": "X (a theory, model, or explanation) rationalizes / provides a coherent account of Y (experimental observations or data), indicating that X offers a conceptual framework that makes sense of Y.",
+      "role_slots": [
+        {
+          "role": "explanation",
+          "type": "METHOD"
+        },
+        {
+          "role": "phenomenon",
+          "type": "PHENOMENON"
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "applies_in_regime",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "claim",
+      "semantic_boundary": "Use only when a method explicitly explains or makes sense of observed data; not for mere correlation, prediction, or when the method is just applied without providing a rationale."
+    },
+    "predicts_phenomenon": {
+      "pattern_id": "predicts_phenomenon",
+      "description": "X (a theory/method) predicts / yields values or behaviors of Y (a phenomenon), where the prediction concerns the phenomenon's occurrence or characteristics.",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "METHOD"
+        },
+        {
+          "role": "to",
+          "type": "PHENOMENON"
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "applies_in_regime",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "dependency",
+      "semantic_boundary": "Predicts applies when a method/theory yields a phenomenon’s values or behavior; NOT when it merely explains, describes, or co-occurs with it."
+    },
+    "studies_phenomenon": {
+      "pattern_id": "studies_phenomenon",
+      "description": "X (a method or investigation approach) studies/analyzes Y (a phenomenon or system), where X is the investigative tool and Y is the subject of investigation.",
+      "role_slots": [
+        {
+          "role": "method",
+          "type": "METHOD"
+        },
+        {
+          "role": "phenomenon",
+          "type": "PHENOMENON"
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "cited_from",
+        "evidence_strength",
+        "method"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "evolution",
+      "semantic_boundary": "Use when X is an investigative tool or method actively examining Y, not when X merely describes, causes, or co-occurs with Y."
+    },
+    "effectively_becomes": {
+      "pattern_id": "effectively_becomes",
+      "description": "X effectively becomes Y, where X is a physical entity or condition that takes on the characteristics of Y due to some process or interaction.",
+      "role_slots": [
+        {
+          "role": "entity",
+          "type": "PROPERTY"
+        },
+        {
+          "role": "effective_state",
+          "type": "PROPERTY"
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "applies_in_regime",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "claim",
+      "semantic_boundary": "Applies when X transforms into Y via a process or interaction, NOT when X merely has Y as an attribute, property, or static state."
+    },
+    "phase_sequence": {
+      "pattern_id": "phase_sequence",
+      "description": "One phase or regime sequentially follows another in a process (e.g., compaction phase followed by recovery phase).",
+      "role_slots": [
+        {
+          "role": "first_phase",
+          "type": "REGIME"
+        },
+        {
+          "role": "second_phase",
+          "type": "REGIME"
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "cited_from",
+        "evidence_strength",
+        "method",
+        "applies_in_regime"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "evolution",
+      "semantic_boundary": "phase_sequence applies when one regime temporally gives way to another in a process, NOT when regimes coexist, overlap, or are merely listed as simultaneous states."
+    },
+    "relates_to": {
+      "pattern_id": "relates_to",
+      "description": "X is mathematically related to Y via a known relation or formula, where X and Y are quantities or parameters connected by an established equation (e.g., Einstein relation connecting mean square displacement to diffusion coefficient).",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "THING"
+        },
+        {
+          "role": "to",
+          "type": "THING"
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "applies_in_regime",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "dependency",
+      "semantic_boundary": "Use for explicit equations or formulas linking quantities; NOT for mere co-occurrence, correlation, or causal claims without a stated mathematical relation."
+    },
+    "alternative_expression": {
+      "pattern_id": "alternative_expression",
+      "description": "X can be expressed in an alternative form Y, where X and Y are equivalent formulations of the same quantity or concept.",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "THING"
+        },
+        {
+          "role": "to",
+          "type": "THING"
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "applies_in_regime",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "claim",
+      "semantic_boundary": "Use for equivalent reformulations of the same quantity or concept, not for causal, definitional, or part-whole relations."
+    },
+    "propagates_along": {
+      "pattern_id": "propagates_along",
+      "description": "X (a curve, wave, or entity) propagates along or through Y (a medium or region), with a specified direction or condition.",
+      "role_slots": [
+        {
+          "role": "propagator",
+          "type": "THING"
+        },
+        {
+          "role": "medium",
+          "type": "THING"
+        },
+        {
+          "role": "condition",
+          "type": "REGIME"
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "applies_in_regime",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "evolution",
+      "semantic_boundary": "Use when a thing moves or spreads through a medium over time; not for static containment, mere co-occurrence, or causal influence without propagation."
+    },
+    "generates": {
+      "pattern_id": "generates",
+      "description": "One entity (e.g., a moving point) generates or produces another entity (e.g., a non-uniform section of a shock) as a consequence of its motion or behavior (e.g., 'the triple-point moves upstream... as it generates the non-uniform section of the third shock'). This is a causal production relation, distinct from influences (which is a functional dependence between quantities) and from composed_of (structural parts).",
+      "role_slots": [
+        {
+          "role": "producer",
+          "type": "PHENOMENON"
+        },
+        {
+          "role": "product",
+          "type": "PHENOMENON"
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "applies_in_regime",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "dependency",
+      "semantic_boundary": "Use generates only when one phenomenon causally produces another through motion or behavior, not for mere influence, co-occurrence, or part-whole composition."
+    }
+  },
+  "meta_edges": [
+    {
+      "src": "MATERIAL",
+      "dst": "THING",
+      "relation": "subclass_of",
+      "props": {}
+    },
+    {
+      "src": "METHOD",
+      "dst": "THING",
+      "relation": "subclass_of",
+      "props": {}
+    },
+    {
+      "src": "PARAMETER",
+      "dst": "THING",
+      "relation": "subclass_of",
+      "props": {}
+    },
+    {
+      "src": "PHENOMENON",
+      "dst": "THING",
+      "relation": "subclass_of",
+      "props": {}
+    },
+    {
+      "src": "PROPERTY",
+      "dst": "THING",
+      "relation": "subclass_of",
+      "props": {}
+    },
+    {
+      "src": "NUMERIC",
+      "dst": "THING",
+      "relation": "subclass_of",
+      "props": {}
+    },
+    {
+      "src": "REGIME",
+      "dst": "THING",
+      "relation": "subclass_of",
+      "props": {}
+    },
+    {
+      "src": "closer_to",
+      "dst": "claim_relation",
+      "relation": "subclass_of",
+      "props": {
+        "paper_id": "granular",
+        "evidence": "approach that is closer to the established methods of Chapman–Enskog gas theory",
+        "via": "family_root"
+      }
+    },
+    {
+      "src": "validates_with",
+      "dst": "measures",
+      "relation": "subclass_of",
+      "props": {
+        "paper_id": "granular",
+        "evidence": "Savage & Jeffrey (1981), on the basis of some comparisons of their predicted stresses with Couette-flow experiments, suggest that R is not small, but about one or two.",
+        "via": "family_root"
+      }
+    },
+    {
+      "src": "contrasts_with",
+      "dst": "claim_relation",
+      "relation": "subclass_of",
+      "props": {
+        "paper_id": "granular",
+        "evidence": "In comparing the theories with each other, one sees that a merit of the Savage & Jeffrey treatment is its applicability for all values of e, while its weakness is its restriction to a mean simple shear flow. This is in contrast with the Jenkins & Savage (1983) treatment, which applies to any type of flow, but was developed for values of e near 1 (i.e. slightly inelastic particles);",
+        "via": "family_root"
+      }
+    },
+    {
+      "src": "agrees_with",
+      "dst": "claim_relation",
+      "relation": "subclass_of",
+      "props": {
+        "paper_id": "granular",
+        "evidence": "In the plots of stresses versus e, the magnitudes of the shear stress of Jenkins & Savage and that of the present theory are too close to be distinguished on the graph",
+        "via": "family_root"
+      }
+    },
+    {
+      "src": "deviates_from",
+      "dst": "claim_relation",
+      "relation": "subclass_of",
+      "props": {
+        "paper_id": "granular",
+        "evidence": "In the figures showing stresses versus R, there are noticeable differences in the magnitudes of the stresses of Jenkins & Savage and those of the present theory.",
+        "via": "family_root"
+      }
+    },
+    {
+      "src": "compares_within_theory",
+      "dst": "claim_relation",
+      "relation": "subclass_of",
+      "props": {
+        "paper_id": "granular",
+        "evidence": "If χ₀(ν) is used in the Chapman–Enskog theory, it is found that the normal stresses are less than those of the present theory",
+        "via": "family_root"
+      }
+    },
+    {
+      "src": "applies_method_to",
+      "dst": "background",
+      "relation": "subclass_of",
+      "props": {
+        "paper_id": "granular",
+        "evidence": "following the approach of either the Chapman–Enskog or the moment methods",
+        "via": "family_root"
+      }
+    },
+    {
+      "src": "discussed_in",
+      "dst": "claim_relation",
+      "relation": "subclass_of",
+      "props": {
+        "paper_id": "granular",
+        "evidence": "ad hoc analyses such as those discussed in §3 and in Jenkins & Savage (1983)",
+        "via": "family_root"
+      }
+    },
+    {
+      "src": "analogous_to",
+      "dst": "claim_relation",
+      "relation": "subclass_of",
+      "props": {
+        "paper_id": "granular",
+        "evidence": "Similar 'anomalous' terms dependent upon density gradient have been noted previously in dense-gas kinetic theories",
+        "via": "family_root"
+      }
+    },
+    {
+      "src": "compares_predictions",
+      "dst": "claim_relation",
+      "relation": "subclass_of",
+      "props": {
+        "paper_id": "granular",
+        "evidence": "Figures 13 and 14 compare the non-dimensional stresses $|p_{xy}| / [\\rho_{\\mathrm{p}}\\sigma^{2}(\\mathrm{du} / \\mathrm{dy})^{2}]$ and $p_{yy} / [\\rho_{\\mathrm{p}}\\sigma^{2}(\\mathrm{du} / \\mathrm{dy})^{2}]$ versus $\\nu$ predicted by the above analysis with the corresponding predictions of Jenkins & Savage (1983) and the analysis of §3.1",
+        "via": "family_root"
+      }
+    },
+    {
+      "src": "influences",
+      "dst": "defines",
+      "relation": "depends_on",
+      "props": {
+        "paper_id": "PPR_ED6187DF955A",
+        "evidence": "node 'parameter R' co-referenced"
+      }
+    },
+    {
+      "src": "improves",
+      "dst": "defines",
+      "relation": "depends_on",
+      "props": {
+        "paper_id": "PPR_ED6187DF955A",
+        "evidence": "node 'g₀(ν)' co-referenced"
+      }
+    },
+    {
+      "src": "compares",
+      "dst": "defines",
+      "relation": "depends_on",
+      "props": {
+        "paper_id": "PPR_ED6187DF955A",
+        "evidence": "node 'g₀(ν)' co-referenced"
+      }
+    },
+    {
+      "src": "extends",
+      "dst": "defines",
+      "relation": "depends_on",
+      "props": {
+        "paper_id": "PPR_ED6187DF955A",
+        "evidence": "node 'first-order expansion for small R of the $g(\\boldsymbol{r}_{1},\\boldsymbol{r}_{2})$ of the present theory' co-referenced"
+      }
+    },
+    {
+      "src": "composed_of",
+      "dst": "influences",
+      "relation": "composes",
+      "props": {
+        "paper_id": "PPR_ED6187DF955A",
+        "evidence": "node 'a local perturbation' is a component of a composition + referenced by another pattern"
+      }
+    },
+    {
+      "src": "predicts",
+      "dst": "influences",
+      "relation": "subclass_of",
+      "props": {
+        "paper_id": "granular",
+        "evidence": "comparing predicted transport properties with those obtained directly from the RET via Monte Carlo simulation",
+        "via": "family_root"
+      }
+    },
+    {
+      "src": "agrees_with",
+      "dst": "defines",
+      "relation": "depends_on",
+      "props": {
+        "paper_id": "PPR_99C7FFAD6529",
+        "evidence": "node 'Chapman–Enskog hard-sphere kinetic theory of dense gas' co-referenced"
+      }
+    },
+    {
+      "src": "deviates_from",
+      "dst": "defines",
+      "relation": "depends_on",
+      "props": {
+        "paper_id": "PPR_99C7FFAD6529",
+        "evidence": "node 'Chapman–Enskog hard-sphere kinetic theory of dense gas' co-referenced"
+      }
+    },
+    {
+      "src": "background",
+      "dst": "defines",
+      "relation": "depends_on",
+      "props": {
+        "paper_id": "PPR_99C7FFAD6529",
+        "evidence": "node 'Chapman–Enskog hard-sphere kinetic theory of dense gas' co-referenced"
+      }
+    },
+    {
+      "src": "contrasts_with",
+      "dst": "defines",
+      "relation": "depends_on",
+      "props": {
+        "paper_id": "PPR_99C7FFAD6529",
+        "evidence": "node 'theory of Jenkins & Savage (1983)' co-referenced"
+      }
+    },
+    {
+      "src": "constitutive_law",
+      "dst": "influences",
+      "relation": "constrains",
+      "props": {
+        "paper_id": "PPR_99C7FFAD6529",
+        "evidence": "node 'transport coefficients' governed by authority + used by consumer"
+      }
+    },
+    {
+      "src": "captures_phenomenon",
+      "dst": "claim_relation",
+      "relation": "subclass_of",
+      "props": {
+        "paper_id": "granular",
+        "evidence": "Without any fit parameter, it quantitatively captures the complex three-dimensional sheared flow observed when grains flow in between two rough walls.",
+        "via": "family_root"
+      }
+    },
+    {
+      "src": "replaces",
+      "dst": "defines",
+      "relation": "depends_on",
+      "props": {
+        "paper_id": "PPR_B0E8916D4E19",
+        "evidence": "node 'theory of Jenkins & Savage (1983)' co-referenced"
+      }
+    },
+    {
+      "src": "constitutive_law",
+      "dst": "defines",
+      "relation": "depends_on",
+      "props": {
+        "paper_id": "PPR_8EF563699F2B",
+        "evidence": "node 'shear stress' co-referenced"
+      }
+    },
+    {
+      "src": "analogous_to",
+      "dst": "defines",
+      "relation": "depends_on",
+      "props": {
+        "paper_id": "PPR_8EF563699F2B",
+        "evidence": "node 'granular fluidity' co-referenced"
+      }
+    },
+    {
+      "src": "compares_numeric_to_property",
+      "dst": "claim_relation",
+      "relation": "subclass_of",
+      "props": {
+        "paper_id": "granular",
+        "evidence": "which is approximately 20% less than the yield torque observed by Wandersman and van Hecke [15]",
+        "via": "family_root"
+      }
+    },
+    {
+      "src": "compares_model_to_data",
+      "dst": "claim_relation",
+      "relation": "subclass_of",
+      "props": {
+        "paper_id": "granular",
+        "evidence": "Steady-state simulation results obtained using the NGF model as described in Sec. II are included in Figs. 3 and 4 using open circle markers",
+        "via": "family_root"
+      }
+    },
+    {
+      "src": "approximates",
+      "dst": "claim_relation",
+      "relation": "subclass_of",
+      "props": {
+        "paper_id": "granular",
+        "evidence": "the cylindrical intruder geometry is indeed a reasonable approximation of the vanelike intruder geometry",
+        "via": "family_root"
+      }
+    },
+    {
+      "src": "regime_transition",
+      "dst": "influences",
+      "relation": "subclass_of",
+      "props": {
+        "paper_id": "granular",
+        "evidence": "There are two regimes of intruder depth in which the secondary rheology is qualitatively different.",
+        "via": "family_root"
+      }
+    },
+    {
+      "src": "rationalizes",
+      "dst": "claim_relation",
+      "relation": "subclass_of",
+      "props": {
+        "paper_id": "granular",
+        "evidence": "Overall, these observations lead us to the following rationalization of the experiments of Wandersman and van Hecke [15].",
+        "via": "family_root"
+      }
+    },
+    {
+      "src": "captures_phenomenon",
+      "dst": "defines",
+      "relation": "depends_on",
+      "props": {
+        "paper_id": "PPR_AA69AC4BEFFF",
+        "evidence": "node 'nonlocal granular fluidity (NGF) model' co-referenced"
+      }
+    },
+    {
+      "src": "predicts",
+      "dst": "defines",
+      "relation": "depends_on",
+      "props": {
+        "paper_id": "PPR_AA69AC4BEFFF",
+        "evidence": "node 'primary flow' co-referenced"
+      }
+    },
+    {
+      "src": "measures",
+      "dst": "defines",
+      "relation": "depends_on",
+      "props": {
+        "paper_id": "PPR_AA69AC4BEFFF",
+        "evidence": "node 'ω / Ω' co-referenced"
+      }
+    },
+    {
+      "src": "predicts_phenomenon",
+      "dst": "influences",
+      "relation": "subclass_of",
+      "props": {
+        "paper_id": "granular",
+        "evidence": "We review the predictions of this theory for the cases of mixtures of different density particles and of different size particles",
+        "via": "family_root"
+      }
+    },
+    {
+      "src": "validates_with",
+      "dst": "defines",
+      "relation": "depends_on",
+      "props": {
+        "paper_id": "PPR_88D62082F6B4",
+        "evidence": "node 'NGF model' co-referenced"
+      }
+    },
+    {
+      "src": "applies_method_to",
+      "dst": "defines",
+      "relation": "depends_on",
+      "props": {
+        "paper_id": "PPR_88D62082F6B4",
+        "evidence": "node 'NGF model' co-referenced"
+      }
+    },
+    {
+      "src": "compares_model_to_data",
+      "dst": "defines",
+      "relation": "depends_on",
+      "props": {
+        "paper_id": "PPR_88D62082F6B4",
+        "evidence": "node 'NGF model' co-referenced"
+      }
+    },
+    {
+      "src": "studies_phenomenon",
+      "dst": "background",
+      "relation": "subclass_of",
+      "props": {
+        "paper_id": "granular",
+        "evidence": "computer simulations of these flows",
+        "via": "family_root"
+      }
+    },
+    {
+      "src": "effectively_becomes",
+      "dst": "claim_relation",
+      "relation": "subclass_of",
+      "props": {
+        "paper_id": "granular",
+        "evidence": "the walls became effectively 'rougher'",
+        "via": "family_root"
+      }
+    },
+    {
+      "src": "phase_sequence",
+      "dst": "background",
+      "relation": "subclass_of",
+      "props": {
+        "paper_id": "granular",
+        "evidence": "The collision process can be divided into a compaction phase during which the distance between particle centers decreases and the contact forces increase to a maximum, and a recovery phase in which the centers move apart and the contact forces decrease to zero when the particles come apart.",
+        "via": "family_root"
+      }
+    },
+    {
+      "src": "relates_to",
+      "dst": "influences",
+      "relation": "subclass_of",
+      "props": {
+        "paper_id": "granular",
+        "evidence": "the mean square particle displacement due to random walking $\\langle|R|^{2}\\rangle$ can be expressed in terms of the well known Einstein relation where $D$ is the coefficient of self-diffusion",
+        "via": "family_root"
+      }
+    },
+    {
+      "src": "alternative_expression",
+      "dst": "claim_relation",
+      "relation": "subclass_of",
+      "props": {
+        "paper_id": "granular",
+        "evidence": "Hence, we can obtain an alternative form for the diffusion coefficient",
+        "via": "family_root"
+      }
+    },
+    {
+      "src": "propagates_along",
+      "dst": "background",
+      "relation": "subclass_of",
+      "props": {
+        "paper_id": "granular",
+        "evidence": "Characteristic curves on which φ_λ > 1/2 propagate up through the avalanche",
+        "via": "family_root"
+      }
+    },
+    {
+      "src": "generates",
+      "dst": "influences",
+      "relation": "subclass_of",
+      "props": {
+        "paper_id": "granular",
+        "evidence": "the triple-point moves upstream from its initial position as it generates the non-uniform section of the third shock",
+        "via": "family_root"
+      }
+    }
+  ],
+  "family_roots": {
+    "constitutive_law": "constitutive_law",
+    "dependency": "influences",
+    "definition": "defines",
+    "composition": "composed_of",
+    "measure": "measures",
+    "claim": "claim_relation",
+    "evolution": "background"
+  }
+}
