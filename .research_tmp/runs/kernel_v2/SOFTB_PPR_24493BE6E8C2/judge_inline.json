@@ -1,0 +1,19 @@
+{
+  "n_total": 34,
+  "n_pass": 25,
+  "novel_total": 0,
+  "novel_pass": 0,
+  "pass_rate": 0.735,
+  "judge": "inline-semantic (GLM, 2026-08-26)",
+  "failures": [
+    {"i": 9, "pattern_type": "influences", "nodes": "source=game score; target=whole previous sequence of actions and observations; cause=game score; effect=whole previous sequence", "evidence": "Note that in general the game score may depend on the whole previous sequence of actions and observations", "reason": "cause/effect polarity REVERSED: sentence says score depends on sequence, so cause should be sequence -> effect score; edge asserts the score causes its own past"},
+    {"i": 10, "pattern_type": "influences", "nodes": "source=feedback about an action; target=many thousands of time-steps", "evidence": "feedback about an action may only be received after many thousands of time-steps have elapsed", "reason": "temporal delay statement misread as causal influence; feedback does not influence the elapsed time-steps"},
+    {"i": 13, "pattern_type": "influences", "nodes": "source=current situation; target=current screen xt; cause=current situation; effect=current screen xt", "evidence": "it is impossible to fully understand the current situation from only the current screen xt", "reason": "epistemic limitation (partial observability) misread as dependence; situation does not influence the screen"},
+    {"i": 14, "pattern_type": "defines", "nodes": "subject=sequences of actions and observations st; definition=algorithm; object=sequences st", "evidence": "sequences of actions and observations, st = x1, a1, x2, ..., at-1, xt, are input to the algorithm", "reason": "'are input to the algorithm' is an input relation, not a definition; st is not defined-as 'algorithm'"},
+    {"i": 23, "pattern_type": "measures", "nodes": "object=action at; instrument=emulator", "evidence": "Execute action at in emulator and observe reward rt and image x_{t+1}", "reason": "algorithm step (execute action in environment) is not a measurement relation; the emulator does not measure the action"},
+    {"i": 25, "pattern_type": "composed_of", "nodes": "whole=transition (phi_t, a_t, r_t, phi_{t+1}); component=D", "evidence": "Store transition (phi_t, a_t, r_t, phi_{t+1}) in D", "reason": "storage-in-replay-memory misread as composition with direction inverted; D is composed of transitions, not a component of one transition"},
+    {"i": 26, "pattern_type": "constitutive_law", "nodes": "output=action-value function; input=Bellman equation", "evidence": "estimate the action-value function by using the Bellman equation as an iterative update, Q_{i+1}(s,a) = E[...]", "reason": "Bellman equation is the update law itself, not an input quantity; binding it to the input slot is a law-vs-input category confusion"},
+    {"i": 27, "pattern_type": "extends", "nodes": "from=value iteration algorithms; to=optimal action-value function", "evidence": "Such value iteration algorithms converge to the optimal action-value function", "reason": "'converge to' is a convergence guarantee, not a generalization/extension relation"},
+    {"i": 28, "pattern_type": "improves", "nodes": "from=function approximator; to=action-value function", "evidence": "it is common to use a function approximator to estimate the action-value function", "reason": "sentence states usage-for-estimation, no improvement claim at all"}
+  ]
+}
