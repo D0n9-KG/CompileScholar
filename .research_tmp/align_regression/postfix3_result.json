@@ -1,0 +1,208 @@
+{
+ "tag": "postfix3",
+ "n_concepts_before": 544,
+ "n_concepts_after": 518,
+ "n_merge": 16,
+ "seconds": 43,
+ "merges": [
+  {
+   "keep": "CM0005",
+   "merged": [
+    "CM0023",
+    "CM0057",
+    "CM0385"
+   ],
+   "outcome": "concept_merged"
+  },
+  {
+   "keep": "CM0003",
+   "merged": [
+    "CM0006",
+    "CM0020",
+    "CM0024",
+    "CM0064",
+    "CM0066",
+    "CM0384"
+   ],
+   "outcome": "concept_merged"
+  },
+  {
+   "keep": "CM0017",
+   "merged": [
+    "CM0010"
+   ],
+   "outcome": "concept_merged"
+  },
+  {
+   "keep": "CM0120",
+   "merged": [
+    "CM0383",
+    "CM0433",
+    "CM0613"
+   ],
+   "outcome": "concept_merged"
+  },
+  {
+   "keep": "CM0365",
+   "merged": [
+    "CM0399"
+   ],
+   "outcome": "concept_merged"
+  },
+  {
+   "keep": "CM0377",
+   "merged": [
+    "CM0418"
+   ],
+   "outcome": "concept_merged"
+  },
+  {
+   "keep": "CM0382",
+   "merged": [
+    "CM0435"
+   ],
+   "outcome": "concept_merged"
+  },
+  {
+   "keep": "CM0472",
+   "merged": [
+    "CM0542"
+   ],
+   "outcome": "concept_merged"
+  },
+  {
+   "keep": "CF0368",
+   "merged": [
+    "CF0615"
+   ],
+   "outcome": "concept_merged"
+  },
+  {
+   "keep": "CP0009",
+   "merged": [
+    "CP0081",
+    "CP0378"
+   ],
+   "outcome": "concept_merged"
+  },
+  {
+   "keep": "CP0068",
+   "merged": [
+    "CP0031"
+   ],
+   "outcome": "concept_merged"
+  },
+  {
+   "keep": "CP0172",
+   "merged": [
+    "CP0177"
+   ],
+   "outcome": "concept_merged"
+  },
+  {
+   "keep": "CP0122",
+   "merged": [
+    "CP0320"
+   ],
+   "outcome": "concept_merged"
+  },
+  {
+   "keep": "CP0132",
+   "merged": [
+    "CP0609"
+   ],
+   "outcome": "concept_merged"
+  },
+  {
+   "keep": "CP0193",
+   "merged": [
+    "CP0166"
+   ],
+   "outcome": "concept_merged"
+  },
+  {
+   "keep": "CP0415",
+   "merged": [
+    "CP0437"
+   ],
+   "outcome": "concept_merged"
+  }
+ ],
+ "families": {
+  "restitution": {
+   "members": [
+    "CP0009",
+    "CP0081",
+    "CP0378"
+   ],
+   "distinct_after": 1,
+   "collapsed": true
+  },
+  "kinetic_theory": {
+   "members": [
+    "CM0002",
+    "CM0005",
+    "CM0006",
+    "CM0020",
+    "CM0023",
+    "CM0057",
+    "CM0064",
+    "CM0120",
+    "CM0383",
+    "CM0385",
+    "CM0419",
+    "CM0433",
+    "CM0613",
+    "CM0616"
+   ],
+   "distinct_after": 5,
+   "collapsed": true
+  },
+  "chapman_enskog_955A": {
+   "members": [
+    "CM0003",
+    "CM0006",
+    "CM0020",
+    "CM0024",
+    "CM0064",
+    "CM0066"
+   ],
+   "distinct_after": 1,
+   "collapsed": true
+  },
+  "molecular_dynamics": {
+   "members": [
+    "CM0377",
+    "CM0418"
+   ],
+   "distinct_after": 1,
+   "collapsed": true
+  },
+  "steady_state": {
+   "members": [
+    "CR0178",
+    "CR0264"
+   ],
+   "distinct_after": 2,
+   "collapsed": false
+  },
+  "inertial_number": {
+   "members": [
+    "CP0122",
+    "CP0320"
+   ],
+   "distinct_after": 1,
+   "collapsed": true
+  },
+  "granular_temperature": {
+   "members": [
+    "CC0147",
+    "CC0431",
+    "CC0618",
+    "CF0626"
+   ],
+   "distinct_after": 4,
+   "collapsed": false
+  }
+ }
+}

@@ -442,11 +442,20 @@ class ConceptGraph:
         return cg
 
 
-_ALIGN_PROMPT = """下面是抽取出的多个{type_label}实体(每个有一个代表性surface, 来自不同论文).
+_ALIGN_PROMPT = """下面是抽取出的多个{type_label}实体(每个有一个代表性surface与定义, 来自不同论文).
 判断哪些是【同一个概念】(近义/同义/只是表述不同, 如同一方法在不同论文里用了不同名).
-只把确属同一概念的归一组; 不同概念不要合并; 不确定的不合并.
 
-{type_label}列表(id: surface):
+合并判据(按此执行):
+1. 同一方法/量的**变体命名**必须合并: 词序倒置("restitution coefficient"~"coefficient of restitution"),
+   缩写与全称("RET"~"revised Enskog theory"), 修饰语增减("kinetic theory"~"kinetic theory formula"
+   ~"kinetic theories for granular flow"), 连字符/单复数差异 — 这些是同一概念.
+2. 单字母/纯符号 surface: 不同论文里同一字母常指**不同物理量**(甲文的f是频率, 乙文的f是摩擦系数).
+   只有定义或上下文能确证是同一个量才合并; 只看字母相同不合并.
+3. 泛指词("model"/"theory"/"simulations"/"experiments")不与具体命名方法合并 — 泛指不是名字.
+4. 共享中心词但机制不同的("density segregation" vs "size segregation")是不同概念, 不合并.
+5. 不确定的不合并.
+
+{type_label}列表(id: surface [symbol] (定义)):
 {items}
 
 输出 JSON: {{"groups": [[id1, id2], [id3], ...]}}  每组是同一概念的id列表, 单个的也列出.
@@ -468,13 +477,20 @@ def _llm_align_batch(items, type_label, llm_fn, max_tokens: int = 2000):
     [] (signature mismatch / parse fail) previously masked BLOCKER-level bugs."""
     type_map = {"METHOD": "方法", "PHENOMENON": "现象", "PARAMETER": "参数", "NUMERIC": "数值量"}
     tl = type_map.get(type_label, type_label)
-    # present items with index + surface (+symbol if any, as context)
+    # present items with index + surface (+symbol, +definition as context).
+    # definition (4th tuple slot, 2026-08-27): without it the judge cannot
+    # distinguish cross-paper single-letter collisions (f=frequency vs
+    # f=friction — audit: ~40% of cross-paper merges were symbol collisions).
     idx_items = []
-    for i, (_, surf, sym) in enumerate(items):
+    for i, item in enumerate(items):
+        surf, sym = item[1], item[2]
+        definition = item[3] if len(item) > 3 else ""
+        line = f"{i}: {surf}"
         if sym:
-            idx_items.append(f"{i}: {surf} [symbol: {sym}]")
-        else:
-            idx_items.append(f"{i}: {surf}")
+            line += f" [symbol: {sym}]"
+        if definition:
+            line += f" ({definition[:100]})"
+        idx_items.append(line)
     idx_items = "\n".join(idx_items)
     prompt = _ALIGN_PROMPT.format(type_label=tl, items=idx_items).replace(
         "id1, id2", "index1, index2").replace("id3", "index3")
@@ -488,7 +504,7 @@ def _llm_align_batch(items, type_label, llm_fn, max_tokens: int = 2000):
         obj = parse_json_response(resp) or {}
         groups = obj.get("groups", [])
         out = []
-        ids = [cid for cid, _, _ in items]
+        ids = [item[0] for item in items]
         for g in groups:
             # g may be list of int indices OR strings; map to concept_ids
             cids = []

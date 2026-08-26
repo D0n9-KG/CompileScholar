@@ -33,12 +33,108 @@ entities not claims), but the path is kept.
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass, field
 from typing import Callable
 
 from granular_agent.knowledge_base import KnowledgeBase, Mutation, Op, Role, Outcome
 from granular_agent.concept_graph import ConceptGraph, Concept, _llm_align_batch, _norm_surface
 from granular_agent.hypergraph_schema import InstanceHypergraph
+
+
+# ---------------------------------------------------------------------------
+# Alignment batching fixes (2026-08-27, audit align_first_test root causes)
+# ---------------------------------------------------------------------------
+
+# structural noise: figure/table/equation references and closed-list generic
+# surfaces. Domain-agnostic STRUCTURAL patterns only (rules-vs-LLM boundary:
+# whether "Fig. 3" or bare "model" is a named method is not a semantic
+# judgment). These surfaces may exist as concepts (edges reference them) but
+# are excluded from ALIGNMENT — they were the raw material of the audit's
+# 泛称吞噬 bad merges ("model"+DEM, "theory"+Nonlocal continuum, "Fig.3"×2).
+_NOISE_REF_RE = re.compile(
+    r"^(fig|figure|table|tab|eq|equation|sec|section|ref|appendix)\.?\s*[\d\w]+$",
+    re.IGNORECASE)
+_GENERIC_SURFACES = {
+    "model", "models", "theory", "theories", "law", "laws",
+    "method", "methods", "approach", "framework", "algorithm", "algorithms",
+    "experiment", "experiments", "experimental measurements", "measurement",
+    "simulation", "simulations", "numerical simulations", "data", "results",
+    "flow", "modeling", "analysis", "study", "setup", "system",
+}
+
+
+def _is_noise_surface(surface: str) -> bool:
+    s = (surface or "").strip().rstrip(".,;:")
+    if not s:
+        return True
+    if _NOISE_REF_RE.match(s):
+        return True
+    return s.lower() in _GENERIC_SURFACES
+
+
+_ALIGN_STOPWORDS = {
+    "the", "of", "and", "in", "to", "for", "with", "on", "at", "by", "from",
+    "a", "an", "is", "are", "was", "were", "its", "their", "each", "own",
+    "this", "that", "these", "those", "based", "using", "used", "into",
+}
+
+
+def _surface_tokens(surface: str) -> set:
+    """Token set for preclustering: lowercase, plural-normalized (trailing
+    's' stripped on 4+ char tokens — 'temperatures'~'temperature'), English
+    function words dropped ('anisotropy OF THE granular temperature' clusters
+    with 'granular temperature'). Pure normalization, no semantics."""
+    toks = set()
+    for t in re.findall(r"[a-z0-9]+", surface.lower()):
+        if t in _ALIGN_STOPWORDS:
+            continue
+        if len(t) > 3 and t.endswith("s"):
+            t = t[:-1]
+        toks.add(t)
+    return toks
+
+
+def _precluster_batches(items, batch_size: int, jaccard_threshold: float = 0.35):
+    """Group items so surface-similar concepts share one LLM batch
+    (deterministic token-Jaccard clustering over connected components).
+    Items with no similar partner are SKIPPED — no LLM call (the old code
+    sent every solo concept through a judge that could not merge it anyway;
+    544-concept runs become ~clusters-only, a large efficiency win).
+    Single letters/symbols DO cluster together (J=1.0) so the judge can
+    explicitly reject/confirm them WITH definitions in view."""
+    n = len(items)
+    parent = list(range(n))
+
+    def find(x):
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+
+    def union(a, b):
+        ra, rb = find(a), find(b)
+        if ra != rb:
+            parent[rb] = ra
+
+    toks = [_surface_tokens(it[1]) for it in items]
+    for i in range(n):
+        for j in range(i + 1, n):
+            a, b = toks[i], toks[j]
+            if not a or not b:
+                continue
+            if len(a & b) / len(a | b) >= jaccard_threshold:
+                union(i, j)
+    comps: dict[int, list] = {}
+    for i in range(n):
+        comps.setdefault(find(i), []).append(items[i])
+    batches = []
+    for members in comps.values():
+        if len(members) < 2:
+            continue   # solo: nothing to merge with
+        for k in range(0, len(members), batch_size):
+            batches.append(members[k:k + batch_size])
+    return batches
 
 
 # ---------------------------------------------------------------------------
@@ -162,7 +258,8 @@ class AlignmentAgent:
 
     def align(self, domain: str = "",
               new_concept_ids: list[str] | None = None,
-              type_filter=("METHOD", "PHENOMENON", "PARAMETER"),
+              type_filter=("METHOD", "PHENOMENON", "PARAMETER",
+                           "PROPERTY", "REGIME"),
               batch_size: int = 20) -> AlignmentReport:
         """Canonicalize stage: find same-concept candidate groups WITHIN a domain,
         route each merge through kb.commit(align_merge Mutation) → 5-outcome.
@@ -190,12 +287,26 @@ class AlignmentAgent:
             for c in concepts:
                 if not c.surfaces():
                     continue
+                # noise gate (2026-08-27, audit align_first_test): figure/
+                # table/eq references and closed-list generic surfaces become
+                # concepts but never ALIGN (they swallowed named methods:
+                # 'model'+DEM, 'theory'+Nonlocal continuum merged). Structural/
+                # deterministic rule — no semantic judgment here.
+                if _is_noise_surface(c.surfaces()[0]):
+                    continue
                 items.append((c.concept_id, c.surfaces()[0],
-                              c.symbol if getattr(c, "symbol", "") else ""))
+                              c.symbol if getattr(c, "symbol", "") else "",
+                              c.definition if getattr(c, "definition", "") else ""))
             if len(items) < 2:
                 continue
-            for i in range(0, len(items), batch_size):
-                batch = items[i:i + batch_size]
+            # SIMILARITY-PRECLUSTERED batches (2026-08-27, audit root cause #1):
+            # the old insertion-order slicing (batch_size=20) meant 'kinetic
+            # theory' (#52) and 'kinetic theory formula' (#97) NEVER appeared
+            # in the same LLM call — merge rate 3-9% was mostly a batching
+            # artifact, not judge strictness. Pre-cluster by surface token
+            # Jaccard (deterministic, structural) so same-concept variants
+            # share a batch; the LLM still judges the merge semantically.
+            for batch in _precluster_batches(items, batch_size):
                 # delegate candidate-group discovery to the verified内核
                 groups = _llm_align_batch(batch, t, self.llm_judge)
                 report.n_candidates += len(groups)
@@ -242,6 +353,16 @@ class AlignmentAgent:
         alignment (align_merge) when that path is used; concept alignment uses
         this dedicated op. (See DECISION-alignment-agent-form update.)"""
         if len(cands) < 2:
+            return
+        # pure-symbol merge guard (2026-08-27, audit symbol-collision class):
+        # a group whose EVERY surface is symbol/math-only (no alphabetic word
+        # >=4 chars — 'F', 'f', '$F(\Phi)$', 'g_0(\nu)') carries no evidence
+        # but the letters themselves, and same-letter-different-quantity
+        # collisions (f=frequency vs f=friction) are the documented failure.
+        # Named surfaces always contain a >=4-char word (inertial, shear...),
+        # so this never blocks a named merge. Deterministic structural guard.
+        if all(not re.search(r"[a-zA-Z]{4,}", s)
+               for c in cands for s in c.surfaces()[:1]):
             return
         # keep = concept with most variants; tiebreak by SMALLEST concept_id
         # (stable, predictable — keeps the earliest-created concept; m1 fix
