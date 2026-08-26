@@ -1,0 +1,1402 @@
+[
+  {
+    "edge_id": "n1_e2",
+    "pattern_type": "defines",
+    "evidence_span": "The analysis is performed to first order in the spatial gradients, allowing identification of the Navier-Stokes order transport coefficients associated with the heat and momentum fluxes.",
+    "node_ids": [
+      "n1_n6",
+      "n1_n7",
+      "n1_n8"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Navier-Stokes order transport coefficients",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "heat flux",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "momentum flux",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1_e1",
+    "pattern_type": "defines",
+    "evidence_span": "A normal solution is obtained via the Chapman-Enskog method for states near the local homogeneous cooling state.",
+    "node_ids": [
+      "n1_n4",
+      "n1_n5"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Chapman-Enskog method",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "normal solution",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "verifier-missed-bad-role",
+    "verifier_note": "The sentence states that a normal solution is obtained via the Chapman-Enskog method. This is a definitional relation: the normal solution is defined as the result of applying the Chapman-Enskog method. The pattern 'defines' is correct for this definitional relation. The edge is kept with the correct pattern.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "retype:defines"
+  },
+  {
+    "edge_id": "n2c1_e0",
+    "pattern_type": "extends",
+    "evidence_span": "The objective here is to extend this analysis to the revised Enskog kinetic theory",
+    "node_ids": [
+      "n2c1_n1",
+      "n2c1_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Chapman-Enskog solution to the Boltzmann equation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "revised Enskog kinetic theory (RET)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c1_e1",
+    "pattern_type": "extends",
+    "evidence_span": "has been extended to the inelastic case to obtain the Navier-Stokes equations",
+    "node_ids": [
+      "n2c1_n1",
+      "n2c1_n3"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Chapman-Enskog solution to the Boltzmann equation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Navier-Stokes hydrodynamic equations",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c1_e2",
+    "pattern_type": "compares",
+    "evidence_span": "Preliminary comparisons with direct Monte Carlo simulation",
+    "node_ids": [
+      "n2c1_n1",
+      "n2c1_n4"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Chapman-Enskog solution to the Boltzmann equation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "direct Monte Carlo simulation",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c1_e3",
+    "pattern_type": "validates_against",
+    "evidence_span": "comparison of the calculated viscosity dependence ... with that from molecular dynamics would determine the validity",
+    "node_ids": [
+      "n2c1_n5",
+      "n2c1_n6"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "transport coefficients",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "molecular dynamics simulations",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c1_e5",
+    "pattern_type": "influences",
+    "evidence_span": "viscosity dependence on both the density and restitution coefficient",
+    "node_ids": [
+      "n2c1_n5",
+      "n2c1_n8"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "transport coefficients",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "density",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c1_e6",
+    "pattern_type": "background",
+    "evidence_span": "may suggest its relevance for granular media undergoing cluster formation",
+    "node_ids": [
+      "n2c1_n2",
+      "n2c1_n9"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "revised Enskog kinetic theory (RET)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "granular media",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e0",
+    "pattern_type": "extends",
+    "evidence_span": "The objective here is to extend this analysis to the revised Enskog kinetic theory \\~RET!",
+    "node_ids": [
+      "n2c0_n1",
+      "n2c0_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Chapman-Enskog solution to the Boltzmann equation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "revised Enskog kinetic theory (RET)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e1",
+    "pattern_type": "extends",
+    "evidence_span": "the Chapman-Enskog solution to the Boltzmann equation, familiar from transport theory for normal gases, has been extended to the inelastic case to obtain the Navier-Stokes equations",
+    "node_ids": [
+      "n2c0_n1",
+      "n2c0_n3"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Chapman-Enskog solution to the Boltzmann equation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Navier-Stokes hydrodynamic equations",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e2",
+    "pattern_type": "compares",
+    "evidence_span": "Preliminary comparisons with direct Monte Carlo simulation",
+    "node_ids": [
+      "n2c0_n1",
+      "n2c0_n4"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Chapman-Enskog solution to the Boltzmann equation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "direct Monte Carlo simulation",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e3",
+    "pattern_type": "validates_against",
+    "evidence_span": "a comparison of the calculated viscosity dependence on both the density and restitution coefficient with that from molecular dynamics would determine the validity",
+    "node_ids": [
+      "n2c0_n5",
+      "n2c0_n7"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "transport coefficients",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "molecular dynamics simulations",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e5",
+    "pattern_type": "influences",
+    "evidence_span": "viscosity dependence on both the density and restitution coefficient",
+    "node_ids": [
+      "n2c0_n5",
+      "n2c0_n8"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "transport coefficients",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "density",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e6",
+    "pattern_type": "background",
+    "evidence_span": "which may suggest its relevance for granular media undergoing cluster formation",
+    "node_ids": [
+      "n2c0_n2",
+      "n2c0_n9"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "revised Enskog kinetic theory (RET)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "granular media",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e7",
+    "pattern_type": "defines",
+    "evidence_span": "revised Enskog kinetic theory \\~RET!",
+    "node_ids": [
+      "n2c0_n2",
+      "n2c0_n10"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "revised Enskog kinetic theory (RET)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "RET",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c1_e7",
+    "pattern_type": "defines",
+    "evidence_span": "revised Enskog kinetic theory (RET)",
+    "node_ids": [
+      "n2c1_n2",
+      "n2c1_n2"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "revised Enskog kinetic theory (RET)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "revised Enskog kinetic theory (RET)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence span introduces the abbreviation 'RET' for 'revised Enskog kinetic theory', which is a definitional identity. The subject and object are both the same entity, which is appropriate for an abbreviation definition. The relation type 'abbreviation' is correctly identified.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n7c0_e26",
+    "pattern_type": "replaces",
+    "evidence_span": "It is straightforward to show that the projection operator Q in the definition of $\\mathcal { L }$ can be replaced by the identity in both integrations",
+    "node_ids": [
+      "n7c0_n67",
+      "n7c0_n34"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "projection operator Q",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "identity operator",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c1_e0",
+    "pattern_type": "defines",
+    "evidence_span": "In a similar way, the integral $I _ { \\kappa }$ is given by",
+    "node_ids": [
+      "n7c1_n1",
+      "n7c1_n2"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "$I _ { \\gamma }$",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "$I _ { \\kappa }$",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that I_kappa is given 'in a similar way' to I_gamma, which is a comparison/analogy, not a definitional identity. The pattern 'defines' requires a definitional identity (X is defined as Y), but here the relation is that I_kappa is analogous to I_gamma. The correct pattern would be 'compares' (equivalence/contrast of formulations), not 'defines'. The slot binding is also wrong: I_gamma is not the subject being defined, and I_kappa is not the object/definition. The relation is a comparison, not a definition.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7c0_e4",
+    "pattern_type": "extends",
+    "evidence_span": "Substitution of Eqs. \\~A14! and \\~A17! into Eq. \\~A8! gives",
+    "node_ids": [
+      "n7c0_n7",
+      "n7c0_n8",
+      "n7c0_n9",
+      "n7c0_n10"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "to",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Eq. \\~A10!",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Eq. \\~A14!",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Eq. \\~A17!",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Eq. \\~A8!",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a substitution operation (Eqs. A14 and A17 are substituted into Eq. A8), which is a mathematical manipulation, not an 'extends' relation. The pattern 'extends' requires X generalizes Y, but here the relation is substitution, not extension. The correct pattern would be 'influences' (Eq. A8 depends on Eqs. A14 and A17) or a different relation. The slot binding is also wrong: Eq. A10 is not the 'from' node, and Eqs. A14, A17, A8 are not 'to' nodes in an extension relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7c0_e6",
+    "pattern_type": "extends",
+    "evidence_span": "can be identified by using the property \\~36! and the definitions \\~32!–\\~35!",
+    "node_ids": [
+      "n7c0_n14",
+      "n7c0_n15"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Eqs. \\~32!–\\~35!",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Eq. \\~36!",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that Eqs. 32-35 can be identified by using property 36 and the definitions. This is an identification process, not an 'extends' relation. The pattern 'extends' requires X generalizes Y, but here the relation is identification, not extension. The correct pattern would be 'defines' (Eqs. 32-35 are defined by property 36) or 'influences'. The slot binding is also wrong: Eqs. 32-35 are not the 'from' node, and Eq. 36 is not the 'to' node in an extension relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7c0_e7",
+    "pattern_type": "extends",
+    "evidence_span": "as follows from Eq. \\~A9!.",
+    "node_ids": [
+      "n7c0_n16",
+      "n7c0_n17",
+      "n7c0_n18"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Eq. \\~A9!",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Eqs. \\~24!–\\~27!",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Eq. \\~A3!",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence span is a fragment of a sentence, not a complete statement. The full sentence 'Use has been made of the property as follows from Eq. ~A9!.' does not state an 'extends' relation between Eq. A9 and Eqs. 24-27 or Eq. A3. It merely references a property. The edge is a spurious extraction from a sentence fragment.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7c0_e8",
+    "pattern_type": "extends",
+    "evidence_span": "Equations \\~48!–\\~50! for the kinetic contributions to the transport coefficients follow directly from the integral equations.",
+    "node_ids": [
+      "n7c0_n19",
+      "n7c0_n20"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "kinetic contributions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Eqs. \\~48!–\\~50!",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence states that equations 'follow directly from' integral equations. This is a derivation relationship, not an 'extends' (generalization) relationship. The edge misinterprets a derivation as an extension. The relation is real but the pattern is wrong; however, no suitable pattern (e.g., 'derives_from') exists in the schema, so the edge should be dropped.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7c0_e11",
+    "pattern_type": "extends",
+    "evidence_span": "The integral on the right side can be performed using the definition \\~26! and Eq. \\~C2! becomes",
+    "node_ids": [
+      "n7c0_n29",
+      "n7c0_n30"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Eq. \\~C2!",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "definition \\~26!",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence describes a mathematical operation (performing an integral using a definition). It does not state an 'extends' relation between Eq. C2 and definition 26. The edge is a spurious extraction from a procedural description.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7c0_e12",
+    "pattern_type": "extends",
+    "evidence_span": "The remaining integral is performed using the definition of K in Eq. \\~28!",
+    "node_ids": [
+      "n7c0_n31",
+      "n7c0_n32"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "K",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Eq. \\~28!",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence describes a mathematical operation (performing an integral using a definition). It does not state an 'extends' relation between K and Eq. 28. The edge is a spurious extraction from a procedural description.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7c0_e14",
+    "pattern_type": "extends",
+    "evidence_span": "The scattering law for $\\mathbf { V } _ { 1 } ^ { \\prime }$ and $\\mathbf { V } _ { 2 } ^ { \\prime }$ is given in Sec. II.",
+    "node_ids": [
+      "n7c0_n36",
+      "n7c0_n37"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "scattering law",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Sec. II",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence states that a scattering law is 'given in' a section, which is a reference/citation, not an 'extends' relation. The edge misinterprets a reference as an extension. The relation is real but the pattern is wrong; however, no suitable pattern (e.g., 'background') exists in the schema for this type of reference, so the edge should be dropped.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7c0_e15",
+    "pattern_type": "extends",
+    "evidence_span": "The Jacobian of the transformation is",
+    "node_ids": [
+      "n7c0_n38",
+      "n7c0_n39"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Eq. \\~C5!",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Jacobian",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence merely states the existence of a Jacobian for a variable transformation. It does not state that Eq. C5 extends or generalizes the Jacobian. The relation is a mathematical transformation step, not a methodological extension. The pattern 'extends' is inappropriate for a mathematical substitution.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7c0_e16",
+    "pattern_type": "extends",
+    "evidence_span": "Use of this in Eq. \\~C4! gives the final result The kinetic part of the thermal conductivity is obtained in a similar way.",
+    "node_ids": [
+      "n7c0_n40",
+      "n7c0_n41"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Eq. \\~C4!",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "kinetic part of the thermal conductivity",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that a result is obtained from Eq. C4 and that the kinetic part of thermal conductivity is obtained in a similar way. This is a derivation step, not a generalization/extension of Eq. C4 to the thermal conductivity. The relation is a mathematical derivation, not a methodological extension.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7c0_e17",
+    "pattern_type": "extends",
+    "evidence_span": "Multiplication of Eq. \\~32! by S(V) and integration over the velocity leads to",
+    "node_ids": [
+      "n7c0_n42",
+      "n7c0_n43"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Eq. \\~32!",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "S(V)",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a mathematical operation (multiplication and integration) performed on Eq. 32. It does not state that Eq. 32 extends or generalizes S(V). This is a mathematical manipulation, not a methodological extension.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7c0_e18",
+    "pattern_type": "extends",
+    "evidence_span": "Use of this in Eq. \\~C8! gives the desired result",
+    "node_ids": [
+      "n7c0_n44",
+      "n7c0_n45"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Eq. \\~C9!",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Eq. \\~C8!",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that a result is obtained by using a previous result in Eq. C8. This is a substitution/derivation step, not a generalization or extension of Eq. C8. The relation is a mathematical derivation, not a methodological extension.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7c0_e19",
+    "pattern_type": "extends",
+    "evidence_span": "To evaluate $\\mu ^ { k } ,$ , multiply Eq. \\~33! by S(V) and integrate over the velocity to get",
+    "node_ids": [
+      "n7c0_n46",
+      "n7c0_n47"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "$\\mu ^ { k }$",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Eq. \\~33!",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a mathematical operation (multiplication and integration) to evaluate a quantity. It does not state that mu^k extends or generalizes Eq. 33. This is a mathematical manipulation, not a methodological extension.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7c0_e20",
+    "pattern_type": "extends",
+    "evidence_span": "Substitution of Eq. \\~C14! into Eq. \\~C13! gives",
+    "node_ids": [
+      "n7c0_n48",
+      "n7c0_n49"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Eq. \\~C14!",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Eq. \\~C13!",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states a substitution of one equation into another. This is a mathematical derivation step, not a generalization or extension of Eq. C13. The relation is a mathematical substitution, not a methodological extension.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7c0_e21",
+    "pattern_type": "extends",
+    "evidence_span": "The collisional transfer contributions to the pressure tensor and heat flux are determined from Eqs. \\~8! and \\~9!.",
+    "node_ids": [
+      "n7c0_n50",
+      "n7c0_n51",
+      "n7c0_n52"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "collisional transfer contributions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "pressure tensor",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "heat flux",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that collisional transfer contributions are determined from Eqs. 8 and 9. This is a derivation, not a generalization/extension. The relation is a mathematical derivation, not a methodological extension.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7c0_e22",
+    "pattern_type": "extends",
+    "evidence_span": "From this equation one can easily identify the collisional transfer contributions to the shear viscosity  and the bulk viscosity given by Eqs. \\~38!, \\~39!, and \\~45!.",
+    "node_ids": [
+      "n7c0_n53",
+      "n7c0_n54",
+      "n7c0_n55"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Eqs. \\~8! and \\~9!",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "shear viscosity",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "bulk viscosity",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that contributions to viscosity are identified from an equation. This is an identification/derivation, not a generalization/extension. The relation is a mathematical identification, not a methodological extension.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7c0_e23",
+    "pattern_type": "extends",
+    "evidence_span": "From Eq. \\~D2! one may identify the collisional contributions to the thermal conductivity  and the coefficient $\\mu$ given in Eqs. \\~40!, \\~41!, and \\~46!.",
+    "node_ids": [
+      "n7c0_n57",
+      "n7c0_n58",
+      "n7c0_n59"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Eq. \\~D2!",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "thermal conductivity",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "coefficient $\\mu$",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that Eq. D2 is used to 'identify' the collisional contributions to thermal conductivity and coefficient mu. This is a definitional/identification relation, not an 'extends' relation. The pattern 'extends' requires a direct technical extension/generalization, which is not present. The relation is real but the pattern is wrong; however, the correct pattern 'defines' is not in the allowed schema for this edge, and the slot binding is also incorrect (Eq. D2 is not 'extending' thermal conductivity). Dropping.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7c0_e24",
+    "pattern_type": "extends",
+    "evidence_span": "In this appendix an outline of the integrations appearing in the evaluation of the transport coefficients is given using the first Sonine approximations for the zeroth-order distribution \\~53! and for the first-order distribution \\~56!.",
+    "node_ids": [
+      "n7c0_n61",
+      "n7c0_n62",
+      "n7c0_n63"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "first Sonine approximations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "zeroth-order distribution \\~53!",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "first-order distribution \\~56!",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the first Sonine approximations are 'used' for the zeroth-order and first-order distributions. This is a usage/application relation, not an 'extends' relation. The first Sonine approximation is a method applied to the distributions, not a generalization of them. The pattern 'extends' is incorrect; the relation is more of a 'measures' or 'influences' type, but the correct pattern is not clear from the schema. Dropping due to incorrect pattern and slot binding.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7c0_e28",
+    "pattern_type": "extends",
+    "evidence_span": "only the results are quoted in Table I.",
+    "node_ids": [
+      "n7c0_n70",
+      "n7c0_n71"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "factor $\\chi$",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Table I",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that results are 'quoted in Table I', which is a reference to a table, not an 'extends' relation. The factor chi is mentioned in the preceding sentence as a difference, but the evidence span does not state that chi extends Table I. The relation does not exist as stated. Dropping.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n8_e7",
+    "pattern_type": "improves",
+    "evidence_span": "The corrected value for the latter was obtained in Ref. [13]",
+    "node_ids": [
+      "n8_n9",
+      "n8_n10"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "corrected c*",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Goldshtein and Shapiro's c*",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e1",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "Finally, ζ^(1,1) is obtained from Eqs. (F2) and (F9).",
+    "node_ids": [
+      "n8_n3",
+      "n8_n4",
+      "n8_n5"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "ζ^(1,1)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "c_D",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "ν_γ",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence states ζ^(1,1) is obtained from equations involving c_D and ν_γ, which is a formal quantitative relation fitting the constitutive_law pattern.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n8_e2",
+    "pattern_type": "influences",
+    "evidence_span": "Dimensional analysis requires that ζ^(0) and ν_γ are proportional to T^(1/2)",
+    "node_ids": [
+      "n8_n2",
+      "n8_n6"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "ζ^(0)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "T",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence explicitly states ζ^(0) is proportional to T^(1/2), which is a scaling dependence (influences).",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n8_e3",
+    "pattern_type": "influences",
+    "evidence_span": "Dimensional analysis requires that ζ^(0) and ν_γ are proportional to T^(1/2)",
+    "node_ids": [
+      "n8_n5",
+      "n8_n6"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "ν_γ",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "T",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence explicitly states ν_γ is proportional to T^(1/2), which is a scaling dependence (influences).",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n8_e4",
+    "pattern_type": "influences",
+    "evidence_span": "Therefore c_D ∝ T^(-1/2)",
+    "node_ids": [
+      "n8_n4",
+      "n8_n6"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "c_D",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "T",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence explicitly states c_D is proportional to T^(-1/2), which is a scaling dependence (influences).",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n8_e5",
+    "pattern_type": "defines",
+    "evidence_span": "In order to determine c_D, multiply the integral equation (35) by E(V) and integrate over V",
+    "node_ids": [
+      "n8_n4",
+      "n8_n7"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "c_D",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "integral equation (35)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence describes a procedure to determine c_D, not a definitional identity. It does not state that c_D is defined as the integral equation. The relation is a measurement/calculation setup, not a definition.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n8_e6",
+    "pattern_type": "compares",
+    "evidence_span": "We are not aware of any previous calculation of ζ^(1,1) for comparison.",
+    "node_ids": [
+      "n8_n3",
+      "n8_n8"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "ζ^(1,1)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "previous calculations",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence explicitly mentions 'for comparison' regarding ζ^(1,1) and previous calculations, fitting the compares pattern.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  }
+]

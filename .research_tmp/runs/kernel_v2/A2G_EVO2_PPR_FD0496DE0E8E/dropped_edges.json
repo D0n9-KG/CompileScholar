@@ -1,0 +1,1976 @@
+[
+  {
+    "edge_id": "n1_e1",
+    "pattern_type": "defines",
+    "evidence_span": "Time-dependent solutions for particle size segregation in shallow granular avalanches",
+    "node_ids": [
+      "n1_n2",
+      "n1_n3"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "particle size segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "shallow granular avalanches",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence span is a title stating that solutions exist for a phenomenon in a context. It does not define 'particle size segregation' as 'shallow granular avalanches'. The preposition 'in' indicates a context/location, not a definitional identity. The defines pattern requires an explicit definitional statement (X is defined as Y), which is absent here. The relation does not exist, and the slot binding is incorrect.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n2_e2",
+    "pattern_type": "defines",
+    "evidence_span": "grains of different sizes often separate out into inversely graded layers, with the large particles on top of the fines, by a process called kinetic sieving",
+    "node_ids": [
+      "n2_n4",
+      "n2_n5"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "kinetic sieving",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "inversely graded layers",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence describes a process (kinetic sieving) that causes a phenomenon (separation into inversely graded layers). It does not define kinetic sieving as being inversely graded layers. This is a causal/process relation, not a definitional identity.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n2_e5",
+    "pattern_type": "composed_of",
+    "evidence_span": "Concentration shocks develop during the flow and the particles eventually separate out into inversely-graded layers sufficiently far downstream",
+    "node_ids": [
+      "n2_n8",
+      "n2_n9"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "concentration shocks",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "inversely-graded layers",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence describes a temporal sequence: shocks develop, then particles separate into layers. It does not state that concentration shocks are composed of inversely-graded layers. This is a sequential development, not a structural composition.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n2_e6",
+    "pattern_type": "influences",
+    "evidence_span": "Sections with a monotonically decreasing shock height, between these layers, steepen and break in finite time",
+    "node_ids": [
+      "n2_n10",
+      "n2_n8"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "shock height",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "concentration shocks",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence describes a property of sections (monotonically decreasing shock height) and their behavior (steepen and break). It does not state that shock height influences concentration shocks. This is a description of a section's behavior, not a causal dependence.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n2_e7",
+    "pattern_type": "composed_of",
+    "evidence_span": "shock waves, concentration expansions, non-centred expanding shock regions and breaking shocks develop",
+    "node_ids": [
+      "n2_n11",
+      "n2_n12",
+      "n2_n13",
+      "n2_n14"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "shock waves",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "concentration expansions",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "non-centred expanding shock regions",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "breaking shocks",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence lists several phenomena that develop. It does not state that shock waves are composed of the other items. This is a co-listing of parallel phenomena, not a structural composition.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e3",
+    "pattern_type": "develops_during_flow",
+    "evidence_span": "the large particles are pushed to the sides to form stationary lateral levees (Pouliquen et al. 1997) that channel the flow",
+    "node_ids": [
+      "n3c0_n9",
+      "n3c0_n10"
+    ],
+    "node_roles": [
+      "phenomenon",
+      "process"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "lateral levees",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "shallow granular avalanches",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e5",
+    "pattern_type": "improves",
+    "evidence_span": "The resulting time-dependent segregation equation is considerably simpler and more general than that of Savage & Lun (1988)",
+    "node_ids": [
+      "n3c0_n13",
+      "n3c0_n11"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Gray & Thornton (2005) model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Savage & Lun (1988) model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e6",
+    "pattern_type": "compares",
+    "evidence_span": "The resulting time-dependent segregation equation is considerably simpler and more general than that of Savage & Lun (1988)",
+    "node_ids": [
+      "n3c0_n13",
+      "n3c0_n11"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Gray & Thornton (2005) model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Savage & Lun (1988) model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e7",
+    "pattern_type": "describes",
+    "evidence_span": "Gray & Thornton (2005) used mixture theory to formulate mass and momentum balances for the large and small particles, which provided a natural way of introducing gravity into the theory. Assuming a linear velocity drag between the particles and that the fines carry less of the overburden pressure as they fall down through the gaps, Gray and Thornton derived an expression for the segregation flux in terms of the volume fraction of small particles.",
+    "node_ids": [
+      "n3c0_n13",
+      "n3c0_n3"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Gray & Thornton (2005) model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "kinetic sieving",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e8",
+    "pattern_type": "describes",
+    "evidence_span": "but is still able to quantitatively reproduce the concentration jumps observed in the laboratory experiments of Savage & Lun (1988) and Vallance & Savage (2000).",
+    "node_ids": [
+      "n3c0_n13",
+      "n3c0_n15"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Gray & Thornton (2005) model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "concentration jumps",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5c1_e4",
+    "pattern_type": "influences",
+    "evidence_span": "a straight horizontal shock of height is formed",
+    "node_ids": [
+      "n5c1_n11",
+      "n5c1_n10"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "straight horizontal shock",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "steady-state position",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5c1_e6",
+    "pattern_type": "influences",
+    "evidence_span": "When there is shear, points that are higher up in the flow move faster downstream than those below them",
+    "node_ids": [
+      "n5c1_n14",
+      "n5c1_n15",
+      "n5c1_n16"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "shear",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "points that are higher up in the flow",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "points that are below them",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5c1_e9",
+    "pattern_type": "influences",
+    "evidence_span": "the breaking-time is singular when $\\alpha = 1$",
+    "node_ids": [
+      "n5c1_n22",
+      "n5c1_n23"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "breaking-time",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "alpha",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5c1_e10",
+    "pattern_type": "influences",
+    "evidence_span": "the third shock does not break",
+    "node_ids": [
+      "n5c1_n24",
+      "n5c1_n23"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "third shock",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "alpha",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5c1_e15",
+    "pattern_type": "influences",
+    "evidence_span": "The full parameter dependence of the breaking-time on α and $\\phi _ { 0 }$ is illustrated in Fig. 3",
+    "node_ids": [
+      "n5c1_n36",
+      "n5c1_n37",
+      "n5c1_n38"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "full parameter dependence of the breaking-time",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "alpha",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "phi_0",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e19",
+    "pattern_type": "influences",
+    "evidence_span": "Once the small particles reach the base of the flow the no normal flux condition (5.3) implies that they separate out and a concentration shock is formed between the expansion fan and the pure phase",
+    "node_ids": [
+      "n6c0_n35",
+      "n6c0_n28"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "concentration shock",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "centred expansion fan",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e37",
+    "pattern_type": "influences",
+    "evidence_span": "On the other hand, material entering the chute is normally graded as it enters, and then begins to segregate in a steady expansion fan (5.7) centered at $x = 0 , \\ z = z _ { r }$",
+    "node_ids": [
+      "n6c0_n63",
+      "n6c0_n65"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "material that subsequently enters the chute",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "steady expansion fan (5.7)",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e38",
+    "pattern_type": "defines",
+    "evidence_span": "The interface between the two kinds of material points, those initially in the chute and those entering the chute, is a curve that we call the fan-interface",
+    "node_ids": [
+      "n6c0_n66",
+      "n6c0_n62",
+      "n6c0_n63"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "fan-interface",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "material that was initially in the chute",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "material that subsequently enters the chute",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e39",
+    "pattern_type": "defines",
+    "evidence_span": "Points in the interface are located by tracking the characteristics (5.21) with initial location $x = 0$",
+    "node_ids": [
+      "n6c0_n66",
+      "n6c0_n67"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "fan-interface",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "characteristics (5.21)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e42",
+    "pattern_type": "composed_of",
+    "evidence_span": "The solution for small times, therefore, consists of steady-state fan (5.7) upstream of the interface (5.22) and a time-dependent fan (5.14) downstream of ${ \\mathrm { i t } } ,$ which expand with increasing time",
+    "node_ids": [
+      "n6c0_n56",
+      "n6c0_n72",
+      "n6c0_n73"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "full problem",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "steady-state fan (5.7)",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "time-dependent fan (5.14)",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e43",
+    "pattern_type": "composed_of",
+    "evidence_span": "Above and below the fan are pure regions of small and large particles, as shown in the left-hand panels of Fig. 4",
+    "node_ids": [
+      "n6c0_n56",
+      "n6c0_n74"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "full problem",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "pure regions of small and large particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e44",
+    "pattern_type": "influences",
+    "evidence_span": "The fans continue to expand until the laterally uniform time-dependent sections intersect with the surface and base of the flow at times $t _ { t o p }$ and $t _ { b o t t o m }$",
+    "node_ids": [
+      "n6c0_n75",
+      "n6c0_n53"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "laterally uniform time-dependent sections",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "horizontal boundaries $z = 0 , 1$",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e7",
+    "pattern_type": "influences",
+    "evidence_span": "Neglecting the time-derivatives in the segregation equation (3.3) and expanding the remaining terms yields a first order quasi-linear equation of the form",
+    "node_ids": [
+      "n6c0_n15",
+      "n6c0_n14"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "segregation equation (3.3)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "time-derivatives",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a mathematical operation (neglecting terms) that transforms an equation, not a functional dependence between quantities. The 'influences' pattern requires a causal/scaling dependence, which is not present here. The relation is a derivation step, not a dependency.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6c0_e8",
+    "pattern_type": "defines",
+    "evidence_span": "Neglecting the time-derivatives in the segregation equation (3.3) and expanding the remaining terms yields a first order quasi-linear equation of the form",
+    "node_ids": [
+      "n6c0_n16",
+      "n6c0_n15"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "first order quasi-linear equation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "segregation equation (3.3)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that a first-order quasi-linear equation is derived from the segregation equation, not that the first-order equation is defined as the segregation equation. This is a derivation, not a definitional identity. The 'defines' pattern requires a definitional identity, which is not present.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6c0_e9",
+    "pattern_type": "defines",
+    "evidence_span": "The small particle concentration $\\phi$ is equal to a constant $\\phi _ { \\lambda }$ along the characteristic curve",
+    "node_ids": [
+      "n6c0_n18",
+      "n6c0_n19"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "small particle concentration $\\phi$",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "constant $\\phi _ { \\lambda }$",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the concentration is equal to a constant along a curve, which is a property of the characteristic curve, not a definition of the concentration. This is a mathematical statement about the solution, not a definitional identity. The 'defines' pattern requires a definitional identity, which is not present.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6c0_e10",
+    "pattern_type": "influences",
+    "evidence_span": "The small particle concentration $\\phi$ is equal to a constant $\\phi _ { \\lambda }$ along the characteristic curve given by the subsidiary equation",
+    "node_ids": [
+      "n6c0_n20",
+      "n6c0_n18"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "characteristic curve",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "small particle concentration $\\phi$",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the concentration is constant along the characteristic curve, which is a property of the curve, not a dependence of the curve on the concentration. The 'influences' pattern requires a causal/scaling dependence, which is not present. The relation is a mathematical property, not a dependency.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6c0_e11",
+    "pattern_type": "influences",
+    "evidence_span": "This may be integrated for general positive definite velocity fields with an isolated zero at the origin",
+    "node_ids": [
+      "n6c0_n22",
+      "n6c0_n23"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "general positive definite velocity fields",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "isolated zero at the origin",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the integration is possible for a class of velocity fields, which is a condition for the integration, not a dependence of the velocity fields on the zero. The 'influences' pattern requires a causal/scaling dependence, which is not present. The relation is a mathematical condition, not a dependency.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6c0_e12",
+    "pattern_type": "defines",
+    "evidence_span": "by using the depth-integrated velocity coordinates defined in (4.7) to give where $( x _ { \\lambda } , \\psi _ { \\lambda } )$ is the starting position in mapped coordinates",
+    "node_ids": [
+      "n6c0_n24",
+      "n6c0_n25"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "depth-integrated velocity coordinates",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "starting position in mapped coordinates",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the starting position is in mapped coordinates, which is a property of the position, not a definition of the coordinates. The 'defines' pattern requires a definitional identity, which is not present. The relation is a property, not a definition.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6c0_e13",
+    "pattern_type": "influences",
+    "evidence_span": "Characteristic curves on which $\\phi _ { \\lambda } > 1 / 2$ propagate up through the avalanche, whilst curves with $\\phi _ { \\lambda } <$ $1 / 2$ propagate down towards the base of the flow",
+    "node_ids": [
+      "n6c0_n26",
+      "n6c0_n18"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Characteristic curves",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "small particle concentration $\\phi$",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes the propagation direction of characteristic curves based on the concentration value, which is a property of the curves, not a dependence of the curves on the concentration. The 'influences' pattern requires a causal/scaling dependence, which is not present. The relation is a property, not a dependency.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6c0_e14",
+    "pattern_type": "influences",
+    "evidence_span": "It follows that at the inflow concentration discontinuity, which lies at $z = z _ { r } , \\mathrm { o r } , \\psi = \\psi _ { r }$ in mapped coordinates, the characteristics diverge from one another and a centred expansion fan is formed",
+    "node_ids": [
+      "n6c0_n27",
+      "n6c0_n28"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "inflow concentration discontinuity",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "centred expansion fan",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the expansion fan is formed at the discontinuity, which is a spatial location, not a causal dependence of the fan on the discontinuity. The 'influences' pattern requires a causal/scaling dependence, which is not present. The relation is a spatial co-location, not a dependency.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6c0_e15",
+    "pattern_type": "defines",
+    "evidence_span": "The characteristic curve $\\psi = \\psi _ { r } - x$ (on which $\\phi = 0 )$ lies along the lower boundary of the expansion fan and separates it from a pure region of large particles",
+    "node_ids": [
+      "n6c0_n29",
+      "n6c0_n30"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "lower boundary of the expansion fan",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "pure region of large particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states a spatial separation relation ('separates it from'), not a definitional identity. The edge incorrectly frames a geometric boundary as a 'defines' relation. The subject is a curve, not a defined concept, and the object is a region, not a definition.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6c0_e16",
+    "pattern_type": "defines",
+    "evidence_span": "It represents the trajectory of the first small particles percolating towards the base of the avalanche",
+    "node_ids": [
+      "n6c0_n31",
+      "n6c0_n29"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "trajectory of the first small particles",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "lower boundary of the expansion fan",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that a curve 'represents' a trajectory, which is a representational or descriptive relation, not a definitional identity. The edge incorrectly frames a physical interpretation as a 'defines' relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6c0_e17",
+    "pattern_type": "defines",
+    "evidence_span": "Similarly, the curve $\\psi = \\psi _ { r } + x$ (on which $\\phi = 1 )$ separates the fan from a region of small particles above",
+    "node_ids": [
+      "n6c0_n32",
+      "n6c0_n33"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "curve $\\psi = \\psi _ { r } + x$",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "region of small particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states a spatial separation relation ('separates the fan from'), not a definitional identity. The edge incorrectly frames a geometric boundary as a 'defines' relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6c0_e18",
+    "pattern_type": "defines",
+    "evidence_span": "represents the front of the first large particles that are being pushed up to the free-surface",
+    "node_ids": [
+      "n6c0_n34",
+      "n6c0_n32"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "front of the first large particles",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "curve $\\psi = \\psi _ { r } + x$",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that a curve 'represents' a front, which is a representational or descriptive relation, not a definitional identity. The edge incorrectly frames a physical interpretation as a 'defines' relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6c0_e20",
+    "pattern_type": "defines",
+    "evidence_span": "The steady-state version of the jump condition (3.4) with $\\phi ^ { + }$ given by (5.7) and $\\phi ^ { - } = 1$ reduces to in mapped coordinates",
+    "node_ids": [
+      "n6c0_n36",
+      "n6c0_n35"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "jump condition (3.4)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "concentration shock",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that a jump condition 'reduces to' a specific form, which is a mathematical reduction or simplification, not a definitional identity. The edge incorrectly frames a mathematical derivation as a 'defines' relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6c0_e21",
+    "pattern_type": "defines",
+    "evidence_span": "This is a linear ODE that can easily be integrated subject to the initial condition that ψ = 0 at $x = \\psi _ { \\tau }$ r to give the height of the bottom shock",
+    "node_ids": [
+      "n6c0_n37",
+      "n6c0_n38"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "linear ODE",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "height of the bottom shock",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that integrating an ODE 'gives' the height of a shock, which is a mathematical derivation, not a definitional identity. The edge incorrectly frames a computational result as a 'defines' relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6c0_e22",
+    "pattern_type": "influences",
+    "evidence_span": "An analogous upper shock Article submitted to Royal Society forms as the large particles separate out into a pure phase",
+    "node_ids": [
+      "n6c0_n39",
+      "n6c0_n42"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "upper shock",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "inversely graded layers of large and small particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that a shock 'forms as' particles separate, which is a formation or emergence process, not a causal influence or dependency. The edge incorrectly frames a physical process as an 'influences' relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6c0_e23",
+    "pattern_type": "influences",
+    "evidence_span": "The upper and lower shocks meet at and a third shock is formed between the inversely graded layers of large and small particles along the line",
+    "node_ids": [
+      "n6c0_n40",
+      "n6c0_n41"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "upper and lower shocks",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "third shock",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that shocks 'meet' and a third shock 'is formed', which is a formation or emergence process, not a causal influence or dependency. The edge incorrectly frames a physical process as an 'influences' relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6c0_e32",
+    "pattern_type": "defines",
+    "evidence_span": "Expanding the derivatives in the segregation equation (3.3) yields a first order quasi-linear equation Article submitted to Royal Society Article submitted to Royal Society that governs the full problem",
+    "node_ids": [
+      "n6c0_n57",
+      "n6c0_n56"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "first order quasi-linear equation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "full problem",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the equation 'governs' the full problem, which is a functional/dependency relation (influences), not a definitional identity (defines). The pattern_type is incorrect, and the slot binding is wrong because the equation is not being defined as the full problem.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6c0_e33",
+    "pattern_type": "defines",
+    "evidence_span": "The method of characteristics implies that the concentration is equal to a constant $\\phi _ { \\lambda }$ on characteristic curves (parameterized by λ) given by the subsidiary equations",
+    "node_ids": [
+      "n6c0_n58",
+      "n6c0_n59"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "characteristic curves",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "subsidiary equations",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that characteristic curves are 'given by' the subsidiary equations, which is a definitional relation. However, the subject is 'characteristic curves' and the definition is 'subsidiary equations', which is reversed. The correct relation is that the subsidiary equations define the characteristic curves, not the other way around. The role binding is incorrect.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6c0_e34",
+    "pattern_type": "defines",
+    "evidence_span": "The first and second can then be integrated using (5.20) and the definition of the linear velocity field (4.14) to show that",
+    "node_ids": [
+      "n6c0_n60",
+      "n6c0_n58"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "linear velocity field (4.14)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "characteristic curves",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the linear velocity field is 'used in' the integration, which is a methodological application, not a definitional identity. The relation is not 'defines'. The slot binding is also incorrect as the linear velocity field is not being defined as characteristic curves.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6c0_e35",
+    "pattern_type": "defines",
+    "evidence_span": "At $t = 0$ the line $x = 0$ separates the material that was initially in the chute from the material that subsequently enters the chute along $x = 0$",
+    "node_ids": [
+      "n6c0_n61",
+      "n6c0_n62",
+      "n6c0_n63"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "line $x = 0$",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "material that was initially in the chute",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "material that subsequently enters the chute",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the line 'separates' two materials, which is a spatial or compositional relation, not a definitional identity. The pattern_type 'defines' is incorrect. The slot binding is also wrong because the line is not being defined as the material.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6c0_e36",
+    "pattern_type": "influences",
+    "evidence_span": "Material initially in the chute is swept downstream, and experiences segregation in a time dependent expansion fan (5.14)",
+    "node_ids": [
+      "n6c0_n62",
+      "n6c0_n64"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "material that was initially in the chute",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "time dependent expansion fan (5.14)",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the material 'experiences segregation in' a fan, which is a process or state, not a causal dependence (influences). The pattern_type is incorrect. The slot binding is also wrong because the material is not influencing the fan; it is undergoing a process within it.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6c0_e40",
+    "pattern_type": "defines",
+    "evidence_span": "Within the time-dependent characteristic fan, $\\phi _ { \\lambda }$ is given by (5.14), and the material on the time-dependent side of the fan-interface therefore lies along the straight line at time t",
+    "node_ids": [
+      "n6c0_n68",
+      "n6c0_n69"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "time-dependent characteristic fan",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "straight line",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the material 'lies along' a straight line, which is a spatial configuration, not a definitional identity. The pattern_type 'defines' is incorrect. The slot binding is also wrong because the fan is not being defined as the line.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6c0_e41",
+    "pattern_type": "defines",
+    "evidence_span": "Equating the time-dependent and steady-state fan concentrations (5.14) and (5.7) also yields (5.22). This shows that the fan-interface (5.22) creates a continuous match between the steady-state and time-dependent fans",
+    "node_ids": [
+      "n6c0_n70",
+      "n6c0_n71"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "time-dependent and steady-state fan concentrations (5.14) and (5.7)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "fan-interface (5.22)",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that equating concentrations 'yields' the fan-interface, which is a derivation or result, not a definitional identity. The pattern_type 'defines' is incorrect. The slot binding is also wrong because the concentrations are not being defined as the fan-interface.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7c0_e3",
+    "pattern_type": "influences",
+    "evidence_span": "Using the linear velocity profile (4.14) and the inverse mapping (4.16), the first equation reduces to",
+    "node_ids": [
+      "n7c0_n13",
+      "n7c0_n14",
+      "n7c0_n15"
+    ],
+    "node_roles": [
+      "source",
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "linear velocity profile (4.14)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "inverse mapping (4.16)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "characteristic curves",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e12",
+    "pattern_type": "composed_of",
+    "evidence_span": "There is a steady-state section EF, a fully dynamic curve FG and a laterally uniform time-dependent section GH",
+    "node_ids": [
+      "n7c0_n32",
+      "n7c0_n33",
+      "n7c0_n34",
+      "n7c0_n35"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "fully dynamic top shock",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "steady-state section EF",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "fully dynamic curve FG",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "laterally uniform time-dependent section GH",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e19",
+    "pattern_type": "influences",
+    "evidence_span": "The current position of the fully dynamic part of the top shock is therefore",
+    "node_ids": [
+      "n7c0_n45",
+      "n7c0_n46"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "expanding fan of characteristic curves",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "current position of the fully dynamic part of the top shock",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e20",
+    "pattern_type": "influences",
+    "evidence_span": "The evolution of the three sections of the top shock are illustrated in the righthand panels of Fig. 4 for α=1/2 and zr=0.4.",
+    "node_ids": [
+      "n7c0_n47",
+      "n7c0_n48"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "evolution of the three sections of the top shock",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "upper and lower time-dependent laterally uniform shocks",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e4",
+    "pattern_type": "composed_of",
+    "evidence_span": "the dot-dash curve AC, which is defined by the trajectory of the intersection between the fan-interface CF and the laterally uniform shock CD.",
+    "node_ids": [
+      "n7c0_n16",
+      "n7c0_n17",
+      "n7c0_n18"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "dot-dash curve AC",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "fan-interface CF",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "laterally uniform shock CD",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence explicitly states that the dot-dash curve AC is defined by the trajectory of the intersection between the fan-interface CF and the laterally uniform shock CD. This is a structural composition where the curve is the whole and the two intersecting entities are the components.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n7c0_e8",
+    "pattern_type": "influences",
+    "evidence_span": "As α⟶0, the mapped discontinuity height ψr⟶zr^2 and xb(tbottom)⟶zr^2",
+    "node_ids": [
+      "n7c0_n26",
+      "n7c0_n27"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mapped discontinuity height ψr",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "xb(tbottom)",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states that as α approaches 0, both ψr and xb(tbottom) approach zr^2, indicating a dependence of both quantities on α. The edge captures the co-limit of ψr and xb(tbottom) as a dependence relation, which is a reasonable interpretation of the 'influences' pattern in this context.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n7c0_e9",
+    "pattern_type": "influences",
+    "evidence_span": "Since λ1(xb(tbottom))=−2zr the constant c in (5.28) is negative and It follows that (5.31) has a logarithmic singularity as α⟶0",
+    "node_ids": [
+      "n7c0_n28",
+      "n7c0_n29"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "constant c",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "logarithmic singularity",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly states that because the constant c is negative, a logarithmic singularity follows. This is a direct causal/dependence relation between the constant c and the singularity, matching the 'influences' pattern.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n7c0_e10",
+    "pattern_type": "influences",
+    "evidence_span": "It follows that (5.31) has a logarithmic singularity as α⟶0, and, therefore, point B can not move away from its initial position in simple-shear.",
+    "node_ids": [
+      "n7c0_n29",
+      "n7c0_n30"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "logarithmic singularity",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "point B",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states that the logarithmic singularity prevents point B from moving. This is a clear causal dependence where the singularity (source) prevents the movement of point B (target), matching the 'influences' pattern.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n7c0_e17",
+    "pattern_type": "influences",
+    "evidence_span": "The shocks are initiated along the trajectory of point F, which moves along the steady-state section of the upper shock EF",
+    "node_ids": [
+      "n7c0_n42",
+      "n7c0_n43"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "trajectory of point F",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "steady-state section of the upper shock EF",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states that the trajectory of point F 'moves along' the steady-state section. This is a spatial/geometric containment or path relation, not a causal or functional dependence. The trajectory is a path that lies on the section, which is better captured by 'composed_of' (the trajectory is part of the section's geometry) or a similar structural relation. The 'influences' pattern requires a genuine causal/scaling dependence, which is not present here.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "retype:composed_of"
+  },
+  {
+    "edge_id": "n7c0_e21",
+    "pattern_type": "influences",
+    "evidence_span": "At time t3 the upper and lower time-dependent laterally uniform shocks meet to form a third laterally uniform shock z3",
+    "node_ids": [
+      "n7c0_n48",
+      "n7c0_n49"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "upper and lower time-dependent laterally uniform shocks",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "third laterally uniform shock z3",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states that the upper and lower shocks 'meet to form' a third shock. This is a structural composition relation: the two shocks are components that make up the third shock. The 'influences' pattern requires a causal or scaling dependence, which is not present. The relation is better captured by 'composed_of' (the third shock is composed of the upper and lower shocks).",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "retype:composed_of"
+  },
+  {
+    "edge_id": "n7c0_e24",
+    "pattern_type": "influences",
+    "evidence_span": "the section generated by xo∈[xtop,xotriple] has already intersected with the bottom shock",
+    "node_ids": [
+      "n7c0_n53",
+      "n7c0_n54"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "section generated by xo",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "bottom shock",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states that the section 'has already intersected with' the bottom shock. This is a spatial interaction or collision, not a causal or functional dependence. The 'influences' pattern requires a genuine causal/scaling dependence, which is not present. The relation is better captured by 'influences' (the section influences the bottom shock) or a similar interaction relation.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "retype:influences"
+  },
+  {
+    "edge_id": "n7c0_e25",
+    "pattern_type": "influences",
+    "evidence_span": "At these points, the shock is a jump from φ=0 to φ=1, and consequently now form part of the third shock z3",
+    "node_ids": [
+      "n7c0_n55",
+      "n7c0_n56"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "jump from φ=0 to φ=1",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "third shock z3",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states that the jump 'form[s] part of' the third shock. This is a structural composition relation: the jump is a component of the third shock. The 'influences' pattern requires a causal or scaling dependence, which is not present. The relation is better captured by 'composed_of' (the third shock is composed of the jump).",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "retype:composed_of"
+  },
+  {
+    "edge_id": "n7c0_e26",
+    "pattern_type": "influences",
+    "evidence_span": "the third shock z3 which is governed by the conservation law (4.20)",
+    "node_ids": [
+      "n7c0_n56",
+      "n7c0_n57"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "third shock z3",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "conservation law (4.20)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states that the third shock is 'governed by' the conservation law. This is a functional dependence: the shock's behavior is determined by the law. The relation is correctly identified as 'influences' (the law influences the shock). The slot binding is correct: the shock is the source, and the law is the target.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "retype:influences"
+  },
+  {
+    "edge_id": "n8c1_e0",
+    "pattern_type": "defines",
+    "evidence_span": "an inversely graded layer is formed, which is the basic building block",
+    "node_ids": [
+      "n8c1_n1",
+      "n8c1_n2"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "inversely graded layer",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "basic building block",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that an inversely graded layer is formed and that it is a basic building block, but this is a descriptive statement about the layer's role, not a definitional identity. The sentence does not define 'inversely graded layer' as 'basic building block'; it says the layer is a building block. This is a claim about the layer's function, not a definition. The pattern 'defines' requires a definitional identity (X is defined as Y), which is not present here. The relation is better characterized as a claim or descriptive statement, not a definition.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n8c1_e1",
+    "pattern_type": "composed_of",
+    "evidence_span": "basic building block for many pattern formation processes",
+    "node_ids": [
+      "n8c1_n2",
+      "n8c1_n3"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "basic building block",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "many pattern formation processes",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that an inversely graded layer is a basic building block for many pattern formation processes. This is a statement about the layer's role or function in pattern formation, not a structural composition. The pattern 'composed_of' requires structural composition (parts making up a whole), which is not present here. The sentence does not say that the layer is composed of pattern formation processes; it says the layer is a building block for them. This is a functional or causal statement, not a structural one. The relation is better characterized as a claim or influence, not composition.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n9_e6",
+    "pattern_type": "develops_during_flow",
+    "evidence_span": "particles separate out into inversely-graded layers sufficiently far downstream",
+    "node_ids": [
+      "n9_n5",
+      "n9_n3"
+    ],
+    "node_roles": [
+      "phenomenon",
+      "process"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "inversely-graded layers",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "steady uniform chute flows",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  }
+]

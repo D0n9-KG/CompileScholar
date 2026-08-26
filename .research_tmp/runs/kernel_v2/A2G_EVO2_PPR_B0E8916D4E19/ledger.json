@@ -1,0 +1,5043 @@
+[
+  {
+    "mutations": [
+      {
+        "op": "add_edge",
+        "target": "n1_e1",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "inelastic particles in Couette flow",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "inelastic particles in Couette flow",
+              "central": true
+            },
+            {
+              "surface": "other theories of granular flow",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "other theories of granular flow",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "compared_with",
+            "_evidence_offset": "933"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "front_matter",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.1",
+        "evidence": "The results of this first analysis are compared with other theories of granular flow",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-26T08:12:31Z",
+        "mutation_id": "mut_000001",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1_e2",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "inelastic particles in Couette flow",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "inelastic particles in Couette flow",
+              "central": true
+            },
+            {
+              "surface": "Chapman–Enskog dense-gas theory",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "Chapman–Enskog dense-gas theory",
+              "central": true
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "compared_with",
+            "_evidence_offset": "933"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "front_matter",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.1",
+        "evidence": "The results of this first analysis are compared with other theories of granular flow, with the Chapman–Enskog dense-gas theory",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-26T08:12:31Z",
+        "mutation_id": "mut_000002",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1_e3",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "inelastic particles in Couette flow",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "inelastic particles in Couette flow",
+              "central": true
+            },
+            {
+              "surface": "experiments",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "experiments",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "compared_with",
+            "_evidence_offset": "933"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "front_matter",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.1",
+        "evidence": "The results of this first analysis are compared with other theories of granular flow, with the Chapman–Enskog dense-gas theory, and with experiments",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-26T08:12:31Z",
+        "mutation_id": "mut_000003",
+        "status": "committed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.1",
+      "validated": [
+        "mut_000001",
+        "mut_000002",
+        "mut_000003"
+      ],
+      "rejected": [],
+      "routed": []
+    },
+    "version_diff": {
+      "before": "0.1",
+      "after": "0.1"
+    }
+  },
+  {
+    "mutations": [
+      {
+        "op": "add_edge",
+        "target": "n2c0_e0",
+        "payload": {
+          "kind": "background",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "kinetic theories for granular flow",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "we may speak of kinetic theories for granular flow",
+              "central": true
+            },
+            {
+              "surface": "Chapman–Enskog kinetic theory of dense gases",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "This assumption naturally suggests an analogy with the Chapman–Enskog kinetic theory of dense gases",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "analogy",
+            "_evidence_offset": "351"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "1. Introduction",
+            "cited_from": "prior_art",
+            "method": "theory",
+            "evidence_strength": "assumed"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.1",
+        "evidence": "This assumption naturally suggests an analogy with the Chapman–Enskog kinetic theory of dense gases",
+        "rationale": "extracted background",
+        "timestamp": "2026-08-26T08:13:10Z",
+        "mutation_id": "mut_000004",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n2c0_e1",
+        "payload": {
+          "kind": "background",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "kinetic theories for granular flow",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "we may speak of kinetic theories for granular flow",
+              "central": true
+            },
+            {
+              "surface": "statistical methods developed for gases",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "certain of the statistical methods developed for gases have been used in the analysis of granular flow",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "uses",
+            "_evidence_offset": "489"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "1. Introduction",
+            "cited_from": "prior_art",
+            "method": "theory",
+            "evidence_strength": "assumed"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.1",
+        "evidence": "certain of the statistical methods developed for gases have been used in the analysis of granular flow",
+        "rationale": "extracted background",
+        "timestamp": "2026-08-26T08:13:10Z",
+        "mutation_id": "mut_000005",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n2c0_e7",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target"
+          ],
+          "concepts": [
+            {
+              "surface": "energy dissipated as a result of collisions",
+              "type": "PROPERTY",
+              "role": "source",
+              "evidence": "calculated the energy dissipated as a result of collisions",
+              "central": false
+            },
+            {
+              "surface": "coefficient of restitution e",
+              "type": "PARAMETER",
+              "role": "target",
+              "evidence": "they possess a conventional coefficient of restitution e",
+              "central": true
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "functional",
+            "applies_in_regime": "simple shear flow",
+            "_evidence_offset": "1428"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "1. Introduction",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.1",
+        "evidence": "calculated the energy dissipated as a result of collisions, so that the ratio ... can be found as a function of e",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-26T08:13:10Z",
+        "mutation_id": "mut_000006",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n2c1_e0",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "ad hoc analysis of Jenkins & Savage (1983)",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "the simpler ad hoc analysis of Jenkins & Savage (1983)",
+              "central": false
+            },
+            {
+              "surface": "simple expressions for the singlet- and pair-distribution functions",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "assumes simple expressions for the singlet- and pair-distribution functions",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "contrast",
+            "_evidence_offset": "5746"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "1. Introduction",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.1",
+        "evidence": "Comparisons are made with the simpler ad hoc analysis of Jenkins & Savage (1983) which assumes simple expressions for the singlet- and pair-distribution functions.",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-26T08:13:10Z",
+        "mutation_id": "mut_000007",
+        "status": "committed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.1",
+      "validated": [
+        "mut_000004",
+        "mut_000005",
+        "mut_000006",
+        "mut_000007"
+      ],
+      "rejected": [],
+      "routed": []
+    },
+    "version_diff": {
+      "before": "0.1",
+      "after": "0.1"
+    }
+  },
+  {
+    "mutations": [
+      {
+        "op": "add_pattern",
+        "target": "contrasts_with",
+        "payload": {
+          "pattern": {
+            "pattern_id": "contrasts_with",
+            "description": "A discourse relation where one theory/approach is explicitly contrasted with another, often to highlight differences in assumptions, scope, or predictions. This is distinct from compares (which is about side-by-side evaluation) and claim_relation (which is about support/opposition between claims).",
+            "role_slots": [
+              {
+                "role": "from",
+                "type": "THING"
+              },
+              {
+                "role": "to",
+                "type": "THING"
+              }
+            ],
+            "allowed_qualifiers": [
+              "relation_type",
+              "cited_from",
+              "evidence_strength",
+              "method",
+              "contrast_dimension"
+            ],
+            "deprecated": false,
+            "split_from": "",
+            "is_abstract": false,
+            "family": "claim",
+            "semantic_boundary": "contrasts_with = explicit opposition between two theories/approaches, NOT side-by-side evaluation (compares) and NOT support/opposition between claims (claim_relation)."
+          }
+        },
+        "proposer_role": "evolver",
+        "domain": "granular",
+        "base_version": "0.1",
+        "evidence": "This is in contrast with the Jenkins & Savage (1983) treatment",
+        "rationale": "The failing hyperedges HE0 and HE1 express a 'contrast' relation between theories, which is semantically distinct from 'compares' (which implies side-by-side evaluation or equivalence/contrast of formulations). The evidence explicitly uses 'in contrast with', indicating a discourse-level contrast between approaches, not a comparison of their outputs. This is a genuine schema gap: the current 'compares' pattern requires either parallel alternatives, theory-vs-experiment validation, or equivalence/contrast of formulations — but 'contrast' here is about highlighting differences in treatment/assumptions, not evaluating them side-by-side. The new pattern captures this discourse relation.",
+        "timestamp": "2026-08-26T08:13:21Z",
+        "mutation_id": "mut_000008",
+        "status": "committed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.2",
+      "validated": [
+        "mut_000008"
+      ],
+      "rejected": [],
+      "routed": []
+    },
+    "version_diff": {
+      "before": "0.1",
+      "after": "0.2"
+    }
+  },
+  {
+    "mutations": [
+      {
+        "op": "add_pattern",
+        "target": "validates_against",
+        "payload": {
+          "pattern": {
+            "pattern_id": "validates_against",
+            "description": "A relation where a theory/model's predictions are validated or checked against experimental or observational data. This is distinct from 'compares' (which includes theory-vs-experiment as one subtype) because it specifically emphasizes the validation/evaluation aspect, not just side-by-side comparison.",
+            "role_slots": [
+              {
+                "role": "from",
+                "type": "THING"
+              },
+              {
+                "role": "to",
+                "type": "THING"
+              }
+            ],
+            "allowed_qualifiers": [
+              "relation_type",
+              "cited_from",
+              "evidence_strength",
+              "method",
+              "validation_outcome"
+            ],
+            "deprecated": false,
+            "split_from": "",
+            "is_abstract": false,
+            "family": "measure",
+            "semantic_boundary": "Use only when the core action is testing/evaluating a model or theory against data; not for mere side-by-side comparison or general agreement."
+          }
+        },
+        "proposer_role": "evolver",
+        "domain": "granular",
+        "base_version": "0.2",
+        "evidence": "comparisons of their predicted stresses with Couette-flow experiments",
+        "rationale": "HE2 describes a theory being validated against experiments ('comparisons of their predicted stresses with Couette-flow experiments'). While 'compares' includes theory-vs-experiment as a subtype, the emphasis here is on validation/evaluation of predictions against data, which is a measurement-like relation. The current 'measures' pattern requires an instrument/method, but here the 'instrument' is an experiment (Couette-flow), and the relation is about validating predictions, not measuring a quantity. This is a distinct structural relation: theory-validated-against-experiment, which deserves its own pattern rather than being shoehorned into 'compares' or 'measures'.",
+        "timestamp": "2026-08-26T08:13:25Z",
+        "mutation_id": "mut_000009",
+        "status": "committed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.3",
+      "validated": [
+        "mut_000009"
+      ],
+      "rejected": [],
+      "routed": []
+    },
+    "version_diff": {
+      "before": "0.2",
+      "after": "0.3"
+    }
+  },
+  {
+    "mutations": [
+      {
+        "op": "add_edge",
+        "target": "n3c1_e0",
+        "payload": {
+          "kind": "composed_of",
+          "roles": [
+            "whole",
+            "component",
+            "component"
+          ],
+          "concepts": [
+            {
+              "surface": "total pressure tensor p",
+              "type": "PROPERTY",
+              "role": "whole",
+              "evidence": "The total pressure tensor p is the sum of a kinetic part and a collisional part",
+              "central": false
+            },
+            {
+              "surface": "kinetic part",
+              "type": "THING",
+              "role": "component",
+              "evidence": "The total pressure tensor p is the sum of a kinetic part and a collisional part",
+              "central": false
+            },
+            {
+              "surface": "collisional part",
+              "type": "THING",
+              "role": "component",
+              "evidence": "The total pressure tensor p is the sum of a kinetic part and a collisional part",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "sum_of",
+            "_evidence_offset": "7184"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "2. Integral forms for the constitutive equations for stress, flux of fluctuation energy and dissipation",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "The total pressure tensor p is the sum of a kinetic part and a collisional part",
+        "rationale": "extracted composed_of",
+        "timestamp": "2026-08-26T08:14:49Z",
+        "mutation_id": "mut_000010",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c1_e1",
+        "payload": {
+          "kind": "composed_of",
+          "roles": [
+            "whole",
+            "component",
+            "component"
+          ],
+          "concepts": [
+            {
+              "surface": "flux of fluctuation energy q",
+              "type": "PROPERTY",
+              "role": "whole",
+              "evidence": "Similarly, the flux of fluctuation energy q is the sum of a kinetic part and a collisional part",
+              "central": false
+            },
+            {
+              "surface": "kinetic part",
+              "type": "THING",
+              "role": "component",
+              "evidence": "Similarly, the flux of fluctuation energy q is the sum of a kinetic part and a collisional part",
+              "central": false
+            },
+            {
+              "surface": "collisional part",
+              "type": "THING",
+              "role": "component",
+              "evidence": "Similarly, the flux of fluctuation energy q is the sum of a kinetic part and a collisional part",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "sum_of",
+            "_evidence_offset": "7264"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "2. Integral forms for the constitutive equations for stress, flux of fluctuation energy and dissipation",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "Similarly, the flux of fluctuation energy q is the sum of a kinetic part and a collisional part",
+        "rationale": "extracted composed_of",
+        "timestamp": "2026-08-26T08:14:49Z",
+        "mutation_id": "mut_000011",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c0_e2",
+        "payload": {
+          "kind": "improves",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "collisional integrals",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "collisional integrals",
+              "central": true
+            },
+            {
+              "surface": "Jenkins & Savage (1983)",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "Jenkins & Savage (1983)",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "corrects",
+            "_evidence_offset": "632"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "2. Integral forms for the constitutive equations for stress, flux of fluctuation energy and dissipation",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "Some manipulations of the collisional integrals in the paper of Jenkins & Savage (1983) are inappropriate and some higher-order terms were neglected. Although these oversights did not affect the end results for the constitutive equations of Jenkins & Savage (1983), they would cause errors in the more detailed analysis given in the latter part of the present paper. In the present section we provide a more careful derivation of these collisional integrals for the case of smooth, hard, inelastic particles of uniform diameter.",
+        "rationale": "extracted improves",
+        "timestamp": "2026-08-26T08:14:49Z",
+        "mutation_id": "mut_000012",
+        "status": "committed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.3",
+      "validated": [
+        "mut_000010",
+        "mut_000011",
+        "mut_000012"
+      ],
+      "rejected": [],
+      "routed": []
+    },
+    "version_diff": {
+      "before": "0.3",
+      "after": "0.3"
+    }
+  },
+  {
+    "mutations": [
+      {
+        "op": "add_edge",
+        "target": "n4c1_e0",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "predictions of stresses",
+              "type": "PROPERTY",
+              "role": "from",
+              "evidence": "The predictions of stresses for the case of simple shear",
+              "central": false
+            },
+            {
+              "surface": "experimental results",
+              "type": "PROPERTY",
+              "role": "to",
+              "evidence": "experimental results for the annular shear-cell tests of Savage & Sayed (1980)",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "theory_vs_experiment",
+            "_evidence_offset": "6432"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3. Couette flow of inelastic particles",
+            "cited_from": "prior_art",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "The predictions of stresses for the case of simple shear are also compared with experimental results for the annular shear-cell tests of Savage & Sayed (1980)",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-26T08:16:15Z",
+        "mutation_id": "mut_000013",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n4c1_e1",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "predictions of stresses",
+              "type": "PROPERTY",
+              "role": "from",
+              "evidence": "The predictions of stresses for the case of simple shear",
+              "central": false
+            },
+            {
+              "surface": "Chapman–Enskog dense-gas kinetic theory",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "the Chapman–Enskog dense-gas kinetic theory (Chapman & Cowling 1970)",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "theory_vs_theory",
+            "_evidence_offset": "6432"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3. Couette flow of inelastic particles",
+            "cited_from": "prior_art",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "The predictions of stresses for the case of simple shear are also compared with ... the Chapman–Enskog dense-gas kinetic theory (Chapman & Cowling 1970)",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-26T08:16:15Z",
+        "mutation_id": "mut_000014",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n4c0_e0",
+        "payload": {
+          "kind": "background",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "Savage & Jeffrey (1981)",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "This is the case considered by Savage & Jeffrey (1981), and we use the pair-distribution function they proposed.",
+              "central": false
+            },
+            {
+              "surface": "pair-distribution function",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "we use the pair-distribution function they proposed",
+              "central": true
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "uses",
+            "_evidence_offset": "160"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3. Couette flow of inelastic particles",
+            "cited_from": "prior_art",
+            "evidence_strength": "assumed"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "This is the case considered by Savage & Jeffrey (1981), and we use the pair-distribution function they proposed.",
+        "rationale": "extracted background",
+        "timestamp": "2026-08-26T08:16:15Z",
+        "mutation_id": "mut_000015",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n4c0_e1",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "granular-flow theories",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "Comparisons of the various granular-flow theories with experiments",
+              "central": false
+            },
+            {
+              "surface": "experiments",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "Comparisons of the various granular-flow theories with experiments",
+              "central": false
+            },
+            {
+              "surface": "Chapman–Enskog dense-gas analysis",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "Comparisons of the various granular-flow theories with experiments and the Chapman–Enskog dense-gas analysis (Chapman & Cowling 1970)",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "comparison",
+            "_evidence_offset": "642"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3. Couette flow of inelastic particles",
+            "cited_from": "this_work",
+            "evidence_strength": "hypothesized"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "Comparisons of the various granular-flow theories with experiments and the Chapman–Enskog dense-gas analysis (Chapman & Cowling 1970) will give some ideas of their merits and shortcomings.",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-26T08:16:15Z",
+        "mutation_id": "mut_000016",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n4c0_e2",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target"
+          ],
+          "concepts": [
+            {
+              "surface": "translational fluctuation energy equation (2.15)",
+              "type": "METHOD",
+              "role": "source",
+              "evidence": "the translational fluctuation energy equation (2.15) reduces to a simple balance",
+              "central": false
+            },
+            {
+              "surface": "simple balance between the shear work and the rate of dissipation",
+              "type": "PHENOMENON",
+              "role": "target",
+              "evidence": "reduces to a simple balance between the shear work and the rate of dissipation",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "reduces_to",
+            "applies_in_regime": "simple shear flow",
+            "_evidence_offset": "1018"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3. Couette flow of inelastic particles",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "In this flow q=0, and the translational fluctuation energy equation (2.15) reduces to a simple balance between the shear work and the rate of dissipation",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-26T08:16:15Z",
+        "mutation_id": "mut_000017",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n4c0_e3",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "R",
+              "type": "PARAMETER",
+              "role": "subject",
+              "evidence": "We write this down using their parameter R",
+              "central": false
+            },
+            {
+              "surface": "temperature",
+              "type": "PROPERTY",
+              "role": "object",
+              "evidence": "or equivalently the temperature $T = \\frac{1}{3}\\langle v^{2} \\rangle$",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "equivalence",
+            "_evidence_offset": "1374"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3. Couette flow of inelastic particles",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "We write this down using their parameter R, or equivalently the temperature $T = \\frac{1}{3}\\langle v^{2} \\rangle$",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-26T08:16:15Z",
+        "mutation_id": "mut_000018",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n4c0_e4",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "v",
+              "type": "PARAMETER",
+              "role": "subject",
+              "evidence": "we now use the symbol v to designate the peculiar velocity",
+              "central": false
+            },
+            {
+              "surface": "C",
+              "type": "PARAMETER",
+              "role": "object",
+              "evidence": "which in the previous section was specified as C",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "renaming",
+            "_evidence_offset": "1585"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3. Couette flow of inelastic particles",
+            "method": "theory",
+            "evidence_strength": "assumed"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "To be consistent with most of the other granular-flow theories we now use the symbol v to designate the peculiar velocity, which in the previous section was specified as C.",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-26T08:16:15Z",
+        "mutation_id": "mut_000019",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n4c0_e5",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "definition",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "g_0(ν)",
+              "type": "PARAMETER",
+              "role": "subject",
+              "evidence": "and $g_0(\\nu)$ is the Carnahan-Starling (1969) expression for the radial distribution function at contact",
+              "central": false
+            },
+            {
+              "surface": "Carnahan-Starling (1969) expression",
+              "type": "METHOD",
+              "role": "definition",
+              "evidence": "and $g_0(\\nu)$ is the Carnahan-Starling (1969) expression for the radial distribution function at contact",
+              "central": false
+            },
+            {
+              "surface": "radial distribution function at contact",
+              "type": "PROPERTY",
+              "role": "object",
+              "evidence": "expression for the radial distribution function at contact",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "is",
+            "_math_binding_review": "1",
+            "_evidence_offset": "1998"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3. Couette flow of inelastic particles",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "and $g_0(\\nu)$ is the Carnahan-Starling (1969) expression for the radial distribution function at contact:",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-26T08:16:15Z",
+        "mutation_id": "mut_000020",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n4c0_e6",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "computer experiments by Campbell (1982)",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "Recent computer experiments by Campbell (1982) show a similar form for the collisional distribution function at low concentration",
+              "central": false
+            },
+            {
+              "surface": "collisional distribution function",
+              "type": "PROPERTY",
+              "role": "to",
+              "evidence": "show a similar form for the collisional distribution function at low concentration",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "similarity",
+            "_evidence_offset": "2105"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3. Couette flow of inelastic particles",
+            "method": "simulation",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "Recent computer experiments by Campbell (1982) show a similar form for the collisional distribution function at low concentration; however, he finds a distribution function that contained spikes at higher concentrations.",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-26T08:16:15Z",
+        "mutation_id": "mut_000021",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n4c0_e7",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target",
+            "target"
+          ],
+          "concepts": [
+            {
+              "surface": "conservation of linear momentum",
+              "type": "PHENOMENON",
+              "role": "source",
+              "evidence": "the conservation of linear momentum requires that the velocities of the particles before collision $c_{1}$ and $c_{2}$ are related to those after collision",
+              "central": false
+            },
+            {
+              "surface": "c1",
+              "type": "PARAMETER",
+              "role": "target",
+              "evidence": "the velocities of the particles before collision $c_{1}$",
+              "central": false
+            },
+            {
+              "surface": "c2",
+              "type": "PARAMETER",
+              "role": "target",
+              "evidence": "and $c_{2}$",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "requires",
+            "_evidence_offset": "2326"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3. Couette flow of inelastic particles",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "For a collision between two identical, smooth, inelastic, spherical particles of diameter $\\sigma$ and mass m, the conservation of linear momentum requires that the velocities of the particles before collision $c_{1}$ and $c_{2}$ are related to those after collision",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-26T08:16:15Z",
+        "mutation_id": "mut_000022",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n4c0_e8",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target"
+          ],
+          "concepts": [
+            {
+              "surface": "coefficient of restitution e",
+              "type": "PARAMETER",
+              "role": "source",
+              "evidence": "The coefficient of restitution e is introduced through $(2.11)$",
+              "central": false
+            },
+            {
+              "surface": "J",
+              "type": "PARAMETER",
+              "role": "target",
+              "evidence": "where J is the impulse of the force between the particles",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "introduces",
+            "_evidence_offset": "2655"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3. Couette flow of inelastic particles",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "The coefficient of restitution e is introduced through $(2.11)$ , allowing us to eliminate J from $(3.4)$ to obtain",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-26T08:16:15Z",
+        "mutation_id": "mut_000023",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n4c0_e10",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "definition",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "ρ",
+              "type": "PARAMETER",
+              "role": "subject",
+              "evidence": "where $\\rho = nm$",
+              "central": false
+            },
+            {
+              "surface": "n",
+              "type": "PARAMETER",
+              "role": "definition",
+              "evidence": "where $\\rho = nm$",
+              "central": false
+            },
+            {
+              "surface": "bulk solid density",
+              "type": "PROPERTY",
+              "role": "object",
+              "evidence": "and is the bulk solid density",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "is",
+            "_math_binding_review": "1",
+            "_evidence_offset": "3067"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3. Couette flow of inelastic particles",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "where $\\rho = nm$ and is the bulk solid density.",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-26T08:16:15Z",
+        "mutation_id": "mut_000024",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n4c0_e11",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "numerical evaluation of (3.10)",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "The numerical evaluation of (3.10) as a function of R is unchanged from Savage & Jeffrey (1981)",
+              "central": false
+            },
+            {
+              "surface": "evaluation of (3.11) for γ*",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "and the evaluation of (3.11) for $\\gamma^{*}$ is similar",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "unchanged_from",
+            "_math_binding_review": "1",
+            "_evidence_offset": "3420"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3. Couette flow of inelastic particles",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "The numerical evaluation of (3.10) as a function of R is unchanged from Savage & Jeffrey (1981), because all new factors have been incorporated in the non-dimensionalization, and the evaluation of (3.11) for $\\gamma^{*}$ is similar.",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-26T08:16:15Z",
+        "mutation_id": "mut_000025",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n4c0_e12",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "4 subsidiary variables",
+              "type": "PARAMETER",
+              "role": "subject",
+              "evidence": "We define 4 subsidiary variables",
+              "central": false
+            },
+            {
+              "surface": "d_n",
+              "type": "PARAMETER",
+              "role": "object",
+              "evidence": "where $n = 1,2,3,4$ and the $d_{n}$ will be chosen separately for each function",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "defines",
+            "_math_binding_review": "1",
+            "_evidence_offset": "4071"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3. Couette flow of inelastic particles",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "We define 4 subsidiary variables where $n = 1,2,3,4$ and the $d_{n}$ will be chosen separately for each function.",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-26T08:16:15Z",
+        "mutation_id": "mut_000026",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n4c0_e13",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target",
+            "target"
+          ],
+          "concepts": [
+            {
+              "surface": "functional form",
+              "type": "METHOD",
+              "role": "source",
+              "evidence": "A functional form that reproduces the series expansion for $p_{xx}^{*}$ correct to $O(R^4)$",
+              "central": false
+            },
+            {
+              "surface": "p_xx*",
+              "type": "PARAMETER",
+              "role": "target",
+              "evidence": "A functional form that reproduces the series expansion for $p_{xx}^{*}$",
+              "central": false
+            },
+            {
+              "surface": "O(R^4)",
+              "type": "NUMERIC",
+              "role": "target",
+              "evidence": "correct to $O(R^4)$",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "reproduces",
+            "_math_binding_review": "1",
+            "_evidence_offset": "4185"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3. Couette flow of inelastic particles",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "A functional form that reproduces the series expansion for $p_{xx}^{*}$ correct to $O(R^4)$ is",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-26T08:16:15Z",
+        "mutation_id": "mut_000027",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n4c0_e16",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target",
+            "target"
+          ],
+          "concepts": [
+            {
+              "surface": "functional form",
+              "type": "METHOD",
+              "role": "source",
+              "evidence": "Next a functional form that is correct to $O(R^3)$ for $p_{xy}^*$",
+              "central": false
+            },
+            {
+              "surface": "p_xy*",
+              "type": "PARAMETER",
+              "role": "target",
+              "evidence": "for $p_{xy}^*$",
+              "central": false
+            },
+            {
+              "surface": "O(R^3)",
+              "type": "NUMERIC",
+              "role": "target",
+              "evidence": "correct to $O(R^3)$",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "correct_to",
+            "_math_binding_review": "1",
+            "_evidence_offset": "4477"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3. Couette flow of inelastic particles",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "Next a functional form that is correct to $O(R^3)$ for $p_{xy}^*$ is",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-26T08:16:15Z",
+        "mutation_id": "mut_000028",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n4c0_e22",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "figure 1",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "The relation is plotted in figure 1",
+              "central": false
+            },
+            {
+              "surface": "data from §3.3",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "together with data from §3.3",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "plotted_with",
+            "_evidence_offset": "4967"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3. Couette flow of inelastic particles",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "The relation is plotted in figure 1 together with data from §3.3.",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-26T08:16:15Z",
+        "mutation_id": "mut_000029",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n4c0_e28",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to",
+            "to",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "comparisons",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "In this section we shall make comparisons of the results just obtained with predictions",
+              "central": false
+            },
+            {
+              "surface": "results just obtained",
+              "type": "PROPERTY",
+              "role": "to",
+              "evidence": "of the results just obtained",
+              "central": false
+            },
+            {
+              "surface": "predictions",
+              "type": "PROPERTY",
+              "role": "to",
+              "evidence": "with predictions given by the recent granular-flow theories",
+              "central": false
+            },
+            {
+              "surface": "recent granular-flow theories",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "with predictions given by the recent granular-flow theories put forth by Ogawa et al. (1980), Shen (1981) and Jenkins & Savage (1983)",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "comparison",
+            "_evidence_offset": "5834"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3. Couette flow of inelastic particles",
+            "method": "theory",
+            "evidence_strength": "hypothesized"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "In this section we shall make comparisons of the results just obtained with predictions given by the recent granular-flow theories put forth by Ogawa et al. (1980), Shen (1981) and Jenkins & Savage (1983).",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-26T08:16:15Z",
+        "mutation_id": "mut_000030",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n4c0_e32",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target"
+          ],
+          "concepts": [
+            {
+              "surface": "further manipulation",
+              "type": "METHOD",
+              "role": "source",
+              "evidence": "they each require further manipulation to recast them in a form suitable for comparison with the present work",
+              "central": false
+            },
+            {
+              "surface": "form suitable for comparison",
+              "type": "PROPERTY",
+              "role": "target",
+              "evidence": "in a form suitable for comparison with the present work",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "require",
+            "_evidence_offset": "6308"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3. Couette flow of inelastic particles",
+            "method": "theory",
+            "evidence_strength": "assumed"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "In addition, they each require further manipulation to recast them in a form suitable for comparison with the present work.",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-26T08:16:15Z",
+        "mutation_id": "mut_000031",
+        "status": "committed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.3",
+      "validated": [
+        "mut_000013",
+        "mut_000014",
+        "mut_000015",
+        "mut_000016",
+        "mut_000017",
+        "mut_000018",
+        "mut_000019",
+        "mut_000020",
+        "mut_000021",
+        "mut_000022",
+        "mut_000023",
+        "mut_000024",
+        "mut_000025",
+        "mut_000026",
+        "mut_000027",
+        "mut_000028",
+        "mut_000029",
+        "mut_000030",
+        "mut_000031"
+      ],
+      "rejected": [],
+      "routed": []
+    },
+    "version_diff": {
+      "before": "0.3",
+      "after": "0.3"
+    }
+  },
+  {
+    "mutations": [
+      {
+        "op": "add_edge",
+        "target": "n5c1_e0",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "Shen's stresses",
+              "type": "PROPERTY",
+              "role": "from",
+              "evidence": "The magnitudes of Shen's stresses",
+              "central": false
+            },
+            {
+              "surface": "Ogawa et al.",
+              "type": "THING",
+              "role": "to",
+              "evidence": "those of Ogawa et al.",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "higher_than",
+            "_evidence_offset": "7133"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3.3.1. Ogawa, Umemura & Oshima (1980)",
+            "cited_from": "this_work",
+            "method": "simulation",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "The magnitudes of Shen's stresses are higher than those of Ogawa et al.",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-26T08:18:10Z",
+        "mutation_id": "mut_000032",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n5c1_e1",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "Shen's stresses",
+              "type": "PROPERTY",
+              "role": "from",
+              "evidence": "The magnitudes of Shen's stresses",
+              "central": false
+            },
+            {
+              "surface": "present theory",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "the present theory",
+              "central": true
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "lower_than",
+            "_evidence_offset": "7133"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3.3.1. Ogawa, Umemura & Oshima (1980)",
+            "cited_from": "this_work",
+            "method": "simulation",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "The magnitudes of Shen's stresses are higher than those of Ogawa et al.; however, they are still considerably lower than those of the present theory.",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-26T08:18:10Z",
+        "mutation_id": "mut_000033",
+        "status": "committed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.3",
+      "validated": [
+        "mut_000032",
+        "mut_000033"
+      ],
+      "rejected": [],
+      "routed": []
+    },
+    "version_diff": {
+      "before": "0.3",
+      "after": "0.3"
+    }
+  },
+  {
+    "mutations": [
+      {
+        "op": "add_edge",
+        "target": "n7_e0",
+        "payload": {
+          "kind": "background",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "present analysis",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "Certain aspects of the present analysis and that of Jenkins & Savage (1983) were based upon the approach used in the Chapman–Enskog hard-sphere kinetic theory of dense gas",
+              "central": true
+            },
+            {
+              "surface": "Chapman–Enskog hard-sphere kinetic theory of dense gas",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "Certain aspects of the present analysis and that of Jenkins & Savage (1983) were based upon the approach used in the Chapman–Enskog hard-sphere kinetic theory of dense gas",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "based_on",
+            "_evidence_offset": "59"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3.3.5. Comparison with the Chapman–Enskog dense-gas theory",
+            "cited_from": "prior_art",
+            "evidence_strength": "assumed"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "Certain aspects of the present analysis and that of Jenkins & Savage (1983) were based upon the approach used in the Chapman–Enskog hard-sphere kinetic theory of dense gas",
+        "rationale": "extracted background",
+        "timestamp": "2026-08-26T08:20:13Z",
+        "mutation_id": "mut_000034",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n7_e1",
+        "payload": {
+          "kind": "background",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "present analysis",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "Certain aspects of the present analysis and that of Jenkins & Savage (1983) were based upon the approach used in the Chapman–Enskog hard-sphere kinetic theory of dense gas",
+              "central": true
+            },
+            {
+              "surface": "Savage & Jeffrey (1981)",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "The main departure initially suggested by Savage & Jeffrey (1981) is that the forms for the one- and two-particle distribution functions were merely assumed to have simple but plausible forms",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "inspired_by",
+            "_evidence_offset": "257"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3.3.5. Comparison with the Chapman–Enskog dense-gas theory",
+            "cited_from": "prior_art",
+            "evidence_strength": "assumed"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "The main departure initially suggested by Savage & Jeffrey (1981) is that the forms for the one- and two-particle distribution functions were merely assumed to have simple but plausible forms",
+        "rationale": "extracted background",
+        "timestamp": "2026-08-26T08:20:13Z",
+        "mutation_id": "mut_000035",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n7_e2",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "present stresses",
+              "type": "PROPERTY",
+              "role": "from",
+              "evidence": "It is of interest therefore to compare the present stresses with those given by the Chapman–Enskog theory.",
+              "central": false
+            },
+            {
+              "surface": "Chapman–Enskog theory",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "It is of interest therefore to compare the present stresses with those given by the Chapman–Enskog theory.",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "compared_with",
+            "_evidence_offset": "561"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3.3.5. Comparison with the Chapman–Enskog dense-gas theory",
+            "cited_from": "this_work",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "It is of interest therefore to compare the present stresses with those given by the Chapman–Enskog theory.",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-26T08:20:13Z",
+        "mutation_id": "mut_000036",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n7_e4",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "g0(ν)",
+              "type": "PARAMETER",
+              "role": "from",
+              "evidence": "Comparing the expression for the stresses given by the two theories, one notes an obvious difference in the dependence upon ν arising from the difference between χ0(ν) and g0(ν).",
+              "central": true
+            },
+            {
+              "surface": "χ0(ν)",
+              "type": "PARAMETER",
+              "role": "to",
+              "evidence": "where χ0(ν) corresponds to the equilibrium radial distribution function at contact.",
+              "central": true
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "differs_from",
+            "_math_binding_review": "1",
+            "_evidence_offset": "1536"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3.3.5. Comparison with the Chapman–Enskog dense-gas theory",
+            "cited_from": "this_work",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "These two functions are plotted in figure 10; they differ by a large amount at high concentrations.",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-26T08:20:13Z",
+        "mutation_id": "mut_000037",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n7_e5",
+        "payload": {
+          "kind": "improves",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "g0(ν)",
+              "type": "PARAMETER",
+              "role": "from",
+              "evidence": "Comparing the expression for the stresses given by the two theories, one notes an obvious difference in the dependence upon ν arising from the difference between χ0(ν) and g0(ν).",
+              "central": true
+            },
+            {
+              "surface": "χ0(ν)",
+              "type": "PARAMETER",
+              "role": "to",
+              "evidence": "where χ0(ν) corresponds to the equilibrium radial distribution function at contact.",
+              "central": true
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "more_accurate_than",
+            "_math_binding_review": "1",
+            "_evidence_offset": "-1"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3.3.5. Comparison with the Chapman–Enskog dense-gas theory",
+            "cited_from": "this_work",
+            "evidence_strength": "hypothesized"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "Since g0(ν) is derived semi-empirically from computer simulations of molecular dynamics, it is expected that g0(ν) is more accurate than χ0(ν), especially at higher concentrations.",
+        "rationale": "extracted improves",
+        "timestamp": "2026-08-26T08:20:13Z",
+        "mutation_id": "mut_000038",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n7_e6",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target"
+          ],
+          "concepts": [
+            {
+              "surface": "stresses",
+              "type": "PROPERTY",
+              "role": "source",
+              "evidence": "Comparing the expression for the stresses given by the two theories, one notes an obvious difference in the dependence upon ν arising from the difference between χ0(ν) and g0(ν).",
+              "central": true
+            },
+            {
+              "surface": "ν",
+              "type": "PARAMETER",
+              "role": "target",
+              "evidence": "Comparing the expression for the stresses given by the two theories, one notes an obvious difference in the dependence upon ν arising from the difference between χ0(ν) and g0(ν).",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "depends_on",
+            "_math_binding_review": "1",
+            "_evidence_offset": "1335"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3.3.5. Comparison with the Chapman–Enskog dense-gas theory",
+            "cited_from": "this_work",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "Comparing the expression for the stresses given by the two theories, one notes an obvious difference in the dependence upon ν arising from the difference between χ0(ν) and g0(ν).",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-26T08:20:13Z",
+        "mutation_id": "mut_000039",
+        "status": "committed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.3",
+      "validated": [
+        "mut_000034",
+        "mut_000035",
+        "mut_000036",
+        "mut_000037",
+        "mut_000038",
+        "mut_000039"
+      ],
+      "rejected": [],
+      "routed": []
+    },
+    "version_diff": {
+      "before": "0.3",
+      "after": "0.3"
+    }
+  },
+  {
+    "mutations": [
+      {
+        "op": "add_edge",
+        "target": "n8_e3",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "present analysis",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "the present analysis",
+              "central": true
+            },
+            {
+              "surface": "Chapman–Enskog dense-gas theory",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "Chapman–Enskog dense-gas theory",
+              "central": true
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "close_to",
+            "_evidence_offset": "2476"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3.4. Conclusion",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "These two analyses also predict shear stresses for perfectly elastic particles in a simple shear flow that are very close to the collisional stresses given by the Chapman–Enskog dense-gas theory, and collisional normal stresses that are the same.",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-26T08:20:41Z",
+        "mutation_id": "mut_000040",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n8_e4",
+        "payload": {
+          "kind": "validates_against",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "present analysis",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "the present analysis",
+              "central": true
+            },
+            {
+              "surface": "Savage & Sayed (1980)",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "Savage & Sayed (1980)",
+              "central": true
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "validates_against",
+            "validation_outcome": "fairly_close",
+            "_evidence_offset": "2244"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3.4. Conclusion",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "The present analysis and that of Jenkins & Savage (1983) predict stresses based upon reasonable values of e that are fairly close to the experimental stresses measured in the annular shear-cell experiments of Savage & Sayed (1980).",
+        "rationale": "extracted validates_against",
+        "timestamp": "2026-08-26T08:20:41Z",
+        "mutation_id": "mut_000041",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n8_e5",
+        "payload": {
+          "kind": "validates_against",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "Jenkins & Savage (1983)",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "Jenkins & Savage (1983)",
+              "central": true
+            },
+            {
+              "surface": "Savage & Sayed (1980)",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "Savage & Sayed (1980)",
+              "central": true
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "validates_against",
+            "validation_outcome": "fairly_close",
+            "_evidence_offset": "2244"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3.4. Conclusion",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "The present analysis and that of Jenkins & Savage (1983) predict stresses based upon reasonable values of e that are fairly close to the experimental stresses measured in the annular shear-cell experiments of Savage & Sayed (1980).",
+        "rationale": "extracted validates_against",
+        "timestamp": "2026-08-26T08:20:41Z",
+        "mutation_id": "mut_000042",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n8_e7",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target",
+            "cause",
+            "effect"
+          ],
+          "concepts": [
+            {
+              "surface": "R",
+              "type": "PARAMETER",
+              "role": "source",
+              "evidence": "R",
+              "central": false
+            },
+            {
+              "surface": "stresses",
+              "type": "PROPERTY",
+              "role": "target",
+              "evidence": "stresses",
+              "central": false
+            },
+            {
+              "surface": "R",
+              "type": "PARAMETER",
+              "role": "cause",
+              "evidence": "R",
+              "central": false
+            },
+            {
+              "surface": "stresses",
+              "type": "PROPERTY",
+              "role": "effect",
+              "evidence": "stresses",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "varies_with",
+            "applies_in_regime": "simple_shear",
+            "_evidence_offset": "343"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "3.4. Conclusion",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "stresses versus R, e and v",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-26T08:20:41Z",
+        "mutation_id": "mut_000043",
+        "status": "committed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.3",
+      "validated": [
+        "mut_000040",
+        "mut_000041",
+        "mut_000042",
+        "mut_000043"
+      ],
+      "rejected": [],
+      "routed": []
+    },
+    "version_diff": {
+      "before": "0.3",
+      "after": "0.3"
+    }
+  },
+  {
+    "mutations": [
+      {
+        "op": "add_edge",
+        "target": "n9_e2",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target"
+          ],
+          "concepts": [
+            {
+              "surface": "energy dissipated during a collision",
+              "type": "PROPERTY",
+              "role": "source",
+              "evidence": "the energy dissipated during a collision is small",
+              "central": false
+            },
+            {
+              "surface": "coefficient of restitution e",
+              "type": "PARAMETER",
+              "role": "target",
+              "evidence": "the coefficient of restitution e is nearly unity",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "causal",
+            "applies_in_regime": "nearly elastic",
+            "_evidence_offset": "560"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "4. Hard-sphere, dense-fluid kinetic theory for nearly elastic particles",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "assumed"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "molecular",
+        "base_version": "0.3",
+        "evidence": "the energy dissipated during a collision is small, and hence that the smooth particles considered here are nearly elastic (the coefficient of restitution e is nearly unity)",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-26T08:21:14Z",
+        "mutation_id": "mut_000044",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n9_e4",
+        "payload": {
+          "kind": "constitutive_law",
+          "roles": [
+            "output",
+            "input"
+          ],
+          "concepts": [
+            {
+              "surface": "constitutive equations",
+              "type": "METHOD",
+              "role": "output",
+              "evidence": "The resulting constitutive equations are bound to be fairly complex",
+              "central": true
+            },
+            {
+              "surface": "distribution functions",
+              "type": "METHOD",
+              "role": "input",
+              "evidence": "these constitutive equations, which are calculated by using distribution functions which have been determined in a systematic way",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "applies_in_regime": "nearly elastic",
+            "function_form": "calculated",
+            "parameters": "distribution functions",
+            "_evidence_offset": "1165"
+          },
+          "provenance": {
+            "paper_id": "PPR_ED6187DF955A",
+            "year": "",
+            "section": "4. Hard-sphere, dense-fluid kinetic theory for nearly elastic particles",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "molecular",
+        "base_version": "0.3",
+        "evidence": "these constitutive equations, which are calculated by using distribution functions which have been determined in a systematic way",
+        "rationale": "extracted constitutive_law",
+        "timestamp": "2026-08-26T08:21:14Z",
+        "mutation_id": "mut_000045",
+        "status": "committed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.3",
+      "validated": [
+        "mut_000044",
+        "mut_000045"
+      ],
+      "rejected": [],
+      "routed": []
+    },
+    "version_diff": {
+      "before": "0.3",
+      "after": "0.3"
+    }
+  },
+  {
+    "mutations": [
+      {
+        "op": "add_pattern",
+        "target": "assesses_accuracy_of",
+        "payload": {
+          "pattern": {
+            "pattern_id": "assesses_accuracy_of",
+            "description": "X provides means to assess/evaluate the accuracy of Y (a methodological relation where one approach serves as a benchmark or reference to evaluate another's accuracy). This is distinct from compares (which is side-by-side) and improves (which implies fixing limitations).",
+            "role_slots": [
+              {
+                "role": "from",
+                "type": "METHOD"
+              },
+              {
+                "role": "to",
+                "type": "METHOD"
+              }
+            ],
+            "allowed_qualifiers": [
+              "relation_type",
+              "method",
+              "evidence_strength",
+              "cited_from"
+            ],
+            "deprecated": false,
+            "split_from": "",
+            "is_abstract": false,
+            "family": "measure",
+            "semantic_boundary": "Use when one method is explicitly used as a benchmark/reference to test another’s accuracy; not for side-by-side comparison (compares) or fixing flaws (improves)."
+          }
+        },
+        "proposer_role": "evolver",
+        "domain": "granular",
+        "base_version": "0.3",
+        "evidence": "provide means to assess the accuracy of simpler, but more approximate, ad hoc analyses such as those discussed in §3 and in Jenkins & Savage (1983)",
+        "rationale": "HE3 describes 'new analysis' providing means to assess accuracy of ad hoc analyses. This is not improves (no claim that new analysis fixes their limitations — it evaluates them), not compares (no side-by-side evaluation), not validates_against (that's theory-vs-data, not theory-vs-theory). The schema lacks a pattern for 'benchmarking/evaluating another method's accuracy' — a distinct methodological relation.",
+        "timestamp": "2026-08-26T08:21:26Z",
+        "mutation_id": "mut_000046",
+        "status": "committed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.4",
+      "validated": [
+        "mut_000046"
+      ],
+      "rejected": [],
+      "routed": []
+    },
+    "version_diff": {
+      "before": "0.3",
+      "after": "0.4"
+    }
+  },
+  {
+    "mutations": [
+      {
+        "op": "add_edge",
+        "target": "n1_e0",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "definition",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "revised Enskog theory",
+              "type": "METHOD",
+              "role": "subject",
+              "evidence": "The revised Enskog theory for inelastic hard spheres is considered as a model for rapid flow granular media at finite densities.",
+              "central": true
+            },
+            {
+              "surface": "model",
+              "type": "METHOD",
+              "role": "definition",
+              "evidence": "The revised Enskog theory for inelastic hard spheres is considered as a model for rapid flow granular media at finite densities.",
+              "central": false
+            },
+            {
+              "surface": "rapid flow granular media",
+              "type": "PHENOMENON",
+              "role": "object",
+              "evidence": "The revised Enskog theory for inelastic hard spheres is considered as a model for rapid flow granular media at finite densities.",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "is_considered_as",
+            "_evidence_offset": "179"
+          },
+          "provenance": {
+            "paper_id": "PPR_99C7FFAD6529",
+            "year": "",
+            "section": "front_matter",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "assumed"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "molecular",
+        "base_version": "0.4",
+        "evidence": "The revised Enskog theory for inelastic hard spheres is considered as a model for rapid flow granular media at finite densities.",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-26T08:23:05Z",
+        "mutation_id": "mut_000047",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1_e3",
+        "payload": {
+          "kind": "constitutive_law",
+          "roles": [
+            "output",
+            "input"
+          ],
+          "concepts": [
+            {
+              "surface": "cooling rate",
+              "type": "PROPERTY",
+              "role": "output",
+              "evidence": "In addition, the cooling rate is calculated to first order in the gradients and expressed in terms of the transport coefficients.",
+              "central": true
+            },
+            {
+              "surface": "transport coefficients",
+              "type": "PROPERTY",
+              "role": "input",
+              "evidence": "In addition, the cooling rate is calculated to first order in the gradients and expressed in terms of the transport coefficients.",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "applies_in_regime": "first_order_in_gradients",
+            "function_form": "expressed_in_terms_of",
+            "_evidence_offset": "608"
+          },
+          "provenance": {
+            "paper_id": "PPR_99C7FFAD6529",
+            "year": "",
+            "section": "front_matter",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "molecular",
+        "base_version": "0.4",
+        "evidence": "In addition, the cooling rate is calculated to first order in the gradients and expressed in terms of the transport coefficients.",
+        "rationale": "extracted constitutive_law",
+        "timestamp": "2026-08-26T08:23:05Z",
+        "mutation_id": "mut_000048",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1_e4",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target"
+          ],
+          "concepts": [
+            {
+              "surface": "transport coefficients",
+              "type": "PROPERTY",
+              "role": "source",
+              "evidence": "In addition, the cooling rate is calculated to first order in the gradients and expressed in terms of the transport coefficients.",
+              "central": false
+            },
+            {
+              "surface": "density",
+              "type": "PARAMETER",
+              "role": "target",
+              "evidence": "The transport coefficients are determined from linear integral equations analogous to those for elastic collisions. The solubility conditions for these equations are confirmed and the transport coefficients are calculated as explicit functions of the density and restitution coefficient using a Sonine polynomial expansion.",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "explicit_function_of",
+            "applies_in_regime": "finite_densities",
+            "_evidence_offset": "738"
+          },
+          "provenance": {
+            "paper_id": "PPR_99C7FFAD6529",
+            "year": "",
+            "section": "front_matter",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "molecular",
+        "base_version": "0.4",
+        "evidence": "The transport coefficients are determined from linear integral equations analogous to those for elastic collisions. The solubility conditions for these equations are confirmed and the transport coefficients are calculated as explicit functions of the density and restitution coefficient using a Sonine polynomial expansion.",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-26T08:23:05Z",
+        "mutation_id": "mut_000049",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1_e5",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target"
+          ],
+          "concepts": [
+            {
+              "surface": "transport coefficients",
+              "type": "PROPERTY",
+              "role": "source",
+              "evidence": "In addition, the cooling rate is calculated to first order in the gradients and expressed in terms of the transport coefficients.",
+              "central": false
+            },
+            {
+              "surface": "restitution coefficient",
+              "type": "PARAMETER",
+              "role": "target",
+              "evidence": "The transport coefficients are determined from linear integral equations analogous to those for elastic collisions. The solubility conditions for these equations are confirmed and the transport coefficients are calculated as explicit functions of the density and restitution coefficient using a Sonine polynomial expansion.",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "explicit_function_of",
+            "applies_in_regime": "finite_densities",
+            "_evidence_offset": "738"
+          },
+          "provenance": {
+            "paper_id": "PPR_99C7FFAD6529",
+            "year": "",
+            "section": "front_matter",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "molecular",
+        "base_version": "0.4",
+        "evidence": "The transport coefficients are determined from linear integral equations analogous to those for elastic collisions. The solubility conditions for these equations are confirmed and the transport coefficients are calculated as explicit functions of the density and restitution coefficient using a Sonine polynomial expansion.",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-26T08:23:05Z",
+        "mutation_id": "mut_000050",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1_e6",
+        "payload": {
+          "kind": "measures",
+          "roles": [
+            "object",
+            "instrument"
+          ],
+          "concepts": [
+            {
+              "surface": "transport coefficients",
+              "type": "PROPERTY",
+              "role": "object",
+              "evidence": "In addition, the cooling rate is calculated to first order in the gradients and expressed in terms of the transport coefficients.",
+              "central": false
+            },
+            {
+              "surface": "Sonine polynomial expansion",
+              "type": "METHOD",
+              "role": "instrument",
+              "evidence": "The transport coefficients are determined from linear integral equations analogous to those for elastic collisions. The solubility conditions for these equations are confirmed and the transport coefficients are calculated as explicit functions of the density and restitution coefficient using a Sonine polynomial expansion.",
+              "central": true
+            }
+          ],
+          "qualifiers": {
+            "condition": "using_Sonine_polynomial_expansion",
+            "applies_in_regime": "finite_densities",
+            "_evidence_offset": "738"
+          },
+          "provenance": {
+            "paper_id": "PPR_99C7FFAD6529",
+            "year": "",
+            "section": "front_matter",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "molecular",
+        "base_version": "0.4",
+        "evidence": "The transport coefficients are determined from linear integral equations analogous to those for elastic collisions. The solubility conditions for these equations are confirmed and the transport coefficients are calculated as explicit functions of the density and restitution coefficient using a Sonine polynomial expansion.",
+        "rationale": "extracted measures",
+        "timestamp": "2026-08-26T08:23:05Z",
+        "mutation_id": "mut_000051",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1_e7",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "simpler kinetic model",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "Finally, the analysis is repeated using a simpler kinetic model.",
+              "central": false
+            },
+            {
+              "surface": "revised Enskog equation",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "Excellent agreement is obtained with the results from the revised Enskog equation.",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "agreement",
+            "_evidence_offset": "1112"
+          },
+          "provenance": {
+            "paper_id": "PPR_99C7FFAD6529",
+            "year": "",
+            "section": "front_matter",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "molecular",
+        "base_version": "0.4",
+        "evidence": "Finally, the analysis is repeated using a simpler kinetic model. Excellent agreement is obtained with the results from the revised Enskog equation.",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-26T08:23:05Z",
+        "mutation_id": "mut_000052",
+        "status": "committed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.5",
+      "validated": [
+        "mut_000047",
+        "mut_000048",
+        "mut_000049",
+        "mut_000050",
+        "mut_000051",
+        "mut_000052"
+      ],
+      "rejected": [],
+      "routed": []
+    },
+    "version_diff": {
+      "before": "0.4",
+      "after": "0.5"
+    }
+  },
+  {
+    "mutations": [
+      {
+        "op": "add_edge",
+        "target": "n2c1_e4",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target"
+          ],
+          "concepts": [
+            {
+              "surface": "transport coefficients",
+              "type": "PROPERTY",
+              "role": "source",
+              "evidence": "transport coefficients",
+              "central": true
+            },
+            {
+              "surface": "restitution coefficient",
+              "type": "PARAMETER",
+              "role": "target",
+              "evidence": "restitution coefficient",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "functional_dependence",
+            "_evidence_offset": "895"
+          },
+          "provenance": {
+            "paper_id": "PPR_99C7FFAD6529",
+            "year": "",
+            "section": "I. INTRODUCTION",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.5",
+        "evidence": "transport coefficients as functions of the restitution coefficient",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-26T08:23:28Z",
+        "mutation_id": "mut_000053",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n2c0_e4",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target"
+          ],
+          "concepts": [
+            {
+              "surface": "transport coefficients",
+              "type": "PROPERTY",
+              "role": "source",
+              "evidence": "transport coefficients as functions of the restitution coefficient",
+              "central": true
+            },
+            {
+              "surface": "restitution coefficient",
+              "type": "PARAMETER",
+              "role": "target",
+              "evidence": "transport coefficients as functions of the restitution coefficient",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "functional",
+            "applies_in_regime": "inelastic",
+            "_evidence_offset": "895"
+          },
+          "provenance": {
+            "paper_id": "PPR_99C7FFAD6529",
+            "year": "",
+            "section": "I. INTRODUCTION",
+            "cited_from": "prior_art",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.5",
+        "evidence": "transport coefficients as functions of the restitution coefficient",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-26T08:23:28Z",
+        "mutation_id": "mut_000054",
+        "status": "committed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.5",
+      "validated": [
+        "mut_000053",
+        "mut_000054"
+      ],
+      "rejected": [],
+      "routed": []
+    },
+    "version_diff": {
+      "before": "0.5",
+      "after": "0.5"
+    }
+  },
+  {
+    "mutations": [
+      {
+        "op": "add_edge",
+        "target": "n7c0_e0",
+        "payload": {
+          "kind": "background",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "Chapman-Enskog expansion",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "APPENDIX A: CHAPMAN-ENSKOG EXPANSION",
+              "central": true
+            },
+            {
+              "surface": "RET",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "To initiate the Chapman-Enskog expansion it is useful to make a formal transformation of the RET",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "transformation",
+            "_evidence_offset": "37"
+          },
+          "provenance": {
+            "paper_id": "PPR_99C7FFAD6529",
+            "year": "",
+            "section": "APPENDIX A: CHAPMAN-ENSKOG EXPANSION",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "molecular",
+        "base_version": "0.5",
+        "evidence": "To initiate the Chapman-Enskog expansion it is useful to make a formal transformation of the RET",
+        "rationale": "extracted background",
+        "timestamp": "2026-08-26T08:25:11Z",
+        "mutation_id": "mut_000055",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n7c0_e1",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "operator $J _ { E } ^ { ' } [ f ]$",
+              "type": "METHOD",
+              "role": "subject",
+              "evidence": "First, define the operator $J _ { E } ^ { ' } [ f ]$",
+              "central": false
+            },
+            {
+              "surface": "$\\mathcal { P }$",
+              "type": "METHOD",
+              "role": "object",
+              "evidence": "$\\mathcal { P }$ is the projection operator onto an orthonormal set constructed from $\\{ \\bar { 1 } , v ^ { 2 } , \\mathbf { v } \\}$",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "definition",
+            "_math_binding_review": "1",
+            "_evidence_offset": "168"
+          },
+          "provenance": {
+            "paper_id": "PPR_99C7FFAD6529",
+            "year": "",
+            "section": "APPENDIX A: CHAPMAN-ENSKOG EXPANSION",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "molecular",
+        "base_version": "0.5",
+        "evidence": "First, define the operator $J _ { E } ^ { ' } [ f ]$ by and decompose it according to where $\\mathcal { P }$ is the projection operator onto an orthonormal set constructed from $\\{ \\bar { 1 } , v ^ { 2 } , \\mathbf { v } \\}$",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-26T08:25:11Z",
+        "mutation_id": "mut_000056",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n7c0_e2",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "$\\mathcal { Q } = ( 1 - \\mathcal { P } )$",
+              "type": "METHOD",
+              "role": "subject",
+              "evidence": "Also $\\mathcal { Q } = ( 1 - \\mathcal { P } )$ is the orthogonal projection.",
+              "central": false
+            },
+            {
+              "surface": "$\\mathcal { P }$",
+              "type": "METHOD",
+              "role": "object",
+              "evidence": "$\\mathcal { P }$ is the projection operator onto an orthonormal set constructed from $\\{ \\bar { 1 } , v ^ { 2 } , \\mathbf { v } \\}$",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "definition",
+            "_math_binding_review": "1",
+            "_evidence_offset": "461"
+          },
+          "provenance": {
+            "paper_id": "PPR_99C7FFAD6529",
+            "year": "",
+            "section": "APPENDIX A: CHAPMAN-ENSKOG EXPANSION",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "molecular",
+        "base_version": "0.5",
+        "evidence": "Also $\\mathcal { Q } = ( 1 - \\mathcal { P } )$ is the orthogonal projection.",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-26T08:25:11Z",
+        "mutation_id": "mut_000057",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n7c0_e3",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "RET",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "To initiate the Chapman-Enskog expansion it is useful to make a formal transformation of the RET",
+              "central": false
+            },
+            {
+              "surface": "Eq. \\~19! of Sec. III",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "which is the same as Eq. \\~19! of Sec. III.",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "equivalence",
+            "_math_binding_review": "1",
+            "_evidence_offset": "761"
+          },
+          "provenance": {
+            "paper_id": "PPR_99C7FFAD6529",
+            "year": "",
+            "section": "APPENDIX A: CHAPMAN-ENSKOG EXPANSION",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "molecular",
+        "base_version": "0.5",
+        "evidence": "which is the same as Eq. \\~19! of Sec. III.",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-26T08:25:11Z",
+        "mutation_id": "mut_000058",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n7c0_e5",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "solubility conditions",
+              "type": "METHOD",
+              "role": "subject",
+              "evidence": "APPENDIX B: SOLUBILITY CONDITIONS",
+              "central": true
+            },
+            {
+              "surface": "Fredholm alternative",
+              "type": "METHOD",
+              "role": "object",
+              "evidence": "The solubility conditions \\~Fredholm alternative @14#! for Eqs. \\~32!–\\~35!",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "definition",
+            "_evidence_offset": "1859"
+          },
+          "provenance": {
+            "paper_id": "PPR_99C7FFAD6529",
+            "year": "",
+            "section": "APPENDIX A: CHAPMAN-ENSKOG EXPANSION",
+            "cited_from": "prior_art",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "molecular",
+        "base_version": "0.5",
+        "evidence": "The solubility conditions \\~Fredholm alternative @14#! for Eqs. \\~32!–\\~35!",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-26T08:25:11Z",
+        "mutation_id": "mut_000059",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n7c0_e9",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "$\\nu _ { \\eta }$",
+              "type": "PARAMETER",
+              "role": "subject",
+              "evidence": "where $\\nu _ { \\eta }$ is defined by Eq. \\~51!.",
+              "central": false
+            },
+            {
+              "surface": "Eq. \\~51!",
+              "type": "METHOD",
+              "role": "object",
+              "evidence": "where $\\nu _ { \\eta }$ is defined by Eq. \\~51!.",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "definition",
+            "_math_binding_review": "1",
+            "_evidence_offset": "2684"
+          },
+          "provenance": {
+            "paper_id": "PPR_99C7FFAD6529",
+            "year": "",
+            "section": "APPENDIX A: CHAPMAN-ENSKOG EXPANSION",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "molecular",
+        "base_version": "0.5",
+        "evidence": "where $\\nu _ { \\eta }$ is defined by Eq. \\~51!.",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-26T08:25:11Z",
+        "mutation_id": "mut_000060",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n7c0_e10",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target"
+          ],
+          "concepts": [
+            {
+              "surface": "$\\eta ^ { k }$",
+              "type": "PARAMETER",
+              "role": "source",
+              "evidence": "From dimensional analysis $\\eta ^ { k } \\propto T ^ { 1 / 2 }$",
+              "central": false
+            },
+            {
+              "surface": "$T ^ { 1 / 2 }$",
+              "type": "PARAMETER",
+              "role": "target",
+              "evidence": "From dimensional analysis $\\eta ^ { k } \\propto T ^ { 1 / 2 }$",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "proportional",
+            "applies_in_regime": "kinetic",
+            "_math_binding_review": "1",
+            "_evidence_offset": "2732"
+          },
+          "provenance": {
+            "paper_id": "PPR_99C7FFAD6529",
+            "year": "",
+            "section": "APPENDIX A: CHAPMAN-ENSKOG EXPANSION",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "molecular",
+        "base_version": "0.5",
+        "evidence": "From dimensional analysis $\\eta ^ { k } \\propto T ^ { 1 / 2 }$",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-26T08:25:11Z",
+        "mutation_id": "mut_000061",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n7c0_e13",
+        "payload": {
+          "kind": "replaces",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "projection operator",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "The projection operator  can be replaced by the identity operator",
+              "central": false
+            },
+            {
+              "surface": "identity operator",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "The projection operator  can be replaced by the identity operator",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "replacement",
+            "_evidence_offset": "2970"
+          },
+          "provenance": {
+            "paper_id": "PPR_99C7FFAD6529",
+            "year": "",
+            "section": "APPENDIX A: CHAPMAN-ENSKOG EXPANSION",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "molecular",
+        "base_version": "0.5",
+        "evidence": "The projection operator  can be replaced by the identity operator",
+        "rationale": "extracted replaces",
+        "timestamp": "2026-08-26T08:25:11Z",
+        "mutation_id": "mut_000062",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n7c0_e25",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "object",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "$\\nu _ { \\eta } ^ { * }$",
+              "type": "PARAMETER",
+              "role": "subject",
+              "evidence": "The frequencies $\\nu _ { \\eta } ^ { * }$ and $\\nu _ { \\kappa } ^ { * } { = \\nu _ { \\mu } ^ { * } }$",
+              "central": false
+            },
+            {
+              "surface": "$\\nu _ { \\kappa } ^ { * } { = \\nu _ { \\mu } ^ { * } }$",
+              "type": "PARAMETER",
+              "role": "object",
+              "evidence": "The frequencies $\\nu _ { \\eta } ^ { * }$ and $\\nu _ { \\kappa } ^ { * } { = \\nu _ { \\mu } ^ { * } }$",
+              "central": false
+            },
+            {
+              "surface": "Eq. \\~61!",
+              "type": "METHOD",
+              "role": "object",
+              "evidence": "are given by Eq. \\~61! in the first approximation.",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "definition",
+            "_math_binding_review": "1",
+            "_evidence_offset": "5497"
+          },
+          "provenance": {
+            "paper_id": "PPR_99C7FFAD6529",
+            "year": "",
+            "section": "APPENDIX A: CHAPMAN-ENSKOG EXPANSION",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "molecular",
+        "base_version": "0.5",
+        "evidence": "The frequencies $\\nu _ { \\eta } ^ { * }$ and $\\nu _ { \\kappa } ^ { * } { = \\nu _ { \\mu } ^ { * } }$ are given by Eq. \\~61! in the first approximation.",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-26T08:25:11Z",
+        "mutation_id": "mut_000063",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n7c0_e27",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "$\\mathcal { L }$",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "in the definition of $\\mathcal { L }$",
+              "central": false
+            },
+            {
+              "surface": "Boltzmann limit",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "these integrals become the same as those appearing in the Boltzmann limit",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "equivalence",
+            "_math_binding_review": "1",
+            "_evidence_offset": "5805"
+          },
+          "provenance": {
+            "paper_id": "PPR_99C7FFAD6529",
+            "year": "",
+            "section": "APPENDIX A: CHAPMAN-ENSKOG EXPANSION",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "molecular",
+        "base_version": "0.5",
+        "evidence": "these integrals become the same as those appearing in the Boltzmann limit",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-26T08:25:11Z",
+        "mutation_id": "mut_000064",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n7c0_e29",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "dimensionless integrals $I _ { \\gamma }$ and $I _ { \\kappa }$",
+              "type": "PARAMETER",
+              "role": "subject",
+              "evidence": "The collisional contributions are given in terms of the dimensionless integrals $I _ { \\gamma }$ and $I _ { \\kappa }$",
+              "central": false
+            },
+            {
+              "surface": "Eqs. \\~45! and \\~46!",
+              "type": "METHOD",
+              "role": "object",
+              "evidence": "defined by Eqs. \\~45! and \\~46!, respectively.",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "definition",
+            "_math_binding_review": "1",
+            "_evidence_offset": "5997"
+          },
+          "provenance": {
+            "paper_id": "PPR_99C7FFAD6529",
+            "year": "",
+            "section": "APPENDIX A: CHAPMAN-ENSKOG EXPANSION",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "molecular",
+        "base_version": "0.5",
+        "evidence": "The collisional contributions are given in terms of the dimensionless integrals $I _ { \\gamma }$ and $I _ { \\kappa }$ defined by Eqs. \\~45! and \\~46!, respectively.",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-26T08:25:11Z",
+        "mutation_id": "mut_000065",
+        "status": "committed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.5",
+      "validated": [
+        "mut_000055",
+        "mut_000056",
+        "mut_000057",
+        "mut_000058",
+        "mut_000059",
+        "mut_000060",
+        "mut_000061",
+        "mut_000062",
+        "mut_000063",
+        "mut_000064",
+        "mut_000065"
+      ],
+      "rejected": [],
+      "routed": []
+    },
+    "version_diff": {
+      "before": "0.5",
+      "after": "0.5"
+    }
+  },
+  {
+    "mutations": [
+      {
+        "op": "add_pattern",
+        "target": "substitutes_in",
+        "payload": {
+          "pattern": {
+            "pattern_id": "substitutes_in",
+            "description": "A mathematical/formal relation where one operator, expression, or quantity can be substituted for another in a specific context without changing the result. This is distinct from replaces (which implies outright retirement of the old entity) and defines (which implies definitional identity).",
+            "role_slots": [
+              {
+                "role": "substitute",
+                "type": "THING"
+              },
+              {
+                "role": "original",
+                "type": "THING"
+              }
+            ],
+            "allowed_qualifiers": [
+              "relation_type",
+              "method",
+              "evidence_strength",
+              "cited_from",
+              "applies_in_regime"
+            ],
+            "deprecated": false,
+            "split_from": "",
+            "is_abstract": false,
+            "family": "dependency",
+            "semantic_boundary": "Use substitutes_in only when one thing can be swapped for another in a specific operation or proof; not for replacing/retiring (replaces) or defining equivalence (defines)."
+          }
+        },
+        "proposer_role": "evolver",
+        "domain": "granular",
+        "base_version": "0.5",
+        "evidence": "It is straightforward to show that the projection operator Q in the definition of $\\mathcal { L }$ can be replaced by the identity in both integrations",
+        "rationale": "HE0 describes a mathematical substitution where one operator can be replaced by another in a specific context. This is not replaces (which implies the original is retired and no longer used) but rather a formal equivalence in a specific mathematical operation. The relation is about interchangeability in a derivation, not about one method superseding another.",
+        "timestamp": "2026-08-26T08:25:27Z",
+        "mutation_id": "mut_000066",
+        "status": "committed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.6",
+      "validated": [
+        "mut_000066"
+      ],
+      "rejected": [],
+      "routed": []
+    },
+    "version_diff": {
+      "before": "0.5",
+      "after": "0.6"
+    }
+  },
+  {
+    "mutations": [
+      {
+        "op": "add_pattern",
+        "target": "analogous_to",
+        "payload": {
+          "pattern": {
+            "pattern_id": "analogous_to",
+            "description": "A relation where one mathematical expression, integral, or quantity is given in a similar way to another, indicating structural or methodological analogy without implying derivation or definitional identity.",
+            "role_slots": [
+              {
+                "role": "analog",
+                "type": "THING"
+              },
+              {
+                "role": "reference",
+                "type": "THING"
+              }
+            ],
+            "allowed_qualifiers": [
+              "relation_type",
+              "method",
+              "evidence_strength",
+              "cited_from"
+            ],
+            "deprecated": false,
+            "split_from": "",
+            "is_abstract": false,
+            "family": "claim",
+            "semantic_boundary": "Use for explicit “analogous to” or “similar in form/method” comparisons; NOT for derivation, definition, or mere co-occurrence."
+          }
+        },
+        "proposer_role": "evolver",
+        "domain": "granular",
+        "base_version": "0.6",
+        "evidence": "In a similar way, the integral $I _ { \\kappa }$ is given by",
+        "rationale": "HE1 describes a structural analogy between two integrals that are computed in a similar manner. This is not defines (which implies definitional identity) nor extends (which implies generalization). The relation indicates methodological parallelism in derivation, which is a distinct semantic relation not captured by existing patterns.",
+        "timestamp": "2026-08-26T08:25:32Z",
+        "mutation_id": "mut_000067",
+        "status": "committed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.7",
+      "validated": [
+        "mut_000067"
+      ],
+      "rejected": [],
+      "routed": []
+    },
+    "version_diff": {
+      "before": "0.6",
+      "after": "0.7"
+    }
+  },
+  {
+    "mutations": [
+      {
+        "op": "add_edge",
+        "target": "n8_e0",
+        "payload": {
+          "kind": "constitutive_law",
+          "roles": [
+            "output",
+            "input",
+            "input"
+          ],
+          "concepts": [
+            {
+              "surface": "cooling rate",
+              "type": "PROPERTY",
+              "role": "output",
+              "evidence": "Up to the first order in gradients, the cooling rate is",
+              "central": true
+            },
+            {
+              "surface": "ζ^(0)",
+              "type": "PARAMETER",
+              "role": "input",
+              "evidence": "ζ^(0)",
+              "central": true
+            },
+            {
+              "surface": "ζ^(1,1)",
+              "type": "PARAMETER",
+              "role": "input",
+              "evidence": "ζ^(1,1)",
+              "central": true
+            }
+          ],
+          "qualifiers": {
+            "applies_in_regime": "first order in gradients",
+            "_math_binding_review": "1",
+            "_evidence_offset": "46"
+          },
+          "provenance": {
+            "paper_id": "PPR_99C7FFAD6529",
+            "year": "",
+            "section": "APPENDIX F: CONTRIBUTIONS TO THE COOLING RATE",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.7",
+        "evidence": "Up to the first order in gradients, the cooling rate is where ζ^(0) and ζ^(1,1) are defined by Eqs. (16) and (30), respectively.",
+        "rationale": "extracted constitutive_law",
+        "timestamp": "2026-08-26T08:25:56Z",
+        "mutation_id": "mut_000068",
+        "status": "committed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.7",
+      "validated": [
+        "mut_000068"
+      ],
+      "rejected": [],
+      "routed": []
+    },
+    "version_diff": {
+      "before": "0.7",
+      "after": "0.7"
+    }
+  },
+  {
+    "mutations": [
+      {
+        "op": "add_pattern",
+        "target": "lacks_comparison",
+        "payload": {
+          "pattern": {
+            "pattern_id": "lacks_comparison",
+            "description": "X lacks comparison with Y, indicating that no prior work exists for comparison, highlighting novelty or absence of benchmark.",
+            "role_slots": [
+              {
+                "role": "from",
+                "type": "THING"
+              },
+              {
+                "role": "to",
+                "type": "THING"
+              }
+            ],
+            "allowed_qualifiers": [
+              "relation_type",
+              "cited_from",
+              "evidence_strength",
+              "method"
+            ],
+            "deprecated": false,
+            "split_from": "",
+            "is_abstract": false,
+            "family": "claim",
+            "semantic_boundary": "Use when explicitly stating no comparison or benchmark exists for X, not when comparing X to Y or noting a lack of evidence."
+          }
+        },
+        "proposer_role": "evolver",
+        "domain": "granular",
+        "base_version": "0.7",
+        "evidence": "We are not aware of any previous calculation of ζ^(1,1) for comparison.",
+        "rationale": "HE6 describes the absence of comparison, which is a negative claim about the state of the literature. This is distinct from 'compares' (which requires actual comparison) and represents a claim about novelty/uniqueness. This is a genuine structural gap for expressing absence of prior work.",
+        "timestamp": "2026-08-26T08:26:14Z",
+        "mutation_id": "mut_000069",
+        "status": "committed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.8",
+      "validated": [
+        "mut_000069"
+      ],
+      "rejected": [],
+      "routed": []
+    },
+    "version_diff": {
+      "before": "0.7",
+      "after": "0.8"
+    }
+  },
+  {
+    "mutations": [
+      {
+        "op": "align_concept_merge",
+        "target": "CM0086",
+        "payload": {
+          "merge_ids": [
+            "CM0075",
+            "CM0084"
+          ]
+        },
+        "proposer_role": "aligner",
+        "domain": "granular",
+        "base_version": "0.8",
+        "evidence": "same-concept group: revised Enskog theory, revised Enskog equation, RET",
+        "rationale": "LLM-judged same concept (canonicalize)",
+        "timestamp": "2026-08-26T08:26:25Z",
+        "mutation_id": "mut_000070",
+        "status": "routed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.8",
+      "validated": [
+        "mut_000070"
+      ],
+      "rejected": [],
+      "routed": [
+        {
+          "mutation_id": "mut_000070",
+          "op": "align_concept_merge",
+          "outcome": "insert",
+          "detail": "no-route-for-op"
+        }
+      ]
+    },
+    "version_diff": {
+      "before": "0.8",
+      "after": "0.8"
+    }
+  },
+  {
+    "mutations": [
+      {
+        "op": "align_concept_merge",
+        "target": "CP0093",
+        "payload": {
+          "merge_ids": [
+            "CP0099"
+          ]
+        },
+        "proposer_role": "aligner",
+        "domain": "granular",
+        "base_version": "0.8",
+        "evidence": "same-concept group: $\\nu _ { \\eta }$, $\\nu _ { \\eta } ^ { * }$",
+        "rationale": "LLM-judged same concept (canonicalize)",
+        "timestamp": "2026-08-26T08:26:26Z",
+        "mutation_id": "mut_000071",
+        "status": "routed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.8",
+      "validated": [
+        "mut_000071"
+      ],
+      "rejected": [],
+      "routed": [
+        {
+          "mutation_id": "mut_000071",
+          "op": "align_concept_merge",
+          "outcome": "insert",
+          "detail": "no-route-for-op"
+        }
+      ]
+    },
+    "version_diff": {
+      "before": "0.8",
+      "after": "0.8"
+    }
+  },
+  {
+    "mutations": [
+      {
+        "op": "add_edge",
+        "target": "n1c1_e0",
+        "payload": {
+          "kind": "measures",
+          "roles": [
+            "object",
+            "instrument"
+          ],
+          "concepts": [
+            {
+              "surface": "incompressible Navier-Stockes equations",
+              "type": "METHOD",
+              "role": "object",
+              "evidence": "we solve the incompressible Navier-Stockes equations",
+              "central": false
+            },
+            {
+              "surface": "finite different scheme",
+              "type": "METHOD",
+              "role": "instrument",
+              "evidence": "using a finite different scheme",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "_evidence_offset": "8214"
+          },
+          "provenance": {
+            "paper_id": "PPR_B0E8916D4E19",
+            "year": "",
+            "section": "front_matter (part 1)",
+            "method": "simulation",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.8",
+        "evidence": "we solve the incompressible Navier-Stockes equations with the internal stress being given by Eq. 3 using a finite different scheme",
+        "rationale": "extracted measures",
+        "timestamp": "2026-08-26T08:28:11Z",
+        "mutation_id": "mut_000072",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1c1_e3",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "free-surfacevelocity profiles",
+              "type": "PROPERTY",
+              "role": "from",
+              "evidence": "free-surfacevelocity profiles obtained in the experiments and simulations",
+              "central": false
+            },
+            {
+              "surface": "3D rheology",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "the prediction of the 3D rheology",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "comparison",
+            "_evidence_offset": "9633"
+          },
+          "provenance": {
+            "paper_id": "PPR_B0E8916D4E19",
+            "year": "",
+            "section": "front_matter (part 1)",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.8",
+        "evidence": "free-surfacevelocity profiles obtained in the experiments and simulations for different widths and different flow rates. The experimental data are the symbols and the continuous lines are the prediction of the 3D rheology",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-26T08:28:11Z",
+        "mutation_id": "mut_000073",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1c1_e8",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "experimental measurements",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "the experimental measurements follow the predicted scaling",
+              "central": false
+            },
+            {
+              "surface": "numerical simulations",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "the numerical simulations (continuous lines in Fig. 5)",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "comparison",
+            "_evidence_offset": "11552"
+          },
+          "provenance": {
+            "paper_id": "PPR_B0E8916D4E19",
+            "year": "",
+            "section": "front_matter (part 1)",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.8",
+        "evidence": "the experimental measurements follow the predicted scaling and that the numerical simulations (continuous lines in Fig. 5) give quantitative predictions",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-26T08:28:11Z",
+        "mutation_id": "mut_000074",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1c1_e9",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target",
+            "effect"
+          ],
+          "concepts": [
+            {
+              "surface": "thickness h",
+              "type": "PROPERTY",
+              "role": "source",
+              "evidence": "the thickness h scales with the width W",
+              "central": false
+            },
+            {
+              "surface": "width W",
+              "type": "PARAMETER",
+              "role": "target",
+              "evidence": "the width W",
+              "central": false
+            },
+            {
+              "surface": "flow rate",
+              "type": "PROPERTY",
+              "role": "effect",
+              "evidence": "the flow rate",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "scaling",
+            "_evidence_offset": "11765"
+          },
+          "provenance": {
+            "paper_id": "PPR_B0E8916D4E19",
+            "year": "",
+            "section": "front_matter (part 1)",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.8",
+        "evidence": "the thickness h scales with the width W meaning that the thickness of the flowing layer is not an intrinsic property of the granular media but is controlled by the width of the channel and the flow rate",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-26T08:28:11Z",
+        "mutation_id": "mut_000075",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1c0_e0",
+        "payload": {
+          "kind": "background",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "new constitutive law for dense granular flows",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "A new constitutive law for dense granular flows",
+              "central": false
+            },
+            {
+              "surface": "continuum description",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "a continuum description would be of considerable help",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "motivation",
+            "_evidence_offset": "198"
+          },
+          "provenance": {
+            "paper_id": "PPR_B0E8916D4E19",
+            "year": "",
+            "section": "front_matter (part 1)",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "hypothesized"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.8",
+        "evidence": "In many geophysical or industrial applications involving flows of grains, a continuum description would be of considerable help",
+        "rationale": "extracted background",
+        "timestamp": "2026-08-26T08:28:11Z",
+        "mutation_id": "mut_000076",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1c0_e3",
+        "payload": {
+          "kind": "background",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "intermediate dense regime",
+              "type": "REGIME",
+              "role": "from",
+              "evidence": "The intermediate dense regime",
+              "central": false
+            },
+            {
+              "surface": "kinetic theory",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "constitutive equations have been proposed based on kinetic theory for the collisional rapid flows",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "motivation",
+            "_evidence_offset": "639"
+          },
+          "provenance": {
+            "paper_id": "PPR_B0E8916D4E19",
+            "year": "",
+            "section": "front_matter (part 1)",
+            "cited_from": "prior_art",
+            "method": "review",
+            "evidence_strength": "assumed"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.8",
+        "evidence": "For the two extreme regimes, constitutive equations have been proposed based on kinetic theory for the collisional rapid flows",
+        "rationale": "extracted background",
+        "timestamp": "2026-08-26T08:28:11Z",
+        "mutation_id": "mut_000077",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1c0_e17",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target"
+          ],
+          "concepts": [
+            {
+              "surface": "volume fraction Φ",
+              "type": "PARAMETER",
+              "role": "source",
+              "evidence": "volume fraction Φ",
+              "central": false
+            },
+            {
+              "surface": "Inertial number",
+              "type": "PARAMETER",
+              "role": "target",
+              "evidence": "the Inertial number",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "functional",
+            "_math_binding_review": "1",
+            "_evidence_offset": "2770"
+          },
+          "provenance": {
+            "paper_id": "PPR_B0E8916D4E19",
+            "year": "",
+            "section": "front_matter (part 1)",
+            "cited_from": "prior_art",
+            "method": "simulation",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.8",
+        "evidence": "They found that the volume fraction Φ of the sample is also a function of I but varies only slightly in the dense regime.",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-26T08:28:11Z",
+        "mutation_id": "mut_000078",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1c0_e18",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "Inertial number",
+              "type": "PARAMETER",
+              "role": "subject",
+              "evidence": "the Inertial number",
+              "central": false
+            },
+            {
+              "surface": "Savage number",
+              "type": "PARAMETER",
+              "role": "object",
+              "evidence": "Savage number",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "definition",
+            "_evidence_offset": "2892"
+          },
+          "provenance": {
+            "paper_id": "PPR_B0E8916D4E19",
+            "year": "",
+            "section": "front_matter (part 1)",
+            "cited_from": "prior_art",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.8",
+        "evidence": "The inertial number, which is the square root of the Savage number20 or of the Coulomb number21 introduced previously in the literature",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-26T08:28:11Z",
+        "mutation_id": "mut_000079",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1c0_e19",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "Inertial number",
+              "type": "PARAMETER",
+              "role": "subject",
+              "evidence": "the Inertial number",
+              "central": false
+            },
+            {
+              "surface": "Coulomb number",
+              "type": "PARAMETER",
+              "role": "object",
+              "evidence": "Coulomb number",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "definition",
+            "_evidence_offset": "2892"
+          },
+          "provenance": {
+            "paper_id": "PPR_B0E8916D4E19",
+            "year": "",
+            "section": "front_matter (part 1)",
+            "cited_from": "prior_art",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.8",
+        "evidence": "The inertial number, which is the square root of the Savage number20 or of the Coulomb number21 introduced previously in the literature",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-26T08:28:11Z",
+        "mutation_id": "mut_000080",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1c0_e20",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "Inertial number",
+              "type": "PARAMETER",
+              "role": "subject",
+              "evidence": "the Inertial number",
+              "central": false
+            },
+            {
+              "surface": "macroscopic deformation time scale",
+              "type": "PARAMETER",
+              "role": "object",
+              "evidence": "macroscopic deformation time scale",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "definition",
+            "_evidence_offset": "3029"
+          },
+          "provenance": {
+            "paper_id": "PPR_B0E8916D4E19",
+            "year": "",
+            "section": "front_matter (part 1)",
+            "cited_from": "prior_art",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.8",
+        "evidence": "can be interpreted as the ratio between two time scales, a macroscopic deformation time scale (1/ ˙ ) and an inertial time scale",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-26T08:28:11Z",
+        "mutation_id": "mut_000081",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1c0_e21",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "Inertial number",
+              "type": "PARAMETER",
+              "role": "subject",
+              "evidence": "the Inertial number",
+              "central": false
+            },
+            {
+              "surface": "inertial time scale",
+              "type": "PARAMETER",
+              "role": "object",
+              "evidence": "inertial time scale",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "definition",
+            "_evidence_offset": "3029"
+          },
+          "provenance": {
+            "paper_id": "PPR_B0E8916D4E19",
+            "year": "",
+            "section": "front_matter (part 1)",
+            "cited_from": "prior_art",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.8",
+        "evidence": "can be interpreted as the ratio between two time scales, a macroscopic deformation time scale (1/ ˙ ) and an inertial time scale",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-26T08:28:11Z",
+        "mutation_id": "mut_000082",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1c0_e25",
+        "payload": {
+          "kind": "extends",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "simple scalar law (Eq. 1)",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "simple scalar law (Eq. 1)",
+              "central": false
+            },
+            {
+              "surface": "3D generalization of the friction law",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "3D generalization of the friction law",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "generalization",
+            "_evidence_offset": "3875"
+          },
+          "provenance": {
+            "paper_id": "PPR_B0E8916D4E19",
+            "year": "",
+            "section": "front_matter (part 1)",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "hypothesized"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.8",
+        "evidence": "However, the simple scalar law (Eq. 1) cannot be applied in more complex flows where shear in different directions is present and where a full three-dimensional rheology is needed. We therefore propose the following 3D generalization of the friction law",
+        "rationale": "extracted extends",
+        "timestamp": "2026-08-26T08:28:11Z",
+        "mutation_id": "mut_000083",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1c0_e26",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "incompressible fluid",
+              "type": "METHOD",
+              "role": "subject",
+              "evidence": "incompressible fluid",
+              "central": false
+            },
+            {
+              "surface": "internal stress tensor",
+              "type": "PARAMETER",
+              "role": "object",
+              "evidence": "internal stress tensor",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "definition",
+            "_evidence_offset": "4271"
+          },
+          "provenance": {
+            "paper_id": "PPR_B0E8916D4E19",
+            "year": "",
+            "section": "front_matter (part 1)",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "hypothesized"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.8",
+        "evidence": "The granular material is then described as an incompressible fluid with the internal stress tensor given by the following relations",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-26T08:28:11Z",
+        "mutation_id": "mut_000084",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1c0_e31",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target"
+          ],
+          "concepts": [
+            {
+              "surface": "yield criterion",
+              "type": "PHENOMENON",
+              "role": "source",
+              "evidence": "yield criterion",
+              "central": false
+            },
+            {
+              "surface": "shear rate",
+              "type": "PARAMETER",
+              "role": "target",
+              "evidence": "shear rate",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "causal",
+            "_evidence_offset": "5358"
+          },
+          "provenance": {
+            "paper_id": "PPR_B0E8916D4E19",
+            "year": "",
+            "section": "front_matter (part 1)",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.8",
+        "evidence": "This divergence insures that a yield criterion exists.",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-26T08:28:11Z",
+        "mutation_id": "mut_000085",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1c0_e32",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "yield criterion",
+              "type": "PHENOMENON",
+              "role": "subject",
+              "evidence": "yield criterion",
+              "central": false
+            },
+            {
+              "surface": "Drucker-Prager like criterion",
+              "type": "METHOD",
+              "role": "object",
+              "evidence": "Drucker-Prager like criterion",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "definition",
+            "_evidence_offset": "5577"
+          },
+          "provenance": {
+            "paper_id": "PPR_B0E8916D4E19",
+            "year": "",
+            "section": "front_matter (part 1)",
+            "cited_from": "prior_art",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.8",
+        "evidence": "The yield criterion takes then the form of a Drucker-Prager like criterion23.",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-26T08:28:11Z",
+        "mutation_id": "mut_000086",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1c0_e35",
+        "payload": {
+          "kind": "contrasts_with",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "visco-plastic fluid",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "visco-plastic fluid",
+              "central": false
+            },
+            {
+              "surface": "Bingham or Herschel-Bulkley fluids",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "Bingham or Herschel-Bulkley fluids",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "contrast",
+            "contrast_dimension": "viscosity dependence",
+            "_evidence_offset": "5835"
+          },
+          "provenance": {
+            "paper_id": "PPR_B0E8916D4E19",
+            "year": "",
+            "section": "front_matter (part 1)",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "hypothesized"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.8",
+        "evidence": "The specificity compared to classical Bingham or Herschel-Bulkley fluids is that the effective viscosity depends both on the shear rate and on the local pressure.",
+        "rationale": "extracted contrasts_with",
+        "timestamp": "2026-08-26T08:28:11Z",
+        "mutation_id": "mut_000087",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1c0_e37",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target"
+          ],
+          "concepts": [
+            {
+              "surface": "frictional nature of stresses",
+              "type": "PHENOMENON",
+              "role": "source",
+              "evidence": "frictional nature of stresses",
+              "central": false
+            },
+            {
+              "surface": "effective viscosity",
+              "type": "PARAMETER",
+              "role": "target",
+              "evidence": "effective viscosity",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "causal",
+            "_evidence_offset": "5998"
+          },
+          "provenance": {
+            "paper_id": "PPR_B0E8916D4E19",
+            "year": "",
+            "section": "front_matter (part 1)",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "hypothesized"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.8",
+        "evidence": "This property is linked to the frictional nature of stresses in granular media.",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-26T08:28:11Z",
+        "mutation_id": "mut_000088",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1c0_e47",
+        "payload": {
+          "kind": "measures",
+          "roles": [
+            "object",
+            "instrument"
+          ],
+          "concepts": [
+            {
+              "surface": "free-surface inclination",
+              "type": "PARAMETER",
+              "role": "object",
+              "evidence": "free-surface inclination",
+              "central": false
+            },
+            {
+              "surface": "particle-imaging velocimetry",
+              "type": "METHOD",
+              "role": "instrument",
+              "evidence": "particle-imaging velocimetry",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "condition": "steady uniform regime",
+            "_evidence_offset": "7556"
+          },
+          "provenance": {
+            "paper_id": "PPR_B0E8916D4E19",
+            "year": "",
+            "section": "front_matter (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.8",
+        "evidence": "we performed systematic measurements of the free-surface inclination , of the free-surface-velocity profile V_surf(y) using particle-imaging velocimetry",
+        "rationale": "extracted measures",
+        "timestamp": "2026-08-26T08:28:11Z",
+        "mutation_id": "mut_000089",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1c0_e48",
+        "payload": {
+          "kind": "measures",
+          "roles": [
+            "object",
+            "instrument"
+          ],
+          "concepts": [
+            {
+              "surface": "free-surface-velocity profile V_surf(y)",
+              "type": "PARAMETER",
+              "role": "object",
+              "evidence": "free-surface-velocity profile V_surf(y)",
+              "central": false
+            },
+            {
+              "surface": "particle-imaging velocimetry",
+              "type": "METHOD",
+              "role": "instrument",
+              "evidence": "particle-imaging velocimetry",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "condition": "steady uniform regime",
+            "_math_binding_review": "1",
+            "_evidence_offset": "7556"
+          },
+          "provenance": {
+            "paper_id": "PPR_B0E8916D4E19",
+            "year": "",
+            "section": "front_matter (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.8",
+        "evidence": "we performed systematic measurements of the free-surface inclination , of the free-surface-velocity profile V_surf(y) using particle-imaging velocimetry",
+        "rationale": "extracted measures",
+        "timestamp": "2026-08-26T08:28:11Z",
+        "mutation_id": "mut_000090",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1c0_e49",
+        "payload": {
+          "kind": "measures",
+          "roles": [
+            "object",
+            "instrument"
+          ],
+          "concepts": [
+            {
+              "surface": "thickness of the flowing layer h(y)",
+              "type": "PARAMETER",
+              "role": "object",
+              "evidence": "thickness of the flowing layer h(y)",
+              "central": false
+            },
+            {
+              "surface": "erosion method",
+              "type": "METHOD",
+              "role": "instrument",
+              "evidence": "erosion method",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "condition": "steady uniform regime",
+            "_evidence_offset": "7727"
+          },
+          "provenance": {
+            "paper_id": "PPR_B0E8916D4E19",
+            "year": "",
+            "section": "front_matter (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.8",
+        "evidence": "we get estimates of the thickness of the flowing layer h(y) using an erosion method19.",
+        "rationale": "extracted measures",
+        "timestamp": "2026-08-26T08:28:11Z",
+        "mutation_id": "mut_000091",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1c0_e50",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "numerical simulations",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "numerical simulations",
+              "central": false
+            },
+            {
+              "surface": "local rheology",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "local rheology",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "theory_vs_experiment",
+            "_evidence_offset": "7814"
+          },
+          "provenance": {
+            "paper_id": "PPR_B0E8916D4E19",
+            "year": "",
+            "section": "front_matter (part 1)",
+            "cited_from": "this_work",
+            "method": "simulation",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.8",
+        "evidence": "To compare the experimental results with the predictions of the local rheology, we perform numerical simulations of a granular fluid described by the constitutive law Eq.",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-26T08:28:11Z",
+        "mutation_id": "mut_000092",
+        "status": "committed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.12",
+      "validated": [
+        "mut_000072",
+        "mut_000073",
+        "mut_000074",
+        "mut_000075",
+        "mut_000076",
+        "mut_000077",
+        "mut_000078",
+        "mut_000079",
+        "mut_000080",
+        "mut_000081",
+        "mut_000082",
+        "mut_000083",
+        "mut_000084",
+        "mut_000085",
+        "mut_000086",
+        "mut_000087",
+        "mut_000088",
+        "mut_000089",
+        "mut_000090",
+        "mut_000091",
+        "mut_000092"
+      ],
+      "rejected": [],
+      "routed": []
+    },
+    "version_diff": {
+      "before": "0.8",
+      "after": "0.12"
+    }
+  },
+  {
+    "mutations": [
+      {
+        "op": "add_edge",
+        "target": "n2_e2",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target"
+          ],
+          "concepts": [
+            {
+              "surface": "flow threshold",
+              "type": "PROPERTY",
+              "role": "source",
+              "evidence": "the flow threshold",
+              "central": false
+            },
+            {
+              "surface": "Coulomb criterion",
+              "type": "METHOD",
+              "role": "target",
+              "evidence": "a Coulomb criterion",
+              "central": true
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "functional_dependence",
+            "_evidence_offset": "407"
+          },
+          "provenance": {
+            "paper_id": "PPR_B0E8916D4E19",
+            "year": "",
+            "section": "front_matter (part 2)",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "granular",
+        "base_version": "0.12",
+        "evidence": "the flow threshold is simply described by a Coulomb criterion",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-26T08:28:47Z",
+        "mutation_id": "mut_000093",
+        "status": "committed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.12",
+      "validated": [
+        "mut_000093"
+      ],
+      "rejected": [],
+      "routed": []
+    },
+    "version_diff": {
+      "before": "0.12",
+      "after": "0.12"
+    }
+  },
+  {
+    "mutations": [
+      {
+        "op": "add_pattern",
+        "target": "describes",
+        "payload": {
+          "pattern": {
+            "pattern_id": "describes",
+            "description": "A relation where one entity (typically a model or theory) describes or accounts for a phenomenon or system. This is distinct from 'influences' (which implies causal dependence) and 'constitutive_law' (which requires formal quantitative relations).",
+            "role_slots": [
+              {
+                "role": "model",
+                "type": "THING"
+              },
+              {
+                "role": "phenomenon",
+                "type": "THING"
+              }
+            ],
+            "allowed_qualifiers": [
+              "relation_type",
+              "applies_in_regime",
+              "method",
+              "evidence_strength",
+              "cited_from"
+            ],
+            "deprecated": false,
+            "split_from": "",
+            "is_abstract": false,
+            "family": "claim",
+            "semantic_boundary": "Applies when a model/theory explains or accounts for a phenomenon, not when it merely influences it or states a quantitative law."
+          }
+        },
+        "proposer_role": "evolver",
+        "domain": "granular",
+        "base_version": "0.12",
+        "evidence": "the simple visco-plastic constitutive law proposed seems very successful to describe dense granular flows",
+        "rationale": "HE0 describes a constitutive law being successful in describing a phenomenon. This is a descriptive/representational relation, not a formal constitutive law (which requires explicit input-output-parameter structure). The existing 'constitutive_law' pattern requires formal quantitative relations with specific roles (output, input, parameter, coefficient, exponent), which doesn't fit this qualitative description of success. This new pattern captures the descriptive relationship between a model and the phenomenon it describes.",
+        "timestamp": "2026-08-26T08:29:03Z",
+        "mutation_id": "mut_000094",
+        "status": "committed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.13",
+      "validated": [
+        "mut_000094"
+      ],
+      "rejected": [],
+      "routed": []
+    },
+    "version_diff": {
+      "before": "0.12",
+      "after": "0.13"
+    }
+  },
+  {
+    "mutations": [
+      {
+        "op": "align_concept_merge",
+        "target": "CM0111",
+        "payload": {
+          "merge_ids": [
+            "CM0128"
+          ]
+        },
+        "proposer_role": "aligner",
+        "domain": "granular",
+        "base_version": "0.13",
+        "evidence": "same-concept group: 3D rheology, 3D generalization of the friction law",
+        "rationale": "LLM-judged same concept (canonicalize)",
+        "timestamp": "2026-08-26T08:29:20Z",
+        "mutation_id": "mut_000095",
+        "status": "routed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.13",
+      "validated": [
+        "mut_000095"
+      ],
+      "rejected": [],
+      "routed": [
+        {
+          "mutation_id": "mut_000095",
+          "op": "align_concept_merge",
+          "outcome": "insert",
+          "detail": "no-route-for-op"
+        }
+      ]
+    },
+    "version_diff": {
+      "before": "0.13",
+      "after": "0.13"
+    }
+  },
+  {
+    "mutations": [
+      {
+        "op": "align_concept_merge",
+        "target": "CM0133",
+        "payload": {
+          "merge_ids": [
+            "CM0145"
+          ]
+        },
+        "proposer_role": "aligner",
+        "domain": "granular",
+        "base_version": "0.13",
+        "evidence": "same-concept group: Drucker-Prager like criterion, Coulomb criterion",
+        "rationale": "LLM-judged same concept (canonicalize)",
+        "timestamp": "2026-08-26T08:29:20Z",
+        "mutation_id": "mut_000096",
+        "status": "routed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.13",
+      "validated": [
+        "mut_000096"
+      ],
+      "rejected": [],
+      "routed": [
+        {
+          "mutation_id": "mut_000096",
+          "op": "align_concept_merge",
+          "outcome": "insert",
+          "detail": "no-route-for-op"
+        }
+      ]
+    },
+    "version_diff": {
+      "before": "0.13",
+      "after": "0.13"
+    }
+  },
+  {
+    "mutations": [
+      {
+        "op": "align_concept_merge",
+        "target": "CM0134",
+        "payload": {
+          "merge_ids": [
+            "CM0135"
+          ]
+        },
+        "proposer_role": "aligner",
+        "domain": "granular",
+        "base_version": "0.13",
+        "evidence": "same-concept group: visco-plastic fluid, Bingham or Herschel-Bulkley fluids",
+        "rationale": "LLM-judged same concept (canonicalize)",
+        "timestamp": "2026-08-26T08:29:20Z",
+        "mutation_id": "mut_000097",
+        "status": "routed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.13",
+      "validated": [
+        "mut_000097"
+      ],
+      "rejected": [],
+      "routed": [
+        {
+          "mutation_id": "mut_000097",
+          "op": "align_concept_merge",
+          "outcome": "insert",
+          "detail": "no-route-for-op"
+        }
+      ]
+    },
+    "version_diff": {
+      "before": "0.13",
+      "after": "0.13"
+    }
+  }
+]

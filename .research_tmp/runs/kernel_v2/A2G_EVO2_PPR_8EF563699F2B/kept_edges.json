@@ -1,0 +1,325 @@
+[
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "evidence": "The velocity fluctuation δv is defined as the root of granular temperature which"
+  },
+  {
+    "pattern_type": "composed_of",
+    "roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "evidence": "The particle-wise stress tensor is calculated considering both the contact contr"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "evidence": "the pressure is defined as $P = - \\sigma _ { i i } / 3$"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition",
+      "definition",
+      "object"
+    ],
+    "evidence": "the shear stress is defined as the equivalent shear stress $\\tau = \\sqrt { \\sigm"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition"
+    ],
+    "evidence": "where $\\sigma _ { i j } ^ { \\prime } = \\sigma _ { i j } + P \\delta _ { i j }$ is"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "evidence": "we calculate the layerwise fluidity field $g = \\dot { \\gamma } / \\mu , \\delta v$"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition"
+    ],
+    "evidence": "here we evaluate d as the layer-wise mean particle size"
+  },
+  {
+    "pattern_type": "constitutive_law",
+    "roles": [
+      "output",
+      "input",
+      "parameter"
+    ],
+    "evidence": "$F ( \\Phi ) = \\frac { - ( \\Phi - 0 . 5 8 ) + \\sqrt { ( \\Phi - 0 . 5 8 ) ^ { 2 } "
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "evidence": "the granular fluidity is found to be a kinematic variable given by the velocity "
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target",
+      "cause"
+    ],
+    "evidence": "The g field influences the flow through its role in the constitutive relation be"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "evidence": "The inertial law, Eq. (1), can be obtained when the flow field is homogeneous (∇"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition",
+      "object",
+      "object"
+    ],
+    "evidence": "we identify a microphysical definition for the granular fluidity field, which de"
+  },
+  {
+    "pattern_type": "compares",
+    "roles": [
+      "from",
+      "to",
+      "to"
+    ],
+    "evidence": "Using discrete element method (DEM) simulations in multiple configurations at st"
+  },
+  {
+    "pattern_type": "compares",
+    "roles": [
+      "from",
+      "to",
+      "to"
+    ],
+    "evidence": "Using discrete element method (DEM) simulations in multiple configurations at st"
+  },
+  {
+    "pattern_type": "compares",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "we compare the predictions of this microscopic formula with the constitutive def"
+  },
+  {
+    "pattern_type": "describes",
+    "roles": [
+      "model",
+      "phenomenon"
+    ],
+    "evidence": "we attempt to explain the microphysical description of g using kinetic theory"
+  },
+  {
+    "pattern_type": "describes",
+    "roles": [
+      "model",
+      "phenomenon"
+    ],
+    "evidence": "and also using an Eyring-like model"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target",
+      "cause"
+    ],
+    "evidence": "We start with the hypothesis that for hard particles, g should relate to velocit"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "If we suppose the only other state variable affecting g is the packing fraction "
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "the normalized fluidity should be expressible as where F is an unknown function."
+  },
+  {
+    "pattern_type": "composed_of",
+    "roles": [
+      "whole",
+      "component",
+      "component",
+      "component"
+    ],
+    "evidence": "The particle interaction model [7, 18] contains elastic forces, damping effects,"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition",
+      "object",
+      "object"
+    ],
+    "evidence": "using a spring-dashpot law defined by stiffness in the normal and tangential dir"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "evidence": "damping coefficient in the normal and tangential directions γ_n, γ_t"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "f relates microscopically to the rate of plastic events"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "which has been correlated to shear-rate fluctuations in experiments"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "Our result that a fluctuation variable is key as well in describing granular flu"
+  },
+  {
+    "pattern_type": "claim_relation",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "Our result that a fluctuation variable is key as well in describing granular flu"
+  },
+  {
+    "pattern_type": "constitutive_law",
+    "roles": [
+      "output",
+      "input",
+      "input"
+    ],
+    "evidence": "Possible simplifications of $\\boldsymbol { g } = \\boldsymbol { g } ( \\delta \\bol"
+  },
+  {
+    "pattern_type": "constitutive_law",
+    "roles": [
+      "output",
+      "input",
+      "input"
+    ],
+    "evidence": "Is it possible $g = g ( \\delta v , P )$"
+  },
+  {
+    "pattern_type": "constitutive_law",
+    "roles": [
+      "output",
+      "input",
+      "input"
+    ],
+    "evidence": "or $g = g ( \\Phi , P ) \\ell$"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "object"
+    ],
+    "evidence": "Φ corresponds to $^ { 6 6 } \\mathrm { V } ^ { 5 }$"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "object"
+    ],
+    "evidence": "δv corresponds to $^ { 6 6 } \\mathrm { T } ^ { 9 }$"
+  },
+  {
+    "pattern_type": "compares",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "Is it possible $g = g ( \\delta v , P )$ or $g = g ( \\Phi , P ) \\ell$"
+  },
+  {
+    "pattern_type": "compares",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "Is it possible $g = g ( \\delta v , P )$ or $g = g ( \\Phi , P ) \\ell$"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "at hypothetically fixed velocity fluctuations, the fluidity would still be nontr"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "The fluidity is proportional to δv at fixed Φ"
+  },
+  {
+    "pattern_type": "constitutive_law",
+    "roles": [
+      "output",
+      "input",
+      "input",
+      "parameter",
+      "parameter"
+    ],
+    "evidence": "Because $g = \\dot { \\gamma } / \\mu = \\delta v F ( \\Phi ) / d .$"
+  }
+]

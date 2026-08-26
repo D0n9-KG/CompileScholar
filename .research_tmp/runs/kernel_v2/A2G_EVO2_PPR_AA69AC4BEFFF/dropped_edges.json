@@ -1,0 +1,1912 @@
+[
+  {
+    "edge_id": "n1_e0",
+    "pattern_type": "describes",
+    "evidence_span": "we apply the nonlocal granular fluidity (NGF) model—a continuum model that involves higher-order flow gradients—to simulate the specific case of dense flow in a split-bottom cell with a vane-shape intruder",
+    "node_ids": [
+      "n1_n1",
+      "n1_n2"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "nonlocal granular fluidity (NGF) model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "dense granular flow",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1_e1",
+    "pattern_type": "validates_against",
+    "evidence_span": "Our simulations quantitatively capture the key features of the experimentally observed phenomena",
+    "node_ids": [
+      "n1_n8",
+      "n1_n9"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "simulations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "experiments",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1_e2",
+    "pattern_type": "influences",
+    "evidence_span": "the yield condition vanishes throughout the granular material—even in regions that are very far from the “primary,” boundary-driven shear flow",
+    "node_ids": [
+      "n1_n3",
+      "n1_n4"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "primary flow",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "yield condition",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1_e5",
+    "pattern_type": "compares",
+    "evidence_span": "Our simulations quantitatively capture the key features of the experimentally observed phenomena",
+    "node_ids": [
+      "n1_n8",
+      "n1_n9"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "simulations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "experiments",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e17",
+    "pattern_type": "defines",
+    "evidence_span": "Secondary rheology is a rate-independent process.",
+    "node_ids": [
+      "n2c0_n25",
+      "n2c0_n30"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "secondary rheology of the intruder",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "rate-independent process",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e20",
+    "pattern_type": "influences",
+    "evidence_span": "The secondary rheology of an intruder depends on the distance between the intruder and the primary flow and the pressure in the region of the intruder.",
+    "node_ids": [
+      "n2c0_n35",
+      "n2c0_n25"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "distance between the intruder and the primary flow",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "secondary rheology of the intruder",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e21",
+    "pattern_type": "influences",
+    "evidence_span": "The secondary rheology of an intruder depends on the distance between the intruder and the primary flow and the pressure in the region of the intruder.",
+    "node_ids": [
+      "n2c0_n36",
+      "n2c0_n25"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "pressure in the region of the intruder",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "secondary rheology of the intruder",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e22",
+    "pattern_type": "influences",
+    "evidence_span": "Secondary rheology is directiondependent—i.e., it is different depending on whether the intruder moves with or against the primary flow.",
+    "node_ids": [
+      "n2c0_n38",
+      "n2c0_n25"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "intruder moves with or against the primary flow",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "secondary rheology of the intruder",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e34",
+    "pattern_type": "describes",
+    "evidence_span": "Henann and Kamrin [40] showed that the NGF model could capture the rate-independent nature of secondary rheology",
+    "node_ids": [
+      "n2c0_n56",
+      "n2c0_n62"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "nonlocal granular fluidity (NGF) model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "rate-independent nature of secondary rheology",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e35",
+    "pattern_type": "describes",
+    "evidence_span": "as well as the exponential-type relationship between the force applied to the intruder and its rate of motion.",
+    "node_ids": [
+      "n2c0_n56",
+      "n2c0_n63"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "nonlocal granular fluidity (NGF) model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "exponential-type relationship between the force applied to the intruder and its rate of motion",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e36",
+    "pattern_type": "compares",
+    "evidence_span": "The purpose of this paper is to apply the NGF model to obtain predictions of the secondary rheology of vane-shaped intruders in a split-bottom cell and to compare to the experimental results of Wandersman and van Hecke [15].",
+    "node_ids": [
+      "n2c0_n56",
+      "n2c0_n67"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "nonlocal granular fluidity (NGF) model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "experimental results of Wandersman and van Hecke",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e37",
+    "pattern_type": "describes",
+    "evidence_span": "we aim to show that the NGF model can indeed capture the observed direction-dependence and pressuredependence",
+    "node_ids": [
+      "n2c0_n56",
+      "n2c0_n68"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "nonlocal granular fluidity (NGF) model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "observed direction-dependence and pressuredependence",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e38",
+    "pattern_type": "validates_against",
+    "evidence_span": "Previous validation tests of the NGF model against experimental results for glass beads have involved flow configurations",
+    "node_ids": [
+      "n2c0_n56",
+      "n2c0_n71"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "nonlocal granular fluidity (NGF) model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "glass beads",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e39",
+    "pattern_type": "describes",
+    "evidence_span": "we present results that show that the NGF model can quantitatively capture all features of secondary rheology phenomenology",
+    "node_ids": [
+      "n2c0_n56",
+      "n2c0_n78"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "nonlocal granular fluidity (NGF) model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "all features of secondary rheology phenomenology",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e40",
+    "pattern_type": "describes",
+    "evidence_span": "including the directiondependence of the relationship between the rotation rate of the vane and the applied torque.",
+    "node_ids": [
+      "n2c0_n56",
+      "n2c0_n79"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "nonlocal granular fluidity (NGF) model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "directiondependence of the relationship between the rotation rate of the vane and the applied torque",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e15",
+    "pattern_type": "influences",
+    "evidence_span": "therefore related to other cooperative effects that arise in dense granular materials, such as decaying flow fields in steady nonuniform flows",
+    "node_ids": [
+      "n2c0_n25",
+      "n2c0_n28"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "secondary rheology of the intruder",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "decaying flow fields in steady nonuniform flows",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that secondary rheology is 'related to' other cooperative effects, which is a similarity/association claim, not a causal influence or dependency. The edge claims a causal influence from secondary rheology to decaying flow fields, but the text only groups them as related phenomena. The relation is not explicitly stated as a dependency.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n2c0_e16",
+    "pattern_type": "influences",
+    "evidence_span": "therefore related to other cooperative effects that arise in dense granular materials, such as decaying flow fields in steady nonuniform flows [e.g., 16–20] and the size-dependence of the flow threshold [e.g., 21–23].",
+    "node_ids": [
+      "n2c0_n25",
+      "n2c0_n29"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "secondary rheology of the intruder",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "size-dependence of the flow threshold",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "Same issue as n2c0_e15. The text says secondary rheology is 'related to' size-dependence of the flow threshold, grouping them as cooperative effects. This is not a causal influence or dependency relation. The edge claims a causal influence, which is not supported by the evidence.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n2c0_e19",
+    "pattern_type": "influences",
+    "evidence_span": "and not affected by any material timescale.",
+    "node_ids": [
+      "n2c0_n33",
+      "n2c0_n31"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "material timescale",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "rate of motion of the intruder",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the rate of motion is NOT affected by material timescale, which is a negation of a dependency. The edge claims a causal influence from material timescale to rate of motion, which is the opposite of what the text states. The relation is explicitly denied, not asserted.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n2c0_e29",
+    "pattern_type": "influences",
+    "evidence_span": "the μ(I )-rheology will predict that the relationship between the force applied to an intruder and its rate of motion is unaffected by the primary flow",
+    "node_ids": [
+      "n2c0_n52",
+      "n2c0_n51"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "primary flow",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "relationship between the force applied to an intruder and its rate of motion",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states that the primary flow does not affect the force-motion relationship, which is a causal dependence. The source (primary flow) and target (relationship) are correctly identified.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n2c0_e30",
+    "pattern_type": "influences",
+    "evidence_span": "This shortcoming stems from the local nature of the μ(I )-rheology, which neglects cooperative effects.",
+    "node_ids": [
+      "n2c0_n53",
+      "n2c0_n54"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "local nature of the μ(I )-rheology",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "cooperative effects",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states that the local nature of the rheology leads to neglecting cooperative effects, which is a causal dependence. The source (local nature) and target (cooperative effects) are correctly identified.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3c1_e0",
+    "pattern_type": "sets_parameter_value",
+    "evidence_span": "we adopt ε_0 = 0.01 for all three-dimensional simulations.",
+    "node_ids": [
+      "n3c1_n8",
+      "n3c1_n9"
+    ],
+    "node_roles": [
+      "subject",
+      "value"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "ε_0",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "0.01",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly states that ε_0 is set to 0.01 in the simulation setup. The subject is the parameter ε_0 and the value is 0.01, matching the roles. The relation is a direct assignment of a parameter value, fitting the sets_parameter_value pattern.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n4c0_e10",
+    "pattern_type": "defines",
+    "evidence_span": "a finite yield torque $T _ { \\mathrm { Y } }$ exists",
+    "node_ids": [
+      "n4c0_n28",
+      "n4c0_n29"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "yield torque T_Y",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "11.7 mN·m",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e11",
+    "pattern_type": "defines",
+    "evidence_span": "we refer to this situation as coflow",
+    "node_ids": [
+      "n4c0_n30",
+      "n4c0_n31"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "coflow",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "counterflow",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e13",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "in coflow, the scaling $\\omega / \\Omega \\sim \\exp [ ( T - T _ { \\mathrm { H } } ) / T _ { + } ]$ is observed",
+    "node_ids": [
+      "n4c0_n37",
+      "n4c0_n25",
+      "n4c0_n26",
+      "n4c0_n39"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter",
+      "coefficient"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "scaling ω/Ω ~ exp[(T - T_H)/T_+]",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "vane torque T",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "hold torque T_H",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "T_+",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e14",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "in counterflow, $\\omega / \\Omega \\sim - \\exp [ - ( T - T _ { \\mathrm { H } } ) / T _ { - } ]$ is observed",
+    "node_ids": [
+      "n4c0_n38",
+      "n4c0_n25",
+      "n4c0_n26",
+      "n4c0_n40"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter",
+      "coefficient"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "scaling ω/Ω ~ -exp[-(T - T_H)/T_-]",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "vane torque T",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "hold torque T_H",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "T_-",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e17",
+    "pattern_type": "compares",
+    "evidence_span": "the simulated yield torque is $T _ { \\mathrm { Y } } = 9 . 1 3 \\ : \\mathrm { m N }$ · m, which is approximately 20% less than the yield torque observed by Wandersman and van Hecke [15]",
+    "node_ids": [
+      "n4c0_n46",
+      "n4c0_n29"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "9.13 mN·m",
+        "labels": [
+          "NUMERIC"
+        ]
+      },
+      {
+        "surface": "11.7 mN·m",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e20",
+    "pattern_type": "measures",
+    "evidence_span": "the steady precession rate $\\omega _ { \\mathrm { p } }$ is measured",
+    "node_ids": [
+      "n4c0_n51",
+      "n4c0_n49"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "steady precession rate ω_p",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "steady-state torque T",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e21",
+    "pattern_type": "compares",
+    "evidence_span": "the maximum inertial number in the neighborhood of the vane is about $1 0 ^ { - 4 }$, which is much less than the inertial number near the split edge",
+    "node_ids": [
+      "n4c0_n53",
+      "n4c0_n12"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "10^-4",
+        "labels": [
+          "NUMERIC"
+        ]
+      },
+      {
+        "surface": "0.01",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e8",
+    "pattern_type": "influences",
+    "evidence_span": "the intruder will be placed along the central axis in the region above the shear zone",
+    "node_ids": [
+      "n4c0_n18",
+      "n4c0_n19",
+      "n4c0_n20"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "intruder",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "central axis",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "region above the shear zone",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes an experimental setup (placement of the intruder), not a functional dependence or influence relation. The intruder is not a quantity that influences the central axis or the region; it is placed there. This is a setup description, not a causal/scaling dependence.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e9",
+    "pattern_type": "defines",
+    "evidence_span": "This is the torque required to hold the vane fixed in the presence of the primary flow, and we refer to $T _ { \\mathrm { H } }$ as the hold torque",
+    "node_ids": [
+      "n4c0_n26",
+      "n4c0_n27"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "hold torque T_H",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "primary flow",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence defines T_H as the hold torque, but the 'object' role is incorrectly bound to 'primary flow'. The definition is of T_H as the hold torque, not as the primary flow. The primary flow is part of the definitional context (the torque required in the presence of the primary flow), but it is not the object being defined. The definitional identity is between T_H and 'hold torque', not T_H and 'primary flow'.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": true,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e18",
+    "pattern_type": "influences",
+    "evidence_span": "the yield threshold vanishes, and creeping flow is seen for $| T | < T _ { \\mathrm { Y } }$",
+    "node_ids": [
+      "n4c0_n47",
+      "n4c0_n48"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "yield threshold",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "creeping flow",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a condition (yield threshold vanishes) and a resulting phenomenon (creeping flow is seen), but this is not a causal influence relation between the yield threshold and creeping flow. It describes a regime transition, not a functional dependence. The yield threshold vanishing is a prerequisite for creeping flow, not a source that influences it.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e19",
+    "pattern_type": "measures",
+    "evidence_span": "the hold torque $T _ { \\mathrm { H } }$ is measured as the steady-state torque corresponding to $\\omega = 0$",
+    "node_ids": [
+      "n4c0_n49",
+      "n4c0_n50"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "steady-state torque T",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "hold torque T_H",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that T_H is measured as the steady-state torque at ω=0. This is a definitional/measurement relation where T_H is the object being measured, and the steady-state torque is the value it takes. The roles are reversed: T_H is the object, and the steady-state torque is the measured value, not the instrument. The 'instrument' role is incorrectly bound to T_H.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e22",
+    "pattern_type": "compares",
+    "evidence_span": "An exponential relationship between the force applied to an intruder and the creep rate of the intruder in the presence of far-away primary flow has also been observed in the continuum simulations of Henann and Kamrin [40] using the NGF model",
+    "node_ids": [
+      "n4c0_n1",
+      "n4c0_n55"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "NGF model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "continuum simulations of Henann and Kamrin [40]",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that an exponential relationship was observed in the simulations of Henann and Kamrin using the NGF model. This is not a comparison between the NGF model and the simulations; it is a statement that the same phenomenon was observed in those simulations. The NGF model is the tool used in the simulations, not a separate entity being compared.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6c1_e0",
+    "pattern_type": "compares",
+    "evidence_span": "the simulated secondary rheology of the cylindrical intruder is quantitatively similar to that of the vane-shaped intruder",
+    "node_ids": [
+      "n6c1_n1",
+      "n6c1_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "secondary rheology of the cylindrical intruder",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "secondary rheology of the vane-shaped intruder",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e5",
+    "pattern_type": "sets_parameter_value",
+    "evidence_span": "we consider a much greater filling height of H = 120 mm",
+    "node_ids": [
+      "n6c0_n10",
+      "n6c0_n11"
+    ],
+    "node_roles": [
+      "subject",
+      "value"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "filling height H",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "120 mm",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e7",
+    "pattern_type": "compares",
+    "evidence_span": "leading to a nearly identical response in coflow and counterflow",
+    "node_ids": [
+      "n6c0_n14",
+      "n6c0_n15"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "coflow response",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "counterflow response",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e6",
+    "pattern_type": "sets_parameter_value",
+    "evidence_span": "consider a much wider range of intruder depths z_m than in our three-dimensional simulations, varying from 10 to 100 mm",
+    "node_ids": [
+      "n6c0_n12",
+      "n6c0_n13"
+    ],
+    "node_roles": [
+      "subject",
+      "value"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "intruder depths z_m",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "10 to 100 mm",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states the intruder depths z_m are varied from 10 to 100 mm in the simulation setup. This fits the 'sets_parameter_value' pattern.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n7c1_e0",
+    "pattern_type": "influences",
+    "evidence_span": "Since the intruder cannot be placed farther away from the primary flow zone without partially emerging from the granular material, this discrepancy appears to hold close to z _ { \\mathrm { m } } = 0 \\ : \\mathrm { m m } .",
+    "node_ids": [
+      "n7c1_n1",
+      "n7c1_n2",
+      "n7c1_n3",
+      "n7c1_n4"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "intruder",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "primary flow zone",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "granular material",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "z_m = 0 : mm",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence sentence does not state an 'influences' relation. It states a spatial constraint (cannot be placed farther away) and a consequence (discrepancy holds close to z_m=0). The edge claims a causal/scaling dependence between 'intruder' and 'primary flow zone' with 'granular material' as cause and 'z_m=0' as effect, but the sentence does not support this. The sentence is about the physical impossibility of positioning the intruder, not about a functional dependence. The slot bindings are also incorrect: 'z_m = 0 : mm' is not an 'effect' of any influence, and 'granular material' is not a 'cause' in this context. The pattern type is wrong; this is a spatial/geometric constraint, not a dependency. The edge should be dropped.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n8_e7",
+    "pattern_type": "claim_relation",
+    "evidence_span": "for the slow flows considered in the present work, nearly constant-volume steady flow seems to remain a reasonable simplifying assumption",
+    "node_ids": [
+      "n8_n19",
+      "n8_n20"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "nearly constant-volume flow",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "slow flows",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e1",
+    "pattern_type": "composed_of",
+    "evidence_span": "the governing equations for the nonlocal granular fluidity (NGF) model",
+    "node_ids": [
+      "n9_n2",
+      "n9_n4",
+      "n9_n5"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "governing equations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "velocity vector v",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "stress tensor σ",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e0",
+    "pattern_type": "defines",
+    "evidence_span": "the governing equations for the nonlocal granular fluidity (NGF) model for steady, dense granular flow",
+    "node_ids": [
+      "n9_n2",
+      "n9_n1",
+      "n9_n3"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "governing equations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "nonlocal granular fluidity (NGF) model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "steady, dense granular flow",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence states that the governing equations are FOR the NGF model, not that the governing equations ARE DEFINED AS the NGF model. The NGF model is the subject of the equations, not a definition of them. The relation is one of ownership/application, not definitional identity. The 'steady, dense granular flow' is the regime the model applies to, not an object being defined. This is a misapplication of the defines pattern.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n9_e3",
+    "pattern_type": "describes",
+    "evidence_span": "the nonlocal granular fluidity (NGF) model for steady, dense granular flow",
+    "node_ids": [
+      "n9_n1",
+      "n9_n3"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "nonlocal granular fluidity (NGF) model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "steady, dense granular flow",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence merely states that the NGF model is FOR steady, dense granular flow, indicating the model's scope or applicability. It does not explicitly state that the model DESCRIBES or ACCOUNTS FOR the phenomenon. The relation is one of application/scope, not description. The 'steady, dense granular flow' is the regime the model applies to, not a phenomenon being described. This is a misapplication of the describes pattern.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n10c0_e5",
+    "pattern_type": "defines",
+    "evidence_span": "we define the equivalent shear stress, the pressure, and the stress ratio as $\\tau = ( \\sigma _ { i j } ^ { \\prime } \\sigma _ { i j } ^ { \\prime } / 2 ) ^ { 1 / 2 } , P = - \\sigma _ { k k } / 3$ , and $\\mu = \\tau / P$",
+    "node_ids": [
+      "n10c0_n8",
+      "n10c0_n6"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "pressure P",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "stress tensor σ_ij",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c0_e6",
+    "pattern_type": "defines",
+    "evidence_span": "we define the equivalent shear stress, the pressure, and the stress ratio as $\\tau = ( \\sigma _ { i j } ^ { \\prime } \\sigma _ { i j } ^ { \\prime } / 2 ) ^ { 1 / 2 } , P = - \\sigma _ { k k } / 3$ , and $\\mu = \\tau / P$",
+    "node_ids": [
+      "n10c0_n9",
+      "n10c0_n7",
+      "n10c0_n8"
+    ],
+    "node_roles": [
+      "subject",
+      "object",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "stress ratio μ",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "equivalent shear stress τ",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "pressure P",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c0_e9",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "a simple Bingham-like functional form may be used [25]: $\\mu ( I ) = \\mu _ { \\mathrm { s } } + b I$ , where $\\mu _ { \\mathrm { s } }$ is a static yield value and b is a dimensionless material parameter.",
+    "node_ids": [
+      "n10c0_n9",
+      "n10c0_n14",
+      "n10c0_n18",
+      "n10c0_n19"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "stress ratio μ",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "inertial number I",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "static yield value μ_s",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "material parameter b",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c0_e10",
+    "pattern_type": "defines",
+    "evidence_span": "dimensional arguments applied to homogeneous shearing lead to a one-to-one relationship between the stress ratio μ and the dimensionless inertial number $I = \\dot { \\gamma } \\sqrt { d ^ { 2 } \\rho _ { \\mathrm { s } } / P }$ .",
+    "node_ids": [
+      "n10c0_n14",
+      "n10c0_n3",
+      "n10c0_n15",
+      "n10c0_n16",
+      "n10c0_n8"
+    ],
+    "node_roles": [
+      "subject",
+      "object",
+      "object",
+      "object",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "inertial number I",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "equivalent shear strain-rate γ̇",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "grain diameter d",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "grain material density ρ_s",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "pressure P",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c0_e11",
+    "pattern_type": "defines",
+    "evidence_span": "$\\xi ( \\mu ) = A d /$ $\\sqrt { | \\mu - \\mu _ { \\mathrm { s } } | }$ is a stress-dependent length scale called the cooperativity length",
+    "node_ids": [
+      "n10c0_n22",
+      "n10c0_n15",
+      "n10c0_n9",
+      "n10c0_n18"
+    ],
+    "node_roles": [
+      "subject",
+      "object",
+      "object",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "cooperativity length ξ(μ)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "grain diameter d",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "stress ratio μ",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "static yield value μ_s",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c0_e12",
+    "pattern_type": "influences",
+    "evidence_span": "an additional governing equation is required to relate the fluidity field to the stress field and close the system of equations.",
+    "node_ids": [
+      "n10c0_n10",
+      "n10c0_n6"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "granular fluidity g",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "stress tensor σ_ij",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c0_e16",
+    "pattern_type": "background",
+    "evidence_span": "In a local approach, the fluidity would be given as a function of the stress in a manner consistent with the $\\mu ( I )$ -rheology [24–26].",
+    "node_ids": [
+      "n10c0_n21",
+      "n10c0_n24"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "NGF model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "μ(I)-rheology",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c0_e19",
+    "pattern_type": "composed_of",
+    "evidence_span": "Instead of utilizing only this local constitutive equation, in the NGF model, the granular fluidity $g$ is governed by the following partial differential equation: where√ $g _ { \\mathrm { l o c } } ( \\mu , P )$ is given through Eq. (A3), $\\xi ( \\mu ) = A d /$ $\\sqrt { | \\mu - \\mu _ { \\mathrm { s } } | }$ is a stress-dependent length scale called the cooperativity length",
+    "node_ids": [
+      "n10c0_n21",
+      "n10c0_n13",
+      "n10c0_n20",
+      "n10c0_n22"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "NGF model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "scalar form of the flow rule",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "local constitutive equation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "cooperativity length ξ(μ)",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n11_e0",
+    "pattern_type": "sets_parameter_value",
+    "evidence_span": "we take μ_s = 0.3819",
+    "node_ids": [
+      "n11_n1",
+      "n11_n2"
+    ],
+    "node_roles": [
+      "subject",
+      "value"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "μ_s",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "0.3819",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly states the parameter μ_s is set to 0.3819. The subject and value roles are correctly bound.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n11_e3",
+    "pattern_type": "sets_parameter_value",
+    "evidence_span": "the grain diameter is d = 1 mm",
+    "node_ids": [
+      "n11_n7",
+      "n11_n8"
+    ],
+    "node_roles": [
+      "subject",
+      "value"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "d",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "1 mm",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly states the parameter d is set to 1 mm. The subject and value roles are correctly bound.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n11_e4",
+    "pattern_type": "sets_parameter_value",
+    "evidence_span": "the grain material density is taken to be that of glass ρ_s = 2450 kg/m^3",
+    "node_ids": [
+      "n11_n9",
+      "n11_n10"
+    ],
+    "node_roles": [
+      "subject",
+      "value"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "ρ_s",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "2450 kg/m^3",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly states the parameter ρ_s is set to 2450 kg/m^3. The subject and value roles are correctly bound.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n11_e5",
+    "pattern_type": "sets_parameter_value",
+    "evidence_span": "the solid volume fraction is taken to be φ = 0.62",
+    "node_ids": [
+      "n11_n11",
+      "n11_n12"
+    ],
+    "node_roles": [
+      "subject",
+      "value"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "φ",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "0.62",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly states the parameter φ is set to 0.62. The subject and value roles are correctly bound.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n11_e6",
+    "pattern_type": "influences",
+    "evidence_span": "As μ_s increases, the torque-related quantities {T_H, T_+, T̄_-} increase",
+    "node_ids": [
+      "n11_n13",
+      "n11_n14"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "μ_s",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "torque-related quantities {T_H, T_+, T̄_-}",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly states a positive dependence of the torque-related quantities on μ_s. The source and target roles are correctly bound.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n12_e2",
+    "pattern_type": "composed_of",
+    "evidence_span": "The governing partial differential equations in the computational domain are (1) the equilibrium equations (A1) and (2) the differential relation for the granular fluidity Eq. (A4)",
+    "node_ids": [
+      "n12_n1",
+      "n12_n4",
+      "n12_n5"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "nonlinear, quasistatic finite-element formulation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "equilibrium equations (A1)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "differential relation for the granular fluidity Eq. (A4)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n12_e3",
+    "pattern_type": "composed_of",
+    "evidence_span": "In the three-dimensional simulations, the finite-element degreesof-freedom are the three displacement components and the granular fluidity. In the generalized axisymmetric simulations, the degrees-of-freedom are the displacements along the r and z directions, the angle of rotation, and the granular fluidity, and these fields may vary in the r and z directions but not along the θ direction.",
+    "node_ids": [
+      "n12_n1",
+      "n12_n6",
+      "n12_n7"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "nonlinear, quasistatic finite-element formulation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "three-dimensional simulations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "generalized axisymmetric simulations",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n12_e6",
+    "pattern_type": "influences",
+    "evidence_span": "The differential relation Eq. (A4) requires that boundary conditions for the granular fluidity g be specified",
+    "node_ids": [
+      "n12_n5",
+      "n12_n12"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "differential relation for the granular fluidity Eq. (A4)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "boundary conditions for the granular fluidity g",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  }
+]

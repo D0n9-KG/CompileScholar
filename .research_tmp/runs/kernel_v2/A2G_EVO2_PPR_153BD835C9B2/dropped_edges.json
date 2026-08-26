@@ -1,0 +1,1633 @@
+[
+  {
+    "edge_id": "n1c1_e0",
+    "pattern_type": "analogous_to",
+    "evidence_span": "An identical equation is obtained from the kinetic theory for the case of equal size and different density spheres, but with $T _ { E }$ replaced by the number average kinetic temperature $( T _ { K } = [ ( 1 - f ) m _ { L } u _ { L } ^ { 2 } + f m _ { H } u _ { H } ^ { 2 } ] / 2 )$ [13,30].",
+    "node_ids": [
+      "n1c1_n1",
+      "n1c1_n25"
+    ],
+    "node_roles": [
+      "analog",
+      "reference"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "kinetic theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Stokes flow of a sphere",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c1_e5",
+    "pattern_type": "influences",
+    "evidence_span": "the equilibrium number fraction profile, $f ( y )$ , is simply related to the effective temperature profile $( T _ { E } ( y ) )$",
+    "node_ids": [
+      "n1c1_n18",
+      "n1c1_n20"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "f(y)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "T_E(y)",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c1_e19",
+    "pattern_type": "sets_parameter_value",
+    "evidence_span": "is captured with a high-speed camera at rate of $5 0 0 \\mathrm { f p s }$",
+    "node_ids": [
+      "n1c1_n51",
+      "n1c1_n52"
+    ],
+    "node_roles": [
+      "subject",
+      "value"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "high-speed camera",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "500 fps",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e11",
+    "pattern_type": "describes",
+    "evidence_span": "In the latter the gravity-driven motion and diffusion of a single different mass particle in a sheared granular bed is considered",
+    "node_ids": [
+      "n1c0_n12",
+      "n1c0_n15"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mode coupling theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "gravity-driven motion",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e12",
+    "pattern_type": "describes",
+    "evidence_span": "In the latter the gravity-driven motion and diffusion of a single different mass particle in a sheared granular bed is considered",
+    "node_ids": [
+      "n1c0_n12",
+      "n1c0_n16"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mode coupling theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "diffusion",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e13",
+    "pattern_type": "describes",
+    "evidence_span": "In the latter the gravity-driven motion and diffusion of a single different mass particle in a sheared granular bed is considered",
+    "node_ids": [
+      "n1c0_n12",
+      "n1c0_n17"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mode coupling theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "single different mass particle",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e14",
+    "pattern_type": "describes",
+    "evidence_span": "In the latter the gravity-driven motion and diffusion of a single different mass particle in a sheared granular bed is considered",
+    "node_ids": [
+      "n1c0_n12",
+      "n1c0_n18"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mode coupling theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "sheared granular bed",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e15",
+    "pattern_type": "describes",
+    "evidence_span": "numerical simulations [26] of granular shear flows very near random close packing of the particles",
+    "node_ids": [
+      "n1c0_n12",
+      "n1c0_n19"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mode coupling theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "random close packing",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e16",
+    "pattern_type": "describes",
+    "evidence_span": "numerical simulations [26] of granular shear flows very near random close packing of the particles",
+    "node_ids": [
+      "n1c0_n12",
+      "n1c0_n20"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mode coupling theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "granular shear flows",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e21",
+    "pattern_type": "describes",
+    "evidence_span": "We consider here the segregation of a mixture of equal size and different density particles in a dense, gravitydriven, shear flow",
+    "node_ids": [
+      "n1c0_n5",
+      "n1c0_n27"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "mixture of equal size and different density particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e22",
+    "pattern_type": "describes",
+    "evidence_span": "We consider here the segregation of a mixture of equal size and different density particles in a dense, gravitydriven, shear flow",
+    "node_ids": [
+      "n1c0_n5",
+      "n1c0_n28"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "dense, gravitydriven, shear flow",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e28",
+    "pattern_type": "describes",
+    "evidence_span": "To obtain the equilibrium number fraction profile of the heavy particles",
+    "node_ids": [
+      "n1c0_n5",
+      "n1c0_n37"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "equilibrium number fraction profile",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e29",
+    "pattern_type": "describes",
+    "evidence_span": "To obtain the equilibrium number fraction profile of the heavy particles",
+    "node_ids": [
+      "n1c0_n5",
+      "n1c0_n38"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "heavy particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e30",
+    "pattern_type": "describes",
+    "evidence_span": "we analyze the gravity-driven motion of a single heavy particle normal to the mean flow",
+    "node_ids": [
+      "n1c0_n5",
+      "n1c0_n39"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "gravity-driven motion",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e31",
+    "pattern_type": "describes",
+    "evidence_span": "we analyze the gravity-driven motion of a single heavy particle normal to the mean flow",
+    "node_ids": [
+      "n1c0_n5",
+      "n1c0_n40"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "single heavy particle",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e32",
+    "pattern_type": "describes",
+    "evidence_span": "in a flowing layer with a surface angle β",
+    "node_ids": [
+      "n1c0_n5",
+      "n1c0_n41"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "flowing layer",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e33",
+    "pattern_type": "describes",
+    "evidence_span": "in a flowing layer with a surface angle β",
+    "node_ids": [
+      "n1c0_n5",
+      "n1c0_n42"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "surface angle β",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e37",
+    "pattern_type": "defines",
+    "evidence_span": "The density of the effective medium is given by ρ_m = [ f m_H + ( 1 - f ) m_L ] / V",
+    "node_ids": [
+      "n1c0_n44",
+      "n1c0_n50"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "density ρ_m",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "mass of the heavy particles",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e43",
+    "pattern_type": "defines",
+    "evidence_span": "The density of the effective medium is given by ρ_m = [ f m_H + ( 1 - f ) m_L ] / V",
+    "node_ids": [
+      "n1c0_n44",
+      "n1c0_n56"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "density ρ_m",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "total number density",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e44",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "The velocity of a heavy particle normal to the flow direction is then v_H = F_H / ξ_H",
+    "node_ids": [
+      "n1c0_n57",
+      "n1c0_n45",
+      "n1c0_n58"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "velocity of a heavy particle",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "net force",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "friction coefficient of the heavy particles",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e45",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "Similarly, the velocity of the light particles is given by v_L = F_L / ξ_L",
+    "node_ids": [
+      "n1c0_n59",
+      "n1c0_n60",
+      "n1c0_n61"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "velocity of the light particles",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "friction coefficient of the light particles",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "friction coefficient",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e46",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "We use the fluctuation-dissipation relation to obtain the friction coefficient in terms of the effective temperature (T_E) as ξ_H = ξ_L = ξ = T_E / D",
+    "node_ids": [
+      "n1c0_n61",
+      "n1c0_n2",
+      "n1c0_n62"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "friction coefficient",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "effective temperature",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "diffusivity",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e47",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "The segregation flux of the heavy particles is J_H^s = (v_H - v_m) n_H",
+    "node_ids": [
+      "n1c0_n63",
+      "n1c0_n57",
+      "n1c0_n64"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "segregation flux of the heavy particles",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "velocity of a heavy particle",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "number average velocity",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e48",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "where v_m = f v_H + (1 - f) v_L is the number average velocity",
+    "node_ids": [
+      "n1c0_n64",
+      "n1c0_n57",
+      "n1c0_n59"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "number average velocity",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "velocity of a heavy particle",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "velocity of the light particles",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c1_e3",
+    "pattern_type": "co_occurs_with",
+    "evidence_span": "At equilibrium, there is a balance between diffusion and segregation",
+    "node_ids": [
+      "n1c1_n14",
+      "n1c1_n15"
+    ],
+    "node_roles": [
+      "phenomenon",
+      "co_phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "diffusion",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states that diffusion and segregation co-occur and are balanced in the system. This is a co-occurrence without implying structural composition or causal dependence, fitting the pattern.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n1c1_e10",
+    "pattern_type": "defines",
+    "evidence_span": "$\\eta$ is the local apparent viscosity",
+    "node_ids": [
+      "n1c1_n23",
+      "n1c1_n30"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "η",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "local apparent viscosity",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence explicitly defines η as the local apparent viscosity, matching the defines pattern.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n1c1_e24",
+    "pattern_type": "measures",
+    "evidence_span": "Averaging is done over all the particles present in the corresponding bin over all the images to obtain the number density, velocity and r.m.s. velocity profiles",
+    "node_ids": [
+      "n1c1_n62",
+      "n1c1_n59"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "number density",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "bins",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states that averaging over bins is used to obtain the number density. This is a measurement relation where the number density is the object and the bins are the instrument. The roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n1c1_e25",
+    "pattern_type": "measures",
+    "evidence_span": "Averaging is done over all the particles present in the corresponding bin over all the images to obtain the number density, velocity and r.m.s. velocity profiles",
+    "node_ids": [
+      "n1c1_n63",
+      "n1c1_n59"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "velocity",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "bins",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states that averaging over bins is used to obtain the velocity. This is a measurement relation where the velocity is the object and the bins are the instrument. The roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n1c1_e26",
+    "pattern_type": "measures",
+    "evidence_span": "Averaging is done over all the particles present in the corresponding bin over all the images to obtain the number density, velocity and r.m.s. velocity profiles",
+    "node_ids": [
+      "n1c1_n64",
+      "n1c1_n59"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "r.m.s. velocity profiles",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "bins",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states that averaging over bins is used to obtain the r.m.s. velocity profiles. This is a measurement relation where the r.m.s. velocity profiles are the object and the bins are the instrument. The roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n1c0_e34",
+    "pattern_type": "defines",
+    "evidence_span": "The particle mixture in the flowing layer is treated as an effective medium of density ρ_m",
+    "node_ids": [
+      "n1c0_n43",
+      "n1c0_n44"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "effective medium",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "density ρ_m",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence defines the particle mixture as an effective medium with a specific density, which is a definitional identity. The subject and object roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n1c0_e35",
+    "pattern_type": "composed_of",
+    "evidence_span": "The net force on the heavy particle in the direction normal to mean flow is then where the first term is the gravitational force",
+    "node_ids": [
+      "n1c0_n45",
+      "n1c0_n46"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "net force",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "gravitational force",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence states that the net force is composed of the gravitational force (as the first term), which is a structural composition. The whole and component roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n1c0_e36",
+    "pattern_type": "composed_of",
+    "evidence_span": "The net force on the heavy particle in the direction normal to mean flow is then where the first term is the gravitational force and the second term is the effective buoyancy force exerted by the surrounding particles",
+    "node_ids": [
+      "n1c0_n45",
+      "n1c0_n47"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "net force",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "effective buoyancy force",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence states that the net force is composed of the gravitational force and the effective buoyancy force, which is a structural composition. The whole and component roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n1c0_e38",
+    "pattern_type": "defines",
+    "evidence_span": "The density of the effective medium is given by ρ_m = [ f m_H + ( 1 - f ) m_L ] / V",
+    "node_ids": [
+      "n1c0_n44",
+      "n1c0_n51"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "density ρ_m",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "volume of the particles",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence provides a formula for the density of the effective medium, which is a definitional identity. The subject and object roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n1c0_e39",
+    "pattern_type": "defines",
+    "evidence_span": "The density of the effective medium is given by ρ_m = [ f m_H + ( 1 - f ) m_L ] / V",
+    "node_ids": [
+      "n1c0_n44",
+      "n1c0_n52"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "density ρ_m",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "acceleration due to gravity",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states a constitutive law (a formula defining ρ_m in terms of other quantities), not a definitional identity between ρ_m and 'acceleration due to gravity'. The 'acceleration due to gravity' is not part of this formula at all. The relation is a formal quantitative law, so the correct pattern would be constitutive_law, but the slot binding is wrong (gravity is not an input to this law).",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c0_e40",
+    "pattern_type": "defines",
+    "evidence_span": "The density of the effective medium is given by ρ_m = [ f m_H + ( 1 - f ) m_L ] / V",
+    "node_ids": [
+      "n1c0_n44",
+      "n1c0_n53"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "density ρ_m",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "mass of the lighter particles",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states a constitutive law (a formula defining ρ_m in terms of other quantities), not a definitional identity between ρ_m and 'mass of the lighter particles'. The 'mass of the lighter particles' is just one input variable in the formula, not the definition of ρ_m. The relation is a formal quantitative law, so the correct pattern would be constitutive_law, but the slot binding is wrong (m_L is an input, not the definition).",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c0_e41",
+    "pattern_type": "defines",
+    "evidence_span": "The density of the effective medium is given by ρ_m = [ f m_H + ( 1 - f ) m_L ] / V",
+    "node_ids": [
+      "n1c0_n44",
+      "n1c0_n54"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "density ρ_m",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "number fraction of the heavy particles",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states a constitutive law (a formula defining ρ_m in terms of other quantities), not a definitional identity between ρ_m and 'number fraction of the heavy particles'. The 'number fraction of the heavy particles' is just one input variable in the formula, not the definition of ρ_m. The relation is a formal quantitative law, so the correct pattern would be constitutive_law, but the slot binding is wrong (f is an input, not the definition).",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c0_e42",
+    "pattern_type": "defines",
+    "evidence_span": "The density of the effective medium is given by ρ_m = [ f m_H + ( 1 - f ) m_L ] / V",
+    "node_ids": [
+      "n1c0_n44",
+      "n1c0_n55"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "density ρ_m",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "number density of heavy particles",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states a constitutive law (a formula defining ρ_m in terms of other quantities), not a definitional identity between ρ_m and 'number density of heavy particles'. The 'number density of heavy particles' is not even directly in the formula (it's part of the definition of f). The relation is a formal quantitative law, so the correct pattern would be constitutive_law, but the slot binding is wrong.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c0_e49",
+    "pattern_type": "defines",
+    "evidence_span": "By definition, the flux of the light particles is J_L^s = - J_H^s",
+    "node_ids": [
+      "n1c0_n65",
+      "n1c0_n63"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "flux of the light particles",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "segregation flux of the heavy particles",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly states a definitional identity: the flux of light particles is defined as the negative of the segregation flux of heavy particles. The slot binding is correct: 'flux of the light particles' is the subject being defined, and 'segregation flux of the heavy particles' is the object it is defined in terms of. The polarity is correct as the definition is direct. The pattern 'defines' is appropriate for this definitional identity.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n2c0_e6",
+    "pattern_type": "similar_response",
+    "evidence_span": "The mean velocity ( v_x ) and the r.m.s. fluctuation velocity ( u ) for the glass particles and steel particles are nearly the same",
+    "node_ids": [
+      "n2c0_n10",
+      "n2c0_n11"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mean velocity v_x",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "r.m.s. fluctuation velocity u",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e15",
+    "pattern_type": "analogous_to",
+    "evidence_span": "We note the similarity of the approach presented here to that of Perrin [36] who determined the equilibrium profile of Brownian particles in a gravity field.",
+    "node_ids": [
+      "n2c0_n23",
+      "n2c0_n26"
+    ],
+    "node_roles": [
+      "analog",
+      "reference"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Perrin",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e16",
+    "pattern_type": "applies_to",
+    "evidence_span": "Such a “barotropic” experiment was suggested by Berthier and Barrat [22] for sheared colloids.",
+    "node_ids": [
+      "n2c0_n27",
+      "n2c0_n25"
+    ],
+    "node_roles": [
+      "theory",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Berthier and Barrat",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "density-difference–driven segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c1_e0",
+    "pattern_type": "applies_to",
+    "evidence_span": "the new thermodynamics for applications of practical interest related to granular materials and other systems, at high solids volume fraction",
+    "node_ids": [
+      "n2c1_n1",
+      "n2c1_n2",
+      "n2c1_n3",
+      "n2c1_n4"
+    ],
+    "node_roles": [
+      "theory",
+      "phenomenon",
+      "phenomenon",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "new thermodynamics",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "granular materials",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "other systems",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "high solids volume fraction",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states a potential application ('show the utility... for applications of practical interest'), which is a claim about future/practical use, not an actual application of the theory to a specific phenomenon. The 'phenomenon' role is filled by 'granular materials' and 'other systems', which are domains, not specific phenomena. The relation is more of a claim about utility than an 'applies_to' relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n2c0_e0",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "τ_xy = g sin β ∫_-y^0 ρ_b dy - (2 μ_w / b) g cos β ∫_-y^0 [ ∫_-y^0 ρ_b dy ] dy",
+    "node_ids": [
+      "n2c0_n2",
+      "n2c0_n3",
+      "n2c0_n6"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "τ_xy",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "ρ_b",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "μ_w",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence is a clear constitutive law relating shear stress to bulk density and wall friction coefficient. The roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n2c0_e1",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "ρ_b = α ( m_L N_L + m_H N_H )",
+    "node_ids": [
+      "n2c0_n3",
+      "n2c0_n4"
+    ],
+    "node_roles": [
+      "output",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "ρ_b",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "α",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence is a clear constitutive law defining bulk density as a function of the normalizing factor and other quantities. The roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n2c0_e2",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "α = [ n_b ω ( R^2 - δ^2 ) ] / [ 2 ∫_δ^0 ( v_xL N_L + v_xH N_H ) dy ]",
+    "node_ids": [
+      "n2c0_n4",
+      "n2c0_n5"
+    ],
+    "node_roles": [
+      "output",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "α",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "n_b",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence is a clear constitutive law defining the normalizing factor α as a function of the number density and other quantities. The roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n2c0_e3",
+    "pattern_type": "defines",
+    "evidence_span": "The dynamic angle of repose β is obtained as the angle at which the y-component of the mean velocity is zero.",
+    "node_ids": [
+      "n2c0_n7",
+      "n2c0_n2"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "dynamic angle of repose β",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "τ_xy",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence defines the dynamic angle of repose as the angle where the y-component of velocity is zero. It does not define it as τ_xy. The 'definition' role is incorrectly bound to τ_xy. The relation is a definition of β, not a definition of β in terms of τ_xy.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n2c0_e4",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "The apparent viscosity ( η ) of the mixture is obtained as η = τ_xy / γ̇",
+    "node_ids": [
+      "n2c0_n8",
+      "n2c0_n2",
+      "n2c0_n9"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "apparent viscosity η",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "τ_xy",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "γ̇",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence is a clear constitutive law defining apparent viscosity as a function of shear stress and shear rate. The roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n2c0_e5",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "γ̇ = | d v_x / d y |",
+    "node_ids": [
+      "n2c0_n9",
+      "n2c0_n10"
+    ],
+    "node_roles": [
+      "output",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "γ̇",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "mean velocity v_x",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence is a clear constitutive law defining shear rate as a function of the velocity gradient. The roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n2c0_e7",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "The apparent viscosity ( η = τ_xy / γ̇ ) increases sharply with depth",
+    "node_ids": [
+      "n2c0_n14",
+      "n2c0_n2",
+      "n2c0_n9"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "apparent viscosity η",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "τ_xy",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "γ̇",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states the constitutive law for apparent viscosity (η = τ_xy / γ̇) and describes its behavior. The roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n2c0_e8",
+    "pattern_type": "measures",
+    "evidence_span": "the diffusivity is obtained as half the slope of the linear part of the graph",
+    "node_ids": [
+      "n2c0_n15",
+      "n2c0_n16"
+    ],
+    "node_roles": [
+      "output",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "diffusivity D",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "mean squared displacement Δy²",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-missed-bad-role",
+    "verifier_note": "The evidence states a measurement procedure (obtaining diffusivity from the slope of MSD vs time), not a constitutive law relating output to input. The relation is real but the pattern is wrong; it should be measures.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "retype:measures"
+  },
+  {
+    "edge_id": "n2c0_e12",
+    "pattern_type": "validates_against",
+    "evidence_span": "Figure 6 shows a plot of [ f ( 1 - f ) ]^-1 d f / d y vs . 1 / T_E to test eq. (3), where symbols with error bars are experimental measurements and the line is the prediction of the theory.",
+    "node_ids": [
+      "n2c0_n22",
+      "n2c0_n23"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "eq. (3)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "theory",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly states that eq. (3) is tested against experimental data, which is a validation action. The relation is correctly typed as validates_against.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  }
+]

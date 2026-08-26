@@ -1,0 +1,574 @@
+{
+  "version": "0.5",
+  "meta_nodes": {
+    "THING": {
+      "type_id": "THING",
+      "description": "root: any node type is-a THING",
+      "is_abstract": false
+    },
+    "MATERIAL": {
+      "type_id": "MATERIAL",
+      "description": "a granular material or substance",
+      "is_abstract": false
+    },
+    "METHOD": {
+      "type_id": "METHOD",
+      "description": "a named modeling approach/theory/law/model (e.g. μ(I) rheology, kinetic theory, NGF, DEM, RFT)",
+      "is_abstract": false
+    },
+    "PARAMETER": {
+      "type_id": "PARAMETER",
+      "description": "a named physical quantity/constant/coefficient in equations (e.g. μ, I, d, P, τ, g, ρ_s, T, A, ξ, μ_s, b)",
+      "is_abstract": false
+    },
+    "PHENOMENON": {
+      "type_id": "PHENOMENON",
+      "description": "a physical effect/behavior methods capture (e.g. nonlocal creep, thin-body strengthening, secondary rheology, segregation, clogging)",
+      "is_abstract": false
+    },
+    "PROPERTY": {
+      "type_id": "PROPERTY",
+      "description": "a generic physical property/quantity not fitting the above (kept for residual cases)",
+      "is_abstract": false
+    },
+    "NUMERIC": {
+      "type_id": "NUMERIC",
+      "description": "a numeric value / measured number",
+      "is_abstract": false
+    },
+    "REGIME": {
+      "type_id": "REGIME",
+      "description": "a flow regime (dense/quasi-static/inertial)",
+      "is_abstract": false
+    }
+  },
+  "patterns": {
+    "constitutive_law": {
+      "pattern_id": "constitutive_law",
+      "description": "a constitutive law relating output quantity/quantities to >=1 input quantity (n-ary)",
+      "role_slots": [
+        {
+          "role": "output",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "input",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "parameter",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "coefficient",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "exponent",
+          "type": "THING",
+          "repeatable": true
+        }
+      ],
+      "allowed_qualifiers": [
+        "applies_in_regime",
+        "function_form",
+        "parameters",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "constitutive_law",
+      "semantic_boundary": "a FORMAL/QUANTITATIVE law output=f(inputs+params), stated as a formula or explicit functional relation. NOT a prose 'X depends on Y' (that is influences), NOT a definition (defines), NOT a measurement setup (measures)."
+    },
+    "influences": {
+      "pattern_id": "influences",
+      "description": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "role_slots": [
+        {
+          "role": "source",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "target",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "cause",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "effect",
+          "type": "THING",
+          "repeatable": true
+        }
+      ],
+      "allowed_qualifiers": [
+        "dependency_type",
+        "applies_in_regime",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "dependency",
+      "semantic_boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of)."
+    },
+    "defines": {
+      "pattern_id": "defines",
+      "description": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "role_slots": [
+        {
+          "role": "subject",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "definition",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "object",
+          "type": "THING",
+          "repeatable": true
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "definition",
+      "semantic_boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition."
+    },
+    "composed_of": {
+      "pattern_id": "composed_of",
+      "description": "one whole is composed-of / part-of >=1 component (n-ary composition)",
+      "role_slots": [
+        {
+          "role": "whole",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "component",
+          "type": "THING",
+          "repeatable": true
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "composition",
+      "semantic_boundary": "STRUCTURAL composition: parts that make up a whole (model A = B + C). NOT classification (defines), NOT 'X has control params' (influences), NOT experimental setup description, NOT 'we tested X by doing Y'."
+    },
+    "measures": {
+      "pattern_id": "measures",
+      "description": "a quantity is measured by / characterizes >=1 measure",
+      "role_slots": [
+        {
+          "role": "object",
+          "type": "THING"
+        },
+        {
+          "role": "instrument",
+          "type": "THING",
+          "repeatable": true
+        }
+      ],
+      "allowed_qualifiers": [
+        "condition",
+        "applies_in_regime",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "measure",
+      "semantic_boundary": "a measurement/evaluation relation: X is measured/evaluated by instrument/method Y. NOT a functional law (constitutive_law), NOT a dependence (influences)."
+    },
+    "claim_relation": {
+      "pattern_id": "claim_relation",
+      "description": "a discourse relation between >=2 claims/approaches (supports/contrasts/extends/...)",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "to",
+          "type": "THING",
+          "repeatable": true
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "applies_in_regime",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "claim",
+      "semantic_boundary": "a DISCOURSE relation between claims/findings (supports/contrasts/outperforms). NOT a method-to-method development (extends/improves/compares — those are evolution), NOT a measurement (measures)."
+    },
+    "extends": {
+      "pattern_id": "extends",
+      "description": "X generalizes/extends Y (X METHOD/PHENOMENON -> Y)",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "to",
+          "type": "THING",
+          "repeatable": true
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "cited_from",
+        "evidence_strength",
+        "method"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "evolution",
+      "semantic_boundary": "X GENERALIZES Y (X extends Y's scope/regime/params; X is a direct technical extension of Y). NOT improves (X need not be more accurate, just broader), NOT background (X is a direct technical inheritance, not a motivation citation), NOT claim_relation (this is method-to-method)."
+    },
+    "improves": {
+      "pattern_id": "improves",
+      "description": "X improves Y's accuracy/applicability, resolving Y's limitation",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "to",
+          "type": "THING",
+          "repeatable": true
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "cited_from",
+        "evidence_strength",
+        "method"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "evolution",
+      "semantic_boundary": "X RESOLVES a limitation of Y (X is more accurate/applicable BECAUSE it fixes something Y fails at; first-principles vs phenomenological = improves). NOT compares (X is NOT a parallel different-mechanism alternative; X builds on Y and is better), NOT extends (X is better not just broader)."
+    },
+    "compares": {
+      "pattern_id": "compares",
+      "description": "X is compared with Y",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "to",
+          "type": "THING",
+          "repeatable": true
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "cited_from",
+        "evidence_strength",
+        "method"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "evolution",
+      "semantic_boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiments', 'in contrast with'), or (iii) equivalence/contrast of formulations ('equivalent', 'the same as', 'rather than'). NOT improves (neither fixes the other's limitation), NOT extends (neither generalizes the other)."
+    },
+    "replaces": {
+      "pattern_id": "replaces",
+      "description": "X replaces Y",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "to",
+          "type": "THING",
+          "repeatable": true
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "cited_from",
+        "evidence_strength",
+        "method"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "evolution",
+      "semantic_boundary": "X SUBSTITUTES Y outright (X is used INSTEAD of Y; Y is retired). NOT improves (replaces = Y is gone, improves = Y still used + X better)."
+    },
+    "adapts": {
+      "pattern_id": "adapts",
+      "description": "X adapts Y to a new scenario",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "to",
+          "type": "THING",
+          "repeatable": true
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "cited_from",
+        "evidence_strength",
+        "method"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "evolution",
+      "semantic_boundary": "X PORTS Y to a NEW scenario/regime/domain Y wasn't designed for (adaptation of Y's mechanism). NOT extends (adapts = new scenario, extends = broader scope within same setting)."
+    },
+    "background": {
+      "pattern_id": "background",
+      "description": "X uses Y as background/motivation",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "THING",
+          "repeatable": true
+        },
+        {
+          "role": "to",
+          "type": "THING",
+          "repeatable": true
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "cited_from",
+        "evidence_strength",
+        "method"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "evolution",
+      "semantic_boundary": "X cites Y as MOTIVATION/prior context only (Y inspired X but X is NOT a direct technical extension/inheritance of Y). NOT extends (no direct technical lineage), NOT improves (no limitation fix)."
+    },
+    "contrasts_with": {
+      "pattern_id": "contrasts_with",
+      "description": "A discourse relation where one theory/approach is explicitly contrasted with another, often to highlight differences in assumptions, scope, or predictions. This is distinct from compares (which is about side-by-side evaluation) and claim_relation (which is about support/opposition between claims).",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "THING"
+        },
+        {
+          "role": "to",
+          "type": "THING"
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "cited_from",
+        "evidence_strength",
+        "method",
+        "contrast_dimension"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "claim",
+      "semantic_boundary": "contrasts_with = explicit opposition between two theories/approaches, NOT side-by-side evaluation (compares) and NOT support/opposition between claims (claim_relation)."
+    },
+    "validates_against": {
+      "pattern_id": "validates_against",
+      "description": "A relation where a theory/model's predictions are validated or checked against experimental or observational data. This is distinct from 'compares' (which includes theory-vs-experiment as one subtype) because it specifically emphasizes the validation/evaluation aspect, not just side-by-side comparison.",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "THING"
+        },
+        {
+          "role": "to",
+          "type": "THING"
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "cited_from",
+        "evidence_strength",
+        "method",
+        "validation_outcome"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "measure",
+      "semantic_boundary": "Use only when the core action is testing/evaluating a model or theory against data; not for mere side-by-side comparison or general agreement."
+    },
+    "assesses_accuracy_of": {
+      "pattern_id": "assesses_accuracy_of",
+      "description": "X provides means to assess/evaluate the accuracy of Y (a methodological relation where one approach serves as a benchmark or reference to evaluate another's accuracy). This is distinct from compares (which is side-by-side) and improves (which implies fixing limitations).",
+      "role_slots": [
+        {
+          "role": "from",
+          "type": "METHOD"
+        },
+        {
+          "role": "to",
+          "type": "METHOD"
+        }
+      ],
+      "allowed_qualifiers": [
+        "relation_type",
+        "method",
+        "evidence_strength",
+        "cited_from"
+      ],
+      "deprecated": false,
+      "is_abstract": false,
+      "split_from": "",
+      "family": "measure",
+      "semantic_boundary": "Use when one method is explicitly used as a benchmark/reference to test another’s accuracy; not for side-by-side comparison (compares) or fixing flaws (improves)."
+    }
+  },
+  "meta_edges": [
+    {
+      "src": "MATERIAL",
+      "dst": "THING",
+      "relation": "subclass_of",
+      "props": {}
+    },
+    {
+      "src": "METHOD",
+      "dst": "THING",
+      "relation": "subclass_of",
+      "props": {}
+    },
+    {
+      "src": "PARAMETER",
+      "dst": "THING",
+      "relation": "subclass_of",
+      "props": {}
+    },
+    {
+      "src": "PHENOMENON",
+      "dst": "THING",
+      "relation": "subclass_of",
+      "props": {}
+    },
+    {
+      "src": "PROPERTY",
+      "dst": "THING",
+      "relation": "subclass_of",
+      "props": {}
+    },
+    {
+      "src": "NUMERIC",
+      "dst": "THING",
+      "relation": "subclass_of",
+      "props": {}
+    },
+    {
+      "src": "REGIME",
+      "dst": "THING",
+      "relation": "subclass_of",
+      "props": {}
+    },
+    {
+      "src": "contrasts_with",
+      "dst": "claim_relation",
+      "relation": "subclass_of",
+      "props": {
+        "paper_id": "granular",
+        "evidence": "This is in contrast with the Jenkins & Savage (1983) treatment",
+        "via": "family_root"
+      }
+    },
+    {
+      "src": "validates_against",
+      "dst": "measures",
+      "relation": "subclass_of",
+      "props": {
+        "paper_id": "granular",
+        "evidence": "comparisons of their predicted stresses with Couette-flow experiments",
+        "via": "family_root"
+      }
+    },
+    {
+      "src": "assesses_accuracy_of",
+      "dst": "measures",
+      "relation": "subclass_of",
+      "props": {
+        "paper_id": "granular",
+        "evidence": "provide means to assess the accuracy of simpler, but more approximate, ad hoc analyses such as those discussed in §3 and in Jenkins & Savage (1983)",
+        "via": "family_root"
+      }
+    },
+    {
+      "src": "influences",
+      "dst": "defines",
+      "relation": "depends_on",
+      "props": {
+        "paper_id": "PPR_ED6187DF955A",
+        "evidence": "node 'R' co-referenced"
+      }
+    }
+  ],
+  "family_roots": {
+    "constitutive_law": "constitutive_law",
+    "dependency": "influences",
+    "definition": "defines",
+    "composition": "composed_of",
+    "measure": "measures",
+    "claim": "claim_relation",
+    "evolution": "background"
+  }
+}

@@ -1,0 +1,1581 @@
+[
+  {
+    "edge_id": "n1_e2",
+    "pattern_type": "observed_in_simulation",
+    "evidence_span": "'Layering' of the particles is observed at high concentrations.",
+    "node_ids": [
+      "n1_n5",
+      "n1_n1"
+    ],
+    "node_roles": [
+      "phenomenon",
+      "simulation"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "layering",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "molecular dynamics simulations",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e1",
+    "pattern_type": "background",
+    "evidence_span": "through computer simulations of these flows",
+    "node_ids": [
+      "n2_n3",
+      "n2_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "computer simulations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "granular flows",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e2",
+    "pattern_type": "background",
+    "evidence_span": "and by experimental investigations",
+    "node_ids": [
+      "n2_n4",
+      "n2_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "experimental investigations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "granular flows",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e7",
+    "pattern_type": "measures",
+    "evidence_span": "difficulty of developing techniques to measure things like velocities, granular temperatures, densities at 'points' in the interior of the flowing material",
+    "node_ids": [
+      "n2_n5",
+      "n2_n4"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "velocities",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "experimental investigations",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e8",
+    "pattern_type": "measures",
+    "evidence_span": "difficulty of developing techniques to measure things like velocities, granular temperatures, densities at 'points' in the interior of the flowing material",
+    "node_ids": [
+      "n2_n6",
+      "n2_n4"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "granular temperatures",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "experimental investigations",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e9",
+    "pattern_type": "measures",
+    "evidence_span": "difficulty of developing techniques to measure things like velocities, granular temperatures, densities at 'points' in the interior of the flowing material",
+    "node_ids": [
+      "n2_n7",
+      "n2_n4"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "densities",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "experimental investigations",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e3",
+    "pattern_type": "compares",
+    "evidence_span": "Progress has been made through the development of kinetic theories that can be used to predict the characteristics of various flow fields (e.g., Savage and Jeffrey, 1981; Lun et al., 1984; Jenkins and Richman, 1985) through computer simulations of these flows (e.g., Walton et al., 1988; Campbell and Brennen, 1985; Campbell, 1990; Savage, 1992; Walton and Braun, 1985), and by experimental investigations",
+    "node_ids": [
+      "n2_n1",
+      "n2_n3"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "kinetic theories",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "computer simulations",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence_span lists kinetic theories and computer simulations as parallel approaches used to make progress, but it does not explicitly compare them. The sentence merely lists them as separate methods that have contributed to progress, without putting them side-by-side for comparison. This is a co-listing, not a comparison.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n2_e4",
+    "pattern_type": "compares",
+    "evidence_span": "through computer simulations of these flows (e.g., Walton et al., 1988; Campbell and Brennen, 1985; Campbell, 1990; Savage, 1992; Walton and Braun, 1985), and by experimental investigations",
+    "node_ids": [
+      "n2_n3",
+      "n2_n4"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "computer simulations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "experimental investigations",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence_span lists computer simulations and experimental investigations as parallel approaches that have contributed to progress, but it does not explicitly compare them. The sentence merely lists them as separate methods, without putting them side-by-side for comparison. This is a co-listing, not a comparison.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n2_e5",
+    "pattern_type": "compares",
+    "evidence_span": "Progress has been made through the development of kinetic theories that can be used to predict the characteristics of various flow fields (e.g., Savage and Jeffrey, 1981; Lun et al., 1984; Jenkins and Richman, 1985) through computer simulations of these flows (e.g., Walton et al., 1988; Campbell and Brennen, 1985; Campbell, 1990; Savage, 1992; Walton and Braun, 1985), and by experimental investigations",
+    "node_ids": [
+      "n2_n1",
+      "n2_n4"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "kinetic theories",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "experimental investigations",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence_span lists kinetic theories and experimental investigations as parallel approaches that have contributed to progress, but it does not explicitly compare them. The sentence merely lists them as separate methods, without putting them side-by-side for comparison. This is a co-listing, not a comparison.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3_e0",
+    "pattern_type": "compares",
+    "evidence_span": "using both 'hard' and 'soft' sphere models",
+    "node_ids": [
+      "n3_n4",
+      "n3_n5"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "hard sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "soft sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3_e1",
+    "pattern_type": "applies_to",
+    "evidence_span": "The computational work in the present investigation has considered shear flows (Fig. 1) of smooth, inelastic spherical particles of uniform diameter $\\sigma$, using both 'hard' and 'soft' sphere models",
+    "node_ids": [
+      "n3_n4",
+      "n3_n1"
+    ],
+    "node_roles": [
+      "theory",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "hard sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "shear flows",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3_e2",
+    "pattern_type": "applies_to",
+    "evidence_span": "The computational work in the present investigation has considered shear flows (Fig. 1) of smooth, inelastic spherical particles of uniform diameter $\\sigma$, using both 'hard' and 'soft' sphere models",
+    "node_ids": [
+      "n3_n5",
+      "n3_n1"
+    ],
+    "node_roles": [
+      "theory",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "soft sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "shear flows",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3_e3",
+    "pattern_type": "influences",
+    "evidence_span": "The influence of gravity was neglected in the computations presented herein.",
+    "node_ids": [
+      "n3_n7",
+      "n3_n1"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "gravity",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "shear flows",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4_e0",
+    "pattern_type": "defines",
+    "evidence_span": "all lengths were nondimensionalized by dividing by H, the height of the shear region",
+    "node_ids": [
+      "n4_n1",
+      "n4_n2",
+      "n4_n3"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "nondimensionalization",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "H",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "length scale",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4_e1",
+    "pattern_type": "defines",
+    "evidence_span": "Velocities were nondimensionalized by U, the magnitude of the velocities of the top and bottom of the 'box'",
+    "node_ids": [
+      "n4_n1",
+      "n4_n4",
+      "n4_n5"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "nondimensionalization",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "U",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "velocity scale",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4_e2",
+    "pattern_type": "applies_to",
+    "evidence_span": "the Lees-Edwards (Lees and Edwards, 1972) type periodic boundary conditions were applied to the top and bottom horizontal faces to induce a simple shear flow",
+    "node_ids": [
+      "n4_n6",
+      "n4_n7"
+    ],
+    "node_roles": [
+      "theory",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Lees-Edwards periodic boundary conditions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "simple shear flow",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4_e5",
+    "pattern_type": "influences",
+    "evidence_span": "the particle spacing increased as mean solids fraction was decreased and the walls became effectively 'rougher'",
+    "node_ids": [
+      "n4_n11",
+      "n4_n12",
+      "n4_n13"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mean solids fraction",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "wall particle spacing",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "wall roughness",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4_e6",
+    "pattern_type": "sets_parameter_value",
+    "evidence_span": "The centers of the top and bottom wall particles were located at nondimensional y-distances of ±3/7",
+    "node_ids": [
+      "n4_n14",
+      "n4_n15"
+    ],
+    "node_roles": [
+      "subject",
+      "value"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "wall particle y-distance",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "±3/7",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4_e7",
+    "pattern_type": "sets_parameter_value",
+    "evidence_span": "moved with nondimensional velocities of ±6/7",
+    "node_ids": [
+      "n4_n16",
+      "n4_n17"
+    ],
+    "node_roles": [
+      "subject",
+      "value"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "wall velocity",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "±6/7",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5_e0",
+    "pattern_type": "compares",
+    "evidence_span": "Two smooth, inelastic particle models were considered. In the 'hard-sphere' model the inelasticity was characterized by a standard coefficient of restitution, e, which was independent of impact velocity. There the impacts were instantaneous, implying binary particle collisions; this permitted a computational algorithm that was simple and efficient. In the 'soft-sphere' model, the collisions were of finite duration, and thus this model permitted the possibility of multiple contacts.",
+    "node_ids": [
+      "n5_n1",
+      "n5_n3"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "hard-sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "soft-sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5_e1",
+    "pattern_type": "defines",
+    "evidence_span": "In the 'hard-sphere' model the inelasticity was characterized by a standard coefficient of restitution, e, which was independent of impact velocity.",
+    "node_ids": [
+      "n5_n1",
+      "n5_n2"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "hard-sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "coefficient of restitution",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5_e2",
+    "pattern_type": "defines",
+    "evidence_span": "In the 'soft-sphere' model, the collisions were of finite duration, and thus this model permitted the possibility of multiple contacts. There are different ways to model the dissipation during finite period collisions, but we have used the so-called ratchet contact model of Walton and Braun (1985).",
+    "node_ids": [
+      "n5_n3",
+      "n5_n4"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "soft-sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "ratchet contact model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e0",
+    "pattern_type": "describes",
+    "evidence_span": "In the case of the hard-sphere model, we search through all possible collisions to determine the shortest time",
+    "node_ids": [
+      "n6c0_n1",
+      "n6c0_n3"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "hard-sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "collision search procedure",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e1",
+    "pattern_type": "describes",
+    "evidence_span": "A Verlet algorithm is then applied to compute the velocity variation",
+    "node_ids": [
+      "n6c0_n2",
+      "n6c0_n4"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "soft-sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Verlet algorithm",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e4",
+    "pattern_type": "influences",
+    "evidence_span": "If e is decreased, the energy dissipation increases",
+    "node_ids": [
+      "n6c0_n5",
+      "n6c0_n6"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "restitution coefficient e",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "energy dissipation",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e5",
+    "pattern_type": "influences",
+    "evidence_span": "the energy dissipation increases, and thus the distributions ... are more nonuniform",
+    "node_ids": [
+      "n6c0_n6",
+      "n6c0_n7"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "energy dissipation",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "granular temperature",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e7",
+    "pattern_type": "observed_in_simulation",
+    "evidence_span": "In the case of bounded Couette type flow, in which the flow is generated by the rough walls, nonuniform distributions of solids fraction ν and granular temperature T (and sometimes shear-rate) can arise",
+    "node_ids": [
+      "n6c0_n9",
+      "n6c0_n10"
+    ],
+    "node_roles": [
+      "phenomenon",
+      "simulation"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "nonuniform distributions of solids fraction ν and granular temperature T",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "bounded Couette type flow",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:slot-type-mismatch",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c1_e2",
+    "pattern_type": "influences",
+    "evidence_span": "If e is decreased, the energy dissipation increases",
+    "node_ids": [
+      "n6c1_n5",
+      "n6c1_n6"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "restitution coefficient e",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "energy dissipation",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c1_e3",
+    "pattern_type": "influences",
+    "evidence_span": "energy dissipation increases, and thus the distributions ... are more nonuniform",
+    "node_ids": [
+      "n6c1_n7",
+      "n6c1_n8"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "energy dissipation",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "granular temperature",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c1_e5",
+    "pattern_type": "describes",
+    "evidence_span": "we search through all possible collisions to determine the shortest time",
+    "node_ids": [
+      "n6c1_n11",
+      "n6c1_n12"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "hard-sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "collision search procedure",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c1_e6",
+    "pattern_type": "describes",
+    "evidence_span": "A Verlet algorithm is then applied to compute the velocity variation",
+    "node_ids": [
+      "n6c1_n13",
+      "n6c1_n14"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "soft-sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Verlet algorithm",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c1_e7",
+    "pattern_type": "observed_in_simulation",
+    "evidence_span": "nonuniform distributions of solids fraction ν and granular temperature T can arise",
+    "node_ids": [
+      "n6c1_n15",
+      "n6c1_n16"
+    ],
+    "node_roles": [
+      "phenomenon",
+      "simulation"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "nonuniform distributions of solids fraction",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "bounded Couette type flow",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:slot-type-mismatch",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c1_e4",
+    "pattern_type": "compares",
+    "evidence_span": "Agreement with the results from the kinetic theories is now much closer, at least for e = 0.9",
+    "node_ids": [
+      "n7c1_n2",
+      "n7c1_n3"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "computer simulations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "kinetic theory",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e2",
+    "pattern_type": "defines",
+    "evidence_span": "The 'slip velocity' in this case is defined as $v=U-u(L/2-\\overline{\\sigma})$ .",
+    "node_ids": [
+      "n7c0_n6",
+      "n7c0_n4"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "slip velocity",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "Richman and Chou (1988)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e5",
+    "pattern_type": "defines",
+    "evidence_span": "We can define a ‘slip’ velocity, $u_{s}$ , as follows. We extrapolate the curve fit of the computed velocity profile to the centers of the wall particles (cf., Figs. 4 and 5) and call that velocity $u_{w}$ . The slip velocity is thus $u_{s} = U_{w} - u_{w}$ where $U_{w}$ is the velocity of the centers of the wall boundary particles.",
+    "node_ids": [
+      "n7c0_n14",
+      "n7c0_n11"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "slip velocity",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "present simulations",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e0",
+    "pattern_type": "defines",
+    "evidence_span": "the mean square particle displacement due to random walking $\\langle|R|^{2}\\rangle$ can be expressed in terms of the well known Einstein relation where $D$ is the coefficient of self-diffusion",
+    "node_ids": [
+      "n8_n1",
+      "n8_n2",
+      "n8_n3"
+    ],
+    "node_roles": [
+      "subject",
+      "object",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "self-diffusion coefficient D",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "mean square particle displacement ⟨|R|²⟩",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "Einstein relation",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e1",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "It is also possible (see, for example, McQuarrie (1976)) to express the mean square particle displacement in terms of velocity autocorrelation function $\\langle\\boldsymbol{C}(0)\\cdot\\boldsymbol{C}(t)\\rangle$ , i.e.,",
+    "node_ids": [
+      "n8_n2",
+      "n8_n4",
+      "n8_n5"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mean square particle displacement ⟨|R|²⟩",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "velocity autocorrelation function ⟨C(0)·C(t)⟩",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "time t",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e2",
+    "pattern_type": "defines",
+    "evidence_span": "C = c - u is the particle velocity fluctuation, i.e., the difference between the instantaneous particle velocity c and the mean velocity u",
+    "node_ids": [
+      "n8_n6",
+      "n8_n7",
+      "n8_n8"
+    ],
+    "node_roles": [
+      "subject",
+      "object",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "particle velocity fluctuation C",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "instantaneous particle velocity c",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "local mean velocity u(r)",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e3",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "Hence, we can obtain an alternative form for the diffusion coefficient",
+    "node_ids": [
+      "n8_n1",
+      "n8_n4"
+    ],
+    "node_roles": [
+      "output",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "self-diffusion coefficient D",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "velocity autocorrelation function ⟨C(0)·C(t)⟩",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e4",
+    "pattern_type": "background",
+    "evidence_span": "In a ‘Brownian’ type system of identical particles, the diffusive characteristic of the motion determines that the mean square particle displacement due to random walking $\\langle|R|^{2}\\rangle$ can be expressed in terms of the well known Einstein relation where $D$ is the coefficient of self-diffusion",
+    "node_ids": [
+      "n8_n1",
+      "n8_n10"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "self-diffusion coefficient D",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Brownian type system",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e6",
+    "pattern_type": "describes",
+    "evidence_span": "the mean square particle displacement due to random walking $\\langle|R|^{2}\\rangle$ can be expressed in terms of the well known Einstein relation",
+    "node_ids": [
+      "n8_n3",
+      "n8_n2"
+    ],
+    "node_roles": [
+      "model",
+      "phenomenon"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Einstein relation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "mean square particle displacement ⟨|R|²⟩",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e3",
+    "pattern_type": "defines",
+    "evidence_span": "T=<C^2>/3 is the granular temperature",
+    "node_ids": [
+      "n9_n7",
+      "n9_n8"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "granular temperature T",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "<C^2>",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e6",
+    "pattern_type": "nondimensionalizes",
+    "evidence_span": "it is convenient to define a nondimensional self-diffusion coefficient as",
+    "node_ids": [
+      "n9_n12",
+      "n9_n7",
+      "n9_n13"
+    ],
+    "node_roles": [
+      "quantity",
+      "scale",
+      "scale"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "nondimensional self-diffusion coefficient",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "granular temperature T",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "particle diameter σ",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e2",
+    "pattern_type": "defines",
+    "evidence_span": "A complete pair distribution function f^(2)(r1,c1;r2,c2;t) is defined such that is the probability of finding a pair of particles in the volume elements δr1, δr2 centered on the points r1, r2 and having velocities within the ranges c1 and c1 + δc1, c2 and c2 + δc2",
+    "node_ids": [
+      "n9_n5",
+      "n9_n6"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "complete pair distribution function f^(2)",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "probability of finding a pair of particles",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly defines the complete pair distribution function as the probability of finding a pair of particles in specified volume elements and velocity ranges. This is a definitional identity, fitting defines.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n9_e5",
+    "pattern_type": "compares",
+    "evidence_span": "(4.13) reduces to the classical Chapman-Enskog result",
+    "node_ids": [
+      "n9_n11",
+      "n9_n11"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Chapman-Enskog result",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Chapman-Enskog result",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The edge claims a comparison between 'Chapman-Enskog result' and 'Chapman-Enskog result', which is nonsensical. The actual relation is that equation (4.13) reduces to the Chapman-Enskog result, meaning (4.13) is a generalization of it. The 'from' node should be the equation (4.13), not the Chapman-Enskog result. The slot binding is incorrect, so the edge must be dropped.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": true,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n10c1_e0",
+    "pattern_type": "compares",
+    "evidence_span": "The analytical and numerical predictions of the self-diffusion coefficients as functions of solids fraction and coefficient of restitution are reasonably close to each other",
+    "node_ids": [
+      "n10c1_n1",
+      "n10c1_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "analytical predictions of the self-diffusion coefficients",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "numerical predictions of the self-diffusion coefficients",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c1_e1",
+    "pattern_type": "compares",
+    "evidence_span": "The analytical and numerical predictions of the self-diffusion coefficients as functions of solids fraction and coefficient of restitution are reasonably close to each other and similar to the few laboratory experiments that exist.",
+    "node_ids": [
+      "n10c1_n1",
+      "n10c1_n3"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "analytical predictions of the self-diffusion coefficients",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "laboratory experiments",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c0_e1",
+    "pattern_type": "compares",
+    "evidence_span": "the results for soft spheres are slightly smaller than those for hard spheres",
+    "node_ids": [
+      "n10c0_n12",
+      "n10c0_n13"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "results for soft spheres",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "results for hard spheres",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c0_e2",
+    "pattern_type": "compares",
+    "evidence_span": "the self-diffusion coefficients associated with the streamwise direction are somewhat larger than those associated with the lateral directions",
+    "node_ids": [
+      "n10c0_n15",
+      "n10c0_n16"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "self-diffusion coefficients associated with the streamwise direction",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "self-diffusion coefficients associated with the lateral directions",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c0_e6",
+    "pattern_type": "compares",
+    "evidence_span": "The self-diffusion coefficients produced by the kinetic theory analysis are lower than those calculated from the results of the molecular dynamics simulations",
+    "node_ids": [
+      "n10c0_n27",
+      "n10c0_n28"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "self-diffusion coefficients produced by the kinetic theory analysis",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "self-diffusion coefficients calculated from the results of the molecular dynamics simulations",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c0_e7",
+    "pattern_type": "background",
+    "evidence_span": "Chapman and Cowling (1970) have pointed out similar discrepancies",
+    "node_ids": [
+      "n10c0_n31",
+      "n10c0_n27"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Chapman and Cowling (1970)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "self-diffusion coefficients produced by the kinetic theory analysis",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c0_e10",
+    "pattern_type": "validates_against",
+    "evidence_span": "the experimental results are quite close to the values of self-diffusion coefficient obtained in the molecular dynamics computer simulations",
+    "node_ids": [
+      "n10c0_n39",
+      "n10c0_n32"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "molecular dynamics computer simulations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "experiments of Bridgwater et al. (1985)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  }
+]

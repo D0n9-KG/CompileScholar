@@ -1,0 +1,47 @@
+{
+  "contrasts_with": {
+    "desc": "A discourse relation where one theory/approach is explicitly contrasted with another, often to highlight differences in assumptions, scope, or predictions. This is distinct from compares (which is about side-by-side evaluation) and claim_relation (which is about support/opposition between claims).",
+    "boundary": "contrasts_with = explicit opposition between two theories/approaches, NOT side-by-side evaluation (compares) and NOT support/opposition between claims (claim_relation).",
+    "family": "claim",
+    "role_slots": [
+      {
+        "role": "from",
+        "type": "THING"
+      },
+      {
+        "role": "to",
+        "type": "THING"
+      }
+    ]
+  },
+  "validates_against": {
+    "desc": "A relation where a theory/model's predictions are validated or checked against experimental or observational data. This is distinct from 'compares' (which includes theory-vs-experiment as one subtype) because it specifically emphasizes the validation/evaluation aspect, not just side-by-side comparison.",
+    "boundary": "Use only when the core action is testing/evaluating a model or theory against data; not for mere side-by-side comparison or general agreement.",
+    "family": "measure",
+    "role_slots": [
+      {
+        "role": "from",
+        "type": "THING"
+      },
+      {
+        "role": "to",
+        "type": "THING"
+      }
+    ]
+  },
+  "assesses_accuracy_of": {
+    "desc": "X provides means to assess/evaluate the accuracy of Y (a methodological relation where one approach serves as a benchmark or reference to evaluate another's accuracy). This is distinct from compares (which is side-by-side) and improves (which implies fixing limitations).",
+    "boundary": "Use when one method is explicitly used as a benchmark/reference to test another’s accuracy; not for side-by-side comparison (compares) or fixing flaws (improves).",
+    "family": "measure",
+    "role_slots": [
+      {
+        "role": "from",
+        "type": "METHOD"
+      },
+      {
+        "role": "to",
+        "type": "METHOD"
+      }
+    ]
+  }
+}

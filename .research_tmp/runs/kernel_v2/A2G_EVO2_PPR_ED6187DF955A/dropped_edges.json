@@ -1,0 +1,3297 @@
+[
+  {
+    "edge_id": "n1_e0",
+    "pattern_type": "extends",
+    "evidence_span": "a second for the general flow of particles with coefficients of restitution near 1 (slightly inelastic particles)",
+    "node_ids": [
+      "n1_n3",
+      "n1_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "slightly inelastic particles in a general flowfield",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "inelastic particles in Couette flow",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1_e4",
+    "pattern_type": "compares",
+    "evidence_span": "it is found that the asymptotic analysis of Jenkins & Savage (1983), which was developed for slightly inelastic particles, surprisingly gives results similar to the first theory even for highly inelastic particles",
+    "node_ids": [
+      "n1_n2",
+      "n1_n7"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "inelastic particles in Couette flow",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Jenkins & Savage (1983) asymptotic analysis",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1_e5",
+    "pattern_type": "improves",
+    "evidence_span": "It incorporates kinetic as well as collisional contributions to the constitutive equations for stress and energy flux and is thus appropriate for dilute as well as dense concentrations of solids",
+    "node_ids": [
+      "n1_n3",
+      "n1_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "slightly inelastic particles in a general flowfield",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "inelastic particles in Couette flow",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1_e6",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "It incorporates kinetic as well as collisional contributions to the constitutive equations for stress and energy flux",
+    "node_ids": [
+      "n1_n8",
+      "n1_n9",
+      "n1_n10",
+      "n1_n11"
+    ],
+    "node_roles": [
+      "output",
+      "output",
+      "parameter",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "stress",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "energy flux",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "coefficient of restitution",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "collisional distribution functions",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e2",
+    "pattern_type": "compares",
+    "evidence_span": "This is in contrast with the Jenkins & Savage (1983) treatment",
+    "node_ids": [
+      "n2c0_n4",
+      "n2c0_n5"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Savage & Jeffrey (1981) theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Jenkins & Savage (1983) theory",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e3",
+    "pattern_type": "compares",
+    "evidence_span": "even more in contrast with Chapman–Enskog theory",
+    "node_ids": [
+      "n2c0_n5",
+      "n2c0_n6"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Jenkins & Savage (1983) theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Chapman–Enskog theory",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e4",
+    "pattern_type": "compares",
+    "evidence_span": "comparisons of their predicted stresses with Couette-flow experiments",
+    "node_ids": [
+      "n2c0_n4",
+      "n2c0_n7"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Savage & Jeffrey (1981) theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Couette-flow experiments",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e5",
+    "pattern_type": "extends",
+    "evidence_span": "the theory of Savage & Jeffrey (1981) must be completed by allowing the granular particles to be inelastic",
+    "node_ids": [
+      "n2c0_n1",
+      "n2c0_n4"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "kinetic theories for granular flow",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Savage & Jeffrey (1981) theory",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e6",
+    "pattern_type": "improves",
+    "evidence_span": "a merit of the Savage & Jeffrey treatment is its applicability for all values of e, while its weakness is its restriction to a mean simple shear flow",
+    "node_ids": [
+      "n2c0_n5",
+      "n2c0_n4"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Jenkins & Savage (1983) theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Savage & Jeffrey (1981) theory",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e22",
+    "pattern_type": "compares",
+    "evidence_span": "However, for more general forms for $f^{(2)}$ there would be differences.",
+    "node_ids": [
+      "n3c0_n8",
+      "n3c0_n3"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "Jenkins & Savage (1983)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e26",
+    "pattern_type": "influences",
+    "evidence_span": "The translational kinetic-energy change during a collision is",
+    "node_ids": [
+      "n3c0_n11",
+      "n3c0_n11",
+      "n3c0_n11",
+      "n3c0_n11"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "translational kinetic energy",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "translational kinetic energy",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "translational kinetic energy",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "translational kinetic energy",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e0",
+    "pattern_type": "background",
+    "evidence_span": "The procedure we shall use for the development of the so-called hydrodynamic or fluid-mechanical equations and the integral forms for stresses, energy fluxes and the collisional rate of energy dissipation per unit volume is similar to the approach employed in the kinetic theory of dense fluids (Chapman & Cowling 1970; Ferziger & Kaper 1972).",
+    "node_ids": [
+      "n3c0_n1",
+      "n3c0_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "kinetic theory of dense fluids",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Savage & Jeffrey (1981)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states the procedure is similar to the kinetic theory of dense fluids, but the edge claims a background relation between 'kinetic theory of dense fluids' and 'Savage & Jeffrey (1981)'. The sentence does not state that the kinetic theory uses Savage & Jeffrey as background. The relation is between the current work and the kinetic theory, not between the kinetic theory and Savage & Jeffrey. The edge is a misattribution of the relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e1",
+    "pattern_type": "background",
+    "evidence_span": "As noted previously, Savage & Jeffrey (1981) and Jenkins & Savage (1983) have considered the flows of granular materials composed of smooth, hard, spherical particles in this context.",
+    "node_ids": [
+      "n3c0_n2",
+      "n3c0_n3"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Savage & Jeffrey (1981)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Jenkins & Savage (1983)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that both Savage & Jeffrey and Jenkins & Savage have considered the flows of granular materials. It does not state that Savage & Jeffrey uses Jenkins & Savage as background. The relation is a co-listing of prior work, not a background relation between the two. The edge misinterprets the sentence.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e3",
+    "pattern_type": "defines",
+    "evidence_span": "where $f^{(1)}(\\boldsymbol{r},\\boldsymbol{c};t)$ is the usual single-particle velocity distribution function defined such that $f^{(1)}\\delta\\boldsymbol{c}$ is the differential number of particles per unit volume with velocities within the range c and $c+\\delta c$ .",
+    "node_ids": [
+      "n3c0_n6",
+      "n3c0_n6",
+      "n3c0_n6"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "single-particle velocity distribution function",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "single-particle velocity distribution function",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "single-particle velocity distribution function",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence defines the single-particle velocity distribution function, but the edge has the same surface for all three roles (subject, definition, object). This is a self-referential definition and does not fit the n-ary 'defines' pattern which requires distinct entities. The slot binding is incorrect as the roles are not distinct.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": true,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e4",
+    "pattern_type": "defines",
+    "evidence_span": "Similarly, a complete pair-distribution function $f^{(2)}(\\boldsymbol{r}_{1},\\boldsymbol{c}_{1};\\boldsymbol{r}_{2},\\boldsymbol{c}_{2};t)$ may be defined such that $f^{(2)}(\\boldsymbol{r}_{1},\\boldsymbol{c}_{1};\\boldsymbol{r}_{2},\\boldsymbol{c}_{2};t)\\delta\\boldsymbol{r}_{1}\\delta\\boldsymbol{r}_{2}\\delta\\boldsymbol{c}_{1}\\delta\\boldsymbol{c}_{2}$ is the probability of finding a pair of particles in the volume elements $\\delta r_{1},\\delta r_{2}$ centred on the points $r_{1},r_{2}$ and having velocities within the ranges $c_{1}$ and $c_{1}+\\delta c_{1}$ , and $c_{2}$ and $c_{2}+\\delta c_{2}$ .",
+    "node_ids": [
+      "n3c0_n7",
+      "n3c0_n7",
+      "n3c0_n7"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "pair-distribution function",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "pair-distribution function",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "pair-distribution function",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence defines the pair-distribution function, but the edge has the same surface for all three roles (subject, definition, object). This is a self-referential definition and does not fit the n-ary 'defines' pattern which requires distinct entities. The slot binding is incorrect as the roles are not distinct.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": true,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e5",
+    "pattern_type": "influences",
+    "evidence_span": "The rate of change of $\\langle n\\psi\\rangle$ may be expressed as (Reif 1965) F is the external force acting on a particle of mass m, and $\\phi_{c}$ is the collisional rate of increase of the mean of $\\psi$ per unit volume.",
+    "node_ids": [
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the rate of change of <nψ> may be expressed as an equation involving F and φ_c. It does not state that φ_c influences or depends on itself. The edge has the same surface for all four roles (source, target, cause, effect), which is nonsensical for an 'influences' relation. The relation is not stated in the evidence.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e6",
+    "pattern_type": "influences",
+    "evidence_span": "To obtain more explicit expressions for the collisional term $\\phi_{\\mathrm{c}}$ , we consider binary collisions between hard, smooth but inelastic particles of uniform diameter $\\sigma$ .",
+    "node_ids": [
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence span merely states the intent to derive expressions for the collisional term, not a functional dependence. All four node surfaces are identical, making the edge vacuous. The span describes a setup, not a relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e7",
+    "pattern_type": "influences",
+    "evidence_span": "At the instant of a collision between particles labelled 1 and 2 we take the centre $O_{2}$ of the second particle to be located at position $\\pmb{r}$ and the centre $O_{1}$ of particle 1 to be at $\\pmb{r} - \\sigma \\pmb{k}$ , where $\\pmb{k}$ is the unit vector along the line of centres from $O_{1}$ to $O_{2}$ .",
+    "node_ids": [
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a geometric setup for collision analysis, not a functional dependence. All four node surfaces are identical, making the edge vacuous. No influence relation is stated.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e8",
+    "pattern_type": "influences",
+    "evidence_span": "In time $\\delta t$ prior to the collision, particle 1 moved through a distance $c_{12}\\delta t$ relative to particle 2, where $c_{12} = c_1 - c_2$ .",
+    "node_ids": [
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a kinematic relation between distance, time, and relative velocity, not a dependence of the collisional rate. All four node surfaces are identical, making the edge vacuous.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e9",
+    "pattern_type": "influences",
+    "evidence_span": "For a collision to occur within $\\delta t$ , then, $O_{1}$ must lie within the volume $\\sigma^2\\delta k(c_{12}\\cdot k)\\delta t$ .",
+    "node_ids": [
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states a geometric condition for collision occurrence, not a functional dependence. All four node surfaces are identical, making the edge vacuous.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e10",
+    "pattern_type": "influences",
+    "evidence_span": "The probable number of collisions such that $O_{2}$ lies within the volume $\\delta r$ and in which $c_{1}, c_{2}$ and k lie within the ranges $\\delta c_{1}, \\delta c_{2}$ and $\\delta k$ is",
+    "node_ids": [
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a probability distribution setup, not a functional dependence. All four node surfaces are identical, making the edge vacuous.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e11",
+    "pattern_type": "influences",
+    "evidence_span": "During a collision, particle 2 gains a quantity $\\psi_{2}^{\\prime}-\\psi_{2}$ of $\\psi$ , where primed and unprimed quantities refer to values after and before the collision.",
+    "node_ids": [
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a change in a quantity during collision, not a functional dependence. All four node surfaces are identical, making the edge vacuous.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e12",
+    "pattern_type": "influences",
+    "evidence_span": "Considering only particles that are about to collide (i.e. taking $c_{12} \\cdot k > 0$ ), we find that the collisional rate of increase for the mean of $\\psi$ per unit volume",
+    "node_ids": [
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence introduces a derivation step, not a functional dependence. All four node surfaces are identical, making the edge vacuous.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e13",
+    "pattern_type": "influences",
+    "evidence_span": "This may be put in a more convenient and physically significant form. Interchanging the roles of the colliding particles by interchanging the subscripts 1 and 2 and replacing k by -k, (2.4) may be written as",
+    "node_ids": [
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a mathematical manipulation, not a functional dependence. All four node surfaces are identical, making the edge vacuous.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e14",
+    "pattern_type": "influences",
+    "evidence_span": "After expanding the pair-distribution function $f^{(2)}(\\boldsymbol{r} - \\sigma \\boldsymbol{k}, \\boldsymbol{c}_1; \\boldsymbol{r}, \\boldsymbol{c}_2; t)$ in a Taylor series and rearranging, we may write",
+    "node_ids": [
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence span describes a mathematical manipulation (Taylor expansion) but does not state any influence/dependency relation. All four node surfaces are identical, making the edge meaningless. The relation does not exist in the evidence.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e15",
+    "pattern_type": "influences",
+    "evidence_span": "Substituting (2.6) in (2.5) and adding this to (2.4), we obtain where the collisional transfer contribution and the 'source-like' contribution",
+    "node_ids": [
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes algebraic substitution and addition of equations, not an influence/dependency relation. All four nodes are identical, making the edge meaningless. No relation is stated.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e16",
+    "pattern_type": "influences",
+    "evidence_span": "Note that, when $\\psi$ is a summational invariant, $\\chi$ is zero.",
+    "node_ids": [
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states a conditional mathematical fact (when ψ is a summational invariant, χ is zero), not an influence/dependency relation. All four nodes are identical, making the edge meaningless.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e17",
+    "pattern_type": "influences",
+    "evidence_span": "When $\\psi$ is taken to be the translational kinetic energy $\\frac{1}{2} mc^2$ , then $\\chi = -\\gamma$ , where $\\gamma$ is the rate of energy dissipation per unit volume due to inelastic collisions of the smooth particles.",
+    "node_ids": [
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states a definitional identity (χ = -γ when ψ is kinetic energy), not an influence/dependency relation. All four nodes are identical, making the edge meaningless.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e18",
+    "pattern_type": "influences",
+    "evidence_span": "Also note that to first order which is the same expression as given by Chapman & Cowling (1970, §16.4) for the collisional transfer of ‘molecular’ properties.",
+    "node_ids": [
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that an expression matches Chapman & Cowling's, which is a comparison/equivalence claim, not an influence/dependency relation. All four nodes are identical, making the edge meaningless.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e19",
+    "pattern_type": "influences",
+    "evidence_span": "Equations (2.2), (2.9) and (2.10) have been derived previously by Condiff, Lu & Dahler (1965) using slightly different arguments.",
+    "node_ids": [
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8",
+      "n3c0_n8"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that equations were derived previously by others, which is a provenance/attribution claim, not an influence/dependency relation. All four nodes are identical, making the edge meaningless.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e20",
+    "pattern_type": "compares",
+    "evidence_span": "The expression for $\\theta$ given by (2.8) differs from the corresponding expression of Jenkins & Savage (1983); the difference is due to an incorrect spatial shifting of $f^{(2)}$ and the neglect of some higher-order terms in Jenkins & Savage (1983).",
+    "node_ids": [
+      "n3c0_n8",
+      "n3c0_n3"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "Jenkins & Savage (1983)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the expression for θ (from equation 2.8) differs from Jenkins & Savage's expression. The 'from' node should be 'expression for θ given by (2.8)' not 'collisional rate of increase of the mean of ψ per unit volume'. The node surface is incorrect for the role.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": true,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e21",
+    "pattern_type": "compares",
+    "evidence_span": "Because of the simple form used by Jenkins & Savage for $f^{(2)}$ , their final integrated expressions for the constitutive equations are no different from those that are obtained using (2.8) and (2.9).",
+    "node_ids": [
+      "n3c0_n8",
+      "n3c0_n3"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "Jenkins & Savage (1983)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that Jenkins & Savage's final integrated expressions are no different from those obtained using (2.8) and (2.9). The 'from' node should be 'final integrated expressions for the constitutive equations' not 'collisional rate of increase of the mean of ψ per unit volume'. The node surface is incorrect for the role.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": true,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e23",
+    "pattern_type": "background",
+    "evidence_span": "It is worth mentioning that Brush (1972, pp. 72–76), in his book on the history of kinetic theory, has described the controversy concerning the appropriate form for Boltzmann-like equations and the collisional-transfer contributions for dense fluids in which the forms used by Enskog were first rejected and then reinstated.",
+    "node_ids": [
+      "n3c0_n8",
+      "n3c0_n8"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a historical controversy about Enskog's forms, not a background relation where one entity uses another as motivation. The nodes are identical and self-referential, and the pattern is misapplied.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e24",
+    "pattern_type": "compares",
+    "evidence_span": "The present correction is more pedestrian, but nevertheless analogous to the issues described by Brush.",
+    "node_ids": [
+      "n3c0_n8",
+      "n3c0_n8"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of increase of the mean of ψ per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence draws an analogy between the present correction and historical issues, but this is not a comparison of two entities in the sense of the 'compares' pattern. The nodes are identical and self-referential, and the relation is not a side-by-side evaluation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e25",
+    "pattern_type": "influences",
+    "evidence_span": "Considering the particles to be smooth but inelastic with a coefficient of restitution e (Jenkins & Savage 1983), one finds that the component of relative velocity $c_{12}$ in the direction of k is changed during a collision such that",
+    "node_ids": [
+      "n3c0_n13",
+      "n3c0_n13",
+      "n3c0_n13",
+      "n3c0_n13"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "coefficient of restitution",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "coefficient of restitution",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "coefficient of restitution",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "coefficient of restitution",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the coefficient of restitution is a parameter in the collision model, not that it influences a target quantity. The nodes are all identical and self-referential, and the relation is not a functional dependence.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e27",
+    "pattern_type": "influences",
+    "evidence_span": "By taking $\\psi$ to be $m$ , $mc$ and $\\frac{1}{2} mc^2$ in (2.2) and (2.7)-(2.9) we obtain the usual hydrodynamic equations",
+    "node_ids": [
+      "n3c0_n14",
+      "n3c0_n14",
+      "n3c0_n14",
+      "n3c0_n14"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "hydrodynamic equations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "hydrodynamic equations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "hydrodynamic equations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "hydrodynamic equations",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a derivation process, not a functional dependence. The nodes are all identical and self-referential, and the relation is not an influence/dependency.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e28",
+    "pattern_type": "defines",
+    "evidence_span": "In these equations $\\rho = mn = \\nu \\rho_{\\mathrm{p}}$ is the bulk mass density",
+    "node_ids": [
+      "n3c0_n15",
+      "n3c0_n15",
+      "n3c0_n15"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "bulk mass density",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "bulk mass density",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "bulk mass density",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence defines the bulk mass density, but the nodes are all identical and self-referential. The definition relation requires distinct subject and object entities, which are not present here.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e29",
+    "pattern_type": "defines",
+    "evidence_span": "$\\nu$ is the bulk solids fraction",
+    "node_ids": [
+      "n3c0_n16",
+      "n3c0_n16",
+      "n3c0_n16"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "bulk solids fraction",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "bulk solids fraction",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "bulk solids fraction",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence defines the bulk solids fraction, but the nodes are all identical and self-referential. The definition relation requires distinct subject and object entities, which are not present here.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e30",
+    "pattern_type": "defines",
+    "evidence_span": "$\\rho_{\\mathrm{p}}$ is the mass density of an individual particle",
+    "node_ids": [
+      "n3c0_n17",
+      "n3c0_n17",
+      "n3c0_n17"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mass density of an individual particle",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "mass density of an individual particle",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "mass density of an individual particle",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence defines the mass density of an individual particle, but the nodes are all identical and self-referential. The definition relation requires distinct subject and object entities, which are not present here.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e31",
+    "pattern_type": "defines",
+    "evidence_span": "$u = \\langle c\\rangle$ is the bulk velocity",
+    "node_ids": [
+      "n3c0_n18",
+      "n3c0_n18",
+      "n3c0_n18"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "bulk velocity",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "bulk velocity",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "bulk velocity",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence defines the bulk velocity, but the nodes are all identical and self-referential. The definition relation requires distinct subject and object entities, which are not present here.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e32",
+    "pattern_type": "defines",
+    "evidence_span": "$p$ is the pressure tensor",
+    "node_ids": [
+      "n3c0_n19",
+      "n3c0_n19",
+      "n3c0_n19"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "pressure tensor",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "pressure tensor",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "pressure tensor",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence span is a simple naming/identification of the symbol 'p' with the term 'pressure tensor'. It does not define the concept of 'pressure tensor' itself; it merely assigns a symbol to it. The edge incorrectly treats the symbol and the term as separate entities in a definitional relation, but they are the same entity. The pattern 'defines' is not appropriate here; this is a symbol assignment, not a definition of a concept.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e33",
+    "pattern_type": "defines",
+    "evidence_span": "$\\gamma = -\\chi (\\frac{1}{2} mc^2)$ is the collisional rate of dissipation per unit volume",
+    "node_ids": [
+      "n3c0_n20",
+      "n3c0_n20",
+      "n3c0_n20"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "collisional rate of dissipation per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of dissipation per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional rate of dissipation per unit volume",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence span is a definition of the symbol 'gamma' as the collisional rate of dissipation. It does not define the concept 'collisional rate of dissipation per unit volume' itself. The edge incorrectly treats the symbol and the term as separate entities in a definitional relation, but they are the same entity. The pattern 'defines' is not appropriate here; this is a symbol assignment, not a definition of a concept.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e34",
+    "pattern_type": "defines",
+    "evidence_span": "$b$ is the body force per unit mass",
+    "node_ids": [
+      "n3c0_n21",
+      "n3c0_n21",
+      "n3c0_n21"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "body force per unit mass",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "body force per unit mass",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "body force per unit mass",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence span is a simple naming/identification of the symbol 'b' with the term 'body force per unit mass'. It does not define the concept of 'body force per unit mass' itself; it merely assigns a symbol to it. The edge incorrectly treats the symbol and the term as separate entities in a definitional relation, but they are the same entity. The pattern 'defines' is not appropriate here; this is a symbol assignment, not a definition of a concept.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e35",
+    "pattern_type": "defines",
+    "evidence_span": "$\\frac{3}{2} T = \\frac{1}{2}\\langle C^2\\rangle$ is the specific kinetic energy of the velocity fluctuations (or for short the translational fluctuation energy)",
+    "node_ids": [
+      "n3c0_n22",
+      "n3c0_n22",
+      "n3c0_n22"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "specific kinetic energy of the velocity fluctuations",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "specific kinetic energy of the velocity fluctuations",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "specific kinetic energy of the velocity fluctuations",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence span is a definition of the symbol 'T' (via the equation) as the specific kinetic energy. It does not define the concept 'specific kinetic energy of the velocity fluctuations' itself; it merely assigns a symbol to it. The edge incorrectly treats the symbol and the term as separate entities in a definitional relation, but they are the same entity. The pattern 'defines' is not appropriate here; this is a symbol assignment, not a definition of a concept.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e36",
+    "pattern_type": "defines",
+    "evidence_span": "$q$ is the flux of fluctuation energy",
+    "node_ids": [
+      "n3c0_n23",
+      "n3c0_n23",
+      "n3c0_n23"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "flux of fluctuation energy",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "flux of fluctuation energy",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "flux of fluctuation energy",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence span is a simple naming/identification of the symbol 'q' with the term 'flux of fluctuation energy'. It does not define the concept of 'flux of fluctuation energy' itself; it merely assigns a symbol to it. The edge incorrectly treats the symbol and the term as separate entities in a definitional relation, but they are the same entity. The pattern 'defines' is not appropriate here; this is a symbol assignment, not a definition of a concept.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e37",
+    "pattern_type": "defines",
+    "evidence_span": "The quantity $T$ has become known as the granular temperature.",
+    "node_ids": [
+      "n3c0_n24",
+      "n3c0_n24",
+      "n3c0_n24"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "granular temperature",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "granular temperature",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "granular temperature",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence span is a simple naming/identification of the symbol 'T' with the term 'granular temperature'. It does not define the concept of 'granular temperature' itself; it merely assigns a symbol to it. The edge incorrectly treats the symbol and the term as separate entities in a definitional relation, but they are the same entity. The pattern 'defines' is not appropriate here; this is a symbol assignment, not a definition of a concept.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e9",
+    "pattern_type": "compares",
+    "evidence_span": "Thus from the general expressions (2.10) and (2.17) with $\\psi = mC$ , we see that the expression for the stress tensor is modified from Savage & Jeffrey (1981) only by the factor $\\frac{1}{2}(1 + e)$ :",
+    "node_ids": [
+      "n4c0_n41",
+      "n4c0_n42"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "stress tensor",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "factor 1/2(1+e)",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e14",
+    "pattern_type": "influences",
+    "evidence_span": "and if $d_1^2 = 858(4 - \\pi)$ the correct value of $\\frac{12}{35}$ is obtained as $R \\to \\infty$",
+    "node_ids": [
+      "n4c0_n60",
+      "n4c0_n61",
+      "n4c0_n62"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "d_1^2 = 858(4 - π)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "12/35",
+        "labels": [
+          "NUMERIC"
+        ]
+      },
+      {
+        "surface": "R → ∞",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e15",
+    "pattern_type": "influences",
+    "evidence_span": "where $d_2^2 = \\frac{2574}{7}(4 - \\pi)$ , to obtain $\\frac{4}{35}$ as $R \\to \\infty$",
+    "node_ids": [
+      "n4c0_n63",
+      "n4c0_n64",
+      "n4c0_n62"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "d_2^2 = 2574/7(4 - π)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "4/35",
+        "labels": [
+          "NUMERIC"
+        ]
+      },
+      {
+        "surface": "R → ∞",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e17",
+    "pattern_type": "influences",
+    "evidence_span": "and to obtain $-32 / 35\\pi$ as $R\\to \\infty$ we need $d_{3} = 20.6474$",
+    "node_ids": [
+      "n4c0_n68",
+      "n4c0_n69",
+      "n4c0_n62"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "-32/35π",
+        "labels": [
+          "NUMERIC"
+        ]
+      },
+      {
+        "surface": "d_3 = 20.6474",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "R → ∞",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e19",
+    "pattern_type": "influences",
+    "evidence_span": "and to obtain $8 / 35\\pi$ as $R\\to \\infty$ we take $d_4 = 0.888348$",
+    "node_ids": [
+      "n4c0_n72",
+      "n4c0_n73",
+      "n4c0_n62"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "8/35π",
+        "labels": [
+          "NUMERIC"
+        ]
+      },
+      {
+        "surface": "d_4 = 0.888348",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "R → ∞",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e26",
+    "pattern_type": "influences",
+    "evidence_span": "Thus one would expect that the results in figure 1 represent a low estimate of R for any given value of e.",
+    "node_ids": [
+      "n4c0_n85",
+      "n4c0_n80"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "low estimate of R",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "physically possible values of e",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e30",
+    "pattern_type": "compares",
+    "evidence_span": "but they involve different assumptions about the material properties and use different methods for the statistical averaging and evaluation of the collisional integrals.",
+    "node_ids": [
+      "n4c0_n94",
+      "n4c0_n100"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "recent granular-flow theories",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "different assumptions about the material properties",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e31",
+    "pattern_type": "compares",
+    "evidence_span": "and use different methods for the statistical averaging and evaluation of the collisional integrals.",
+    "node_ids": [
+      "n4c0_n94",
+      "n4c0_n101",
+      "n4c0_n102"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "recent granular-flow theories",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "different methods for the statistical averaging",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "evaluation of the collisional integrals",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e18",
+    "pattern_type": "influences",
+    "evidence_span": "Similarly, a functional form that is correct to $O(R^3)$ for $\\gamma^{*}$ is",
+    "node_ids": [
+      "n4c0_n70",
+      "n4c0_n71",
+      "n4c0_n67"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "functional form",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "γ*",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "O(R^3)",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that a functional form is correct to O(R^3) for gamma*. This is a statement about the accuracy of a functional form, not a causal or scaling dependence. The pattern 'influences' is incorrect; this is a constitutive law or a definition of the functional form. The slot binding is also wrong: 'functional form' is not a source that influences gamma*; it is a representation of gamma*.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e20",
+    "pattern_type": "influences",
+    "evidence_span": "From (3.1), (3.8) and (3.9) we obtain the equation from which we obtain e as a function of R.",
+    "node_ids": [
+      "n4c0_n74",
+      "n4c0_n75"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "equation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "e as a function of R",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that an equation is obtained from which e is obtained as a function of R. This is a derivation of a functional relationship, not a general 'influences' dependency. The pattern 'influences' is too generic; this is a constitutive law or a definition. The slot binding is wrong: 'equation' is not a source that influences 'e as a function of R'; it is the means of deriving it.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e21",
+    "pattern_type": "influences",
+    "evidence_span": "In physical terms, of course, we think more of R as a function of e.",
+    "node_ids": [
+      "n4c0_n76",
+      "n4c0_n75"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "R as a function of e",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "e as a function of R",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states a preference for thinking of R as a function of e, which is a definitional or conceptual choice, not a causal or scaling dependence. The pattern 'influences' is incorrect. The slot binding is wrong: 'R as a function of e' is not a source that influences 'e as a function of R'; they are inverse relationships.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e23",
+    "pattern_type": "influences",
+    "evidence_span": "It can be seen that, although Savage & Jeffrey (1981) anticipated values of R and 0 and infinity, it is only for R > 2.73 that physically possible values of e are obtained.",
+    "node_ids": [
+      "n4c0_n79",
+      "n4c0_n80"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "R > 2.73",
+        "labels": [
+          "NUMERIC"
+        ]
+      },
+      {
+        "surface": "physically possible values of e",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states a condition (R > 2.73) under which physically possible values of e are obtained. This is a regime constraint, not a causal or scaling dependence. The pattern 'influences' is incorrect. The slot binding is wrong: 'R > 2.73' is a condition, not a source that influences 'physically possible values of e'.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e24",
+    "pattern_type": "influences",
+    "evidence_span": "This result points out the simplicity of the dissipation mechanism assumed in the present model.",
+    "node_ids": [
+      "n4c0_n81",
+      "n4c0_n82"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "simplicity of the dissipation mechanism",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "dissipation mechanism",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that a result points out the simplicity of a mechanism. This is a claim about the result, not a causal or scaling dependence. The pattern 'influences' is incorrect. The slot binding is wrong: 'simplicity of the dissipation mechanism' is not a source that influences 'dissipation mechanism'; it is a property of it.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e25",
+    "pattern_type": "influences",
+    "evidence_span": "It is obvious that in a granular material there are many additional dissipation mechanisms that have been omitted here.",
+    "node_ids": [
+      "n4c0_n83",
+      "n4c0_n84"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "granular material",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "additional dissipation mechanisms",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that a granular material has many additional dissipation mechanisms. This is a statement of existence, not a causal or scaling dependence. The pattern 'influences' is incorrect. The slot binding is wrong: 'granular material' is not a source that influences 'additional dissipation mechanisms'; it is the container of them.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e27",
+    "pattern_type": "compares",
+    "evidence_span": "In particular, the experiments of Bagnold (1954), which probably achieved much higher values of R, had a suspending medium of the same density as the particles, which would have changed the dissipation mechanisms greatly from the one considered here.",
+    "node_ids": [
+      "n4c0_n86",
+      "n4c0_n87"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "experiments of Bagnold (1954)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "higher values of R",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that experiments achieved higher values of R and had a suspending medium that changed dissipation mechanisms. This is not a comparison between the experiments and higher values of R. The pattern 'compares' is incorrect. The slot binding is wrong: 'experiments of Bagnold (1954)' is not compared with 'higher values of R'; it is a statement about what the experiments achieved.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e29",
+    "pattern_type": "composed_of",
+    "evidence_span": "All of these are microstructural theories based upon collisional transfer of momentum and energy",
+    "node_ids": [
+      "n4c0_n98",
+      "n4c0_n99"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "microstructural theories",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "collisional transfer of momentum and energy",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-missed-bad-role",
+    "verifier_note": "The sentence states that the theories are 'based upon' collisional transfer, which is a structural composition (theories are composed of this mechanism), not a definitional identity. The 'defines' pattern is incorrect; 'composed_of' is the correct pattern.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "retype:composed_of"
+  },
+  {
+    "edge_id": "n6c1_e0",
+    "pattern_type": "compares",
+    "evidence_span": "a detailed analysis of wall boundary conditions analogous to the theoretical treatments described herein is required",
+    "node_ids": [
+      "n6c1_n2",
+      "n6c1_n3"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "wall boundary conditions",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "theoretical treatments described herein",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence sentence does not state a comparison between wall boundary conditions and theoretical treatments. It merely states that a detailed analysis of wall boundary conditions is required, and that this analysis would be analogous to the theoretical treatments. This is a statement about a future need, not an actual comparison being made. The relation is hypothetical and not established in the text. The pattern 'compares' requires an actual side-by-side evaluation, which is not present here. The edge should be dropped.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7_e7",
+    "pattern_type": "compares",
+    "evidence_span": "But, if χ0(ν) is replaced by g0(ν), their shear stress is quite close to the present one, especially at concentrations of ν = 0.2 and higher; the normal stresses are exactly the same.",
+    "node_ids": [
+      "n7_n1",
+      "n7_n12"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "present analysis",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Chapman–Enskog theory with g0(ν)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7_e3",
+    "pattern_type": "defines",
+    "evidence_span": "where χ0(ν) corresponds to the equilibrium radial distribution function at contact.",
+    "node_ids": [
+      "n7_n7",
+      "n7_n8"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "χ0(ν)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "equilibrium radial distribution function at contact",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly defines χ0(ν) as the equilibrium radial distribution function at contact. This is a definitional identity, fitting the defines pattern. The direction is correct (subject is defined as object).",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n8_e6",
+    "pattern_type": "extends",
+    "evidence_span": "it may be expedient to extend this analysis to consider the effects of particle surface friction and rotary inertia.",
+    "node_ids": [
+      "n8_n2",
+      "n8_n1"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Jenkins & Savage (1983)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "present analysis",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e0",
+    "pattern_type": "compares",
+    "evidence_span": "The asymptotic analysis of Jenkins & Savage (1983) ... is found to yield predictions for the stresses that asymptotically approach the present analysis ... as e approaches unity",
+    "node_ids": [
+      "n8_n1",
+      "n8_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "present analysis",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Jenkins & Savage (1983)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence clearly states that the asymptotic analysis of Jenkins & Savage (1983) approaches the present analysis, which is a valid comparison of two theories. The evidence_span is a paraphrase, not a verbatim quote, but the relation is clearly stated in the source.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n8_e1",
+    "pattern_type": "compares",
+    "evidence_span": "The theories of Shen (1981) and Ogawa et al. (1980) ... do predict lower stresses than those of the present analysis",
+    "node_ids": [
+      "n8_n3",
+      "n8_n1"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Shen (1981)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "present analysis",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states that Shen (1981) predicts lower stresses than the present analysis, which is a valid comparison. The evidence_span is a paraphrase, not a verbatim quote, but the relation is clearly stated in the source.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n8_e2",
+    "pattern_type": "compares",
+    "evidence_span": "The theories of Shen (1981) and Ogawa et al. (1980) ... do predict lower stresses than those of the present analysis",
+    "node_ids": [
+      "n8_n4",
+      "n8_n1"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Ogawa et al. (1980)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "present analysis",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states that Ogawa et al. (1980) predicts lower stresses than the present analysis, which is a valid comparison. The evidence_span is a paraphrase, not a verbatim quote, but the relation is clearly stated in the source.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n9_e0",
+    "pattern_type": "extends",
+    "evidence_span": "following the approach of either the Chapman–Enskog or the moment methods",
+    "node_ids": [
+      "n9_n3",
+      "n9_n1"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "new analysis",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Chapman–Enskog method",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e1",
+    "pattern_type": "extends",
+    "evidence_span": "following the approach of either the Chapman–Enskog or the moment methods",
+    "node_ids": [
+      "n9_n3",
+      "n9_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "new analysis",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "moment methods",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e3",
+    "pattern_type": "compares",
+    "evidence_span": "We expect the analysis for inelastic particles to reduce to the standard Enskog results for dense hard-sphere fluids (Chapman & Cowling 1970; Ferziger & Kaper 1972; Hirschfelder, Curtis & Bird 1954; Davis 1973) in the limit as $e \\rightarrow 1$",
+    "node_ids": [
+      "n9_n3",
+      "n9_n6"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "new analysis",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "standard Enskog results for dense hard-sphere fluids",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e5",
+    "pattern_type": "improves",
+    "evidence_span": "provide means to assess the accuracy of simpler, but more approximate, ad hoc analyses such as those discussed in §3 and in Jenkins & Savage (1983)",
+    "node_ids": [
+      "n9_n3",
+      "n9_n9"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "new analysis",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "ad hoc analyses",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e6",
+    "pattern_type": "background",
+    "evidence_span": "standard Enskog results for dense hard-sphere fluids (Chapman & Cowling 1970; Ferziger & Kaper 1972; Hirschfelder, Curtis & Bird 1954; Davis 1973)",
+    "node_ids": [
+      "n9_n3",
+      "n9_n11"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "new analysis",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Chapman & Cowling 1970",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e7",
+    "pattern_type": "background",
+    "evidence_span": "ad hoc analyses such as those discussed in §3 and in Jenkins & Savage (1983)",
+    "node_ids": [
+      "n9_n3",
+      "n9_n10"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "new analysis",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Jenkins & Savage (1983)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n12c1_e0",
+    "pattern_type": "compares",
+    "evidence_span": "Comparing (4.41) and (4.42), one sees that the normalized collisional frequency distribution...",
+    "node_ids": [
+      "n12c1_n1",
+      "n12c1_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "present theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Jenkins & Savage theory",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n12c1_e1",
+    "pattern_type": "compares",
+    "evidence_span": "Equations (4.41) and (4.42) are plotted in figure 18...",
+    "node_ids": [
+      "n12c1_n4",
+      "n12c1_n5"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "collisional frequency distribution (present theory)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional frequency distribution (Jenkins & Savage theory)",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n12c1_e2",
+    "pattern_type": "influences",
+    "evidence_span": "depends upon the solids concentration ν through the function a1",
+    "node_ids": [
+      "n12c1_n6",
+      "n12c1_n4"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "solids concentration ν",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "collisional frequency distribution (present theory)",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n12c1_e3",
+    "pattern_type": "influences",
+    "evidence_span": "collisional anisotropies from both theories have a sinusoidal dependence upon ϑ",
+    "node_ids": [
+      "n12c1_n7",
+      "n12c1_n4"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "angle ϑ",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "collisional frequency distribution (present theory)",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n12c1_e4",
+    "pattern_type": "defines",
+    "evidence_span": "Dividing (4.39) by (4.40), we obtain the normalized collision frequency",
+    "node_ids": [
+      "n12c1_n8",
+      "n12c1_n9"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "normalized collision frequency",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional frequency distribution divided by equilibrium frequency",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n12c1_e5",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "express this in integral form as By using the pair velocity distribution function...",
+    "node_ids": [
+      "n12c1_n4",
+      "n12c1_n10",
+      "n12c1_n7",
+      "n12c1_n11"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "collisional frequency distribution (present theory)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "pair velocity distribution function f^(2)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "angle ϑ",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "angle φ",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n12c1_e6",
+    "pattern_type": "validates_against",
+    "evidence_span": "the differences in the stresses are not as great as might be expected from the comparison...",
+    "node_ids": [
+      "n12c1_n1",
+      "n12c1_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "present theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Jenkins & Savage theory",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n12c1_e7",
+    "pattern_type": "compares",
+    "evidence_span": "results in collisional shear stresses that are slightly higher than the total...",
+    "node_ids": [
+      "n12c1_n12",
+      "n12c1_n13"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "collisional shear stresses (Jenkins & Savage)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "total shear stresses (present theory)",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n12c0_e0",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "we may express this in integral form as By using the pair velocity distribution function given by (4.1)-(4.6), we find",
+    "node_ids": [
+      "n12c0_n1",
+      "n12c0_n2",
+      "n12c0_n3",
+      "n12c0_n4"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "collisional frequency distribution",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "pair velocity distribution function f^(2)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "angle ϑ",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "angle φ",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n12c0_e1",
+    "pattern_type": "defines",
+    "evidence_span": "Dividing (4.39) by (4.40), we obtain the normalized collision frequency",
+    "node_ids": [
+      "n12c0_n5",
+      "n12c0_n1"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "normalized collision frequency",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional frequency distribution",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n12c0_e2",
+    "pattern_type": "compares",
+    "evidence_span": "Comparing (4.41) and (4.42), one sees that the normalized collisional frequency distribution of the present theory depends upon the solids concentration $\\nu$ through the function $a_{1}$ (see (4.6)), whereas that given by the theory of Jenkins & Savage is independent of $\\nu$",
+    "node_ids": [
+      "n12c0_n6",
+      "n12c0_n7"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "collisional frequency distribution (present theory)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional frequency distribution (Jenkins & Savage theory)",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n12c0_e3",
+    "pattern_type": "influences",
+    "evidence_span": "the normalized collisional frequency distribution of the present theory depends upon the solids concentration $\\nu$ through the function $a_{1}$",
+    "node_ids": [
+      "n12c0_n8",
+      "n12c0_n6",
+      "n12c0_n8",
+      "n12c0_n9"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "solids concentration ν",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "collisional frequency distribution (present theory)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "solids concentration ν",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "function a1",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n12c0_e4",
+    "pattern_type": "influences",
+    "evidence_span": "The collisional anisotropies from both theories have a sinusoidal dependence upon $\\vartheta$",
+    "node_ids": [
+      "n12c0_n3",
+      "n12c0_n6",
+      "n12c0_n3",
+      "n12c0_n6"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "angle ϑ",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "collisional frequency distribution (present theory)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "angle ϑ",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "collisional frequency distribution (present theory)",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n12c0_e5",
+    "pattern_type": "compares",
+    "evidence_span": "The anisotropy of collisions predicted by the theory of Jenkins & Savage is more pronounced than that given by the present theory",
+    "node_ids": [
+      "n12c0_n10",
+      "n12c0_n11"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "present theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Jenkins & Savage theory",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n12c0_e6",
+    "pattern_type": "compares",
+    "evidence_span": "this results in collisional shear stresses that are slightly higher than the total (collisional plus kinetic) shear stresses predicted by the present theory shown in figure 13",
+    "node_ids": [
+      "n12c0_n12",
+      "n12c0_n13"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "collisional shear stresses (Jenkins & Savage)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "total shear stresses (present theory)",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n12c0_e7",
+    "pattern_type": "validates_against",
+    "evidence_span": "the differences in the stresses are not as great as might be expected from the comparison of the collisional frequency distribution functions",
+    "node_ids": [
+      "n12c0_n10",
+      "n12c0_n11"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "present theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Jenkins & Savage theory",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  }
+]

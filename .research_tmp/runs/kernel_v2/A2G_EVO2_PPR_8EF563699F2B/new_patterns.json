@@ -1,0 +1,122 @@
+{
+  "contrasts_with": {
+    "desc": "A discourse relation where one theory/approach is explicitly contrasted with another, often to highlight differences in assumptions, scope, or predictions. This is distinct from compares (which is about side-by-side evaluation) and claim_relation (which is about support/opposition between claims).",
+    "boundary": "contrasts_with = explicit opposition between two theories/approaches, NOT side-by-side evaluation (compares) and NOT support/opposition between claims (claim_relation).",
+    "family": "claim",
+    "role_slots": [
+      {
+        "role": "from",
+        "type": "THING"
+      },
+      {
+        "role": "to",
+        "type": "THING"
+      }
+    ]
+  },
+  "validates_against": {
+    "desc": "A relation where a theory/model's predictions are validated or checked against experimental or observational data. This is distinct from 'compares' (which includes theory-vs-experiment as one subtype) because it specifically emphasizes the validation/evaluation aspect, not just side-by-side comparison.",
+    "boundary": "Use only when the core action is testing/evaluating a model or theory against data; not for mere side-by-side comparison or general agreement.",
+    "family": "measure",
+    "role_slots": [
+      {
+        "role": "from",
+        "type": "THING"
+      },
+      {
+        "role": "to",
+        "type": "THING"
+      }
+    ]
+  },
+  "assesses_accuracy_of": {
+    "desc": "X provides means to assess/evaluate the accuracy of Y (a methodological relation where one approach serves as a benchmark or reference to evaluate another's accuracy). This is distinct from compares (which is side-by-side) and improves (which implies fixing limitations).",
+    "boundary": "Use when one method is explicitly used as a benchmark/reference to test another’s accuracy; not for side-by-side comparison (compares) or fixing flaws (improves).",
+    "family": "measure",
+    "role_slots": [
+      {
+        "role": "from",
+        "type": "METHOD"
+      },
+      {
+        "role": "to",
+        "type": "METHOD"
+      }
+    ]
+  },
+  "substitutes_in": {
+    "desc": "A mathematical/formal relation where one operator, expression, or quantity can be substituted for another in a specific context without changing the result. This is distinct from replaces (which implies outright retirement of the old entity) and defines (which implies definitional identity).",
+    "boundary": "Use substitutes_in only when one thing can be swapped for another in a specific operation or proof; not for replacing/retiring (replaces) or defining equivalence (defines).",
+    "family": "dependency",
+    "role_slots": [
+      {
+        "role": "substitute",
+        "type": "THING"
+      },
+      {
+        "role": "original",
+        "type": "THING"
+      }
+    ]
+  },
+  "analogous_to": {
+    "desc": "A relation where one mathematical expression, integral, or quantity is given in a similar way to another, indicating structural or methodological analogy without implying derivation or definitional identity.",
+    "boundary": "Use for explicit “analogous to” or “similar in form/method” comparisons; NOT for derivation, definition, or mere co-occurrence.",
+    "family": "claim",
+    "role_slots": [
+      {
+        "role": "analog",
+        "type": "THING"
+      },
+      {
+        "role": "reference",
+        "type": "THING"
+      }
+    ]
+  },
+  "lacks_comparison": {
+    "desc": "X lacks comparison with Y, indicating that no prior work exists for comparison, highlighting novelty or absence of benchmark.",
+    "boundary": "Use when explicitly stating no comparison or benchmark exists for X, not when comparing X to Y or noting a lack of evidence.",
+    "family": "claim",
+    "role_slots": [
+      {
+        "role": "from",
+        "type": "THING"
+      },
+      {
+        "role": "to",
+        "type": "THING"
+      }
+    ]
+  },
+  "describes": {
+    "desc": "A relation where one entity (typically a model or theory) describes or accounts for a phenomenon or system. This is distinct from 'influences' (which implies causal dependence) and 'constitutive_law' (which requires formal quantitative relations).",
+    "boundary": "Applies when a model/theory explains or accounts for a phenomenon, not when it merely influences it or states a quantitative law.",
+    "family": "claim",
+    "role_slots": [
+      {
+        "role": "model",
+        "type": "THING"
+      },
+      {
+        "role": "phenomenon",
+        "type": "THING"
+      }
+    ]
+  },
+  "sets_parameter_value": {
+    "desc": "A relation where a parameter or variable is assigned a specific numerical value or set to a particular condition in an experimental or simulation setup. This is distinct from 'defines' (which implies definitional identity) and 'measures' (which implies measurement/evaluation).",
+    "boundary": "Use when a parameter is explicitly assigned a number or condition in setup; NOT for defining its meaning or reporting a measured outcome.",
+    "family": "measure",
+    "role_slots": [
+      {
+        "role": "subject",
+        "type": "PARAMETER"
+      },
+      {
+        "role": "value",
+        "type": "NUMERIC"
+      }
+    ]
+  }
+}
