@@ -1,0 +1,602 @@
+[
+ {
+  "i": 6,
+  "pattern_type": "background",
+  "nodes": "from=data from our previous experimental work [37]; to=spatial distribution of rearrangements",
+  "evidence": "we use data from our previous experimental work [37] to study the spatial distribution of rearrangements in a flowing 2D emulsion",
+  "reason": "direction inverted: the prior data IS the background for the current study; the edge makes the prior data the user and the study topic the background",
+  "_ppr": "PPR_149984584E26\\judge_inline.json"
+ },
+ {
+  "i": 7,
+  "pattern_type": "composed_of",
+  "nodes": "whole=silicone oil (PDMS, rho=1g/mL, eta=350mPa*s); component=water",
+  "evidence": "The droplets are silicone oil (poly-dimethylsiloxane...) in water",
+  "reason": "oil-in-water dispersion misread as composition: the oil is not composed of water; the whole should be the emulsion, not the oil",
+  "_ppr": "PPR_149984584E26\\judge_inline.json"
+ },
+ {
+  "i": 8,
+  "pattern_type": "defines",
+  "nodes": "subject=silicone oil; object='co-flow' microfluidic technique [44]",
+  "evidence": "The droplets are silicone oil ... in water, made by the 'co-flow' microfluidic technique [44]",
+  "reason": "manufacturing provenance ('made by') misread as definitional identity",
+  "_ppr": "PPR_149984584E26\\judge_inline.json"
+ },
+ {
+  "i": 9,
+  "pattern_type": "influences",
+  "nodes": "source=Fairy soap; target=mass fraction 0.025; cause=silicone oil",
+  "evidence": "The droplets are stabilized by Fairy(TM) soap with mass fraction 0.025",
+  "reason": "no influence relation stated: 0.025 is the soap's own concentration parameter, not something influenced by the soap; cause=silicone oil unrelated to the sentence's relation",
+  "_ppr": "PPR_149984584E26\\judge_inline.json"
+ },
+ {
+  "i": 10,
+  "pattern_type": "influences",
+  "nodes": "source=constant flux rate; target=syringe pump; cause=left edge of the chamber",
+  "evidence": "A constant flux rate is set by a syringe pump attached to the left edge of the chamber",
+  "reason": "cause slot binds the pump's attachment location ('left edge'), which is not a cause of anything; setup description misread as influence",
+  "_ppr": "PPR_149984584E26\\judge_inline.json"
+ },
+ {
+  "i": 11,
+  "pattern_type": "influences",
+  "nodes": "source=diameter; target=gap thickness; cause=pancake shapes",
+  "evidence": "The droplets have a diameter at least twice as large as the gap thickness, so that the droplets are compressed into pancake shapes",
+  "reason": "polarity reversal: pancake shapes are the RESULT of the size mismatch, bound as cause; and diameter does not influence the gap thickness",
+  "_ppr": "PPR_149984584E26\\judge_inline.json"
+ },
+ {
+  "i": 12,
+  "pattern_type": "influences",
+  "nodes": "source=low area fraction; target=pancake shapes; cause=volume fraction phi",
+  "evidence": "At a low area fraction, these droplets are circular in shape when viewed from below",
+  "reason": "bindings garbled: the sentence states droplets appear circular at low area fraction; target=pancake shapes (from a different sentence) and cause=phi (duplicate of source) do not match this sentence's assertion",
+  "_ppr": "PPR_149984584E26\\judge_inline.json"
+ },
+ {
+  "i": 15,
+  "pattern_type": "influences",
+  "nodes": "source=area fraction above jamming; target=D > 0; cause=D",
+  "evidence": "Given the sample is at an area fraction above jamming, all droplets are compressed by their neighbors and thus are deformed so that D > 0",
+  "reason": "cause slot binds D itself (circular): D>0 is the outcome, D is not the cause of the relation",
+  "_ppr": "PPR_149984584E26\\judge_inline.json"
+ },
+ {
+  "i": 21,
+  "pattern_type": "influences",
+  "nodes": "source=Neighbor relations; target=positional noise; cause=separations",
+  "evidence": "Neighbor relations defined by tessellation algorithms are sensitive to positional noise, so to overcome this sensitivity, we further require that the separations must change by at least 5%...",
+  "reason": "cause slot binds the mitigation criterion (5% separation change requirement), which is the remedy, not a cause",
+  "_ppr": "PPR_149984584E26\\judge_inline.json"
+ },
+ {
+  "i": 28,
+  "pattern_type": "influences",
+  "nodes": "source=a trivial dependence on A-tilde; target=faster flows",
+  "evidence": "There is a trivial dependence on A-tilde -- faster flows have higher rates of T1 events",
+  "reason": "source is a meta-description ('a trivial dependence'), not an influencing quantity; the real relation is already captured by edge 29",
+  "_ppr": "PPR_149984584E26\\judge_inline.json"
+ },
+ {
+  "i": 31,
+  "pattern_type": "measures",
+  "nodes": "object=the T1 frequency; instrument=the size of the deformation change dD_G",
+  "evidence": "we plot the T1 frequency as a function of the size of the deformation change dD_G",
+  "reason": "a plot-axis variable is not a measurement instrument; plotting X vs Y is not 'X measured by Y'",
+  "_ppr": "PPR_149984584E26\\judge_inline.json"
+ },
+ {
+  "i": 32,
+  "pattern_type": "compares",
+  "nodes": "from=decreases; to=increases",
+  "evidence": "for both decreases (solid triangles) and increases (open triangles)",
+  "reason": "co-listing of two plot categories ('both X and Y'), no comparison stated",
+  "_ppr": "PPR_149984584E26\\judge_inline.json"
+ },
+ {
+  "i": 33,
+  "pattern_type": "influences",
+  "nodes": "source=small increases or decreases; target=the T1 frequency",
+  "evidence": "For small increases or decreases, the T1 frequency is fairly constant",
+  "reason": "negated dependence: 'fairly constant' means the frequency does NOT vary for small changes",
+  "_ppr": "PPR_149984584E26\\judge_inline.json"
+ },
+ {
+  "i": 37,
+  "pattern_type": "influences",
+  "nodes": "source=Vy; target=Vx",
+  "evidence": "Vy is no more than half the value of Vx",
+  "reason": "a geometric magnitude bound (Vy <= Vx/2) is not an influence relation between the two velocity components",
+  "_ppr": "PPR_149984584E26\\judge_inline.json"
+ },
+ {
+  "i": 45,
+  "pattern_type": "influences",
+  "nodes": "source=power spectrum; target=power-law decay",
+  "evidence": "The power spectrum (inset) shows a tendency of power-law decay",
+  "reason": "power-law decay is the spectrum's own shape property, not a separate quantity the spectrum influences",
+  "_ppr": "PPR_149984584E26\\judge_inline.json"
+ },
+ {
+  "i": 49,
+  "pattern_type": "compares",
+  "nodes": "from=Gaussian fit; to=Gaussian distribution",
+  "evidence": "Large events are rare, but not as rare as would be predicted from the Gaussian fit",
+  "reason": "the stated comparison is observed-event-rarity vs the Gaussian-fit prediction; binding fit-vs-distribution compares two guises of the same null model",
+  "_ppr": "PPR_149984584E26\\judge_inline.json"
+ },
+ {
+  "i": 50,
+  "pattern_type": "compares",
+  "nodes": "from=Gaussian distribution; to=similar quantity",
+  "evidence": "found a Gaussian distribution for a similar quantity",
+  "reason": "the contrast is our-distribution vs the previous experiment's Gaussian; 'a similar quantity' is the object the prior work measured, not a comparator",
+  "_ppr": "PPR_149984584E26\\judge_inline.json"
+ },
+ {
+  "i": 54,
+  "pattern_type": "absence_of_phenomenon (run-created)",
+  "nodes": "system=cluster sizes N_cluster; absent_phenomenon=constant flux rate",
+  "evidence": "the sizes of those largest clusters N_cluster are fairly small (a mean value close to 2) and have no dependence on the flux rate in these experiments",
+  "reason": "absent_phenomenon binds the FACTOR (flux rate) instead of the absent phenomenon (the dependence on flux rate); the flux rate exists and was varied - only its effect is absent",
+  "_ppr": "PPR_149984584E26\\judge_inline.json"
+ },
+ {
+  "i": 58,
+  "pattern_type": "compares",
+  "nodes": "from=flow cooperativity length; to=theory",
+  "evidence": "suggestive of the 'flow cooperativity length' predicted by theory [6,15]",
+  "reason": "observation-suggests-theory-prediction is not a comparison, and 'theory' is not a comparator entity for a length; agrees_with (created this run, unused) is the right pattern",
+  "_ppr": "PPR_149984584E26\\judge_inline.json"
+ },
+ {
+  "i": 59,
+  "pattern_type": "absence_of_phenomenon (run-created)",
+  "nodes": "system=flowing dense amorphous materials; absent_phenomenon=microscopic details",
+  "evidence": "some characteristics of flowing dense amorphous materials are independent of their microscopic details",
+  "reason": "same misbinding as edge 54: the absent phenomenon is the DEPENDENCE on microscopic details, not the microscopic details themselves",
+  "_ppr": "PPR_149984584E26\\judge_inline.json"
+ },
+ {
+  "i": 9,
+  "pattern_type": "influences",
+  "nodes": "source=game score; target=whole previous sequence of actions and observations; cause=game score; effect=whole previous sequence",
+  "evidence": "Note that in general the game score may depend on the whole previous sequence of actions and observations",
+  "reason": "cause/effect polarity REVERSED: sentence says score depends on sequence, so cause should be sequence -> effect score; edge asserts the score causes its own past",
+  "_ppr": "PPR_24493BE6E8C2\\judge_inline.json"
+ },
+ {
+  "i": 10,
+  "pattern_type": "influences",
+  "nodes": "source=feedback about an action; target=many thousands of time-steps",
+  "evidence": "feedback about an action may only be received after many thousands of time-steps have elapsed",
+  "reason": "temporal delay statement misread as causal influence; feedback does not influence the elapsed time-steps",
+  "_ppr": "PPR_24493BE6E8C2\\judge_inline.json"
+ },
+ {
+  "i": 13,
+  "pattern_type": "influences",
+  "nodes": "source=current situation; target=current screen xt; cause=current situation; effect=current screen xt",
+  "evidence": "it is impossible to fully understand the current situation from only the current screen xt",
+  "reason": "epistemic limitation (partial observability) misread as dependence; situation does not influence the screen",
+  "_ppr": "PPR_24493BE6E8C2\\judge_inline.json"
+ },
+ {
+  "i": 14,
+  "pattern_type": "defines",
+  "nodes": "subject=sequences of actions and observations st; definition=algorithm; object=sequences st",
+  "evidence": "sequences of actions and observations, st = x1, a1, x2, ..., at-1, xt, are input to the algorithm",
+  "reason": "'are input to the algorithm' is an input relation, not a definition; st is not defined-as 'algorithm'",
+  "_ppr": "PPR_24493BE6E8C2\\judge_inline.json"
+ },
+ {
+  "i": 23,
+  "pattern_type": "measures",
+  "nodes": "object=action at; instrument=emulator",
+  "evidence": "Execute action at in emulator and observe reward rt and image x_{t+1}",
+  "reason": "algorithm step (execute action in environment) is not a measurement relation; the emulator does not measure the action",
+  "_ppr": "PPR_24493BE6E8C2\\judge_inline.json"
+ },
+ {
+  "i": 25,
+  "pattern_type": "composed_of",
+  "nodes": "whole=transition (phi_t, a_t, r_t, phi_{t+1}); component=D",
+  "evidence": "Store transition (phi_t, a_t, r_t, phi_{t+1}) in D",
+  "reason": "storage-in-replay-memory misread as composition with direction inverted; D is composed of transitions, not a component of one transition",
+  "_ppr": "PPR_24493BE6E8C2\\judge_inline.json"
+ },
+ {
+  "i": 26,
+  "pattern_type": "constitutive_law",
+  "nodes": "output=action-value function; input=Bellman equation",
+  "evidence": "estimate the action-value function by using the Bellman equation as an iterative update, Q_{i+1}(s,a) = E[...]",
+  "reason": "Bellman equation is the update law itself, not an input quantity; binding it to the input slot is a law-vs-input category confusion",
+  "_ppr": "PPR_24493BE6E8C2\\judge_inline.json"
+ },
+ {
+  "i": 27,
+  "pattern_type": "extends",
+  "nodes": "from=value iteration algorithms; to=optimal action-value function",
+  "evidence": "Such value iteration algorithms converge to the optimal action-value function",
+  "reason": "'converge to' is a convergence guarantee, not a generalization/extension relation",
+  "_ppr": "PPR_24493BE6E8C2\\judge_inline.json"
+ },
+ {
+  "i": 28,
+  "pattern_type": "improves",
+  "nodes": "from=function approximator; to=action-value function",
+  "evidence": "it is common to use a function approximator to estimate the action-value function",
+  "reason": "sentence states usage-for-estimation, no improvement claim at all",
+  "_ppr": "PPR_24493BE6E8C2\\judge_inline.json"
+ },
+ {
+  "i": 4,
+  "pattern_type": "influences",
+  "nodes": "source=degree of mixedness; target=kinetics of mixing",
+  "evidence": "The degree of mixedness is a fundamental state of a system and is completely independent of the means by which it is achieved, i.e. it does not depend on the process of mixing.",
+  "reason": "NEGATED dependence: 'completely independent of ... does not depend on' extracted as positive influence",
+  "_ppr": "PPR_29EFA9BE34EC\\judge_inline.json"
+ },
+ {
+  "i": 5,
+  "pattern_type": "background",
+  "nodes": "from=ideal system; to=theoretical expressions for the kinetics of the process",
+  "evidence": "Such a system has been devised and used to obtain data with which the validity of the theory of diffusional mixing can be established.",
+  "reason": "system-used-to-TEST-the-theory misextracted as background: the ideal system does not use the theory as background/motivation (validates_against territory, role-inverted)",
+  "_ppr": "PPR_29EFA9BE34EC\\judge_inline.json"
+ },
+ {
+  "i": 6,
+  "pattern_type": "defines",
+  "nodes": "subject=C(x,t); object=diffusion coefficient",
+  "evidence": "Where C(x,t) is the relative concentration of the mixture after time t ..., D* is the diffusion coefficient and has dimensions in2/min.",
+  "reason": "two INDEPENDENT definitions in one sentence paired as one defines edge: C(x,t) is not defined-as the diffusion coefficient",
+  "_ppr": "PPR_29EFA9BE34EC\\judge_inline.json"
+ },
+ {
+  "i": 10,
+  "pattern_type": "influences",
+  "nodes": "source=M(N); target=M_r",
+  "evidence": "for long mixing times M(N) will fluctuate about a random degree of mixedness M_r",
+  "reason": "fluctuation-about-a-limit-value (convergence to asymptote) is not an influence relation in either direction",
+  "_ppr": "PPR_29EFA9BE34EC\\judge_inline.json"
+ },
+ {
+  "i": 11,
+  "pattern_type": "defines",
+  "nodes": "subject=Q; object=P",
+  "evidence": "Q is the over-all proportion of one of the components in the system. ... where P is the average number of particles per sample.",
+  "reason": "same as edge 6: two independent definitions from adjacent sentences paired as one defines edge (Q is not defined-as P)",
+  "_ppr": "PPR_29EFA9BE34EC\\judge_inline.json"
+ },
+ {
+  "i": 17,
+  "pattern_type": "influences",
+  "nodes": "source=density; target=kinetics of mixing",
+  "evidence": "effects due to differences in density, particle shape, or surface roughness would not influence the kinetics of mixing",
+  "reason": "NEGATED influence: 'would not influence' states these effects were designed OUT; edge asserts positive influence",
+  "_ppr": "PPR_29EFA9BE34EC\\judge_inline.json"
+ },
+ {
+  "i": 18,
+  "pattern_type": "influences",
+  "nodes": "source=particle shape; target=kinetics of mixing",
+  "evidence": "effects due to differences in density, particle shape, or surface roughness would not influence the kinetics of mixing",
+  "reason": "NEGATED influence (same sentence as edge 17)",
+  "_ppr": "PPR_29EFA9BE34EC\\judge_inline.json"
+ },
+ {
+  "i": 19,
+  "pattern_type": "influences",
+  "nodes": "source=surface roughness; target=kinetics of mixing",
+  "evidence": "effects due to differences in density, particle shape, or surface roughness would not influence the kinetics of mixing",
+  "reason": "NEGATED influence (same sentence as edge 17)",
+  "_ppr": "PPR_29EFA9BE34EC\\judge_inline.json"
+ },
+ {
+  "i": 26,
+  "pattern_type": "influences",
+  "nodes": "source=concentration gradient; target=sample concentration",
+  "evidence": "the concentration gradient at this point is extremely steep ... and slight inaccuracies in the location of the sampling probe will result in large deviations of the sample concentration from the expected value of 0.5",
+  "reason": "misattributed cause: the sentence's causal verb ('will result in') attaches to the probe-location inaccuracy (captured correctly by edge 27); the steep gradient is the enabling condition, stated as a state not a cause",
+  "_ppr": "PPR_29EFA9BE34EC\\judge_inline.json"
+ },
+ {
+  "i": 30,
+  "pattern_type": "validates_against (run-created)",
+  "nodes": "object=ideal system; reference=theoretical expressions for the kinetics of the process",
+  "evidence": "This system has been used to test the validity of the theoretical relationships, and excellent agreement has been obtained between theory and experiment.",
+  "reason": "role inversion: the sentence says the system tests the THEORY's validity (theory = validated object, system = means); the edge binds the system as the validated object",
+  "_ppr": "PPR_29EFA9BE34EC\\judge_inline.json"
+ },
+ {
+  "i": 4,
+  "pattern_type": "constitutive_law",
+  "nodes": "output=operator of segregation; input=granular material composition in surface flow; parameter=composition of the layer generated at the surface",
+  "evidence": "The operator of segregation relates the granular material composition in surface flow to the composition of the layer generated at the surface of a growing pile or filling.",
+  "reason": "law-as-output category confusion: the operator IS the law; the layer composition is the law's OUTPUT but is bound to the parameter slot",
+  "_ppr": "PPR_6048B48856F7\\judge_inline.json"
+ },
+ {
+  "i": 10,
+  "pattern_type": "compares",
+  "nodes": "from=model @11# of avalanche mixing; to=simple continuous flow mixing model",
+  "evidence": "Mathematically, the model @11# of avalanche mixing in a rotating drum is a finite difference approximation of a simple continuous flow mixing model.",
+  "reason": "derivation/approximation identity ('X is a finite-difference approximation of Y') extracted as a side-by-side comparison; equivalent_formulation (in meta, created run 2) is the right pattern and was not used",
+  "_ppr": "PPR_6048B48856F7\\judge_inline.json"
+ },
+ {
+  "i": 11,
+  "pattern_type": "background",
+  "nodes": "from=complicated model of transverse flow; to=simulation of mixing of equal but differently colored granules",
+  "evidence": "A much more complicated model of transverse flow has been recently proposed and used in simulation of mixing of equal but differently colored granules @13#.",
+  "reason": "uses-relation inverted into background: the model was USED IN the simulation; neither is background for the other",
+  "_ppr": "PPR_6048B48856F7\\judge_inline.json"
+ },
+ {
+  "i": 15,
+  "pattern_type": "influences",
+  "nodes": "source=percolation of small particles; target=bulk of material",
+  "evidence": "the percolation of small particles through the bulk of material is also neglected",
+  "reason": "a neglected phenomenon ('percolation through the bulk') is not an influence of percolation ON the bulk; no dependence between the two nodes is stated",
+  "_ppr": "PPR_6048B48856F7\\judge_inline.json"
+ },
+ {
+  "i": 16,
+  "pattern_type": "influences",
+  "nodes": "source=free surface of a filling; target=angle of repose",
+  "evidence": "the free surface of a filling is initially flat and, as the rotation starts, becomes inclined approximately at the angle of repose",
+  "reason": "geometric evolution (surface inclines TO the repose angle) contains no influence of the surface on the angle; the angle characterizes the surface's final slope",
+  "_ppr": "PPR_6048B48856F7\\judge_inline.json"
+ },
+ {
+  "i": 18,
+  "pattern_type": "influences",
+  "nodes": "source=thin surface layer; target=kappa",
+  "evidence": "all mixing and segregation occur in a thin surface layer",
+  "reason": "spatial confinement of processes to a layer is not an influence of the layer on the concentration kappa",
+  "_ppr": "PPR_6048B48856F7\\judge_inline.json"
+ },
+ {
+  "i": 19,
+  "pattern_type": "defines",
+  "nodes": "subject=speed; object=V_n",
+  "evidence": "V is the velocity in the rotating bulk and V_n is the value at the free surface of the component of V normal to this surface",
+  "reason": "subject 'speed' does not occur in the sentence at all (concept conflation with rotation speed); the sentence defines V_n as the normal component of V",
+  "_ppr": "PPR_6048B48856F7\\judge_inline.json"
+ },
+ {
+  "i": 23,
+  "pattern_type": "influences",
+  "nodes": "source=s; target=bulk layer",
+  "evidence": "kappa_- is the composition of a bulk layer that has just arrived at this surface",
+  "reason": "definitional statement about kappa_-; no influence between the surface coordinate s and the bulk layer is stated; source=s is spurious",
+  "_ppr": "PPR_6048B48856F7\\judge_inline.json"
+ },
+ {
+  "i": 27,
+  "pattern_type": "defines",
+  "nodes": "subject=operator of segregation; object=s",
+  "evidence": "it is necessary to know the operator of segregation which ... determines the local composition of a generated surface layer: kappa_-(s,t) = S(kappa_+(s,t))",
+  "reason": "object slot binds the surface coordinate s; the operator's defining formula kappa_- = S(kappa_+) is what should be bound",
+  "_ppr": "PPR_6048B48856F7\\judge_inline.json"
+ },
+ {
+  "i": 34,
+  "pattern_type": "influences",
+  "nodes": "source=midpoint flux concentration; target=ordinary differential equation",
+  "evidence": "The midpoint flux concentration kappa_0^1 serves as the initial condition for ordinary differential equation ~3!",
+  "reason": "serving as an initial condition for an ODE is not an influence relation, and an equation is not a dependent quantity",
+  "_ppr": "PPR_6048B48856F7\\judge_inline.json"
+ },
+ {
+  "i": 35,
+  "pattern_type": "composed_of",
+  "nodes": "whole=numerical simulation; component=midpoint flux concentration",
+  "evidence": "Each step of the numerical simulation should consist of ~1! determining the midpoint flux concentration kappa_0^1 from Eq. ~5!; ~2! ...",
+  "reason": "a quantity computed within a simulation step is not a structural component of the simulation",
+  "_ppr": "PPR_6048B48856F7\\judge_inline.json"
+ },
+ {
+  "i": 38,
+  "pattern_type": "influences",
+  "nodes": "source=mean tracer position; target=type of material",
+  "evidence": "the mean tracer position is not affected by the type of material",
+  "reason": "NEGATED influence extracted as positive: 'not affected by' states independence",
+  "_ppr": "PPR_6048B48856F7\\judge_inline.json"
+ },
+ {
+  "i": 41,
+  "pattern_type": "defines",
+  "nodes": "subject=parametric representation; object=tau",
+  "evidence": "A smooth monotone interpolation ... is given, e.g., by the parametric representation where tau in [0,1] is a parameter",
+  "reason": "tau is a PARAMETER of the representation, not its definition; 'X is parameterized by Y' is not 'X is defined-as Y'",
+  "_ppr": "PPR_6048B48856F7\\judge_inline.json"
+ },
+ {
+  "i": 48,
+  "pattern_type": "extends",
+  "nodes": "from=this relation; to=operator of surface segregation",
+  "evidence": "In this work we employed this relation, which is supposedly independent of geometrical configuration, to simulate the size segregation of binary mixture in a rotating drum.",
+  "reason": "the two nodes are two guises of the SAME entity (the relation IS the operator, employed unchanged); the real content - porting it to the new drum configuration (adapts) - is not captured",
+  "_ppr": "PPR_6048B48856F7\\judge_inline.json"
+ },
+ {
+  "i": 51,
+  "pattern_type": "constitutive_law",
+  "nodes": "output=segregation properties of polydisperse granular material; parameter=operator of surface segregation; input=external conditions",
+  "evidence": "The segregation properties ... are characterized by a constitutive relation (the operator of segregation), which does not depend on these external conditions and can be identified experimentally.",
+  "reason": "POLARITY INVERSION: the sentence says the relation does NOT depend on external conditions; the edge binds external conditions as an input, asserting the opposite",
+  "_ppr": "PPR_6048B48856F7\\judge_inline.json"
+ },
+ {
+  "i": 1,
+  "pattern_type": "compares",
+  "nodes": "from=compressible mu(I)-rheology; to=kinetic theory",
+  "evidence": "at very high inertial numbers, granular flows enter the collisional regime and are best described by kinetic theory",
+  "reason": "sentence states kinetic theory best describes the collisional regime; no juxtaposition with the rheology in the span and the from-node does not occur in the sentence",
+  "_ppr": "PPR_A249CB1DCBA7\\judge_inline.json"
+ },
+ {
+  "i": 2,
+  "pattern_type": "influences",
+  "nodes": "source=volume occupied by granular flows; target=granular temperature; cause=volume; effect=granular temperature",
+  "evidence": "the volume occupied by granular flows depends directly on the granular temperature",
+  "reason": "cause/effect polarity REVERSED: sentence says volume depends on temperature, so temperature is the cause; edge asserts volume causes temperature",
+  "_ppr": "PPR_A249CB1DCBA7\\judge_inline.json"
+ },
+ {
+  "i": 3,
+  "pattern_type": "influences",
+  "nodes": "source=granular temperature; target=imposed shear; cause=granular temperature; effect=imposed shear",
+  "evidence": "which itself is a function of the imposed shear",
+  "reason": "cause/effect polarity REVERSED: temperature is a function of imposed shear, so shear causes temperature, not vice versa",
+  "_ppr": "PPR_A249CB1DCBA7\\judge_inline.json"
+ },
+ {
+  "i": 4,
+  "pattern_type": "background",
+  "nodes": "from=kinetic theory; to=Forterre & Pouliquen (2002)",
+  "evidence": "Forterre & Pouliquen (2002) showed that kinetic theory taken in the compressible limit could reproduce the instability...",
+  "reason": "direction wrong: F&P used kinetic theory (and this paper cites F&P); kinetic theory is not an entity that cites F&P as background",
+  "_ppr": "PPR_A249CB1DCBA7\\judge_inline.json"
+ },
+ {
+  "i": 6,
+  "pattern_type": "influences",
+  "nodes": "source=compressibility; target=conclusions of Barker et al. (2015)",
+  "evidence": "taking into account compressibility changes the conclusions of Barker et al. (2015)",
+  "reason": "discourse-level impact on prior conclusions extracted as quantity dependence (claim_relation territory); 'conclusions' is not a quantity",
+  "_ppr": "PPR_A249CB1DCBA7\\judge_inline.json"
+ },
+ {
+  "i": 10,
+  "pattern_type": "influences",
+  "nodes": "source=phi; target=eq. (3.2)",
+  "evidence": "phi and phi' are then directly given by eq. (3.2)",
+  "reason": "'given by eq (3.2)' is a provenance/formula reference, not an influence; and an equation reference is not a target quantity (direction also inverted)",
+  "_ppr": "PPR_A249CB1DCBA7\\judge_inline.json"
+ },
+ {
+  "i": 11,
+  "pattern_type": "influences",
+  "nodes": "source=compressible mu(I)-rheology; target=plane shear flows; cause=domain defined by Eq. (4.12)",
+  "evidence": "the compressible mu(I)-rheology leads to plane shear flows that are unstable outside of the domain defined by Eq. (4.12)",
+  "reason": "cause slot binds the stability domain, which is a criterion/condition (flows are unstable OUTSIDE it), not a cause",
+  "_ppr": "PPR_A249CB1DCBA7\\judge_inline.json"
+ },
+ {
+  "i": 12,
+  "pattern_type": "influences",
+  "nodes": "source=mu_b; target=mu (friction coefficient); effect=well-posedness condition (mu_b > 1-7mu/6)",
+  "evidence": "if compressibility is associated with sufficient dissipation (i.e., mu_b > 1-7mu/6) ... the rheology remains wellposed",
+  "reason": "sentence states a sufficient condition for well-posedness; it does not state mu_b influencing mu (mu is not the target of any dependence here)",
+  "_ppr": "PPR_A249CB1DCBA7\\judge_inline.json"
+ },
+ {
+  "i": 13,
+  "pattern_type": "compares",
+  "nodes": "from=stability domain (4.12); to=phi'; to=well-posed domain of Barker et al.",
+  "evidence": "the stability domain ... is independent of flow compressibility phi' and equivalent to the well-posed domain defined by Barker et al. (2015)",
+  "reason": "phi' bound as a comparator but the sentence explicitly says the domain is INDEPENDENT of phi'; independence misextracted as comparison (the Barker-domain equivalence part alone would pass)",
+  "_ppr": "PPR_A249CB1DCBA7\\judge_inline.json"
+ },
+ {
+  "i": 14,
+  "pattern_type": "extends",
+  "nodes": "from=compressible mu(I)-rheology; to=Eq.(4.5)",
+  "evidence": "Another way to see this is by letting phi'->0 in Eq.(4.5)",
+  "reason": "taking a mathematical limit in an equation is not a generalization/extension relation",
+  "_ppr": "PPR_A249CB1DCBA7\\judge_inline.json"
+ },
+ {
+  "i": 16,
+  "pattern_type": "influences",
+  "nodes": "source=lambda; target=compressible mu(I)-rheology",
+  "evidence": "when lambda becomes positive outside of the domain defined by (4.12), the incompressible rheology becomes ill-posed",
+  "reason": "node mismatch: the evidence sentence is about the INCOMPRESSIBLE rheology becoming ill-posed, the edge binds the compressible rheology; also a diagnostic indicator misread as influence",
+  "_ppr": "PPR_A249CB1DCBA7\\judge_inline.json"
+ },
+ {
+  "i": 17,
+  "pattern_type": "influences",
+  "nodes": "source=growth rate of the positive eigenvalue; target=lambda_3",
+  "evidence": "the growth rate of the positive eigenvalue is bounded since lambda_3 ~ O(1)",
+  "reason": "lambda_3 IS the positive eigenvalue: source and target are the same entity, no dependence between two distinct quantities is stated",
+  "_ppr": "PPR_A249CB1DCBA7\\judge_inline.json"
+ },
+ {
+  "i": 19,
+  "pattern_type": "influences",
+  "nodes": "source=mu'; target=well-posedness condition (mu_b > 1-7mu/6)",
+  "evidence": "but remain well-posed since the condition mu_b > 1-7mu/6 is not affected by the value of mu'",
+  "reason": "NEGATED influence extracted as positive: sentence explicitly says the condition is NOT affected by mu'",
+  "_ppr": "PPR_A249CB1DCBA7\\judge_inline.json"
+ },
+ {
+  "i": 22,
+  "pattern_type": "influences",
+  "nodes": "source=I; target=well-posedness criteria",
+  "evidence": "the well-posedness criteria is not affected by this other possible definition of the inertial number",
+  "reason": "NEGATED influence extracted as positive: 'not affected by' states independence, not dependence",
+  "_ppr": "PPR_A249CB1DCBA7\\judge_inline.json"
+ },
+ {
+  "i": 24,
+  "pattern_type": "influences",
+  "nodes": "source=instantaneous pressure (A 4); target=linear analysis; effect=stability and well-posed criteria",
+  "evidence": "As long as a linear analysis is concerned, choosing the latter has no impact on the stability and well-posed criteria derived above",
+  "reason": "NEGATED influence extracted as positive: 'no impact on' states independence",
+  "_ppr": "PPR_A249CB1DCBA7\\judge_inline.json"
+ },
+ {
+  "i": 29,
+  "pattern_type": "background",
+  "nodes": "from=acoustic probing; to=knowledge of dense granular flows",
+  "evidence": "the acoustic probing and characterization of flowing granular media form a rather new and promising perspective to improve our knowledge of dense granular flows",
+  "reason": "purpose relation ('to improve our knowledge') misextracted as background: acoustic probing does not use 'knowledge' as background/motivation",
+  "_ppr": "PPR_A249CB1DCBA7\\judge_inline.json"
+ },
+ {
+  "i": 38,
+  "pattern_type": "influences",
+  "nodes": "source=mu'; target=I",
+  "evidence": "mu_tilde = mu' * I_tilde",
+  "reason": "mu' is the linearization coefficient relating the perturbations of mu and I, not an influencer of I",
+  "_ppr": "PPR_A249CB1DCBA7\\judge_inline.json"
+ },
+ {
+  "i": 39,
+  "pattern_type": "influences",
+  "nodes": "source=phi'; target=I",
+  "evidence": "phi_tilde = phi' * I_tilde",
+  "reason": "phi' is the linearization coefficient relating the perturbations of phi and I, not an influencer of I",
+  "_ppr": "PPR_A249CB1DCBA7\\judge_inline.json"
+ },
+ {
+  "i": 41,
+  "pattern_type": "constitutive_law",
+  "nodes": "output=stresses; input=rheological law (3.9)",
+  "evidence": "Given the rheological law (3.9), the stresses are, to first order",
+  "reason": "law-as-input category confusion: the rheological law is the generating rule, not an input quantity (same failure mode as the DQN Bellman-equation edge)",
+  "_ppr": "PPR_A249CB1DCBA7\\judge_inline.json"
+ },
+ {
+  "i": 43,
+  "pattern_type": "composed_of",
+  "nodes": "whole=eigenvalue problem; component=perturbed variables; component=stresses",
+  "evidence": "inserting the perturbed variables and stresses into (3.12) ... leads to an eigenvalue problem of the form (A - lambda B)y = 0",
+  "reason": "derivation provenance ('inserting X leads to problem P') misread as structural composition; stresses are substituted away and are not components of the eigenvalue problem",
+  "_ppr": "PPR_A249CB1DCBA7\\judge_inline.json"
+ },
+ {
+  "i": 45,
+  "pattern_type": "defines",
+  "nodes": "subject=alpha; object=mu",
+  "evidence": "together with alpha = mu_b + 2mu/3 and beta = 2/I",
+  "reason": "materially incomplete definition binding: alpha = mu_b + 2mu/3 has two terms; binding object=mu alone drops mu_b and misstates the identity (contrast edge 46: beta = 2/I where I is the sole defining variable)",
+  "_ppr": "PPR_A249CB1DCBA7\\judge_inline.json"
+ }
+]
