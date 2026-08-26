@@ -325,8 +325,25 @@ class ExtractionAgent:
                 continue
             declared = {s.get("role") for s in pat.role_slots}
             if not set(he.node_roles).issubset(declared):
-                dropped.append(self._gate_drop(he, nid2node, "gate:illegal-role"))
-                continue
+                # deterministic synonym remap FIRST (A2 root cause: LLM writes
+                # predictor/influencer/subject-object etc. instead of the
+                # pattern's declared role names — 282 whole edges killed for a
+                # naming convention). Two-stage: canonical synonym table, then
+                # slot-position fallback (first role -> first declared slot,
+                # second -> second) for pairs the table doesn't cover.
+                remapped = [_ROLE_SYNONYMS.get(r, r) for r in he.node_roles]
+                if not set(remapped).issubset(declared) and len(he.node_roles) >= 2:
+                    slots = [s.get("role") for s in pat.role_slots if s.get("role")]
+                    if len(slots) >= len(he.node_roles):
+                        # positional: keep any already-declared role, replace
+                        # undeclared ones with the slot's declared name
+                        remapped = [r if r in declared else slots[i]
+                                    for i, r in enumerate(he.node_roles)]
+                if set(remapped).issubset(declared) and len(remapped) == len(he.node_roles):
+                    he.node_roles = remapped
+                else:
+                    dropped.append(self._gate_drop(he, nid2node, "gate:illegal-role"))
+                    continue
             # --- 1. binding locality (±1 sentence window + plural tolerance) ---
             # Gate audit (2026-08-25, 38-drop audit): 66% of strict-span drops
             # were false kills — evidence span chosen too narrow (participant
@@ -930,6 +947,21 @@ def _evidence_window(evidence: str, section_text: str) -> str:
 # adverbial/person surfaces that must NOT occupy entity slots (arbitration
 # findings: time/position/repetition adverbials and researcher names were
 # bound as cause/instrument nodes)
+# deterministic role-name synonyms (A2 late-production root cause safety net:
+# the LLM invents semantic role names the pattern never declared — predictor,
+# influencer, defined_entity... — and the role gate killed whole edges for it).
+_ROLE_SYNONYMS = {
+    "predictor": "from", "predicted": "to", "predicted_phenomenon": "to",
+    "influencer": "source", "influenced": "target",
+    "subject": "from", "object": "to",
+    "defined_entity": "subject", "definition": "definition",
+    "entity": "from", "medium": "to",
+    "first_phase": "from", "second_phase": "to",
+    "winner": "from", "loser": "to",
+    "method": "from", "component": "to", "effect": "to",
+}
+
+
 _NOT_ENTITY_RE = re.compile(
     r"^((after|before|during|at|near|within|over|throughout|for)\s+)?(the\s+)?(first|last|next)?\s*\d+[–-]?\d*\s*"
     r"(revolutions?|steps?|frames?|times?|minutes?|hours?|seconds?|iterations?|epochs?)\b"

@@ -413,7 +413,16 @@ def _render_patterns_compact(meta, keep_ids):
         fam = f"<{pat.family}>" if pat.family else ""
         abs_tag = " (abstract)" if pat.is_abstract else ""
         desc = (pat.description or "")[:120]
-        line = f"- {pid}{fam}{abs_tag}: {desc}"
+        # role slots MUST render in compact mode (A2 late-production-root-cause:
+        # once the schema grows past the retrieval-K threshold the compact
+        # renderer omitted roles, the LLM never saw the declared role names,
+        # invented its own (predictor/influencer/...), and the role gate killed
+        # the whole edge — 282 edges lost across 4 papers, 87% of late-run
+        # production). Roles are short; the bounded-budget concern that
+        # justified omitting them is nothing next to this.
+        slots = ",".join(s.get("role") for s in pat.role_slots if s.get("role"))
+        slot_tag = f"({slots})" if slots else ""
+        line = f"- {pid}{fam}{abs_tag}{slot_tag}: {desc}"
         # P1-B fix: render semantic_boundary in compact mode too (truncated) so
         # the extractor/verifier sees the disambiguation hint for confusable
         # patterns even under retrieval+compact. Without it, retrieval severs
