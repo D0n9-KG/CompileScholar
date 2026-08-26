@@ -169,6 +169,12 @@ class EvolutionAgent:
         # SAGE writer-reader: accumulated consumer feedback
         self._consumer_feedback: list[ConsumerFeedback] = []
 
+        # SOFT SCHEMA ROUTING: novel-type recurrence tracking (induction
+        # channel). novel_type name -> set of (paper_id, node_id) that used it.
+        self._novel_seen: dict[str, set] = {}
+        # novel_type name -> sample edges (for role_slot induction)
+        self._novel_samples: dict[str, list] = {}
+
     # ===================================================================
     # Unified queue (断点 6): all trigger sources propose here
     # ===================================================================
@@ -199,6 +205,57 @@ class EvolutionAgent:
     # Stage 1: probe — convert trigger sources into proposals
     # ===================================================================
 
+    def propose_novel_type(self, edge: dict, node_id: str = "",
+                           paper_id: str = "", domain: str = "") -> None:
+        """Record a committed _novel_type edge for the induction channel.
+        The edge dict is the extractor's kept-edge record (pattern_type +
+        roles + node surfaces + evidence). Recurrence across >=2 nodes/papers
+        triggers a promotion proposal on the next drain."""
+        name = str(edge.get("pattern_type", "")).strip().lower()
+        if not name or name in self.kb.tbox.patterns:
+            return
+        key = (paper_id or "", node_id or "")
+        seen = self._novel_seen.setdefault(name, set())
+        if key not in seen:
+            seen.add(key)
+            samples = self._novel_samples.setdefault(name, [])
+            if len(samples) < 6:
+                samples.append({
+                    "roles": list(edge.get("roles", [])),
+                    "surfaces": list(edge.get("surfaces", [])),
+                    "evidence": str(edge.get("evidence", ""))[:200],
+                })
+        self._queue.append(TriggerSource(
+            kind="novel_type", payload={"pattern_type": name}, domain=domain,
+            paper_id=paper_id, node_id=node_id))
+
+    def _probe_novel_type(self, src: TriggerSource) -> list[dict]:
+        seen = self._novel_seen.get(src.payload.get("pattern_type"), set())
+        distinct_sources = len({(p, n) for p, n in seen if p or n})
+        if distinct_sources < 2:
+            return []   # single occurrence: not promoted (conservative gate)
+        name = src.payload["pattern_type"]
+        samples = self._novel_samples.get(name, [])
+        # induce role_slots from observed roles (mode per position)
+        from collections import Counter
+        roles_union = []
+        for s in samples:
+            for r in s.get("roles", []):
+                if r and r not in roles_union:
+                    roles_union.append(r)
+        role_slots = [{"role": r, "type": "THING"} for r in roles_union[:6]] or                      [{"role": "from", "type": "THING"}, {"role": "to", "type": "THING"}]
+        return [{
+            "op": "add_pattern",
+            "pattern_id": name,
+            "description": f"[induced] {name}: used in {distinct_sources} papers/sections",
+            "semantic_boundary": "",
+            "family": "",
+            "role_slots": role_slots,
+            "evidence": "; ".join(s.get("evidence", "") for s in samples[:3]),
+            "rationale": f"novel type recurrence {distinct_sources}x (soft-schema induction)",
+            "source": "novel_type",
+        }]
+
     def _probe(self, src: TriggerSource,
                failing_hes: list[tuple[Hyperedge, str]] | None = None
                ) -> list[dict]:
@@ -216,6 +273,14 @@ class EvolutionAgent:
         the pattern over-merges) or a rename (if it's confusingly named), based on
         the issue type. Lightweight; the governance stage gates it."""
         kind = src.kind
+        if kind == "novel_type":
+            # SOFT SCHEMA ROUTING induction channel (DECISION-soft-schema-routing):
+            # the extractor committed an edge whose pattern_type is not in the
+            # T-box (flagged _novel_type, verified semantically). Recurrence is
+            # tracked per novel type name; >= 2 distinct nodes/papers proposes
+            # promotion with role_slots induced from the observed edges.
+            # Governance (distinctness/merge) still gates the add_pattern.
+            return self._probe_novel_type(src)
         if kind in ("validate_failure", "recurring_mismatch"):
             if not failing_hes:
                 return []

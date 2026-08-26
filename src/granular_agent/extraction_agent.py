@@ -321,7 +321,25 @@ class ExtractionAgent:
             pat = self.kb.tbox.patterns.get(he.pattern_type)
             # --- 2. role legality (pattern must exist too) ---
             if pat is None:
-                dropped.append(self._gate_drop(he, nid2node, "gate:unknown-pattern"))
+                # SOFT SCHEMA ROUTING (DECISION-soft-schema-routing, 2026-08-26):
+                # an unknown pattern_type is NO LONGER a kill. The edge passes
+                # with a _novel_type flag (verifier judges it semantically; the
+                # induction channel in the evolver watches novel-type edges for
+                # recurrence and promotes recurring ones through the governance
+                # gates). EXCEPTION: the evolution-relation types (extends/
+                # improves/compares/replaces/adapts/background) stay a CLOSED
+                # set — cross-paper connectivity and evaluation depend on those
+                # type names being stable, so a near-miss of them is a real
+                # error (e.g. 'extend' or 'improves_on') and gets the old drop.
+                if he.pattern_type.lower() in _EVOLUTION_TYPE_MISS_RE:
+                    dropped.append(self._gate_drop(he, nid2node, "gate:evolution-type-miss"))
+                    continue
+                he.qualifiers = dict(he.qualifiers) if he.qualifiers else {}
+                he.qualifiers["_novel_type"] = he.pattern_type
+                # novel types have no declared role_slots — role-legality and
+                # slot-type checks are skipped; the verifier's slot_binding
+                # check carries the semantic responsibility for these edges.
+                passing.append(he)
                 continue
             declared = {s.get("role") for s in pat.role_slots}
             if not set(he.node_roles).issubset(declared):
@@ -961,6 +979,19 @@ _ROLE_SYNONYMS = {
     "method": "from", "component": "to", "effect": "to",
 }
 
+
+# closed evolution-relation types + their common near-misses (a novel type
+# that is a near-miss of these is a typo/error, NOT a new domain concept —
+# keeping these names stable is what cross-paper evaluation relies on)
+_EVOLUTION_TYPES = ("extends", "improves", "compares", "replaces", "adapts", "background")
+_EVOLUTION_TYPE_MISS_RE = {
+    "extend", "extended", "extending", "extension_of", "extends_to",
+    "improve", "improved", "improving", "improves_on", "improvement_of",
+    "compare", "compared", "comparing", "compared_to", "compares_with",
+    "replace", "replaced", "replacing", "replaced_by",
+    "adapt", "adapted", "adapting", "adapted_from",
+    "background_of", "motivated_by",
+}
 
 _NOT_ENTITY_RE = re.compile(
     r"^((after|before|during|at|near|within|over|throughout|for)\s+)?(the\s+)?(first|last|next)?\s*\d+[–-]?\d*\s*"

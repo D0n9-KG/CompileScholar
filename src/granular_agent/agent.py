@@ -260,6 +260,17 @@ class GranularFlowAgent:
                 if failing:
                     evo.propose_validate_failures(failing, node_id=nid,
                                                   paper_id=paper_id, domain=self.domain)
+                # SOFT SCHEMA ROUTING: committed _novel_type edges feed the
+                # induction channel (recurrence-tracked promotion, gated by
+                # governance). The kept-edge records don't carry the _novel_type
+                # flag explicitly, so detect novelty by tbox membership.
+                for ke in ext_rep.get("kept_edges", []):
+                    pt = ke.get("pattern_type", "")
+                    if pt and pt not in kb.tbox.patterns:
+                        evo.propose_novel_type(
+                            {"pattern_type": pt, "roles": ke.get("roles", []),
+                             "surfaces": [], "evidence": ke.get("evidence", "")},
+                            node_id=nid, paper_id=paper_id, domain=self.domain)
                 evo_rep = evo.drain()
             elif arm == "no_intra_dag":
                 deferred_failures.extend(

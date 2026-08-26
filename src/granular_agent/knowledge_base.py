@@ -514,30 +514,33 @@ class KnowledgeBase:
         op = mut.op
         if op == Op.ADD_EDGE:
             # extractor add_edge: kind (pattern_type) MUST be a known ACTIVE
-            # T-box pattern. A new pattern_type the schema doesn't know must go
-            # through the evolver's add_pattern op FIRST (then add_edge), not
-            # be smuggled in as an add_edge. Rejecting unknown/deprecated kinds
-            # here is what makes the verifier's retype fix safe: a retype to a
-            # non-existent pattern is rejected at the kernel, not silently
-            # committed as bad data. (BLOCKER B3 fix — the DECISION's claim
-            # "retype to a non-existent pattern is rejected" was previously
-            # false because ADD_EDGE had no schema-constraint branch.)
+            # T-box pattern — EXCEPT for _novel_type edges (SOFT SCHEMA
+            # ROUTING, DECISION-soft-schema-routing 2026-08-26): an edge whose
+            # pattern_type is not in the T-box passes the GATE with a
+            # _novel_type qualifier; committing it is legal (the edge is real
+            # knowledge; its TYPE is an induction candidate, not an error).
+            # The novel type does NOT enter the T-box — only the evolver's
+            # induction channel can promote it via add_pattern. Retype-safety
+            # (B3) still holds for regular edges: a retype to a non-existent
+            # pattern without the _novel_type flag is still rejected.
             kind = mut.payload.get("kind", "")
+            novel = bool(mut.payload.get("qualifiers", {}).get("_novel_type"))
             pat = self.tbox.patterns.get(kind)
             if pat is None:
-                return False, f"add_edge:unknown-pattern-type:{kind}"
-            if pat.deprecated:
-                return False, f"add_edge:pattern-deprecated:{kind}"
-            # role compatibility: every role the edge uses must be declared by
-            # the pattern's role_slots (a defines edge using whole/component
-            # roles = composed_of's roles misattributed to defines). This is a
-            # deterministic structural check (rule, not LLM). Catches the
-            # real-run failure where a 'defines' edge carried composed_of roles.
-            declared = {s.get("role") for s in pat.role_slots}
-            used = {r for r in mut.payload.get("roles", [])}
-            extra = used - declared
-            if extra:
-                return False, f"add_edge:role-not-in-pattern:{sorted(extra)}<-{kind}"
+                if not novel:
+                    return False, f"add_edge:unknown-pattern-type:{kind}"
+            elif pat.deprecated:
+                if not novel:
+                    return False, f"add_edge:pattern-deprecated:{kind}"
+            if pat is not None:
+                # role compatibility only checkable for known patterns (a novel
+                # type has no declared role_slots — the verifier's slot_binding
+                # check carries that responsibility)
+                declared = {s.get("role") for s in pat.role_slots}
+                used = {r for r in mut.payload.get("roles", [])}
+                extra = used - declared
+                if extra:
+                    return False, f"add_edge:role-not-in-pattern:{sorted(extra)}<-{kind}"
             return True, "ok"
         if op == Op.ADD_PATTERN:
             pat: MetaHyperedgePattern = mut.payload.get("pattern")
