@@ -1120,10 +1120,14 @@ def seed_meta_hypergraph() -> MetaHypergraph:
                     "improves). NOT compares (X is NOT a parallel different-mechanism "
                     "alternative; X builds on Y and is better), NOT extends (X is better "
                     "not just broader).",
-        "compares": "A and B are PARALLEL different-mechanism alternatives with overlapping "
-                    "scope (both model the same phenomenon, different assumptions, each "
-                    "pros/cons). NOT improves (neither fixes the other's limitation), NOT "
-                    "extends (neither generalizes the other).",
+        "compares": "A and B are put side by side: either (i) PARALLEL different-mechanism "
+                    "alternatives with overlapping scope (both model the same phenomenon, "
+                    "different assumptions), or (ii) THEORY-vs-EXPERIMENT / "
+                    "prediction-vs-observation validation ('data compared with predictions', "
+                    "'simulations agree with experiments', 'in contrast with'), or (iii) "
+                    "equivalence/contrast of formulations ('equivalent', 'the same as', "
+                    "'rather than'). NOT improves (neither fixes the other's limitation), "
+                    "NOT extends (neither generalizes the other).",
         "replaces": "X SUBSTITUTES Y outright (X is used INSTEAD of Y; Y is retired). "
                     "NOT improves (replaces = Y is gone, improves = Y still used + X better).",
         "adapts": "X PORTS Y to a NEW scenario/regime/domain Y wasn't designed for "
@@ -1242,9 +1246,12 @@ def seed_meta_hypergraph_general() -> MetaHypergraph:
                     "it fixes something Y fails at). NOT compares (X is NOT a parallel "
                     "different-mechanism alternative; X builds on Y and is better), NOT "
                     "extends (X is better not just broader).",
-        "compares": "A and B are PARALLEL different-mechanism alternatives with overlapping "
-                    "scope (both model the same phenomenon, different assumptions). NOT "
-                    "improves (neither fixes the other), NOT extends (neither generalizes).",
+        "compares": "A and B are put side by side: either (i) PARALLEL different-mechanism "
+                    "alternatives with overlapping scope, or (ii) THEORY-vs-EXPERIMENT "
+                    "validation ('data compared with predictions', 'agree with'), or (iii) "
+                    "equivalence/contrast ('equivalent', 'the same as', 'rather than'). "
+                    "NOT improves (neither fixes the other), NOT extends (neither "
+                    "generalizes).",
         "replaces": "X SUBSTITUTES Y outright (X is used INSTEAD of Y; Y is retired). "
                     "NOT improves (replaces = Y is gone, improves = Y still used + X better).",
         "adapts": "X PORTS Y to a NEW scenario/regime/domain Y wasn't designed for "
