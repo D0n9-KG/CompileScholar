@@ -44,6 +44,7 @@ Honest scope / no-downgrade:
 from __future__ import annotations
 
 import json
+import os
 import re
 import unicodedata
 from dataclasses import dataclass, field
@@ -157,7 +158,10 @@ than a dropped one):
 CHECK 1 — EVIDENCE SUPPORT: does the evidence_span sentence actually STATE this
 relation? Reject if it (a) merely describes a setup/baseline without a result,
 (b) states a DIFFERENT relation than the edge claims, (c) only implies/adjacent-to
-the fact. relation_exists=false → fix=drop.
+the fact, (d) NEGATES the relation — "does not depend", "is independent of",
+"not affected by", "no impact on", "would not influence", "is fairly constant
+as ... varies" state INDEPENDENCE, so a positive influences/dependency edge
+from them is wrong. relation_exists=false → fix=drop.
 
 CHECK 2 — SLOT BINDING: is each node really the thing its role claims, IN THIS
 SENTENCE? winner really outperformed the loser; the METHOD slot really holds a
@@ -167,7 +171,10 @@ wrong edge — do NOT keep it for the relation alone).
 
 CHECK 3 — POLARITY/DIRECTION: does the sentence's direction match the roles?
 'A comparable to B' / 'A achieves 75% of B' is NOT outperforms(A,B).
-'A fails where B works' inverts winner/loser. Polarity mismatch → fix=drop
+'A fails where B works' inverts winner/loser. DEPENDENCY DIRECTION: 'A depends
+on B' / 'A is a function of B' / 'A varies with B' means B is the source/cause
+and A the target/effect — an edge making the depending quantity the source is
+polarity-wrong. Polarity mismatch → fix=drop
 (or rolefix if ONLY the role order is swapped and the participants are right).
 
 Also:
@@ -331,8 +338,16 @@ class ExtractionAgent:
                 # set — cross-paper connectivity and evaluation depend on those
                 # type names being stable, so a near-miss of them is a real
                 # error (e.g. 'extend' or 'improves_on') and gets the old drop.
-                if he.pattern_type.lower() in _EVOLUTION_TYPE_MISS_RE:
-                    dropped.append(self._gate_drop(he, nid2node, "gate:evolution-type-miss"))
+                # SOFT_ROUTING env (SOFTB verdict 2026-08-26: preregistered
+                # main gate FAIL, -5.4pt within single-run variance band →
+                # 改动① demoted to a tested variable): SOFT_ROUTING=0 restores
+                # the OLD hard gate (any unknown pattern_type = drop); =1
+                # (default) keeps the soft pass-through. Multi-seed runs both.
+                soft_routing = os.environ.get("SOFT_ROUTING", "1") == "1"
+                if he.pattern_type.lower() in _EVOLUTION_TYPE_MISS_RE or not soft_routing:
+                    dropped.append(self._gate_drop(he, nid2node,
+                                  "gate:evolution-type-miss" if he.pattern_type.lower() in _EVOLUTION_TYPE_MISS_RE
+                                  else "gate:unknown-pattern (SOFT_ROUTING=0)"))
                     continue
                 he.qualifiers = dict(he.qualifiers) if he.qualifiers else {}
                 he.qualifiers["_novel_type"] = he.pattern_type

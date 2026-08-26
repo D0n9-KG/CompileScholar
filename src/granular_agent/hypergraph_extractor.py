@@ -564,6 +564,38 @@ PATTERN-SELECTION CRITERIA (the highest-error types — apply these tests before
   understand X from Y"), a DEFINITION ("X is Y"), or an ASSUMPTION ("sequences
   are assumed to terminate") is NOT an influences edge — properties/conditions/
   limits are not functional dependencies. When unsure, do NOT emit the edge.
+- NEGATION = INDEPENDENCE: "X does not depend on Y", "X is independent of Y",
+  "would not influence", "not affected by", "no impact on", "X is fairly
+  constant as Y varies" DENY a dependence — NEVER emit an influences edge from
+  such a sentence (if the schema has an absence/independence pattern and the
+  independence is itself the finding, use that; otherwise emit nothing). The
+  negation counts wherever it sits — including inside a relative or causal
+  clause ("the law, which does not depend on Y", "remains well-posed since the
+  condition is not affected by Y"): Y is NOT an input/parameter/cause. A
+  sentence may carry a negated clause AND a positive one ("X is not affected
+  by A but depends linearly on B") — extract the positive dependence (B), and
+  the independence from A only via an absence/independence pattern.
+- DEPENDENCY DIRECTION: in "A depends on B" / "A is a function of B" / "A
+  varies with B", B is the source/cause and A is the target/effect — the
+  DEPENDING quantity is the target, never the source.
+- compares requires an explicit side-by-side EVALUATION of two entities.
+  "X is a (finite-difference) approximation of Y" / "X reduces to Y" is
+  formulation equivalence (equivalent_formulation if the schema has it);
+  "observation matches the theoretical prediction" is agreement (agrees_with),
+  not a comparison.
+- PORTING: "we employ (a prior) relation X in a new geometry/configuration" is
+  adapts (reuse in a new setting), not extends (extends = direct technical
+  generalization of a method).
+- BACKGROUND direction: from = the CURRENT work, to = the prior context it
+  cites as motivation. A system used to TEST a theory is validates_against
+  territory, not background — and validates_against binds object = the thing
+  VALIDATED (usually the theory/claim), reference = the experiment/benchmark
+  it is checked against ("this system has been used to test the validity of
+  the theory": object=theory, reference=system).
+- constitutive_law slots hold PHYSICAL QUANTITIES (the law's inputs/outputs/
+  parameters), never the law/equation itself: "using the Bellman equation to
+  estimate Q" does not put the Bellman equation in the input slot — the law
+  IS the pattern; its quantities are the slots.
 - composed_of ONLY means structural parts of a whole ("DQN consists of a replay
   buffer and a target network"). "X combines/combines the ideas of paradigm A
   and B" is lineage/derivation, not structural composition; a preprocessing
@@ -591,6 +623,16 @@ HARD RULES (a post-check rejects violations — a rule-violating edge is a waste
 6. node_roles MUST be exactly the roles DECLARED for that pattern_type in the schema above (the schema's role slots override anything else you remember).
 7. qualifiers: only keys the pattern declares. Enum values only for enum keys (method: experiment|simulation|theory|review; evidence_strength: measured|derived|hypothesized|assumed; cited_from: this_work|prior_art|definition).
 8. Prefer a schema pattern over inventing a new pattern_type. New pattern names (only if nothing fits): clean snake_case, never slash-joined compounds.
+9. SETUP/IMPLEMENTATION/PLOTTING sentences ("a constant flux rate is set by a
+  syringe pump attached to ...", "store transition ... in D", "execute action
+  in emulator", "we plot X as a function of Y", "solid/open triangles") say
+  what was DONE or how data is displayed — they are NOT scientific claims: no
+  influences/measures/composed_of/defines edges from them. A measurement
+  instrument MEASURES a quantity; a plot axis, a storage target, or an
+  apparatus location is not an instrument, component, or cause. This targets
+  apparatus/protocol/display text ONLY — a stated modeling or design choice
+  ("we use the full sequence as the state representation") IS a claim and may
+  support defines/composed_of.
 
 If nothing extractable, output {{"nodes":[],"hyperedges":[]}}.
 """
