@@ -1,0 +1,2019 @@
+{
+  "summary": {
+    "GLM-5-Turbo": {
+      "pass": 23,
+      "total": 54,
+      "rate": 0.426
+    },
+    "qwen3.5": {
+      "pass": 21,
+      "total": 54,
+      "rate": 0.389
+    },
+    "agreement": "46/54",
+    "both_pass": "18/54",
+    "either_pass": "26/54"
+  },
+  "edges": [
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiment",
+      "nodes": [
+        [
+          "from",
+          "theoretical distributions"
+        ],
+        [
+          "to",
+          "experimental data"
+        ]
+      ],
+      "ev": "The theoretical distributions are in agreement with the experimental data obtained.",
+      "ctx_before": "mathematical model of material transport accounts for the free-surface segregation and predicts the evolving nonuniform distribution of the mixture components. ",
+      "ctx_after": " @S1063-651X\\~98!14202-2# PACS number\\~s!: 81.05.Rm, 64.75.1g, 46.10.1z I. INTRODUCTION Industrial bulk solids are usually nonhomogeneous and it is essential to"
+    },
+    {
+      "pt": "claim_relation",
+      "desc": "a discourse relation between >=2 claims/approaches (supports/contrasts/extends/...)",
+      "boundary": "a DISCOURSE relation between claims/findings (supports/contrasts/outperforms). NOT a method-to-method development (extends/improves/compares — those are evolution), NOT a measurement (measures).",
+      "nodes": [
+        [
+          "from",
+          "such models"
+        ],
+        [
+          "to",
+          "size segregation"
+        ]
+      ],
+      "ev": "such models are unable to describe size segregation",
+      "ctx_before": " @2#!. The difference in the repose angles of mixture components has been chosen in @8# as the macroscopic parameter entirely determining segregation. However, ",
+      "ctx_after": ": although the mixtures of particles differing only in size show the strongest tendency to segregate, their components have the same angle of repose @9#. The an"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "angle of repose of a mixture"
+        ],
+        [
+          "target",
+          "variations in the bulk composition"
+        ]
+      ],
+      "ev": "The angle of repose of a mixture may reflect variations in the bulk composition",
+      "ctx_before": "gation: although the mixtures of particles differing only in size show the strongest tendency to segregate, their components have the same angle of repose @9#. ",
+      "ctx_after": " but these variations seem in most cases a consequence rather than a cause of segregation. A practicable macroscopic model of granular body formation that is ab"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "operator of segregation"
+        ],
+        [
+          "object",
+          "constitutive relation"
+        ]
+      ],
+      "ev": "or an operator of segregation",
+      "ctx_before": " free-surface segregation can be derived by combining a material-independent mathematical model of mass transfer with a phenomenological constitutive relation, ",
+      "ctx_after": " @10#. The operator of segregation relates the granular material composition in surface flow to the composition of the layer generated at the surface of a growi"
+    },
+    {
+      "pt": "constitutive_law",
+      "desc": "a constitutive law relating output quantity/quantities to >=1 input quantity (n-ary)",
+      "boundary": "a FORMAL/QUANTITATIVE law output=f(inputs+params), stated as a formula or explicit functional relation. NOT a prose 'X depends on Y' (that is influences), NOT a definition (defines), NOT a measurement setup (measures).",
+      "nodes": [
+        [
+          "output",
+          "operator of segregation"
+        ],
+        [
+          "input",
+          "granular material composition in surface flow"
+        ],
+        [
+          "parameter",
+          "composition of the layer generated at the surface of a growing pile or filling"
+        ]
+      ],
+      "ev": "The operator of segregation relates the granular material composition in surface flow to the composition of the layer generated at the surface of a growing pile or filling.",
+      "ctx_before": "ived by combining a material-independent mathematical model of mass transfer with a phenomenological constitutive relation, or an operator of segregation @10#. ",
+      "ctx_after": " This constitutive relation depends only on the mechanism of segregation that is specific for a given type of material, and can be determined in a simple experi"
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiment",
+      "nodes": [
+        [
+          "from",
+          "theoretical predictions"
+        ],
+        [
+          "to",
+          "experimental data"
+        ]
+      ],
+      "ev": "a good agreement of theoretical predictions and the experimental data",
+      "ctx_before": "ing drum, a device used in numerous operations with bulk solids. Although both the configuration and the material of particles are different from those in @2#, ",
+      "ctx_after": " has been achieved without any fitting of model parameters. II. EXPERIMENT The mixer used in the experiments was a cylindrical vessel, 141 mm in internal diamet"
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiment",
+      "nodes": [
+        [
+          "from",
+          "observed rotation-induced evolution"
+        ],
+        [
+          "to",
+          "computer simulation of mixing and segregation"
+        ]
+      ],
+      "ev": "Some of the experiments were conducted for a qualitative comparison of the observed rotation-induced evolution of a given distribution of differently colored granules with the results of computer simulation of mixing and segregation.",
+      "ctx_before": "ok place in a thin boundary layer \\~2–4 particle diameters in thickness! and occurred either in avalanches or continuously, depending on the speed of rotation. ",
+      "ctx_after": " In other experiments, which started from an approximately uniform initial distribution of species, the drum was rotated a number of times until the evolving no"
+    },
+    {
+      "pt": "composed_of",
+      "desc": "one whole is composed-of / part-of >=1 component (n-ary composition)",
+      "boundary": "STRUCTURAL composition: parts that make up a whole (model A = B + C). NOT classification (defines), NOT 'X has control params' (influences), NOT experimental setup description, NOT 'we tested X by doing Y'.",
+      "nodes": [
+        [
+          "whole",
+          "samplers"
+        ],
+        [
+          "component",
+          "copper pipe"
+        ]
+      ],
+      "ev": "This was done to control the exact location of the samplers which were made of a copper pipe with an external diameter 22 mm, internal diameter 20 mm, and a height 61 mm.",
+      "ctx_before": " diameter of the drum, a thickness 20 mm, and contained holes 22 mm in diameter at the specified distances from the center! was placed upon the drum \\~Fig. 1!. ",
+      "ctx_after": " The samplers were closed on one side and their walls sharpened on the other. The samplers were pushed down through the holes of the sampling cylinder and throu"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "speed"
+        ],
+        [
+          "target",
+          "time intervals between avalanches"
+        ],
+        [
+          "cause",
+          "speed"
+        ],
+        [
+          "effect",
+          "time intervals between avalanches"
+        ]
+      ],
+      "ev": "As the speed increases, the time intervals between avalanches become shorter, and then a continuous surface flow regime is established ~we do not consider the centrifugal regime at very high rotation speeds!.",
+      "ctx_before": "the way. Then they are once again trapped into the rotating bulk. At a low rotation speed, the pouring of particles down the free surface occurs in avalanches. ",
+      "ctx_after": ". Using simple, purely geometrical argumentation, Metcalfe et al. @11# were able to analyze the avalanche mixing of equal but differently colored granules. The "
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "speed"
+        ],
+        [
+          "target",
+          "continuous surface flow regime"
+        ],
+        [
+          "cause",
+          "speed"
+        ],
+        [
+          "effect",
+          "continuous surface flow regime"
+        ]
+      ],
+      "ev": "As the speed increases, the time intervals between avalanches become shorter, and then a continuous surface flow regime is established ~we do not consider the centrifugal regime at very high rotation speeds!.",
+      "ctx_before": "the way. Then they are once again trapped into the rotating bulk. At a low rotation speed, the pouring of particles down the free surface occurs in avalanches. ",
+      "ctx_after": ". Using simple, purely geometrical argumentation, Metcalfe et al. @11# were able to analyze the avalanche mixing of equal but differently colored granules. The "
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiment",
+      "nodes": [
+        [
+          "from",
+          "model @11# of avalanche mixing"
+        ],
+        [
+          "to",
+          "simple continuous flow mixing model"
+        ]
+      ],
+      "ev": "Mathematically, the model @11# of avalanche mixing in a rotating drum is a finite difference approximation of a simple continuous flow mixing model.",
+      "ctx_before": "th avalanche and continuous regimes of surface flow and, in our opinion, the influence of avalanches on the distribution of particles is sometimes exaggerated. ",
+      "ctx_after": " These models yield similar results if the difference between surface incline angles before and after avalanches \\~a parameter in avalanche mixing model! is sma"
+    },
+    {
+      "pt": "background",
+      "desc": "X uses Y as background/motivation",
+      "boundary": "X cites Y as MOTIVATION/prior context only (Y inspired X but X is NOT a direct technical extension/inheritance of Y). NOT extends (no direct technical lineage), NOT improves (no limitation fix).",
+      "nodes": [
+        [
+          "from",
+          "complicated model of transverse flow"
+        ],
+        [
+          "to",
+          "simulation of mixing of equal but differently colored granules"
+        ]
+      ],
+      "ev": "~A much more complicated model of transverse flow has been recently proposed and used in simulation of mixing of equal but differently colored granules @13#.",
+      "ctx_before": "e thick so that the necessity for fines to percolate through this layer to the bulk surface can limit segregation @2#. Henceforth, we neglect this phenomenon. \\",
+      "ctx_after": " Further evaluation and generalization of this model for simulating segregation in a thick surface flow layer would be interesting.! Because of the stochastic n"
+    },
+    {
+      "pt": "composed_of",
+      "desc": "one whole is composed-of / part-of >=1 component (n-ary composition)",
+      "boundary": "STRUCTURAL composition: parts that make up a whole (model A = B + C). NOT classification (defines), NOT 'X has control params' (influences), NOT experimental setup description, NOT 'we tested X by doing Y'.",
+      "nodes": [
+        [
+          "whole",
+          "mixture"
+        ],
+        [
+          "component",
+          "two types of approximately spherical particles"
+        ]
+      ],
+      "ev": "a mixture contain two types of approximately spherical particles",
+      "ctx_before": ". A purely deterministic macroscopic model @10# allows us to calculate these distributions also for a polydisperse material. A. Equations of mass transport Let ",
+      "ctx_after": ", having the same mass density but different diameters $d _ { 1 }$ and $d _ { 2 }$ . We neglect the dependence of the bulk density and repose angle on material "
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "bulk density"
+        ],
+        [
+          "target",
+          "material composition"
+        ]
+      ],
+      "ev": "We neglect the dependence of the bulk density and repose angle on material composition",
+      "ctx_before": "nsport Let a mixture contain two types of approximately spherical particles, having the same mass density but different diameters $d _ { 1 }$ and $d _ { 2 }$ . ",
+      "ctx_after": "; the percolation of small particles through the bulk of material is also neglected. This is justified if the particle sizes are not too different. We suppose t"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "repose angle"
+        ],
+        [
+          "target",
+          "material composition"
+        ]
+      ],
+      "ev": "We neglect the dependence of the bulk density and repose angle on material composition",
+      "ctx_before": "nsport Let a mixture contain two types of approximately spherical particles, having the same mass density but different diameters $d _ { 1 }$ and $d _ { 2 }$ . ",
+      "ctx_after": "; the percolation of small particles through the bulk of material is also neglected. This is justified if the particle sizes are not too different. We suppose t"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "percolation of small particles"
+        ],
+        [
+          "target",
+          "bulk of material"
+        ]
+      ],
+      "ev": "the percolation of small particles through the bulk of material is also neglected",
+      "ctx_before": "same mass density but different diameters $d _ { 1 }$ and $d _ { 2 }$ . We neglect the dependence of the bulk density and repose angle on material composition; ",
+      "ctx_after": ". This is justified if the particle sizes are not too different. We suppose the free surface of a filling is initially flat and, as the rotation starts, becomes"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "free surface of a filling"
+        ],
+        [
+          "target",
+          "angle of repose"
+        ]
+      ],
+      "ev": "the free surface of a filling is initially flat and, as the rotation starts, becomes inclined approximately at the angle of repose",
+      "ctx_before": "n; the percolation of small particles through the bulk of material is also neglected. This is justified if the particle sizes are not too different. We suppose ",
+      "ctx_after": " and remains stationary \\~fluctuations caused by avalanches are neglected!. We also assume that all mixing and segregation occur in a thin surface layer. Let $\\"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "avalanches"
+        ],
+        [
+          "target",
+          "free surface of a filling"
+        ]
+      ],
+      "ev": "fluctuations caused by avalanches are neglected",
+      "ctx_before": "ose the free surface of a filling is initially flat and, as the rotation starts, becomes inclined approximately at the angle of repose and remains stationary \\~",
+      "ctx_after": "!. We also assume that all mixing and segregation occur in a thin surface layer. Let $\\kappa { = } \\{ \\kappa ^ { 1 } ( x , y , t ) , \\kappa ^ { 2 } ( x , y , t "
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "thin surface layer"
+        ],
+        [
+          "target",
+          "κ"
+        ]
+      ],
+      "ev": "all mixing and segregation occur in a thin surface layer",
+      "ctx_before": "on starts, becomes inclined approximately at the angle of repose and remains stationary \\~fluctuations caused by avalanches are neglected!. We also assume that ",
+      "ctx_after": ". Let $\\kappa { = } \\{ \\kappa ^ { 1 } ( x , y , t ) , \\kappa ^ { 2 } ( x , y , t ) \\}$ be the time-dependent bulk composition of a filling in the neighborhood o"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "speed"
+        ],
+        [
+          "object",
+          "V_n"
+        ]
+      ],
+      "ev": "$\\vec { V }$ is the velocity in the rotating bulk and $V _ { n }$ is the value at the free surface of the component of $\\vec { V }$ normal to this surface",
+      "ctx_before": "x at point s, the surface flux of the ith type of particles is $\\kappa _ { + } ^ { i } J ,$ and the conservation law for each component may be written as where ",
+      "ctx_after": ". Let be the angular velocity of rotation. Then $\\stackrel { \\triangledown } { \\vec { V } } = \\omega ( y , - x )$ and it is easy to show that $V _ { n } { = } -"
+    },
+    {
+      "pt": "constitutive_law",
+      "desc": "a constitutive law relating output quantity/quantities to >=1 input quantity (n-ary)",
+      "boundary": "a FORMAL/QUANTITATIVE law output=f(inputs+params), stated as a formula or explicit functional relation. NOT a prose 'X depends on Y' (that is influences), NOT a definition (defines), NOT a measurement setup (measures).",
+      "nodes": [
+        [
+          "output",
+          "V_n"
+        ],
+        [
+          "input",
+          "ω"
+        ],
+        [
+          "parameter",
+          "s"
+        ]
+      ],
+      "ev": "it is easy to show that $V _ { n } { = } - \\omega s$",
+      "ctx_before": "ent of $\\vec { V }$ normal to this surface. Let be the angular velocity of rotation. Then $\\stackrel { \\triangledown } { \\vec { V } } = \\omega ( y , - x )$ and ",
+      "ctx_after": " . Adding Eqs. \\~2! for $i = 1 , 2$ and taking into account that Eq. \\~1! holds also for both 2 and $\\kappa _ { + }$ , we arrive at the equation for total surfa"
+    },
+    {
+      "pt": "constitutive_law",
+      "desc": "a constitutive law relating output quantity/quantities to >=1 input quantity (n-ary)",
+      "boundary": "a FORMAL/QUANTITATIVE law output=f(inputs+params), stated as a formula or explicit functional relation. NOT a prose 'X depends on Y' (that is influences), NOT a definition (defines), NOT a measurement setup (measures).",
+      "nodes": [
+        [
+          "output",
+          "equation for total surface flux"
+        ],
+        [
+          "input",
+          "ω"
+        ],
+        [
+          "parameter",
+          "s"
+        ]
+      ],
+      "ev": "we arrive at the equation for total surface flux: $\\partial _ { s } J = - \\omega s$",
+      "ctx_before": "to show that $V _ { n } { = } - \\omega s$ . Adding Eqs. \\~2! for $i = 1 , 2$ and taking into account that Eq. \\~1! holds also for both 2 and $\\kappa _ { + }$ , ",
+      "ctx_after": " . Since at the point $s { = } - a$ the flux must be zero, the solution is $J = ( \\omega / 2 ) \\stackrel { \\textstyle - } { ( } a ^ { 2 } - s ^ { 2 } )$ . The b"
+    },
+    {
+      "pt": "constitutive_law",
+      "desc": "a constitutive law relating output quantity/quantities to >=1 input quantity (n-ary)",
+      "boundary": "a FORMAL/QUANTITATIVE law output=f(inputs+params), stated as a formula or explicit functional relation. NOT a prose 'X depends on Y' (that is influences), NOT a definition (defines), NOT a measurement setup (measures).",
+      "nodes": [
+        [
+          "output",
+          "J = (ω/2)(a^2 - s^2)"
+        ],
+        [
+          "input",
+          "ω"
+        ],
+        [
+          "parameter",
+          "s"
+        ]
+      ],
+      "ev": "the solution is $J = ( \\omega / 2 ) \\stackrel { \\textstyle - } { ( } a ^ { 2 } - s ^ { 2 } )$",
+      "ctx_before": "\\kappa _ { + }$ , we arrive at the equation for total surface flux: $\\partial _ { s } J = - \\omega s$ . Since at the point $s { = } - a$ the flux must be zero, ",
+      "ctx_after": " . The balance equation \\~2! can now be written as At the upper half of the free surface, $\\kappa _ { - }$ is the composition of a bulk layer that has just arri"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "s"
+        ],
+        [
+          "target",
+          "bulk layer"
+        ]
+      ],
+      "ev": "$\\kappa _ { - }$ is the composition of a bulk layer that has just arrived at this surface",
+      "ctx_before": "\\omega / 2 ) \\stackrel { \\textstyle - } { ( } a ^ { 2 } - s ^ { 2 } )$ . The balance equation \\~2! can now be written as At the upper half of the free surface, ",
+      "ctx_after": " and is to be destroyed by pouring. This composition is known initially, since the initial composition of the bulk is given. The material of this layer feeds th"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "surface flow"
+        ],
+        [
+          "target",
+          "new layer"
+        ]
+      ],
+      "ev": "The material of this layer feeds the surface flow, the composition of which determines the material distribution in a new layer",
+      "ctx_before": "at has just arrived at this surface and is to be destroyed by pouring. This composition is known initially, since the initial composition of the bulk is given. ",
+      "ctx_after": "al distribution in a new layer generated at the lower half of the free surface: $\\kappa _ { - }$ for $0 \\leqslant s \\leqslant a$ . This latter distribution prov"
+    },
+    {
+      "pt": "composed_of",
+      "desc": "one whole is composed-of / part-of >=1 component (n-ary composition)",
+      "boundary": "STRUCTURAL composition: parts that make up a whole (model A = B + C). NOT classification (defines), NOT 'X has control params' (influences), NOT experimental setup description, NOT 'we tested X by doing Y'.",
+      "nodes": [
+        [
+          "whole",
+          "nonmixing rotating central core"
+        ],
+        [
+          "component",
+          "particles"
+        ]
+      ],
+      "ev": "there exists a nonmixing rotating central core consisting of particles which never reach the free surface",
+      "ctx_before": " is similar to the one observed experimentally \\~see Figs. 3 and 4!. It should be noted, though, that according to the model if the drum is more than half full ",
+      "ctx_after": ". In practice, however, there is some erosion of this core because of the finite thickness of the surface flow layer. The bed surface in these pictures is horiz"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "erosion of this core"
+        ],
+        [
+          "target",
+          "finite thickness of the surface flow layer"
+        ]
+      ],
+      "ev": "there is some erosion of this core because of the finite thickness of the surface flow layer",
+      "ctx_before": "he drum is more than half full there exists a nonmixing rotating central core consisting of particles which never reach the free surface. In practice, however, ",
+      "ctx_after": ". The bed surface in these pictures is horizontal because, before making the photographs, we rotated the drum back at the angle of repose to stabilize the curre"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "operator of segregation"
+        ],
+        [
+          "object",
+          "s"
+        ]
+      ],
+      "ev": "it is necessary to know the operator of segregation which, provided the local composition of the surface flux is known, determines the local composition of a generated surface layer: $\\kappa _ { - } ( s , t ) = S ( \\kappa _ { + } ( s , t ) )$",
+      "ctx_before": "because, before making the photographs, we rotated the drum back at the angle of repose to stabilize the current distribution of particles. In the general case ",
+      "ctx_after": " . This phenomenological constitutive relation characterizes the material tendency to segregate, a property specific to the granular state of matter. While it s"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "constitutive relation"
+        ],
+        [
+          "object",
+          "material tendency to segregate"
+        ]
+      ],
+      "ev": "This phenomenological constitutive relation characterizes the material tendency to segregate",
+      "ctx_before": "tion of the surface flux is known, determines the local composition of a generated surface layer: $\\kappa _ { - } ( s , t ) = S ( \\kappa _ { + } ( s , t ) )$ . ",
+      "ctx_after": ", a property specific to the granular state of matter. While it seems difficult to obtain this macroscopic relation theoretically by analyzing the chaotic surfa"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "material tendency to segregate"
+        ],
+        [
+          "object",
+          "property specific to the granular state of matter"
+        ]
+      ],
+      "ev": "a property specific to the granular state of matter",
+      "ctx_before": "er: $\\kappa _ { - } ( s , t ) = S ( \\kappa _ { + } ( s , t ) )$ . This phenomenological constitutive relation characterizes the material tendency to segregate, ",
+      "ctx_after": ". While it seems difficult to obtain this macroscopic relation theoretically by analyzing the chaotic surface flow of a mixture of particles, the segregation re"
+    },
+    {
+      "pt": "measures",
+      "desc": "a quantity is measured by / characterizes >=1 measure",
+      "boundary": "a measurement/evaluation relation: X is measured/evaluated by instrument/method Y. NOT a functional law (constitutive_law), NOT a dependence (influences).",
+      "nodes": [
+        [
+          "object",
+          "segregation relation"
+        ],
+        [
+          "instrument",
+          "identification procedure"
+        ]
+      ],
+      "ev": "the segregation relation can be determined in an experiment. Below, we describe briefly the identification procedure used in @10#",
+      "ctx_before": "ar state of matter. While it seems difficult to obtain this macroscopic relation theoretically by analyzing the chaotic surface flow of a mixture of particles, ",
+      "ctx_after": " to find approximately the constitutive relation governing the free-surface size segregation of binary mixtures. Since composition of such a mixture is determin"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "constitutive relation"
+        ],
+        [
+          "object",
+          "size segregation"
+        ]
+      ],
+      "ev": "to find approximately the constitutive relation governing the free-surface size segregation of binary mixtures",
+      "ctx_before": "ow of a mixture of particles, the segregation relation can be determined in an experiment. Below, we describe briefly the identification procedure used in @10# ",
+      "ctx_after": ". Since composition of such a mixture is determined by the concentration of only one component, the operator S becomes a function: Provided the segregation func"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "concentration of only one component"
+        ],
+        [
+          "target",
+          "binary mixtures"
+        ]
+      ],
+      "ev": "composition of such a mixture is determined by the concentration of only one component",
+      "ctx_before": "the identification procedure used in @10# to find approximately the constitutive relation governing the free-surface size segregation of binary mixtures. Since ",
+      "ctx_after": ", the operator S becomes a function: Provided the segregation function is known, computing the material distribution is not difficult. The midpoint flux concent"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "operator S"
+        ],
+        [
+          "object",
+          "segregation relation"
+        ]
+      ],
+      "ev": "the operator S becomes a function: Provided the segregation function is known",
+      "ctx_before": "n governing the free-surface size segregation of binary mixtures. Since composition of such a mixture is determined by the concentration of only one component, ",
+      "ctx_after": ", computing the material distribution is not difficult. The midpoint flux concentration $\\boldsymbol { \\kappa } _ { 0 } ^ { 1 }$ serves as the initial condition"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "midpoint flux concentration"
+        ],
+        [
+          "target",
+          "ordinary differential equation"
+        ]
+      ],
+      "ev": "The midpoint flux concentration $\\boldsymbol { \\kappa } _ { 0 } ^ { 1 }$ serves as the initial condition for ordinary differential equation \\~3!",
+      "ctx_before": "ion of only one component, the operator S becomes a function: Provided the segregation function is known, computing the material distribution is not difficult. ",
+      "ctx_after": " for $\\kappa _ { + } ^ { 1 }$ on the interval $^ { ( 0 , a ) }$ \\~with time being a parameter!. We can write this equation as $\\partial _ { s } \\lbrace \\kappa _"
+    },
+    {
+      "pt": "composed_of",
+      "desc": "one whole is composed-of / part-of >=1 component (n-ary composition)",
+      "boundary": "STRUCTURAL composition: parts that make up a whole (model A = B + C). NOT classification (defines), NOT 'X has control params' (influences), NOT experimental setup description, NOT 'we tested X by doing Y'.",
+      "nodes": [
+        [
+          "whole",
+          "numerical simulation"
+        ],
+        [
+          "component",
+          "midpoint flux concentration"
+        ]
+      ],
+      "ev": "Each step of the numerical simulation should consist of \\~1! determining the midpoint flux concentration $\\boldsymbol { \\kappa } _ { 0 } ^ { 1 }$ from Eq. \\~5!",
+      "ctx_before": " } \\lbrace \\kappa _ { + } ^ { 1 } ( a ^ { 2 } \\bar { - } s ^ { 2 } ) \\bar { \\rbrace } = - 2 s S ( \\kappa _ { + } ^ { 1 } )$ and solve it by dividing variables: ",
+      "ctx_after": "; \\~2! calculating the flux concentration $\\kappa _ { + } ^ { 1 } ( s )$ for $0 \\leqslant s \\leqslant a$ using \\~6!; \\~3! finding the new surface layer composit"
+    },
+    {
+      "pt": "measures",
+      "desc": "a quantity is measured by / characterizes >=1 measure",
+      "boundary": "a measurement/evaluation relation: X is measured/evaluated by instrument/method Y. NOT a functional law (constitutive_law), NOT a dependence (influences).",
+      "nodes": [
+        [
+          "object",
+          "stationary spatial distributions of fines"
+        ],
+        [
+          "instrument",
+          "sampling plates"
+        ]
+      ],
+      "ev": "the stationary spatial distributions of fines were measured using the sampling plates",
+      "ctx_before": "nes varied from 10% to 90%. The calculated and experimentally determined sampler concentrations are very close \\~Fig. 10!. In the second series of experiments, ",
+      "ctx_after": " which allowed us to take samples from locations at various distances from the center. The total weight concentration of fines in all these experiments was 50%;"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "segregation relation"
+        ],
+        [
+          "target",
+          "particle diameter ratio"
+        ]
+      ],
+      "ev": "this operator depends only on the particle diameter ratio",
+      "ctx_before": "en identified using the data obtained for an entirely different geometric configuration and different materials. Therefore the agreement obtained confirms that ",
+      "ctx_after": ". IV. DISCUSSION A theoretical model for mixing and radial size segregation of a binary mixture in a rotating drum was derived and tested experimentally. This m"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "mean tracer position"
+        ],
+        [
+          "target",
+          "type of material"
+        ]
+      ],
+      "ev": "the mean tracer position is not affected by the type of material",
+      "ctx_before": "rmed with a mixture in which one of the components, let us call it type 1, was present in small amounts \\~a tracer!. It has been found that in such experiments ",
+      "ctx_after": " and depends linearly on the diameter ratio for $0 . 4 { < } d _ { 1 } / d _ { 2 } { < } 1 . 6 $ : Almost all tracers are concentrated under the source point or"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "surface flux J"
+        ],
+        [
+          "target",
+          "a - s"
+        ]
+      ],
+      "ev": "the surface flux J is proportional to a - s",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiment",
+      "nodes": [
+        [
+          "from",
+          "theoretical distributions of tracers"
+        ],
+        [
+          "to",
+          "experimental distributions"
+        ]
+      ],
+      "ev": "theoretical distributions of tracers which were close to the experimental distributions",
+      "ctx_before": "e relation in which particles of type 1 are assumed to be tracers. Using thus specified segregation operator, we obtained \\~see @10#!, for various size ratios, ",
+      "ctx_after": " @2#. Therefore, if the source concentration of type-1 particles is low, a good approximation for S is $S ( \\kappa _ { + } ^ { 1 } ) { = } C _ { 1 } \\kappa _ { "
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "parametric representation"
+        ],
+        [
+          "object",
+          "τ"
+        ]
+      ],
+      "ev": "A smooth monotone interpolation that takes into account this function behavior in two limiting cases is given, e.g., by the parametric representation where τ ∈ [0, 1] is a parameter",
+      "ctx_before": "where $C _ { 2 } { = } C ( d _ { 2 } / d _ { 1 } )$ . Furthermore, for a fixed size ratio, S should be a smooth monotone function of $\\kappa _ { + } ^ { 1 }$ . ",
+      "ctx_after": " 1 ]$ is a parameter and Although this may be only a crude approximation of the segregation function, it takes into account all information at our disposal. The"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "period of these oscillations"
+        ],
+        [
+          "target",
+          "filled drum portion"
+        ]
+      ],
+      "ev": "The period of these oscillations depends on the filled drum portion",
+      "ctx_before": "tribution of particles \\~Fig. 7!. Time oscillations of $\\kappa _ { 0 } ^ { 1 } .$ the surface flux concentration of fines at $s { = } 0$ , are shown in Fig. 8. ",
+      "ctx_after": ". The amplitude is determined by the initial material distribution and decreases exponentially as the stationary particle distribution is established. Note that"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "amplitude"
+        ],
+        [
+          "target",
+          "initial material distribution"
+        ]
+      ],
+      "ev": "The amplitude is determined by the initial material distribution",
+      "ctx_before": "} ^ { 1 } .$ the surface flux concentration of fines at $s { = } 0$ , are shown in Fig. 8. The period of these oscillations depends on the filled drum portion. ",
+      "ctx_after": " and decreases exponentially as the stationary particle distribution is established. Note that the $\\boldsymbol { \\kappa } _ { 0 } ^ { 1 }$ values are greater t"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "h"
+        ],
+        [
+          "object",
+          "r(s)"
+        ]
+      ],
+      "ev": "Let h be the distance between the drum axis and filling surface, r(s) = √(h^2 + s^2)",
+      "ctx_before": "the concentration $\\kappa ^ { 1 }$ depends only on the distance from the drum axis and is equal to $\\kappa _ { - } ^ { 1 }$ at the corresponding surface point. ",
+      "ctx_after": "h ^ { 2 } + s ^ { 2 }$ , and $F ( s )$ be the intersection of the filling cross section and a circle having its center at the drum axis and radius $r ( s )$ \\~s"
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiment",
+      "nodes": [
+        [
+          "from",
+          "stationary radial distribution of material"
+        ],
+        [
+          "to",
+          "20%-filled drum"
+        ],
+        [
+          "to",
+          "80%-filled drum"
+        ]
+      ],
+      "ev": "the stationary radial distribution of material in a, say, 20%-filled drum is the same as in an 80%-filled drum outside the unmixing core",
+      "ctx_before": " - } ^ { 1 } ( s )$ . This determines the stationary concentration $\\kappa ^ { 1 }$ everywhere \\~everywhere outside the nonmixing core if it exists!. Note that ",
+      "ctx_after": ". Numerically calculated theoretical stationary radial distributions have been compared with the experimental data obtained by means of the sampling procedure d"
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiment",
+      "nodes": [
+        [
+          "from",
+          "theoretical stationary radial distributions"
+        ],
+        [
+          "to",
+          "experimental data"
+        ]
+      ],
+      "ev": "Numerically calculated theoretical stationary radial distributions have been compared with the experimental data",
+      "ctx_before": "it exists!. Note that the stationary radial distribution of material in a, say, 20%-filled drum is the same as in an 80%-filled drum outside the unmixing core. ",
+      "ctx_after": " obtained by means of the sampling procedure described in Sec. II. To make the comparison, we first calculated the radial distributions of particles and then, i"
+    },
+    {
+      "pt": "composed_of",
+      "desc": "one whole is composed-of / part-of >=1 component (n-ary composition)",
+      "boundary": "STRUCTURAL composition: parts that make up a whole (model A = B + C). NOT classification (defines), NOT 'X has control params' (influences), NOT experimental setup description, NOT 'we tested X by doing Y'.",
+      "nodes": [
+        [
+          "whole",
+          "theoretical model"
+        ],
+        [
+          "component",
+          "material transport equations"
+        ],
+        [
+          "component",
+          "operator of surface segregation"
+        ]
+      ],
+      "ev": "This model consists of material transport equations, determined by the problem’s geometry, and an operator of surface segregation, a phenomenological relation characterizing the segregation properties of granular material.",
+      "ctx_before": " ratio. IV. DISCUSSION A theoretical model for mixing and radial size segregation of a binary mixture in a rotating drum was derived and tested experimentally. ",
+      "ctx_after": " The operator of size segregation for a binary mixture has been identified in @10#. In this work we employed this relation, which is supposedly independent of g"
+    },
+    {
+      "pt": "extends",
+      "desc": "X generalizes/extends Y (X METHOD/PHENOMENON -> Y)",
+      "boundary": "X GENERALIZES Y (X extends Y's scope/regime/params; X is a direct technical extension of Y). NOT improves (X need not be more accurate, just broader), NOT background (X is a direct technical inheritance, not a motivation citation), NOT claim_relation (this is method-to-method).",
+      "nodes": [
+        [
+          "from",
+          "this relation"
+        ],
+        [
+          "to",
+          "operator of surface segregation"
+        ]
+      ],
+      "ev": "In this work we employed this relation, which is supposedly independent of geometrical configuration, to simulate the size segregation of binary mixture in a rotating drum.",
+      "ctx_before": "cal relation characterizing the segregation properties of granular material. The operator of size segregation for a binary mixture has been identified in @10#. ",
+      "ctx_after": " The calculated and experimental material distributions agree well without any fitting of model parameters. Obviously, our simplified model does not account for"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "percolation of small particles"
+        ],
+        [
+          "target",
+          "segregation"
+        ]
+      ],
+      "ev": "In this study we ignored the percolation of fines in the bulk of material, which can also lead to segregation.",
+      "ctx_before": "re the source discharge rate is low.! Provided this condition is satisfied, it is less important whether the surface flow occurs continuously or by avalanches. ",
+      "ctx_after": " Generally, such percolation is significant only if the fine particles are several times smaller than the large ones, or in the presence of vibration. Since the"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "repeated revolutions of the bulk"
+        ],
+        [
+          "target",
+          "percolation of small particles"
+        ]
+      ],
+      "ev": "It is, however, possible that repeated revolutions of the bulk enhance interparticle percolation.",
+      "ctx_before": "nes, or in the presence of vibration. Since the diameter ratio was 0.55 in our experiments, no significant percolation in a motionless bulk should be expected. ",
+      "ctx_after": " The axial segregation in our experiments was not entirely negligible: the bands containing a higher proportion of large particles could be observed near the dr"
+    },
+    {
+      "pt": "constitutive_law",
+      "desc": "a constitutive law relating output quantity/quantities to >=1 input quantity (n-ary)",
+      "boundary": "a FORMAL/QUANTITATIVE law output=f(inputs+params), stated as a formula or explicit functional relation. NOT a prose 'X depends on Y' (that is influences), NOT a definition (defines), NOT a measurement setup (measures).",
+      "nodes": [
+        [
+          "output",
+          "segregation properties of polydisperse granular material"
+        ],
+        [
+          "parameter",
+          "operator of surface segregation"
+        ],
+        [
+          "input",
+          "external conditions"
+        ]
+      ],
+      "ev": "The segregation properties of polydisperse granular material in such a model are characterized by a constitutive relation (the operator of segregation), which does not depend on these external conditions and can be identified experimentally.",
+      "ctx_before": "odel in which the transport equations account for all ‘‘external’’ conditions \\~such as the geometrical configuration or the distribution of material sources!. ",
+      "ctx_after": "."
+    },
+    {
+      "pt": "predicts",
+      "desc": "X (a model/method) predicts Y (a distribution/outcome) under conditions Z — a predictive relation where a model generates predictions for a system",
+      "boundary": "Use when a model/method outputs a predicted quantity for a system under specified conditions; NOT for observed correlations, causal claims, or mere co-occurrence of variables.",
+      "nodes": [
+        [
+          "model",
+          "theoretical model"
+        ],
+        [
+          "predicted_quantity",
+          "material distribution in a slowly rotating drum"
+        ],
+        [
+          "condition",
+          "external conditions"
+        ]
+      ],
+      "ev": "Despite these and other simplifications, our model succeeded in predicting the material distribution in a slowly rotating drum.",
+      "ctx_before": "@6#, where the interaction of axial and radial segregation was studied experimentally. As far as we know, no explanation of the wall effect has been presented. ",
+      "ctx_after": " This confirms the conjecture @10# that the material distribution inside granular bodies formed under various conditions can be predicted by a model in which th"
+    },
+    {
+      "pt": "predicts",
+      "desc": "X (a model/method) predicts Y (a distribution/outcome) under conditions Z — a predictive relation where a model generates predictions for a system",
+      "boundary": "Use when a model/method outputs a predicted quantity for a system under specified conditions; NOT for observed correlations, causal claims, or mere co-occurrence of variables.",
+      "nodes": [
+        [
+          "model",
+          "theoretical model"
+        ],
+        [
+          "predicted_quantity",
+          "material distribution inside granular bodies"
+        ],
+        [
+          "condition",
+          "external conditions"
+        ]
+      ],
+      "ev": "This confirms the conjecture @10# that the material distribution inside granular bodies formed under various conditions can be predicted by a model in which the transport equations account for all “external” conditions (such as the geometrical configuration or the distribution of material sources).",
+      "ctx_before": "wall effect has been presented. Despite these and other simplifications, our model succeeded in predicting the material distribution in a slowly rotating drum. ",
+      "ctx_after": "s!. The segregation properties of polydisperse granular material in such a model are characterized by a constitutive relation \\~the operator of segregation!, wh"
+    }
+  ],
+  "glm": [
+    {
+      "i": 0,
+      "pt": "compares",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states a theory-vs-experiment validation ('in agreement with'), and the nodes accurately bind to"
+    },
+    {
+      "i": 1,
+      "pt": "claim_relation",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence states a model's inability to describe a phenomenon, not a discourse relation between two claims/approaches"
+    },
+    {
+      "i": 2,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states the angle of repose 'may reflect' variations in bulk composition, correctly captured as a dep"
+    },
+    {
+      "i": 3,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence text presents 'operator of segregation' as an alternative to 'constitutive relation', not as a definition o"
+    },
+    {
+      "i": 4,
+      "pt": "constitutive_law",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence is a prose definition of an operator ('relates X to Y'), not a formal/quantitative formula, and the 'operat"
+    },
+    {
+      "i": 5,
+      "pt": "compares",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states a 'good agreement' between theoretical predictions and experimental data, perfectly match"
+    },
+    {
+      "i": 6,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence text describes the setup or purpose of the experiments rather than stating the actual comparison or its res"
+    },
+    {
+      "i": 7,
+      "pt": "composed_of",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states the samplers were made of a copper pipe, correctly binding the whole and component roles "
+    },
+    {
+      "i": 8,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states that as speed increases, the time intervals between avalanches become shorter, correctly "
+    },
+    {
+      "i": 9,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states that as speed increases, a continuous surface flow regime is established, correctly binding s"
+    },
+    {
+      "i": 10,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence states a mathematical derivation relationship (is a finite difference approximation of), not a comparison o"
+    },
+    {
+      "i": 11,
+      "pt": "background",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The sentence states the model was used *in* the simulation as its actual model, not as background/motivation; the curren"
+    },
+    {
+      "i": 12,
+      "pt": "composed_of",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states the mixture contains (is composed of) the two types of particles, correctly binding the whole"
+    },
+    {
+      "i": 13,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states that the dependence is neglected, meaning the relation is dismissed rather than stated as"
+    },
+    {
+      "i": 14,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states that the dependence is neglected, not asserted as a valid relationship in the paper's model."
+    },
+    {
+      "i": 15,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence states that the percolation is 'neglected' in the model, not that it influences the bulk of material."
+    },
+    {
+      "i": 16,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states the free surface's inclination depends on the angle of repose, correctly binding the dependen"
+    },
+    {
+      "i": 17,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence explicitly states that fluctuations caused by avalanches are 'neglected', meaning the text denies the exist"
+    },
+    {
+      "i": 18,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence text states where mixing and segregation occur, but does not mention κ or state any influence relation betw"
+    },
+    {
+      "i": 19,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence defines V_n as the normal component of velocity, not 'speed' defined as V_n."
+    },
+    {
+      "i": 20,
+      "pt": "constitutive_law",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states the exact quantitative formula mapping the input and parameter to the output."
+    },
+    {
+      "i": 21,
+      "pt": "constitutive_law",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The spatial variable s is the independent input and ω is the parameter, but the edge incorrectly swaps their role bindin"
+    },
+    {
+      "i": 22,
+      "pt": "constitutive_law",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "'s' is the independent variable (input) of the solved function, not a parameter, making the slot binding incorrect."
+    },
+    {
+      "i": 23,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence states a compositional definition ('is the composition of'), not an influence/dependence, and the node 's' "
+    },
+    {
+      "i": 24,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states the composition of the surface flow determines the material distribution in a new layer, corr"
+    },
+    {
+      "i": 25,
+      "pt": "composed_of",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states the core is 'consisting of particles', perfectly matching the composed_of relation and node r"
+    },
+    {
+      "i": 26,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states the erosion happens 'because of' the finite thickness, perfectly matching the 'depends on"
+    },
+    {
+      "i": 27,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The object node 's' is incorrectly bound; the equation defines the operator of segregation as 'S' (uppercase), not 's' ("
+    },
+    {
+      "i": 28,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "'Characterizes' is a descriptive relation, not a definitional identity (e.g., 'is defined as', 'denotes')."
+    },
+    {
+      "i": 29,
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The appositive phrase in the context explicitly identifies the 'material tendency to segregate' as 'a property specific "
+    },
+    {
+      "i": 30,
+      "pt": "measures",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states the segregation relation is determined via an experiment and introduces the identification pr"
+    },
+    {
+      "i": 31,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text states the relation 'governs' size segregation, which is a functional dependence, not a definitional identity."
+    },
+    {
+      "i": 32,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The target node is incorrectly bound to 'binary mixtures' instead of 'composition of such a mixture', as the sentence st"
+    },
+    {
+      "i": 33,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text states the operator S becomes a function provided the segregation function is known, which is a conditional ope"
+    },
+    {
+      "i": 34,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "Serving as an initial condition is a mathematical setup/input, not a stated functional dependence, causal influence, or "
+    },
+    {
+      "i": 35,
+      "pt": "composed_of",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The evidence describes a procedural step (determining a variable) rather than a structural composition of parts making u"
+    },
+    {
+      "i": 36,
+      "pt": "measures",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states the object was measured using the instrument, with correct role bindings and polarity."
+    },
+    {
+      "i": 37,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The evidence sentence explicitly names 'this operator' as the dependent source, not 'segregation relation', violating st"
+    },
+    {
+      "i": 38,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The text explicitly negates the influence relation by stating the mean tracer position is 'not affected by' the type of "
+    },
+    {
+      "i": 39,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states that surface flux J is proportional to a - s, correctly capturing the functional dependence o"
+    },
+    {
+      "i": 40,
+      "pt": "compares",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states the theoretical distributions were close to the experimental ones, correctly binding theo"
+    },
+    {
+      "i": 41,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text states that τ is a parameter within the parametric representation, not that the representation is defined as τ."
+    },
+    {
+      "i": 42,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states that the source depends on the target, perfectly matching the slot bindings and polarity."
+    },
+    {
+      "i": 43,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states the amplitude is determined by (depends on) the initial material distribution, correctly bind"
+    },
+    {
+      "i": 44,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text defines 'h' as a distance and 'r(s)' as a formula, but does not define 'h' as 'r(s)'."
+    },
+    {
+      "i": 45,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The sentence compares the distribution in a 20%-filled drum to the distribution in an 80%-filled drum, not the distribut"
+    },
+    {
+      "i": 46,
+      "pt": "compares",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states the theoretical distributions were compared with experimental data, perfectly matching th"
+    },
+    {
+      "i": 47,
+      "pt": "composed_of",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states the model 'consists of' the two listed components, perfectly matching the composed_of pat"
+    },
+    {
+      "i": 48,
+      "pt": "extends",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence text only states that 'this relation' was employed to simulate segregation; it does not state that it exten"
+    },
+    {
+      "i": 49,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states that the percolation of fines (small particles) can lead to segregation, correctly binding th"
+    },
+    {
+      "i": 50,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states that repeated revolutions of the bulk 'enhance' interparticle percolation, correctly mapp"
+    },
+    {
+      "i": 51,
+      "pt": "constitutive_law",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text explicitly states the operator does NOT depend on external conditions, failing to provide a formal formula and "
+    },
+    {
+      "i": 52,
+      "pt": "predicts",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The condition node binds 'external conditions', but the evidence span specifies the condition as 'in a slowly rotating d"
+    },
+    {
+      "i": 53,
+      "pt": "predicts",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The text refers to 'a model', not a 'theoretical model', violating strict slot binding."
+    }
+  ],
+  "qwen": [
+    {
+      "i": 0,
+      "pt": "compares",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence sentence explicitly states a validation relationship (agreement) between the exact theoretical distribution"
+    },
+    {
+      "i": 1,
+      "pt": "claim_relation",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "Pattern requires a discourse relation between claims, but evidence links a model to a physical phenomenon."
+    },
+    {
+      "i": 2,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": ""
+    },
+    {
+      "i": 3,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": ""
+    },
+    {
+      "i": 4,
+      "pt": "constitutive_law",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": ""
+    },
+    {
+      "i": 5,
+      "pt": "compares",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly links the exact node phrases via 'agreement', fitting the theory-vs-experiment comparison pattern."
+    },
+    {
+      "i": 6,
+      "pt": "compares",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states a comparison was conducted between the observed evolution and simulation results, matching th"
+    },
+    {
+      "i": 7,
+      "pt": "composed_of",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states 'samplers which were made of a copper pipe,' directly supporting the structural composition r"
+    },
+    {
+      "i": 8,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states that increasing speed causes time intervals to shorten, confirming the functional dependence "
+    },
+    {
+      "i": 9,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states that increasing speed leads to the establishment of the flow regime, confirming the causal in"
+    },
+    {
+      "i": 10,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "Evidence sentence describes a mathematical derivation relationship rather than a comparative evaluation of results or pe"
+    },
+    {
+      "i": 11,
+      "pt": "background",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": ""
+    },
+    {
+      "i": 12,
+      "pt": "composed_of",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly defines the structural constituents of the mixture within the theoretical model."
+    },
+    {
+      "i": 13,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": ""
+    },
+    {
+      "i": 14,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": ""
+    },
+    {
+      "i": 15,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "Text states the effect is 'neglected' rather than asserted as functional dependence, and 'through' indicates spatial med"
+    },
+    {
+      "i": 16,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": ""
+    },
+    {
+      "i": 17,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The text states the avalanche effect is neglected/ignored, contradicting the assertion of a valid influence dependency."
+    },
+    {
+      "i": 18,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence text describes a spatial location ('occur in') rather than functional influence, and the target variable 'κ"
+    },
+    {
+      "i": 19,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence text defines $V_n$ using 'velocity', but the edge subject 'speed' does not appear in the span."
+    },
+    {
+      "i": 20,
+      "pt": "constitutive_law",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence text explicitly states the formula V_n = -ωs, aligning with the assigned output and RHS variable roles."
+    },
+    {
+      "i": 21,
+      "pt": "constitutive_law",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The 'output' node binds to a descriptive phrase ('equation for...') instead of the specific physical quantity variable ("
+    },
+    {
+      "i": 22,
+      "pt": "constitutive_law",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": ""
+    },
+    {
+      "i": 23,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "Evidence defines variable identity excluded by pattern, and does not mention source node 's'."
+    },
+    {
+      "i": 24,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "Text explicitly states surface flow determines new layer distribution, matching influence semantics and node roles."
+    },
+    {
+      "i": 25,
+      "pt": "composed_of",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "Text explicitly states 'core consisting of particles', confirming the composition relation with accurate slot binding an"
+    },
+    {
+      "i": 26,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence text explicitly states the causal dependency ('because of'), the nodes faithfully bind to the dependent (er"
+    },
+    {
+      "i": 27,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence distinguishes the operator 'S' from the variable 's', making the object binding incorrect."
+    },
+    {
+      "i": 28,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The verb 'characterizes' denotes description rather than the definitional identity required by the 'defines' pattern."
+    },
+    {
+      "i": 29,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": ""
+    },
+    {
+      "i": 30,
+      "pt": "measures",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "Text explicitly states the segregation relation is determined/found via the identification procedure, matching the measu"
+    },
+    {
+      "i": 31,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text describes a functional dependence ('governing'), which the pattern boundary explicitly excludes."
+    },
+    {
+      "i": 32,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states the mixture's composition is determined by the concentration, confirming the functional depen"
+    },
+    {
+      "i": 33,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text describes a conditional mathematical property ('becomes a function... Provided'), not a definitional identity l"
+    },
+    {
+      "i": 34,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text states the concentration is an 'initial condition for' the equation, which defines a boundary value setup rathe"
+    },
+    {
+      "i": 35,
+      "pt": "composed_of",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text describes a procedural calculation step involving a variable, not a structural composition where the variable i"
+    },
+    {
+      "i": 36,
+      "pt": "measures",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence sentence explicitly states the measurement relation between the extracted object and instrument."
+    },
+    {
+      "i": 37,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": ""
+    },
+    {
+      "i": 38,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The evidence explicitly negates the relationship ('not affected by'), contradicting the 'influences' pattern which requi"
+    },
+    {
+      "i": 39,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "Evidence explicitly states the proportionality relation between the exact entities bound to the source and target roles."
+    },
+    {
+      "i": 40,
+      "pt": "compares",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states the theoretical distributions were close to the experimental ones, confirming the compari"
+    },
+    {
+      "i": 41,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The text describes τ as a parameter within the representation, which is a usage relationship, not a definitional identit"
+    },
+    {
+      "i": 42,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence text explicitly states the dependency relation exactly as captured by the source and target nodes."
+    },
+    {
+      "i": 43,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": ""
+    },
+    {
+      "i": 44,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text describes a mathematical formula relating variables, not a definitional identity (naming/classification) relati"
+    },
+    {
+      "i": 45,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": ""
+    },
+    {
+      "i": 46,
+      "pt": "compares",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence sentence explicitly states the comparison relation between the extracted theoretical distributions and expe"
+    },
+    {
+      "i": 47,
+      "pt": "composed_of",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence sentence explicitly states \"This model consists of...\" confirming the structural composition relationship a"
+    },
+    {
+      "i": 48,
+      "pt": "extends",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence describes employing a relation for simulation, not asserting that it extends or generalizes the target oper"
+    },
+    {
+      "i": 49,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states percolation of fines 'can also lead to segregation,' confirming the causal influence relation"
+    },
+    {
+      "i": 50,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": ""
+    },
+    {
+      "i": 51,
+      "pt": "constitutive_law",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence is prose describing a relation's existence rather than a formal formula and explicitly negates dependence o"
+    },
+    {
+      "i": 52,
+      "pt": "predicts",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": ""
+    },
+    {
+      "i": 53,
+      "pt": "predicts",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states the model predicts the material distribution under external conditions, matching all node"
+    }
+  ]
+}

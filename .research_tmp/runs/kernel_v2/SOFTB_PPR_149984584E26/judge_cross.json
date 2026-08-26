@@ -1,0 +1,2259 @@
+{
+  "summary": {
+    "GLM-5-Turbo": {
+      "pass": 22,
+      "total": 61,
+      "rate": 0.361
+    },
+    "qwen3.5": {
+      "pass": 26,
+      "total": 61,
+      "rate": 0.426
+    },
+    "agreement": "55/61",
+    "both_pass": "21/61",
+    "either_pass": "27/61"
+  },
+  "edges": [
+    {
+      "pt": "measures",
+      "desc": "a quantity is measured by / characterizes >=1 measure",
+      "boundary": "a measurement/evaluation relation: X is measured/evaluated by instrument/method Y. NOT a functional law (constitutive_law), NOT a dependence (influences).",
+      "nodes": [
+        [
+          "object",
+          "rearranging regions"
+        ],
+        [
+          "instrument",
+          "thin chamber with a constricting hopper shape"
+        ]
+      ],
+      "ev": "We experimentally study rearranging regions in slow athermal flow by observing the flow of a concentrated oil-in-water emulsion in a thin chamber with a constricting hopper shape",
+      "ctx_before": "Department of Physics, Emory University, Atlanta, Georgia 30322, USA (Received 27 July 2014; revised manuscript received 30 April 2015; published 22 June 2015) ",
+      "ctx_after": ". The gap of the chamber is smaller than the droplet diameters, so that the droplets are compressed into quasi-two-dimensional pancakes. We focus on localized r"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "T1 events"
+        ],
+        [
+          "definition",
+          "rearranging regions"
+        ],
+        [
+          "object",
+          "four droplets"
+        ]
+      ],
+      "ev": "We focus on localized rearrangements known as “T1 events” where four droplets exchange neighbors",
+      "ctx_before": "nstricting hopper shape. The gap of the chamber is smaller than the droplet diameters, so that the droplets are compressed into quasi-two-dimensional pancakes. ",
+      "ctx_after": ". Flowing droplets are deformed due to forces from neighboring droplets, and these deformations are decreased by nearby T1 events, with a spatial dependence rel"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "T1 events"
+        ],
+        [
+          "target",
+          "deformations"
+        ],
+        [
+          "cause",
+          "T1 events"
+        ],
+        [
+          "effect",
+          "deformations"
+        ]
+      ],
+      "ev": "these deformations are decreased by nearby T1 events",
+      "ctx_before": "ocalized rearrangements known as “T1 events” where four droplets exchange neighbors. Flowing droplets are deformed due to forces from neighboring droplets, and ",
+      "ctx_after": ", with a spatial dependence related to the local structure. We see a tendency of the T1 events to occur in small clusters. DOI: 10.1103/PhysRevE.91.062306 PACS "
+    },
+    {
+      "pt": "background",
+      "desc": "X uses Y as background/motivation",
+      "boundary": "X cites Y as MOTIVATION/prior context only (Y inspired X but X is NOT a direct technical extension/inheritance of Y). NOT extends (no direct technical lineage), NOT improves (no limitation fix).",
+      "nodes": [
+        [
+          "from",
+          "T1 events"
+        ],
+        [
+          "to",
+          "Argon"
+        ]
+      ],
+      "ev": "concept of localized plastic events first introduced by Argon",
+      "ctx_before": "ress network where only a small subset of particles support most of the load $[4,11-13]$ . An understanding of the plasticity of soft materials is based on the ",
+      "ctx_after": " $[14]$ . These localized plastic events are responsible for the macroscopic fluctuations in the flow, with larger fluctuations associated with larger numbers o"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "volume fraction φ"
+        ],
+        [
+          "definition",
+          "amount of sample occupied by the particles (in a granular material or colloidal suspension), droplets (in an emulsion), or bubbles (in a foam)"
+        ]
+      ],
+      "ev": "A key control parameter for many soft materials is the volume fraction φ, the amount of sample occupied by the particles (in a granular material or colloidal suspension), droplets (in an emulsion), or bubbles (in a foam).",
+      "ctx_before": " subset of particles rearrange. Several experiments have examined dynamical heterogeneity in sheared colloidal glasses and granular materials $[25-27,29-32]$ . ",
+      "ctx_after": "foam). Jamming occurs when $\\phi$ exceeds a critical value $\\phi_{J}$ , and it is for $\\phi \\geqslant \\phi_{J}$ that these samples have a yield stress. Studies "
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "deformation"
+        ],
+        [
+          "definition",
+          "deviation of its outline from a circle"
+        ]
+      ],
+      "ev": "we measure the deviation of its outline from a circle and term this the deformation",
+      "ctx_before": "sed, our samples are jammed with $\\phi \\approx 0.9 > \\phi_{J} \\approx 0.84$ . These samples require a finite nonzero stress in order to flow. For each droplet, ",
+      "ctx_after": "; these deviations are due to forces on the droplet from the surrounding droplets. We simultaneously measure macroscopic flow profiles, macroscopic and microsco"
+    },
+    {
+      "pt": "background",
+      "desc": "X uses Y as background/motivation",
+      "boundary": "X cites Y as MOTIVATION/prior context only (Y inspired X but X is NOT a direct technical extension/inheritance of Y). NOT extends (no direct technical lineage), NOT improves (no limitation fix).",
+      "nodes": [
+        [
+          "from",
+          "data from our previous experimental work [37]"
+        ],
+        [
+          "to",
+          "spatial distribution of rearrangements"
+        ]
+      ],
+      "ev": "we use data from our previous experimental work [37] to study the spatial distribution of rearrangements in a flowing 2D emulsion",
+      "ctx_before": "vents and show that the spatial structure of deformation relaxation is related to the local structure. II. EXPERIMENTAL DETAILS A. Flow chamber For this paper, ",
+      "ctx_after": "on. The experimental details are given in Ref. $[37]$ but we reprise the key points here. Figure 2 is a sketch of our experimental setup. The sample chamber has"
+    },
+    {
+      "pt": "composed_of",
+      "desc": "one whole is composed-of / part-of >=1 component (n-ary composition)",
+      "boundary": "STRUCTURAL composition: parts that make up a whole (model A = B + C). NOT classification (defines), NOT 'X has control params' (influences), NOT experimental setup description, NOT 'we tested X by doing Y'.",
+      "nodes": [
+        [
+          "whole",
+          "silicone oil (poly-dimethylsiloxane, ρ = 1 g/mL, η = 350 mPa·s)"
+        ],
+        [
+          "component",
+          "water"
+        ]
+      ],
+      "ev": "The droplets are silicone oil (poly-dimethylsiloxane, ρ = 1 g/mL, η = 350 mPa·s) in water",
+      "ctx_before": "imental setup. The sample chamber has a gap of $0.10 \\pm 0.02$ mm, controlled by a thin film of double-sided adhesive tape sandwiched between two glass plates. ",
+      "ctx_after": ") in water, made by the “co-flow” microfluidic technique [44]. The droplets are stabilized by Fairy $^{TM}$ soap with mass fraction 0.025. The adhesive tape is "
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "silicone oil (poly-dimethylsiloxane, ρ = 1 g/mL, η = 350 mPa·s)"
+        ],
+        [
+          "object",
+          "“co-flow” microfluidic technique [44]"
+        ]
+      ],
+      "ev": "The droplets are silicone oil (poly-dimethylsiloxane, ρ = 1 g/mL, η = 350 mPa·s) in water, made by the “co-flow” microfluidic technique [44]",
+      "ctx_before": "imental setup. The sample chamber has a gap of $0.10 \\pm 0.02$ mm, controlled by a thin film of double-sided adhesive tape sandwiched between two glass plates. ",
+      "ctx_after": "nique [44]. The droplets are stabilized by Fairy $^{TM}$ soap with mass fraction 0.025. The adhesive tape is cut into a constricting hopper shape. A constant fl"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "Fairy ™ soap"
+        ],
+        [
+          "target",
+          "mass fraction 0.025"
+        ],
+        [
+          "cause",
+          "silicone oil (poly-dimethylsiloxane, ρ = 1 g/mL, η = 350 mPa·s)"
+        ]
+      ],
+      "ev": "The droplets are stabilized by Fairy ™ soap with mass fraction 0.025",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "constant flux rate"
+        ],
+        [
+          "target",
+          "syringe pump"
+        ],
+        [
+          "cause",
+          "left edge of the chamber"
+        ]
+      ],
+      "ev": "A constant flux rate is set by a syringe pump attached to the left edge of the chamber",
+      "ctx_before": "ofluidic technique [44]. The droplets are stabilized by Fairy $^{TM}$ soap with mass fraction 0.025. The adhesive tape is cut into a constricting hopper shape. ",
+      "ctx_after": ". More details for our experimental runs are given in Table I. The droplets have a diameter at least twice as large as the gap thickness, so that the droplets a"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "diameter"
+        ],
+        [
+          "target",
+          "gap thickness"
+        ],
+        [
+          "cause",
+          "pancake shapes"
+        ]
+      ],
+      "ev": "The droplets have a diameter at least twice as large as the gap thickness, so that the droplets are compressed into pancake shapes",
+      "ctx_before": "per shape. A constant flux rate is set by a syringe pump attached to the left edge of the chamber. More details for our experimental runs are given in Table I. ",
+      "ctx_after": ", as indicated in Fig. 2(a). At a low area fraction, these droplets are circular in shape when viewed from below. For our experiments, the samples have area fra"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "low area fraction"
+        ],
+        [
+          "target",
+          "pancake shapes"
+        ],
+        [
+          "cause",
+          "volume fraction φ"
+        ]
+      ],
+      "ev": "At a low area fraction, these droplets are circular in shape when viewed from below",
+      "ctx_before": " The droplets have a diameter at least twice as large as the gap thickness, so that the droplets are compressed into pancake shapes, as indicated in Fig. 2(a). ",
+      "ctx_after": ". For our experiments, the samples have area fraction $\\phi \\geqslant 0.90$ , at which the samples are jammed (the jamming point is $\\phi_J \\approx 0.84$ for ou"
+    },
+    {
+      "pt": "measures",
+      "desc": "a quantity is measured by / characterizes >=1 measure",
+      "boundary": "a measurement/evaluation relation: X is measured/evaluated by instrument/method Y. NOT a functional law (constitutive_law), NOT a dependence (influences).",
+      "nodes": [
+        [
+          "object",
+          "movies of our flowing emulsions"
+        ],
+        [
+          "instrument",
+          "bright-field microscope"
+        ]
+      ],
+      "ev": "We use a bright-field microscope coupled to a CCD camera to record movies of our flowing emulsions at 30 frames per second",
+      "ctx_before": " below, it is this deformation (caused by neighboring droplets) that we analyze, as distinct from the deformation caused by the glass plates. B. Image analysis ",
+      "ctx_after": ". We collect our movies well into the contracting portion of the chamber, as indicated in Fig. 2(b). Due to the mismatch of the indices of refraction of oil and"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "deformation of droplets"
+        ],
+        [
+          "object",
+          "standard deviation of the radius r(θ)"
+        ]
+      ],
+      "ev": "We quantify the deformation of droplets as the standard deviation of the radius r(θ)",
+      "ctx_before": "not track their motion. To quantify the deformation of each droplet, we discretize the perimeter at 200 evenly spaced angles $\\theta$ [see inset of Fig. 3(a)]. ",
+      "ctx_after": "theta)$ : The values of D are shown in Fig. 3(a). Given the sample is at an area fraction above jamming, all droplets are compressed by their neighbors and thus"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "area fraction above jamming"
+        ],
+        [
+          "target",
+          "D > 0"
+        ],
+        [
+          "cause",
+          "D"
+        ]
+      ],
+      "ev": "Given the sample is at an area fraction above jamming, all droplets are compressed by their neighbors and thus are deformed so that D > 0",
+      "ctx_before": "[see inset of Fig. 3(a)]. We quantify the deformation of droplets as the standard deviation of the radius $r(\\theta)$ : The values of D are shown in Fig. 3(a). ",
+      "ctx_after": ". We have examined values of D for isolated droplets in other data sets, and note that pixelation results in $D \\approx 0.03$ in these cases. This can be regard"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "pixelation"
+        ],
+        [
+          "target",
+          "D ≈ 0.03"
+        ],
+        [
+          "cause",
+          "isolated droplets"
+        ]
+      ],
+      "ev": "We have examined values of D for isolated droplets in other data sets, and note that pixelation results in D ≈ 0.03 in these cases",
+      "ctx_before": " shown in Fig. 3(a). Given the sample is at an area fraction above jamming, all droplets are compressed by their neighbors and thus are deformed so that D > 0. ",
+      "ctx_after": "se cases. This can be regarded as the uncertainty in D, although for this paper we only consider results where D is averaged over hundreds of droplets. For our "
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiment",
+      "nodes": [
+        [
+          "from",
+          "viscous forces"
+        ],
+        [
+          "to",
+          "repulsive droplet-droplet contact forces [38,47]"
+        ]
+      ],
+      "ev": "At these slow flow rates and with the relatively large area fraction (φ ≥ 0.90), all viscous forces are an order of magnitude smaller than the repulsive droplet-droplet contact forces [38,47]",
+      "ctx_before": "sure the exact forces in these experiments as the data were acquired with resolution inadequate to resolve forces (in order to achieve a larger field of view). ",
+      "ctx_after": " forces [38,47], so in large part values of D arise due to contacts with other droplets rather than viscous effects. However, note that immediately after a T1 e"
+    },
+    {
+      "pt": "measures",
+      "desc": "a quantity is measured by / characterizes >=1 measure",
+      "boundary": "a measurement/evaluation relation: X is measured/evaluated by instrument/method Y. NOT a functional law (constitutive_law), NOT a dependence (influences).",
+      "nodes": [
+        [
+          "object",
+          "droplet displacements"
+        ],
+        [
+          "instrument",
+          "standard particle-tracking routines [49,50]"
+        ]
+      ],
+      "ev": "We use standard particle-tracking routines [49,50] to track our droplets",
+      "ctx_before": " s, and the relaxation of these forces is limited by viscosity (perhaps both bulk viscosity and interfacial viscosity [48]). This will be discussed more below. ",
+      "ctx_after": "ts. These routines work best when droplet displacements between consecutive images are significantly less than the interdroplet distances, which is the case for"
+    },
+    {
+      "pt": "measures",
+      "desc": "a quantity is measured by / characterizes >=1 measure",
+      "boundary": "a measurement/evaluation relation: X is measured/evaluated by instrument/method Y. NOT a functional law (constitutive_law), NOT a dependence (influences).",
+      "nodes": [
+        [
+          "object",
+          "T1 events"
+        ],
+        [
+          "instrument",
+          "Laguerre (radical) tessellation [51,52]"
+        ]
+      ],
+      "ev": "We wish to study T1 events (Fig. 1). To identify a T1 event, we first identify the nearest neighbors of each droplet. As our samples are polydisperse, we use the Laguerre (radical) tessellation [51,52] to determine the nearest neighbors",
+      "ctx_before": " droplet displacements between consecutive images are significantly less than the interdroplet distances, which is the case for our camera rate and flow rates. ",
+      "ctx_after": "rs. Similar to the Voronoi tessellation, the Laguerre tessellation also partitions space into polygons, but uses the radius of each droplet as a weighting so th"
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiment",
+      "nodes": [
+        [
+          "from",
+          "Laguerre (radical) tessellation [51,52]"
+        ],
+        [
+          "to",
+          "Voronoi tessellation"
+        ]
+      ],
+      "ev": "Similar to the Voronoi tessellation, the Laguerre tessellation also partitions space into polygons",
+      "ctx_before": "he nearest neighbors of each droplet. As our samples are polydisperse, we use the Laguerre (radical) tessellation $[51,52]$ to determine the nearest neighbors. ",
+      "ctx_after": ", but uses the radius of each droplet as a weighting so that bigger droplets have polygons with larger areas. Droplets whose polygons share an edge are consider"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "Neighbor relations"
+        ],
+        [
+          "target",
+          "positional noise"
+        ],
+        [
+          "cause",
+          "separations"
+        ]
+      ],
+      "ev": "Neighbor relations defined by tessellation algorithms are sensitive to positional noise, so to overcome this sensitivity, we further require that the separations must change by at least 5% in a time interval of 1 s",
+      "ctx_before": "d nearest neighbors. T1 events are cases where two droplets that are not neighbors converge and become nearest neighbors, and an adjacent two droplets diverge. ",
+      "ctx_after": ". The time of the T1 event is when the topological neighbor change occurs. III. FLOW PROFILES At any given moment, the velocity field in our experiment fluctuat"
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiment",
+      "nodes": [
+        [
+          "from",
+          "normalized $D_{G}$"
+        ],
+        [
+          "to",
+          "raw D"
+        ]
+      ],
+      "ev": "the data being compared are the normalized $D_{G}$ rather than the raw D",
+      "ctx_before": "for the aggregated data of 0.044. No systematic dependence on $\\tilde{A}$ is seen in the widths from the individual experiments. This is, of course, as long as ",
+      "ctx_after": "; otherwise, the slight dependence of $\\langle D\\rangle$ on $\\tilde{A}$ is seen in the larger widths for larger $\\tilde{A}$ . A connection between large deforma"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "$\\langle D\\rangle$"
+        ],
+        [
+          "target",
+          "$\\tilde{A}$"
+        ]
+      ],
+      "ev": "the slight dependence of $\\langle D\\rangle$ on $\\tilde{A}$",
+      "ctx_before": "the widths from the individual experiments. This is, of course, as long as the data being compared are the normalized $D_{G}$ rather than the raw D; otherwise, ",
+      "ctx_after": " is seen in the larger widths for larger $\\tilde{A}$ . A connection between large deformation drops and T1 events has been observed before in foams $[18,62]$ , "
+    },
+    {
+      "pt": "claim_relation",
+      "desc": "a discourse relation between >=2 claims/approaches (supports/contrasts/extends/...)",
+      "boundary": "a DISCOURSE relation between claims/findings (supports/contrasts/outperforms). NOT a method-to-method development (extends/improves/compares — those are evolution), NOT a measurement (measures).",
+      "nodes": [
+        [
+          "from",
+          "large deformation drops"
+        ],
+        [
+          "to",
+          "T1 events"
+        ]
+      ],
+      "ev": "A connection between large deformation drops and T1 events has been observed before in foams $[18,62]$",
+      "ctx_before": "ized $D_{G}$ rather than the raw D; otherwise, the slight dependence of $\\langle D\\rangle$ on $\\tilde{A}$ is seen in the larger widths for larger $\\tilde{A}$ . ",
+      "ctx_after": " , as well as in our prior analysis of these emulsion experiments $[37]$ . For illustration, T1 events within the highlighted time windows of Fig. 5 are shown i"
+    },
+    {
+      "pt": "visualizes",
+      "desc": "X is made visible/observable by Y (an imaging/visualization relation where an instrument or technique renders a phenomenon/property observable).",
+      "boundary": "Use only when a method/technique makes a phenomenon observable; not for mere measurement, detection, or data collection without direct visualization.",
+      "nodes": [
+        [
+          "object",
+          "T1 events"
+        ],
+        [
+          "instrument",
+          "Fig. 8(a)"
+        ]
+      ],
+      "ev": "T1 events within the highlighted time windows of Fig. 5 are shown in Fig. 8(a)",
+      "ctx_before": "ion drops and T1 events has been observed before in foams $[18,62]$ , as well as in our prior analysis of these emulsion experiments $[37]$ . For illustration, ",
+      "ctx_after": ". Here we quantify this connection in a different way that highlights that there is a “background” rate of T1 events, but that the largest decreases of the defo"
+    },
+    {
+      "pt": "claim_relation",
+      "desc": "a discourse relation between >=2 claims/approaches (supports/contrasts/extends/...)",
+      "boundary": "a DISCOURSE relation between claims/findings (supports/contrasts/outperforms). NOT a method-to-method development (extends/improves/compares — those are evolution), NOT a measurement (measures).",
+      "nodes": [
+        [
+          "from",
+          "T1 events"
+        ],
+        [
+          "to",
+          "the largest decreases of the deformation"
+        ]
+      ],
+      "ev": "there is a “background” rate of T1 events, but that the largest decreases of the deformation are connected to a higher rate of T1 events",
+      "ctx_before": "ation, T1 events within the highlighted time windows of Fig. 5 are shown in Fig. 8(a). Here we quantify this connection in a different way that highlights that ",
+      "ctx_after": " $[19]$ . We define the frequency of T1 events as the number of T1 events $N_{T1}$ occurring in a given time interval $\\tau$ [between extrema of $D_{G}(t)$ ], d"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "the frequency of T1 events"
+        ],
+        [
+          "definition",
+          "$f_{T1} = N_{T1}/\\tau$"
+        ]
+      ],
+      "ev": "We define the frequency of T1 events as the number of T1 events $N_{T1}$ occurring in a given time interval $\\tau$ [between extrema of $D_{G}(t)$ ], divided by $\\tau$, that is, $f_{T1} = N_{T1}/\\tau$",
+      "ctx_before": "ghlights that there is a “background” rate of T1 events, but that the largest decreases of the deformation are connected to a higher rate of T1 events $[19]$ . ",
+      "ctx_after": "$ . There is a trivial dependence on $\\tilde{A}$ —faster flows have higher rates of T1 events—so accordingly we normalize the T1 frequency by considering the no"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "a trivial dependence on $\\tilde{A}$"
+        ],
+        [
+          "target",
+          "faster flows"
+        ]
+      ],
+      "ev": "There is a trivial dependence on $\\tilde{A}$ —faster flows have higher rates of T1 events",
+      "ctx_before": " number of T1 events $N_{T1}$ occurring in a given time interval $\\tau$ [between extrema of $D_{G}(t)$ ], divided by $\\tau$ , that is, $f_{T1} = N_{T1}/\\tau$ . ",
+      "ctx_after": "—so accordingly we normalize the T1 frequency by considering the nondimensional quantity $f_{T1}/\\tilde{A}$ . In Fig. 6(c), we plot the T1 frequency as a functi"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "faster flows"
+        ],
+        [
+          "target",
+          "T1 events"
+        ]
+      ],
+      "ev": "faster flows have higher rates of T1 events",
+      "ctx_before": "iven time interval $\\tau$ [between extrema of $D_{G}(t)$ ], divided by $\\tau$ , that is, $f_{T1} = N_{T1}/\\tau$ . There is a trivial dependence on $\\tilde{A}$ —",
+      "ctx_after": "—so accordingly we normalize the T1 frequency by considering the nondimensional quantity $f_{T1}/\\tilde{A}$ . In Fig. 6(c), we plot the T1 frequency as a functi"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "the nondimensional quantity $f_{T1}/\\tilde{A}$"
+        ],
+        [
+          "definition",
+          "the T1 frequency"
+        ]
+      ],
+      "ev": "we normalize the T1 frequency by considering the nondimensional quantity $f_{T1}/\\tilde{A}$",
+      "ctx_before": " divided by $\\tau$ , that is, $f_{T1} = N_{T1}/\\tau$ . There is a trivial dependence on $\\tilde{A}$ —faster flows have higher rates of T1 events—so accordingly ",
+      "ctx_after": " . In Fig. 6(c), we plot the T1 frequency as a function of the size of the deformation change $\\Delta D_{G}$ for both decreases (solid triangles) and increases "
+    },
+    {
+      "pt": "measures",
+      "desc": "a quantity is measured by / characterizes >=1 measure",
+      "boundary": "a measurement/evaluation relation: X is measured/evaluated by instrument/method Y. NOT a functional law (constitutive_law), NOT a dependence (influences).",
+      "nodes": [
+        [
+          "object",
+          "the T1 frequency"
+        ],
+        [
+          "instrument",
+          "the size of the deformation change $\\Delta D_{G}$"
+        ]
+      ],
+      "ev": "we plot the T1 frequency as a function of the size of the deformation change $\\Delta D_{G}$",
+      "ctx_before": "flows have higher rates of T1 events—so accordingly we normalize the T1 frequency by considering the nondimensional quantity $f_{T1}/\\tilde{A}$ . In Fig. 6(c), ",
+      "ctx_after": " for both decreases (solid triangles) and increases (open triangles). For small increases or decreases, the T1 frequency is fairly constant. For larger decrease"
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiment",
+      "nodes": [
+        [
+          "from",
+          "decreases"
+        ],
+        [
+          "to",
+          "increases"
+        ]
+      ],
+      "ev": "for both decreases (solid triangles) and increases (open triangles)",
+      "ctx_before": "ring the nondimensional quantity $f_{T1}/\\tilde{A}$ . In Fig. 6(c), we plot the T1 frequency as a function of the size of the deformation change $\\Delta D_{G}$ ",
+      "ctx_after": ". For small increases or decreases, the T1 frequency is fairly constant. For larger decreases of $D_{G} (\\Delta D_{G} \\lesssim -0.2)$ , the T1 frequency is mark"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "small increases or decreases"
+        ],
+        [
+          "target",
+          "the T1 frequency"
+        ]
+      ],
+      "ev": "For small increases or decreases, the T1 frequency is fairly constant",
+      "ctx_before": "e plot the T1 frequency as a function of the size of the deformation change $\\Delta D_{G}$ for both decreases (solid triangles) and increases (open triangles). ",
+      "ctx_after": ". For larger decreases of $D_{G} (\\Delta D_{G} \\lesssim -0.2)$ , the T1 frequency is markedly larger as well, although as Fig. 6(b) makes clear, this is based o"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "larger decreases of $D_{G} (\\Delta D_{G} \\lesssim -0.2)$"
+        ],
+        [
+          "target",
+          "the T1 frequency"
+        ]
+      ],
+      "ev": "For larger decreases of $D_{G} (\\Delta D_{G} \\lesssim -0.2)$, the T1 frequency is markedly larger as well",
+      "ctx_before": "ange $\\Delta D_{G}$ for both decreases (solid triangles) and increases (open triangles). For small increases or decreases, the T1 frequency is fairly constant. ",
+      "ctx_after": "l, although as Fig. 6(b) makes clear, this is based on a relatively small number of events. Similar to the discussion in the previous paragraph, here again if w"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "$f_{T1}/\\tilde{A}$"
+        ],
+        [
+          "target",
+          "larger $\\Delta D_{G}$"
+        ]
+      ],
+      "ev": "the data all show $f_{T1}/\\tilde{A}$ decreasing for larger $\\Delta D_{G}$",
+      "ctx_before": " on a relatively small number of events. Similar to the discussion in the previous paragraph, here again if we analyze the data for each experiment separately, ",
+      "ctx_after": " . For each individual experiment, the downward slope is similar to that seen from the combined data shown in Fig. 6(c), and again no systematic dependence on $"
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiment",
+      "nodes": [
+        [
+          "from",
+          "the downward slope"
+        ],
+        [
+          "to",
+          "the combined data shown in Fig. 6(c)"
+        ]
+      ],
+      "ev": "the downward slope is similar to that seen from the combined data shown in Fig. 6(c)",
+      "ctx_before": "we analyze the data for each experiment separately, the data all show $f_{T1}/\\tilde{A}$ decreasing for larger $\\Delta D_{G}$ . For each individual experiment, ",
+      "ctx_after": ", and again no systematic dependence on $\\tilde{A}$ is seen. B. Local spatial structure Given the correlation between T1 events and global deformation relaxatio"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "Vy"
+        ],
+        [
+          "target",
+          "Vx"
+        ]
+      ],
+      "ev": "Vy is no more than half the value of Vx",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "velocity profile of a foam"
+        ],
+        [
+          "target",
+          "glass plates"
+        ]
+      ],
+      "ev": "the velocity profile of a foam is strongly influenced by the glass plates",
+      "ctx_before": "gles $\\Theta$ , and the maximum value for $|y|$ is $w(x)/2$ , so $V_y$ is no more than half the value of $V_x$ . Note that several prior experiments found that ",
+      "ctx_after": " confining the sample (the plates making the sample quasi-2D) [55,56]. Those experiments used shear imposed at the side boundaries and found that the sample mot"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "sample"
+        ],
+        [
+          "definition",
+          "quasi-2D"
+        ]
+      ],
+      "ev": "the plates making the sample quasi-2D",
+      "ctx_before": "value of $V_x$ . Note that several prior experiments found that the velocity profile of a foam is strongly influenced by the glass plates confining the sample (",
+      "ctx_after": ") [55,56]. Those experiments used shear imposed at the side boundaries and found that the sample motion was localized near the moving boundary. However, when th"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "sample motion"
+        ],
+        [
+          "target",
+          "moving boundary"
+        ]
+      ],
+      "ev": "the sample motion was localized near the moving boundary",
+      "ctx_before": "e glass plates confining the sample (the plates making the sample quasi-2D) [55,56]. Those experiments used shear imposed at the side boundaries and found that ",
+      "ctx_after": ". However, when the experiments were repeated without a confining glass wall (using a bubble raft floating on a water surface), there was no shear localization."
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "velocity profile"
+        ],
+        [
+          "target",
+          "confining glass plates"
+        ]
+      ],
+      "ev": "the velocity profile might be different for flows with the same geometry as our experiments, but without confining glass plates",
+      "ctx_before": "ear localization. With our flow geometry, the forcing is due to a pump rather than motion of side walls, and we do not observe shear localization. Nonetheless, ",
+      "ctx_after": ". In the absence of flow, droplets would all have similar values for their deformation, $D_{0} = 0.06$ for the area fraction $\\phi \\approx 0.9$ relevant for our"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "D"
+        ],
+        [
+          "definition",
+          "0.06"
+        ]
+      ],
+      "ev": "D0 = 0.06",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiment",
+      "nodes": [
+        [
+          "from",
+          "slow steady flow"
+        ],
+        [
+          "to",
+          "quasistatic limit"
+        ]
+      ],
+      "ev": "even slow steady flow is not equivalent to the quasistatic limit",
+      "ctx_before": "e shows that our experiment is not in a rate-independent regime. Furthermore, a prior experimental study of a sheared bubble raft provides strong evidence that ",
+      "ctx_after": " $[57]$ . Nonetheless, all relevant time scales appear to be set by the flow rate for our data. This will be discussed where relevant (as above for the velocity"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "time scales"
+        ],
+        [
+          "target",
+          "flow rate"
+        ]
+      ],
+      "ev": "all relevant time scales appear to be set by the flow rate",
+      "ctx_before": "xperimental study of a sheared bubble raft provides strong evidence that even slow steady flow is not equivalent to the quasistatic limit $[57]$ . Nonetheless, ",
+      "ctx_after": " for our data. This will be discussed where relevant (as above for the velocity profiles, and in Sec. IV A for the rates of T1 events). Furthermore, all our res"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "power spectrum"
+        ],
+        [
+          "target",
+          "power-law decay"
+        ]
+      ],
+      "ev": "The power spectrum (inset) shows a tendency of power-law decay",
+      "ctx_before": "D_G(t)\\rangle_t\\equiv 1$ . Similar to previous granular [21,58,59] and foam [8,18,57,60-62] experiments, large deformation fluctuations are observed in Fig. 5. ",
+      "ctx_after": " $P(\\omega)\\sim \\omega^{-1}$ at high frequencies, comparable to spectra found in granular flows [21,58,59]. To quantify the deformation releases, we define defo"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "larger changes"
+        ],
+        [
+          "target",
+          "longer times"
+        ]
+      ],
+      "ev": "larger changes of DG take longer times",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "time scale τ"
+        ],
+        [
+          "target",
+          "viscosity"
+        ]
+      ],
+      "ev": "The time scale τ is primarily set by viscosity",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "T1 events"
+        ],
+        [
+          "target",
+          "time scale τ"
+        ]
+      ],
+      "ev": "depending mainly on the number of T1 events relaxing",
+      "ctx_before": "cale $\\tau$ is primarily set by viscosity, and given that all of our samples have similar area fractions this time scale should be relatively constant (1–3 s), ",
+      "ctx_after": " [47]. The probability distribution of event sizes $\\Delta D_{G}$ is shown in Fig. 6(b). Large events are rare, but not as rare as would be predicted from the G"
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiment",
+      "nodes": [
+        [
+          "from",
+          "Gaussian fit"
+        ],
+        [
+          "to",
+          "Gaussian distribution"
+        ]
+      ],
+      "ev": "Large events are rare, but not as rare as would be predicted from the Gaussian fit",
+      "ctx_before": " constant (1–3 s), depending mainly on the number of T1 events relaxing [47]. The probability distribution of event sizes $\\Delta D_{G}$ is shown in Fig. 6(b). ",
+      "ctx_after": " (dashed line) shown in the plot. Our distribution is slightly broader than a previous foam experiment, which found a Gaussian distribution for a similar quanti"
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiment",
+      "nodes": [
+        [
+          "from",
+          "Gaussian distribution"
+        ],
+        [
+          "to",
+          "similar quantity"
+        ]
+      ],
+      "ev": "found a Gaussian distribution for a similar quantity",
+      "ctx_before": "s rare as would be predicted from the Gaussian fit (dashed line) shown in the plot. Our distribution is slightly broader than a previous foam experiment, which ",
+      "ctx_after": " [18], perhaps because the flow geometry was quite different. In our data, there is a slightly larger probability for large decreases of $D_{G}$ as compared to "
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "T1 events"
+        ],
+        [
+          "target",
+          "local deformation field D"
+        ]
+      ],
+      "ev": "Given the correlation between T1 events and global deformation relaxations, we next examine how a T1 event changes the local deformation field D of the nearby droplets.",
+      "ctx_before": " slope is similar to that seen from the combined data shown in Fig. 6(c), and again no systematic dependence on $\\tilde{A}$ is seen. B. Local spatial structure ",
+      "ctx_after": " Figure 7(a) is the spatial-temporal map of the local deformation field around a T1 event. The lag time $\\Delta t = 0$ is the instant of a T1 event, and the dis"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "viscous forces"
+        ],
+        [
+          "target",
+          "time over which the pattern changes"
+        ]
+      ],
+      "ev": "Overall, viscous forces help determine the moderately short time over which the pattern changes in Fig. 7 after the T1 event.",
+      "ctx_before": " focusing on $\\Delta R$ dependence and averaging over any angular dependence that might be present (angular dependence has been suggested by simulations [16]). ",
+      "ctx_after": " That is, in the absence of viscosity, the T1 event would be expected to snap the droplets into place instantaneously. C. Clusters of T1 events Given that T1 ev"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "one T1 event"
+        ],
+        [
+          "target",
+          "other T1 events"
+        ]
+      ],
+      "ev": "Given that T1 events affect nearby droplets (Fig. 7), one T1 event sometimes triggers other T1 events, forming a relaxing region with a larger length scale.",
+      "ctx_before": "er the T1 event. That is, in the absence of viscosity, the T1 event would be expected to snap the droplets into place instantaneously. C. Clusters of T1 events ",
+      "ctx_after": " Figure 8(a) shows small clusters of T1 events during two time windows of global deformation drops (Fig. 5). To quantify these rearranging regions during global"
+    },
+    {
+      "pt": "absence_of_phenomenon",
+      "desc": "A phenomenon or effect is explicitly absent or not observed in a system (e.g., no shear localization, no dependence).",
+      "boundary": "Use this pattern only when a phenomenon is explicitly stated as absent or not observed; do not use for mere non-mention, absence of a thing, or a negative correlation.",
+      "nodes": [
+        [
+          "system",
+          "cluster sizes N_cluster"
+        ],
+        [
+          "absent_phenomenon",
+          "constant flux rate"
+        ]
+      ],
+      "ev": "As shown in Fig. 8(b), the sizes of those largest clusters N_cluster are fairly small (a mean value close to 2) and have no dependence on the flux rate in these experiments.",
+      "ctx_before": "quired to occur during an interval where $D_G(t)$ drops monotonically. Furthermore, we focus only on the largest T1 cluster in each global deformation release. ",
+      "ctx_after": "nts. Given the small sizes of these clusters, we checked to see if random chance could form clusters of similar sizes. To do this, we took the data of all clust"
+    },
+    {
+      "pt": "visualizes",
+      "desc": "X is made visible/observable by Y (an imaging/visualization relation where an instrument or technique renders a phenomenon/property observable).",
+      "boundary": "Use only when a method/technique makes a phenomenon observable; not for mere measurement, detection, or data collection without direct visualization.",
+      "nodes": [
+        [
+          "object",
+          "local deformation field D"
+        ],
+        [
+          "instrument",
+          "spatial-temporal map"
+        ]
+      ],
+      "ev": "Figure 7(a) is the spatial-temporal map of the local deformation field around a T1 event.",
+      "ctx_before": " correlation between T1 events and global deformation relaxations, we next examine how a T1 event changes the local deformation field D of the nearby droplets. ",
+      "ctx_after": " The lag time $\\Delta t = 0$ is the instant of a T1 event, and the distance $\\Delta R = 0$ is the center of the four droplets undergoing the T1 event in their c"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "T1 events"
+        ],
+        [
+          "target",
+          "deformation"
+        ]
+      ],
+      "ev": "T1 events decrease the deformation of nearby droplets",
+      "ctx_before": "eases of the global deformation are correlated with small cascades of local T1 events in agreement with previous studies of 2D foams [60,62]. We also find that ",
+      "ctx_after": ", with a spatial pattern related to the local spatial structure of the droplets. Noticeable decreases of the deformation are seen as far as three diameters away"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "T1 events"
+        ],
+        [
+          "target",
+          "global mean deformation"
+        ]
+      ],
+      "ev": "Large decreases of the global deformation are correlated with small cascades of local T1 events",
+      "ctx_before": " droplets deform during the flow as they are compressed by other droplets. The flow is steady, but the global mean deformation has large temporal fluctuations. ",
+      "ctx_after": " in agreement with previous studies of 2D foams [60,62]. We also find that T1 events decrease the deformation of nearby droplets, with a spatial pattern related"
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiment",
+      "nodes": [
+        [
+          "from",
+          "flow cooperativity length"
+        ],
+        [
+          "to",
+          "theory"
+        ]
+      ],
+      "ev": "suggestive of the flow cooperativity length predicted by theory",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "absence_of_phenomenon",
+      "desc": "A phenomenon or effect is explicitly absent or not observed in a system (e.g., no shear localization, no dependence).",
+      "boundary": "Use this pattern only when a phenomenon is explicitly stated as absent or not observed; do not use for mere non-mention, absence of a thing, or a negative correlation.",
+      "nodes": [
+        [
+          "system",
+          "flowing dense amorphous materials"
+        ],
+        [
+          "absent_phenomenon",
+          "microscopic details"
+        ]
+      ],
+      "ev": "some characteristics of flowing dense amorphous materials are independent of their microscopic details",
+      "ctx_before": "65]$ and simulations $[10]$ . We find T1 events tend to form small clusters, especially in cases where the global deformation decreases the most. To an extent, ",
+      "ctx_after": " $[17,66–68]$ , and so our results may be relevant for flow of three-dimensional amorphous materials, although of course the definition of rearrangements will b"
+    },
+    {
+      "pt": "claim_relation",
+      "desc": "a discourse relation between >=2 claims/approaches (supports/contrasts/extends/...)",
+      "boundary": "a DISCOURSE relation between claims/findings (supports/contrasts/outperforms). NOT a method-to-method development (extends/improves/compares — those are evolution), NOT a measurement (measures).",
+      "nodes": [
+        [
+          "from",
+          "cascades of local rearrangements"
+        ],
+        [
+          "to",
+          "macroscopic fluctuations"
+        ]
+      ],
+      "ev": "we confirm a connection between cascades of local rearrangements and macroscopic fluctuations of the sample behavior",
+      "ctx_before": "ts may be relevant for flow of three-dimensional amorphous materials, although of course the definition of rearrangements will be different $[9,34]$ . Overall, ",
+      "ctx_after": ", with the latter quantified by the instantaneous mean global deformation of the flowing droplets. ACKNOWLEDGMENTS We thank S. Devaiah, A. Fernandez-Nieves, S. "
+    }
+  ],
+  "glm": [
+    {
+      "i": 0,
+      "pt": "measures",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states that rearranging regions are studied by observing the flow in the thin chamber, correctly bin"
+    },
+    {
+      "i": 1,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The definition node 'rearranging regions' is a hallucination; the evidence text states 'localized rearrangements'."
+    },
+    {
+      "i": 2,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states that deformations are decreased by T1 events, correctly binding T1 events as the cause an"
+    },
+    {
+      "i": 3,
+      "pt": "background",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The sentence states that Argon introduced the concept of T1 events, not that T1 events uses Argon as background/motivati"
+    },
+    {
+      "i": 4,
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence text explicitly uses an appositive to define 'volume fraction φ' as the specified amount of sample occupied"
+    },
+    {
+      "i": 5,
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states 'term this the deformation' referring to 'the deviation of its outline from a circle', pe"
+    },
+    {
+      "i": 6,
+      "pt": "background",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states using the prior data to study the spatial distribution, correctly binding the 'from' and "
+    },
+    {
+      "i": 7,
+      "pt": "composed_of",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence states that droplets are made of silicone oil dispersed in water, not that silicone oil is structurally com"
+    },
+    {
+      "i": 8,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The text states the droplets are 'made by' the technique, not that the silicone oil is defined as the technique."
+    },
+    {
+      "i": 9,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence text describes a static experimental setup (soap at a specific mass fraction stabilizes droplets), not a fu"
+    },
+    {
+      "i": 10,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text states the syringe pump sets the flux rate, not the reverse, and the left edge is merely a spatial attachment p"
+    },
+    {
+      "i": 11,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text states that the diameter being larger than the gap thickness causes pancake shapes, not that diameter influence"
+    },
+    {
+      "i": 12,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence states that droplets are circular at a low area fraction, directly contradicting the claim that low area fr"
+    },
+    {
+      "i": 13,
+      "pt": "measures",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states a bright-field microscope is used to record movies of the flowing emulsions, correctly bindin"
+    },
+    {
+      "i": 14,
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states that the deformation of droplets is quantified as the standard deviation of the radius r("
+    },
+    {
+      "i": 15,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The node 'D' is incorrectly bound to the 'cause' role, as the sentence clearly identifies the area fraction above jammin"
+    },
+    {
+      "i": 16,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "'Isolated droplets' is the condition or context for the measurement, not the cause of D ≈ 0.03; the sentence identifies "
+    },
+    {
+      "i": 17,
+      "pt": "compares",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly compares the magnitudes of two different mechanisms (viscous vs. contact forces) and correctly b"
+    },
+    {
+      "i": 18,
+      "pt": "measures",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The evidence sentence states the routines track 'our droplets', not 'droplet displacements', violating strict slot bindi"
+    },
+    {
+      "i": 19,
+      "pt": "measures",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The text states the Laguerre tessellation is used to determine the nearest neighbors, not to measure T1 events directly."
+    },
+    {
+      "i": 20,
+      "pt": "compares",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly compares the two tessellations as parallel alternatives that model the same phenomenon using dif"
+    },
+    {
+      "i": 21,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text states positional noise influences neighbor relations (reversed polarity), and 'separations' is a mitigation re"
+    },
+    {
+      "i": 22,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text states a methodological choice to use one metric instead of another, not a direct comparison between the two me"
+    },
+    {
+      "i": 23,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states the dependence of the source on the target, correctly binding the roles and matching the "
+    },
+    {
+      "i": 24,
+      "pt": "claim_relation",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence describes a physical/empirical correlation ('a connection between'), not a discourse relation like supports"
+    },
+    {
+      "i": 25,
+      "pt": "visualizes",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "Fig. 8(a) is a figure, not an instrument or technique as required by the 'instrument' role."
+    },
+    {
+      "i": 26,
+      "pt": "claim_relation",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text states a physical correlation ('connected to') rather than a discourse relation like supports/contrasts/outperf"
+    },
+    {
+      "i": 27,
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly defines the subject using the exact mathematical formula provided."
+    },
+    {
+      "i": 28,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The sentence states that T1 frequency depends on flow speed ($\\tilde{A}$), not that 'a trivial dependence' influences 'f"
+    },
+    {
+      "i": 29,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states that faster flows lead to higher rates of T1 events, correctly binding the source and tar"
+    },
+    {
+      "i": 30,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text describes normalizing the T1 frequency to create a nondimensional quantity, not defining the quantity as the T1"
+    },
+    {
+      "i": 31,
+      "pt": "measures",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "Plotting X as a function of Y describes a dependence, which explicitly violates the pattern boundary for 'measures'."
+    },
+    {
+      "i": 32,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence merely lists two parameter directions plotted on a graph, not a comparison between different mechanisms or "
+    },
+    {
+      "i": 33,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The evidence explicitly states the T1 frequency is 'fairly constant' for small changes, meaning there is NO influence or"
+    },
+    {
+      "i": 34,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states that the T1 frequency varies (is markedly larger) under the condition of larger decreases"
+    },
+    {
+      "i": 35,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states the source quantity decreases for larger values of the target quantity, correctly capturing a"
+    },
+    {
+      "i": 36,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "Comparing a downward slope from individual experiments to combined data is a consistency check between data subsets, not"
+    },
+    {
+      "i": 37,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence states a static comparative magnitude (Vy ≤ 0.5 * Vx), not a functional, causal, or scaling dependence."
+    },
+    {
+      "i": 38,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The direction of influence is reversed: the sentence states the glass plates influence the velocity profile, but the edg"
+    },
+    {
+      "i": 39,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The evidence describes the plates causing the sample to be quasi-2D, not a definitional identity where the sample is def"
+    },
+    {
+      "i": 40,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "Spatial localization ('near') does not state a causal or scaling dependence (influences)."
+    },
+    {
+      "i": 41,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence is a hypothetical speculation ('might be different') rather than a stated functional or causal dependence."
+    },
+    {
+      "i": 42,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text is a numerical assignment to a variable, not a conceptual definition."
+    },
+    {
+      "i": 43,
+      "pt": "compares",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly compares the two regimes by stating their non-equivalence, correctly binding both nodes to their res"
+    },
+    {
+      "i": 44,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The direction of influence is reversed; the text states time scales are set by the flow rate, not that time scales influ"
+    },
+    {
+      "i": 45,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The sentence states the power spectrum exhibits or shows a power-law decay, not that it functionally depends on or influ"
+    },
+    {
+      "i": 46,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states a direct scaling dependence where the magnitude of changes (source) determines the durati"
+    },
+    {
+      "i": 47,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states τ is set by viscosity, correctly binding τ as the dependent source and viscosity as the targe"
+    },
+    {
+      "i": 48,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states the time scale τ depends mainly on the number of T1 events, correctly binding the source as t"
+    },
+    {
+      "i": 49,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence compares the actual data's rarity to the prediction from the Gaussian fit, not the Gaussian fit to a Gaussi"
+    },
+    {
+      "i": 50,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence text states that a previous experiment found a Gaussian distribution for a quantity, not that a Gaussian di"
+    },
+    {
+      "i": 51,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence text describes a research intent ('we next examine how...') rather than stating the actual dependence as a "
+    },
+    {
+      "i": 52,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states that viscous forces help determine the time over which the pattern changes, correctly binding"
+    },
+    {
+      "i": 53,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states that 'one T1 event sometimes triggers other T1 events,' perfectly matching the source and tar"
+    },
+    {
+      "i": 54,
+      "pt": "absence_of_phenomenon",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The absent phenomenon is 'dependence on the flux rate', not 'constant flux rate' itself."
+    },
+    {
+      "i": 55,
+      "pt": "visualizes",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states the spatial-temporal map is of the local deformation field, correctly binding the object and "
+    },
+    {
+      "i": 56,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states that T1 events decrease deformation, correctly binding T1 events as the source and deform"
+    },
+    {
+      "i": 57,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states a 'correlation' rather than a genuine causal or functional 'influence'."
+    },
+    {
+      "i": 58,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The phrase 'suggestive of' indicates a weak implication or hint rather than an explicit comparison or validation between"
+    },
+    {
+      "i": 59,
+      "pt": "absence_of_phenomenon",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "'Independent of' indicates a lack of dependence, not the explicit absence of a phenomenon as required by the pattern bou"
+    },
+    {
+      "i": 60,
+      "pt": "claim_relation",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence describes a physical connection between two phenomena, not a discourse relation (like supports/contrasts) b"
+    }
+  ],
+  "qwen": [
+    {
+      "i": 0,
+      "pt": "measures",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states the rearranging regions are studied/observed using the specified chamber setup, confirming th"
+    },
+    {
+      "i": 1,
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence text explicitly defines 'T1 events' as 'localized rearrangements' involving 'four droplets', which semantic"
+    },
+    {
+      "i": 2,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "Evidence explicitly states T1 events decrease deformations, confirming the influence relationship and correct role bindi"
+    },
+    {
+      "i": 3,
+      "pt": "background",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": ""
+    },
+    {
+      "i": 4,
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence text explicitly defines the subject via an appositive phrase that matches the definition node exactly."
+    },
+    {
+      "i": 5,
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence text explicitly establishes the definitional identity using 'term this... the...', correctly binding the te"
+    },
+    {
+      "i": 6,
+      "pt": "background",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states data from [37] is used to study the spatial distribution, matching the edge nodes and directi"
+    },
+    {
+      "i": 7,
+      "pt": "composed_of",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text describes oil droplets dispersed in water, not silicone oil being composed of water."
+    },
+    {
+      "i": 8,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence describes a production relationship ('made by'), not a definitional identity."
+    },
+    {
+      "i": 9,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text describes a static experimental setup composition rather than a functional dependence or causal influence, and "
+    },
+    {
+      "i": 10,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "Text describes experimental setup instrumentation rather than a functional dependency between quantities, and node types"
+    },
+    {
+      "i": 11,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text describes a geometric constraint leading to a shape outcome, not a functional influence of diameter on gap thic"
+    },
+    {
+      "i": 12,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "Evidence states low area fraction yields circular shapes, while 'pancake shapes' are attributed to geometric confinement"
+    },
+    {
+      "i": 13,
+      "pt": "measures",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states the microscope is used to record the movies, confirming the measurement relation and exac"
+    },
+    {
+      "i": 14,
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "Evidence sentence explicitly states the definitional relationship with exact node matches."
+    },
+    {
+      "i": 15,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": ""
+    },
+    {
+      "i": 16,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": ""
+    },
+    {
+      "i": 17,
+      "pt": "compares",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence sentence explicitly states a magnitude comparison between viscous forces and contact forces, matching the e"
+    },
+    {
+      "i": 18,
+      "pt": "measures",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": ""
+    },
+    {
+      "i": 19,
+      "pt": "measures",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states Laguerre tessellation is used to identify T1 events via neighbor determination."
+    },
+    {
+      "i": 20,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence span states a definitional similarity rather than a comparative evaluation or result between the two method"
+    },
+    {
+      "i": 21,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": ""
+    },
+    {
+      "i": 22,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The text states normalized data was chosen over raw data for analysis, not that the two were directly compared against e"
+    },
+    {
+      "i": 23,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly affirms a dependence of the source quantity on the target quantity, matching the edge nodes and patt"
+    },
+    {
+      "i": 24,
+      "pt": "claim_relation",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": ""
+    },
+    {
+      "i": 25,
+      "pt": "visualizes",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence text explicitly states the events are shown in the figure, aligning with the visualization relation and nod"
+    },
+    {
+      "i": 26,
+      "pt": "claim_relation",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence describes a physical measurement/correlation between phenomena, violating the pattern boundary that exclude"
+    },
+    {
+      "i": 27,
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence text explicitly states the definition using the exact subject and mathematical formula extracted in the nod"
+    },
+    {
+      "i": 28,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The source node is a descriptive phrase rather than a quantity, and the text does not state this phrase influences faste"
+    },
+    {
+      "i": 29,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence sentence explicitly states the dependence relationship where flow speed affects T1 event rates, matching no"
+    },
+    {
+      "i": 30,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text describes normalizing the frequency using the quantity, not defining them as identical entities."
+    },
+    {
+      "i": 31,
+      "pt": "measures",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text describes a functional dependence ('as a function of'), which the `measures` pattern boundary explicitly exclud"
+    },
+    {
+      "i": 32,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "Evidence text describes figure setup rather than stating an explicit comparative relationship or result."
+    },
+    {
+      "i": 33,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "Source node binds a condition range ('small increases...') instead of the variable quantity ('deformation change'), and "
+    },
+    {
+      "i": 34,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states T1 frequency varies depending on the magnitude of D_G decreases, confirming the influence"
+    },
+    {
+      "i": 35,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "Evidence explicitly states the dependence relation, nodes faithfully match the text entities, and the pattern meaning al"
+    },
+    {
+      "i": 36,
+      "pt": "compares",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence text explicitly states a similarity comparison between the slope and the combined data, correctly matching "
+    },
+    {
+      "i": 37,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The evidence text describes a magnitude comparison constraint rather than a functional dependence or causal influence re"
+    },
+    {
+      "i": 38,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": ""
+    },
+    {
+      "i": 39,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": ""
+    },
+    {
+      "i": 40,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The text reports a spatial observation of localization near a boundary, not a functional influence or dependence relatio"
+    },
+    {
+      "i": 41,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": ""
+    },
+    {
+      "i": 42,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "Subject node 'D' mismatches specific evidence entity 'D0'."
+    },
+    {
+      "i": 43,
+      "pt": "compares",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence text explicitly states a comparison relation between the exact node phrases in the corresponding subject-ob"
+    },
+    {
+      "i": 44,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states time scales are set by flow rate, which matches the pattern's 'depends on' semantics with cor"
+    },
+    {
+      "i": 45,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The text describes a property of the spectrum rather than a functional influence between distinct quantities."
+    },
+    {
+      "i": 46,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence text explicitly asserts the functional dependence where change magnitude determines duration, correctly bin"
+    },
+    {
+      "i": 47,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "Text confirms τ depends on viscosity, matching the edge's defined dependence direction (dependent source -> independent "
+    },
+    {
+      "i": 48,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence span explicitly states the time scale depends on T1 events ('depending mainly on'), correctly matching the "
+    },
+    {
+      "i": 49,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "Evidence sentence compares observations to the fit, not fit to distribution; 'Gaussian distribution' is absent from the "
+    },
+    {
+      "i": 50,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence text describes a finding attribution ('found X for Y'), not a comparison relation between the distribution "
+    },
+    {
+      "i": 51,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": ""
+    },
+    {
+      "i": 52,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states viscous forces determine the change time, perfectly matching the extracted nodes and infl"
+    },
+    {
+      "i": 53,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "Text explicitly states 'one T1 event sometimes triggers other T1 events', confirming causal influence with correct entit"
+    },
+    {
+      "i": 54,
+      "pt": "absence_of_phenomenon",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text states there is 'no dependence on the flux rate', but the edge incorrectly identifies the absent phenomenon as "
+    },
+    {
+      "i": 55,
+      "pt": "visualizes",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly equates the figure to a map of the field, semantically establishing the visualization relationsh"
+    },
+    {
+      "i": 56,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "Sentence explicitly states T1 events causally reduce deformation, matching the influence pattern, node roles, and direct"
+    },
+    {
+      "i": 57,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "Evidence text states correlation ('correlated with') rather than the causal/functional dependence required by the 'influ"
+    },
+    {
+      "i": 58,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": ""
+    },
+    {
+      "i": 59,
+      "pt": "absence_of_phenomenon",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text states characteristics are independent of microscopic details, not that the details themselves are absent; the "
+    },
+    {
+      "i": 60,
+      "pt": "claim_relation",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence describes a physical correlation between phenomena rather than a discourse relation between claims/approach"
+    }
+  ]
+}
