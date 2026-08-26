@@ -1,0 +1,1063 @@
+
+Hyper-KGGen: A Skill-Driven Knowledge Extractor for High-Quality Knowledge Hypergraph Generation
+ 
+ 
+ Report GitHub Issue
+ ×
+ 
+ 
+ Title:
+ 
+ 
+Content selection saved. Describe the issue below:
+ Description:
+ 
+ 
+ 
+ Submit without GitHub
+ Submit in GitHub
+ 
+ 
+ 
+ arXiv is now an independent nonprofit!
+ Learn more
+ ×
+ 
+ 
+ 
+ Back to arXiv
+ 
+ 
+ 
+ 
+ Why HTML?
+ 
+ 
+ 
+ 
+ Report Issue
+ 
+ 
+ 
+ 
+ 
+ 
+ Back to Abstract
+ 
+ 
+ 
+ 
+ 
+ 
+ Download PDF
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Abstract.
+1 Introduction
+2 Related work
+2.1 Knowledge Extraction
+2.2 Hypergraph Knowledge Extraction
+2.3 Skill Distillation and Reuse
+3 Preliminary and Definition
+4 Methodology
+4.1 Overview
+4.2 Coarse-to-Fine Hypergraph Knowledge Extraction
+4.2.1 Document Chunking
+4.2.2 Entity Extraction
+4.2.3 Coarse-to-Fine Hyperedge Extraction
+4.2.4 Knowledge Deduplication
+4.3 Adaptive Skill Acquisition for Diverse Scenarios
+4.3.1 Parallel Rollout for Candidate Generation
+4.3.2 Adaptive Reward for Diverse Scenarios
+4.3.3 Adaptive Skill Acquisition and Deployment
+5 Experiment
+5.1 Experiment Setting
+5.1.1 Dataset
+5.1.2 Baselines
+5.1.3 Implementation Details
+5.1.4 Evaluation Metrics
+5.2 Main Results
+5.3 Analysis
+5.3.1 Semantic Matching Threshold Sensitivity
+5.3.2 Robustness across LLMs
+5.3.3 Effect of the Number of Rollouts
+5.3.4 Skills vs. Few-shot
+5.3.5 Retrieval Efficiency Analysis
+6 Conclusion
+References
+A Baselines
+B Additional Results
+C Case Study
+C.1 Raw Text
+C.2 Knowledge Hypergraph of Hyper-KGGen
+ 
+ License: CC BY 4.0
+ 
+ 
+arXiv:2602.19543v2 [cs.CL] 05 Jul 2026
+Hyper-KGGen: A Skill-Driven Knowledge Extractor for High-Quality Knowledge Hypergraph Generation
+Conference: Proceedings of the 32nd ACM SIGKDD Conference on Knowledge Discovery and Data Mining V.2; August 09–13, 2026; Jeju Island, Republic of KoreaProceedings of the 32nd ACM SIGKDD Conference on Knowledge Discovery and Data Mining V.2 (KDD ’26), August 09–13, 2026, Jeju Island, Republic of KoreaDOI: 10.1145/3770855.3818198ISBN: 979-8-4007-2259-2/2026/08CCS: Computing methodologies Knowledge representation and reasoning
+Rizhuo Huang
+Note: Both authors contributed equally to this research.
+Affiliation: Xi’an Jiaotong University, State Key Laboratory of Human-Machine Hybrid Augmented Intelligence, Institute of Artificial Intelligence and Robotics, Xi’an, China
+email: rizhuo.huang@stu.xjtu.edu.cn
+, 
+Yifan Feng
+Affiliation: Tsinghua University, Beijing, China
+email: evanfeng97@gmail.com
+, 
+Rundong Xue
+Affiliation: Xi’an Jiaotong University, State Key Laboratory of Human-Machine Hybrid Augmented Intelligence, Institute of Artificial Intelligence and Robotics, Xi’an, China
+email: xuerundong2002@gmail.com
+, 
+Shihui Ying
+Affiliation: Shanghai University, Shanghai, China
+email: shying@shu.edu.cn
+, 
+Jun-Hai Yong
+Affiliation: Tsinghua University, Beijing, China
+email: yongjh@tsinghua.edu.cn
+, 
+Chuan Shi
+Affiliation: Beijing University of Posts and Telecommunications, Beijing, China
+email: shichuan@bupt.edu.cn
+, 
+Shaoyi Du
+Affiliation: Xi’an Jiaotong University, State Key Laboratory of Human-Machine Hybrid Augmented Intelligence, Institute of Artificial Intelligence and Robotics, Xi’an, China
+email: dushaoyi@xjtu.edu.cn
+Note: Corresponding Authors.
+ and 
+Yue Gao
+Affiliation: Tsinghua University, Beijing, China
+email: gaoyue@tsinghua.edu.cn
+© cc
+Abstract.
+ 
+Knowledge hypergraphs surpass traditional binary knowledge graphs by encapsulating complex nn-ary atomic facts, providing a more comprehensive paradigm for semantic representation.
+However, constructing high-quality hypergraphs remains challenging due to the scenario gap: generic extractors struggle to generalize across diverse domains with specific jargon, while existing methods often fail to balance structural skeletons with fine-grained details.
+To bridge this gap, we propose Hyper-KGGen, a skill-driven framework that reformulates extraction as a dynamic skill-evolving process.
+First, Hyper-KGGen employs a coarse-to-fine mechanism to systematically decompose documents, ensuring full-dimensional coverage from binary links to complex hyperedges.
+Crucially, it incorporates an adaptive skill acquisition module that actively distills domain expertise into a Global Skill Library. This is achieved via a stability-based feedback loop, where extraction stability serves as a relative reward signal to induce high-quality skills from unstable traces and missed predictions.
+Additionally, we present HyperDocRED, a rigorously annotated benchmark for document-level knowledge hypergraph extraction.
+Experiments demonstrate that Hyper-KGGen significantly outperforms strong baselines, validating that evolved skills provide substantially richer guidance than static few-shot examples in multi-scenario settings. The source codes are available at https://github.com/Rizrock/Hyper-KGGen.
+ 
+Keywords: Knowledge Extraction, Knowledge Hypergraphs, Data Generation
+††cc-license: by
+1. Introduction
+Transforming unstructured text into structured knowledge representations is a fundamental pursuit in artificial intelligence (Schneider, 1973; Angeli et al., 2015), serving as the backbone for advanced reasoning and retrieval augmented generation (RAG) systems. Traditionally, Knowledge Graphs (KGs) have been the gold standard, modeling information as binary relations, formulated as (head, relation, tail) triples. However, this formulation often functions merely as a skeletal representation, oversimplifying the rich semantic complexities of the real world. A substantial fraction of facts are inherently nn-ary (n>2n>2), involving crucial contextual qualifiers such as time, location, and conditions (Luo et al., 2025). Reducing these high-order dependencies into independent pairwise correlations inevitably leads to information loss and semantic ambiguity. Consequently, Knowledge Hypergraphs (Fatemi et al., 2019; Zeng et al., 2023), which model atomic facts as unified hyperedges connecting multiple entities, have emerged as a superior paradigm for preserving the comprehensive fidelity of raw corpora (Liu et al., 2020; Rosso et al., 2020; Wen et al., 2016).
+Despite the representational advantages of hypergraphs, effective extraction remains an open challenge. Existing hypergraph extraction methods typically focus heavily on identifying complex high-order relations. While effective for specific patterns, they often exhibit weakness in capturing fundamental low-order pairwise associations, leading to a "top-heavy" structure that lacks foundational connectivity. This imbalance hinders modeling full-dimensional associative knowledge, where simple links and complex hyperedges must coexist to form a coherent semantic network.
+Figure 1. Illustration of the Scenario Gap of general prompting and domain-specific prompting. Using generic prompts in KGGen leads to suboptimal knowledge extraction. By contrast, applying domain-specific “adaptive prompts” substantially improves the model’s ability to extract facts.
+Furthermore, a significant barrier to high-quality extraction lies in the Scenario Gap. As illustrated in Fig. 1, generic extraction models struggle to generalize across diverse domains (e.g., biomedical, legal, financial) due to the presence of industry jargon, implicit logic, and domain-specific boundaries. Our preliminary analysis reveals that while generic prompts yield suboptimal performance, manually optimizing prompts for specific domains significantly boosts extraction quality. This observation confirms that the model possesses the latent capability to handle domain tasks but lacks the explicit Skill to align with scenario-specific constraints. However, manually crafting optimal prompts for every possible domain is unscalable. Therefore, there is an urgent need for an adaptive strategy that can automatically bridge this gap, transforming a generic extractor into a scenario-expert without human intervention.
+To address these challenges, we propose Hyper-KGGen, a novel skill-driven framework designed for high-quality hypergraph generation.
+First, to ensure structural integrity, we introduce a Coarse-to-Fine Extraction mechanism. This module initially establishes a skeletal graph of entities and binary relations, then progressively enriches it with spatiotemporal details to form complex nn-ary hyperedges, realizing full-dimensional knowledge modeling.
+Second, to overcome the scenario gap, we propose an Adaptive Skill Acquisition mechanism. Instead of relying on static prompts, this module actively distills high-quality extraction skills from the execution history of model, evolving a Global Skill Library 𝒮\mathcal{S}.
+Finally, tackling the difficulty of quantifying scenario-specific knowledge, we design a Stability-based Relative Reward strategy. By categorizing extraction results into stable, unstable, and missed sets, we quantify the model’s confidence boundaries, enabling targeted optimization through path induction and hindsight reasoning.
+To facilitate research in this area, we also construct and release HyperDocRED, a high-quality benchmark for document-level hypergraph extraction. Extensive experiments demonstrate that Hyper-KGGen significantly outperforms state-of-the-art baselines, verifying that learned skills carry substantially more informational value than few-shot examples in multi-scenario settings.
+Our contributions are summarized as follows:
+• 
+We propose a Coarse-to-Fine extraction paradigm that systematically decomposes complex documents, achieving robust full-dimensional hypergraph modeling from binary skeletons to nn-ary details.
+• 
+We introduce a Skill-Driven mechanism to bridge the scenario gap. By maintaining a Global Skill Library, our method enables the model to actively acquire and deploy domain-specific expertise, overcoming the brittleness of generic prompts.
+• 
+We design a Stability-based Relative Reward strategy to quantify the elusive concept of scenario knowledge. By leveraging unstable and missed extraction sets, we implement an efficient self-improving loop that minimizes domain blind spots.
+• 
+We release HyperDocRED, a rigorously annotated benchmark for n-ary knowledge extraction, to foster further research in high-quality knowledge hypergraph construction.
+2. Related work
+2.1. Knowledge Extraction
+Knowledge Extraction is a fundamental task in Natural Language Processing, typically represented through the canonical structure of triple-based Knowledge Graphs. Early works (Suchanek et al., 2007; Oramas et al., 2015; Norabid and Fauzi, 2022) primarily relied on hard-coded heuristic rules to extract knowledge from multi-domain corpora. With the advancement of deep learning, language models based on the Transformer architecture (Arsenyan et al., 2024; Zhang and Soh, 2024; Qiao et al., 2022) have gradually superseded traditional encoding approaches. This paradigm evolution catalyzed the development of automated Knowledge Graph construction frameworks, which are capable of capturing intricate semantic relationships between entities. More recently, the emergence of Large Language Models (LLMs) has facilitated efficient zero-shot extraction. Some methods (Mo et al., 2025; Zhang et al., 2025a; Huang et al., 2025a) have explored orchestrating LLM-based workflows for knowledge extraction, which boost both efficiency and generalization across diverse texts.
+However, triple-based methods are limited to binary relations, making it difficult to cover complex, multi-entity facts and their real-world semantic details.
+2.2. Hypergraph Knowledge Extraction
+To better capture nn-ary facts and qualifiers beyond triple-based graphs, recent work has increasingly adopted knowledge hypergraphs as a more faithful representation for knowledge extraction. Early works (Chia et al., 2022), proposing the concept of hyper-relation, model argument and qualifier interactions via a cube-filling formulation, while Text2NKG (Luo et al., 2024) further casts nn-ary extraction as multi-label classification over span tuples and supports multiple schemas. However, these approaches often rely on predefined label sets, limiting coverage on diverse genres and long-tail relations.
+With the improved generalization of LLMs, recent RAG systems have started to construct knowledge hypergraphs directly from raw text using LLM-driven pipelines. Hyper-RAG (Feng et al., 2025) adopts a two-stage process: it first extracts entities and then induces both low-order (binary) and high-order (multi-entity) associations as hyperedges. HyperGraphRAG (Luo et al., 2025) instead treats each text chunk as a hyperedge-like knowledge unit and links mentioned entities as incident nodes, while Cog-RAG (Hu et al., 2025) further introduces a theme-level hypergraph with thematic summarization to enhance semantic coverage, enabling efficient and high-quality hypergraph extraction across diverse textual scenarios.
+Following this direction in hypergraph-based knowledge modeling, HGMEM represents multi-step RAG memory as a dynamic hypergraph, where evolving hyperedges act as knowledge units and capture high-order associations among retrieved facts (Zhou et al., 2025).
+Despite their strong performance on complex texts, existing methods typically rely on fixed extraction strategies and often fail to produce consistently high-quality hypergraphs when transferred across domains due to scenario gaps. Hyper-KGGen introduces an adaptive skill acquisition module that actively distills domain expertise into a Global Skill Library and applies these skills during extraction to overcome this limitation.
+2.3. Skill Distillation and Reuse
+Skill distillation and reuse treat the reasoning traces and execution processes produced at test time as a learnable source of skills, and distill these skills into reusable external priors. This line of research is closely related to an agent’s reflection mechanism and related forms of memory-augmented, test-time adaptation.
+Reflexion  (Shinn et al., 2023) stores self-reflections as episodic memory and reuses them to steer later attempts. DSPy (Khattab et al., 2023) compiles prompts and intermediate modules into a searchable, compositional program and selects configurations that yield more stable reasoning. Recent work further distills test-time rollouts into reusable repositories. ACE (Zhang et al., 2025b) curates a strategy library via generate–reflect–filter cycles and retrieves strategies for new queries. Training-Free GRPO (Cai et al., 2025) optimizes context-level experience entries through explicit edits rather than parameter updates. RSE (Wang et al., 2026) aggregates test-time samples into an experience bank by extracting stable intermediate conclusions and recurring failure patterns.
+Although these methods have demonstrated the ability to improve continuously in general reasoning and agentic workflow settings, whether their underlying ideas can be effectively transferred to knowledge extraction remains unexplored. Hyper-KGGen fills this gap by learning transferable reasoning skills across scenarios from historical extraction traces, and summarizing LLM-intrinsic logical blind spots to drive more reliable hypergraph generation.
+3. Preliminary and Definition
+In this section, we formally define the Knowledge Hypergraph Extraction Task and specify the structural representation of entities and relations. Furthermore, we establish the Optimization Objective, aiming to align the generated hypergraph with the human-annotated gold standard, thereby setting the stage for our proposed framework.
+Knowledge Hypergraph Extraction Task. 
+Given a raw document DD, the goal is to reconstruct the underlying semantic structure by mapping the unstructured text into a structured knowledge hypergraph:
+(1)
+𝒢=(𝒱,ℰ),\mathcal{G}=(\mathcal{V},\mathcal{E}),
+where the node set 𝒱\mathcal{V} corresponds to the unique entities extracted from Document DD, and the hyperedge set ℰ\mathcal{E} represents the atomic knowledge units connecting these entities.
+Unlike conventional knowledge graphs where edges are strictly binary, a hyperedge e∈ℰe\in\mathcal{E} in our setting is defined as a tuple to capture complex high-order nn-ary interactions:
+(2)
+e=(r,𝒱e),e=(r,\mathcal{V}_{e}),
+where rr denotes the semantic description (or relation type) of the knowledge unit, and 𝒱e⊆𝒱\mathcal{V}_{e}\subseteq\mathcal{V} denotes the subset of entities involved in this relation. To unify both simple binary relations and complex multi-party interactions within a single framework, we constrain the cardinality of the entity subset to satisfy |𝒱e|≥2|\mathcal{V}_{e}|\geq 2.
+Optimization Objective. 
+We assume the existence of an ideal, ground-truth knowledge hypergraph 𝒢∗=(𝒱∗,ℰ∗)\mathcal{G}^{*}=(\mathcal{V}^{*},\mathcal{E}^{*}) for a given document DD. This gold standard is characterized by being comprehensive (covering all salient facts in DD) and precise (accurately reflecting semantic dependencies).
+Consequently, the extraction task is formalized as learning a mapping function ff:
+(3)
+𝒢^=f⁡(D,θ),\hat{\mathcal{G}}=f(D;\theta),
+where θ\theta represents the parameters of the extraction model. The ultimate objective is to generate a predicted hypergraph 𝒢^=(𝒱^,ℰ^)\hat{\mathcal{G}}=(\hat{\mathcal{V}},\hat{\mathcal{E}}) such that it maximizes the alignment with the ideal graph 𝒢∗\mathcal{G}^{*}. Specifically, this requires maximizing the semantic overlap between the predicted hyperedges ℰ^\hat{\mathcal{E}} and the ground-truth hyperedges ℰ∗\mathcal{E}^{*}, ensuring that complex nn-ary relationships are correctly identified and structurally formed.
+Figure 2. The overall architecture of our proposed Hyper-KGGen framework for high quality knowledge hypergraph generation. It consists two modules: (a) is the Coarse-to-Fine Knowledge Hypergraph Extraction module, and (b) is the Adaptive Diverse Scenarios Skill Acquisition module for iteratively generate reusable skills to Skill Library from execution history.
+4. Methodology
+In this section, we present Hyper-KGGen, a novel framework designed for high-quality knowledge hypergraph construction across diverse scenarios. Unlike prior approaches that rely on rigid schema matching or extensive parameter fine-tuning, Hyper-KGGen integrates a hierarchical structural parsing mechanism with a dynamic skill evolution strategy. This allows the model to systematically decompose complex documents while actively acquiring scenario-specific extraction skills from its own successes and failures.
+4.1. Overview
+To achieve the optimization objective defined in Section 3, we reformulate the knowledge extraction task as a conditional generation process augmented by an external evolving memory. Instead of updating the massive model parameters θ\theta via computationally expensive gradient descent, we freeze the LLM and optimize a semantic Global Skill Library 𝒮\mathcal{S}.
+Formally, the generation process is defined as:
+(4)
+𝒢^=f⁡(D,𝒮,θ),\hat{\mathcal{G}}=f(D,\mathcal{S};\theta),
+where DD denotes the input document, θ\theta represents the frozen LLM parameters, and 𝒮\mathcal{S} is learnable skill library, initialized as 𝒮0=∅\mathcal{S}_{0}=\emptyset.
+Our goal is to iteratively evolve 𝒮\mathcal{S} such that the generated hypergraph 𝒢^\hat{\mathcal{G}} progressively aligns with the gold standard 𝒢∗\mathcal{G}^{*}. As illustrated in Fig. 2, the framework operates in a closed-loop cycle comprising two core phases:
+• 
+Forward Pass: Coarse-to-Fine Extraction. Given a document DD and the current skills 𝒮\mathcal{S}, the model first establishes a structural skeleton of entities and binary relations, then progressively fills in spatiotemporal details to construct complex nn-ary hyperedges. This hierarchical approach reduces the cognitive load on the LLM, ensuring the structural integrity of the output graph 𝒢^=(𝒱,ℰ)\hat{\mathcal{G}}=(\mathcal{V},\mathcal{E}).
+• 
+Backward Feedback: Adaptive Skill Acquisition. To bridge the gap between the generated 𝒢^\hat{\mathcal{G}} and the ground truth 𝒢∗\mathcal{G}^{*}, we design a feedback mechanism based on extraction stability. By performing parallel rollouts, we categorize relations into stable, unstable, and missed sets. The system then distills high-quality extraction skills from these discrepancies—specifically through path induction for unstable relations and hindsight reasoning for missed ones—and updates the Global Skill Library 𝒮\mathcal{S} via a memory controller.
+Through this iterative interplay, Hyper-KGGen continuously accumulates scenario-specific expertise, enabling robust and high-precision knowledge extraction across varying domains.
+4.2. Coarse-to-Fine Hypergraph Knowledge Extraction
+In this module, we propose a Coarse-to-Fine Knowledge Extraction pipeline designed to transform unstructured documents into a high-quality knowledge hypergraph 𝒢=(𝒱,ℰ)\mathcal{G}=(\mathcal{V},\mathcal{E}). Unlike traditional approaches that treat all relations uniformly, our method follows a hierarchical paradigm: it first establishes the structural skeleton of the text and progressively fills in spatiotemporal details and complex narrative events. The overall process comprises four distinct stages: document chunking, entity extraction, coarse-to-fine hyperedge extraction, and global knowledge deduplication.
+4.2.1. Document Chunking
+Directly processing long documents poses challenges for LLMs due to context window limitations. To address this, we employ an adaptive document chunking strategy that preserves semantic integrity. Instead of applying fixed-length truncation, we split the input document DD at natural boundaries (e.g., sentence endings or paragraph breaks).
+Formally, we generate a sequence of chunks:
+(5)
+𝒞={c1,c2,…,cm}.\mathcal{C}=\{c_{1},c_{2},\dots,c_{m}\}.
+To mitigate information loss at cut-off points, we introduce an overlapping window mechanism where adjacent chunks share a localized context oo. This redundancy ensures that cross-boundary entities and relations are captured in at least one chunk, facilitating subsequent extraction tasks.
+4.2.2. Entity Extraction
+Entities serve as the fundamental nodes 𝒱\mathcal{V} in the hypergraph 𝒢\mathcal{G}. For each chunk ci∈𝒞c_{i}\in\mathcal{C}, we prompt the LLM to identify all valid mentions, assign fine-grained types, and generate concise descriptions based on the local context. This step isolates the atomic semantic units of the document, creating a candidate entity pool necessary for constructing complex relationships.
+4.2.3. Coarse-to-Fine Hyperedge Extraction
+Drawing upon the extracted entities, we design a Coarse-to-Fine modeling strategy to mine hyperedges ℰ\mathcal{E}. We categorize relationships into three granularities, guiding the model to progressively capture information from the basic structural skeleton to intricate narrative details:
+• 
+Binary Relations (The Skeleton). These represent the coarsest level of interaction, capturing the fundamental pairwise links between entities (e.g., Subject-Predicate-Object). They serve as the “structural skeleton” of the hypergraph, providing the basic connectivity without complex constraints.
+• 
+Qualified Binary Relations (Contextual Augmentation). Moving to a finer granularity, these relations augment standard binary links with qualifying arguments such as time, location, or specific conditions. This category transforms static binary links into dynamic interactions situated in specific spatiotemporal contexts, offering a richer representation than simple triples.
+• 
+General NN-ary Relations (Event Details). At the finest level, we model complex interactions involving multiple entities as general hyperedges in ℰ\mathcal{E}. Unlike binary links, these relations encapsulate entire events or story plots, where multiple participants jointly instantiate a coherent scenario. This granularity captures the nuances of the narrative, treating events as holistic structured units rather than decomposing them into fragmented pairwise edges.
+4.2.4. Knowledge Deduplication
+Since the chunking process involves overlaps and entities may appear repeatedly across different chunks, the raw extraction results contain redundancy. We implement a global clustering and fusion mechanism to consolidate the knowledge.
+First, we perform cross-chunk coreference resolution to cluster mentions referring to the same real-world entity. Second, we merge hyperedges that share identical semantic meanings. For both entities and relations, we synthesize their descriptions by aggregating details from all instances, resulting in a unified and low-redundancy knowledge hypergraph 𝒢\mathcal{G}.
+4.3. Adaptive Skill Acquisition for Diverse Scenarios
+While LLMs possess extensive general knowledge, they often struggle to align with the intricate constraints of specific domains, particularly when extracting complex nn-ary hyperedges. To bridge this gap, we propose an Adaptive Skill Acquisition mechanism. Instead of static prompt tuning, this module establishes a dynamic feedback loop that categorizes extraction results based on their stability, efficiently distilling high-quality extraction skills from unstable and missed instances to refine a global skill library 𝒮\mathcal{S}.
+4.3.1. Parallel Rollout for Candidate Generation
+Extracting complex nn-ary relations involves high uncertainty. Single-pass inference is susceptible to decoding randomness and cognitive bias, often failing to cover the intricate semantic structures hidden in the document. To mitigate this, we employ a Parallel Rollout strategy.
+Given a training document DD and the current skill library 𝒮\mathcal{S}, we independently sample the model’s output KK times using a non-zero temperature TT. This generates a diverse set of candidate hypergraphs to probe the model’s capability boundaries:
+(6)
+𝒢^(k)∼pθ(𝒢∣D,𝒮;T),k=1,…,K,\hat{\mathcal{G}}^{(k)}\sim p_{\theta}\!\left(\mathcal{G}\mid D,\mathcal{S};T\right),\quad k=1,\ldots,K,
+(7)
+𝒢^​(D)={𝒢^(1),…,𝒢^(K)}.\hat{\mathcal{G}}(D)=\left\{\hat{\mathcal{G}}^{(1)},\ldots,\hat{\mathcal{G}}^{(K)}\right\}.
+Here, 𝒢^​(D)\hat{\mathcal{G}}(D) aggregates KK parallel hypotheses. This multi-path exploration helps offset random perturbations and exposes the stability of different relational patterns, providing a rich data source for subsequent analysis.
+4.3.2. Adaptive Reward for Diverse Scenarios
+Evaluating nn-ary relations is significantly more challenging than binary relations due to their fuzzy boundaries and multi-argument complexity. Hard matching often fails to capture partial successes (e.g., extracting 9 out of 10 nodes). Therefore, we introduce a soft evaluation metric based on semantic distance. By computing the embedding similarity between the descriptions of extracted hyperedges and the gold standard 𝒢∗\mathcal{G}^{*}, we assess extraction quality in a continuous semantic space.
+Furthermore, to quantify the distinction between general knowledge and scenario-specific knowledge, we implement a stability-based reward strategy.
+Stability-based Relative Reward. 
+By aligning the KK candidate graphs with 𝒢∗\mathcal{G}^{*}, we categorize the gold relations into three distinct subsets based on their retrieval frequency:
+• 
+Stable Set. Relations consistently retrieved across all samples. These correspond to General Knowledge that the model’s internal weights can handle robustly without external aid.
+• 
+Unstable Set. Relations retrieved only in a subset of trajectories. These typically represent Scenario-Specific Knowledge (e.g., industry jargon or implicit connections), where the model oscillates between success and failure due to insufficient grounding and low confidence.
+• 
+Miss Set. Relations never retrieved in any sample. These indicate Domain-Exclusive Knowledge or deep reasoning gaps where the model completely lacks the necessary extraction logic.
+Adaptive Reflective Computation. 
+Based on the categorization above, we ignore the Stable Set (as no optimization is needed) and focus on distilling skills from the latter two:
+• 
+Path Induction for Unstable Set. For unstable relations, we analyze the successful trajectories where the model correctly extracted the hyperedge. We prompt the LLM to summarize the reasoning path that led to these successes, explicitly articulating the scenario-specific logic to stabilize future inference.
+• 
+Hindsight Reasoning for Miss Set. For relations in the Miss Set, we employ a Hindsight Reasoning strategy. We inject the ground-truth relation from 𝒢∗\mathcal{G}^{*} into the context as a posterior condition. Knowing that the relation exists, the model backtracks through the document, locates overlooked evidence, and constructs a logical chain from scratch. This process generates a fresh extraction rule aimed at covering the prior blind spots.
+These reflective processes output a set of optimization proposals, which are then fed into the library maintenance module.
+4.3.3. Adaptive Skill Acquisition and Deployment
+This module consolidates the fragmented proposals into the global skill library 𝒮\mathcal{S} and deploys them to enhance multi-scenario extraction.
+Skill Acquisition. 
+To maintain the efficiency of 𝒮\mathcal{S}, we employ a Skill Library Controller that ensures compactness and consistency. It processes incoming proposals via four dynamic operations:
+• 
+ADD new skills to cover missed extraction patterns;
+• 
+MODIFY existing skills to improve generalizability;
+• 
+MERGE redundant skills to maintain a compact skill library;
+• 
+KEEP the skill unchanged.
+This ensures that 𝒮\mathcal{S} evolves into a high-quality repository of distinct extraction skills.
+Skill Deployment. 
+During the inference phase, relevant skills from 𝒮\mathcal{S} are dynamically retrieved and injected into the prompt. This augments the generic instructions with scenario-specific expertise, enabling the model to perform high-quality hypergraph generation across diverse domains.
+5. Experiment
+In this section, we present the experimental evaluation of Hyper-KGGen.
+We report result for two variants: Hyper-KGGen denotes the base model without acquired skills while Hyper-KGGen+ represents the skill-augmented model that incorporates the learned skill library 𝒮\mathcal{S}.
+We first outline the experimental setup and compare Hyper-KGGen with various baselines, then provide an in-depth analysis of its hypergraph generation ability, focusing on nn-ary relation extraction, factual coverage, and downstream utility.
+Figure 3. Precision-Recall Curves for nn-ary Relation Extraction on the HyperDocRED Dataset.
+5.1. Experiment Setting
+5.1.1. Dataset
+To evaluate the ability of Hyper-KGGen in handling diverse document structures and complex semantic relations, we conduct experiments on three tasks across four datasets, including a newly constructed benchmark for nn-ary relation extraction:
+Table 1. Statistics of the HyperDocRED Dataset.
+Split
+Sample
+Entity
+Correlation
+Low-order
+High-order
+Total
+Train
+50
+1016
+326
+310
+636
+Test
+100
+2127
+758
+613
+1371
+HyperDocRED Dataset: To evaluate the performance on a standard benchmark adapted for nn-ary relational contexts, we construct the HyperDocRED Bench based on the widely used Re-DocRED corpus (Tan et al., 2022). We manually restructure the original binary annotations into nn-ary relations to match the requirements of knowledge hypergraph construction. Specifically, we target explicit and complete nn-ary relations as expressed in the text, preserving each relation as an integral semantic unit rather than fragmenting it into multiple binary triples. The dataset contains 50 training documents serving as the seed source for skill acquisition and 100 test documents for evaluation. Detailed statistics are shown in Table 1.
+MINE Dataset (Mo et al., 2025): The MINE dataset serves as a benchmark for complex document-level extraction, containing 100 articles. The corpus is linguistically diverse, covering multiple domains including history, art, science, ethics, and psychology. The articles are generated by the LLM based on 100 distinct topics to ensure semantic richness, followed by rigorous human verification to establish the gold standard for hyper-relational extraction.
+UltraDomain Benchmark (Qian et al., 2025): The UltraDomain is sourced from 428 college textbooks and encompasses 18 distinct domains, covering fields such as social sciences and the humanities. We choose the Pathology and Mix datasets for the downstream RAG evaluation.
+5.1.2. Baselines
+In performance comparison, we consider several state-of-the-art baselines, including knowledge graph extraction models: KGGen (Mo et al., 2025), iText2KG (Lairgi et al., 2024), RAKG (Zhang et al., 2025a), text-based RAG: NativeRAG  (Gao et al., 2023), graph-based RAG: GraphRAG  (Edge et al., 2024), LightRAG  (Guo et al., 2024), HiRAG  (Huang et al., 2025b), and hypergraph-enhanced RAG approaches: HyperGraphRAG (Luo et al., 2025), Hyper-RAG (Feng et al., 2025), and Cog-RAG (Hu et al., 2025). We follow the official settings and implementations with GPT-4o-mini as the LLM for all baselines. Baseline details are provided in Appendix A.
+Table 2. Instructional Response Quality on Mix and Pathology across Five Dimensions.
+Method
+Mix
+Pathology
+Comp.
+Diver.
+Empo.
+Logi.
+Read.
+Avg.
+Comp.
+Diver.
+Empo.
+Logi.
+Read.
+Avg.
+NativeRAG
+87.1087.10
+76.6476.64
+74.6274.62
+82.0682.06
+80.4680.46
+80.1880.18
+90.5090.50
+83.6083.60
+77.0077.00
+86.5086.50
+86.5086.50
+84.2284.22
+GraphRAG
+89.0089.00
+79.7079.70
+74.6674.66
+83.0083.00
+82.3282.32
+81.7481.74
+90.6090.60
+82.2082.20
+78.7878.78
+87.2087.20
+86.4286.42
+85.0485.04
+LightRAG
+88.2088.20
+75.9075.90
+74.9474.94
+83.8083.80
+82.9282.92
+81.1581.15
+91.5091.50
+83.7483.74
+78.7078.70
+86.7686.76
+85.5885.58
+85.2685.26
+HiRAG
+88.0088.00
+79.8679.86
+76.8076.80
+84.0684.06
+83.4483.44
+82.4382.43
+90.9090.90
+83.5683.56
+80.98
+87.1687.16
+86.3486.34
+85.7985.79
+Hyper-RAG
+90.50
+83.40
+78.3278.32
+85.4085.40
+83.9683.96
+84.3284.32
+91.4091.40
+84.9284.92
+80.6080.60
+87.2287.22
+86.0086.00
+86.0386.03
+HyperGraphRAG
+90.2090.20
+81.5081.50
+78.7078.70
+84.9484.94
+83.4683.46
+83.7683.76
+91.7091.70
+83.6483.64
+79.9679.96
+87.5487.54
+86.3486.34
+85.8485.84
+Cog-RAG
+90.1090.10
+83.34
+78.5278.52
+85.94
+84.9684.96
+84.5784.57
+91.1091.10
+85.30
+79.0279.02
+88.30
+86.84
+86.1186.11
+Hyper-KGGen
+90.0290.02
+82.1082.10
+79.04
+86.78
+85.42
+84.67
+91.90
+85.0085.00
+79.7079.70
+88.50
+87.38
+86.50
+Hyper-KGGen+
+91.24
+83.0083.00
+79.91
+85.6185.61
+85.74
+85.10
+92.35
+85.71
+81.10
+88.2788.27
+86.1786.17
+86.72
+5.1.3. Implementation Details
+We evaluate Hyper-KGGen along three complementary axes, covering nn-ary relation extraction, fact coverage, and downstream utility.
+(1) For nn-ary relation extraction on HyperDocRED, the precision and recall of nn-ary relations are measured using a semantic-based evaluation pipeline: relation descriptions are encoded with the all-MiniLM-L6-v2 SentenceTransformer. We then compute a cosine-similarity matrix and apply the Hungarian algorithm to find the optimal global matching between predicted and ground-truth relations.
+(2) For fact coverage on MINE, we formulate a fact-verification task with 15 ground-truth facts per article. For each query fact, we retrieve the top 5 nodes with the highest semantic similarity and expand each retrieved node to its 2-hop neighborhood to construct a candidate subgraph. The retrieved contexts are provided to an LLM, which performs binary fact-checking conditioned on the assembled context evidence (1 if the retrieved context supports the fact, 0 otherwise).
+(3) For downstream utility on UltraDomain, we integrate the Hyper-KGGen as the knowledge hypergraph database construction backbone into the standard RAG pipeline on downstream benchmarks. Specifically, we construct a structured hypergraph database from the corpus with a standard procedure.
+At retrieval time, given a user query, we retrieve the relevant entities and hyperedges, perform a one-hop expansion to collect context evidence, and then feed the retrieved evidence to the LLM for response generation.
+5.1.4. Evaluation Metrics
+For nn-ary relation extraction, we plot Precision-Recall curves by treating each predicted nn-ary relation as a detection and each gold relation as a ground-truth instance.
+For fact coverage, we verify ground-truth facts and report Accuracy over all facts in the test set.
+For downstream utility, we adopt an LLM-based score evaluation strategy (Wang et al., 2024; Feng et al., 2025) that judges the responses produced by baselines along five dimensions: Comprehensiveness, Diversity, Empowerment, Logical, and Readability.
+5.2. Main Results
+In this section, we present a comprehensive evaluation of Hyper-KGGen compared with state-of-the-art baselines.
+To assess its capabilities from complementary perspectives, we organize our experiments into three aspects:
+(1) nn-ary relation extraction, evaluating the structural accuracy of the generated nn-ary relations on the HyperDocRED dataset; (2) Fact coverage, measuring semantic completeness and information retention on MINE dataset; and (3) Downstream utility, validating whether the constructed hypergraphs improve RAG task performance on UltraDomain benchmarks.
+Superior Performance in nn-ary Relation Extraction. 
+As shown in Fig. 3, Hyper-KGGen consistently outperforms all baseline methods.
+Hyper-KGGen achieves exceptional recall for nn-ary relations while maintaining high precision, indicating its ability to capture complete nn-ary semantics rather than fragment them into arbitrary components. Furthermore, the deployment of learned skills further uncovers additional nn-ary relations without compromising precision, which validates the effectiveness of skills distilled from different scenario knowledge during adaptive skill acquisition.
+High Fact Coverage Across Domains. 
+Beyond its strong performance in nn-ary relation extraction, Hyper-KGGen captures a broader set of salient facts from diverse-domain texts.
+As shown in Fig. 4, the fact-capture distribution of Hyper-KGGen is clearly shifted toward higher coverage: a larger fraction of its constructed KGs concentrate in the high-capture regime, while the baselines exhibit a heavier low-coverage tail and more mass in mid-range bins.
+The dotted vertical line of Hyper-KGGen also lies rightmost, indicating a higher overall coverage.
+These results suggest that the acquired skills provide additional scenario priors, improving robustness across domains and enabling a more effective structured representation of the source text with reduced information loss.
+Figure 4. Distribution of MINE scores across 100 articles for KGGen, Cog-RAG, and Hyper-KGGen. Dotted vertical lines show average performance.
+Downstream Utility on RAG Tasks. 
+The effectiveness of structured RAG systems depends not only on retrieval heuristics, but also on the quality of the underlying knowledge substrate. To further examine how the generated structured knowledge contributes to downstream utility, we conduct RAG experiments. As shown in Table 2, Hyper-KGGen achieves the best average instructional quality on Mix and Pathology.
+This reveals the reliability of the knowledge hypergraphs generated by Hyper-KGGen and suggests that improving the hypergraph substrate can boost utility even with simple retrieval, highlighting that high-quality hypergraph construction is a primary driver of downstream utility.
+Notably, the gap between Hyper-KGGen and baselines is modest, since the graph mainly serves retrieval while the generation relies on raw text chunks.
+With sufficient retrieval budget, baselines tend to retrieve highly overlapping text, narrowing the quality gap.
+5.3. Analysis
+In this section, we further analyze the model’s nn-ary relation extraction performance and its robustness across different backbone LLMs. We also conduct an ablation on the entity retrieval module by varying the top-kk retrieved entities and examining the resulting context quality. Finally, we investigate the relationship between skill induction and few-shot prompting in the context of knowledge extraction.
+5.3.1. Semantic Matching Threshold Sensitivity
+We evaluate how varying the semantic matching threshold affects nn-ary relation extraction performance. As shown in Fig. 3, we compare precision–recall behavior across models under thresholds of 0.65, 0.70, and 0.75. We observe that Hyper-KGGen consistently maintains high precision regardless of the threshold, indicating its ability to capture complete nn-ary relations from text without fragmenting them into partial facts. Moreover, across all thresholds, Hyper-KGGen substantially outperforms the baselines, demonstrating robust advantages under different semantic matching criteria.
+Table 3. Fact-Verification Accuracy on the MINE Dataset.
+Method
+GPT-4o
+-mini
+Gemini-2.5
+-Flash
+QWen3
+DeepSeek-V3.2
+KGGen
+0.7540
+0.6113
+0.7527
+0.7273
+RAKG
+0.7659
+0.6007
+0.7253
+0.7486
+Hyper-RAG
+0.8173
+0.5993
+0.7873
+0.7660
+HyperGraphRAG
+0.8053
+0.6780
+0.7673
+0.7740
+Cog-RAG
+0.8020
+0.6013
+0.7713
+0.7467
+Hyper-KGGen
+0.8217
+0.7060
+0.8180
+0.7880
+Hyper-KGGen+
+0.8367
+0.7133
+0.8473
+0.8020
+5.3.2. Robustness across LLMs
+To examine how the choice of LLM backbone impacts different knowledge extraction methods, we instantiate all models with a diverse set of base LLMs, including GPT-4o-mini (Hurst et al., 2024), Gemini-2.5-Flash (Comanici et al., 2025), Qwen3 (Yang et al., 2025), and DeepSeek-V3.2 (Liu et al., 2025). As shown in Table 3, Hyper-KGGen consistently extracts more facts across all backbone settings. Moreover, with skill guidance, Hyper-KGGen further improves its robustness across scenarios and enhances extraction efficiency.
+5.3.3. Effect of the Number of Rollouts
+To examine the effect of the number of rollouts, we vary KK in adaptive skill acquisition. As shown in Table 4, larger values of KK consistently improve recall-oriented metrics and downstream accuracy, suggesting that additional parallel hypotheses provide a more reliable basis for estimating extraction stability. This richer stability signal helps identify unstable and missed high-order relations and supports the distillation of more effective extraction skills. The decrease in precision suggests that broader exploration places greater demands on stability estimation, as more unstable or low-confidence candidates may enter the skill acquisition stage and introduce additional noise into the skill library. Overall, the trend reveals a trade-off between exploration coverage and noise control, with the benefit of additional rollouts gradually saturating as KK increases.
+Table 4. Performance under Different Rollout Number KK.
+KK
+HyperDocRED  
+MINE
+Precision
+Recall
+F1
+Acc.
+2
+0.8232
+0.4126
+0.5497
+0.8314
+4
+0.8142
+0.4609
+0.5736
+0.8367
+6
+0.8116
+0.4696
+0.5948
+0.8402
+8
+0.8078
+0.4769
+0.5997
+0.8422
+5.3.4. Skills vs. Few-shot
+To understand how external guidance improves knowledge extraction and how it transfers across scenarios, we compare few-shot prompting and skill-driven guidance.
+The results in Fig. 5 show that both methods outperform the base settings. Few-shot prompting provides a clear boost with a small number of examples. However, adding more examples brings little additional improvement, and performance tends to plateau. This suggests that few-shot prompting mainly helps the model align with the task format and a narrow range of local regularities, but the returns do not keep scaling with more examples.
+In contrast, the skill-driven guidance shows steadier and cumulative gains as the library grows, leading to stronger overall performance. Skills are learned from past reasoning traces through a feedback loop that summarizes recurring errors and missing evidence into reusable skills. These skills can then be applied during inference to guide extraction decisions.
+A key reason for this gap is that few-shot examples often require full context to be effective, including explicit node connections and surrounding evidence for a relation. Much of this information is irrelevant for a particular query and can weaken the useful signal.
+Few-shot prompting is also sensitive to the example distribution. When test cases differ in wording or local subgraph structure, static examples may fail to match the new scenarios. By contrast, skills come from patterns that recur across past cases and scenarios, so they capture decision-relevant constraints and remain effective under scenario shift.
+Figure 5. Performance Scaling with Few-Shot Setting and Skill Size on the HyperDocRED Dataset.
+Table 5. Retrieval Efficiency under Different Top-kk Budgets.
+Factual Coverage
+Accuracy
+k=3k=3
+k=5k=5
+k=7k=7
+k=9k=9
+k=11k=11
+Return top-kk similar entities from the KG in factual coverage
+KGGen
+0.7310
+0.7540
+0.7717
+0.7833
+0.7887
+Hyper-KGGen
+0.7987
+0.8217
+0.8352
+0.8375
+0.8417
+Hyper-KGGen+
+0.8192
+0.8367
+0.8412
+0.8454
+0.8487
+Downstream Utility
+Average Score
+k=40k=40
+k=50k=50
+k=60k=60
+k=70k=70
+k=80k=80
+Retrieve top-kk items from Hypergraph DB within RAG pipeline
+Hyper-RAG
+81.30
+83.07
+84.32
+82.81
+81.52
+Hyper-KGGen
+83.88
+84.46
+84.67
+83.96
+83.48
+Hyper-KGGen+
+83.92
+84.72
+85.10
+84.06
+83.77
+5.3.5. Retrieval Efficiency Analysis
+Graph quality determines the budget efficiency of graph-based retrieval: under the same retrieval budget, a high-quality graph should cover more key facts with fewer candidate entities and provide denser, more relevant evidence for downstream generation.
+Motivated by this, we treat top-kk as a retrieval-budget control variable and evaluate the efficiency of evidence retrieval from the generated graph under different kk values, thereby indirectly assessing graph construction quality.
+As shown in Table 5, in fact retrieval, Hyper-KGGen consistently achieves a high hit rate across different kk settings; even with small kk, it covers most facts in the source text, indicating higher fact-carrying density and better structural usability of its graph, without relying on large-scale retrieval to compensate for noise or fragmentation.
+Furthermore, end-to-end RAG results show that retrieving only a small number of entities (e.g., k=40k=40) already yields performance comparable to larger kk values and to Hyper-RAG under various configurations. This suggests that Hyper-KGGen delivers higher evidence density and less redundant interference under the same budget, enabling stable improvements in fact coverage and generation quality with lower retrieval cost.
+6. Conclusion
+In this work, we identify two obstacles in knowledge hypergraph generation, poor transfer across scenarios and a structural imbalance where systems over focus on higher order hyperedges.
+We introduce Hyper-KGGen, a skill-driven framework that combines coarse-to-fine hyperedge construction with a closed loop skill acquisition mechanism.
+By using stability based relative rewards to learn from unstable cases and missing facts, it distills reusable scenario skills and updates a global skill library that improves extraction in new settings.
+We also release HyperDocRED, a document level dataset with rigorous nn-ary hyperedge annotation for evaluating end to end hypergraph generation.
+Experiments across datasets and downstream retrieval augmented generation show consistent improvement over strong baselines, indicating that skill evolution and coarse to fine construction paradigm are complementary and jointly improve cross scenario robustness and knowledge hypergraph quality.
+Acknowledgement
+This work was supported by New Generation Artificial Intelligence-National Science and Technology Major Project (No. 2025ZD0124204), the National Natural Science Foundation of China (Nos. U24A20252, U25A20532 and 623B2066), Fundamental and Interdisciplinary Disciplines Breakthrough Plan of the Ministry of Education of China (No. JYB2025XDXM504), and Guangdong Major Project of Basic and Applied Basic Research (No. 2023B0303000009).
+References
+Angeli et al. (2015)
+G. Angeli, M. J. J. Premkumar, and C. D. Manning
+Leveraging linguistic structure for open domain information extraction.
+In Proceedings of the 53rd Annual Meeting of the Association for Computational Linguistics and the 7th International Joint Conference on Natural Language Processing (Volume 1: Long Papers),
+pp. 344–354.
+Cited by: §1.
+Arsenyan et al. (2024)
+V. Arsenyan, S. Bughdaryan, F. Shaya, K. W. Small, and D. Shahnazaryan
+Large language models for biomedical knowledge graph construction: information extraction from emr notes.
+In Proceedings of the 23rd Workshop on Biomedical Natural Language Processing,
+pp. 295–317.
+Cited by: §2.1.
+Cai et al. (2025)
+Y. Cai, S. Cai, Y. Shi, Z. Xu, L. Chen, Y. Qin, X. Tan, G. Li, Z. Li, H. Lin, et al.
+Training-free group relative policy optimization.
+arXiv preprint arXiv:2510.08191.
+Cited by: §2.3.
+Chia et al. (2022)
+Y. K. Chia, L. Bing, S. M. Aljunied, L. Si, and S. Poria
+A dataset for hyper-relational extraction and a cube-filling approach.
+arXiv preprint arXiv:2211.10018.
+Cited by: §2.2.
+Comanici et al. (2025)
+G. Comanici, E. Bieber, M. Schaekermann, I. Pasupat, N. Sachdeva, I. Dhillon, M. Blistein, O. Ram, D. Zhang, E. Rosen, et al.
+Gemini 2.5: pushing the frontier with advanced reasoning, multimodality, long context, and next generation agentic capabilities.
+arXiv preprint arXiv:2507.06261.
+Cited by: §5.3.2.
+Edge et al. (2024)
+D. Edge, H. Trinh, N. Cheng, J. Bradley, A. Chao, A. Mody, S. Truitt, D. Metropolitansky, R. O. Ness, and J. Larson
+From local to global: a graph rag approach to query-focused summarization.
+arXiv preprint arXiv:2404.16130.
+Cited by: 4th item,
+§5.1.2.
+Fatemi et al. (2019)
+B. Fatemi, P. Taslakian, D. Vazquez, and D. Poole
+Knowledge hypergraphs: prediction beyond binary relations.
+arXiv preprint arXiv:1906.00137.
+Cited by: §1.
+Feng et al. (2025)
+Y. Feng, H. Hu, X. Hou, S. Liu, S. Ying, S. Du, H. Hu, and Y. Gao
+Hyper-rag: combating llm hallucinations using hypergraph-driven retrieval-augmented generation.
+arXiv preprint arXiv:2504.08758.
+Cited by: 7th item,
+§2.2,
+§5.1.2,
+§5.1.4.
+Gao et al. (2023)
+Y. Gao, Y. Xiong, X. Gao, K. Jia, J. Pan, Y. Bi, Y. Dai, J. Sun, H. Wang, and H. Wang
+Retrieval-augmented generation for large language models: a survey.
+arXiv preprint arXiv:2312.10997 2 (1).
+Cited by: 3rd item,
+§5.1.2.
+Guo et al. (2024)
+Z. Guo, L. Xia, Y. Yu, T. Ao, and C. Huang
+Lightrag: simple and fast retrieval-augmented generation.
+arXiv preprint arXiv:2410.05779.
+Cited by: 5th item,
+§5.1.2.
+Hu et al. (2025)
+H. Hu, Y. Feng, R. Li, R. Xue, X. Hou, Z. Tian, Y. Gao, and S. Du
+Cog-rag: cognitive-inspired dual-hypergraph with theme alignment retrieval-augmented generation.
+arXiv preprint arXiv:2511.13201.
+Cited by: 9th item,
+§2.2,
+§5.1.2.
+Huang et al. (2025a)
+H. Huang, C. Chen, Z. Sheng, Y. Li, and W. Zhang
+Can llms be good graph judge for knowledge graph construction?.
+In Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing,
+pp. 10940–10959.
+Cited by: §2.1.
+Huang et al. (2025b)
+H. Huang, Y. Huang, J. Yang, Z. Pan, Y. Chen, K. Ma, H. Chen, and J. Cheng
+Retrieval-augmented generation with hierarchical knowledge.
+arXiv preprint arXiv:2503.10150.
+Cited by: 6th item,
+§5.1.2.
+Hurst et al. (2024)
+A. Hurst, A. Lerer, A. P. Goucher, A. Perelman, A. Ramesh, A. Clark, A. Ostrow, A. Welihinda, A. Hayes, A. Radford, et al.
+Gpt-4o system card.
+arXiv preprint arXiv:2410.21276.
+Cited by: §5.3.2.
+Khattab et al. (2023)
+O. Khattab, A. Singhvi, P. Maheshwari, Z. Zhang, K. Santhanam, S. Vardhamanan, S. Haq, A. Sharma, T. T. Joshi, H. Moazam, et al.
+Dspy: compiling declarative language model calls into self-improving pipelines.
+arXiv preprint arXiv:2310.03714.
+Cited by: §2.3.
+Lairgi et al. (2024)
+Y. Lairgi, L. Moncla, R. Cazabet, K. Benabdeslem, and P. Cléau
+Itext2kg: incremental knowledge graphs construction using large language models.
+In International Conference on Web Information Systems Engineering,
+pp. 214–229.
+Cited by: §5.1.2.
+Liu et al. (2025)
+A. Liu, A. Mei, B. Lin, B. Xue, B. Wang, B. Xu, B. Wu, B. Zhang, C. Lin, C. Dong, et al.
+Deepseek-v3. 2: pushing the frontier of open large language models.
+arXiv preprint arXiv:2512.02556.
+Cited by: §5.3.2.
+Liu et al. (2020)
+Y. Liu, Q. Yao, and Y. Li
+Generalizing tensor decomposition for n-ary relational knowledge bases.
+In Proceedings of the web conference 2020,
+pp. 1104–1114.
+Cited by: §1.
+Luo et al. (2025)
+H. Luo, G. Chen, Y. Zheng, X. Wu, Y. Guo, Q. Lin, Y. Feng, Z. Kuang, M. Song, Y. Zhu, et al.
+HyperGraphRAG: retrieval-augmented generation via hypergraph-structured knowledge representation.
+arXiv preprint arXiv:2503.21322.
+Cited by: 8th item,
+§1,
+§2.2,
+§5.1.2.
+Luo et al. (2024)
+H. Luo, Y. Yang, T. Yao, Y. Guo, Z. Tang, W. Zhang, S. Peng, K. Wan, M. Song, W. Lin, et al.
+Text2nkg: fine-grained n-ary relation extraction for n-ary relational knowledge graph construction.
+Advances in Neural Information Processing Systems 37, pp. 27417–27439.
+Cited by: §2.2.
+Mo et al. (2025)
+B. Mo, K. Yu, J. Kazdan, J. Cabezas, P. Mpala, L. Yu, C. Cundy, C. Kanatsoulis, and S. Koyejo
+Kggen: extracting knowledge graphs from plain text with language models.
+arXiv preprint arXiv:2502.09956.
+Cited by: 1st item,
+§2.1,
+§5.1.1,
+§5.1.2.
+Norabid and Fauzi (2022)
+I. A. Norabid and F. Fauzi
+Rule-based text extraction for multimodal knowledge graph.
+International Journal of Advanced Computer Science and Applications 13 (5).
+Cited by: §2.1.
+Oramas et al. (2015)
+S. Oramas, M. Sordo, and L. Espinosa-Anke
+A rule-based approach to extracting relations from music tidbits.
+In Proceedings of the 24th International Conference on World Wide Web,
+pp. 661–666.
+Cited by: §2.1.
+Qian et al. (2025)
+H. Qian, Z. Liu, P. Zhang, K. Mao, D. Lian, Z. Dou, and T. Huang
+Memorag: boosting long context processing with global memory-enhanced retrieval augmentation.
+In Proceedings of the ACM on Web Conference 2025,
+pp. 2366–2377.
+Cited by: §5.1.1.
+Qiao et al. (2022)
+B. Qiao, Z. Zou, Y. Huang, K. Fang, X. Zhu, and Y. Chen
+A joint model for entity and relation extraction based on bert.
+Neural Computing and Applications 34 (5), pp. 3471–3481.
+Cited by: §2.1.
+Rosso et al. (2020)
+P. Rosso, D. Yang, and P. Cudré-Mauroux
+Beyond triplets: hyper-relational knowledge graph embedding for link prediction.
+In Proceedings of the web conference 2020,
+pp. 1885–1896.
+Cited by: §1.
+Schneider (1973)
+E. W. Schneider
+Course modularization applied: the interface system and its implications for sequence control and data analysis..
+Cited by: §1.
+Shinn et al. (2023)
+N. Shinn, F. Cassano, A. Gopinath, K. Narasimhan, and S. Yao
+Reflexion: language agents with verbal reinforcement learning.
+Advances in Neural Information Processing Systems 36, pp. 8634–8652.
+Cited by: §2.3.
+Suchanek et al. (2007)
+F. M. Suchanek, G. Kasneci, and G. Weikum
+Yago: a core of semantic knowledge.
+In Proceedings of the 16th international conference on World Wide Web,
+pp. 697–706.
+Cited by: §2.1.
+Tan et al. (2022)
+Q. Tan, L. Xu, L. Bing, H. T. Ng, and S. M. Aljunied
+Revisiting docred–addressing the false negative problem in relation extraction.
+arXiv preprint arXiv:2205.12696.
+Cited by: §5.1.1.
+Wang et al. (2024)
+M. Wang, L. Chen, F. Cheng, S. Liao, X. Zhang, B. Wu, H. Yu, N. Xu, L. Zhang, R. Luo, et al.
+Leave no document behind: benchmarking long-context llms with extended multi-doc qa.
+In Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing,
+pp. 5627–5646.
+Cited by: §5.1.4.
+Wang et al. (2026)
+X. Wang, J. Shi, S. Feng, P. Yuan, Y. Li, Y. Zhang, C. Tan, J. Zhang, B. Pan, Y. Hu, et al.
+Do not waste your rollouts: recycling search experience for efficient test-time scaling.
+arXiv preprint arXiv:2601.21684.
+Cited by: §2.3.
+Wen et al. (2016)
+J. Wen, J. Li, Y. Mao, S. Chen, and R. Zhang
+On the representation and embedding of knowledge bases beyond binary relations.
+arXiv preprint arXiv:1604.08642.
+Cited by: §1.
+Yang et al. (2025)
+A. Yang, A. Li, B. Yang, B. Zhang, B. Hui, B. Zheng, B. Yu, C. Gao, C. Huang, C. Lv, et al.
+Qwen3 technical report.
+arXiv preprint arXiv:2505.09388.
+Cited by: §5.3.2.
+Zeng et al. (2023)
+Y. Zeng, Q. Jin, T. Bao, and W. Li
+Multi-modal knowledge hypergraph for diverse image retrieval.
+In Proceedings of the AAAI conference on artificial intelligence,
+Vol. 37, pp. 3376–3383.
+Cited by: §1.
+Zhang and Soh (2024)
+B. Zhang and H. Soh
+Extract, define, canonicalize: an llm-based framework for knowledge graph construction.
+arXiv preprint arXiv:2404.03868.
+Cited by: §2.1.
+Zhang et al. (2025a)
+H. Zhang, J. Si, G. Yan, B. Qi, P. Cai, S. Mao, D. Wang, and B. Shi
+RAKG: document-level retrieval augmented knowledge graph construction.
+arXiv preprint arXiv:2504.09823.
+Cited by: 2nd item,
+§2.1,
+§5.1.2.
+Zhang et al. (2025b)
+Q. Zhang, C. Hu, S. Upasani, B. Ma, F. Hong, V. Kamanuru, J. Rainton, C. Wu, M. Ji, H. Li, et al.
+Agentic context engineering: evolving contexts for self-improving language models.
+arXiv preprint arXiv:2510.04618.
+Cited by: §2.3.
+Zhou et al. (2025)
+C. Zhou, C. Zhang, G. Yu, F. Meng, J. Zhou, W. Lam, and M. Yu
+Improving multi-step rag with hypergraph-based memory for long-context complex relational modeling.
+arXiv preprint arXiv:2512.23959.
+Cited by: §2.2.
+Appendix A Baselines
+In performance comparison, we consider the state-of-the-art baselines, categorized into standard knowledge graph extraction methods, text-based RAG, graph-based RAG approaches, and hypergraph-based RAG models.
+• 
+KGGen (Mo et al., 2025): an LLM-based text-to-KG generator with iterative entity and edge resolution, reducing sparsity and normalizing relations.
+• 
+RAKG (Zhang et al., 2025a): a document-level KG construction framework that uses pre-entities as retrieval queries to mitigate long-context forgetting and improve global consistency.
+• 
+NativeRAG (Gao et al., 2023): a standard vector-based RAG baseline that indexes chunk embeddings in a vector database, and retrieves responses by matching relevant chunks via embedding similarity.
+• 
+GraphRAG (Edge et al., 2024): a graph-enhanced RAG that uses LLMs to extract entities and relations into a knowledge graph, and retrieves by traversing the graph structure for global context.
+• 
+LightRAG (Guo et al., 2024): a graph-enhanced RAG that fuses structural graph with vector representations, and performs dual-level retrieval over nodes and edges to gather evidence.
+• 
+HiRAG (Huang et al., 2025b): a hierarchical knowledge RAG framework that leverages the inherent hierarchical knowledge in human cognition.
+• 
+Hyper-RAG (Feng et al., 2025): a hypergraph-based RAG method that captures higher-order correlations beyond pairwise links, improving semantic faithfulness.
+• 
+HyperGraphRAG (Luo et al., 2025): a hypergraph-based RAG framework that represents nn-ary relational facts via hyperedges and performs retrieval and generation on hypergraph representations.
+• 
+Cog-RAG (Hu et al., 2025): a cognitive-inspired dual-hypergraph RAG approach with theme alignment, performing top-down theme activation followed by entity-level diffusion.
+Appendix B Additional Results
+We provide specific results for HyperDocRED dataset in Tab. 6.
+Table 6. Evaluation of nn-ary Relations on the HyperDocRED Dataset (Precision, Recall, and F1-score).
+Method
+Micro
+Macro
+Pre
+Rec
+F1
+Pre
+Rec
+F1
+HyperGraphRAG
+0.38280.3828
+0.10720.1072
+0.16750.1675
+0.40180.4018
+0.12080.1208
+0.17100.1710
+HyperRAG
+0.24390.2439
+0.20500.2050
+0.22280.2228
+0.24860.2486
+0.22240.2224
+0.21960.2196
+CogRAG
+0.28840.2884
+0.17940.1794
+0.22120.2212
+0.29260.2926
+0.19330.1933
+0.22430.2243
+Hyper-KGGen
+0.83270.8327
+0.31400.3140
+0.45600.4560
+0.84360.8436
+0.35520.3552
+0.48060.4806
+Hyper-KGGen+
+0.80240.8024
+0.43000.4300
+0.56000.5600
+0.81420.8142
+0.46090.4609
+0.57360.5736
+Appendix C Case Study
+In this section, we present a representative example from the MINE dataset. In this case, Hyper-KGGen achieves 100% factual coverage under the fact-capture evaluation, substantially outperforming KGGen (40%) and HyperRAG (46.67%). Notably, Hyper-KGGen extracts a richer set of entities and relations, exceeding both baselines in volume while still retaining a meaningful subset of binary relations. These results highlight Hyper-KGGen’s strong capability to uncover complex, higher-order relational structures in text.
+C.1. Raw Text
+The Evolution of Video Games
+Video games have come a long way since their inception in the mid-20th century. From simple, pixelated games like Pong and Space Invaders to immersive, lifelike worlds in games like Red Dead Redemption and Fortnite, the evolution of video games has been nothing short of extraordinary. This essay will explore the key milestones in the evolution of video games, from the early days of arcade gaming to the rise of console and PC gaming, and the impact of technological advancements on the industry.
+The history of video games can be traced back to the 1950s and 1960s, when computer scientists and engineers began experimenting with interactive electronic games.
+The Evolution of Video Games
+The 1970s saw the rise of arcade gaming, with games like Pong, Space Invaders, and Pac-Man becoming cultural phenomena. These games were simple in design but highly addictive, capturing the imagination of players around the world. The success of arcade games paved the way for the development of home gaming consoles, such as the Atari 2600, which brought the arcade experience into people’s living rooms.
+The 1980s marked a golden age for video games, with the release of iconic games like Super Mario Bros., The Legend of Zelda, and Tetris. These games introduced new gameplay mechanics, storytelling elements, and visual aesthetics that set the standard for future game development. The introduction of 8-bit and 16-bit graphics allowed for more detailed and colorful game worlds, enhancing the immersive experience for players. 
+The 1990s saw the emergence of 3D graphics and CD-ROM technology, leading to the creation of groundbreaking games like Doom, Quake, and Final Fantasy VII. These games pushed the boundaries of what was possible in terms of graphics, gameplay, and storytelling, setting a new benchmark for the industry. The popularity of PC gaming also grew during this decade, with titles like StarCraft, Half-Life, and Diablo becoming instant classics.
+The early 2000s saw the rise of online gaming, with the launch of platforms like Xbox Live and PlayStation Network enabling players to connect and compete with others around the world. Games like World of Warcraft, Halo, and Call of Duty became synonymous with online multiplayer gaming, creating new opportunities for social interaction and collaboration in gaming communities.
+In recent years, the gaming industry has seen a surge in popularity, driven by advancements in technology such as virtual reality (VR), augmented reality (AR), and cloud gaming. VR headsets like the Oculus Rift and PlayStation VR have allowed players to immerse themselves in virtual worlds like never before, while AR games like PokÃ©mon Go have blurred the line between the virtual and physical worlds. The future of video games looks bright, with developments in artificial intelligence (AI), machine learning, and blockchain technology poised to revolutionize the industry. Games are becoming more sophisticated, realistic, and interconnected, offering players new ways to engage with their favorite franchises and immerse themselves in interactive storytelling experiences. In conclusion, the evolution of video games has been a remarkable journey, from the simple black-and-white games of the 1950s to the complex, immersive worlds of today. The industry has grown and evolved in response to advancements in technology, changing consumer preferences, and new opportunities for creativity and innovation. As we look to the future, it is clear that video games will continue to push the boundaries of what is possible, offering new and exciting experiences for players of all ages.
+C.2. Knowledge Hypergraph of Hyper-KGGen
+Knowledge Hypergraph generated by Hyper-KGGen
+Entities:
+video game; pong; space invader; red dead redemption; fortnite; mid-20th century; arcade; console; pc; technological advancement; video game industry; 1950s; 1960s; spacewar!; 1962; massachusetts institute of technology; 1970s; pac-man; atari 2600; 1980s; super mario bros; the legend of zelda; tetris; 8-bit; 16-bit; 1990s; 3d graphic; cd-rom; doom; quake; final fantasy vii; starcraft; half-life; diablo; early 2000s; online gaming; xbox live; playstation network; world of warcraft; halo; call of duty; virtual reality; augmented reality; cloud gaming; vr headset; oculus rift; playstation vr; pokémon go; gaming industry; gaming community; artificial intelligence; machine learning; blockchain technology; industry; player; interactive storytelling experience; future; franchise.
+Extracted nn-ary Relations (nodes →\rightarrow description)
+{video game; mid-20th century} →\rightarrow Video games originated during the mid-20th century, establishing the historical starting point for the medium (video game, mid-20th century).
+{video game; pong; space invader; arcade} →\rightarrow Pong and Space Invader serve as early, simple pixelated examples of arcade video games, illustrating foundational forms of the medium (video game, pong, space invader, arcade).
+{video game; red dead redemption; fortnite; technological advancement} →\rightarrow Red Dead Redemption and Fortnite exemplify later, immersive video game experiences that reflect advances in technology (video game, red dead redemption, fortnite, technological advancement).
+{arcade; console; pc; technological advancement; video game industry} →\rightarrow The industry shifted from arcade-focused gaming toward the rise of console and PC platforms, a transition driven and amplified by technological advancement and affecting the broader video game industry (arcade, console, pc, technological advancement, video game industry).
+{1950s; 1960s} →\rightarrow 1950s and 1960s function as the joint formative decades when early interactive electronic game experimentation by computer scientists and engineers originated.
+{spacewar!; 1962; massachusetts institute of technology} →\rightarrow spacewar! is identified with the specific development event that occurred in 1962 at the Massachusetts Institute of Technology, tying the title to a year and institutional origin.
+{1970s; pong; space invader; pac-man} →\rightarrow In the 1970s, Pong, Space Invader, and Pac-Man emerged as prominent arcade titles, indicating these games rose to widespread popularity during that decade.
+{pong; space invader; pac-man; atari 2600} →\rightarrow The commercial success of arcade hits Pong, Space Invader, and Pac-Man helped drive the development of home consoles, exemplified by the Atari 2600, linking those arcade titles to the console’s emergence.
+{1980s; super mario bros; the legend of zelda; tetris} →\rightarrow The 1980s is the decade that produced and is characterized by the seminal releases Super Mario Bros., The Legend of Zelda, and Tetris, which came to define that era of gaming.
+{1980s; 8-bit; 16-bit} →\rightarrow The 1980s is associated with the rise of the 8-bit and 16-bit graphical generations, which enabled more detailed and colorful game worlds that shaped games of the era.
+{1990s; 3d graphic; cd-rom; doom; quake; final fantasy vii} →\rightarrow The 1990s saw the emergence of 3D graphics and CD-ROM technology that enabled groundbreaking titles such as Doom, Quake, and Final Fantasy VII to push audiovisual and design boundaries.
+{1990s; pc; starcraft; half-life; diablo} →\rightarrow In the 1990s, PC gaming grew in popularity and was marked by defining PC titles such as StarCraft, Half-Life, and Diablo that became instant classics on the platform.
+{early 2000s; online gaming; xbox live; playstation network} →\rightarrow In the early 2000s, the expansion of online gaming was driven by platform launches—Xbox Live and PlayStation Network—that enabled large-scale player connectivity.
+{world of warcraft; halo; call of duty; online gaming; gaming community} →\rightarrow World of Warcraft, Halo, and Call of Duty acted as flagship online multiplayer titles that shaped online gaming practices and fostered social interaction and collaboration within gaming communities.
+{gaming industry; virtual reality; augmented reality; cloud gaming} →\rightarrow Recent growth in the gaming industry has been driven by technological advances—virtual reality, augmented reality, and cloud gaming—that expanded how games are experienced and who can access them.
+{augmented reality; pokémon go} →\rightarrow Pokémon Go served as a prominent augmented reality game that merged digital gameplay with physical-world interaction, blurring boundaries between virtual and real environments.
+{artificial intelligence; machine learning; blockchain technology; industry; video game; future} →\rightarrow Developments in artificial intelligence, machine learning, and blockchain technology are expected to transform the video game industry and shape the future direction of video games.
+{video game; player; franchise; interactive storytelling experience} →\rightarrow Modern video games provide players new ways to engage with franchises and to be immersed in interactive storytelling experiences.
+{industry; video game; player; future} →\rightarrow The industry has grown and transformed over time, and, looking toward the future, will continue pushing boundaries through video games to deliver new experiences for players.
+ 
+ Experimental support, please
+ view the build logs
+ for errors. Generated by
+ 
+ 
+ L
+ A
+ T
+ E
+ 
+ xml
+ 
+ .
+ 
+ 
+ 
+Instructions for reporting errors
+ 
+We are continuing to improve HTML versions of papers, and your feedback helps enhance accessibility and mobile
+ support. To report errors in the HTML that will help us improve conversion and rendering, choose any of the
+ methods listed below:
+ 
+ 
+Click the "Report Issue" (
+ 
+ ) button, located in the page header.
+ 
+ 
+Tip: You can select the relevant text first, to include it in your report.
+ 
+Our team has already identified the following issues. We appreciate your time reviewing and reporting rendering errors we
+ may not have found yet. Your efforts will help us improve the HTML versions for all readers, because disability
+ should not be a barrier to accessing research. Thank you for your continued support in championing open access for
+ all.
+ 
+Have a free development cycle? Help support accessibility at arXiv! Our collaborators at LaTeXML maintain a list of packages that need conversion, and welcome developer contributions.
+ 
+ 
+ 
+ 
+ We gratefully acknowledge support from
+ our major funders,
+ member institutions, ,
+ and all contributors.
+ 
+ 
+ About
+ ·
+ Help
+ ·
+ Contact
+ ·
+ Subscribe
+ ·
+ Copyright
+ ·
+ Privacy
+ ·
+ Accessibility
+ ·
+ Operational Status (opens in new tab)
+ 
+ 
+ 
+ 
+Major funding support from
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

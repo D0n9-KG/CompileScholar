@@ -1,0 +1,757 @@
+
+AgentCAT: An LLM Agent for Extracting and Analyzing Catalytic Reaction Data from Chemical Engineering Literature
+ 
+ 
+ Report GitHub Issue
+ ×
+ 
+ 
+ Title:
+ 
+ 
+Content selection saved. Describe the issue below:
+ Description:
+ 
+ 
+ 
+ Submit without GitHub
+ Submit in GitHub
+ 
+ 
+ 
+ arXiv is now an independent nonprofit!
+ Learn more
+ ×
+ 
+ 
+ 
+ Back to arXiv
+ 
+ 
+ 
+ 
+ Why HTML?
+ 
+ 
+ 
+ 
+ Report Issue
+ 
+ 
+ 
+ 
+ 
+ 
+ Back to Abstract
+ 
+ 
+ 
+ 
+ 
+ 
+ Download PDF
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Abstract.
+1 Introduction
+2 Related Work
+3 Preliminary&Challenges
+3.1 Graph Abstraction of Catalytic Reaction Data in Chemical Engineering
+3.2 Challenges for General LLMs
+4 The Design of AgentCAT
+4.1 Architectural Overview
+4.2 Adaptive Information Extraction
+4.3 Knowledge Graph Construction
+4.4 General Querying and Graph Exploration
+5 Performance Evaluation
+5.1 Evaluation Settings
+5.2 Performance of the Schema Evolution
+5.3 Performance of Data Extracting
+5.4 Performance of General Querying Agent
+5.5 System Interface
+6 Conclusion
+7 Limitations and Ethical Considerations
+8 GenAI Disclosure
+References
+A Additional Evaluation Results
+B Supplementary Material
+C User Interface
+ 
+ License: CC BY 4.0
+ 
+ 
+arXiv:2602.18479v1 [physics.chem-ph] 10 Feb 2026
+AgentCAT: An LLM Agent for Extracting and Analyzing Catalytic Reaction Data from Chemical Engineering Literature
+DOI: XXXXXXX.XXXXXXXConference: ; August 9-13, 2026; Jeju, Korea
+Wei Yang1, Zihao Liu1, Tao Tan1, Xiao Hu1, Hong Xie1∗{}^{1_{\ast}}, Lulu Li2
+Note: Hong Xie and Lulu Li are corresponding authors
+Affiliation: 1University of Science and Technology of China,
+State Key Laboratory of Cognitive Intelligence
+2National Engineering Research Center of Lower-Carbon Catalysis Technology,
+Dalian Institute of Chemical Physics, Chinese Academy of Sciences
+3IFLYTEK CO.LTD
+, 1,3Hefei, Anhui, China, 2Dalian, Liaoning, China
+ and 
+Xin Li3, Jianyu Han3, Defu Lian1, Mao Ye2
+Affiliation: 1University of Science and Technology of China,
+State Key Laboratory of Cognitive Intelligence
+2National Engineering Research Center of Lower-Carbon Catalysis Technology,
+Dalian Institute of Chemical Physics, Chinese Academy of Sciences
+3IFLYTEK CO.LTD
+, 1,3Hefei, Anhui, China, 2Dalian, Liaoning, China
+2026
+Abstract.
+ 
+This paper presents a large language model (LLM) agent named AgentCAT,
+which extracts and analyzes catalytic reaction data from chemical engineering papers,
+AgentCAT serves as an alternative to overcome the
+long-standing data bottleneck in chemical engineering field,
+and its natural language based interactive data analysis functionality is friendly to
+the community.
+AgentCAT also presents a formal abstraction and challenge analysis
+of the catalytic reaction data extraction task
+in an artificial intelligence-friendly manner.
+This abstraction would help the artificial intelligence community
+understand this problem and in turn would attract more attention to address it.
+Technically, the complex catalytic process leads to complicated dependency structure
+in catalytic reaction data
+with respect to elementary reaction steps, molecular behaviors, measurement evidence,
+etc.
+This dependency structure makes it challenging to
+guarantee the correctness and
+completeness of data extraction, as well as representing
+them for analysis.
+AgentCAT addresses this challenge and it makes four folds of technical contributions:
+(1) a schema-governed extraction pipeline with progressive schema evolution, enabling robust data extraction from chemical engineering papers;
+(2) a dependency-aware reaction-network knowledge graph that links catalysts/active sites, synthesis-derived descriptors, mechanistic claims with evidence, and macroscopic outcomes, preserving process coupling and traceability;
+(3) a general querying module that supports natural-language exploration and visualization over the constructed graph for cross-paper analysis;
+(4) an evaluation on ∼\sim800 peer-reviewed chemical engineering publications demonstrating the effectiveness of AgentCAT.
+ 
+1. Introduction
+Chemical engineering prioritizes engineering practicability and industrial scalability,
+which is quite different from pure chemical research that mainly
+focuses on reaction mechanisms
+(Perry, 1950).
+The core objective is
+translating lab-scale experimental feasibility into
+large-scale industrial production with commercial value, stable operation,
+and economic efficiency.
+Experiments at different scales,
+such as lab-scale screening, pilot scale validation, etc.,
+form the factual basis to achieve that objective (Zlokarnik, 2006).
+The catalytic reaction data generated in these experiments
+reveals insights for understanding and optimizing the catalytic process.
+Reflecting on the history of chemical engineering,
+scarce catalytic reaction data is a long-standing bottleneck,
+which hinders the progress of this area.
+Several public datasets are constructed for the border chemistry area in recent years, such as ORD (Kearnes et al., 2021), Orderly (Wigh et al., 2024), and DigCat (Zhang and Li, 2024). These datasets typically represent reactions as isolated tuples and provide only limited insights for chemical engineering, where the catalytic process and reaction environments (especially scaled ones) distinguish reaction data from other subfields of chemistry. Experimental facts in chemical engineering are only interpretable when linked along the catalytic process, not as self-contained snippets.
+This leaves catalytic reactions reported in chemical engineering literature as the major data source. General-purpose LLMs such as Gemini and Grok excel in semantic understanding and multimodal reasoning, and serve as a promising alternative to extract such data from literature.
+Figure 1. 
+A graph abstraction of
+the backbone of the catalytic reaction data
+in chemical engineering.
+Before diving into technical details, let us get a glimpse of
+the catalytic reaction data in chemical engineering first.
+Figure 1 depicts a graph abstraction of
+the backbone of the catalytic reaction data
+(please refer to Section 3 for more details).
+In Figure 1, the top layer is a catalyst.
+Typical catalysts like molecular sieves,
+exhibit inherent complexity originating from their hierarchical structural features,
+tunable chemical properties, and dynamic physicochemical behaviors
+in practical applications.
+One typical catalyst is HZSM-5 (Yang et al., 2019; Zhang et al., 2019).
+Each catalyst has several active sites, where
+elementary reaction steps occur.
+For example, the active sites of HZSM-5 catalyst include
+Brønsted acid sites,
+Lewis acid sites,
+defective hydroxyl sites, etc.
+The catalytic process can be formally described in micro level and macro level.
+The micro level characterizes molecular behaviors.
+For example, on Brønsted acid sites of HZSM-5, the
+main molecular behaviors include selective adsorption of reactant
+molecules, subsequent bond cleavage/formation reactions of intermediates for product generation, desorption of products to regenerate the acid sites, etc.
+This micro level behavior induces the elementary reaction steps in the macro level.
+The catalytic process is usually highly unobservable.
+Techniques like probe molecular,
+pyridine-adsorbed IR spectra, etc., are employed to
+generate evidence of the catalytic process.
+These lines of evidence together with the tightly coupled elementary reaction steps
+form the catalytic reaction data.
+While general-purpose LLMs such as Gemini and Grok excel
+in semantic understanding and multimodal reasoning,
+their direct application to extracting catalyst experimental data in chemical engineering often falls short in ensuring causal consistency,
+fine-grained alignment, and verifiable grounding.
+Scientific data extraction systems like
+SLM-MATRIX (Li et al., 2025a), Eunomia (Ansari and Moosavi, 2023) and nanoMINER (Odobesku et al., 2025)
+are domain-specific and they can not handle the aforementioned
+complex dependency structure in the catalytic reaction data.
+Our AgentCAT is motivated by a central observation in catalytic chemical engineering: catalyst experiment facts are only interpretable when they are complete, evidence-grounded, and linked along the catalytic process, rather than extracted as isolated reaction tuples. Accordingly, AgentCAT adopts a schema-governed and closed-loop design. We first make the extraction targets explicit via progressive schema evolution, then ground each field in traceable evidence through staged extraction and review-driven self-correction, and finally organize the extracted records into a dependency-aware reaction-network knowledge graph. Building on this graph, we support natural-language querying and visualization for interactive cross-paper exploration. The contributions:
+• 
+We formulate chemical-engineering catalyst experiment extraction as reconstructing an SSP-oriented, process-coupled “partial picture” (mechanistic links, evidence, and experimental control logic), and identify three recurring failure modes of general LLMs in this setting: broken long-range causal linking, fine-grained parameter misalignment, and violations of domain logic without schema-level constraints.
+• 
+We propose a multi-agent, plan-then-execute pipeline featuring progressive schema evolution, a two-phase evidence-grounded extraction procedure, and review verdicts that trigger targeted re-extraction to improve completeness and reliability.
+• 
+We design a reaction-network knowledge graph in Neo4j that links catalysts/active sites, synthesis-derived descriptors, mechanistic claims with evidence, and macroscopic outcomes with traceability to source PDFs, and we build a general querying agent with visualization to enable natural-language exploration across papers. We evaluate AgentCAT on ∼\sim800 peer-reviewed chemical engineering publications and demonstrate robust end-to-end performance.
+2. Related Work
+Chemistry agent.
+Recently, several LLM based chemistry agents are developed. ChemCrow (M. Bran et al., 2024) integrates an LLM with expert-designed chemistry tools to support multi-step problem solving, while CACTUS (McNaughton et al., 2024) similarly connects LLMs to chem informatics tool chains for molecular property prediction, similarity search, and drug-likeness assessment.
+ChemAgent (Wu et al., 2025) further scales up tool-augmented agent frameworks by aggregating diverse external chemistry tools, strengthening the end-to-end capability along the “tool selection–parameter filling–execution” pipeline.
+Several works investigate agentic systems for automated scientific information extraction from chemistry and materials literature. SLM-MATRIX (Li et al., 2025a) proposes a multi-agent reasoning and verification framework to improve the reliability of materials data extraction from papers. Eunomia (Ansari and Moosavi, 2023) formulates a “chemist AI agent” that autonomously constructs materials datasets from scientific literature via planned extraction workflows. nanoMINER (Odobesku et al., 2025) introduces a multi-agent multi modal extraction system for nano materials, highlighting the importance of handling heterogeneous evidence such as text, tables, and figures. Complementary to these agentic extraction systems, OpenChemIE (Fan et al., 2024) provides a toolkit for document-level chemistry literature information extraction by integrating evidence across text, tables, and figures.
+However, these systems are domain-specific and can not
+handle the complex dependency structure in the catalytic reaction data.
+Chemistry knowledge graph.
+Chemistry knowledge graph (CKG) is a structured representation of chemistry entities, chemistry reactions, and their associated conditions (Wang et al., 2024).
+Domain experts manually analyze literature and extract reactants, products, and reaction conditions, such as BioGRID (Oughtred et al., 2021).
+These approaches can achieve high-precision knowledge extraction and ensure the accuracy of entities and relationships, but they are time-consuming, labor-intensive, and difficult to scale to large volumes of literature.
+Rule-based or shallow model methods analyze literature using rule-based systems or shallow machine learning models, enabling rapid processing of large-scale literature and partially automating knowledge graph construction, thus significantly improving efficiency (Lin et al., 2020; Nguyen et al., 2018; Xia et al., 2023; Zhou et al., 2022). However, chemistry literature often contains a mixture of natural language, chemistry symbols, tables, and implicit descriptions, which limits the performance of these methods in complex semantic understanding and cross-sentence dependency handling, thereby affecting the robustness and accuracy of extraction.
+LLMs-based methods leverage the powerful contextual semantic understanding of LLMs, these methods can automatically extract entities and relationships, supporting knowledge graph construction in materials and other domains, and achieving preliminary large-scale automated extraction (Bian, 2025; Omar and Mohammed, 2025; Yoshitake and Nagata, 2025). Nevertheless, most of these methods are restricted to specific domains or task settings, and a general, fully automated construction of CKG remains an open challenge.
+To address the limitations of these existing methods, this paper builds
+AgentCAT. AgentCAT combines the semantic understanding capabilities of the Gemini LLM with automated extraction techniques, enabling efficient and accurate processing of complex literature.
+LLM-based knowledge graph construction.
+Large language models (LLMs) have transformed knowledge graph (KG) construction (Mo et al., 2025).
+Early approaches like Microsoft’s GraphRAG extracts triples at the sentence or document level but often produced sparse, fragmented graphs with poor connectivity and limited downstream performance (Edge et al., 2024).
+A major advance is introduced in KGGen (Mo et al., 2025), which combines LLM-driven triple extraction with advanced post-processing techniques.
+It effectively resolves duplicate entities and consolidates relations, resulting in denser and more coherent knowledge structures compared to prior extractors.
+Recent progress includes agentic frameworks that enable autonomous planning, self-correction, and ontology-aligned construction (Chen et al., 2025; Mohammadi et al., 2025), as well as production tools like Neo4j’s LLM KG Builder supporting multi-model integration and parallel processing (Hunger, 2025). However, these methods still lack strong domain-specific prior knowledge (e.g., chemical validity checks), struggle to maintain global consistency across large-scale corpora, and have limited validation on downstream tasks such as reaction prediction (Wang et al., 2024; Bian, 2025; Li et al., 2025b; Yoshitake and Nagata, 2025).
+3. Preliminary&Challenges
+3.1. Graph Abstraction of Catalytic Reaction Data in Chemical Engineering
+In chemical engineering, reactions are rarely isolated events,
+but instead they are tightly coupled by the catalytic process.
+Experimental facts in this domain are only interpretable when
+they are linked along this catalytic process,
+rather than treated as self-contained snippets.
+The catalytic process is usually highly unobservable.
+Techniques like probe molecular,
+pyridine-adsorbed IR spectra, etc., are employed to
+generate evidence of the catalytic process.
+These lines of evidence together with the tightly coupled reactions
+form a “partial picture” of the catalytic process.
+This partial picture, though not full,
+serves as essential factual basis and
+reveals key insights to optimize chemical engineering experiment design.
+The objective is to extract this type of “partial picture” from
+chemical engineering papers.
+Figure 2 depicts a graph abstraction of
+this “partial picture”.
+To strike a balance between concreteness and readability,
+Figure 2 uses the
+Methanol-to-Olefins (MTO) reaction (Yang et al., 2019; Zhang et al., 2019)
+as an example.
+Note that MTO is a typical chemical engineering reaction.
+Essentially, it is catalytic process that converts methanol into light olefins
+using acid zeotype catalysts in reactors.
+Figure 2 represents
+the Synthesis–Structure–Performance (SSP) paradigm:
+synthesis protocols determine physicochemical structures, which in turn constrain mechanistic pathways and ultimately manifest as observable performance metrics.
+Consequently, experimental facts in this domain are only interpretable when they are linked along this causal lineage, rather than treated as self-contained snippets.
+Figure 2 depicts a graph that abstracts key elements of this partial picture.
+One can observe that
+synthesis-controlled descriptors (e.g., Si/Al →\rightarrow acidity)
+determine active site-level events (e.g., hydrogen-transfer propensity and the formation/retention of aromatic HCP species),
+which then propagate to macroscopic observables such as
+reactants (Olefin HCP and Methanol) and products (Methylated Olefin HCP).
+We next introduce necessary details on the “complexity” of the catalytic process and data.
+Figure 2. 
+A simplified SSP-oriented schematic of how microscopic mechanistic events governed by catalyst active sites and the pore environment propagate to macroscopic reaction outcomes in H-ZSM-5 catalyzed MTO.
+Dependency on material synthesis.
+Many factors that influence the catalytic process.
+Take the MTO study reported in (Liang et al., 2023) as an example.
+The authors prepare a series of H-ZSM-5 zeolites denoted as TZ-mm,
+where mm corresponds to the Si/Al ratio, spanning approximately 22 to 195.
+Within this controlled catalyst family, changing Si/Al systematically alters acidity-related descriptors (e.g., acid amount/density and Al-site configurations such as paired vs. single Al), which then impacts hydrocarbon-pool (HCP) evolution and the balance between competing catalytic cycles.
+Therefore, extracting a performance metric such as “ethene selectivity” is scientifically incomplete unless it is explicitly anchored to the catalyst identity (TZ-mm) and its synthesis-derived structural descriptors (e.g., Si/Al and acidity descriptors) defined elsewhere in the paper (Liang et al., 2023).
+Mechanism-driven complexity beyond macroscopic I/O.
+A catalytic reaction encapsulates not only macroscopic reactant–product outcomes but also microscopic mechanistic events governed by catalyst active sites and the pore environment. In the example paper (Liang et al., 2023),
+acidity-related factors modulate hydrogen-transfer reactivity and the buildup of retained/aromatic HCP species (including polymethylbenzenes), and these microscopic trends are connected to differences in macroscopic product distributions (Liang et al., 2023).
+Notably, it is emphasized in (Liang et al., 2023) that, under pulse-reactor comparisons, the catalyst bed mass is adjusted to keep the total Brønsted acid site (BAS) amount comparable across samples with different BAS densities; this control logic is essential for interpreting downstream comparisons of conversion and selectivity.
+Evidence of the catalytic process.
+The mechanistic links in Figure 2 are not asserted as standalone statements; they are supported by heterogeneous evidence. Specifically, the study employs 13C/12C methanol switching experiments and 13C-methanol/12C-xylene co-feeding experiments to probe the origin of olefins and the role of aromatic HCP species (e.g., whether olefins arise predominantly from aromatics cracking versus alternative pathways) (Liang et al., 2023).
+Heterogeneity in experimental design.
+Experimental outcomes in chemical engineering are highly sensitive to design choices, which creates a high-dimensional parameter space and makes standardization non-trivial. Even within a single paper, the same nominal reaction can be interrogated under distinct operational regimes with fundamentally different semantics.
+The example study (Liang et al., 2023) employs (i) a pulse micro-reactor to probe transient behaviors during the induction period and to analyze retained HCP species under controlled dosing, and (ii) a continuous-flow fixed-bed reactor to evaluate steady-state performance and catalyst stability under extended operation (reported with explicit space-velocity settings). These setups answer different scientific questions (transient mechanism probing vs. lifetime evaluation). Therefore, extracted measurements such as “conversion” or “selectivity” must be contextualized by reactor mode, temporal regime (e.g., pulse index vs. time-on-stream), and the associated protocol; otherwise, merging values across modes leads to invalid comparisons.
+A particularly challenging but common design pattern is controlled comparison, where authors intentionally normalize one factor to isolate another. In the pulse tests of the example paper, catalyst bed mass is adjusted to keep the total Brønsted acid site (BAS) amount comparable across catalysts with different acid site densities. Such normalization is critical for correctly interpreting downstream differences in product distributions and HCP evolution. Accordingly, an extraction system must represent not only the reported outcomes but also the experimental control logic (what is held constant and how), since this logic determines what cross-sample comparisons are valid.
+Summary.
+An effective data extraction system must therefore recover mechanistic claims together with their supporting evidence and experimental context, rather than only extracting surface-level entities (reactants, products, and yields).
+Table 1. Representative extraction discrepancies observed in Grok-3 outputs on processing (Liang et al., 2023). Each row contrasts the erroneous extraction with the original context and domain logic, illustrating the three failure modes identified in Section 3.2.
+Category
+Grok3 Extraction Error
+Original Context & Domain Logic
+1. Lost-in-the-middle in Causal Linking
+Experimental Control Causality
+Records "loading_adjustment" to unify BAS amount but fails to link it to the outcome.
+Original Logic: The adjustment of catalyst weight causes the similar methanol conversion (∼\sim24%) across samples, proving the reaction is BAS-catalyzed. The extraction isolates the method from its intended validation result.
+2. Hallucination in Fine-Grained Parameter Alignment
+Characterization Data Misalignment
+Attributes NH3-TPD acid amounts (e.g., Weak: 247 μ\mumol/g) to "methanol" adsorption site strength.
+Hallucination: The values (247, 203 μ\mumol/g) are specific to NH3 desorption peaks (Table 2). Assigning them to methanol adsorption creates a phantom property not measured in the paper.
+Pulse Parameter Ambiguity
+Generalizes pulse numbers as "11-15 pulses" in reaction_system.
+Precision Error: The paper distinguishes strict protocols: 11 pulses for retained species analysis (in paper’s Fig. 5) vs. 14+414+4 pulses for isotopic switching. Merging them prevents accurate replication of experimental stages.
+3. Lack of Domain Logic Constraints
+Property Attribution Violation
+Defines site_density of "aromatic HCP species" as 131 μ\mumol/g.
+Domain Logic Violation: 131 μ\mumol/g is the density of Brønsted Acid Sites on the zeolite framework (TZ-20). It is physically invalid to assign a catalyst’s structural property as the density of a transient reaction intermediate.
+Missing Steric Constraints
+Describes aromatic elimination steps without noting spatial confinement.
+Mechanism Loss: The paper argues that bulky aromatics (TetraMB-HexaMB) are spatially trapped in intersections, limiting their access to acid sites. The extraction misses this geometric constraint, which is central to explaining the "independence from acid density."
+3.2. Challenges for General LLMs
+While general-purpose LLMs such as Gemini and Grok excel in semantic understanding and multimodal reasoning, their direct application to extracting catalyst experimental data in chemical engineering often falls short in ensuring causal consistency, fine-grained alignment, and verifiable grounding. Through a representative case study on H-ZSM-5 catalysis (Liang et al., 2023), we identify three recurring failure modes, with representative examples listed in Table 1.
+We elaborate on these errors as follows.
+Lost-in-the-middle in causal linking.
+Chemical engineering papers distribute dependent information across distant sections and modalities: synthesis and control logic appear in experimental protocols, characterization data in separate results sections, and mechanistic interpretations elsewhere. Correct extraction requires maintaining long-range causal links among these distributed elements. Standard LLMs frequently break these dependencies or conflate attributes across nearby sample descriptions, producing internally inconsistent records.
+Hallucination in fine-grained parameter alignment.
+Many reported quantities are not static catalyst properties but protocol- and time-indexed measurements. Isotopic switching experiments, pulse sequences, and co-feeding designs introduce temporal structure (e.g., stage ordering and mode-specific readouts). When an LLM extracts a value without preserving its experimental context, the number loses physical meaning and becomes unusable for downstream analysis.
+Lack of domain logic constraints and schema-level verification.
+catalyst experiment data must satisfy domain constraints induced by chemistry and experimental design. For instance, in zeolite series such as TZ-mm, changes in Si/Al correlate with systematic shifts in acidity-related properties; controlled comparisons further impose constraints on valid attribute pairings. A free-form LLM has no built-in mechanism to enforce these constraints or to detect violations such as assigning a catalyst’s structural property to a transient reaction intermediate.
+Figure 3. 
+Architectural overview of AgentCAT, showing the multi-phase process of converting raw PDF literature into structured data and constructing a Knowledge Graph through adaptive extraction, schema evolution, and dynamic graph exploration.
+4. The Design of AgentCAT
+4.1. Architectural Overview
+To address the challenges outlined in Section 3.2, AgentCAT is designed as a multi-agent orchestration framework governed by two fundamental principles: (i) plan-then-execute and (ii) closed-loop self-correction. Specifically, the system decouples the extraction workflow into distinct phases—schema specification, evidence collection, and verification—mirroring the rigorous methodology of human researchers who iteratively refine an initial plan through execution and validation cycles. Meanwhile, feedback loops are embedded at every layer: from JSON parsing at the infrastructure level, to semantic review at the validation layer, to query repair during graph exploration—ensuring errors are detected and corrected in situ rather than propagating downstream.
+As illustrated in Figure 3, this design is instantiated through three progressive stages: Adaptive Extraction, Knowledge Graph Construction, and Interactive Graph Exploration. Together, these stages directly target the three failure modes identified in Section 3.2: progressive schema evolution and dependency-aware graph construction preserve long-range causal links across dispersed sections; candidate-then-resolve evidence grounding improves fine-grained parameter alignment; and review-driven closed-loop re-extraction enforces domain-logic consistency.
+4.2. Adaptive Information Extraction
+At the core of AgentCAT lies its ability to extract high-fidelity, structured data from complex and heterogeneous scientific texts. We implement a multi-stage extraction pipeline, orchestrated by LangGraph, to address the challenges of long-range dependencies and hallucination in fine-grained parameter alignment.
+Progressive schema evolution.
+Prior approaches to literature structuring rely on domain researchers to manually design static schemas. This paradigm heavily depends on both the researcher’s ontology modeling expertise and their proficiency in schema specification (e.g., JSON schema design), and often fails to capture the nuances of domain-specific knowledge, particularly in highly specialized areas such as catalytic chemical engineering. To overcome these limitations, we introduce a Human-in-the-Loop Planning mechanism. Initially, the Planning Agent collaborates with researchers to establish a preliminary DomainKeyElements, which serves as the schema seed. Subsequently, the Schema-Evolution Agent iteratively processes a stratified sample of reference papers, which spanning both historical and recent publications, to refining the schema by incorporating new entity types or hierarchical properties while ensuring backward compatibility. This dynamic schema evolution allows AgentCAT to adapt to emerging research paradigms, while still retaining the ability to reprocess legacy documents.
+Two-phase evidence-based extraction.
+To enhance extraction granularity, we partition the schema into multiple segments and process each through a “Candidate-then-Resolve” strategy, mitigating the risk of hallucination and ensuring that extracted information is grounded in textual evidence:
+• 
+Phase 1 (Candidate): The agent scans the document section by section to extract verbatim text fragments as potential evidence for specific schema fields, without any interpretation or transformation.
+• 
+Phase 2 (Resolve): These verbatim candidates are then processed alongside their original context to populate the final structured fields. This separation compels the model to ground its outputs in explicit textual evidence, thereby enhancing the quality and traceability of the extraction.
+Review and quality verdict.
+Extracted data undergoes rigorous review by the review agent. The review process yields one of three verdicts: PASS, MINOR_FIX (for formatting issues), or MAJOR_ERROR. In the case of a MAJOR_ERROR, a re-extraction loop is triggered, during which error-reason hints are injected back into the extraction prompt to dynamically guide the agent toward more accurate outputs in subsequent iterations. This mechanism ensures continuous improvement throughout the extraction process.
+4.3. Knowledge Graph Construction
+Different chemical research domains require tailored knowledge graphs. In this work, we focus on the interaction between zeolite catalysts and reaction processes within the chemical engineering domain, linking them through active sites as the central bridge. Accordingly, AgentCAT’s Representation Module transforms the structured JSON data produced by the Extraction Module into a Reaction Network Graph stored in a Neo4j graph database, which can be adapted to other graph structures as needed. This process explicitly models the relationships among catalyst properties, microscopic molecular adsorption, and macroscopic catalytic processes, addressing the challenge of “Reaction Dependency” by capturing the complex interdependencies across chemical reactions.
+Dynamic labeling management.
+Scientific discovery frequently introduces novel concepts that cannot be captured by predefined ontologies, while identical concepts may appear under varying nomenclatures. Unlike traditional knowledge graphs with static schemas, our Label Manager supports dynamic schema expansion under a conservative policy, where new labels are introduced only when they are strictly necessary. This restraint preserves structural coherence of the graph. For instance, if the extraction process identifies a novel catalyst property or reaction condition, the system dynamically registers new node labels in the graph database. This enables the knowledge graph to evolve continuously while maintaining its structural integrity as the scientific literature progresses.
+Entity normalization and linking.
+To ensure consistency and connectivity within the graph, we employ a Molecular Normalizer that standardizes chemical formulas (e.g., unifying “propylene”, “propene”, and “C3​H6C_{3}H_{6}”) and resolves naming discrepancies in catalyst nomenclature. Additionally, essential nodes in the graph are linked to their source PDF identifiers, providing traceability and facilitating verification of graph-based information against the original literature.
+4.4. General Querying and Graph Exploration
+The knowledge graph produced by AgentCAT is designed to assist researchers in querying and interacting with the reaction network, facilitating their understanding of catalytic mechanisms and providing a cross-literature perspective that may inspire novel research directions.
+General querying agent for simplified exploration.
+Researchers’ querying needs for the knowledge graph stored in the Neo4j database are often diverse and unpredictable. Fixed query templates fail to accommodate this variability, while expecting researchers to directly manipulate the database imposes an unreasonable burden. To address this, we design a General-Querying Agent that employs a natural language interface, enabling researchers to interact with the reaction network intuitively rather than being constrained by raw data or structured query languages. For instance, a researcher might query, “Which catalysts are designed for producing product X?” The agent progressively decomposes such complex queries into a detailed query plan—determining which sub-queries to execute first, synthesizing intermediate results, revising the plan as needed, and deciding subsequent query steps. Finally, the agent consolidates the complete results and returns them to the visualization interface, offering researchers an intuitive understanding of the network.
+Graph visualization for knowledge discovery.
+The querying agent is integrated with a graph visualization interface that enables researchers to intuitively trace and comprehend the details of catalytic reactions—insights that are difficult to obtain from plain text alone. Crucially, this interface unifies the catalytic mechanisms from multiple publications into a single visual canvas, empowering researchers to explore and query across the boundaries of individual papers. This cross-document view highlights both the similarities and differences in catalytic patterns, reveals non-obvious research directions, and provides anchor points for connecting designs across studies, which ultimately enhances scientific reasoning and accelerates knowledge discovery.
+5. Performance Evaluation
+5.1. Evaluation Settings
+Dataset.
+We evaluate AgentCAT on ∼\sim800 peer-reviewed publications from the energy catalysis domain within chemical engineering. This dataset was curated and validated by domain experts, who confirmed that these papers collectively represent the core findings and methodological breadth of the field, thereby constituting a representative benchmark for agent evaluation.
+Implementation details.
+We implement all agents using LangGraph. For adaptive information extraction, we employ
+Gemini-2.5-Pro via Google AI Studio. For knowledge graph construction
+and general querying & graph exploration, we adopt doubao-seed-1.8 via VolcanoArk to
+better support Chinese-language content and multilingual research workflows. The constructed knowledge graph is persisted in
+Neo4j database.
+5.2. Performance of the Schema Evolution
+We evaluate the convergence behavior of our schema evolution using 10 representative PDFs. Starting from an empty schema, we process documents sequentially and track the count of newly induced items (entities, attributes, or properties) per round. Figure 4 reveals a bootstrapping-then-convergence pattern: the initial round establishes the core structure, while subsequent rounds contribute only marginal extensions to accommodate specific reporting variances. This rapid saturation confirms that our schema quickly stabilizes, requiring minimal updates for processing further literature.
+Figure 4. Number of newly introduced schema items per evolution round (each round processes one PDF).
+5.3. Performance of Data Extracting
+(a) Expert blind scores: Completeness, Accuracy, Readability
+(b) JSON length distribution (lines) over 733 papers
+(c) Review verdict distribution
+Figure 5. Extraction quality and reliability of AgentCAT on a large catalysis corpus. (a) Distribution of extracted JSON length as a coarse proxy for information density. (b) Expert blind ratings of extracted outputs across Completeness/Accuracy/Readability . (c) Overall review-verdict distribution over all extracted sections.
+Chemical engineering expert evaluation.
+Evaluating the completeness and accuracy of extraction is
+challenging for LLMs. Thus, we employ three chemical
+engineering experts to evaluate the extraction of
+twenty randomly selected papers. The experts assessed each extracted record along three axes: Completeness, Accuracy, and Readability, each scored from 1 to 10. Figure  5(a) visualizes the averaged scores across the 20 sampled papers. Across nearly all cases, Accuracy and Readability are consistently strong, while Completeness shows modest variation but remains robust overall. These results suggest that AgentCAT produces structured records that are easy to inspect, largely consistent with the source, and comprehensive for downstream analysis. Qualitative feedback and detailed comments on nine of the papers are summarized in Appendix A (Table 3); these comments also serve as guidance for future refinements.
+Computing-level performance.
+Figure 5(b) reports the distribution of JSON output lengths for 733 catalysis papers processed by AgentCAT. While a coarse and format-dependent metric, line count provides a rough proxy for the richness within the extracted dataset.
+We further assess reliability at scale by aggregating review verdicts over the adaptive extraction phase. Across 4,398 extracted sections from 733 papers, the review agent assigns one of three labels: PASS, MINOR_FIX, or MAJOR_ERROR (Figure 5(c)). The pipeline achieves an 82.0% PASS rate, with 15.3% MINOR_FIX and only 2.7% MAJOR_ERROR. We also break down the MAJOR_ERROR cases across the six common section types in Appendix A (Figure 6), which helps identify where hard failures concentrate and can guide future improvements. The low incidence of major failures supports the value of review-driven gating, while the non-trivial MINOR_FIX fraction suggests that improving ‘single-run-pass’ acceptance remains an important optimization target. Overall, the current extraction phase delivers structured data with practical fidelity that can be readily consumed by subsequent knowledge-graph construction and deeper catalysis studies.
+5.4. Performance of General Querying Agent
+To evaluate the robustness of our General Querying Agent built on the doubao-seed-1.8 model, we designed a benchmark comprising 12 queries across three difficulty levels (Easy, Medium, and Hard, four queries each). Each query was executed five times (60 trials in total) to account for the stochastic nature of LLM generation. We measured the error rate and average execution time per query.
+As shown in Table 2, the agent achieves an overall correctness rate of 86.67%. Both Easy and Medium queries exhibit a 10% error rate, while Hard queries reach 20%, indicating graceful degradation on complex reasoning tasks. Notably, execution time increases with difficulty: Medium queries require approximately 55% more time than Easy queries (149.17s vs. 96.36s) despite identical error rates. However, the relatively modest time gap between these two levels suggests that the planning phase rather than Cypher execution dominates overall latency.Furthermore, even Easy queries incur latencies substantially higher than conventional database queries. While slow inference speed of doubao-seed-1.8 partly accounts for this overhead, these observations point to considerable room for improvement in both plan generation and query decomposition to better accommodate the interactive needs of researchers.
+Table 2. Performance of the General Querying Agent across difficulty levels, categorized by the number of hops in query logic. All queries were executed successfully; error rate denotes cases where returned results were incomplete (e.g., missing nodes or relationships).
+Difficulty
+Error Rate (%)
+Avg. Time (s)
+Easy
+10.00
+96.36
+Medium
+10.00
+149.17
+Hard
+20.00
+308.32
+Overall
+13.33
+184.62
+5.5. System Interface
+Appendix C presents example queries using the general query feature and corresponding results, plus sample logs showing query decomposition.
+6. Conclusion
+This paper presents the design and anlysis of AgentCAT.
+AgentCAT extracts and analyzes catalytic reaction data from chemical engineering papers,
+AgentCAT serves as an alternative to overcome the
+long-standing data bottleneck in chemical engineering field.
+AgentCAT also presents a formal abstraction and challenge analysis
+of the catalytic reaction data extraction task
+in an artificial intelligence-friendly manner.
+AgentCAT makes four folds of technical contributions:
+(1) a schema-governed extraction pipeline with progressive schema evolution, enabling robust data extraction from chemical engineering papers;
+(2) a dependency-aware reaction-network knowledge graph that links catalysts/active sites, synthesis-derived descriptors, mechanistic claims with evidence, and macroscopic outcomes, preserving process coupling and traceability;
+(3) a general querying module that supports natural-language exploration and visualization over the constructed graph for cross-paper analysis;
+(4) an evaluation on ∼\sim800 peer-reviewed papers show the effectiveness
+of AgentCAT.
+7. Limitations and Ethical Considerations
+Ethical considerations.
+This work analyzes publicly available, peer-reviewed publications and does not involve human participants or sensitive data; institutional ethics review is not required.
+The primary ethical consideration is intellectual property.
+AgentCAT extracts structured experimental facts and stores provenance signals to support verification, but does not redistribute copyrighted text.
+To respect publisher copyrights, we do not enable wholesale redistribution of source content.
+Any use of extracted data should comply with publisher licenses and favor sharing structured fields rather than verbatim excerpts.
+Automated extraction may contain errors; we mitigate this via evidence grounding, traceability, and review-driven correction, but outputs should be treated as decision support rather than ground truth.
+Limitations.
+First, interactive querying can be time-consuming due to multi-step planning and query repair.
+Second, some fine-grained misalignment and cross-section linking errors may persist in challenging cases, especially when evidence is implicit or distributed across modalities.
+Third, our evaluation focuses on an energy-catalysis corpus; generalization to other chemical engineering subdomains may require further schema refinement and validation.
+8. GenAI Disclosure
+Generative AI tools were used solely to improve the clarity and conciseness of the manuscript’s language (e.g., grammar, wording, and style). All scientific contributions, including the research ideas, methodology, experimental design, implementation, data collection/processing, results, and conclusions, were produced and verified by the authors. No Generative AI tool was used to generate or alter experimental results, figures, tables, or to produce new scientific claims.
+References
+Ansari and Moosavi (2023)
+M. Ansari and S. M. Moosavi
+Agent-based learning of materials datasets from scientific literature.
+arXiv preprint arXiv:2312.11690.
+External Links: Link
+Cited by: §1,
+§2.
+Bian (2025)
+H. Bian
+LLM-empowered knowledge graph construction: a survey.
+arXiv preprint arXiv:2510.20345.
+Cited by: §2,
+§2.
+Chen et al. (2025)
+H. Chen, J. Shi, X. Chen, X. Yang, M. Gao, L. Shi, J. Chen, J. Huang, J. Chen, C. Sun, L. Li, Z. Liu, J. Lou, J. Yang, and D. Zhang
+KnoBuilder: an llm-agent for autonomous and personalized knowledge graph construction from unstructured text.
+In NeurIPS 2025 Workshop NORA,
+Note: Poster presentation
+External Links: Link
+Cited by: §2.
+Edge et al. (2024)
+D. Edge, H. Trinh, N. Cheng, J. Bradley, B. Huang, A. Karnik, M. Khademi, and A. G. Baydin
+From local to global: a graph rag approach to query-focused summarization.
+arXiv preprint arXiv:2404.16130.
+External Links: 2404.16130,
+Link
+Cited by: §2.
+Fan et al. (2024)
+V. Fan, Y. Qian, A. Wang, A. Wang, C. W. Coley, and R. Barzilay
+OpenChemIE: an information extraction toolkit for chemistry literature.
+J. Chem. Inf. Model..
+External Links: Document
+Cited by: §2.
+Hunger (2025)
+M. HungerLLM knowledge graph builder — first release of 2025(Website)
+Note: Neo4j BlogBlog post announcing tool release
+External Links: Link
+Cited by: §2.
+Kearnes et al. (2021)
+S. M. Kearnes, M. R. Maser, M. Wleklinski, A. Kast, A. G. Doyle, S. D. Dreher, J. M. Hawkins, K. F. Jensen, and C. W. Coley
+The open reaction database.
+Journal of the American Chemical Society 143 (45), pp. 18820–18826.
+Cited by: §1.
+Li et al. (2025a)
+X. Li, Z. Huang, S. Quan, C. Peng, and X. Ma
+SLM-MATRIX: a multi-agent trajectory reasoning and verification framework for enhancing language models in materials data extraction.
+npj Computational Materials.
+External Links: Document
+Cited by: §1,
+§2.
+Li et al. (2025b)
+Y. Li, J. Wang, Y. Zhao, and W. Hu
+LLM-empowered knowledge graph construction: a survey.
+arXiv preprint arXiv:2510.20345.
+External Links: 2510.20345,
+Link
+Cited by: §2.
+Liang et al. (2023)
+T. Liang, J. Chen, Z. Qin, S. Wang, P. Wang, F. Jin, M. Dong, J. Wang, and W. Fan
+Insight into induction period of methanol conversion reaction: reactivity of ethene-precursors over h-zsm-5 zeolite is independent of brϕ\phinsted acid site density.
+Fuel 332, pp. 126062.
+Cited by: §3.1,
+§3.1,
+§3.1,
+§3.1,
+§3.2,
+Table 1,
+Table 1.
+Lin et al. (2020)
+X. Lin, Z. Quan, Z. Wang, T. Ma, and X. Zeng
+KGNN: knowledge graph neural network for drug-drug interaction prediction..
+In IJCAI,
+Vol. 380, pp. 2739–2745.
+Cited by: §2.
+M. Bran et al. (2024)
+A. M. Bran, S. Cox, O. Schilter, C. Baldassari, A. D. White, and P. Schwaller
+Augmenting large language models with chemistry tools.
+Nature Machine Intelligence.
+External Links: Document
+Cited by: §2.
+McNaughton et al. (2024)
+A. D. McNaughton, G. K. Sankar Ramalaxmi, A. Kruel, C. R. Knutson, R. A. Varikoti, and N. Kumar
+CACTUS: chemistry agent connecting tool usage to science.
+ACS Omega.
+External Links: Document
+Cited by: §2.
+Mo et al. (2025)
+B. Mo, K. Yu, J. Kazdan, J. Cabezas, P. Mpala, L. Yu, C. Cundy, C. Kanatsoulis, and S. Koyejo
+KGGen: extracting knowledge graphs from plain text with language models.
+arXiv preprint arXiv:2502.09956.
+Note: Accepted as poster at NeurIPS 2025
+External Links: 2502.09956,
+Link
+Cited by: §2.
+Mohammadi et al. (2025)
+M. Mohammadi, Y. Li, J. Lo, and W. Yip
+Evaluation and benchmarking of llm agents: a survey.
+arXiv preprint arXiv:2507.21504.
+External Links: Link
+Cited by: §2.
+Nguyen et al. (2018)
+T. D. Nguyen, D. Q. Nguyen, D. Phung, et al.
+A novel embedding model for knowledge base completion based on convolutional neural network.
+In Proceedings of the 2018 conference of the North American chapter of the association for computational linguistics: human language technologies, volume 2 (short papers),
+pp. 327–333.
+Cited by: §2.
+Odobesku et al. (2025)
+R. Odobesku, K. Romanova, S. Mirzaeva, O. Zagorulko, R. Sim, R. Khakimullin, J. Razlivina, A. Dmitrenko, and V. Vinogradov
+Agent-based multimodal information extraction for nanomaterials.
+npj Computational Materials.
+External Links: Document
+Cited by: §1,
+§2.
+Omar and Mohammed (2025)
+H. Y. O. Omar and A. Mohammed
+A hybrid llm–knowledge graph framework for accurate biomedical question answering.
+Journal of Applied Science and Technology Trends 6 (2), pp. 342–357.
+Cited by: §2.
+Oughtred et al. (2021)
+R. Oughtred, J. Rust, C. Chang, B. Breitkreutz, C. Stark, A. Willems, L. Boucher, G. Leung, N. Kolas, F. Zhang, et al.
+The biogrid database: a comprehensive biomedical resource of curated protein, genetic, and chemical interactions.
+Protein Science 30 (1), pp. 187–200.
+Cited by: §2.
+Perry (1950)
+J. H. Perry
+Chemical engineers’ handbook.
+ ACS Publications.
+Cited by: §1.
+Wang et al. (2024)
+C. Wang, Y. Yang, J. Song, and X. Nan
+Research progresses and applications of knowledge graph embedding technique in chemistry.
+Journal of Chemical Information and Modeling 64 (19), pp. 7189–7213.
+Cited by: §2,
+§2.
+Wigh et al. (2024)
+D. S. Wigh, J. Arrowsmith, A. Pomberger, K. C. Felton, and A. A. Lapkin
+Orderly: data sets and benchmarks for chemical reaction data.
+Journal of Chemical Information and Modeling 64 (9), pp. 3790–3798.
+Cited by: §1.
+Wu et al. (2025)
+M. Wu, Y. Wang, Y. Ming, Y. An, Y. Wan, W. Chen, B. Lin, Y. Li, T. Xie, and D. Zhou
+CheMatAgent: enhancing llms for chemistry and materials science through tree-search based tool learning.
+arXiv preprint arXiv:2506.07551.
+Cited by: §2.
+Xia et al. (2023)
+X. Xia, C. Zhu, F. Zhong, and L. Liu
+MDTips: a multimodal-data-based drug–target interaction prediction system fusing knowledge, gene expression profile, and structural data.
+Bioinformatics 39 (7), pp. btad411.
+Cited by: §2.
+Yang et al. (2019)
+M. Yang, D. Fan, Y. Wei, P. Tian, and Z. Liu
+Recent progress in methanol-to-olefins (mto) catalysts.
+Advanced materials 31 (50), pp. 1902181.
+Cited by: §1,
+§3.1.
+Yoshitake and Nagata (2025)
+M. Yoshitake and T. Nagata
+A method for llm-based construction of a materials property knowledge graph: a case study.
+Applied Sciences 15 (19), pp. 10511.
+Cited by: §2,
+§2.
+Zhang and Li (2024)
+D. Zhang and H. Li
+Digital catalysis platform (digcat): a gateway to big data and ai-powered innovations in catalysis.
+Cited by: §1.
+Zhang et al. (2019)
+W. Zhang, Y. Zhi, J. Huang, X. Wu, S. Zeng, S. Xu, A. Zheng, Y. Wei, and Z. Liu
+Methanol to olefins reaction route based on methylcyclopentadienes as critical intermediates.
+ACS Catalysis 9 (8), pp. 7373–7379.
+Cited by: §1,
+§3.1.
+Zhou et al. (2022)
+Z. Zhou, C. Wang, Y. Feng, and D. Chen
+JointE: jointly utilizing 1d and 2d convolution for knowledge graph embedding.
+Knowledge-Based Systems 240, pp. 108100.
+Cited by: §2.
+Zlokarnik (2006)
+M. Zlokarnik
+Scale-up in chemical engineering.
+ John Wiley & Sons.
+Cited by: §1.
+Appendix A Additional Evaluation Results
+This appendix provides additional evidence for Section 5.3. Table 3 reports blind-review results for nine papers, including scores on Completeness, Accuracy, and Readability, plus expert comments. Figure 6 breaks down MAJOR_ERROR cases by section type. Most errors occur in Catalytic Performance (58), followed by Catalyst Identity (20), while Synthesis Procedure has very few (1). These results contextualize the aggregate scores and guide pipeline refinement.
+Figure 6. Breakdown of MAJOR_ERROR cases by section type.
+Table 3. Expert Evaluations of Nine Representative Papers (selected from the 20 evaluated papers)
+Paper Title
+Scores
+Expert Evaluation
+[Cu2O]2+ Active Site Formation in Cu-ZSM-5 Geometric and Electronic Structure Requirements for N2O Activation
+9.3/9.7/9.3
+Recommendation: For industrial catalysts, long-term stability (life test) is more important than single-point data. It is recommended to add a "long_term_stability" field to extract key conclusions…
+A computational and conceptual DFT approach to the kinetics of acid zeolite catalyzed electrophilic aromatic substitution reactions
+8.6/9.6/9
+The core research object of the original paper is "electrophilic substitution of aromatics (e.g., benzylation)". Although the rate constants of aromatic reactions (data in Table 1) are not extracted into catalytic_performance (possibly because they are calculated values rather than experimental values), they are correctly placed in the energy barrier of reaction_mechanism.
+A Mechanistic Study of the Brønsted-Acid Catalysis of n-Hexane to Propane + Propene, Featuring Carbonium Ions
+9.3/8.6/9.6
+JSON uniformly converts all energy data (e.g., 16.23 kcal/mol to 0.704 eV). While physically correct and convenient for cross-reference comparisons, it is recommended to retain the original units or use the 0.704 eV (16.23 kcal/mol) format when tracing data sources. Older literature in chemical engineering and catalysis often uses kcal/mol, and direct conversion may cause momentary confusion for experts during verification.
+1,2,4-Trimethylbenzene disproportionation over large-pore zeolites: An experimental and theoretical study
+9.3/9/9.6
+The extraction quality is extremely high, especially in the depth of structural analysis of the reaction mechanism. It is recommended to supplement the research objectives and core conclusions regarding the "shape-selectivity of the LaNa-MOR transition state," optimize the organization of the acidity data, and move the reaction pathway description from reaction_kinetics to reaction_mechanism.
+A Periodic Density Functional Theory Analysis of Direct Methane Conversion into Ethylene and Aromatic Hydrocarbons Catalyzed by Mo4C2-ZSM-5
+9.3/9.6/10
+The extraction comprehensively covers the core reaction mechanism, key energy barriers, and computational models. The structure is clear and the pathway is complete. However, some theoretical details (such as free energy analysis and model selection criteria) and adsorption data are not fully included. For DFT studies, the key energy information is accurately extracted.
+A New Mechanism for the First Carbon-Carbon Bond Formation in the MTG Process: A Theoretical Study
+9.3/9/10
+The JSON structure is clear and highly readable. The energy barrier units have been converted from kcal/mol in the original text to eV, and the numerical correspondences are generally accurate; however, the precise correspondence of energy values requires careful verification.
+A DFT Study for Catalytic Deoxygenation of Methyl Butyrate on a Lewis Acid Site of ZSM-5 Zeolite
+9.3/8.6/9.3
+The extraction results are excellent overall, accurately capturing the core of this DFT study: the ZSM-5 Lewis acid model, seven different bond breaking pathways (α\alpha / β\beta, C-C, C-O), detailed energy barrier data, and optimal pathway conclusions. The data structure is clear.
+13C MAS NMR mechanistic study of the initial stages of propane activation over H-ZSM-5 zeolite
+9.6/9.6/9.6
+The extracted data is very complete and accurate, clearly distinguishing various reaction pathways and mechanisms under different catalyst acidity, propane loading, and additives (C3H6, H2, etc.). It is recommended to supplement the "catalytic_performance" section with initial selectivity or quantitative reaction rate data for key products, or to add a "key_findings" field at the top level to summarize core conclusions such as "strong proton site dominance" and "pressure-dependent path switching."
+A 13CO isotopic study on the CO promotion effect in methane dehydroaromatization reaction over a Mo/HMCM-49 catalyst
+9.3/9.6/9.6
+The extracted content is comprehensive and accurately describes the core findings of the catalyst, synthesis, CO-promoting mechanism, and isotope labeling experiments. It is recommended to supplement the "catalytic_performance" section with stability information such as catalyst deactivation rate and induction period duration, or to add a "key_conclusions" field at the top level to extract the key conclusion that "CO dissociation and CH4 decomposition are independent processes that interfere with each other through the carbon pool."
+Appendix B Supplementary Material
+The literature dataset, expert rating sheets, and schema file are publicly available and can be accessed via the following link:
+https://osf.io/xrtq2/overview?view_only=f068119f2bdb483fa953790d51b7ff5b.
+The code implementation is available at:
+https://anonymous.4open.science/r/agentcat-E69B.
+Figure 7. Backend logs showing the General Querying Agent’s query interpretation and task decomposition process.
+Appendix C User Interface
+Figure 8 illustrates the researcher-facing interface of AgentCAT. Figure 8(a) displays the default view, showing the complete reaction network retrieved from the knowledge graph. Figure 8(b) demonstrates a natural language query submitted by the researcher, along with the results returned by the General Querying Agent. Note that in the query result visualization, catalyst property details are hidden to reduce visual clutter and improve readability. The backend logs capturing how the agent interprets and decomposes the query task are shown in Figure 7.
+(a) Default interface displaying the full reaction network.
+(b) Query results returned by the General Querying Agent. Catalyst properties are hidden for visual clarity.
+Figure 8. The researcher-facing visualization interface of AgentCAT.
+ 
+ Experimental support, please
+ view the build logs
+ for errors. Generated by
+ 
+ 
+ L
+ A
+ T
+ E
+ 
+ xml
+ 
+ .
+ 
+ 
+ 
+Instructions for reporting errors
+ 
+We are continuing to improve HTML versions of papers, and your feedback helps enhance accessibility and mobile
+ support. To report errors in the HTML that will help us improve conversion and rendering, choose any of the
+ methods listed below:
+ 
+ 
+Click the "Report Issue" (
+ 
+ ) button, located in the page header.
+ 
+ 
+Tip: You can select the relevant text first, to include it in your report.
+ 
+Our team has already identified the following issues. We appreciate your time reviewing and reporting rendering errors we
+ may not have found yet. Your efforts will help us improve the HTML versions for all readers, because disability
+ should not be a barrier to accessing research. Thank you for your continued support in championing open access for
+ all.
+ 
+Have a free development cycle? Help support accessibility at arXiv! Our collaborators at LaTeXML maintain a list of packages that need conversion, and welcome developer contributions.
+ 
+ 
+ 
+ 
+ We gratefully acknowledge support from
+ our major funders,
+ member institutions, ,
+ and all contributors.
+ 
+ 
+ About
+ ·
+ Help
+ ·
+ Contact
+ ·
+ Subscribe
+ ·
+ Copyright
+ ·
+ Privacy
+ ·
+ Accessibility
+ ·
+ Operational Status (opens in new tab)
+ 
+ 
+ 
+ 
+Major funding support from
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
