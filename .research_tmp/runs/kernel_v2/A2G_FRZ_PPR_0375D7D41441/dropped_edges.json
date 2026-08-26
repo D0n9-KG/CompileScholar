@@ -1,0 +1,1490 @@
+[
+  {
+    "edge_id": "n1_e5",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "The kinetic theory formula reduces to the classical Chapman–Enskog result in the limit of perfectly elastic particles.",
+    "node_ids": [
+      "n1_n11",
+      "n1_n12",
+      "n1_n13"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "self-diffusion coefficient",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "kinetic theory formula",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Chapman–Enskog result",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states a limiting behavior of a formula, not a constitutive law relating output to input quantities. The 'kinetic theory formula' is not an input to a law; it IS the law itself. The 'Chapman-Enskog result' is not a parameter but a specific case/limit of the formula. This is better described as a 'defines' or 'extends' relation, but the current structure is incorrect. The relation is real but the pattern and slot bindings are wrong.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1_e6",
+    "pattern_type": "defines",
+    "evidence_span": "Self-diffusion coefficients are determined by an analysis based upon kinetic theory and by numerical simulations.",
+    "node_ids": [
+      "n1_n14",
+      "n1_n15",
+      "n1_n16"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "self-diffusion coefficients",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "analysis based upon kinetic theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "numerical simulations",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that self-diffusion coefficients are determined by two methods, which is a measurement/evaluation relation, not a definitional identity. The 'defines' pattern is incorrect. The 'analysis based upon kinetic theory' and 'numerical simulations' are methods/instruments, not definitions or objects. This should be a 'measures' relation, but the current structure is wrong.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n2_e1",
+    "pattern_type": "background",
+    "evidence_span": "computer simulations of these flows",
+    "node_ids": [
+      "n2_n3",
+      "n2_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "computer simulations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "granular flows",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e2",
+    "pattern_type": "background",
+    "evidence_span": "experimental investigations",
+    "node_ids": [
+      "n2_n4",
+      "n2_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "experimental investigations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "granular flows",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e0",
+    "pattern_type": "background",
+    "evidence_span": "development of kinetic theories that can be used to predict the characteristics of various flow fields",
+    "node_ids": [
+      "n2_n1",
+      "n2_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "kinetic theories",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "granular flows",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that kinetic theories were developed to predict flow characteristics, not that kinetic theories use granular flows as background/motivation. The relation is misidentified; the sentence describes a purpose/application, not a background citation. The direction is also reversed (granular flows are the subject of study, not the motivation for kinetic theories).",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n2_e3",
+    "pattern_type": "compares",
+    "evidence_span": "Progress has been made through the development of kinetic theories that can be used to predict the characteristics of various flow fields (e.g., Savage and Jeffrey, 1981; Lun et al., 1984; Jenkins and Richman, 1985) through computer simulations of these flows (e.g., Walton et al., 1988; Campbell and Brennen, 1985; Campbell, 1990; Savage, 1992; Walton and Braun, 1985), and by experimental investigations (e.g., Savage and Sayed, 1984; Ahn et al., 1988; Sanders et al., Correspondence to: Prof. S.B. Savage, Department of Civil Engineering and Applied Mechanics, MacDonald Engineering Building, McGill University, 817 Sherbrooke Street West, Montreal, Quebec H3A 2K6, Canada. 1988; Bridgwater et al., 1985; Johnson and Jackson, 1987).",
+    "node_ids": [
+      "n2_n1",
+      "n2_n3",
+      "n2_n4"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "kinetic theories",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "computer simulations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "experimental investigations",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence lists three parallel approaches (kinetic theories, computer simulations, experimental investigations) that contributed to progress, but does not explicitly compare them against each other. The sentence merely co-lists them as separate avenues of research; no comparison, contrast, or side-by-side evaluation is stated. The edge over-interprets a list as a comparison.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3_e0",
+    "pattern_type": "compares",
+    "evidence_span": "using both 'hard' and 'soft' sphere models",
+    "node_ids": [
+      "n3_n4",
+      "n3_n5"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "hard sphere models",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "soft sphere models",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3_e2",
+    "pattern_type": "influences",
+    "evidence_span": "shear flows of smooth, inelastic spherical particles",
+    "node_ids": [
+      "n3_n1",
+      "n3_n2"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "shear flows",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "smooth, inelastic spherical particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence merely describes the system being simulated (shear flows of particles); it does not state a functional dependence between shear flows and particles. This is a setup description, not an influences relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3_e3",
+    "pattern_type": "influences",
+    "evidence_span": "shear flows of smooth, inelastic spherical particles of uniform diameter σ",
+    "node_ids": [
+      "n3_n1",
+      "n3_n3"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "shear flows",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "uniform diameter σ",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence describes the particle properties (uniform diameter) as part of the simulation setup, not a functional dependence between shear flows and diameter. This is a descriptive attribute, not an influences relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3_e4",
+    "pattern_type": "defines",
+    "evidence_span": "smooth, inelastic spherical particles of uniform diameter σ",
+    "node_ids": [
+      "n3_n2",
+      "n3_n3"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "smooth, inelastic spherical particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "uniform diameter σ",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence states that particles have a uniform diameter (a property/attribute), not that particles are defined by or identified with the diameter. This is a descriptive characteristic, not a definitional identity.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3_e5",
+    "pattern_type": "influences",
+    "evidence_span": "The influence of gravity was neglected in the computations",
+    "node_ids": [
+      "n3_n9",
+      "n3_n8"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "computations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "gravity",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence states that gravity's influence was neglected (an assumption about the model), not that computations depend on gravity. This is a modeling assumption, not a functional dependence relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4_e0",
+    "pattern_type": "defines",
+    "evidence_span": "all lengths were nondimensionalized by dividing by H",
+    "node_ids": [
+      "n4_n1",
+      "n4_n2",
+      "n4_n3"
+    ],
+    "node_roles": [
+      "subject",
+      "object",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "nondimensionalization",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "H",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "length scale",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4_e1",
+    "pattern_type": "defines",
+    "evidence_span": "Velocities were nondimensionalized by U",
+    "node_ids": [
+      "n4_n1",
+      "n4_n4",
+      "n4_n5"
+    ],
+    "node_roles": [
+      "subject",
+      "object",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "nondimensionalization",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "U",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "velocity scale",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4_e3",
+    "pattern_type": "composed_of",
+    "evidence_span": "For bounded Couette flows, we followed the approach described in Savage (1992) in which the interior flow was driven by the 'rough' top and bottom walls",
+    "node_ids": [
+      "n4_n10",
+      "n4_n11",
+      "n4_n12",
+      "n4_n13"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "bounded Couette flow setup",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "top wall",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "bottom wall",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "interior particles",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4_e4",
+    "pattern_type": "influences",
+    "evidence_span": "the particle spacing increased as mean solids fraction was decreased and the walls became effectively 'rougher'",
+    "node_ids": [
+      "n4_n14",
+      "n4_n15"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mean solids fraction",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "wall roughness",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4_e5",
+    "pattern_type": "defines",
+    "evidence_span": "To model unbounded (infinite) flow fields, the Lees-Edwards (Lees and Edwards, 1972) type periodic boundary conditions were applied",
+    "node_ids": [
+      "n4_n16",
+      "n4_n17"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Lees-Edwards periodic boundary conditions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "unbounded flow fields",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4_e2",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "simple shear flow, u(y) = Γy, where the shear rate, Γ = constant",
+    "node_ids": [
+      "n4_n6",
+      "n4_n7",
+      "n4_n8",
+      "n4_n9"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter",
+      "coefficient"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "simple shear flow",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "y",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Γ",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "u",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly states the constitutive law u(y) = Γy with Γ as the shear rate parameter. The roles are correctly bound: u is the output velocity field, y is the input spatial coordinate, Γ is the parameter (shear rate), and the coefficient role is appropriately assigned to u as the dependent variable in the linear relation. The relation is a formal quantitative law, not merely a prose dependence.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n5_e0",
+    "pattern_type": "compares",
+    "evidence_span": "Two smooth, inelastic particle models were considered. In the 'hard-sphere' model the inelasticity was characterized by a standard coefficient of restitution, e, which was independent of impact velocity. There the impacts were instantaneous, implying binary particle collisions; this permitted a computational algorithm that was simple and efficient. In the 'soft-sphere' model, the collisions were of finite duration, and thus this model permitted the possibility of multiple contacts.",
+    "node_ids": [
+      "n5_n1",
+      "n5_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "hard-sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "soft-sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5_e1",
+    "pattern_type": "composed_of",
+    "evidence_span": "we have used the so-called ratchet contact model of Walton and Braun (1985)",
+    "node_ids": [
+      "n5_n2",
+      "n5_n3"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "soft-sphere model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "ratchet contact model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c1_e2",
+    "pattern_type": "influences",
+    "evidence_span": "If e is decreased, the energy dissipation increases",
+    "node_ids": [
+      "n6c1_n5",
+      "n6c1_n6"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "coefficient of restitution e",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "energy dissipation",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c1_e3",
+    "pattern_type": "influences",
+    "evidence_span": "distributions ... for e = 0.7 are more nonuniform than those ... for e = 0.9",
+    "node_ids": [
+      "n6c1_n7",
+      "n6c1_n8"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "energy dissipation",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "nonuniformity of distributions",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c1_e4",
+    "pattern_type": "influences",
+    "evidence_span": "solids fraction to become more uniformly distributed over the gap when the mean ν is decreased",
+    "node_ids": [
+      "n6c1_n9",
+      "n6c1_n10"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mean ν",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "uniformity of solids fraction distribution",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c1_e5",
+    "pattern_type": "measures",
+    "evidence_span": "dividing the computational box into several horizontal 'bins', and periodically sampling data, we can obtain ... distributions of granular temperature",
+    "node_ids": [
+      "n6c1_n11",
+      "n6c1_n12"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "granular temperature",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "horizontal bins",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c1_e6",
+    "pattern_type": "measures",
+    "evidence_span": "dividing the computational box into several horizontal 'bins', and periodically sampling data, we can obtain ... distributions of solids fraction",
+    "node_ids": [
+      "n6c1_n13",
+      "n6c1_n14"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "solids fraction",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "horizontal bins",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e2",
+    "pattern_type": "influences",
+    "evidence_span": "If e is decreased, the energy dissipation increases",
+    "node_ids": [
+      "n6c0_n5",
+      "n6c0_n6"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "coefficient of restitution e",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "energy dissipation",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e3",
+    "pattern_type": "influences",
+    "evidence_span": "the energy dissipation increases, and thus the distributions in Fig. 2b and Fig. 3b for e = 0.7 are more nonuniform than those in Fig. 2a and Fig. 3a based upon e = 0.9",
+    "node_ids": [
+      "n6c0_n7",
+      "n6c0_n8"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "energy dissipation",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "nonuniformity of distributions",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e4",
+    "pattern_type": "influences",
+    "evidence_span": "the solids fraction to become more uniformly distributed over the gap when the mean ν is decreased",
+    "node_ids": [
+      "n6c0_n9",
+      "n6c0_n10"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mean ν",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "uniformity of solids fraction distribution",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c0_e7",
+    "pattern_type": "defines",
+    "evidence_span": "In the case of unbounded flow (simulated by the Lees–Edwards (Lees and Edward, 1972) periodic boundary condition)",
+    "node_ids": [
+      "n6c0_n14",
+      "n6c0_n15"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "unbounded flow",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "Lees–Edwards periodic boundary condition",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6c1_e7",
+    "pattern_type": "defines",
+    "evidence_span": "unbounded flow (simulated by the Lees–Edwards periodic boundary condition)",
+    "node_ids": [
+      "n6c1_n15",
+      "n6c1_n16"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "unbounded flow",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "Lees–Edwards periodic boundary condition",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly states that unbounded flow is simulated by the Lees-Edwards boundary condition, which is a definitional identity of the simulation method. The roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n7c1_e6",
+    "pattern_type": "defines",
+    "evidence_span": "This same definition involving the interior flow one particle diameter away from the wall was used in the initial part of Richman (1988)",
+    "node_ids": [
+      "n7c1_n10",
+      "n7c1_n11",
+      "n7c1_n12"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "slip velocity",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "wall particle velocity",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "velocity in the interior flow one particle diameter away from the wall",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c1_e7",
+    "pattern_type": "defines",
+    "evidence_span": "Figure 8c shows the computer simulation results for 'slip' velocities defined in terms of the difference between the wall particle velocity, U_w, and the velocity in the adjacent layer, u_al, one particle diameter away from the wall",
+    "node_ids": [
+      "n7c1_n4",
+      "n7c1_n17",
+      "n7c1_n18"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "slip velocities",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "U_w",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "u_al",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c1_e9",
+    "pattern_type": "compares",
+    "evidence_span": "Agreement with the results from the kinetic theories is now much closer, at least for e = 0.9",
+    "node_ids": [
+      "n7c1_n3",
+      "n7c1_n22"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "computer simulations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "kinetic theories",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e1",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "It is also possible (see, for example, McQuarrie (1976)) to express the mean square particle displacement in terms of velocity autocorrelation function $\\langle\\boldsymbol{C}(0)\\cdot\\boldsymbol{C}(t)\\rangle$ , i.e., where C = c - u is the particle velocity fluctuation, i.e., the difference between the instantaneous particle velocity c and the mean velocity u. Hence, we can obtain an alternative form for the diffusion coefficient",
+    "node_ids": [
+      "n8_n1",
+      "n8_n4",
+      "n8_n2"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mean square particle displacement",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "velocity autocorrelation function",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "self-diffusion coefficient",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e2",
+    "pattern_type": "defines",
+    "evidence_span": "C = c - u is the particle velocity fluctuation, i.e., the difference between the instantaneous particle velocity c and the mean velocity u",
+    "node_ids": [
+      "n8_n5",
+      "n8_n6",
+      "n8_n7"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "particle velocity fluctuation",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "instantaneous particle velocity",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "local mean velocity",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e4",
+    "pattern_type": "composed_of",
+    "evidence_span": "C = c - u is the particle velocity fluctuation, i.e., the difference between the instantaneous particle velocity c and the mean velocity u",
+    "node_ids": [
+      "n8_n5",
+      "n8_n6",
+      "n8_n7"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "particle velocity fluctuation",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "instantaneous particle velocity",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "local mean velocity",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e0",
+    "pattern_type": "defines",
+    "evidence_span": "the mean square particle displacement due to random walking $\\langle|R|^{2}\\rangle$ can be expressed in terms of the well known Einstein relation where $D$ is the coefficient of self-diffusion",
+    "node_ids": [
+      "n8_n2",
+      "n8_n3",
+      "n8_n1"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "self-diffusion coefficient",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Einstein relation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "mean square particle displacement",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that mean square displacement is expressed in terms of the Einstein relation, and that D is the self-diffusion coefficient. This is a definition of D (the self-diffusion coefficient), not a definition of the self-diffusion coefficient in terms of mean square displacement. The edge claims a definitional identity where 'self-diffusion coefficient' is the subject, 'Einstein relation' is the definition, and 'mean square particle displacement' is the object — this is a misreading. The sentence defines D as the self-diffusion coefficient, and states a relation between mean square displacement and the Einstein relation, but does not define the self-diffusion coefficient via the Einstein relation or mean square displacement. The relation is not a definition; it's a statement of a formulaic relation. The edge should be dropped.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n8_e3",
+    "pattern_type": "influences",
+    "evidence_span": "the mean square particle displacement due to random walking $\\langle|R|^{2}\\rangle$ can be expressed in terms of the well known Einstein relation where $D$ is the coefficient of self-diffusion",
+    "node_ids": [
+      "n8_n1",
+      "n8_n2"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mean square particle displacement",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "self-diffusion coefficient",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that mean square displacement can be expressed in terms of the Einstein relation, and that D is the self-diffusion coefficient. It does not state that mean square displacement depends on or influences the self-diffusion coefficient. The relation is a formulaic expression (mean square displacement = 2Dt in the Einstein relation), not a causal or scaling dependence. The edge claims an 'influences' relation with mean square displacement as source and self-diffusion coefficient as target, which is not supported by the evidence. The relation is a constitutive law (mean square displacement = f(D, t)), not an influence. The edge should be dropped.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n9_e0",
+    "pattern_type": "defines",
+    "evidence_span": "where T=⟨C²⟩/3 is the granular temperature",
+    "node_ids": [
+      "n9_n4",
+      "n9_n5"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "granular temperature T",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "⟨C²⟩/3",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e4",
+    "pattern_type": "extends",
+    "evidence_span": "We estimate β by analyzing the dynamics of the flow of smooth, but inelastic uniform hard spherical particles of diameter σ as in the granular flow kinetic theory of Lun et al. (1984)",
+    "node_ids": [
+      "n9_n9",
+      "n9_n1"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Lun et al. (1984) kinetic theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "velocity autocorrelation function",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e5",
+    "pattern_type": "background",
+    "evidence_span": "Following the usual practice (McQuarrie, 1976), we assume that the velocity autocorrelation function is an exponentially decaying function of time",
+    "node_ids": [
+      "n9_n10",
+      "n9_n1"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "exponential decay assumption",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "velocity autocorrelation function",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e6",
+    "pattern_type": "extends",
+    "evidence_span": "If we take e = 1, corresponding to perfectly elastic particles, (4.13) reduces to the classical Chapman-Enskog result",
+    "node_ids": [
+      "n9_n11",
+      "n9_n12"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "classical Chapman-Enskog result",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "self-diffusion coefficient",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e1",
+    "pattern_type": "defines",
+    "evidence_span": "A complete pair distribution function f^(2)(r1,c1;r2,c2;t) is defined such that is the probability of finding a pair of particles",
+    "node_ids": [
+      "n9_n6",
+      "n9_n7"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "complete pair distribution function f^(2)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "probability of finding a pair of particles",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence explicitly defines the pair distribution function as the probability of finding a pair of particles. The subject and object roles are correctly bound, and the definitional identity is clear.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n10c1_e0",
+    "pattern_type": "compares",
+    "evidence_span": "The analytical and numerical predictions of the self-diffusion coefficients as functions of solids fraction and coefficient of restitution are reasonably close to each other",
+    "node_ids": [
+      "n10c1_n1",
+      "n10c1_n2",
+      "n10c1_n3"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "analytical predictions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "numerical predictions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "self-diffusion coefficients",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c1_e1",
+    "pattern_type": "compares",
+    "evidence_span": "The analytical and numerical predictions of the self-diffusion coefficients as functions of solids fraction and coefficient of restitution are reasonably close to each other and similar to the few laboratory experiments that exist.",
+    "node_ids": [
+      "n10c1_n1",
+      "n10c1_n2",
+      "n10c1_n6",
+      "n10c1_n3"
+    ],
+    "node_roles": [
+      "from",
+      "from",
+      "to",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "analytical predictions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "numerical predictions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "laboratory experiments",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "self-diffusion coefficients",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10c0_e7",
+    "pattern_type": "background",
+    "evidence_span": "It is worth mentioning that Chapman and Cowling (1970) have pointed out similar discrepancies for the case of dense fluids in which experimental measurements were higher than kinetic theories predictions.",
+    "node_ids": [
+      "n10c0_n24",
+      "n10c0_n22"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Chapman and Cowling (1970)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "molecular dynamics simulations",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  }
+]

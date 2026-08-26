@@ -1,0 +1,839 @@
+[
+  {
+    "edge_id": "n1_e0",
+    "pattern_type": "background",
+    "evidence_span": "The predictions of hard sphere mixture theories are briefly discussed first.",
+    "node_ids": [
+      "n1_n1",
+      "n1_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "hard sphere mixture theories",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1_e2",
+    "pattern_type": "influences",
+    "evidence_span": "Mixtures of flowing granular materials containing particles of different sizes or different densities have a tendency to segregate.",
+    "node_ids": [
+      "n1_n6",
+      "n1_n2"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "particle size",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1_e3",
+    "pattern_type": "influences",
+    "evidence_span": "Mixtures of flowing granular materials containing particles of different sizes or different densities have a tendency to segregate.",
+    "node_ids": [
+      "n1_n7",
+      "n1_n2"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "particle density",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1_e6",
+    "pattern_type": "measures",
+    "evidence_span": "Experimental results for size-induced radial segregation are presented.",
+    "node_ids": [
+      "n1_n12",
+      "n1_n13"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "size-induced radial segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "rotating cylinder",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1_e1",
+    "pattern_type": "influences",
+    "evidence_span": "Coupling of composition with flow can lead to instability causing a pattern of radial streaks.",
+    "node_ids": [
+      "n1_n3",
+      "n1_n4",
+      "n1_n5"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "composition",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "flow",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "radial streaks",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence explicitly states that coupling of composition with flow leads to instability causing radial streaks. The edge captures this causal influence: composition (source) influences flow (target), with the effect being radial streaks. The dependency_type 'causal' is appropriate, and the evidence_strength 'hypothesized' matches the modal 'can lead to'.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n2_e3",
+    "pattern_type": "background",
+    "evidence_span": "basic explanation for regular segregation was provided by Savage and Lun",
+    "node_ids": [
+      "n2_n15",
+      "n2_n14"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Savage and Lun's geometric explanation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "regular segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e6",
+    "pattern_type": "claim_relation",
+    "evidence_span": "Thomas [12] proposed that reverse segregation occurs when the large particles are massive enough to move down by pushing aside the small particles",
+    "node_ids": [
+      "n2_n23",
+      "n2_n15"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Thomas's proposal",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Savage and Lun's geometric explanation",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e0",
+    "pattern_type": "defines",
+    "evidence_span": "rapid radial segregation with the small (or high density) particles concentrating in a central core and the large (or low density) particles in the periphery",
+    "node_ids": [
+      "n2_n1",
+      "n2_n2",
+      "n2_n3",
+      "n2_n4",
+      "n2_n5"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "radial segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "small (or high density) particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "central core",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "large (or low density) particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "periphery",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a physical outcome (particles concentrating in regions), not a definitional identity. 'Radial segregation' is not defined as 'small particles' or 'central core'; it is a phenomenon where particles end up in those locations. This is a description of a phenomenon/outcome, not a definition. The pattern 'defines' is incorrect; this is closer to a claim or a description of a phenomenon, but not a definitional identity.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n2_e5",
+    "pattern_type": "influences",
+    "evidence_span": "resulting in a net downward flux of the small particles and a net upward flux of the large particles",
+    "node_ids": [
+      "n2_n19",
+      "n2_n20",
+      "n2_n21"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "small particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "net downward flux of the small particles",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "net upward flux of the large particles",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states a causal result: the mechanism (described in the previous sentence) results in a net downward flux of small particles and a net upward flux of large particles. This is a genuine causal dependence, fitting the 'influences' pattern. The source (small particles) and targets (net downward flux, net upward flux) are correctly identified.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n2_e7",
+    "pattern_type": "defines",
+    "evidence_span": "theory of hard sphere mixtures provides an alternate framework for analysis, but the theory is valid only for slightly inelastic spheres",
+    "node_ids": [
+      "n2_n25",
+      "n2_n26"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "theory of hard sphere mixtures",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "slightly inelastic spheres",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states a condition of validity for the theory, not a definition. 'Theory of hard sphere mixtures' is not defined as 'slightly inelastic spheres'; rather, the theory is valid only for that regime. This is a statement about the theory's applicability, not a definitional identity. The pattern 'defines' is incorrect.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3_e1",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "The equations for the .uxes simplify considerably in the limit of an ideal gas, and are given below [18,19]. The pressure di/usion the temperature di/usion .ux is and the ordinary di/usion .ux is where $p , T$ and $f = n _ { 1 / n }$ are pressure, temperature and number fraction, respectively. $D _ { 1 2 }$ is the binary di/usion coeFcient while $K _ { T }$ is the thermal di/usion ratio.",
+    "node_ids": [
+      "n3_n3",
+      "n3_n4",
+      "n3_n5",
+      "n3_n6",
+      "n3_n7",
+      "n3_n8"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "input",
+      "input",
+      "parameter",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "diffusion fluxes",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "pressure p",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "temperature T",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "number fraction f",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "binary diffusion coefficient D12",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "thermal diffusion ratio KT",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3_e2",
+    "pattern_type": "influences",
+    "evidence_span": "The balance between the pressure and ordinary di/usion .uxes then gives",
+    "node_ids": [
+      "n3_n4",
+      "n3_n3"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "pressure p",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "diffusion fluxes",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3_e6",
+    "pattern_type": "defines",
+    "evidence_span": "where $p , T$ and $f = n _ { 1 / n }$ are pressure, temperature and number fraction, respectively.",
+    "node_ids": [
+      "n3_n6",
+      "n3_n12"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "number fraction f",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "n1/n",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3_e7",
+    "pattern_type": "measures",
+    "evidence_span": "Fig. 1a shows the comparison between predictions of Eq. (4) to computational results from Monte Carlo simulations for equal size particles of di/erent density.",
+    "node_ids": [
+      "n3_n3",
+      "n3_n14"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "diffusion fluxes",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "Monte Carlo simulations",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e0",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "The convective di/usion equation describing the variation of concentration of the high-density particles in the .owing layer is where D is the di/usion coeFcient, R is the cylinder radius and $\\gamma _ { s }$ is the characteristic segregation velocity.",
+    "node_ids": [
+      "n4c0_n1",
+      "n4c0_n2",
+      "n4c0_n3",
+      "n4c0_n4"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "convective diffusion equation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "concentration of the high-density particles",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "D",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "γ_s",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e3",
+    "pattern_type": "influences",
+    "evidence_span": "Increase in the concentration of small particles results in faster .ow.",
+    "node_ids": [
+      "n4c0_n9",
+      "n4c0_n10"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "concentration of small particles",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "flow",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e4",
+    "pattern_type": "composed_of",
+    "evidence_span": "The velocity pro6le is assumed to be piecewise linear with the velocity gradient inversely proportional to the square of the particle diameter. Further, to take into account the variation of the surface angle with the composition of the .owing layer in a simple way, each half of the free surface is allowed to pivot about a point.",
+    "node_ids": [
+      "n4c0_n11",
+      "n4c0_n12"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "velocity profile",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "free surface",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e7",
+    "pattern_type": "influences",
+    "evidence_span": "We found that streaks are not formed if pumping is switched o/.",
+    "node_ids": [
+      "n4c0_n15",
+      "n4c0_n16"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "pumping action",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "streak formation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5_e1",
+    "pattern_type": "compares",
+    "evidence_span": "Hard sphere theory, however, gives qualitatively different results for mixtures of different size particles",
+    "node_ids": [
+      "n5_n1",
+      "n5_n4"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "hard sphere theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "size segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5_e2",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "The segregation flux expression obtained from hard sphere theory is shown to give reasonable predictions for density radial segregation in a rotating cylinder",
+    "node_ids": [
+      "n5_n5",
+      "n5_n2",
+      "n5_n3"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "segregation flux",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "density segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "temperature",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5_e4",
+    "pattern_type": "influences",
+    "evidence_span": "In the case of different size particles at low rotation speeds, streak formation occurs",
+    "node_ids": [
+      "rotation speed",
+      "n5_n7"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "",
+        "labels": []
+      },
+      {
+        "surface": "streak formation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5_e5",
+    "pattern_type": "claim_relation",
+    "evidence_span": "Hard sphere theory does not predict the observed behaviour in this case and new models are needed",
+    "node_ids": [
+      "n5_n1",
+      "n5_n8"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "hard sphere theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "dynamic variation model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5_e6",
+    "pattern_type": "improves",
+    "evidence_span": "A model based on dynamic variation of flow, composition and surface angle is shown to give a qualitative description of the process",
+    "node_ids": [
+      "n5_n8",
+      "n5_n1"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "dynamic variation model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "hard sphere theory",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5_e0",
+    "pattern_type": "compares",
+    "evidence_span": "density segregation is well predicted by hard sphere theory",
+    "node_ids": [
+      "n5_n1",
+      "n5_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "hard sphere theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "density segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states a prediction relation (hard sphere theory predicts density segregation), not a comparison. The 'compares' pattern requires two entities put side-by-side (parallel alternatives, theory-vs-experiment, or equivalence/contrast). Here, 'hard sphere theory' is the predictor and 'density segregation' is the predicted phenomenon — they are not being compared. The relation is better captured by 'influences' (theory influences/predicts segregation) or a claim_relation, but as extracted with these roles, the slot binding is wrong: 'density segregation' is not a 'to' participant in a comparison; it is the object of prediction. The edge should be dropped.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n5_e3",
+    "pattern_type": "influences",
+    "evidence_span": "The radially segregated profiles for mixtures of different size particles reveal double segregation and a complex dependence on size ratio",
+    "node_ids": [
+      "n5_n10",
+      "n5_n9"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "size ratio",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "double segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly states a complex dependence of double segregation on size ratio. The 'influences' pattern fits: size ratio (source) influences double segregation (target). The roles are correctly assigned: size ratio is the causal source, double segregation is the affected target. The qualifiers (complex_dependence, rotating cylinder regime) are appropriate. The edge is valid.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  }
+]

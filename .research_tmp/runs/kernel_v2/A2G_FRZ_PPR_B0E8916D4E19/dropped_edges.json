@@ -1,0 +1,1723 @@
+[
+  {
+    "edge_id": "n1c0_e1",
+    "pattern_type": "background",
+    "evidence_span": "constitutive equations for dry granular flows are still matter of debates",
+    "node_ids": [
+      "n1c0_n3",
+      "n1c0_n4"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "constitutive equations for dry granular flows",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "kinetic theory for the collisional rapid flows",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e2",
+    "pattern_type": "background",
+    "evidence_span": "constitutive equations for dry granular flows are still matter of debates",
+    "node_ids": [
+      "n1c0_n3",
+      "n1c0_n5"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "constitutive equations for dry granular flows",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "soil mechanics for slow plastic flows",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e6",
+    "pattern_type": "background",
+    "evidence_span": "The intermediate dense regime, where the granular material flows like a liquid, still lacks unified view and has motivated many studies the last decade",
+    "node_ids": [
+      "n1c0_n6",
+      "n1c0_n8"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "intermediate dense regime",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "complex shear rate dependence",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e11",
+    "pattern_type": "compares",
+    "evidence_span": "Advances in our understanding of dense granular flows have been recently made by comparing different flow configurations",
+    "node_ids": [
+      "n1c0_n17",
+      "n1c0_n18"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "different flow configurations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "granular material",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e17",
+    "pattern_type": "influences",
+    "evidence_span": "It starts from a critical value μ_s at zero shear rate and converges to a limit value μ_2 at high I",
+    "node_ids": [
+      "n1c0_n23",
+      "n1c0_n22",
+      "n1c0_n23",
+      "n1c0_n22"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "friction coefficient",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Inertial number",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "friction coefficient",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Inertial number",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e18",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "The following friction law can then be proposed which is compatible with the experiments19: where I_0 is a constant",
+    "node_ids": [
+      "n1c0_n23",
+      "n1c0_n22",
+      "n1c0_n31",
+      "n1c0_n32",
+      "n1c0_n34"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter",
+      "coefficient",
+      "exponent"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "friction coefficient",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Inertial number",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "critical value",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "limit value",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "constant",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e20",
+    "pattern_type": "extends",
+    "evidence_span": "We therefore propose the following 3D generalization of the friction law for a granular material",
+    "node_ids": [
+      "n1c0_n35",
+      "n1c0_n37"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "simple scalar law",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "3D generalization of the friction law",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e22",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "η ( | γ˙ | , P ) = μ ( I ) P / | γ˙ | and I = | γ˙ | d / √(P / ρ_s)",
+    "node_ids": [
+      "n1c0_n40",
+      "n1c0_n20",
+      "n1c0_n19",
+      "n1c0_n23",
+      "n1c0_n22"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter",
+      "coefficient",
+      "exponent"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "effective viscosity",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "shear rate",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "normal stress P",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "friction coefficient",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Inertial number",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e23",
+    "pattern_type": "defines",
+    "evidence_span": "where γ˙_ij = ∂u_i/∂x_j + ∂u_j/∂x_i is the strain rate tensor and |γ˙| = √(1/2 γ˙_ij γ˙_ij) is the second invariant of γ˙_ij",
+    "node_ids": [
+      "n1c0_n41",
+      "n1c0_n42",
+      "n1c0_n43"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "strain rate tensor",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "second invariant",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "isotropic pressure",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e24",
+    "pattern_type": "defines",
+    "evidence_span": "η ( | γ˙ | , P ) is an effective viscosity, which definition is related to the friction coefficient μ ( I ) (Eq. 2)",
+    "node_ids": [
+      "n1c0_n40",
+      "n1c0_n23",
+      "n1c0_n43"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "effective viscosity",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "friction coefficient",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "isotropic pressure",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e29",
+    "pattern_type": "influences",
+    "evidence_span": "the effective viscosity depends both on the shear rate and on the local pressure",
+    "node_ids": [
+      "n1c0_n40",
+      "n1c0_n20",
+      "n1c0_n40",
+      "n1c0_n19"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "effective viscosity",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "shear rate",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "effective viscosity",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "normal stress P",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e31",
+    "pattern_type": "measures",
+    "evidence_span": "In order to test this rheology we performed experiments of granular flows on a heap confined between two lateral rough walls",
+    "node_ids": [
+      "n1c0_n11",
+      "n1c0_n50"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "three-dimensional (3D) model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "experiments of granular flows on a heap confined between two lateral rough walls",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e34",
+    "pattern_type": "influences",
+    "evidence_span": "The boundary conditions are then a zero velocity condition that induces strong shear in the lateral direction",
+    "node_ids": [
+      "n1c0_n58",
+      "n1c0_n57",
+      "n1c0_n58",
+      "n1c0_n57"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "zero velocity condition",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "rough sidewalls",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "zero velocity condition",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "rough sidewalls",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e39",
+    "pattern_type": "compares",
+    "evidence_span": "To compare the experimental results with the predictions of the local rheology, we perform numerical simulations of a granular fluid described by the constitutive law Eq.",
+    "node_ids": [
+      "n1c0_n69",
+      "n1c0_n11",
+      "n1c0_n70",
+      "n1c0_n71"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "numerical simulations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "three-dimensional (3D) model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "granular fluid",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "constitutive law Eq.",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c1_e22",
+    "pattern_type": "defines",
+    "evidence_span": "z̃ = z/W",
+    "node_ids": [
+      "n1c1_n59",
+      "n1c1_n56"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "z̃ = z/W",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "width of the channel",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c1_e23",
+    "pattern_type": "defines",
+    "evidence_span": "ỹ = y/W",
+    "node_ids": [
+      "n1c1_n60",
+      "n1c1_n56"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "ỹ = y/W",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "width of the channel",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c1_e24",
+    "pattern_type": "defines",
+    "evidence_span": "Ṽ = Vd/g^(1/2)W^(3/2)",
+    "node_ids": [
+      "n1c1_n61",
+      "n1c1_n56"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Ṽ = Vd/g^(1/2)W^(3/2)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "width of the channel",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c1_e25",
+    "pattern_type": "defines",
+    "evidence_span": "Q̃ = Qd/g^(1/2)W^(5/2)",
+    "node_ids": [
+      "n1c1_n62",
+      "n1c1_n56"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Q̃ = Qd/g^(1/2)W^(5/2)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "width of the channel",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e3",
+    "pattern_type": "background",
+    "evidence_span": "For the two extreme regimes, constitutive equations have been proposed based on kinetic theory for the collisional rapid flows",
+    "node_ids": [
+      "n1c0_n6",
+      "n1c0_n4"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "intermediate dense regime",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "kinetic theory for the collisional rapid flows",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that constitutive equations for the extreme regimes are based on kinetic theory. It does not state that the intermediate dense regime uses kinetic theory as background. The 'from' node (intermediate dense regime) is not the subject of the sentence; the sentence is about the extreme regimes. The relation is misattributed.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c0_e4",
+    "pattern_type": "background",
+    "evidence_span": "For the two extreme regimes, constitutive equations have been proposed based on kinetic theory for the collisional rapid flows",
+    "node_ids": [
+      "n1c0_n6",
+      "n1c0_n5"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "intermediate dense regime",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "soil mechanics for slow plastic flows",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that constitutive equations for the extreme regimes are based on soil mechanics. It does not state that the intermediate dense regime uses soil mechanics as background. The 'from' node (intermediate dense regime) is not the subject of the sentence; the sentence is about the extreme regimes. The relation is misattributed.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c0_e5",
+    "pattern_type": "background",
+    "evidence_span": "The intermediate dense regime, where the granular material flows like a liquid, still lacks unified view and has motivated many studies the last decade",
+    "node_ids": [
+      "n1c0_n6",
+      "n1c0_n7"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "intermediate dense regime",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "yield criterion",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence states that the intermediate dense regime has motivated many studies. It does not state that the intermediate dense regime uses a yield criterion as background. The 'to' node (yield criterion) is not mentioned in the evidence span. The relation is not stated.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c0_e9",
+    "pattern_type": "background",
+    "evidence_span": "These new results support the idea that a simple visco-plastic approach can capture quantitatively granular flows properties",
+    "node_ids": [
+      "n1c0_n14",
+      "n1c0_n15"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "simple visco-plastic approach",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "granular flows properties",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence states that results support the idea that a visco-plastic approach can capture properties. This is a claim about the approach's capability, not a background/motivation relation where the approach uses properties as background. The relation type is wrong; this is a claim_relation, not background.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c0_e10",
+    "pattern_type": "background",
+    "evidence_span": "These new results support the idea that a simple visco-plastic approach can capture quantitatively granular flows properties and could serve as a basic tool for modelling more complex flows",
+    "node_ids": [
+      "n1c0_n14",
+      "n1c0_n16"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "simple visco-plastic approach",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "basic tool for modelling more complex flows",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence states that the approach could serve as a basic tool for modelling more complex flows. This is a claim about the approach's potential utility, not a background/motivation relation where the approach uses the tool as background. The relation type is wrong; this is a claim_relation, not background.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c0_e25",
+    "pattern_type": "influences",
+    "evidence_span": "An important property of the proposed constitutive law is that the effective viscosity diverges to infinity when the shear rate goes to zero",
+    "node_ids": [
+      "n1c0_n40",
+      "n1c0_n20",
+      "n1c0_n40",
+      "n1c0_n20"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "effective viscosity",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "shear rate",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "effective viscosity",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "shear rate",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states the effective viscosity diverges as shear rate goes to zero, which is a clear dependence relation.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n1c1_e0",
+    "pattern_type": "composed_of",
+    "evidence_span": "we solve the incompressible Navier-Stockes equations with the internal stress being given by Eq. 3 using a finite different scheme",
+    "node_ids": [
+      "n1c1_n1",
+      "n1c1_n2"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "incompressible Navier-Stockes equations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "finite different scheme",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a numerical solution method (finite difference scheme) used to solve the Navier-Stokes equations. This is a methodological description, not a structural composition. The finite difference scheme is not a component of the Navier-Stokes equations; it is a method used to solve them. The relation is not a composed_of relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e1",
+    "pattern_type": "defines",
+    "evidence_span": "μ_s = 1 = 101 (20.9)",
+    "node_ids": [
+      "n1c1_n3",
+      "n1c1_n6"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "μ_s",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "1 = 101 (20.9)",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly assigns a numerical value to the parameter μ_s. This is a definitional identity, correctly captured by the defines pattern.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n1c1_e2",
+    "pattern_type": "defines",
+    "evidence_span": "μ_2 = tan(32.76)",
+    "node_ids": [
+      "n1c1_n4",
+      "n1c1_n7"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "μ_2",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "tan(32.76)",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly assigns a numerical value to the parameter μ_2. This is a definitional identity, correctly captured by the defines pattern.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n1c1_e3",
+    "pattern_type": "defines",
+    "evidence_span": "I_0 = 0.279",
+    "node_ids": [
+      "n1c1_n5",
+      "n1c1_n8"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "I_0",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "0.279",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly assigns a numerical value to the parameter I_0. This is a definitional identity, correctly captured by the defines pattern.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n1c1_e4",
+    "pattern_type": "influences",
+    "evidence_span": "we choose the values given by the experimental data of flows on inclined plane18 where the same particles were used",
+    "node_ids": [
+      "n1c1_n3",
+      "n1c1_n9"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "μ_s",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "experimental data of flows on inclined plane18",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the values for μ_s were chosen based on experimental data. This is a parameter calibration process, not a functional dependence or influence relation. The experimental data is a source of values, not a quantity that μ_s depends on. The relation is not an influences relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e5",
+    "pattern_type": "influences",
+    "evidence_span": "we choose the values given by the experimental data of flows on inclined plane18 where the same particles were used",
+    "node_ids": [
+      "n1c1_n4",
+      "n1c1_n9"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "μ_2",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "experimental data of flows on inclined plane18",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the values for μ_2 were chosen based on experimental data. This is a parameter calibration process, not a functional dependence or influence relation. The experimental data is a source of values, not a quantity that μ_2 depends on. The relation is not an influences relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e6",
+    "pattern_type": "influences",
+    "evidence_span": "we choose the values given by the experimental data of flows on inclined plane18 where the same particles were used",
+    "node_ids": [
+      "n1c1_n5",
+      "n1c1_n9"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "I_0",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "experimental data of flows on inclined plane18",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a parameter calibration procedure (choosing values for mu_s, mu_2, I_0 based on prior experimental data), not a functional dependence or influence relation. The edge misrepresents a calibration step as an 'influences' relation. The relation does not exist as stated.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e7",
+    "pattern_type": "measures",
+    "evidence_span": "A typical velocity profile obtained by the model is shown in figure 3",
+    "node_ids": [
+      "n1c1_n10",
+      "n1c1_n11"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "velocity profile",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that a velocity profile was obtained by the model, which is a result of a simulation, not a measurement relation. The 'model' is not an instrument measuring a quantity; it is a computational tool producing a prediction. This is a simulation result, not a 'measures' relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e8",
+    "pattern_type": "influences",
+    "evidence_span": "We first observe that a static zone develops at the base of the channel. The limit of the static zone varies across the channel, the flowing layer being larger in the centre than close to the walls",
+    "node_ids": [
+      "n1c1_n12",
+      "n1c1_n13"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "static zone",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "flowing layer",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a spatial observation about the static zone and flowing layer, but does not state a causal or functional dependence between them. It describes a co-occurrence of spatial features, not an 'influences' relation. The relation is not stated.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e10",
+    "pattern_type": "compares",
+    "evidence_span": "In the simulation we impose the inclination and compute a posteriori the flow rate, whereas in the experiments, the flow rate is controlled and the inclination is measured",
+    "node_ids": [
+      "n1c1_n19",
+      "n1c1_n20"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "inclination",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "flow rate",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a difference in methodology between simulation and experiment (what is imposed vs. what is measured), not a comparison between the inclination and flow rate. The edge misinterprets a methodological contrast as a comparison relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e13",
+    "pattern_type": "compares",
+    "evidence_span": "A slight deviation between experiment and model is observed in the narrower channel, 16.5 particle-diameters wide",
+    "node_ids": [
+      "n1c1_n30",
+      "n1c1_n31",
+      "n1c1_n32",
+      "n1c1_n33"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "to",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "deviation",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "experiment",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "narrower channel, 16.5 particle-diameters wide",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a deviation between experiment and model, which is a discrepancy, not a comparison. The edge misinterprets a deviation as a comparison relation. The relation is not stated as a comparison.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e14",
+    "pattern_type": "compares",
+    "evidence_span": "In Fig 4d, we also compare the prediction of the theory for the thickness of the flowing layer",
+    "node_ids": [
+      "n1c1_n34",
+      "n1c1_n35",
+      "n1c1_n36"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "prediction of the theory for the thickness of the flowing layer",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "thickness of the flowing layer",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states a comparison between the prediction of the theory and the experimental measurements. The 'to' role is incorrectly bound to 'theory' and 'thickness of the flowing layer', which are not the entities being compared. The comparison is between the prediction and the experiment, not between the prediction and the theory.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": true,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e15",
+    "pattern_type": "compares",
+    "evidence_span": "In both theory and experiments, the flowing layer is thicker in the centre than at the walls",
+    "node_ids": [
+      "n1c1_n37",
+      "n1c1_n38",
+      "n1c1_n39"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "flowing layer",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "experiments",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states a comparison between theory and experiments regarding the thickness of the flowing layer. The 'from' role is incorrectly bound to 'flowing layer', which is the subject of the comparison, not the entity being compared. The comparison is between theory and experiments, not between the flowing layer and theory/experiments.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": true,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e16",
+    "pattern_type": "compares",
+    "evidence_span": "A quantitative agreement is again observed, although the simulation systematically overestimates the flowing layer thickness",
+    "node_ids": [
+      "n1c1_n40",
+      "n1c1_n41",
+      "n1c1_n42"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "quantitative agreement",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "simulation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "flowing layer thickness",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states a comparison between simulation and experiment regarding the flowing layer thickness. The 'from' role is incorrectly bound to 'quantitative agreement', which is the result of the comparison, not the entity being compared. The comparison is between simulation and experiment, not between quantitative agreement and simulation/flowing layer thickness.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": true,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e18",
+    "pattern_type": "influences",
+    "evidence_span": "All these results show that the proposed rheology gives quantitative predictions for this complex 3D flow, a striking success for a model with no fit parameter",
+    "node_ids": [
+      "n1c1_n45",
+      "n1c1_n46",
+      "n1c1_n47"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "proposed rheology",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "quantitative predictions",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "complex 3D flow",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the proposed rheology gives quantitative predictions for a complex 3D flow. This is a claim about the model's predictive capability, not a dependency relation. The 'influences' pattern is incorrect; this is better characterized as a claim_relation or a measure relation. The roles are also incorrectly bound: 'proposed rheology' is the subject, not a source, and 'quantitative predictions' and 'complex 3D flow' are not targets of a dependency.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e19",
+    "pattern_type": "compares",
+    "evidence_span": "We have systematically carried out experiments for a wide range of flow rates and channel widths, and within 15% a quantitative agreement is always observed",
+    "node_ids": [
+      "n1c1_n49",
+      "n1c1_n50",
+      "n1c1_n51",
+      "n1c1_n52",
+      "n1c1_n53"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "to",
+      "to",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "experiments",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "wide range of flow rates",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "channel widths",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "15%",
+        "labels": [
+          "NUMERIC"
+        ]
+      },
+      {
+        "surface": "quantitative agreement",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that experiments were carried out for a range of flow rates and channel widths, and a quantitative agreement was observed. This is a statement about the experimental setup and results, not a comparison between experiments and other entities. The 'from' role is incorrectly bound to 'experiments', and the 'to' roles are incorrectly bound to 'wide range of flow rates', 'channel widths', '15%', and 'quantitative agreement', which are not the entities being compared.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": true,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e20",
+    "pattern_type": "influences",
+    "evidence_span": "it is interesting to notice that simple scalings can be predicted from the rheology proposed",
+    "node_ids": [
+      "n1c1_n54",
+      "n1c1_n55"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "simple scalings",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "rheology proposed",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that simple scalings can be predicted from the proposed rheology. This is a statement about the predictive capability of the rheology, not a dependency relation. The 'influences' pattern is incorrect; this is better characterized as a claim_relation. The roles are also incorrectly bound: 'simple scalings' is the subject, not a source, and 'rheology proposed' is not a target of a dependency.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e21",
+    "pattern_type": "influences",
+    "evidence_span": "It is easy to show analytically that one can get rid of the width of the channel in the equations of motion by using the following dimensionless variables",
+    "node_ids": [
+      "n1c1_n56",
+      "n1c1_n57",
+      "n1c1_n58"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "width of the channel",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "equations of motion",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "dimensionless variables",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the width of the channel can be removed from the equations of motion by using dimensionless variables. This is a statement about a mathematical transformation, not a dependency relation. The 'influences' pattern is incorrect; this is better characterized as a claim_relation or a definition. The roles are also incorrectly bound: 'width of the channel' is the subject, not a source, and 'equations of motion' and 'dimensionless variables' are not targets of a dependency.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e26",
+    "pattern_type": "influences",
+    "evidence_span": "It follows that the inclination of the pile, the maximum velocity in the centreline of the channel Ṽ_max, and the maximum flowing thickness h̃_max should depend only on Q̃",
+    "node_ids": [
+      "n1c1_n63",
+      "n1c1_n64",
+      "n1c1_n65",
+      "n1c1_n66"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "target",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "inclination of the pile",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "maximum velocity in the centreline of the channel Ṽ_max",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "maximum flowing thickness h̃_max",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "Q̃",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly states that the inclination, maximum velocity, and maximum thickness depend only on Q̃. The source (inclination) and targets (velocity, thickness, Q̃) are correctly bound. The direction of dependence is correct.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n2_e0",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "Within the proposed constitutive law, the flow threshold is simply described by a Coulomb criterion.",
+    "node_ids": [
+      "n2_n1",
+      "n2_n3",
+      "n2_n7"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "simple visco-plastic constitutive law",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "complex three-dimensional sheared flow",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "Coulomb criterion",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e2",
+    "pattern_type": "extends",
+    "evidence_span": "Such features still have to be included in a more comprehensive rheology.",
+    "node_ids": [
+      "n2_n1",
+      "n2_n13"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "simple visco-plastic constitutive law",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "more comprehensive rheology",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e4",
+    "pattern_type": "claim_relation",
+    "evidence_span": "We think it can serve as a base for further development to take into account more accurately the complex yield features specific to granular matter.",
+    "node_ids": [
+      "n2_n1",
+      "n2_n17"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "simple visco-plastic constitutive law",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "complex yield features",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e1",
+    "pattern_type": "improves",
+    "evidence_span": "the simple visco-plastic constitutive law proposed seems very successful to describe dense granular flows.",
+    "node_ids": [
+      "n2_n1",
+      "n2_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "simple visco-plastic constitutive law",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "dense granular flows",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states the law is successful at describing dense granular flows, which is a claim about the law's descriptive capability, not a claim that the law improves dense granular flows. The 'to' slot is filled by the phenomenon being described, not by something being improved. This is a claim_relation or a statement of capability, not an improves relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n2_e3",
+    "pattern_type": "influences",
+    "evidence_span": "Within the proposed constitutive law, the flow threshold is simply described by a Coulomb criterion.",
+    "node_ids": [
+      "n2_n6",
+      "n2_n7"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "flow threshold",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "Coulomb criterion",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the flow threshold is described by a Coulomb criterion. This is a definitional or constitutive statement (the threshold is defined by the criterion), not a functional dependence where one quantity influences another. The relation is better captured by a defines or constitutive_law pattern, not influences. The current edge misrepresents the nature of the relationship.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  }
+]

@@ -1,0 +1,486 @@
+[
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "evidence": "the granular fluidity is found to be a kinematic variable given by the velocity "
+  },
+  {
+    "pattern_type": "constitutive_law",
+    "roles": [
+      "output",
+      "input",
+      "parameter"
+    ],
+    "evidence": "μ = τ / P"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "The g field influences the flow through its role in the constitutive relation be"
+  },
+  {
+    "pattern_type": "extends",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "The inertial law, Eq. (1), can be obtained when the flow field is homogeneous (∇"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "evidence": "we identify a microphysical definition for the granular fluidity field, which de"
+  },
+  {
+    "pattern_type": "compares",
+    "roles": [
+      "from",
+      "to",
+      "to"
+    ],
+    "evidence": "we compare the predictions of this microscopic formula with the constitutive def"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "We start with the hypothesis that for hard particles, g should relate to velocit"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "If we suppose the only other state variable affecting g is the packing fraction "
+  },
+  {
+    "pattern_type": "measures",
+    "roles": [
+      "object",
+      "instrument"
+    ],
+    "evidence": "we first take the spatial average of the variable of interest in the whole layer"
+  },
+  {
+    "pattern_type": "measures",
+    "roles": [
+      "object",
+      "instrument"
+    ],
+    "evidence": "and then average the instantaneous layer-wise values arithmetically in time"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition",
+      "definition",
+      "definition"
+    ],
+    "evidence": "we subtract the instantaneous mean velocity from the particle velocity to obtain"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition",
+      "definition"
+    ],
+    "evidence": "The velocity fluctuation δv is defined as the root of granular temperature which"
+  },
+  {
+    "pattern_type": "composed_of",
+    "roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "evidence": "The particle-wise stress tensor is calculated considering both the contact contr"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "evidence": "the pressure is defined as $P = - \\sigma _ { i i } / 3$"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition",
+      "definition",
+      "object"
+    ],
+    "evidence": "the shear stress is defined as the equivalent shear stress $\\tau = \\sqrt { \\sigm"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "evidence": "$\\sigma _ { i j } ^ { \\prime } = \\sigma _ { i j } + P \\delta _ { i j }$ is the s"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "evidence": "we calculate the layerwise fluidity field $g = \\dot { \\gamma } / \\mu , \\delta v$"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "object"
+    ],
+    "evidence": "we evaluate d as the layer-wise mean particle size"
+  },
+  {
+    "pattern_type": "constitutive_law",
+    "roles": [
+      "output",
+      "input",
+      "coefficient"
+    ],
+    "evidence": "$F ( \\Phi ) = \\frac { - ( \\Phi - 0 . 5 8 ) + \\sqrt { ( \\Phi - 0 . 5 8 ) ^ { 2 } "
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "f relates microscopically to the rate of plastic events"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "which has been correlated to shear-rate fluctuations in experiments"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "Our result that a fluctuation variable is key as well in describing granular flu"
+  },
+  {
+    "pattern_type": "claim_relation",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "Our result that a fluctuation variable is key as well in describing granular flu"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "object"
+    ],
+    "evidence": "The averaging method and the definition of velocity fluctuation"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "the time averaged fields should be homogeneous in each horizontal ( x - y ) plan"
+  },
+  {
+    "pattern_type": "composed_of",
+    "roles": [
+      "whole",
+      "component"
+    ],
+    "evidence": "The simulated domain is divided into 100 horizontal layers at differing heights "
+  },
+  {
+    "pattern_type": "measures",
+    "roles": [
+      "object",
+      "instrument"
+    ],
+    "evidence": "we first take the spatial average of some variable of interest, say ζ , in the w"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "kinematic variables are weighted by the areas of the cross-sections of the parti"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "object",
+      "definition"
+    ],
+    "evidence": "the instantaneous spatially averaged velocity in layer z = z k is ( ∑ j A j , i "
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "object"
+    ],
+    "evidence": "The layerwise mean velocity fluctuation δv is calculated differently as the squa"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "we need the instantaneous mean velocities of each layer and then interpolate the"
+  },
+  {
+    "pattern_type": "compares",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "This definition is quite similar to the kinetic part of the stress tensor define"
+  },
+  {
+    "pattern_type": "compares",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "we subtract the instantaneous particle-wise mean velocity instead of the time av"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "which can eliminate the temporal velocity fluctuation of the whole layer"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "The temperature definition we use ensures this rigid motion is excluded from the"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "which is important as it should not influence the apparent rheology"
+  },
+  {
+    "pattern_type": "compares",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "we compare the average stress field with the solution of the equilibrium equatio"
+  },
+  {
+    "pattern_type": "measures",
+    "roles": [
+      "object",
+      "instrument"
+    ],
+    "evidence": "the feedback control method of applying top-wall pressure is capable of applying"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "In the cases with nonzero gravity, equilibrium gives ∂ σ z z / ∂ z = − ρ s Φ ( z"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "In the cases with nonzero gravity, equilibrium gives ∂ σ z z / ∂ z = − ρ s Φ ( z"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "since the confining pressure and shear stresses at the top and bottom are not sp"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "in Lun et al.’s work [31], P and the viscosity η in a granular gas are functions"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "in Lun et al.’s work [31], P and the viscosity η in a granular gas are functions"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "in Lun et al.’s work [31], P and the viscosity η in a granular gas are functions"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "in Lun et al.’s work [31], P and the viscosity η in a granular gas are functions"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "In Haff’s work [45], the dependency of P and η on the velocity fluctuation δv an"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "In Haff’s work [45], the dependency of P and η on the velocity fluctuation δv an"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "In Haff’s work [45], the dependency of P and η on the velocity fluctuation δv an"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "In Haff’s work [45], the dependency of P and η on the velocity fluctuation δv an"
+  },
+  {
+    "pattern_type": "compares",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "the normalized fluidity gd/δv proposed in the main text and shown in FIG. 5c col"
+  },
+  {
+    "pattern_type": "constitutive_law",
+    "roles": [
+      "output",
+      "input",
+      "input"
+    ],
+    "evidence": "$\\boldsymbol { g } = \\boldsymbol { g } ( \\delta \\boldsymbol { v } , \\Phi )$"
+  },
+  {
+    "pattern_type": "constitutive_law",
+    "roles": [
+      "output",
+      "input",
+      "input"
+    ],
+    "evidence": "Possible simplifications of $\\boldsymbol { g } = \\boldsymbol { g } ( \\delta \\bol"
+  },
+  {
+    "pattern_type": "constitutive_law",
+    "roles": [
+      "output",
+      "input",
+      "input"
+    ],
+    "evidence": "Is it possible $g = g ( \\delta v , P )$ or $g = g ( \\Phi , P ) \\ell$"
+  },
+  {
+    "pattern_type": "constitutive_law",
+    "roles": [
+      "output",
+      "input",
+      "input"
+    ],
+    "evidence": "Is it possible $g = g ( \\delta v , P )$ or $g = g ( \\Phi , P ) \\ell$"
+  },
+  {
+    "pattern_type": "constitutive_law",
+    "roles": [
+      "output",
+      "input"
+    ],
+    "evidence": "Existence of a $\\mathrm { P V T }$ equation of state would thus imply a one-to-o"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "The fluidity is proportional to δv at fixed Φ"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "the collapse of $g d / \\delta v$ onto $F ( \\Phi )$ spans an order of magnitude. "
+  },
+  {
+    "pattern_type": "compares",
+    "roles": [
+      "from",
+      "to",
+      "to"
+    ],
+    "evidence": "In the following, we discuss possible relations between $P ,$ Φ and δv to see if"
+  }
+]

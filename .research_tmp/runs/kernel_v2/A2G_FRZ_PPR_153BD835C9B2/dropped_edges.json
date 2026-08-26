@@ -1,0 +1,771 @@
+[
+  {
+    "edge_id": "n1c1_e0",
+    "pattern_type": "compares",
+    "evidence_span": "An identical equation is obtained from the kinetic theory for the case of equal size and different density spheres, but with $T _ { E }$ replaced by the number average kinetic temperature",
+    "node_ids": [
+      "n1c1_n1",
+      "n1c1_n2",
+      "n1c1_n3"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "kinetic theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "number average kinetic temperature",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "effective temperature",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c1_e6",
+    "pattern_type": "measures",
+    "evidence_span": "Equation (4) provides a method for estimating the effective temperature from measurements of viscosity and diffusivity",
+    "node_ids": [
+      "n1c1_n10",
+      "n1c1_n17"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "effective temperature profile",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "Equation (4)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c1_e10",
+    "pattern_type": "measures",
+    "evidence_span": "The flowing region at the center of the cylinder (shown by the dashed rectangle in fig. 1a), where the flow is steady and fully developed, is captured with a high-speed camera at rate of $5 0 0 \\mathrm { f p s }$ and a shutter speed of 1/4000 s to freeze particle motion",
+    "node_ids": [
+      "n1c1_n32",
+      "n1c1_n28"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "number density, velocity and r.m.s. velocity profiles",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "high-speed camera",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c1_e11",
+    "pattern_type": "measures",
+    "evidence_span": "The images are analyzed using computer codes to detect the particles",
+    "node_ids": [
+      "n1c1_n32",
+      "n1c1_n29"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "number density, velocity and r.m.s. velocity profiles",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "computer codes",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e10",
+    "pattern_type": "compares",
+    "evidence_span": "We consider here the segregation of a mixture of equal size and different density particles in a dense, gravitydriven, shear flow. However, unlike the studies discussed above, the particles are not in a state near random close packing.",
+    "node_ids": [
+      "n1c0_n26",
+      "n1c0_n24",
+      "n1c0_n26",
+      "n1c0_n24"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "segregation of a mixture of equal size and different density particles in a dense, gravitydriven, shear flow",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "system of a single different density particle in a sheared bed",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "segregation of a mixture of equal size and different density particles in a dense, gravitydriven, shear flow",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "system of a single different density particle in a sheared bed",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e15",
+    "pattern_type": "influences",
+    "evidence_span": "The net ρforce on the heavy particle in the direction normal to mean flow is then where the first term is the gravitational force and the second term is the effective buoyancy force exerted by the surrounding particles.",
+    "node_ids": [
+      "n1c0_n43",
+      "n1c0_n44",
+      "n1c0_n43",
+      "n1c0_n44"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "net force on the heavy particle",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "gravitational force",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "net force on the heavy particle",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "gravitational force",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e16",
+    "pattern_type": "influences",
+    "evidence_span": "The net ρforce on the heavy particle in the direction normal to mean flow is then where the first term is the gravitational force and the second term is the effective buoyancy force exerted by the surrounding particles.",
+    "node_ids": [
+      "n1c0_n43",
+      "n1c0_n45",
+      "n1c0_n43",
+      "n1c0_n45"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "net force on the heavy particle",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "effective buoyancy force",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "net force on the heavy particle",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "effective buoyancy force",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e17",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "The density of the effective medium is given by $\\rho _ { m } = [ f m _ { H } + ( 1 - f ) m _ { L } ] / V$ where $m _ { L }$ ρ f m fis the mass of the lighter particles, $f = n _ { H } / n$ is m f n /nthe number fraction of the heavy particles, H is the number density of heavy particles and  is the total nnumber density.",
+    "node_ids": [
+      "n1c0_n51",
+      "n1c0_n52",
+      "n1c0_n53",
+      "n1c0_n54",
+      "n1c0_n55"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter",
+      "coefficient",
+      "exponent"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "density of the effective medium",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "mass of the lighter particles",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "number fraction of the heavy particles",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "number density of heavy particles",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "total number density",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e18",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "The velocity of a heavy particle normal to the flow direction is then $v _ { H } = F _ { H } / \\xi _ { H }$ where $\\xi _ { H }$ is v F /ξ , ξthe friction coefficient of the heavy particles.",
+    "node_ids": [
+      "n1c0_n56",
+      "n1c0_n43",
+      "n1c0_n57",
+      "n1c0_n57",
+      "n1c0_n57"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter",
+      "coefficient",
+      "exponent"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "velocity of a heavy particle normal to the flow direction",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "net force on the heavy particle",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "friction coefficient of the heavy particles",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "friction coefficient of the heavy particles",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "friction coefficient of the heavy particles",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e19",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "Similarly, the velocity of the light particles is given by $v _ { L } = F _ { L } / \\xi _ { L }$ with $F _ { L } = - ( m _ { L } - \\rho _ { m } V )$ cos .",
+    "node_ids": [
+      "n1c0_n58",
+      "n1c0_n59",
+      "n1c0_n59",
+      "n1c0_n59",
+      "n1c0_n59"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter",
+      "coefficient",
+      "exponent"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "velocity of the light particles",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "friction coefficient of the light particles",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "friction coefficient of the light particles",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "friction coefficient of the light particles",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "friction coefficient of the light particles",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e21",
+    "pattern_type": "influences",
+    "evidence_span": "The friction T /D Dcoefficient for both species is the same since the effective temperature of both species must be the same and so is the diffusivity; both assertions are verified below by measurements.",
+    "node_ids": [
+      "n1c0_n64",
+      "n1c0_n65",
+      "n1c0_n64",
+      "n1c0_n65"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "friction coefficient for both species",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "effective temperature of both species",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "friction coefficient for both species",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "effective temperature of both species",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e22",
+    "pattern_type": "influences",
+    "evidence_span": "The friction T /D Dcoefficient for both species is the same since the effective temperature of both species must be the same and so is the diffusivity; both assertions are verified below by measurements.",
+    "node_ids": [
+      "n1c0_n64",
+      "n1c0_n66",
+      "n1c0_n64",
+      "n1c0_n66"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "friction coefficient for both species",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "diffusivity",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "friction coefficient for both species",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "diffusivity",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e23",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "The segregation flux of the heavy particles is $J _ { H } ^ { s } = ( v _ { H } - v _ { m } ) n _ { H }$ , where $v _ { m } = f v _ { H } + ( 1 - f ) v _ { L }$ is the J v v n v fvnumber average velocity.",
+    "node_ids": [
+      "n1c0_n67",
+      "n1c0_n56",
+      "n1c0_n68",
+      "n1c0_n68",
+      "n1c0_n68"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter",
+      "coefficient",
+      "exponent"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "segregation flux of the heavy particles",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "velocity of a heavy particle normal to the flow direction",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "number average velocity",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "number average velocity",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "number average velocity",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c1_e4",
+    "pattern_type": "claim_relation",
+    "evidence_span": "Estimating the friction coefficient as $\\xi = 6 \\pi \\eta a ,$ by analogy to Stokes flow of a ξ πηasphere",
+    "node_ids": [
+      "n1c1_n11",
+      "n1c1_n12"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "friction coefficient",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Stokes flow",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-missed-bad-role",
+    "verifier_note": "The evidence states the friction coefficient is estimated 'by analogy to Stokes flow'. This is a claim of analogy, not a definitional identity. The pattern boundary for 'defines' explicitly states 'X is analogous to Y' is a CLAIM not a definition. Therefore, this should be a claim_relation.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "retype:claim_relation"
+  },
+  {
+    "edge_id": "n1c1_e7",
+    "pattern_type": "composed_of",
+    "evidence_span": "Experiments are carried out in a quasi–two-dimensional rotating cylinder of diameter 32 cm and length 1 cm half-filled with a mixture of 2 mm spherical glass and steel particles",
+    "node_ids": [
+      "n1c1_n20",
+      "n1c1_n21"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "quasi–two-dimensional rotating cylinder",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "mixture of 2 mm spherical glass and steel particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes an experimental setup. The pattern boundary for 'composed_of' explicitly states it is NOT an experimental setup description. This is a setup description, not a structural composition of a model or concept.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c0_e0",
+    "pattern_type": "defines",
+    "evidence_span": "Granular segregation, spontaneous demixing of components in flowing mixtures, is a phenomenon of practical importance",
+    "node_ids": [
+      "n1c0_n1",
+      "n1c0_n1",
+      "n1c0_n1"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "granular segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "granular segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "granular segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence defines granular segregation as a phenomenon, but the edge incorrectly binds all three roles to the same surface 'granular segregation'. The definition is 'spontaneous demixing of components in flowing mixtures', not the same term. This is a definitional statement, but the slot binding is wrong.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c0_e20",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "We use the fluctuation-F m ρ V gβdissipation relation to obtain the friction coefficient in terms of the effective temperature $\\left( T _ { E } \\right)$ as $\\xi _ { H } = \\xi _ { L } = \\xi =$ $T _ { E } / D$ T ξ ξ ξ, where  is the diffusivity [20,25,29].",
+    "node_ids": [
+      "n1c0_n61",
+      "n1c0_n62",
+      "n1c0_n63",
+      "n1c0_n63",
+      "n1c0_n63"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter",
+      "coefficient",
+      "exponent"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "friction coefficient",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "effective temperature",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "diffusivity",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "diffusivity",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "diffusivity",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states a formal relationship: friction coefficient = effective temperature / diffusivity. This is a constitutive law. The roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n2c1_e0",
+    "pattern_type": "claim_relation",
+    "evidence_span": "They indicate the promise of the new thermodynamics for applications of practical interest related to granular materials and other systems, at high solids volume fraction.",
+    "node_ids": [
+      "n2c1_n1",
+      "n2c1_n2",
+      "n2c1_n3",
+      "n2c1_n4"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "to",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "new thermodynamics",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "granular materials",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "other systems",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "high solids volume fraction",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence sentence states that the new thermodynamics shows promise for applications in granular materials and other systems at high solids volume fraction. This is a statement about the potential utility/applicability of the theory, not a discourse relation (supports/contrasts/extends) between two claims or approaches. The edge mischaracterizes the relation: 'new thermodynamics' is not making a claim that supports 'granular materials' or 'other systems' as claims. The sentence expresses a forward-looking implication for applications, not a discourse relation between claims. The pattern type is wrong (claim_relation is for discourse relations between claims/findings), and the slot binding is incorrect — 'granular materials' and 'other systems' are application domains, not claims being supported. The relation does not exist as extracted.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  }
+]

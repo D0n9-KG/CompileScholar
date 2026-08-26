@@ -1,0 +1,1773 @@
+[
+  {
+    "edge_id": "n1_e1",
+    "pattern_type": "extends",
+    "evidence_span": "The transport coefficients are determined from linear integral equations analogous to those for elastic collisions.",
+    "node_ids": [
+      "n1_n1",
+      "n1_n3"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "revised Enskog theory for inelastic hard spheres",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "revised Enskog theory for elastic hard spheres",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1_e4",
+    "pattern_type": "compares",
+    "evidence_span": "Finally, the analysis is repeated using a simpler kinetic model. Excellent agreement is obtained with the results from the revised Enskog equation.",
+    "node_ids": [
+      "n1_n9",
+      "n1_n10"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "results from the revised Enskog equation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "results from a simpler kinetic model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e3",
+    "pattern_type": "extends",
+    "evidence_span": "Its generalization to inelastic collisions is straightforward",
+    "node_ids": [
+      "n2c0_n7",
+      "n2c0_n8"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "revised Enskog kinetic theory (RET)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "inelastic collisions",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c1_e1",
+    "pattern_type": "extends",
+    "evidence_span": "Its generalization to inelastic collisions is straightforward",
+    "node_ids": [
+      "n2c1_n3",
+      "n2c1_n4"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "revised Enskog kinetic theory (RET)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "inelastic collisions",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e0",
+    "pattern_type": "background",
+    "evidence_span": "The essential difference from that for normal fluids is the absence of energy conservation",
+    "node_ids": [
+      "n2c0_n1",
+      "n2c0_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "hydrodynamic description",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "absence of energy conservation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states a difference/contrast between granular media and normal fluids, not a background/motivation relation where 'hydrodynamic description' uses 'absence of energy conservation' as background. The sentence describes a defining characteristic of the system, not a citation or motivation. The relation is not stated.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c1_e3",
+    "pattern_type": "defines",
+    "evidence_span": "There are additional necessary conditions for the solution to these equations to exist, the Fredholm alternative",
+    "node_ids": [
+      "n3c1_n7",
+      "n3c1_n2"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Fredholm alternative",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "integral equations",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c1_e8",
+    "pattern_type": "influences",
+    "evidence_span": "the cooling rate ζ can be calculated first order in the gradients",
+    "node_ids": [
+      "n3c1_n21",
+      "n3c1_n9"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "cooling rate ζ",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "spatial gradients",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c1_e11",
+    "pattern_type": "improves",
+    "evidence_span": "An approximate solution, known to be accurate for elastic collisions, is given in the next section.",
+    "node_ids": [
+      "n3c1_n27",
+      "n3c1_n22"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "approximate solution",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Chapman-Enskog solution",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e1",
+    "pattern_type": "defines",
+    "evidence_span": "The oneparticle distribution function $f ( \\mathbf { r } , \\mathbf { v } , t )$ is determined from @4# where $J _ { E }$ is the Enskog collision operator",
+    "node_ids": [
+      "n3c0_n3",
+      "n3c0_n4"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "one-particle distribution function f(r,v,t)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "Enskog collision operator J_E",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e2",
+    "pattern_type": "defines",
+    "evidence_span": "The parameter  is the coefficient of restitution with $0 < \\alpha \\leqslant 1$",
+    "node_ids": [
+      "n3c0_n6",
+      "n3c0_n5"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "coefficient of restitution α",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "hard sphere diameter",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e3",
+    "pattern_type": "defines",
+    "evidence_span": "$\\chi [ \\mathbf { r } , \\mathbf { r } + \\pmb { \\sigma } | n ( t ) ]$ is the equilibrium pair correlation function at contact as a functional of the nonequilibrium density field $n ( { \\bf r } , t )$",
+    "node_ids": [
+      "n3c0_n7",
+      "n3c0_n8"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "equilibrium pair correlation function at contact χ",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "nonequilibrium density field n(r,t)",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e4",
+    "pattern_type": "defines",
+    "evidence_span": "the nonequilibrium density field $n ( { \\bf r } , t )$ defined by $\\begin{array} { r } { n ( \\mathbf { r } , t ) = \\int d \\mathbf { v } f ( \\mathbf { r } , \\mathbf { v } , t ) } \\end{array}$",
+    "node_ids": [
+      "n3c0_n8",
+      "n3c0_n3"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "nonequilibrium density field n(r,t)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "one-particle distribution function f(r,v,t)",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e7",
+    "pattern_type": "composed_of",
+    "evidence_span": "$\\mathsf { P } \\mathrm { = } \\mathsf { P } ^ { k } \\mathrm { + } \\mathsf { P } ^ { c }$",
+    "node_ids": [
+      "n3c0_n14",
+      "n3c0_n16",
+      "n3c0_n17"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "pressure tensor P(r,t)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "kinetic contributions P^k",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional transfer contributions P^c",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e8",
+    "pattern_type": "composed_of",
+    "evidence_span": "$\\mathbf { q } = \\mathbf { q } ^ { k } + \\mathbf { q } ^ { c }$",
+    "node_ids": [
+      "n3c0_n15",
+      "n3c0_n18",
+      "n3c0_n19"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "heat flux q(r,t)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "kinetic contributions q^k",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "collisional transfer contributions q^c",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e9",
+    "pattern_type": "defines",
+    "evidence_span": "$\\mathbf { V } { = } \\mathbf { v } { - } \\mathbf { U } ( \\mathbf { r } , t )$ is the peculiar velocity and $\\begin{array} { r } { \\mathbf { G } = \\frac { 1 } { 2 } ( \\mathbf { V } _ { 1 } } \\end{array}$ $+ \\mathbf { V } _ { 2 } )$ is the velocity of center of mass.",
+    "node_ids": [
+      "n3c0_n20",
+      "n3c0_n21"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "peculiar velocity V",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "velocity of center of mass G",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e11",
+    "pattern_type": "defines",
+    "evidence_span": "The resulting closed set of equations constitutes the hydrodynamics for the RET.",
+    "node_ids": [
+      "n3c0_n23",
+      "n3c0_n22"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "hydrodynamics for the RET",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "hydrodynamic description",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e13",
+    "pattern_type": "defines",
+    "evidence_span": "To implement this expansion it is convenient to introduce a formal expansion parameter  referred to as the uniformity parameter.",
+    "node_ids": [
+      "n3c0_n26",
+      "n3c0_n3"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "uniformity parameter",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "one-particle distribution function f(r,v,t)",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e15",
+    "pattern_type": "defines",
+    "evidence_span": "where $p$ is the hydrostatic pressure The dimensionless density $n ^ { * } = n \\sigma ^ { 3 }$ has been introduced.",
+    "node_ids": [
+      "n3c0_n29",
+      "n3c0_n30"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "hydrostatic pressure p",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "dimensionless density n*",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e16",
+    "pattern_type": "defines",
+    "evidence_span": "where $\\mathcal { L }$ is the linearized collision operator Here $\\mathcal { Q } = 1 - \\mathcal { P } ,$ , where $\\mathcal { P }$ is the projection operator",
+    "node_ids": [
+      "n3c0_n31",
+      "n3c0_n32"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "linearized collision operator L",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "projection operator P",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e17",
+    "pattern_type": "defines",
+    "evidence_span": "the linear operator $\\kappa [ X ]$ is defined by",
+    "node_ids": [
+      "n3c0_n33",
+      "n3c0_n31"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "linear operator κ[X]",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "linearized collision operator L",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c1_e0",
+    "pattern_type": "defines",
+    "evidence_span": "gives the integral equations to determine A(V), B(V), C_ij(V)",
+    "node_ids": [
+      "n3c1_n1",
+      "n3c1_n2"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "A(V), B(V), C_ij(V)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "integral equations",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence states that the integral equations determine A(V), B(V), C_ij(V). This is a functional dependence (the functions depend on the equations), not a definitional identity. The 'defines' pattern is incorrect; 'influences' is the correct pattern.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "retype:influences"
+  },
+  {
+    "edge_id": "n3c1_e1",
+    "pattern_type": "influences",
+    "evidence_span": "The lowest order distribution f^(0) is a functional of the exact nonequilibrium fields.",
+    "node_ids": [
+      "n3c1_n3",
+      "n3c1_n4"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "f^(0)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "exact nonequilibrium fields",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence explicitly states that f^(0) is a functional of the fields, which is a direct functional dependence. The 'influences' pattern is appropriate.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3c1_e2",
+    "pattern_type": "defines",
+    "evidence_span": "This implies that f^(1) lies entirely in the orthogonal subspace",
+    "node_ids": [
+      "n3c1_n5",
+      "n3c1_n6"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "f^(1)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "orthogonal subspace",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence states that f^(1) lies in the orthogonal subspace. This is a statement of location/membership, not a definitional identity. The 'defines' pattern is incorrect; 'influences' is a better fit for this dependency relation.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "retype:influences"
+  },
+  {
+    "edge_id": "n3c1_e5",
+    "pattern_type": "defines",
+    "evidence_span": "where η is the shear viscosity",
+    "node_ids": [
+      "n3c1_n10",
+      "n3c1_n11"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "η",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "shear viscosity",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence explicitly defines η as the shear viscosity. This is a clear definitional identity, matching the 'defines' pattern.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3c1_e9",
+    "pattern_type": "defines",
+    "evidence_span": "The distribution function f = f^(0) + f^(1) with f^(0) given by the solution to Eq. (19) and f^(1) given by Eq. (31) is exact to this order in the gradients",
+    "node_ids": [
+      "n3c1_n23",
+      "n3c1_n24",
+      "n3c1_n25"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "f = f^(0) + f^(1)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Eq. (19)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Eq. (31)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence describes the distribution function f as being composed of f^(0) and f^(1), which are given by solutions to specific equations. This is a structural composition, not a definitional identity. The 'defines' pattern is incorrect; 'composed_of' is the correct pattern.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "retype:composed_of"
+  },
+  {
+    "edge_id": "n3c1_e10",
+    "pattern_type": "influences",
+    "evidence_span": "These results require solution to the linear equations (32)–(34).",
+    "node_ids": [
+      "n3c1_n23",
+      "n3c1_n26"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "f = f^(0) + f^(1)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "linear equations (32)–(34)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence explicitly states that the results (f = f^(0) + f^(1), fluxes) require solving the linear equations. This is a genuine dependency relation, correctly typed as influences.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3c1_e12",
+    "pattern_type": "defines",
+    "evidence_span": "κ_0 = 15 k_B η_0 / 4 m and η_0 = 5 m^(1/2) / 16 σ^2 (π β)^(1/2) are the low density values of the thermal conductivity and the shear viscosity in the elastic limit",
+    "node_ids": [
+      "n3c1_n30",
+      "n3c1_n31"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "κ_0",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "η_0",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence defines κ_0 and η_0 as the low-density values of thermal conductivity and shear viscosity. This is a definitional identity, correctly typed as defines.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3c1_e13",
+    "pattern_type": "influences",
+    "evidence_span": "The constant c*(α) is related to the fourth moment of f^(0)",
+    "node_ids": [
+      "n3c1_n34",
+      "n3c1_n35"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "c*(α)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "fourth moment of f^(0)",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence explicitly states a relationship between c*(α) and the fourth moment of f^(0). This is a functional dependence, correctly typed as influences.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3c1_e14",
+    "pattern_type": "influences",
+    "evidence_span": "It is seen that c*(α) vanishes if f^(0) is replaced by the Maxwellian distribution",
+    "node_ids": [
+      "n3c1_n34",
+      "n3c1_n36"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "c*(α)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Maxwellian distribution",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence states that c*(α) vanishes under a specific condition (replacement by Maxwellian). This is a conditional dependence, correctly typed as influences.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3c0_e12",
+    "pattern_type": "defines",
+    "evidence_span": "The Chapman-Enskog method @12# assumes the existence of a “normal” solution",
+    "node_ids": [
+      "n3c0_n24",
+      "n3c0_n25"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Chapman-Enskog method",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "normal solution",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e14",
+    "pattern_type": "compares",
+    "evidence_span": "The collision operator \\~14! can be recognized as the Boltzmann operator for inelastic collisions multiplied by this factor $\\chi .$",
+    "node_ids": [
+      "n3c0_n27",
+      "n3c0_n4"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Boltzmann operator for inelastic collisions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Enskog collision operator J_E",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e0",
+    "pattern_type": "defines",
+    "evidence_span": "expansion in a complete set of polynomials",
+    "node_ids": [
+      "n4c0_n1",
+      "n4c0_n2"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Sonine polynomial expansion",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "complete set of polynomials",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e1",
+    "pattern_type": "extends",
+    "evidence_span": "truncation of the series at the leading first Sonine polynomial approximation",
+    "node_ids": [
+      "n4c0_n1",
+      "n4c0_n3"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Sonine polynomial expansion",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "leading first Sonine polynomial approximation",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e3",
+    "pattern_type": "compares",
+    "evidence_span": "Lun's results show important quantitative discrepancies with those derived here",
+    "node_ids": [
+      "n4c0_n6",
+      "n4c0_n7"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "results derived here",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "Lun et al.",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e4",
+    "pattern_type": "influences",
+    "evidence_span": "η*(α, n*=0), κ*(α, n*=0), and μ*(α, n*=0) as functions of α",
+    "node_ids": [
+      "n4c0_n8",
+      "n4c0_n9",
+      "n4c0_n10"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "transport coefficients",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "α",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "n*",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e5",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "The transport coefficients have been reduced by η0 and κ0",
+    "node_ids": [
+      "n4c0_n8",
+      "n4c0_n1",
+      "n4c0_n9",
+      "n4c0_n10"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "transport coefficients",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "Sonine polynomial expansion",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "α",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "n*",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e6",
+    "pattern_type": "measures",
+    "evidence_span": "Recent Monte Carlo simulations of the dilute shear viscosity confirm the accuracy",
+    "node_ids": [
+      "n4c0_n8",
+      "n4c0_n11"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "transport coefficients",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "Monte Carlo simulation",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5_e1",
+    "pattern_type": "extends",
+    "evidence_span": "Generalizations to the RET for both elastic @18# and inelastic @4,10,11# cases have been discussed recently and applied with excellent success to shear flow far from equilibrium.",
+    "node_ids": [
+      "n5_n4",
+      "n5_n5"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "kinetic model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "BGK kinetic model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5_e3",
+    "pattern_type": "compares",
+    "evidence_span": "Excellent agreement with the Enskog results is found over a wide range of values for $n ^ { * }$ and .",
+    "node_ids": [
+      "n5_n9",
+      "n5_n10"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "kinetic model results",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Enskog results",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5_e5",
+    "pattern_type": "influences",
+    "evidence_span": "This dependence is shown in Figs. 2–4 for different values of the restitution coefficient.",
+    "node_ids": [
+      "n5_n8",
+      "n5_n13"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "transport properties",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "restitution coefficient",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5_e7",
+    "pattern_type": "composed_of",
+    "evidence_span": "The first term is the exact projection of the collision operator into the subspace spanned by 1, V, and $V ^ { 2 }$ @see Eq. \\~A2! of Appendix A#.",
+    "node_ids": [
+      "n5_n1",
+      "n5_n16"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "model kinetic equation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "projection of the collision operator",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5_e0",
+    "pattern_type": "replaces",
+    "evidence_span": "The model kinetic equation is Equation \\~64! has the same form as Eq. \\~1! except that the RET collision operator has been replaced by the terms on the right side of Eq. \\~64!.",
+    "node_ids": [
+      "n5_n1",
+      "n5_n2",
+      "n5_n3"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "model kinetic equation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "RET collision operator",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "terms on the right side of Eq. \\~64!",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the RET collision operator is replaced by the terms on the right side of Eq. 64. The 'from' node is the model kinetic equation, but the actual replacement is the collision operator being replaced by the terms. The model kinetic equation is the result of this replacement, not the agent doing the replacing. The 'from' role should be the terms on the right side of Eq. 64, not the model kinetic equation. Since the 'from' node is wrong, the edge must be dropped.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": true,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n5_e2",
+    "pattern_type": "compares",
+    "evidence_span": "The objective is to test the most sophisticated of these models @11# for the prediction of the transport properties calculated from the RET in the previous sections.",
+    "node_ids": [
+      "n5_n7",
+      "n5_n6",
+      "n5_n8"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "most sophisticated of these models @11#",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "RET",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "transport properties",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states the objective is to test a model for the prediction of transport properties calculated from the RET. This is a statement of intent, not an actual comparison. The 'to' node 'transport properties' is not a valid participant in a compares relation; the comparison is between the model and the RET, not the model and the transport properties. The transport properties are the object of prediction, not the thing being compared. The edge is dropped due to incorrect slot binding.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": true,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n5_e6",
+    "pattern_type": "defines",
+    "evidence_span": "The functions S(V) and $D _ { i j } ( \\mathbf { V } )$ are given by Eq. \\~44! while X and $Y _ { i j }$ are defined by",
+    "node_ids": [
+      "n5_n14",
+      "n5_n15"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "S(V)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Eq. \\~44!",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that S(V) and D_ij(V) are given by Eq. 44. This is a definitional relation, but the 'object' node is 'Eq. 44', which is not a valid definition. The definition should be the mathematical expression, not the equation number. The equation number is a reference, not the definition itself. The edge is dropped due to incorrect slot binding.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": true,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7c0_e6",
+    "pattern_type": "defines",
+    "evidence_span": "Here $\\mathcal { Q } ^ { * }$ is the adjoint projection operator",
+    "node_ids": [
+      "n7c0_n34",
+      "n7c0_n4"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Q*",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "P",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e9",
+    "pattern_type": "compares",
+    "evidence_span": "It is straightforward to show that the projection operator Q in the definition of $\\mathcal { L }$ can be replaced by the identity in both integrations, and these integrals become the same as those appearing in the Boltzmann limit ~except for a factor $\\chi )$ @1#.",
+    "node_ids": [
+      "n7c0_n53",
+      "n7c0_n26"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "L",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "identity operator",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7c0_e0",
+    "pattern_type": "defines",
+    "evidence_span": "define the operator $J _ { E } ^ { ' } [ f ]$ by and decompose it according to where $\\mathcal { P }$ is the projection operator onto an orthonormal set constructed from $\\{ \\bar { 1 } , v ^ { 2 } , \\mathbf { v } \\}$ : The normalization coefficient with $c ^ { * }$ given by Eq. ~52!. Also $\\mathcal { Q } = ( 1 - \\mathcal { P } )$ is the orthogonal projection.",
+    "node_ids": [
+      "n7c0_n3",
+      "n7c0_n4",
+      "n7c0_n5"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "J_E'[f]",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "P",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Q",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a decomposition of the operator J_E'[f] into P and Q components, not a definitional identity between them. The relation is a structural composition (J_E'[f] = P + Q), not a 'defines' relation. The slot binding is also wrong: P and Q are components of the decomposition, not a definition or object of J_E'[f]. The correct pattern would be composed_of, but the current roles don't fit that either.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7c0_e2",
+    "pattern_type": "defines",
+    "evidence_span": "where $\\nu _ { \\eta }$ is defined by Eq. ~51!",
+    "node_ids": [
+      "n7c0_n18",
+      "n7c0_n19"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "ν_η",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Eq. ~51!",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly states that ν_η is defined by Eq. 51, which is a definitional identity. The pattern 'defines' is appropriate. Both nodes are correctly identified.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n7c0_e4",
+    "pattern_type": "defines",
+    "evidence_span": "using the definition of K in Eq. ~28!",
+    "node_ids": [
+      "n7c0_n24",
+      "n7c0_n25"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "K",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Eq. ~28!",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly states that K is defined by Eq. 28, which is a definitional identity. The pattern 'defines' is appropriate. Both nodes are correctly identified.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n8_e1",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "Dimensional analysis requires that ζ^(0) and ν_γ are proportional to T^(1/2)",
+    "node_ids": [
+      "n8_n2",
+      "n8_n4"
+    ],
+    "node_roles": [
+      "output",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "ζ^(0)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "T",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states a direct proportionality relation, which is a formal constitutive law. The roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n8_e2",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "Dimensional analysis requires that ζ^(0) and ν_γ are proportional to T^(1/2)",
+    "node_ids": [
+      "n8_n5",
+      "n8_n4"
+    ],
+    "node_roles": [
+      "output",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "ν_γ",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "T",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states a direct proportionality relation for ν_γ, which is a formal constitutive law. The roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n8_e3",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "Therefore c_D ∝ T^(-1/2)",
+    "node_ids": [
+      "n8_n6",
+      "n8_n4"
+    ],
+    "node_roles": [
+      "output",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "c_D",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "T",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states a direct proportionality relation for c_D, which is a formal constitutive law. The roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n8_e4",
+    "pattern_type": "defines",
+    "evidence_span": "In order to determine c_D, multiply the integral equation (35) by E(V) and integrate over V to get",
+    "node_ids": [
+      "n8_n6",
+      "n8_n7"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "c_D",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "integral equation (35)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence describes a procedure to determine c_D, not a definitional identity. It does not state that c_D is defined as the integral equation. The relation is a method to compute, not a definition.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n8_e5",
+    "pattern_type": "improves",
+    "evidence_span": "The corrected value for the latter was obtained in Ref. [13]",
+    "node_ids": [
+      "n8_n8",
+      "n8_n9"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Ref. [13]",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Goldshtein and Shapiro",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states that Ref. [13] corrected an error in the work of Goldshtein and Shapiro, which is a clear case of improving by resolving a limitation. The roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n8_e6",
+    "pattern_type": "compares",
+    "evidence_span": "the results of Ref. [7] agree with the first two terms on the right side of Eq. (F1)",
+    "node_ids": [
+      "n8_n10",
+      "n8_n11"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Ref. [7]",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Eq. (F1)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states that the results of Ref. [7] agree with Eq. (F1), which is a comparison/validation relation. The roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n8_e7",
+    "pattern_type": "influences",
+    "evidence_span": "ζ^(1,1) vanishes in the limits of elastic spheres (α = 1, arbitrary density)",
+    "node_ids": [
+      "n8_n3",
+      "n8_n12"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "ζ^(1,1)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "α",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states that ζ^(1,1) vanishes when α=1, which is a functional dependence. The roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  }
+]

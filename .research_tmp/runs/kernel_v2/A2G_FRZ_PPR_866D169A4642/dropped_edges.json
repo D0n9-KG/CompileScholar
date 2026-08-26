@@ -1,0 +1,738 @@
+[
+  {
+    "edge_id": "n1_e0",
+    "pattern_type": "compares",
+    "evidence_span": "We employ a kinetic theory for binary mixtures of slightly inelastic, frictionless particles to study segregation in a uniformly agitated system under gravity",
+    "node_ids": [
+      "n1_n1",
+      "n1_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "kinetic theory for binary mixtures",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that a kinetic theory is employed to study segregation, which is a method-to-objective relation, not a comparison between two entities. The pattern 'compares' requires two entities put side by side (parallel alternatives, theory-vs-experiment, or equivalence/contrast). Here, the kinetic theory is the tool used to study the phenomenon, not compared with it. The relation is not stated; it is a setup description.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n2_e0",
+    "pattern_type": "background",
+    "evidence_span": "When a binary mixture of particles differing in sizes and material densities is agitated, the mixture has a tendency to segregate into homogeneous regions of one type of particle.",
+    "node_ids": [
+      "n2_n1",
+      "n2_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "binary mixture of particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "segregation due to gravity",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e4",
+    "pattern_type": "compares",
+    "evidence_span": "we compare the predictions of the direction of segregation with different species temperatures to those with equipartition",
+    "node_ids": [
+      "n2_n15",
+      "n2_n16"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "predictions of the direction of segregation with different species temperatures",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "predictions of the direction of segregation with equipartition",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3_e2",
+    "pattern_type": "defines",
+    "evidence_span": "The total number density is n ≡ n_A + n_B",
+    "node_ids": [
+      "n3_n6",
+      "n3_n7",
+      "n3_n8"
+    ],
+    "node_roles": [
+      "subject",
+      "object",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "total number density (n)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "number density (n_A)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "number density (n_B)",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3_e4",
+    "pattern_type": "defines",
+    "evidence_span": "The granular temperature of species i is where u is the mass averaged velocity of the mixture.",
+    "node_ids": [
+      "n3_n12",
+      "n3_n13",
+      "n3_n14"
+    ],
+    "node_roles": [
+      "subject",
+      "object",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "granular temperature (T_i)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "velocity (c)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "mass averaged velocity (u)",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3_e5",
+    "pattern_type": "defines",
+    "evidence_span": "The mixture temperature is T ≡ n^{-1} ( n_A T_A + n_B T_B )",
+    "node_ids": [
+      "n3_n15",
+      "n3_n7",
+      "n3_n8",
+      "n3_n16",
+      "n3_n17"
+    ],
+    "node_roles": [
+      "subject",
+      "object",
+      "object",
+      "object",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mixture temperature (T)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "number density (n_A)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "number density (n_B)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "granular temperature (T_A)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "granular temperature (T_B)",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3_e6",
+    "pattern_type": "defines",
+    "evidence_span": "The deviation in species temperature from the mean, which was ignored in Jenkins and Yoon,1 is θ_i ≡ T_i - T",
+    "node_ids": [
+      "n3_n18",
+      "n3_n12",
+      "n3_n15"
+    ],
+    "node_roles": [
+      "subject",
+      "object",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "species temperature deviation (θ_i)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "granular temperature (T_i)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "mixture temperature (T)",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3_e0",
+    "pattern_type": "defines",
+    "evidence_span": "The volume fraction  or the area fraction for disks- is ν_i ≡ 2 ( D - 1 ) π r_i^D n_i / D",
+    "node_ids": [
+      "n3_n1",
+      "n3_n2",
+      "n3_n3"
+    ],
+    "node_roles": [
+      "subject",
+      "object",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "volume fraction (ν_i)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "radius (r_i)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "number density (n_i)",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly states the definitional identity: ν_i is defined as 2(D-1)πr_i^D n_i/D. The subject (ν_i) is defined in terms of the objects (r_i and n_i), matching the roles. The relation is a definition, not a structural composition or functional dependence.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3_e1",
+    "pattern_type": "defines",
+    "evidence_span": "the mass density is given by ρ_i ≡ m_i n_i",
+    "node_ids": [
+      "n3_n4",
+      "n3_n5",
+      "n3_n3"
+    ],
+    "node_roles": [
+      "subject",
+      "object",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mass density (ρ_i)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "mass (m_i)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "number density (n_i)",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly states the definitional identity: ρ_i is defined as m_i n_i. The subject (ρ_i) is defined in terms of the objects (m_i and n_i), matching the roles. The relation is a definition, not a structural composition or functional dependence.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3_e3",
+    "pattern_type": "defines",
+    "evidence_span": "the total volume fraction  or area fraction- is ν ≡ ν_A + ν_B",
+    "node_ids": [
+      "n3_n9",
+      "n3_n10",
+      "n3_n11"
+    ],
+    "node_roles": [
+      "subject",
+      "object",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "total volume fraction (ν)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "volume fraction (ν_A)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "volume fraction (ν_B)",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly states the definitional identity: ν is defined as ν_A + ν_B. The subject (ν) is defined in terms of the objects (ν_A and ν_B), matching the roles. The relation is a definition, not a structural composition or functional dependence.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3_e7",
+    "pattern_type": "influences",
+    "evidence_span": "it follows from the definition of T that 0 = n_A θ_A + n_B θ_B",
+    "node_ids": [
+      "n3_n19",
+      "n3_n20",
+      "n3_n7",
+      "n3_n8"
+    ],
+    "node_roles": [
+      "source",
+      "source",
+      "target",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "species temperature deviation (θ_A)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "species temperature deviation (θ_B)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "number density (n_A)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "number density (n_B)",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly states the constraint relation: 0 = n_A θ_A + n_B θ_B. This is a genuine functional dependence/constraint between the species temperature deviations (θ_A, θ_B) and the number densities (n_A, n_B). The roles are correctly assigned: the temperature deviations are the sources (causes) and the number densities are the targets (effects) in this constraint equation. The relation is a dependence/constraint, not a definition or composition.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n4c0_e5",
+    "pattern_type": "influences",
+    "evidence_span": "In general, segregation is driven and sustained by both gravity and temperature gradients.",
+    "node_ids": [
+      "n4c0_n12",
+      "n4c0_n13",
+      "n4c0_n11"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "gravity",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "temperature gradients",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "initial segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e6",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "In Fig. 1, we show how the temperature ratio $T _ { A } / T _ { B }$ varies with the diameter ratio $r _ { A } / r _ { B } = \\eta$ for spheres of the same material $( \\mu { = } 1 )$ ; and, in Fig. 2, we plot $T _ { A } / T _ { B }$ against $m _ { B } / m _ { A } = \\mu / \\eta ^ { D }$ for particles of the same size $\\scriptstyle ( \\eta = 1 )$ , for fixed values of e in both cases.",
+    "node_ids": [
+      "n4c0_n15",
+      "n4c0_n16",
+      "n4c0_n17"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "temperature ratio",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "diameter ratio",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "mass ratio",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e7",
+    "pattern_type": "compares",
+    "evidence_span": "As shown in Figs. 1 and 2, the predictions of Barrat and Trizac8 are in excellent agreement with this relatively simple expression.",
+    "node_ids": [
+      "n4c0_n18",
+      "n4c0_n15"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Barrat and Trizac",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "temperature ratio",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e8",
+    "pattern_type": "compares",
+    "evidence_span": "Galvin et $a l . ^ { \\ : \\breve { 9 } }$ also showed that the ratio of temperatures in their molecular dynamics simulations of binary mixtures of spheres agrees well with this prediction of Jenkins and Mancini.10",
+    "node_ids": [
+      "n4c0_n19",
+      "n4c0_n20"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Galvin et al.",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Jenkins and Mancini",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e9",
+    "pattern_type": "compares",
+    "evidence_span": "The line of circles is the result deduced from the simulation of Hong et $a l . ^ { 2 }$ Their simulation, for both elastic $\\scriptstyle (e = 1)$ hard spheres and disks, begins with a homogeneous binary mixture at high temperature in the absence of gravity. Then, gravity is turned on and the system is taken to be in contact with a thermal reservoir that provides uniform agitation to the entire system. We note that while the prediction of the current work is based on the initial motion of large particles, the segregation criterion of the simulation is based on the final segregated configuration. Despite this, the agreement between the two is quite good.",
+    "node_ids": [
+      "n4c0_n22",
+      "n4c0_n21"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Hong et al.",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "segregation curve",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5c0_e0",
+    "pattern_type": "composed_of",
+    "evidence_span": "Using a simplified form of a revised Enskog theory12 that assumes equipartition, we determine the volume fractions of each species and employ their ratio, $\\nu _ { A } / \\nu _ { B } ,$ as a simple measure of segregation.",
+    "node_ids": [
+      "n5c0_n1",
+      "n5c0_n2",
+      "n5c0_n3"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "boundary value problem",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "revised Enskog theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "equipartition assumption",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5c0_e3",
+    "pattern_type": "defines",
+    "evidence_span": "When $\\nu _ { A } / \\nu _ { B }$ increases from the bottom to the top, A has segregated upward relative to B.",
+    "node_ids": [
+      "n5c0_n8",
+      "n5c0_n9"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "ν_A/ν_B increases from bottom to top",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "A segregated upward relative to B",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5c0_e4",
+    "pattern_type": "defines",
+    "evidence_span": "If $\\nu _ { A } / \\nu _ { B }$ decreases upward, the opposite is true.",
+    "node_ids": [
+      "n5c0_n10",
+      "n5c0_n11"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "ν_A/ν_B decreases upward",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "opposite segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5c0_e7",
+    "pattern_type": "compares",
+    "evidence_span": "there is very good agreement between Fig. 3, using the initial motion as the indicator, and Fig. 6, based on the solution of the boundary value problem.",
+    "node_ids": [
+      "n5c0_n18",
+      "n5c0_n19"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Fig. 3 (initial motion indicator)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Fig. 6 (boundary value problem solution)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6_e3",
+    "pattern_type": "compares",
+    "evidence_span": "our results for the dense system are very different from those of Brey et al.",
+    "node_ids": [
+      "n6_n7",
+      "n6_n8"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "our results for the dense system",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "results of Brey et al.",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  }
+]
