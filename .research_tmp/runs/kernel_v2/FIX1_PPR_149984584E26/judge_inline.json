@@ -1,0 +1,122 @@
+{
+  "n_total": 45,
+  "n_pass": 29,
+  "novel_total": 0,
+  "novel_pass": 0,
+  "pass_rate": 0.6444,
+  "judge": "inline-semantic (Claude, 2026-08-27 FIX1)",
+  "failures": [
+    {
+      "i": 1,
+      "pattern_type": "causes_phenomenon",
+      "nodes": "source=T1 event; target=small clusters",
+      "evidence": "We see a tendency of the T1 events to occur in small clusters",
+      "reason": "(a) relation_exists FAIL: 句子只陈述T1事件倾向于成簇出现(tendency to occur in small clusters, 空间共现), 未陈述T1事件导致小簇的形成; causes是抽取器加上去的因果升级, 不算忠实。"
+    },
+    {
+      "i": 2,
+      "pattern_type": "composed_of",
+      "nodes": "whole=quasi-two-dimensional pancakes; component=droplets",
+      "evidence": "the droplets are compressed into quasi-two-dimensional pancakes",
+      "reason": "(b) slot_binding FAIL: 源文II.A节明确 'the droplets are compressed into pancake shapes' — pancake是单个液滴被压成的形状, 不是由多个droplets组成的整体; 单droplet→pancake是形状变换(同一实体), 不是part-whole组成关系, whole/component两槽都绑错。"
+    },
+    {
+      "i": 4,
+      "pattern_type": "influences",
+      "nodes": "source=Jammed materials; target=applied stress; effect=elastic solids; effect=liquid",
+      "evidence": "Jammed materials behave like elastic solids for low applied stresses but flow like a liquid when the applied stress is above the yield stress",
+      "reason": "(c) polarity/direction FAIL: 句子说的是applied stress的大小决定jammed materials表现为elastic solid还是liquid — stress是条件/原因, 材料行为是结果; 边却把Jammed materials绑为source、applied stress绑为target, 主影响方向放反了。"
+    },
+    {
+      "i": 6,
+      "pattern_type": "influences",
+      "nodes": "source=small subset of particles; target=most of the load",
+      "evidence": "only a small subset of particles support most of the load",
+      "reason": "(a) relation_exists FAIL: 句子陈述的是一小部分颗粒承载(support)大部分载荷, 是load-bearing的结构性事实; 两实体之间没有被陈述的影响/依赖关系, influences是模式误配。"
+    },
+    {
+      "i": 7,
+      "pattern_type": "background",
+      "nodes": "from=plasticity of soft materials; to=localized plastic events",
+      "evidence": "An understanding of the plasticity of soft materials is based on the concept of localized plastic events first introduced by Argon",
+      "reason": "(c) polarity/direction FAIL: 句子说对plasticity of soft materials的理解是基于(is based on)localized plastic events — 后者是基础/背景; 按本schema方向约定(参照i=3: from=背景来源, to=被背景支撑的概念), from应为localized plastic events、to应为plasticity, 边把方向放反了。"
+    },
+    {
+      "i": 8,
+      "pattern_type": "causes_phenomenon",
+      "nodes": "source=localized plastic events; target=fragile stress network",
+      "evidence": "These localized plastic events are responsible for the macroscopic fluctuations in the flow",
+      "reason": "(b) slot_binding FAIL: 句子明确说localized plastic events导致的是macroscopic fluctuations in the flow, 不是fragile stress network; target槽绑错实体(fragile stress network来自相邻的另一句, 不在本句内)。"
+    },
+    {
+      "i": 9,
+      "pattern_type": "influences",
+      "nodes": "source=localized plastic events; target=fragile stress network",
+      "evidence": "with larger fluctuations associated with larger numbers of plastic events",
+      "reason": "(b) slot_binding FAIL: 句子陈述的是plastic events数量与fluctuations幅度之间的关联, 受影响对象是fluctuations; fragile stress network未在本句出现, 被误绑为target。"
+    },
+    {
+      "i": 11,
+      "pattern_type": "compares",
+      "nodes": "from=soft granular particles; to=lower area fractions close to jamming (phi ≈ phi_J)",
+      "evidence": "In contrast, soft granular particles are useful for measuring forces and positions simultaneously but are limited to lower area fractions close to jamming (phi ≈ phi_J)",
+      "reason": "(a) relation_exists FAIL: 句子陈述soft granular particles的能力局限(只适用于接近jamming的低面积分数), 是limitation陈述, 不是把soft granular particles与lower area fractions这两个实体作比较; compares关系不成立。"
+    },
+    {
+      "i": 13,
+      "pattern_type": "influences",
+      "nodes": "source=T1 event; target=fragile stress network",
+      "evidence": "we observe evidence of large deformation fluctuations connected to the T1 events",
+      "reason": "(b) slot_binding FAIL: 句子把T1 events与large deformation fluctuations相连, target应绑deformation fluctuations; fragile stress network不在本句, 误绑为target。"
+    },
+    {
+      "i": 17,
+      "pattern_type": "similar_to",
+      "nodes": "from=T1 event; to=large deformation drops",
+      "evidence": "A connection between large deformation drops and T1 events has been observed before in foams",
+      "reason": "(a) relation_exists FAIL: 句子陈述两者之间存在connection(相关/伴随关系), 不是两者相似; connection≠similarity, 关系类型绑错。"
+    },
+    {
+      "i": 21,
+      "pattern_type": "influences",
+      "nodes": "target=T1 frequency; source=small increases or decreases",
+      "evidence": "For small increases or decreases, the T1 frequency is fairly constant.",
+      "reason": "(a) relation_exists FAIL: 句子陈述在小幅增减区间T1频率基本恒定(fairly constant), 即该区间不存在影响; 边却断言small increases or decreases影响T1 frequency, 与句意相反(constancy正是absence of influence)。"
+    },
+    {
+      "i": 26,
+      "pattern_type": "influences",
+      "nodes": "target=sample motion; source=moving boundary",
+      "evidence": "the sample motion was localized near the moving boundary",
+      "reason": "(a) relation_exists FAIL: 句子陈述sample motion在空间上局限于moving boundary附近, 是位置/局域化陈述, 未陈述moving boundary影响或驱动sample motion; influence是隐含推断, 按纪律不算。"
+    },
+    {
+      "i": 31,
+      "pattern_type": "influences",
+      "nodes": "target=viscous forces; source=relaxation of the droplet deformations",
+      "evidence": "viscous forces slows the relaxation of the droplet deformations back to their equilibrium level",
+      "reason": "(c) polarity/direction FAIL: 句子主语是viscous forces, 它减缓(slows)relaxation — viscous forces是施加影响的一方, relaxation是被影响的一方; 边把relaxation绑为source、viscous forces绑为target, 方向放反。"
+    },
+    {
+      "i": 32,
+      "pattern_type": "compares",
+      "nodes": "from=sheared bubble raft; to=slow steady flow; to=quasistatic limit",
+      "evidence": "a prior experimental study of a sheared bubble raft provides strong evidence that even slow steady flow is not equivalent to the quasistatic limit",
+      "reason": "(b) slot_binding FAIL: 句中真正的比较双方是slow steady flow与quasistatic limit(不等价); sheared bubble raft只是提供证据的实验体系, 不是比较的一方, 被误绑进compare槽。"
+    },
+    {
+      "i": 34,
+      "pattern_type": "influences",
+      "nodes": "target=power spectrum; source=P(ω)∼ω⁻¹",
+      "evidence": "The power spectrum (inset) shows a tendency of power-law decay P(ω)∼ω⁻¹ at high frequencies",
+      "reason": "(b) slot_binding FAIL: P(ω)∼ω⁻¹是power spectrum自身的衰减形式(频谱的形状规律), 不是影响power spectrum的外部实体; 把频谱自己的表达式绑成influence的source是槽位语义错绑; 句子陈述的是频谱呈power-law衰减这一行为, 不是影响关系。"
+    },
+    {
+      "i": 35,
+      "pattern_type": "influences",
+      "nodes": "target=ΔDG; source=τ",
+      "evidence": "In general, larger changes of DG take longer times",
+      "reason": "(c) polarity/direction FAIL: 句子方向是变化幅度决定时间长度('larger changes of D_G take longer times', 主语是changes, 谓语是take longer times), 即ΔD_G→τ; 边把τ绑为source、ΔDG绑为target, 方向放反。"
+    }
+  ]
+}

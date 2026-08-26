@@ -1,0 +1,35 @@
+{"i": 0, "claim": "DQN是一种结合强化学习与深度神经网络的新型智能体", "quote": "we developed a novel agent, a deep Q-network (DQN)", "category": "method_definition"}
+{"i": 1, "claim": "DQN使用深度卷积神经网络来近似最优动作值函数", "quote": "approximate the optimal action-value function", "category": "method_definition"}
+{"i": 2, "claim": "experience replay机制通过随机化数据来消除观察序列中的相关性并平滑数据分布变化", "quote": "in the observation sequence and smoothing over changes in the data distribution", "category": "method_definition"}
+{"i": 3, "claim": "target network机制使用仅定期更新的目标值来减少与目标的相关性", "quote": "only periodically updated, thereby reducing correlations with the target", "category": "method_definition"}
+{"i": 4, "claim": "网络架构为每个可能动作设置独立输出单元，仅状态表征作为网络输入", "quote": "separate output unit for each possible action, and only the state representation", "category": "method_definition"}
+{"i": 5, "claim": "预处理对当前帧和前一帧取每像素颜色最大值以消除Atari 2600画面闪烁伪影", "quote": "take the maximum value for each pixel colour value over the frame being encoded", "category": "method_definition"}
+{"i": 6, "claim": "训练期间将所有正奖励截断为1、负奖励截断为-1以限制误差导数规模", "quote": "clipped all positive rewards at 1 and all negative rewards", "category": "method_definition"}
+{"i": 7, "claim": "对更新中的误差项截断到[-1,1]区间进一步提升了算法稳定性", "quote": "found it helpful to clip the error term from the update", "category": "method_definition"}
+{"i": 8, "claim": "该算法是model-free的，直接使用来自模拟器的样本解决强化学习任务而不显式估计转移动力学", "quote": "this algorithm is model-free: it solves the reinforcement learning task directly", "category": "method_definition"}
+{"i": 9, "claim": "Q-learning的基本思想是使用Bellman方程作为迭代更新来估计动作值函数", "quote": "using the Bellman equation as an iterative update", "category": "method_definition"}
+{"i": 10, "claim": "预处理函数将最近m帧堆叠作为Q函数输入，m=4", "quote": "the m most recent frames and stacks them to produce the input to the Q-function", "category": "method_definition"}
+{"i": 11, "claim": "使用非线性函数逼近器表示动作值函数时强化学习已知会不稳定甚至发散", "quote": "known to be unstable or even to diverge when a nonlinear function approximator", "category": "method_relation"}
+{"i": 12, "claim": "neural fitted Q-iteration等现有稳定方法因需从头重复训练网络数百次迭代而无法高效用于大型网络", "quote": "involve the repeated training of networks de novo on hundreds of iterations", "category": "method_relation"}
+{"i": 13, "claim": "DQN在不使用其他方法的额外先验知识下于49款游戏中43款超越现有最佳强化学习方法", "quote": "outperforms the best existing reinforcement learning methods on 43 of the games", "category": "method_relation"}
+{"i": 14, "claim": "与以往工作不同，该方法采用端到端强化学习，用奖励持续塑造卷积网络内的表征", "quote": "uses reward to continuously shape representations", "category": "method_relation"}
+{"i": 15, "claim": "强化学习与深度网络架构的成功整合关键依赖于回放算法的引入", "quote": "critically dependent on our incorporation of a replay algorithm", "category": "method_relation"}
+{"i": 16, "claim": "DQN在超过一半的游戏（29款）上达到了超过人类测试者分数75%的水平", "quote": "more than 75% of the human score on more than half of the games", "category": "quantitative_result"}
+{"i": 17, "claim": "DQN在49款游戏上取得了与专业人类游戏测试者相当的水平", "quote": "comparable to that of a professional human games tester across a set of 49 games", "category": "quantitative_result"}
+{"i": 18, "claim": "DQN仅接收像素和游戏分数作为输入即可超越所有先前算法的性能", "quote": "surpass the performance of all previous algorithms", "category": "quantitative_result"}
+{"i": 19, "claim": "DQN总共训练了5000万帧（约相当于38天的游戏经验）", "quote": "50 million frames (that is, around 38 days of game experience in total)", "category": "quantitative_result"}
+{"i": 20, "claim": "通过禁用核心组件的消融实验证明了回放记忆、独立target Q网络和深度卷积架构各自的重要性", "quote": "separate target Q-network and deep convolutional network architecture", "category": "quantitative_result"}
+{"i": 21, "claim": "该方法能够以强化学习信号和随机梯度下降稳定地训练大型神经网络", "quote": "reinforcement learning signal and stochastic gradient descent in a stable manner", "category": "qualitative_finding"}
+{"i": 22, "claim": "单一架构可以在不同环境中成功学习控制策略，仅需极少先验知识", "quote": "can successfully learn control policies in a range of different environments", "category": "qualitative_finding"}
+{"i": 23, "claim": "t-SNE可视化显示DQN将感知相似的状态映射到相邻点", "quote": "map the DQN representation of perceptually similar states to nearby points", "category": "qualitative_finding"}
+{"i": 24, "claim": "DQN学到的表征能够泛化到来自其他策略（包括人类游戏）生成的数据", "quote": "able to generalize to data generated from policies other than its own", "category": "qualitative_finding"}
+{"i": 25, "claim": "在Breakout游戏中DQN能发现长期策略：先在墙侧挖隧道让球绕到后方摧毁大量方块", "quote": "optimal strategy, which is to first dig a tunnel around the side of the wall", "category": "qualitative_finding"}
+{"i": 26, "claim": "需要更长时间跨度规划的游戏（如Montezuma's Revenge）对所有现有智能体包括DQN仍是重大挑战", "quote": "temporally extended planning strategies still constitute a major challenge", "category": "qualitative_finding"}
+{"i": 27, "claim": "DQN表现出色的游戏性质极其多样，从横版射击（River Raid）到拳击（Boxing）到3D赛车（Enduro）", "quote": "the games in which DQN excels are extremely varied in their nature", "category": "qualitative_finding"}
+{"i": 28, "claim": "在所有游戏中使用相同的算法、网络架构和超参数", "quote": "using the same algorithm, network architecture and hyperparameters", "category": "setup_fact"}
+{"i": 29, "claim": "DQN仅接收像素和游戏分数作为输入，不使用其他先验知识", "quote": "receiving only the pixels and the game score as inputs", "category": "setup_fact"}
+{"i": 30, "claim": "训练期间行为策略为e-greedy，e在前100万帧内从1.0线性退火至0.1", "quote": "e-greedy with e annealed linearly from 1.0 to 0.1 over the first million frames", "category": "setup_fact"}
+{"i": 31, "claim": "评估时每款游戏玩30次，每次最多5分钟，使用不同初始随机条件和e-greedy策略(e=0.05)", "quote": "30 times for up to 5 min each time with different initial random conditions", "category": "setup_fact"}
+{"i": 32, "claim": "未来奖励按每时间步γ=0.99的折扣因子进行折扣", "quote": "discounted by a factor of c per time-step (c was set to 0.99 throughout)", "category": "setup_fact"}
+{"i": 33, "claim": "使用了容量为100万最近帧的回放记忆", "quote": "a replay memory of 1 million most recent frames", "category": "setup_fact"}
+{"i": 34, "claim": "使用帧跳过技术，智能体仅在第k帧上观察和选择动作，k=4", "quote": "agent sees and selects actions on every kth frame instead of every frame", "category": "setup_fact"}

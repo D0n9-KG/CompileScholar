@@ -1,0 +1,66 @@
+{
+ "n_total": 48,
+ "n_pass": 40,
+ "novel_total": 0,
+ "novel_pass": 0,
+ "pass_rate": 0.8333,
+ "judge": "inline-semantic (Claude, 2026-08-27 FIX1)",
+ "failures": [
+  {
+   "i": 1,
+   "pattern_type": "extends",
+   "nodes": "from=deep convolutional network; to=deep neural networks",
+   "evidence": "We use one particularly successful architecture, the deep convolutional network",
+   "reason": "relation_exists: evidence 'We use one particularly successful architecture, the deep convolutional network' only states usage; that DCN extends/is-a deep neural networks is discourse-implied (preceding sentence mentions the DNN class) but not asserted in this evidence sentence."
+  },
+  {
+   "i": 2,
+   "pattern_type": "improves",
+   "nodes": "from=experience replay; to=Q-learning",
+   "evidence": "we address these instabilities with a novel variant of Q-learning, which uses two key ideas. First, we used a biologically inspired mechanism termed experience replay",
+   "reason": "slot_binding: sentence attributes instability-fixing to 'a novel variant of Q-learning' which uses experience replay as one of two key ideas; ER is presented as a component mechanism inside the variant, not as an agent that improves Q-learning itself."
+  },
+  {
+   "i": 28,
+   "pattern_type": "defines",
+   "nodes": "subject=squared error; object=absolute value loss function",
+   "evidence": "clipping the squared error to be between 21 and 1 corresponds to using an absolute value loss function for errors outside of the $( - 1 , 1 )$ interval",
+   "reason": "relation_exists: 'clipping the squared error ... corresponds to using an absolute value loss function' states an equivalence between two loss treatments, not a definition of squared error; pattern misrepresents the stated relation."
+  },
+  {
+   "i": 33,
+   "pattern_type": "composed_of",
+   "nodes": "whole=transition $\\left( \\phi _ { t } , a _ { t } , r _ { t } , \\phi _ { t + 1 } \\right)$; component=D",
+   "evidence": "Store transition $\\left( \\phi _ { t } , a _ { t } , r _ { t } , \\phi _ { t + 1 } \\right)$ in D",
+   "reason": "slot_binding/direction: evidence 'Store transition (phi_t, a_t, r_t, phi_t+1) in D': D is the replay memory the transition is stored INTO; D is not a component of the transition. Containment reversed (transitions are components of D, if anything)."
+  },
+  {
+   "i": 37,
+   "pattern_type": "influences",
+   "nodes": "target=value iteration algorithms; source=optimal action-value function",
+   "evidence": "Such value iteration algorithms converge to the optimal action-value function",
+   "reason": "direction/slot_binding: 'Such value iteration algorithms converge to the optimal action-value function' states convergence of the algorithms TO Q*, not that Q* influences the algorithms; source/target reversed and stated relation is convergence, not influence."
+  },
+  {
+   "i": 39,
+   "pattern_type": "compares",
+   "nodes": "from=linear function approximator; to=nonlinear function approximator",
+   "evidence": "this is typically a linear function approximator, but sometimes a nonlinear function approximator is used instead",
+   "reason": "relation_exists: 'typically a linear function approximator, but sometimes a nonlinear function approximator is used instead' states usage frequency/alternative choice, not a comparison between the two."
+  },
+  {
+   "i": 42,
+   "pattern_type": "compares",
+   "nodes": "from=targets; to=supervised learning",
+   "evidence": "this is in contrast with the targets used for supervised learning",
+   "reason": "slot_binding: sentence contrasts RL targets with 'the targets used for supervised learning' (which are fixed); the compared entity is the fixed SL targets, not the paradigm 'supervised learning' bound in the to-slot."
+  },
+  {
+   "i": 43,
+   "pattern_type": "influences",
+   "nodes": "target=loss functions; source=stochastic gradient descent",
+   "evidence": "it is often computationally expedient to optimize the loss function by stochastic gradient descent",
+   "reason": "relation_exists/slot_binding: 'optimize the loss function by stochastic gradient descent' states the optimization method; SGD is the optimizer applied to the loss, not a causal source influencing the loss functions (loss depends on network parameters, not on SGD)."
+  }
+ ]
+}

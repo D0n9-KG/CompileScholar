@@ -1,0 +1,59 @@
+{
+  "n_total": 32,
+  "n_pass": 25,
+  "novel_total": 0,
+  "novel_pass": 0,
+  "pass_rate": 0.78125,
+  "judge": "inline-semantic (Claude, 2026-08-27 FIX1)",
+  "failures": [
+    {
+      "i": 3,
+      "pattern_type": "similar_to",
+      "nodes": "from=diffusion in gases, liquids, or solids; to=Fick's second law",
+      "evidence": "the process can be considered as analogous to diffusion in gases, liquids, or solids, and Fick's second law should apply",
+      "reason": "relation_exists FAIL: 句子陈述的是两个独立命题——(1)混合过程类似于气体/液体/固体中的扩散；(2)Fick第二定律适用于该过程。句中从未陈述'扩散'与'Fick第二定律'之间的相似关系。真正被类比的配对（过程↔扩散）没有被绑定，两个槽绑的是两个不同命题各自的对象，拼成了一个句中不存在的similar_to边。"
+    },
+    {
+      "i": 13,
+      "pattern_type": "influences",
+      "nodes": "target=log σ(N) vs N; source=slope -π²D/2·303L²",
+      "evidence": "Thus an experimental plot of $\\log \\sigma(N)$ vs N should yield a straight line of slope $-\\pi^{2}D/2\\cdot303L^{2}$",
+      "reason": "relation_exists FAIL: 句子只是预测 log σ(N) 对 N 作图应得一条具有特定斜率的直线——纯画图描述。斜率是该图的属性而非原因，'斜率影响图'这一influences关系句中不存在；真实内容（N 驱动 σ(N) 衰减）也没有以这个绑定形式被陈述。"
+    },
+    {
+      "i": 14,
+      "pattern_type": "influences",
+      "nodes": "target=σ²(N) vs √N; source=slope -4/L√(2D/π)",
+      "evidence": "Equation (24) predicts that an experimental plot of $\\sigma^{2}(N)$ vs $\\sqrt{N}$ should give a straight line of slope $-4/L\\sqrt{\\frac{2D}{\\pi}}$",
+      "reason": "relation_exists FAIL: 同 i=13。Eq.(24) 预测 σ²(N) 对 √N 作图为直线且斜率给定——画图描述；slope 作 source、plot 作 target 的 influences 关系未被陈述，斜率是图的属性不是原因。"
+    },
+    {
+      "i": 15,
+      "pattern_type": "influences",
+      "nodes": "target=two rate equations; source=mixing process",
+      "evidence": "Substitution of the relationships for $\\sigma^{2}(N)$ given by Eq. (16) and (24) into Eq. (8) yields two rate equations for the mixing process",
+      "reason": "relation_exists FAIL: 句子说的是把 Eq.(16) 和 (24) 的 σ²(N) 关系代入 Eq.(8) 导出两个描述混合过程的速率方程——即方程描述(for)该过程。句中不存在'混合过程影响速率方程'的关系：关系类型错（describes 而非 influences），且因果方向也不成立。"
+    },
+    {
+      "i": 25,
+      "pattern_type": "influences",
+      "nodes": "source=concentration gradient; target=sample concentration",
+      "evidence": "slight inaccuracies in the location of the sampling probe will result in large deviations of the sample concentration from the expected value of 0·5.",
+      "reason": "slot_binding FAIL: evidence 句陈述的因果关系是'取样探头位置的小误差 → 样品浓度的大偏差'。句中根本没有出现 concentration gradient（'该点浓度梯度极陡'只是前置分句/语境条件），source 槽绑定的'浓度梯度'不是这句陈述的原因，真正的原因（探头定位误差）没有被绑上。"
+    },
+    {
+      "i": 28,
+      "pattern_type": "constitutive_law",
+      "nodes": "output=degree of mixedness; input=number of revolutions; parameter=exponential relationship; coefficient=later stages",
+      "evidence": "In the later stages of the process, the degree of mixedness as a function of the number of revolutions of the mixer is described by an exponential relationship",
+      "reason": "slot_binding FAIL: output/input 两个主槽绑定正确，但 'exponential relationship' 是该规律的函数形式而非 parameter，'later stages' 是阶段条件而非 coefficient（系数应为数值常数如 D、L）。句中没有陈述任何参数或系数，两个辅助槽均为类别性错绑，读起来会产生'系数=后期'的误导。（对照 i=27：仅把阶段条件松绑进 parameter 槽可容忍，此处是双重错绑且 coefficient 槽被错用。）"
+    },
+    {
+      "i": 31,
+      "pattern_type": "defines",
+      "nodes": "subject=experimental system; object=ideal case of identical components",
+      "evidence": "An experimental system has been devised which approximates very closely to the ideal case of identical components",
+      "reason": "relation_exists FAIL: 句子陈述的是实验系统 'approximates very closely to' 理想情形——近似/相似关系（similar_to/approximates），不是 defines。实验系统既不定义该理想情形，也不被定义为该理想情形；关系类型错。"
+    }
+  ]
+}

@@ -59,3 +59,6 @@ RETAINED / REGRESSED。
    是方差性漏放）。案例库的作用之一就是把系统性和随机性失败分开。
 3. pass 案例绝对 RETAINED 率低（6/16）是无上下文 chunk+冻结 schema 的固有噪声，
    有意义信号是修前后 REGRESSED **差值**与逐案对比。
+4. **watcher 邻句误配**：`_watches` 用 token 重叠（≥50%）判边是否在 watch 句上，
+   邻接句谈同一批量词时会误配（holdout C012 即此：边全来自邻句，watch 句本身
+   已无边）。复核 STILL_WRONG 时先看 watched 边的 evidence 是不是 watch 句本身。
