@@ -1,18 +1,18 @@
 {
   "summary": {
     "GLM-5-Turbo": {
-      "pass": 14,
-      "total": 66,
-      "rate": 0.212
+      "pass": 15,
+      "total": 52,
+      "rate": 0.288
     },
     "qwen3.5": {
-      "pass": 14,
-      "total": 66,
-      "rate": 0.212
+      "pass": 23,
+      "total": 52,
+      "rate": 0.442
     },
-    "agreement": "56/66",
-    "both_pass": "9/66",
-    "either_pass": "19/66"
+    "agreement": "38/52",
+    "both_pass": "12/52",
+    "either_pass": "26/52"
   },
   "edges": [
     {
@@ -52,7 +52,7 @@
         ],
         [
           "loser",
-          "best existing reinforcement learning methods"
+          "reinforcement learning"
         ],
         [
           "task",
@@ -194,7 +194,7 @@
         ],
         [
           "component",
-          "best existing reinforcement learning methods"
+          "reinforcement learning"
         ],
         [
           "component",
@@ -206,22 +206,84 @@
       "ctx_after": " We tested this agent on the challenging domain of classic Atari 2600 games12. We demonstrate that the deep Q-network agent, receiving only the pixels and the g"
     },
     {
-      "pt": "measures",
-      "desc": "a method/approach is used to evaluate/measure >=1 target (n-ary)",
-      "boundary": "",
+      "pt": "outperforms_on",
+      "desc": "[NEW] method A outperforms method B on task/benchmark T, measured by metric M",
+      "boundary": "quantitative comparison result between two methods on a shared task with a metric; NOT claim_relation (discourse-level supports/contrasts), NOT improves (building-on, no numbers)",
       "nodes": [
         [
-          "object",
+          "winner",
           "DQN"
         ],
         [
-          "instrument",
-          "Atari 2600 platform"
+          "loser",
+          "all previous algorithms"
+        ],
+        [
+          "task",
+          "49 games"
+        ],
+        [
+          "metric",
+          "game score"
         ]
       ],
-      "ev": "To evaluate our DQN agent, we took advantage of the Atari 2600 platform, which offers a diverse array of tasks (n 5 49) designed to be difficult and engaging for human players.",
-      "ctx_before": "eters $\\theta _ { i } ^ { - }$ { are only updated with the Q-network parameters (h ) every C steps and are held fixed between individual updates (see Methods). ",
-      "ctx_after": " We used the same network architecture, hyperparameter values (see Extended Data Table 1) and learning procedure throughout—taking high-dimensional data (210|16"
+      "ev": "We demonstrate that the deep Q-network agent, receiving only the pixels and the game score as inputs, was able to surpass the performance of all previous algorithms and achieve a level comparable to that of a professional human games tester across a set of 49 games, using the same algorithm, network architecture and hyperparameters.",
+      "ctx_before": "tly from high-dimensional sensory inputs using end-to-end reinforcement learning. We tested this agent on the challenging domain of classic Atari 2600 games12. ",
+      "ctx_after": " This work bridges the divide between high-dimensional sensory inputs and actions, resulting in the first artificial agent that is capable of learning to excel "
+    },
+    {
+      "pt": "composed_of",
+      "desc": "one whole (model/pipeline/system) is composed-of / part-of >=1 component (n-ary)",
+      "boundary": "",
+      "nodes": [
+        [
+          "whole",
+          "deep neural networks"
+        ],
+        [
+          "component",
+          "hierarchical layers of tiled convolutional filters"
+        ]
+      ],
+      "ev": "We use one particularly successful architecture, the deep convolutional network17, which uses hierarchical layers of tiled convolutional filters to mimic the effects of receptive fields—inspired by Hubel and Wiesel’s seminal work on feedforward processing in early visual cortex18—thereby exploiting the local spatial correlations present in images, and building in robustness to natural transformations such as changes of viewpoint or scale.",
+      "ctx_before": "t representations of the data, have made it possible for artificial neural networks to learn concepts such as object categories directly from raw sensory data. ",
+      "ctx_after": " We consider tasks in which the agent interacts with an environment through a sequence of observations, actions and rewards. The goal of the agent is to select "
+    },
+    {
+      "pt": "influences",
+      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
+      "boundary": "",
+      "nodes": [
+        [
+          "source",
+          "hierarchical layers of tiled convolutional filters"
+        ],
+        [
+          "target",
+          "receptive fields"
+        ]
+      ],
+      "ev": "We use one particularly successful architecture, the deep convolutional network17, which uses hierarchical layers of tiled convolutional filters to mimic the effects of receptive fields—inspired by Hubel and Wiesel’s seminal work on feedforward processing in early visual cortex18—thereby exploiting the local spatial correlations present in images, and building in robustness to natural transformations such as changes of viewpoint or scale.",
+      "ctx_before": "t representations of the data, have made it possible for artificial neural networks to learn concepts such as object categories directly from raw sensory data. ",
+      "ctx_after": " We consider tasks in which the agent interacts with an environment through a sequence of observations, actions and rewards. The goal of the agent is to select "
+    },
+    {
+      "pt": "influences",
+      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
+      "boundary": "",
+      "nodes": [
+        [
+          "source",
+          "deep neural networks"
+        ],
+        [
+          "target",
+          "optimal action-value function"
+        ]
+      ],
+      "ev": "More formally, we use a deep convolutional neural network to approximate the optimal action-value function which is the maximum sum of rewards $r _ { t }$ discounted by c at each timestep t, achievable by a behaviour policy $\\pi = P ( a | s )$ , after making an observation (s) and taking an action (a) (see Methods)19.",
+      "ctx_before": "nment through a sequence of observations, actions and rewards. The goal of the agent is to select actions in a fashion that maximizes cumulative future reward. ",
+      "ctx_after": " Reinforcement learning is known to be unstable or even to diverge when a nonlinear function approximator such as a neural network is used to represent the acti"
     },
     {
       "pt": "composed_of",
@@ -242,40 +304,40 @@
       "ctx_after": " To evaluate our DQN agent, we took advantage of the Atari 2600 platform, which offers a diverse array of tasks (n 5 49) designed to be difficult and engaging f"
     },
     {
-      "pt": "influences",
-      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
+      "pt": "measures",
+      "desc": "a method/approach is used to evaluate/measure >=1 target (n-ary)",
       "boundary": "",
       "nodes": [
         [
-          "source",
-          "deep neural networks"
+          "object",
+          "DQN"
         ],
         [
-          "target",
-          "action-value function"
+          "instrument",
+          "Atari 2600 platform"
         ]
       ],
-      "ev": "More formally, we use a deep convolutional neural network to approximate the optimal action-value function which is the maximum sum of rewards $r _ { t }$ discounted by c at each timestep t, achievable by a behaviour policy $\\pi = P ( a | s )$ , after making an observation (s) and taking an action (a) (see Methods)19.",
-      "ctx_before": "nment through a sequence of observations, actions and rewards. The goal of the agent is to select actions in a fashion that maximizes cumulative future reward. ",
-      "ctx_after": " Reinforcement learning is known to be unstable or even to diverge when a nonlinear function approximator such as a neural network is used to represent the acti"
+      "ev": "To evaluate our DQN agent, we took advantage of the Atari 2600 platform, which offers a diverse array of tasks (n 5 49) designed to be difficult and engaging for human players.",
+      "ctx_before": "eters $\\theta _ { i } ^ { - }$ { are only updated with the Q-network parameters (h ) every C steps and are held fixed between individual updates (see Methods). ",
+      "ctx_after": " We used the same network architecture, hyperparameter values (see Extended Data Table 1) and learning procedure throughout—taking high-dimensional data (210|16"
     },
     {
-      "pt": "background",
-      "desc": "X uses Y as background/motivation",
-      "boundary": "X cites Y as MOTIVATION/prior context only (Y inspired X but X is NOT a direct technical extension/inheritance of Y). NOT extends (no direct technical lineage), NOT improves (no limitation fix).",
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions). NOT improves (neither fixes the other), NOT extends (neither generalizes).",
       "nodes": [
         [
           "from",
-          "best existing reinforcement learning methods"
+          "reinforcement learning"
         ],
         [
           "to",
-          "neurobiological evidence"
+          "previous work"
         ]
       ],
-      "ev": "This principle draws on neurobiological evidence that reward signals during perceptual learning may influence the characteristics of representations",
-      "ctx_before": "ses reward to continuously shape representations within the convolutional network towards salient features of the environment that facilitate value estimation. ",
-      "ctx_after": " within primate visual cortex27,28. Notably, the successful integration of reinforcement learning with deep network architectures was critically dependent on ou"
+      "ev": "In contrast to previous work, our approach incorporates end-to-end reinforcement learning",
+      "ctx_before": "",
+      "ctx_after": ""
     },
     {
       "pt": "influences",
@@ -289,11 +351,193 @@
         [
           "target",
           "representations"
+        ],
+        [
+          "output",
+          "value estimation"
         ]
       ],
-      "ev": "uses reward to continuously shape representations",
-      "ctx_before": "game, privy only to the inputs a human player would have. In contrast to previous work24,26, our approach incorporates ‘end-to-end’ reinforcement learning that ",
-      "ctx_after": " within the convolutional network towards salient features of the environment that facilitate value estimation. This principle draws on neurobiological evidence"
+      "ev": "reward to continuously shape representations towards salient features that facilitate value estimation",
+      "ctx_before": " privy only to the inputs a human player would have. In contrast to previous work24,26, our approach incorporates ‘end-to-end’ reinforcement learning that uses ",
+      "ctx_after": " of the environment that facilitate value estimation. This principle draws on neurobiological evidence that reward signals during perceptual learning may influe"
+    },
+    {
+      "pt": "background",
+      "desc": "X uses Y as background/motivation",
+      "boundary": "X cites Y as MOTIVATION/prior context only (Y inspired X but X is NOT a direct technical extension/inheritance of Y). NOT extends (no direct technical lineage), NOT improves (no limitation fix).",
+      "nodes": [
+        [
+          "from",
+          "reinforcement learning"
+        ],
+        [
+          "to",
+          "neurobiological evidence"
+        ]
+      ],
+      "ev": "This principle draws on neurobiological evidence that reward signals during perceptual learning may influence representations",
+      "ctx_before": "ses reward to continuously shape representations within the convolutional network towards salient features of the environment that facilitate value estimation. ",
+      "ctx_after": "tics of representations within primate visual cortex27,28. Notably, the successful integration of reinforcement learning with deep network architectures was cri"
+    },
+    {
+      "pt": "claim_relation",
+      "desc": "a discourse relation between >=2 claims/findings/approaches (supports/contrasts/outperforms/extends)",
+      "boundary": "",
+      "nodes": [
+        [
+          "from",
+          "single architecture"
+        ],
+        [
+          "to",
+          "control policies"
+        ]
+      ],
+      "ev": "demonstrate that a single architecture can successfully learn control policies in a range of environments",
+      "ctx_before": "ally extended planning strategies still constitute a major challenge for all existing agents including DQN (for example, Montezuma’s Revenge). In this work, we ",
+      "ctx_after": "vironments with only very minimal prior knowledge, receiving only the pixels and the game score as inputs, and using the same algorithm, network architecture an"
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions). NOT improves (neither fixes the other), NOT extends (neither generalizes).",
+      "nodes": [
+        [
+          "from",
+          "previous work"
+        ],
+        [
+          "to",
+          "our approach"
+        ]
+      ],
+      "ev": "In contrast to previous work24,26, our approach incorporates ‘end-to-end’ reinforcement learning",
+      "ctx_before": " game score as inputs, and using the same algorithm, network architecture and hyperparameters on each game, privy only to the inputs a human player would have. ",
+      "ctx_after": " that uses reward to continuously shape representations within the convolutional network towards salient features of the environment that facilitate value estim"
+    },
+    {
+      "pt": "background",
+      "desc": "X uses Y as background/motivation",
+      "boundary": "X cites Y as MOTIVATION/prior context only (Y inspired X but X is NOT a direct technical extension/inheritance of Y). NOT extends (no direct technical lineage), NOT improves (no limitation fix).",
+      "nodes": [
+        [
+          "from",
+          "neurobiological evidence"
+        ],
+        [
+          "to",
+          "reward signals"
+        ]
+      ],
+      "ev": "This principle draws on neurobiological evidence that reward signals during perceptual learning may influence the characteristics of representations within primate visual cortex",
+      "ctx_before": "ses reward to continuously shape representations within the convolutional network towards salient features of the environment that facilitate value estimation. ",
+      "ctx_after": "27,28. Notably, the successful integration of reinforcement learning with deep network architectures was critically dependent on our incorporation of a replay a"
+    },
+    {
+      "pt": "composed_of",
+      "desc": "one whole (model/pipeline/system) is composed-of / part-of >=1 component (n-ary)",
+      "boundary": "",
+      "nodes": [
+        [
+          "whole",
+          "replay algorithm"
+        ],
+        [
+          "component",
+          "reinforcement learning"
+        ],
+        [
+          "component",
+          "deep network architectures"
+        ]
+      ],
+      "ev": "the successful integration of reinforcement learning with deep network architectures was critically dependent on our incorporation of a replay algorithm",
+      "ctx_before": "ogical evidence that reward signals during perceptual learning may influence the characteristics of representations within primate visual cortex27,28. Notably, ",
+      "ctx_after": "21–23 involving the storage and representation of recently experienced transitions. Convergent evidence suggests that the hippocampus may support the physical p"
+    },
+    {
+      "pt": "influences",
+      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
+      "boundary": "",
+      "nodes": [
+        [
+          "source",
+          "timecompressed reactivation of recently experienced trajectories"
+        ],
+        [
+          "target",
+          "value functions"
+        ],
+        [
+          "condition",
+          "basal ganglia"
+        ]
+      ],
+      "ev": "with the timecompressed reactivation of recently experienced trajectories during offline periods21,22 (for example, waking rest) providing a putative mechanism by which value functions may be efficiently updated through interactions with the basal ganglia22",
+      "ctx_before": "unkers do not carry great significance near the end of a level. With permission from Square Enix Limited. realization of such a process in the mammalian brain, ",
+      "ctx_after": ". In the future, it will be important to explore the potential use of biasing the content of experience replay towards salient events, a phenomenon that charact"
+    },
+    {
+      "pt": "background",
+      "desc": "X uses Y as background/motivation",
+      "boundary": "X cites Y as MOTIVATION/prior context only (Y inspired X but X is NOT a direct technical extension/inheritance of Y). NOT extends (no direct technical lineage), NOT improves (no limitation fix).",
+      "nodes": [
+        [
+          "from",
+          "hippocampal replay"
+        ],
+        [
+          "to",
+          "prioritized sweeping"
+        ]
+      ],
+      "ev": "relates to the notion of ‘prioritized sweeping’30 in reinforcement learning",
+      "ctx_before": "otential use of biasing the content of experience replay towards salient events, a phenomenon that characterizes empirically observed hippocampal replay29, and ",
+      "ctx_after": ". Taken together, our work illustrates the power of harnessing state-of-the-art machine learning techniques with biologically inspired mechanisms to create agen"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "",
+      "nodes": [
+        [
+          "subject",
+          "image $x _ { t } \\in \\mathbb { R } ^ { d }$"
+        ],
+        [
+          "definition",
+          "vector of pixel values"
+        ],
+        [
+          "object",
+          "current screen"
+        ]
+      ],
+      "ev": "instead the agent observes an image $x _ { t } \\in \\mathbb { R } ^ { d }$ from the emulator, which is a vector of pixel values representing the current screen",
+      "ctx_before": "r and modifies its internal state and the game score. In general the environment may be stochastic. The emulator’s internal state is not observed by the agent; ",
+      "ctx_after": ". In addition it receives a reward rt representing the change in game score. Note that in general the game score may depend on the whole previous sequence of ac"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "",
+      "nodes": [
+        [
+          "subject",
+          "reward rt"
+        ],
+        [
+          "definition",
+          "change in game score"
+        ],
+        [
+          "object",
+          "game score"
+        ]
+      ],
+      "ev": "In addition it receives a reward rt representing the change in game score",
+      "ctx_before": "instead the agent observes an image $x _ { t } \\in \\mathbb { R } ^ { d }$ from the emulator, which is a vector of pixel values representing the current screen. ",
+      "ctx_after": ". Note that in general the game score may depend on the whole previous sequence of actions and observations; feedback about an action may only be received after"
     },
     {
       "pt": "influences",
@@ -320,6 +564,104 @@
       "nodes": [
         [
           "source",
+          "feedback about an action"
+        ],
+        [
+          "target",
+          "many thousands of time-steps"
+        ]
+      ],
+      "ev": "feedback about an action may only be received after many thousands of time-steps have elapsed",
+      "ctx_before": "s a reward rt representing the change in game score. Note that in general the game score may depend on the whole previous sequence of actions and observations; ",
+      "ctx_after": ". Because the agent only observes the current screen, the task is partially observed33 and many emulator states are perceptually aliased (that is, it is impossi"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "",
+      "nodes": [
+        [
+          "subject",
+          "task"
+        ],
+        [
+          "definition",
+          "partially observed"
+        ],
+        [
+          "object",
+          "current screen xt"
+        ]
+      ],
+      "ev": "Because the agent only observes the current screen, the task is partially observed",
+      "ctx_before": "pend on the whole previous sequence of actions and observations; feedback about an action may only be received after many thousands of time-steps have elapsed. ",
+      "ctx_after": "33 and many emulator states are perceptually aliased (that is, it is impossible to fully understand the current situation from only the current screen xt). Ther"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "",
+      "nodes": [
+        [
+          "subject",
+          "many emulator states"
+        ],
+        [
+          "definition",
+          "perceptually aliased"
+        ],
+        [
+          "object",
+          "current screen xt"
+        ]
+      ],
+      "ev": "many emulator states are perceptually aliased (that is, it is impossible to fully understand the current situation from only the current screen xt)",
+      "ctx_before": " may only be received after many thousands of time-steps have elapsed. Because the agent only observes the current screen, the task is partially observed33 and ",
+      "ctx_after": ". Therefore, sequences of actions and observations, $s _ { t } = x _ { 1 } , a _ { 1 } , x _ { 2 } , . . . , a _ { t - 1 } , x _ { t }$ , are input to the algor"
+    },
+    {
+      "pt": "influences",
+      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
+      "boundary": "",
+      "nodes": [
+        [
+          "source",
+          "current situation"
+        ],
+        [
+          "target",
+          "current screen xt"
+        ]
+      ],
+      "ev": "it is impossible to fully understand the current situation from only the current screen xt",
+      "ctx_before": " have elapsed. Because the agent only observes the current screen, the task is partially observed33 and many emulator states are perceptually aliased (that is, ",
+      "ctx_after": "). Therefore, sequences of actions and observations, $s _ { t } = x _ { 1 } , a _ { 1 } , x _ { 2 } , . . . , a _ { t - 1 } , x _ { t }$ , are input to the algo"
+    },
+    {
+      "pt": "influences",
+      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
+      "boundary": "",
+      "nodes": [
+        [
+          "source",
+          "sequences of actions and observations"
+        ],
+        [
+          "target",
+          "algorithm"
+        ]
+      ],
+      "ev": "Therefore, sequences of actions and observations, $s _ { t } = x _ { 1 } , a _ { 1 } , x _ { 2 } , . . . , a _ { t - 1 } , x _ { t }$ , are input to the algorithm",
+      "ctx_before": "rved33 and many emulator states are perceptually aliased (that is, it is impossible to fully understand the current situation from only the current screen xt). ",
+      "ctx_after": ", which then learns game strategies depending upon these sequences. All sequences in the emulator are assumed to terminate in a finite number of timesteps. This"
+    },
+    {
+      "pt": "influences",
+      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
+      "boundary": "",
+      "nodes": [
+        [
+          "source",
           "game strategies"
         ],
         [
@@ -332,53 +674,43 @@
       "ctx_after": ". All sequences in the emulator are assumed to terminate in a finite number of timesteps. This formalism gives rise to a large but finite Markov decision proces"
     },
     {
-      "pt": "influences",
-      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
       "boundary": "",
       "nodes": [
         [
-          "source",
-          "This formalism"
+          "subject",
+          "large but finite Markov decision process (MDP)"
         ],
         [
-          "target",
-          "large but finite Markov decision process (MDP)"
-        ]
-      ],
-      "ev": "This formalism gives rise to a large but finite Markov decision process (MDP)",
-      "ctx_before": "ithm, which then learns game strategies depending upon these sequences. All sequences in the emulator are assumed to terminate in a finite number of timesteps. ",
-      "ctx_after": " in which each sequence is a distinct state. As a result, we can apply standard reinforcement learning methods for MDPs, simply by using the complete sequence s"
-    },
-    {
-      "pt": "influences",
-      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
-      "boundary": "",
-      "nodes": [
-        [
-          "source",
+          "definition",
           "each sequence"
         ],
         [
-          "target",
+          "object",
           "distinct state"
         ]
       ],
-      "ev": "in which each sequence is a distinct state",
-      "ctx_before": "quences in the emulator are assumed to terminate in a finite number of timesteps. This formalism gives rise to a large but finite Markov decision process (MDP) ",
+      "ev": "This formalism gives rise to a large but finite Markov decision process (MDP) in which each sequence is a distinct state",
+      "ctx_before": "ithm, which then learns game strategies depending upon these sequences. All sequences in the emulator are assumed to terminate in a finite number of timesteps. ",
       "ctx_after": ". As a result, we can apply standard reinforcement learning methods for MDPs, simply by using the complete sequence st as the state representation at time t. Th"
     },
     {
-      "pt": "influences",
-      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
       "boundary": "",
       "nodes": [
         [
-          "source",
+          "subject",
           "complete sequence st"
         ],
         [
-          "target",
+          "definition",
           "state representation at time t"
+        ],
+        [
+          "object",
+          "standard reinforcement learning methods for MDPs"
         ]
       ],
       "ev": "simply by using the complete sequence st as the state representation at time t",
@@ -386,86 +718,42 @@
       "ctx_after": ". The goal of the agent is to interact with the emulator by selecting actions in a way that maximizes future rewards. We make the standard assumption that futur"
     },
     {
-      "pt": "influences",
-      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
       "boundary": "",
       "nodes": [
         [
-          "source",
-          "goal of the agent"
+          "subject",
+          "future discounted return at time t"
         ],
         [
-          "target",
-          "emulator"
+          "definition",
+          "$R _ { t } = \\sum _ { t ^ { \\prime } = t } ^ { I } \\gamma ^ { t ^ { \\prime } - t } r _ { t ^ { \\prime } }$ T"
         ],
         [
-          "cause",
-          "actions"
-        ],
-        [
-          "effect",
-          "future rewards"
+          "object",
+          "T"
         ]
       ],
-      "ev": "The goal of the agent is to interact with the emulator by selecting actions in a way that maximizes future rewards.",
-      "ctx_before": "te. As a result, we can apply standard reinforcement learning methods for MDPs, simply by using the complete sequence st as the state representation at time t. ",
-      "ctx_after": " We make the standard assumption that future rewards are discounted by a factor of c per time-step (c was set to 0.99 throughout), and define the future discoun"
+      "ev": "define the future discounted return at time t as $R _ { t } = \\sum _ { t ^ { \\prime } = t } ^ { I } \\gamma ^ { t ^ { \\prime } - t } r _ { t ^ { \\prime } }$ T",
+      "ctx_before": "maximizes future rewards. We make the standard assumption that future rewards are discounted by a factor of c per time-step (c was set to 0.99 throughout), and ",
+      "ctx_after": " , in which T is the t0\\~ttime-step at which the game terminates. We define the optimal action-value function $\\boldsymbol { Q } ^ { * } ( s , a )$ as the maxim"
     },
     {
-      "pt": "influences",
-      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
       "boundary": "",
       "nodes": [
         [
-          "source",
-          "future rewards"
-        ],
-        [
-          "target",
-          "factor of c"
-        ],
-        [
-          "condition",
-          "time-step"
-        ]
-      ],
-      "ev": "We make the standard assumption that future rewards are discounted by a factor of c per time-step",
-      "ctx_before": "e st as the state representation at time t. The goal of the agent is to interact with the emulator by selecting actions in a way that maximizes future rewards. ",
-      "ctx_after": " (c was set to 0.99 throughout), and define the future discounted return at time t as $R _ { t } = \\sum _ { t ^ { \\prime } = t } ^ { I } \\gamma ^ { t ^ { \\prime"
-    },
-    {
-      "pt": "influences",
-      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
-      "boundary": "",
-      "nodes": [
-        [
-          "source",
-          "factor of c"
-        ],
-        [
-          "target",
-          "0.99"
-        ]
-      ],
-      "ev": "(c was set to 0.99 throughout)",
-      "ctx_before": " by selecting actions in a way that maximizes future rewards. We make the standard assumption that future rewards are discounted by a factor of c per time-step ",
-      "ctx_after": ", and define the future discounted return at time t as $R _ { t } = \\sum _ { t ^ { \\prime } = t } ^ { I } \\gamma ^ { t ^ { \\prime } - t } r _ { t ^ { \\prime } }"
-    },
-    {
-      "pt": "influences",
-      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
-      "boundary": "",
-      "nodes": [
-        [
-          "source",
+          "subject",
           "optimal action-value function $\\boldsymbol { Q } ^ { * } ( s , a )$"
         ],
         [
-          "target",
+          "definition",
           "maximum expected return"
         ],
         [
-          "condition",
+          "object",
           "any policy"
         ]
       ],
@@ -474,70 +762,70 @@
       "ctx_after": ", after seeing some sequence s and then taking some action a, $Q ^ { * } ( s , a ) =$ max $_ \\tau \\mathbb { E } [ R _ { t } | s _ { t } = s , a _ { t } = a , \\p"
     },
     {
-      "pt": "influences",
-      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
       "boundary": "",
       "nodes": [
         [
-          "source",
-          "some sequence s"
+          "subject",
+          "$Q ^ { * } ( s , a ) =$ max $_ \\tau \\mathbb { E } [ R _ { t } | s _ { t } = s , a _ { t } = a , \\pi ]$"
         ],
         [
-          "target",
-          "some action a"
+          "definition",
+          "optimal action-value function $\\boldsymbol { Q } ^ { * } ( s , a )$"
+        ],
+        [
+          "object",
+          "some sequence s"
         ]
       ],
-      "ev": "after seeing some sequence s and then taking some action a",
-      "ctx_before": "erminates. We define the optimal action-value function $\\boldsymbol { Q } ^ { * } ( s , a )$ as the maximum expected return achievable by following any policy, ",
-      "ctx_after": ", $Q ^ { * } ( s , a ) =$ max $_ \\tau \\mathbb { E } [ R _ { t } | s _ { t } = s , a _ { t } = a , \\pi ]$ in which p is a policy mapping sequences to actions (or"
+      "ev": "$Q ^ { * } ( s , a ) =$ max $_ \\tau \\mathbb { E } [ R _ { t } | s _ { t } = s , a _ { t } = a , \\pi ]$",
+      "ctx_before": "dsymbol { Q } ^ { * } ( s , a )$ as the maximum expected return achievable by following any policy, after seeing some sequence s and then taking some action a, ",
+      "ctx_after": " in which p is a policy mapping sequences to actions (or distributions over actions). The optimal action-value function obeys an important identity known as the"
     },
     {
-      "pt": "influences",
-      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
       "boundary": "",
       "nodes": [
         [
-          "source",
-          "p"
-        ],
-        [
-          "target",
+          "subject",
           "policy"
         ],
         [
-          "cause",
-          "sequences"
+          "definition",
+          "p"
         ],
         [
-          "effect",
-          "actions"
+          "object",
+          "sequences"
         ]
       ],
-      "ev": "in which p is a policy mapping sequences to actions (or distributions over actions)",
+      "ev": "in which p is a policy mapping sequences to actions",
       "ctx_before": "er seeing some sequence s and then taking some action a, $Q ^ { * } ( s , a ) =$ max $_ \\tau \\mathbb { E } [ R _ { t } | s _ { t } = s , a _ { t } = a , \\pi ]$ ",
-      "ctx_after": ". The optimal action-value function obeys an important identity known as the Bellman equation. This is based on the following intuition: if the optimal value $\\"
+      "ctx_after": " (or distributions over actions). The optimal action-value function obeys an important identity known as the Bellman equation. This is based on the following in"
     },
     {
-      "pt": "influences",
-      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
       "boundary": "",
       "nodes": [
         [
-          "source",
+          "subject",
           "optimal action-value function"
         ],
         [
-          "target",
+          "definition",
           "important identity"
         ],
         [
-          "condition",
+          "object",
           "Bellman equation"
         ]
       ],
-      "ev": "The optimal action-value function obeys an important identity known as the Bellman equation.",
+      "ev": "The optimal action-value function obeys an important identity known as the Bellman equation",
       "ctx_before": "$_ \\tau \\mathbb { E } [ R _ { t } | s _ { t } = s , a _ { t } = a , \\pi ]$ in which p is a policy mapping sequences to actions (or distributions over actions). ",
-      "ctx_after": " This is based on the following intuition: if the optimal value $\\boldsymbol { Q } ^ { * } ( s ^ { \\prime } , a ^ { \\prime } )$ Þ of the sequence s9 at the next"
+      "ctx_after": ". This is based on the following intuition: if the optimal value $\\boldsymbol { Q } ^ { * } ( s ^ { \\prime } , a ^ { \\prime } )$ Þ of the sequence s9 at the nex"
     },
     {
       "pt": "influences",
@@ -551,14 +839,6 @@
         [
           "target",
           "sequence s9"
-        ],
-        [
-          "condition",
-          "next time-step"
-        ],
-        [
-          "cause",
-          "all possible actions ${ \\boldsymbol { a } } ^ { \\prime } ,$"
         ]
       ],
       "ev": "if the optimal value $\\boldsymbol { Q } ^ { * } ( s ^ { \\prime } , a ^ { \\prime } )$ Þ of the sequence s9 at the next time-step was known for all possible actions ${ \\boldsymbol { a } } ^ { \\prime } ,$",
@@ -577,10 +857,6 @@
         [
           "target",
           "action a9"
-        ],
-        [
-          "effect",
-          "expected value of $\\dot { \\boldsymbol { r } } + \\gamma \\boldsymbol { Q } ^ { * } ( \\boldsymbol { s } ^ { \\prime } , \\boldsymbol { a } ^ { \\prime } )$"
         ]
       ],
       "ev": "then the optimal strategy is to select the action a9 maximizing the expected value of $\\dot { \\boldsymbol { r } } + \\gamma \\boldsymbol { Q } ^ { * } ( \\boldsymbol { s } ^ { \\prime } , \\boldsymbol { a } ^ { \\prime } )$",
@@ -588,504 +864,22 @@
       "ctx_after": " : The basic idea behind many reinforcement learning algorithms is to estimate the action-value function by using the Bellman equation as an iterative update, $"
     },
     {
-      "pt": "composed_of",
-      "desc": "one whole (model/pipeline/system) is composed-of / part-of >=1 component (n-ary)",
-      "boundary": "",
-      "nodes": [
-        [
-          "whole",
-          "preprocessing step"
-        ],
-        [
-          "component",
-          "maximum value for each pixel colour value over the frame being encoded and the previous frame"
-        ],
-        [
-          "component",
-          "Y channel, also known as luminance, from the RGB frame"
-        ]
-      ],
-      "ev": "We apply a basic preprocessing step aimed at reducing the input dimensionality and dealing with some artefacts of the Atari 2600 emulator. First, to encode a single frame we take the maximum value for each pixel colour value over the frame being encoded and the previous frame. Second, we then extract the Y channel, also known as luminance, from the RGB frame and rescale it to 84 3 84.",
-      "ctx_before": "ectly with raw Atari 2600 frames, which are 210 3 160 pixel images with a 128-colour palette, can be demanding in terms of computation and memory requirements. ",
-      "ctx_after": "s while other objects appear only in odd frames, an artefact caused by the limited number of sprites Atari 2600 can display at once. Second, we then extract the"
-    },
-    {
-      "pt": "composed_of",
-      "desc": "one whole (model/pipeline/system) is composed-of / part-of >=1 component (n-ary)",
-      "boundary": "",
-      "nodes": [
-        [
-          "whole",
-          "function w from algorithm 1"
-        ],
-        [
-          "component",
-          "m most recent frames"
-        ],
-        [
-          "component",
-          "input to the Q-function"
-        ]
-      ],
-      "ev": "The function w from algorithm 1 described below applies this preprocessing to the m most recent frames and stacks them to produce the input to the Q-function, in which $m = 4 ,$ although the algorithm is robust to different values of m (for example, 3 or 5).",
-      "ctx_before": "number of sprites Atari 2600 can display at once. Second, we then extract the Y channel, also known as luminance, from the RGB frame and rescale it to 84 3 84. ",
-      "ctx_after": " Code availability. The source code can be accessed at https://sites.google.com/a/ deepmind.com/dqn for non-commercial uses only. Model architecture. There are "
-    },
-    {
-      "pt": "composed_of",
-      "desc": "one whole (model/pipeline/system) is composed-of / part-of >=1 component (n-ary)",
-      "boundary": "",
-      "nodes": [
-        [
-          "whole",
-          "input to the neural network"
-        ],
-        [
-          "component",
-          "$8 4 \\times 8 4 \\times 4$ image"
-        ],
-        [
-          "component",
-          "function w from algorithm 1"
-        ]
-      ],
-      "ev": "The input to the neural network consists of an $8 4 \\times 8 4 \\times 4$ image produced by the preprocessing map w.",
-      "ctx_before": "ll possible actions in a given state with only a single forward pass through the network. The exact architecture, shown schematically in Fig. 1, is as follows. ",
-      "ctx_after": " The first hidden layer convolves 32 filters of 8 3 8 with stride 4 with the input image and applies a rectifier nonlinearity31,32. The second hidden layer conv"
-    },
-    {
-      "pt": "composed_of",
-      "desc": "one whole (model/pipeline/system) is composed-of / part-of >=1 component (n-ary)",
-      "boundary": "",
-      "nodes": [
-        [
-          "whole",
-          "first hidden layer"
-        ],
-        [
-          "component",
-          "32 filters of 8 3 8 with stride 4"
-        ],
-        [
-          "component",
-          "rectifier nonlinearity"
-        ]
-      ],
-      "ev": "The first hidden layer convolves 32 filters of 8 3 8 with stride 4 with the input image and applies a rectifier nonlinearity31,32.",
-      "ctx_before": "own schematically in Fig. 1, is as follows. The input to the neural network consists of an $8 4 \\times 8 4 \\times 4$ image produced by the preprocessing map w. ",
-      "ctx_after": " The second hidden layer convolves 64 filters of $\\bar { 4 } \\times 4$ with stride 2, again followed by a rectifier nonlinearity. This is followed by a third co"
-    },
-    {
-      "pt": "composed_of",
-      "desc": "one whole (model/pipeline/system) is composed-of / part-of >=1 component (n-ary)",
-      "boundary": "",
-      "nodes": [
-        [
-          "whole",
-          "second hidden layer"
-        ],
-        [
-          "component",
-          "32 filters of 8 3 8 with stride 4"
-        ],
-        [
-          "component",
-          "rectifier nonlinearity"
-        ]
-      ],
-      "ev": "The second hidden layer convolves 64 filters of $\\bar { 4 } \\times 4$ with stride 2, again followed by a rectifier nonlinearity.",
-      "ctx_before": " by the preprocessing map w. The first hidden layer convolves 32 filters of 8 3 8 with stride 4 with the input image and applies a rectifier nonlinearity31,32. ",
-      "ctx_after": " This is followed by a third convolutional layer that convolves 64 filters of 3 3 3 with stride 1 followed by a rectifier. The final hidden layer is fully-conne"
-    },
-    {
-      "pt": "composed_of",
-      "desc": "one whole (model/pipeline/system) is composed-of / part-of >=1 component (n-ary)",
-      "boundary": "",
-      "nodes": [
-        [
-          "whole",
-          "third convolutional layer"
-        ],
-        [
-          "component",
-          "32 filters of 8 3 8 with stride 4"
-        ],
-        [
-          "component",
-          "rectifier nonlinearity"
-        ]
-      ],
-      "ev": "This is followed by a third convolutional layer that convolves 64 filters of 3 3 3 with stride 1 followed by a rectifier.",
-      "ctx_before": "a rectifier nonlinearity31,32. The second hidden layer convolves 64 filters of $\\bar { 4 } \\times 4$ with stride 2, again followed by a rectifier nonlinearity. ",
-      "ctx_after": " The final hidden layer is fully-connected and consists of 512 rectifier units. The output layer is a fully-connected linear layer with a single output for each"
-    },
-    {
-      "pt": "composed_of",
-      "desc": "one whole (model/pipeline/system) is composed-of / part-of >=1 component (n-ary)",
-      "boundary": "",
-      "nodes": [
-        [
-          "whole",
-          "final hidden layer"
-        ],
-        [
-          "component",
-          "512 rectifier units"
-        ]
-      ],
-      "ev": "The final hidden layer is fully-connected and consists of 512 rectifier units.",
-      "ctx_before": "followed by a rectifier nonlinearity. This is followed by a third convolutional layer that convolves 64 filters of 3 3 3 with stride 1 followed by a rectifier. ",
-      "ctx_after": " The output layer is a fully-connected linear layer with a single output for each valid action. The number of valid actions varied between 4 and 18 on the games"
-    },
-    {
-      "pt": "composed_of",
-      "desc": "one whole (model/pipeline/system) is composed-of / part-of >=1 component (n-ary)",
-      "boundary": "",
-      "nodes": [
-        [
-          "whole",
-          "output layer"
-        ],
-        [
-          "component",
-          "single output for each valid action"
-        ]
-      ],
-      "ev": "The output layer is a fully-connected linear layer with a single output for each valid action.",
-      "ctx_before": " layer that convolves 64 filters of 3 3 3 with stride 1 followed by a rectifier. The final hidden layer is fully-connected and consists of 512 rectifier units. ",
-      "ctx_after": " The number of valid actions varied between 4 and 18 on the games we considered. Training details. We performed experiments on 49 Atari 2600 games where results"
-    },
-    {
-      "pt": "influences",
-      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
-      "boundary": "",
-      "nodes": [
-        [
-          "source",
-          "life counter"
-        ],
-        [
-          "target",
-          "number of lives left in the game"
-        ],
-        [
-          "output",
-          "end of an episode"
-        ]
-      ],
-      "ev": "For games where there is a life counter, the Atari 2600 emulator also sends the number of lives left in the game, which is then used to mark the end of an episode during training.",
-      "ctx_before": "ate across multiple games. At the same time, it could affect the performance of our agent since it cannot differentiate between rewards of different magnitude. ",
-      "ctx_after": " In these experiments, we used the RMSProp (see http://www.cs.toronto.edu/ ,tijmen/csc321/slides/lecture\\_slides\\_lec6.pdf ) algorithm with minibatches of size "
-    },
-    {
-      "pt": "influences",
-      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
-      "boundary": "",
-      "nodes": [
-        [
-          "source",
-          "behaviour policy"
-        ],
-        [
-          "target",
-          "e"
-        ],
-        [
-          "output",
-          "1.0 to 0.1"
-        ],
-        [
-          "condition",
-          "first million frames"
-        ]
-      ],
-      "ev": "The behaviour policy during training was e-greedy with e annealed linearly from 1.0 to 0.1 over the first million frames, and fixed at 0.1 thereafter.",
-      "ctx_before": "these experiments, we used the RMSProp (see http://www.cs.toronto.edu/ ,tijmen/csc321/slides/lecture\\_slides\\_lec6.pdf ) algorithm with minibatches of size 32. ",
-      "ctx_after": " We trained for a total of 50 million frames (that is, around 38 days of game experience in total) and used a replay memory of 1 million most recent frames. Fol"
-    },
-    {
-      "pt": "influences",
-      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
-      "boundary": "",
-      "nodes": [
-        [
-          "source",
-          "simple frame-skipping technique"
-        ],
-        [
-          "target",
-          "simple frame-skipping technique"
-        ],
-        [
-          "output",
-          "k"
-        ]
-      ],
-      "ev": "More precisely, the agent sees and selects actions on every kth frame instead of every frame, and its last action is repeated on skipped frames.",
-      "ctx_before": "ed a replay memory of 1 million most recent frames. Following previous approaches to playing Atari 2600 games, we also use a simple frame-skipping technique15. ",
-      "ctx_after": " Because running the emulator forward for one step requires much less computation than having the agent select an action, this technique allows the agent to pla"
-    },
-    {
-      "pt": "influences",
-      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
-      "boundary": "",
-      "nodes": [
-        [
-          "source",
-          "values of all the hyperparameters and optimization parameters"
-        ],
-        [
-          "target",
-          "informal search"
-        ],
-        [
-          "output",
-          "games Pong, Breakout, Seaquest, Space Invaders and Beam Rider"
-        ]
-      ],
-      "ev": "The values of all the hyperparameters and optimization parameters were selected by performing an informal search on the games Pong, Breakout, Seaquest, Space Invaders and Beam Rider.",
-      "ctx_before": "elect an action, this technique allows the agent to play roughly k times more games without significantly increasing the runtime. We use $k = 4$ for all games. ",
-      "ctx_after": " We did not perform a systematic grid search owing to the high computational cost. These parameters were then held fixed across all other games. The values and "
-    },
-    {
-      "pt": "influences",
-      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
-      "boundary": "",
-      "nodes": [
-        [
-          "source",
-          "visual images"
-        ],
-        [
-          "target",
-          "convolutional deep network"
-        ]
-      ],
-      "ev": "Our experimental setup amounts to using the following minimal prior knowledge: that the input data consisted of visual images (motivating our use of a convolutional deep network), the game-specific score (with no modification), number of actions, although not their correspondences (for example, specification of the up ‘button’) and the life count.",
-      "ctx_before": "l cost. These parameters were then held fixed across all other games. The values and descriptions of all hyperparameters are provided in Extended Data Table 1. ",
-      "ctx_after": " Evaluation procedure. The trained agents were evaluated by playing each game 30 times for up to 5 min each time with different initial random conditions (‘noop"
-    },
-    {
-      "pt": "outperforms_on",
-      "desc": "[NEW] method A outperforms method B on task/benchmark T, measured by metric M",
-      "boundary": "quantitative comparison result between two methods on a shared task with a metric; NOT claim_relation (discourse-level supports/contrasts), NOT improves (building-on, no numbers)",
-      "nodes": [
-        [
-          "winner",
-          "DQN"
-        ],
-        [
-          "loser",
-          "expert human"
-        ],
-        [
-          "task",
-          "six games (Boxing, Breakout, Crazy Climber, Demon Attack, Krull and Robotank)"
-        ],
-        [
-          "metric",
-          "normalized DQN performance"
-        ]
-      ],
-      "ev": "This had a minimal effect: changing the normalized DQN performance by more than 5% in only six games (Boxing, Breakout, Crazy Climber, Demon Attack, Krull and Robotank), and in all these games DQN outperformed the expert human by a considerable margin.",
-      "ctx_before": "urious baseline scores in a handful of the games. We did also assess the performance of a random agent that selected an action at 60 Hz (that is, every frame). ",
-      "ctx_after": " The professional human tester used the same emulator engine as the agents, and played under controlled conditions. The human tester was not allowed to pause, s"
-    },
-    {
-      "pt": "influences",
-      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
-      "boundary": "",
-      "nodes": [
-        [
-          "source",
-          "agent"
-        ],
-        [
-          "target",
-          "environment"
-        ],
-        [
-          "output",
-          "sequence of actions, observations and rewards"
-        ]
-      ],
-      "ev": "We consider tasks in which an agent interacts with an environment, in this case the Atari emulator, in a sequence of actions, observations and rewards.",
-      "ctx_before": "he average reward achieved from around 20 episodes of each game lasting a maximum of 5 min each, following around 2 h of practice playing each game. Algorithm. ",
-      "ctx_after": " At each time-step the agent selects an action at from the set of legal game actions, $\\mathcal { A } = \\left\\{ 1 , \\ldots , K \\right\\}$ . The action is passed "
-    },
-    {
-      "pt": "influences",
-      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
-      "boundary": "",
-      "nodes": [
-        [
-          "source",
-          "action at"
-        ],
-        [
-          "target",
-          "emulator"
-        ],
-        [
-          "output",
-          "internal state"
-        ],
-        [
-          "cause",
-          "game score"
-        ]
-      ],
-      "ev": "The action is passed to the emulator and modifies its internal state and the game score.",
-      "ctx_before": "rvations and rewards. At each time-step the agent selects an action at from the set of legal game actions, $\\mathcal { A } = \\left\\{ 1 , \\ldots , K \\right\\}$ . ",
-      "ctx_after": " In general the environment may be stochastic. The emulator’s internal state is not observed by the agent; instead the agent observes an image $x _ { t } \\in \\m"
-    },
-    {
-      "pt": "compares",
-      "desc": "X is compared with Y",
-      "boundary": "A and B are PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions). NOT improves (neither fixes the other), NOT extends (neither generalizes).",
-      "nodes": [
-        [
-          "from",
-          "linear function approximator"
-        ],
-        [
-          "to",
-          "nonlinear function approximator"
-        ]
-      ],
-      "ev": "In the reinforcement learning community this is typically a linear function approximator, but sometimes a nonlinear function approximator is used instead",
-      "ctx_before": "alization. Instead, it is common to use a function approximator to estimate the action-value function, $Q ( s , a ; \\theta ) { \\approx } Q ^ { * } ( s , a )$ . ",
-      "ctx_after": ", such as a neural network. We refer to a neural network function approximator with weights h as a Q-network. A Q-network can be trained by adjusting the parame"
-    },
-    {
       "pt": "defines",
       "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
       "boundary": "",
       "nodes": [
         [
           "subject",
-          "DQN"
-        ],
-        [
-          "object",
-          "neural network function approximator with weights h"
-        ]
-      ],
-      "ev": "We refer to a neural network function approximator with weights h as a Q-network",
-      "ctx_before": "learning community this is typically a linear function approximator, but sometimes a nonlinear function approximator is used instead, such as a neural network. ",
-      "ctx_after": ". A Q-network can be trained by adjusting the parameters hi at iteration i to reduce the mean-squared error in the Bellman equation, where the optimal target va"
-    },
-    {
-      "pt": "extends",
-      "desc": "X generalizes/extends Y (X METHOD/PHENOMENON -> Y)",
-      "boundary": "X GENERALIZES Y (X extends Y's scope/regime/params; X is a direct technical extension of Y). NOT improves (X need not be more accurate, just broader), NOT background (X is a direct technical inheritance, not a motivation citation), NOT claim_relation (this is method-to-method).",
-      "nodes": [
-        [
-          "from",
-          "Q-learning algorithm"
-        ],
-        [
-          "to",
-          "this framework"
-        ]
-      ],
-      "ev": "The familiar Q-learning algorithm19 can be recovered in this framework",
-      "ctx_before": "than computing the full expectations in the above gradient, it is often computationally expedient to optimize the loss function by stochastic gradient descent. ",
-      "ctx_after": " by updating the weights after every time step, replacing the expectations using single samples, and setting $\\theta _ { i } ^ { - } = \\theta _ { i - 1 }$ . Not"
-    },
-    {
-      "pt": "defines",
-      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
-      "boundary": "",
-      "nodes": [
-        [
-          "subject",
-          "model-free"
-        ],
-        [
-          "object",
-          "Q-learning algorithm"
-        ]
-      ],
-      "ev": "Note that this algorithm is model-free",
-      "ctx_before": "ork by updating the weights after every time step, replacing the expectations using single samples, and setting $\\theta _ { i } ^ { - } = \\theta _ { i - 1 }$ . ",
-      "ctx_after": ": it solves the reinforcement learning task directly using samples from the emulator, without explicitly estimating the reward and transition dynamics $P ( r , "
-    },
-    {
-      "pt": "influences",
-      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
-      "boundary": "",
-      "nodes": [
-        [
-          "source",
-          "deep Q-learning with experience replay"
-        ],
-        [
-          "target",
-          "behaviour distribution"
-        ]
-      ],
-      "ev": "By using experience replay the behaviour distribution is averaged over many of its previous states",
-      "ctx_before": "how unwanted feedback loops may arise and the parameters could get stuck in a poor local minimum, or even diverge catastrophica $\\mathrm { l y } ^ { 2 0 } .$ . ",
-      "ctx_after": ", smoothing out learning and avoiding oscillations or divergence in the parameters. Note that when learning by experience replay, it is necessary to learn off-p"
-    },
-    {
-      "pt": "draws_on",
-      "desc": "X draws on / is inspired by / leverages Y as a source of evidence or theoretical foundation",
-      "boundary": "Applies when X explicitly cites or relies on Y as its source or foundation, not when X merely mentions, evaluates, or co-occurs with Y.",
-      "nodes": [
-        [
-          "from",
-          "Q-learning algorithm"
-        ],
-        [
-          "to",
-          "prioritized sweeping"
-        ]
-      ],
-      "ev": "similar to prioritized sweeping30",
-      "ctx_before": " equal importance to all transitions in the replay memory. A more sophisticated sampling strategy might emphasize transitions from which we can learn the most, ",
-      "ctx_after": ". The second modification to online Q-learning aimed at further improving the stability of our method with neural networks is to use a separate network for gene"
-    },
-    {
-      "pt": "defines",
-      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
-      "boundary": "",
-      "nodes": [
-        [
-          "subject",
-          "target network"
-        ],
-        [
-          "object",
-          "network Q"
-        ]
-      ],
-      "ev": "every C updates we clone the network Q to obtain a target network Q^",
-      "ctx_before": "improving the stability of our method with neural networks is to use a separate network for generating the targets yj in the Q-learning update. More precisely, ",
-      "ctx_after": " and use $\\hat { \\boldsymbol { Q } }$ for generating the Q-learning targets yj for the following C updates to Q. This modification makes the algorithm more stab"
-    },
-    {
-      "pt": "constitutive_law",
-      "desc": "a quantitative/formal relation (output computed from inputs + parameters): loss, score formula, scaling law",
-      "boundary": "",
-      "nodes": [
-        [
-          "output",
-          "clipping the squared error to be between 21 and 1"
-        ],
-        [
-          "input",
-          "absolute value loss function"
-        ],
-        [
-          "parameter",
           "squared error"
+        ],
+        [
+          "object",
+          "absolute value loss function"
         ]
       ],
-      "ev": "Because the absolute value loss function jxj has a derivative of 21 for all negative values of x and a derivative of 1 for all positive values of x, clipping the squared error to be between 21 and 1 corresponds to using an absolute value loss function for errors outside of the $( - 1 , 1 )$ interval.",
-      "ctx_before": " update $r + \\gamma$ maxa0 $Q$ $\\left( s ^ { \\prime } , a ^ { \\prime } ; \\theta _ { i } ^ { - } \\right) - Q ( s , a ; \\theta _ { i } )$ to be between 21 and 1. ",
-      "ctx_after": " This form of error clipping further improved the stability of the algorithm. Algorithm 1: deep Q-learning with experience replay. Initialize replay memory D to"
+      "ev": "clipping the squared error to be between 21 and 1 corresponds to using an absolute value loss function for errors outside of the $( - 1 , 1 )$ interval",
+      "ctx_before": " 21 and 1. Because the absolute value loss function jxj has a derivative of 21 for all negative values of x and a derivative of 1 for all positive values of x, ",
+      "ctx_after": ". This form of error clipping further improved the stability of the algorithm. Algorithm 1: deep Q-learning with experience replay. Initialize replay memory D t"
     },
     {
       "pt": "improves",
@@ -1094,38 +888,16 @@
       "nodes": [
         [
           "from",
-          "clipping the squared error to be between 21 and 1"
+          "absolute value loss function"
         ],
         [
           "to",
-          "the algorithm"
+          "algorithm"
         ]
       ],
-      "ev": "This form of error clipping further improved the stability of the algorithm.",
+      "ev": "This form of error clipping further improved the stability of the algorithm",
       "ctx_before": " of x, clipping the squared error to be between 21 and 1 corresponds to using an absolute value loss function for errors outside of the $( - 1 , 1 )$ interval. ",
-      "ctx_after": " Algorithm 1: deep Q-learning with experience replay. Initialize replay memory D to capacity N Initialize action-value function Q with random weights h Initiali"
-    },
-    {
-      "pt": "defines",
-      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
-      "boundary": "",
-      "nodes": [
-        [
-          "subject",
-          "deep Q-learning with experience replay"
-        ],
-        [
-          "definition",
-          "replay memory D"
-        ],
-        [
-          "object",
-          "action-value function Q"
-        ]
-      ],
-      "ev": "Algorithm 1: deep Q-learning with experience replay. Initialize replay memory D to capacity N Initialize action-value function Q with random weights h Initialize target action-value function $\\hat { \\boldsymbol Q }$ with weights $\\theta ^ { - } = \\theta$",
-      "ctx_before": " an absolute value loss function for errors outside of the $( - 1 , 1 )$ interval. This form of error clipping further improved the stability of the algorithm. ",
-      "ctx_after": " For episode 5 1, M do Initialize sequence $s _ { 1 } = \\{ x _ { 1 } \\}$ and preprocessed sequence $\\phi _ { 1 } = \\phi ( s _ { 1 } )$ For $t = 1 , \\mathrm { T "
+      "ctx_after": ". Algorithm 1: deep Q-learning with experience replay. Initialize replay memory D to capacity N Initialize action-value function Q with random weights h Initial"
     },
     {
       "pt": "composed_of",
@@ -1134,7 +906,7 @@
       "nodes": [
         [
           "whole",
-          "deep Q-learning with experience replay"
+          "replay algorithm"
         ],
         [
           "component",
@@ -1146,7 +918,7 @@
         ],
         [
           "component",
-          "target action-value function $\\hat { \\boldsymbol Q }$"
+          "target action-value function"
         ]
       ],
       "ev": "Algorithm 1: deep Q-learning with experience replay. Initialize replay memory D to capacity N Initialize action-value function Q with random weights h Initialize target action-value function $\\hat { \\boldsymbol Q }$ with weights $\\theta ^ { - } = \\theta$",
@@ -1154,71 +926,17 @@
       "ctx_after": " For episode 5 1, M do Initialize sequence $s _ { 1 } = \\{ x _ { 1 } \\}$ and preprocessed sequence $\\phi _ { 1 } = \\phi ( s _ { 1 } )$ For $t = 1 , \\mathrm { T "
     },
     {
-      "pt": "defines",
-      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "pt": "influences",
+      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
       "boundary": "",
       "nodes": [
         [
-          "subject",
-          "action-value function Q"
+          "source",
+          "random action"
         ],
         [
-          "definition",
-          "random weights h"
-        ]
-      ],
-      "ev": "Initialize action-value function Q with random weights h",
-      "ctx_before": "f error clipping further improved the stability of the algorithm. Algorithm 1: deep Q-learning with experience replay. Initialize replay memory D to capacity N ",
-      "ctx_after": " Initialize target action-value function $\\hat { \\boldsymbol Q }$ with weights $\\theta ^ { - } = \\theta$ For episode 5 1, M do Initialize sequence $s _ { 1 } = "
-    },
-    {
-      "pt": "defines",
-      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
-      "boundary": "",
-      "nodes": [
-        [
-          "subject",
-          "target action-value function $\\hat { \\boldsymbol Q }$"
-        ],
-        [
-          "definition",
-          "weights $\\theta ^ { - } = \\theta$"
-        ]
-      ],
-      "ev": "Initialize target action-value function $\\hat { \\boldsymbol Q }$ with weights $\\theta ^ { - } = \\theta$",
-      "ctx_before": "gorithm. Algorithm 1: deep Q-learning with experience replay. Initialize replay memory D to capacity N Initialize action-value function Q with random weights h ",
-      "ctx_after": " For episode 5 1, M do Initialize sequence $s _ { 1 } = \\{ x _ { 1 } \\}$ and preprocessed sequence $\\phi _ { 1 } = \\phi ( s _ { 1 } )$ For $t = 1 , \\mathrm { T "
-    },
-    {
-      "pt": "defines",
-      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
-      "boundary": "",
-      "nodes": [
-        [
-          "subject",
-          "sequence $s _ { 1 } = \\{ x _ { 1 } \\}$"
-        ],
-        [
-          "definition",
-          "preprocessed sequence $\\phi _ { 1 } = \\phi ( s _ { 1 } )$"
-        ]
-      ],
-      "ev": "Initialize sequence $s _ { 1 } = \\{ x _ { 1 } \\}$ and preprocessed sequence $\\phi _ { 1 } = \\phi ( s _ { 1 } )$",
-      "ctx_before": " function Q with random weights h Initialize target action-value function $\\hat { \\boldsymbol Q }$ with weights $\\theta ^ { - } = \\theta$ For episode 5 1, M do ",
-      "ctx_after": " For $t = 1 , \\mathrm { T }$ do With probability e select a random action $a _ { t }$ otherwise select $a _ { t } = \\operatorname { a r g m a x } _ { a } Q ( \\p"
-    },
-    {
-      "pt": "defines",
-      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
-      "boundary": "",
-      "nodes": [
-        [
-          "subject",
-          "random action $a _ { t }$"
-        ],
-        [
-          "definition",
-          "$a _ { t } = \\operatorname { a r g m a x } _ { a } Q ( \\phi ( s _ { t } ) , a ; \\theta )$"
+          "target",
+          "action"
         ]
       ],
       "ev": "With probability e select a random action $a _ { t }$ otherwise select $a _ { t } = \\operatorname { a r g m a x } _ { a } Q ( \\phi ( s _ { t } ) , a ; \\theta )$",
@@ -1226,21 +944,25 @@
       "ctx_after": " Execute action at in emulator and observe reward rt and image $x _ { t + 1 }$ Set $s _ { t + 1 } = s _ { t } , a _ { t } , x _ { t + 1 }$ 1 and preprocess $\\ph"
     },
     {
-      "pt": "defines",
-      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "pt": "influences",
+      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
       "boundary": "",
       "nodes": [
         [
-          "subject",
-          "action at"
+          "source",
+          "action"
         ],
         [
-          "definition",
+          "target",
+          "emulator"
+        ],
+        [
+          "output",
           "reward rt"
         ],
         [
-          "object",
-          "image $x _ { t + 1 }$"
+          "output",
+          "image"
         ]
       ],
       "ev": "Execute action at in emulator and observe reward rt and image $x _ { t + 1 }$",
@@ -1248,124 +970,102 @@
       "ctx_after": " Set $s _ { t + 1 } = s _ { t } , a _ { t } , x _ { t + 1 }$ 1 and preprocess $\\phi _ { t + 1 } = \\phi ( s _ { t + 1 } )$ Store transition $\\left( \\phi _ { t } "
     },
     {
-      "pt": "defines",
-      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "pt": "influences",
+      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
       "boundary": "",
       "nodes": [
         [
-          "subject",
-          "$s _ { t + 1 } = s _ { t } , a _ { t } , x _ { t + 1 }$"
+          "source",
+          "sequence"
         ],
         [
-          "definition",
-          "$\\phi _ { t + 1 } = \\phi ( s _ { t + 1 } )$"
+          "target",
+          "transition"
         ]
       ],
-      "ev": "Set $s _ { t + 1 } = s _ { t } , a _ { t } , x _ { t + 1 }$ 1 and preprocess $\\phi _ { t + 1 } = \\phi ( s _ { t + 1 } )$",
+      "ev": "Set $s _ { t + 1 } = s _ { t } , a _ { t } , x _ { t + 1 }$ 1 and preprocess $\\phi _ { t + 1 } = \\phi ( s _ { t + 1 } )$ Store transition $\\left( \\phi _ { t } , a _ { t } , r _ { t } , \\phi _ { t + 1 } \\right)$ in D",
       "ctx_before": " } = \\operatorname { a r g m a x } _ { a } Q ( \\phi ( s _ { t } ) , a ; \\theta )$ Execute action at in emulator and observe reward rt and image $x _ { t + 1 }$ ",
-      "ctx_after": " Store transition $\\left( \\phi _ { t } , a _ { t } , r _ { t } , \\phi _ { t + 1 } \\right)$ in D t t 1Sample random minibatch of transitions $\\left( \\phi _ { j }"
-    },
-    {
-      "pt": "composed_of",
-      "desc": "one whole (model/pipeline/system) is composed-of / part-of >=1 component (n-ary)",
-      "boundary": "",
-      "nodes": [
-        [
-          "whole",
-          "transition $\\left( \\phi _ { t } , a _ { t } , r _ { t } , \\phi _ { t + 1 } \\right)$"
-        ],
-        [
-          "component",
-          "D"
-        ]
-      ],
-      "ev": "Store transition $\\left( \\phi _ { t } , a _ { t } , r _ { t } , \\phi _ { t + 1 } \\right)$ in D",
-      "ctx_before": "ve reward rt and image $x _ { t + 1 }$ Set $s _ { t + 1 } = s _ { t } , a _ { t } , x _ { t + 1 }$ 1 and preprocess $\\phi _ { t + 1 } = \\phi ( s _ { t + 1 } )$ ",
       "ctx_after": " t t 1Sample random minibatch of transitions $\\left( \\phi _ { j } , a _ { j } , r _ { j } , \\phi _ { j + 1 } \\right)$ from D $\\mathrm { S e t } y _ { j } = \\lef"
     },
     {
-      "pt": "composed_of",
-      "desc": "one whole (model/pipeline/system) is composed-of / part-of >=1 component (n-ary)",
+      "pt": "influences",
+      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
       "boundary": "",
       "nodes": [
         [
-          "whole",
-          "minibatch of transitions $\\left( \\phi _ { j } , a _ { j } , r _ { j } , \\phi _ { j + 1 } \\right)$"
+          "source",
+          "minibatch of transitions"
         ],
         [
-          "component",
-          "D"
+          "target",
+          "gradient descent step"
+        ],
+        [
+          "output",
+          "network parameters h"
         ]
       ],
-      "ev": "Sample random minibatch of transitions $\\left( \\phi _ { j } , a _ { j } , r _ { j } , \\phi _ { j + 1 } \\right)$ from D",
+      "ev": "Sample random minibatch of transitions $\\left( \\phi _ { j } , a _ { j } , r _ { j } , \\phi _ { j + 1 } \\right)$ from D $\\mathrm { S e t } y _ { j } = \\left\\{ \\begin{array} { c } { r _ { j } } \\\\ { r _ { j } + \\gamma \\operatorname* { m a x } _ { a ^ { \\prime } } \\hat { Q } \\Big ( \\phi _ { j + 1 } , a ^ { \\prime } ; \\theta ^ { - } \\Big ) } \\end{array} \\right.$ if episode terminates at step jz1otherwise otherwise Perform a gradient descent step on $\\left( y _ { j } - Q \\big ( \\phi _ { j } , a _ { j } ; \\theta \\big ) \\right) ^ { 2 }$ with respect to the network parameters h",
       "ctx_before": " and preprocess $\\phi _ { t + 1 } = \\phi ( s _ { t + 1 } )$ Store transition $\\left( \\phi _ { t } , a _ { t } , r _ { t } , \\phi _ { t + 1 } \\right)$ in D t t 1",
-      "ctx_after": " $\\mathrm { S e t } y _ { j } = \\left\\{ \\begin{array} { c } { r _ { j } } \\\\ { r _ { j } + \\gamma \\operatorname* { m a x } _ { a ^ { \\prime } } \\hat { Q } \\Big "
-    },
-    {
-      "pt": "constitutive_law",
-      "desc": "a quantitative/formal relation (output computed from inputs + parameters): loss, score formula, scaling law",
-      "boundary": "",
-      "nodes": [
-        [
-          "output",
-          "$y _ { j } = \\left\\{ \\begin{array} { c } { r _ { j } } \\\\ { r _ { j } + \\gamma \\operatorname* { m a x } _ { a ^ { \\prime } } \\hat { Q } \\Big ( \\phi _ { j + 1 } , a ^ { \\prime } ; \\theta ^ { - } \\Big ) } \\end{array} \\right.$"
-        ],
-        [
-          "input",
-          "reward rt"
-        ],
-        [
-          "parameter",
-          "image $x _ { t + 1 }$"
-        ]
-      ],
-      "ev": "$\\mathrm { S e t } y _ { j } = \\left\\{ \\begin{array} { c } { r _ { j } } \\\\ { r _ { j } + \\gamma \\operatorname* { m a x } _ { a ^ { \\prime } } \\hat { Q } \\Big ( \\phi _ { j + 1 } , a ^ { \\prime } ; \\theta ^ { - } \\Big ) } \\end{array} \\right.$",
-      "ctx_before": " } , \\phi _ { t + 1 } \\right)$ in D t t 1Sample random minibatch of transitions $\\left( \\phi _ { j } , a _ { j } , r _ { j } , \\phi _ { j + 1 } \\right)$ from D ",
-      "ctx_after": " if episode terminates at step jz1otherwise otherwise Perform a gradient descent step on $\\left( y _ { j } - Q \\big ( \\phi _ { j } , a _ { j } ; \\theta \\big ) \\"
-    },
-    {
-      "pt": "constitutive_law",
-      "desc": "a quantitative/formal relation (output computed from inputs + parameters): loss, score formula, scaling law",
-      "boundary": "",
-      "nodes": [
-        [
-          "output",
-          "gradient descent step on $\\left( y _ { j } - Q \\big ( \\phi _ { j } , a _ { j } ; \\theta \\big ) \\right) ^ { 2 }$"
-        ],
-        [
-          "input",
-          "$y _ { j } = \\left\\{ \\begin{array} { c } { r _ { j } } \\\\ { r _ { j } + \\gamma \\operatorname* { m a x } _ { a ^ { \\prime } } \\hat { Q } \\Big ( \\phi _ { j + 1 } , a ^ { \\prime } ; \\theta ^ { - } \\Big ) } \\end{array} \\right.$"
-        ],
-        [
-          "parameter",
-          "action-value function Q"
-        ],
-        [
-          "coefficient",
-          "random weights h"
-        ]
-      ],
-      "ev": "Perform a gradient descent step on $\\left( y _ { j } - Q \\big ( \\phi _ { j } , a _ { j } ; \\theta \\big ) \\right) ^ { 2 }$ with respect to the network parameters h",
-      "ctx_before": "ime } } \\hat { Q } \\Big ( \\phi _ { j + 1 } , a ^ { \\prime } ; \\theta ^ { - } \\Big ) } \\end{array} \\right.$ if episode terminates at step jz1otherwise otherwise ",
       "ctx_after": " Every C steps reset $\\scriptstyle { \\hat { Q } } = Q$"
     },
     {
-      "pt": "defines",
-      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "pt": "influences",
+      "desc": "one concept/quantity influences / depends on / improves another (n-ary)",
       "boundary": "",
       "nodes": [
         [
-          "subject",
-          "target action-value function $\\hat { \\boldsymbol Q }$"
+          "source",
+          "C steps"
         ],
         [
-          "definition",
-          "action-value function Q"
+          "target",
+          "target action-value function"
         ]
       ],
       "ev": "Every C steps reset $\\scriptstyle { \\hat { Q } } = Q$",
       "ctx_before": "form a gradient descent step on $\\left( y _ { j } - Q \\big ( \\phi _ { j } , a _ { j } ; \\theta \\big ) \\right) ^ { 2 }$ with respect to the network parameters h ",
       "ctx_after": ""
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "",
+      "nodes": [
+        [
+          "subject",
+          "DQN"
+        ],
+        [
+          "object",
+          "neural network"
+        ]
+      ],
+      "ev": "We refer to a neural network function approximator with weights h as a Q-network",
+      "ctx_before": "learning community this is typically a linear function approximator, but sometimes a nonlinear function approximator is used instead, such as a neural network. ",
+      "ctx_after": ". A Q-network can be trained by adjusting the parameters hi at iteration i to reduce the mean-squared error in the Bellman equation, where the optimal target va"
+    },
+    {
+      "pt": "composed_of",
+      "desc": "one whole (model/pipeline/system) is composed-of / part-of >=1 component (n-ary)",
+      "boundary": "",
+      "nodes": [
+        [
+          "whole",
+          "deep Q-networks"
+        ],
+        [
+          "component",
+          "replay algorithm"
+        ],
+        [
+          "component",
+          "target network"
+        ]
+      ],
+      "ev": "The full algorithm for training deep Q-networks is presented in Algorithm 1. The agent selects and executes actions according to an e-greedy policy based on Q. Because using histories of arbitrary length as inputs to a neural network can be difficult, our Q-function instead works on a fixed length representation of histories produced by the function w described above. The algorithm modifies standard online Q-learning in two ways to make it suitable for training large neural networks without diverging. First, we use a technique known as experience replay23 in which we store the agent’s experiences at each time-step, e_t = (s_t, a_t, r_t, s_{t+1}), in a data set D_t = {e_1, ..., e_t}, pooled over many episodes (where the end of an episode occurs when a terminal state is reached) into a replay memory. During the inner loop of the algorithm, we apply Q-learning updates, or minibatch updates, to samples of experience, (s, a, r, s') ~ U(D), drawn at random from the pool of stored samples. This approach has several advantages over standard online Q-learning. First, each step of experience is potentially used in many weight updates, which allows for greater data efficiency. Second, learnin",
+      "ctx_before": "olicy that follows the greedy policy with probability $1 - \\varepsilon$ and selects a random action with probability e. Training algorithm for deep Q-networks. ",
+      "ctx_after": "the time the update affects the targets $\\gamma _ { j } ,$ making divergence or oscillations much more unlikely. We also found it helpful to clip the error term"
     }
   ],
   "glm": [
@@ -1374,27 +1074,27 @@
       "pt": "claim_relation",
       "pass": false,
       "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The evidence states a limitation rather than a discourse relation between claims/findings/approaches, and the nodes repr"
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence makes a single claim about a challenge rather than stating a discourse relation between two or more distinc"
     },
     {
       "i": 1,
       "pt": "outperforms_on",
-      "pass": false,
+      "pass": true,
       "evidence_support": true,
-      "slot_binding": false,
+      "slot_binding": true,
       "polarity_ok": true,
-      "reason": "The 'loser' node is a broad category ('best existing reinforcement learning methods') rather than a specifically named m"
+      "reason": "The sentence explicitly states DQN outperforms reinforcement learning methods on 43 games with correct polarity and fait"
     },
     {
       "i": 2,
       "pt": "compares",
-      "pass": false,
-      "evidence_support": false,
+      "pass": true,
+      "evidence_support": true,
       "slot_binding": true,
       "polarity_ok": true,
-      "reason": "A human tester is not a parallel different-mechanism alternative to DQN, violating the pattern boundary for 'compares'."
+      "reason": "The evidence explicitly states DQN performed at a level 'comparable to' a professional human games tester, perfectly mat"
     },
     {
       "i": 3,
@@ -1403,7 +1103,7 @@
       "evidence_support": true,
       "slot_binding": true,
       "polarity_ok": true,
-      "reason": "The evidence explicitly states that disabling the replay memory component of the DQN agent results in detrimental effect"
+      "reason": "The text explicitly states disabling the replay memory of the DQN agent demonstrates detrimental effects on performance,"
     },
     {
       "i": 4,
@@ -1421,7 +1121,7 @@
       "evidence_support": true,
       "slot_binding": true,
       "polarity_ok": true,
-      "reason": "The evidence explicitly states that disabling the deep convolutional network architecture component of the DQN agent res"
+      "reason": "The text explicitly states disabling the deep convolutional network architecture of the DQN agent demonstrates detriment"
     },
     {
       "i": 6,
@@ -1430,88 +1130,88 @@
       "evidence_support": false,
       "slot_binding": true,
       "polarity_ok": true,
-      "reason": "The evidence states that t-SNE maps the DQN representation for visualization, not that it measures or evaluates it."
+      "reason": "The evidence describes t-SNE mapping representations for visualization, not measuring or evaluating them."
     },
     {
       "i": 7,
       "pt": "extends",
       "pass": false,
-      "evidence_support": true,
+      "evidence_support": false,
       "slot_binding": false,
       "polarity_ok": false,
-      "reason": "Data is not a method or phenomenon that can be technically extended by a representation."
+      "reason": "The sentence states representations generalize 'to' a target data domain, not that the representations 'extend' the data"
     },
     {
       "i": 8,
       "pt": "composed_of",
       "pass": false,
       "evidence_support": false,
-      "slot_binding": false,
+      "slot_binding": true,
       "polarity_ok": true,
-      "reason": "The evidence mentions 'deep neural networks' and 'end-to-end reinforcement learning', but does not state that DQN is com"
+      "reason": "The text states that deep neural networks were used to develop the DQN and that the agent learns using reinforcement lea"
     },
     {
       "i": 9,
-      "pt": "measures",
-      "pass": true,
+      "pt": "outperforms_on",
+      "pass": false,
       "evidence_support": true,
-      "slot_binding": true,
+      "slot_binding": false,
       "polarity_ok": true,
-      "reason": "The text explicitly states the Atari 2600 platform was used to evaluate the DQN agent, correctly mapping DQN to the eval"
+      "reason": "The text states 'game score' is an input to the agent, not the metric used to measure the comparison."
     },
     {
       "i": 10,
       "pt": "composed_of",
       "pass": false,
-      "evidence_support": false,
+      "evidence_support": true,
       "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The evidence text describes the update mechanism of the target network and Q-network but does not explicitly state that "
+      "polarity_ok": true,
+      "reason": "The evidence text specifies 'deep convolutional network' as the whole, not the broader 'deep neural networks' extracted "
     },
     {
       "i": 11,
       "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The text states the filters mimic the effects of receptive fields, not that the filters influence the receptive fields."
+    },
+    {
+      "i": 12,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text states the network is used to 'approximate' the function, which does not equate to 'influencing' it."
+    },
+    {
+      "i": 13,
+      "pt": "composed_of",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The evidence text describes the update mechanism of the target network parameters but never explicitly states that DQN i"
+    },
+    {
+      "i": 14,
+      "pt": "measures",
       "pass": true,
       "evidence_support": true,
       "slot_binding": true,
       "polarity_ok": true,
-      "reason": "The text explicitly states that a deep convolutional neural network is used to approximate the optimal action-value func"
+      "reason": "The sentence explicitly states that the Atari 2600 platform is used to evaluate the DQN agent, correctly matching the 'm"
     },
     {
-      "i": 12,
-      "pt": "background",
+      "i": 15,
+      "pt": "compares",
       "pass": false,
       "evidence_support": false,
       "slot_binding": false,
       "polarity_ok": false,
-      "reason": "The evidence states that 'This principle' (referring to the proposed DQN method) draws on neurobiological evidence, not "
-    },
-    {
-      "i": 13,
-      "pt": "influences",
-      "pass": true,
-      "evidence_support": true,
-      "slot_binding": true,
-      "polarity_ok": true,
-      "reason": "The text explicitly states that reward is used to shape representations, correctly mapping the source and target roles w"
-    },
-    {
-      "i": 14,
-      "pt": "influences",
-      "pass": false,
-      "evidence_support": true,
-      "slot_binding": true,
-      "polarity_ok": false,
-      "reason": "The polarity is reversed because the text states the game score depends on the sequence, meaning the sequence influences"
-    },
-    {
-      "i": 15,
-      "pt": "influences",
-      "pass": false,
-      "evidence_support": true,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The text states game strategies depend on the sequences, so 'these sequences' should be the source and 'game strategies'"
+      "reason": "The sentence contrasts 'our approach' with 'previous work' (not 'reinforcement learning') and describes an addition rath"
     },
     {
       "i": 16,
@@ -1520,425 +1220,299 @@
       "evidence_support": true,
       "slot_binding": true,
       "polarity_ok": true,
-      "reason": "The phrase 'gives rise to' explicitly states the influence relation, correctly binding the anaphoric source to its resul"
+      "reason": "The evidence explicitly states that reward shapes (influences) representations to facilitate value estimation, correctly"
     },
     {
       "i": 17,
-      "pt": "influences",
-      "pass": false,
-      "evidence_support": false,
+      "pt": "background",
+      "pass": true,
+      "evidence_support": true,
       "slot_binding": true,
-      "polarity_ok": false,
-      "reason": "The evidence states an identity relation ('is'), not an 'influences' relationship."
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states that the reinforcement learning principle draws on neurobiological evidence, correctly ma"
     },
     {
       "i": 18,
-      "pt": "influences",
+      "pt": "claim_relation",
       "pass": false,
       "evidence_support": false,
-      "slot_binding": true,
+      "slot_binding": false,
       "polarity_ok": false,
-      "reason": "The evidence states an identity or definition ('using X as Y'), not an 'influences' relationship."
+      "reason": "The evidence states that one architecture learns policies, not a discourse relation between two separate claims or appro"
     },
     {
       "i": 19,
-      "pt": "influences",
+      "pt": "compares",
       "pass": false,
       "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The sentence states the agent's goal is to interact with the emulator to maximize rewards, not that the 'goal' itself in"
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text states that 'our approach' incorporates an additional feature ('end-to-end' reinforcement learning) lacking in "
     },
     {
       "i": 20,
-      "pt": "influences",
-      "pass": false,
-      "evidence_support": true,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The factor of c influences (discounts) future rewards, so the source and target roles are bound backwards."
-    },
-    {
-      "i": 21,
-      "pt": "influences",
+      "pt": "background",
       "pass": false,
       "evidence_support": false,
       "slot_binding": false,
       "polarity_ok": false,
-      "reason": "The evidence merely states a parameter assignment (c equals 0.99), not an influence relationship between the two nodes."
+      "reason": "The sentence states that the *principle* draws on neurobiological evidence, not that 'reward signals' or 'neurobiologica"
+    },
+    {
+      "i": 21,
+      "pt": "composed_of",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text states that the integration of RL and deep networks depends on a replay algorithm, not that the replay algorith"
     },
     {
       "i": 22,
       "pt": "influences",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The evidence states a definition (the function IS the maximum expected return), not an 'influences' relationship."
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states that timecompressed reactivation provides a mechanism by which value functions are update"
     },
     {
       "i": 23,
-      "pt": "influences",
+      "pt": "background",
       "pass": false,
       "evidence_support": false,
       "slot_binding": false,
       "polarity_ok": false,
-      "reason": "The evidence merely lists the arguments of the Q-function definition, not an influence relationship between the sequence"
+      "reason": "The text states that a phenomenon characterizes hippocampal replay and relates to prioritized sweeping, not that hippoca"
     },
     {
       "i": 24,
-      "pt": "influences",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The evidence is a mathematical definition stating 'p is a policy', not an 'influences' relation, and incorrectly binds '"
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states the image is a vector of pixel values representing the current screen, perfectly matching"
     },
     {
       "i": 25,
-      "pt": "influences",
+      "pt": "defines",
       "pass": false,
-      "evidence_support": false,
+      "evidence_support": true,
       "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The verb 'obeys' does not express an 'influences' relation, and 'important identity' is a generic descriptor rather than"
+      "polarity_ok": true,
+      "reason": "'game score' is merely part of the definition phrase (the object of the preposition 'in'), not the object of the 'define"
     },
     {
       "i": 26,
       "pt": "influences",
       "pass": false,
-      "evidence_support": false,
+      "evidence_support": true,
       "slot_binding": false,
       "polarity_ok": false,
-      "reason": "The text describes a hypothetical condition for the Bellman equation rather than an influence relation, and 'sequence s9"
+      "reason": "The text states the game score depends on the sequence, making the sequence the source of influence and the score the ta"
     },
     {
       "i": 27,
       "pt": "influences",
       "pass": false,
       "evidence_support": false,
-      "slot_binding": true,
-      "polarity_ok": true,
-      "reason": "The text defines the optimal strategy as selecting an action, rather than stating that the strategy influences the actio"
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text states that the reception of feedback depends on time-steps elapsing, so the source and target roles are revers"
     },
     {
       "i": 28,
-      "pt": "composed_of",
-      "pass": true,
-      "evidence_support": true,
-      "slot_binding": true,
-      "polarity_ok": true,
-      "reason": "The evidence explicitly enumerates the two specific actions as the 'First' and 'Second' parts of the 'preprocessing step"
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence states a causal relationship (the task is partially observed *because* of the current screen), not a defini"
     },
     {
       "i": 29,
-      "pt": "composed_of",
+      "pt": "defines",
       "pass": false,
       "evidence_support": true,
       "slot_binding": false,
       "polarity_ok": true,
-      "reason": "The function w processes the frames to produce the input, rather than being composed of them."
+      "reason": "'current screen xt' is merely a component of the parenthetical explanation of the definition, not the object being defin"
     },
     {
       "i": 30,
-      "pt": "composed_of",
+      "pt": "influences",
       "pass": false,
-      "evidence_support": true,
-      "slot_binding": false,
-      "polarity_ok": true,
-      "reason": "The input consists of the image, not the function w, which is the producer of the image rather than a component of the i"
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The evidence explicitly states it is impossible to understand the source from the target, negating a positive 'influence"
     },
     {
       "i": 31,
-      "pt": "composed_of",
+      "pt": "influences",
       "pass": true,
       "evidence_support": true,
       "slot_binding": true,
       "polarity_ok": true,
-      "reason": "The evidence explicitly states the first hidden layer convolves the specified filters and applies the rectifier nonlinea"
+      "reason": "The evidence explicitly states that sequences of actions and observations are input to the algorithm, correctly binding "
     },
     {
       "i": 32,
-      "pt": "composed_of",
+      "pt": "influences",
       "pass": false,
-      "evidence_support": false,
+      "evidence_support": true,
       "slot_binding": false,
-      "polarity_ok": true,
-      "reason": "The evidence states the second hidden layer uses 64 filters of 4x4 with stride 2, not 32 filters of 8x8 with stride 4."
+      "polarity_ok": false,
+      "reason": "The direction is reversed; the text states game strategies depend on the sequences, so the sequences should be the sourc"
     },
     {
       "i": 33,
-      "pt": "composed_of",
+      "pt": "defines",
       "pass": false,
       "evidence_support": false,
       "slot_binding": false,
-      "polarity_ok": true,
-      "reason": "The evidence states the third layer uses 64 filters of 3x3x3 with stride 1, not 32 filters of 8x3x8 with stride 4."
+      "polarity_ok": false,
+      "reason": "The sentence states 'each sequence is a distinct state' (an identity/property), not that one entity 'defines' another."
     },
     {
       "i": 34,
-      "pt": "composed_of",
-      "pass": true,
-      "evidence_support": true,
-      "slot_binding": true,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
       "polarity_ok": true,
-      "reason": "The evidence explicitly states the final hidden layer 'consists of' 512 rectifier units, perfectly matching the composed"
+      "reason": "The evidence span does not mention the 'object' node ('standard reinforcement learning methods for MDPs'), failing both "
     },
     {
       "i": 35,
-      "pt": "composed_of",
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The variable 'T' is merely a component within the mathematical formula, not the object of the definition."
+    },
+    {
+      "i": 36,
+      "pt": "defines",
       "pass": true,
       "evidence_support": true,
       "slot_binding": true,
       "polarity_ok": true,
-      "reason": "The evidence explicitly states the output layer has a single output for each valid action, correctly binding the whole t"
-    },
-    {
-      "i": 36,
-      "pt": "influences",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The text states the number of lives is 'used to mark' the end of an episode, not that a life counter 'influences' the nu"
+      "reason": "The evidence explicitly defines the subject as the definition achievable by following the object, with all roles accurat"
     },
     {
       "i": 37,
-      "pt": "influences",
+      "pt": "defines",
       "pass": false,
       "evidence_support": false,
       "slot_binding": false,
       "polarity_ok": false,
-      "reason": "The text states 'e' is a parameter that defines the behaviour policy, not that the behaviour policy influences 'e'."
+      "reason": "The evidence span is only the equation and lacks the definitional text; additionally, the subject and definition roles a"
     },
     {
       "i": 38,
-      "pt": "influences",
+      "pt": "defines",
       "pass": false,
-      "evidence_support": false,
+      "evidence_support": true,
       "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The evidence merely defines the frame-skipping parameter 'k' and does not state an 'influences' relation, and binding th"
+      "polarity_ok": true,
+      "reason": "The subject and definition roles are swapped; the text states 'p' is a 'policy', not that a 'policy' is defined as 'p'."
     },
     {
       "i": 39,
-      "pt": "influences",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The text describes a methodological selection process ('selected by'), not an 'influences' relationship, and the directi"
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states the optimal action-value function obeys an important identity known as the Bellman equati"
     },
     {
       "i": 40,
       "pt": "influences",
-      "pass": true,
-      "evidence_support": true,
-      "slot_binding": true,
-      "polarity_ok": true,
-      "reason": "The text explicitly states that the input consisting of visual images motivated their use of a convolutional deep networ"
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence states the optimal value is 'of' the sequence (a possessive/attribute relationship), not that it influences"
     },
     {
       "i": 41,
-      "pt": "outperforms_on",
+      "pt": "influences",
       "pass": false,
-      "evidence_support": true,
-      "slot_binding": false,
+      "evidence_support": false,
+      "slot_binding": true,
       "polarity_ok": true,
-      "reason": "The metric 'normalized DQN performance' describes the ablation effect, not the outperformance metric, which is only stat"
+      "reason": "The evidence defines the optimal strategy as the selection of an action, rather than stating that the strategy influence"
     },
     {
       "i": 42,
-      "pt": "influences",
+      "pt": "defines",
       "pass": false,
       "evidence_support": false,
       "slot_binding": false,
       "polarity_ok": false,
-      "reason": "The evidence merely describes the basic reinforcement learning interaction loop, not a causal 'influences' relationship "
+      "reason": "The text states a conditional equivalence ('corresponds to'), not a definitional identity ('defines')."
     },
     {
       "i": 43,
-      "pt": "influences",
+      "pt": "improves",
       "pass": false,
-      "evidence_support": true,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "Game score is an effect modified by the action, not a cause, making the slot binding and polarity incorrect."
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence states a general improvement in stability, not that it resolves a specific limitation of the algorithm as s"
     },
     {
       "i": 44,
-      "pt": "compares",
+      "pt": "composed_of",
       "pass": true,
       "evidence_support": true,
       "slot_binding": true,
       "polarity_ok": true,
-      "reason": "The text explicitly presents linear and nonlinear function approximators as parallel alternative mechanisms for the same"
+      "reason": "The evidence explicitly lists the initialization of the three components for the algorithm, correctly supporting the com"
     },
     {
       "i": 45,
-      "pt": "defines",
+      "pt": "influences",
       "pass": false,
       "evidence_support": false,
       "slot_binding": false,
-      "polarity_ok": true,
-      "reason": "The evidence explicitly defines a 'Q-network', not 'DQN', breaking both exact support and correct subject binding."
+      "polarity_ok": false,
+      "reason": "The text describes an epsilon-greedy selection mechanism between a random action and an optimal action, not an influence"
     },
     {
       "i": 46,
-      "pt": "extends",
+      "pt": "influences",
       "pass": false,
       "evidence_support": false,
       "slot_binding": false,
       "polarity_ok": false,
-      "reason": "The evidence states Q-learning is recovered *within* this framework, meaning the framework extends Q-learning, not the r"
+      "reason": "The action is executed *in* the emulator, not influencing it; the emulator is the environment, not the target of the inf"
     },
     {
       "i": 47,
-      "pt": "defines",
+      "pt": "influences",
       "pass": false,
       "evidence_support": false,
       "slot_binding": false,
       "polarity_ok": false,
-      "reason": "The evidence states a property of the algorithm rather than providing a definition, and the object 'Q-learning algorithm"
+      "reason": "The evidence text describes a procedural step of constructing and storing a transition tuple, not an 'influences' relati"
     },
     {
       "i": 48,
       "pt": "influences",
-      "pass": false,
-      "evidence_support": true,
-      "slot_binding": false,
-      "polarity_ok": true,
-      "reason": "The evidence text explicitly mentions only 'experience replay' as the source, not the broader 'deep Q-learning with expe"
-    },
-    {
-      "i": 49,
-      "pt": "draws_on",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The text only suggests a hypothetical future sampling strategy conceptually similar to prioritized sweeping, not that th"
-    },
-    {
-      "i": 50,
-      "pt": "defines",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The evidence describes a cloning operation to obtain a target network, not a definitional identity between the two netwo"
-    },
-    {
-      "i": 51,
-      "pt": "constitutive_law",
-      "pass": false,
-      "evidence_support": true,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The input and output roles are swapped, as the text states that clipping the squared error corresponds to using the abso"
-    },
-    {
-      "i": 52,
-      "pt": "improves",
-      "pass": false,
-      "evidence_support": true,
-      "slot_binding": false,
-      "polarity_ok": true,
-      "reason": "The 'to' node 'the algorithm' is a generic anaphora rather than a named method as required by the slot binding rules."
-    },
-    {
-      "i": 53,
-      "pt": "defines",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The evidence merely lists initialization steps for the algorithm's components, it does not define the algorithm as its r"
-    },
-    {
-      "i": 54,
-      "pt": "composed_of",
       "pass": true,
       "evidence_support": true,
       "slot_binding": true,
       "polarity_ok": true,
-      "reason": "The evidence explicitly lists the initialization of these three exact components under the heading of the specified whol"
+      "reason": "The evidence explicitly lists sampling a minibatch and then performing a gradient descent step with respect to the netwo"
     },
     {
-      "i": 55,
-      "pt": "defines",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The text describes an initialization step, not a definitional identity, and 'random weights h' are parameters of the fun"
-    },
-    {
-      "i": 56,
-      "pt": "defines",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": true,
-      "reason": "The text states the function is initialized with specific weights, not that the function is defined as those weights."
-    },
-    {
-      "i": 57,
-      "pt": "defines",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The text initializes two separate sequences in an algorithm, it does not define one as the other."
-    },
-    {
-      "i": 58,
-      "pt": "defines",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The text contrasts the random action with the greedy argmax action rather than defining the random action as the argmax "
-    },
-    {
-      "i": 59,
-      "pt": "defines",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The text describes executing an action and observing a reward and image, not defining the action as the reward and image"
-    },
-    {
-      "i": 60,
-      "pt": "defines",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The text describes sequential algorithmic steps (setting a state variable and then preprocessing it), not a definitional"
-    },
-    {
-      "i": 61,
-      "pt": "composed_of",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The evidence states the transition is stored *in* D (replay memory), meaning D is composed of transitions, not the other"
-    },
-    {
-      "i": 62,
-      "pt": "composed_of",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The minibatch is sampled *from* D (the replay memory), not composed of D as a component."
-    },
-    {
-      "i": 63,
-      "pt": "constitutive_law",
+      "i": 49,
+      "pt": "influences",
       "pass": false,
       "evidence_support": false,
       "slot_binding": false,
@@ -1946,22 +1520,22 @@
       "reason": ""
     },
     {
-      "i": 64,
-      "pt": "constitutive_law",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The evidence span only mentions the gradient descent step on the loss with respect to h, completely omitting the input f"
-    },
-    {
-      "i": 65,
+      "i": 50,
       "pt": "defines",
       "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The text defines 'Q-network' as a 'neural network function approximator', not 'DQN' defining 'neural network', failing s"
+    },
+    {
+      "i": 51,
+      "pt": "composed_of",
+      "pass": false,
       "evidence_support": false,
       "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The text describes a periodic parameter reset/copying operation, not a definitional identity."
+      "polarity_ok": true,
+      "reason": "The evidence text mentions 'experience replay' as a component but cuts off before mentioning the 'target network', faili"
     }
   ],
   "qwen": [
@@ -1972,7 +1546,7 @@
       "evidence_support": false,
       "slot_binding": false,
       "polarity_ok": false,
-      "reason": "Evidence describes a limitation rather than a comparative claim relation, and slots bind task types instead of methods."
+      "reason": "The evidence describes a limitation (games challenge agents) rather than a comparative relation between approaches (supp"
     },
     {
       "i": 1,
@@ -1981,7 +1555,7 @@
       "evidence_support": true,
       "slot_binding": true,
       "polarity_ok": true,
-      "reason": "The evidence sentence explicitly states DQN outperforms existing methods on 43 games, matching all node roles and direct"
+      "reason": "The evidence sentence explicitly states the outperformance relation, and the nodes correctly map to the subject (DQN), b"
     },
     {
       "i": 2,
@@ -1990,7 +1564,7 @@
       "evidence_support": true,
       "slot_binding": true,
       "polarity_ok": true,
-      "reason": "The evidence text explicitly states the DQN agent's performance is comparable to the human tester, satisfying the compar"
+      "reason": "The evidence sentence explicitly states DQN performance is comparable to the human tester, correctly binding both entiti"
     },
     {
       "i": 3,
@@ -1999,7 +1573,7 @@
       "evidence_support": true,
       "slot_binding": true,
       "polarity_ok": true,
-      "reason": "The evidence explicitly states disabling listed components causes detrimental performance, correctly matching the ablati"
+      "reason": "The evidence explicitly states disabling (ablating) the replay memory component of DQN causes detrimental performance ef"
     },
     {
       "i": 4,
@@ -2008,7 +1582,7 @@
       "evidence_support": true,
       "slot_binding": true,
       "polarity_ok": true,
-      "reason": "Evidence explicitly states disabling the component yields detrimental effects, matching all roles and polarity."
+      "reason": "The evidence text explicitly states disabling the component leads to detrimental effects, matching the ablation pattern "
     },
     {
       "i": 5,
@@ -2017,52 +1591,52 @@
       "evidence_support": true,
       "slot_binding": true,
       "polarity_ok": true,
-      "reason": "Evidence explicitly states disabling this DQN component causes detrimental performance effects."
+      "reason": "Evidence explicitly states disabling the component leads to detrimental effects, matching all node bindings and pattern "
     },
     {
       "i": 6,
       "pt": "measures",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": ""
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "Evidence confirms t-SNE acts on DQN representation, and context validates usage for evaluation/visualization."
     },
     {
       "i": 7,
       "pt": "extends",
       "pass": false,
       "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": ""
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The 'extends' pattern requires a method-to-method relation, but the evidence describes generalization to data."
     },
     {
       "i": 8,
       "pt": "composed_of",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
       "polarity_ok": true,
-      "reason": "The evidence text mentions 'reinforcement learning' generally, not the specific component 'best existing reinforcement l"
+      "reason": "The text explicitly states the deep Q-network is developed using deep neural networks and utilizes reinforcement learnin"
     },
     {
       "i": 9,
-      "pt": "measures",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": ""
+      "pt": "outperforms_on",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states the agent surpasses previous algorithms on the games, validating the relation and node bindin"
     },
     {
       "i": 10,
       "pt": "composed_of",
       "pass": false,
       "evidence_support": false,
-      "slot_binding": true,
-      "polarity_ok": true,
-      "reason": "Evidence describes parameter update mechanics rather than explicitly stating the system's compositional structure."
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": ""
     },
     {
       "i": 11,
@@ -2075,223 +1649,214 @@
     },
     {
       "i": 12,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text states the network is used to 'approximate' the function (estimation), not that it 'influences' or that the the"
+    },
+    {
+      "i": 13,
+      "pt": "composed_of",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The evidence sentence describes parameter update mechanics without explicitly stating the compositional relationship or "
+    },
+    {
+      "i": 14,
+      "pt": "measures",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence text explicitly states the DQN agent is evaluated using the Atari 2600 platform, correctly binding the agen"
+    },
+    {
+      "i": 15,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The sentence contrasts the proposed approach with previous work, not reinforcement learning directly, making the compari"
+    },
+    {
+      "i": 16,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "Text explicitly states reward shapes representations to facilitate value estimation, matching all roles and direction."
+    },
+    {
+      "i": 17,
       "pt": "background",
       "pass": false,
       "evidence_support": false,
       "slot_binding": false,
       "polarity_ok": false,
-      "reason": "The text states the proposed principle draws on evidence, not 'best existing reinforcement learning methods'."
-    },
-    {
-      "i": 13,
-      "pt": "influences",
-      "pass": true,
-      "evidence_support": true,
-      "slot_binding": true,
-      "polarity_ok": true,
-      "reason": "The text explicitly states reward is used to shape representations, confirming the influence direction and entity roles."
-    },
-    {
-      "i": 14,
-      "pt": "influences",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
       "reason": ""
-    },
-    {
-      "i": 15,
-      "pt": "influences",
-      "pass": true,
-      "evidence_support": true,
-      "slot_binding": true,
-      "polarity_ok": true,
-      "reason": "Evidence explicitly states 'strategies depending upon these sequences', matching slots and 'depends on' semantics allowe"
-    },
-    {
-      "i": 16,
-      "pt": "influences",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": ""
-    },
-    {
-      "i": 17,
-      "pt": "influences",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": true,
-      "polarity_ok": false,
-      "reason": "The text asserts identity ('is'), not an influence or dependency relation."
     },
     {
       "i": 18,
-      "pt": "influences",
+      "pt": "claim_relation",
       "pass": false,
       "evidence_support": false,
-      "slot_binding": false,
+      "slot_binding": true,
       "polarity_ok": false,
-      "reason": ""
+      "reason": "Evidence describes capability (architecture learns policies), not a discourse relation between >=2 claims/approaches req"
     },
     {
       "i": 19,
-      "pt": "influences",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The text defines an objective rather than a causal influence from 'goal' to 'emulator', and the 'agent' (not 'goal') is "
+      "pt": "compares",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly contrasts the mechanisms of the two approaches, satisfying the comparison relation without claim"
     },
     {
       "i": 20,
-      "pt": "influences",
+      "pt": "background",
       "pass": false,
       "evidence_support": false,
       "slot_binding": false,
       "polarity_ok": false,
-      "reason": "The text states rewards are discounted by the factor, meaning the factor influences the rewards, whereas the edge claims"
+      "reason": "The text states the principle draws on evidence, not that the evidence uses reward signals as background."
     },
     {
       "i": 21,
-      "pt": "influences",
+      "pt": "composed_of",
       "pass": false,
       "evidence_support": false,
       "slot_binding": false,
       "polarity_ok": false,
-      "reason": "The evidence states a parameter assignment (c=0.99), not a causal influence between variables, and a constant value is n"
+      "reason": "The text states the replay algorithm was a dependency for integration, not a whole composed of reinforcement learning an"
     },
     {
       "i": 22,
       "pt": "influences",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The evidence text establishes a definitional equivalence ('defined as'), not a causal influence or dependency relationsh"
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states reactivation provides a mechanism for updating value functions via basal ganglia interactions"
     },
     {
       "i": 23,
-      "pt": "influences",
+      "pt": "background",
       "pass": false,
       "evidence_support": false,
       "slot_binding": false,
       "polarity_ok": false,
-      "reason": "The text defines Q-function conditioning on s and a, not stating that sequence s influences action a."
+      "reason": "The text states the authors' method relates to both concepts, not that hippocampal replay uses prioritized sweeping as b"
     },
     {
       "i": 24,
-      "pt": "influences",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "Evidence states a definition ('p is a policy') rather than an influence relationship, and 'policy' is a class type not a"
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states the image is a vector of pixel values representing the current screen, matching all node role"
     },
     {
       "i": 25,
-      "pt": "influences",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The text asserts a mathematical property ('obeys') rather than influence, and incorrectly splits an appositive phrase in"
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states that reward rt represents the change in game score, faithfully supporting the definitional re"
     },
     {
       "i": 26,
       "pt": "influences",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The evidence describes the Q-value as a property of the state rather than an influencer, and the target node does not re"
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence text explicitly states the dependency relation between the exact entities bound to the roles, matching the "
     },
     {
       "i": 27,
       "pt": "influences",
       "pass": false,
       "evidence_support": false,
-      "slot_binding": false,
+      "slot_binding": true,
       "polarity_ok": false,
-      "reason": ""
+      "reason": "The text describes a temporal delay constraint rather than an influence relation, and the dependency direction is revers"
     },
     {
       "i": 28,
-      "pt": "composed_of",
-      "pass": true,
-      "evidence_support": true,
-      "slot_binding": true,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
       "polarity_ok": true,
-      "reason": "The evidence text explicitly defines the preprocessing step as consisting of the two listed operations (First... Second."
+      "reason": "The evidence describes a causal property rather than a definition, and the node 'current screen xt' contains tokens abse"
     },
     {
       "i": 29,
-      "pt": "composed_of",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "Evidence describes functional transformation (w processes frames to produce input), not structural composition where w c"
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states the states are perceptually aliased and links this condition to the current screen, supportin"
     },
     {
       "i": 30,
-      "pt": "composed_of",
+      "pt": "influences",
       "pass": false,
       "evidence_support": false,
-      "slot_binding": false,
+      "slot_binding": true,
       "polarity_ok": false,
-      "reason": "The evidence states the input consists of the image, but describes w as the producer of the image rather than a componen"
+      "reason": "The evidence text describes an inference limitation regarding observability rather than explicitly stating a causal infl"
     },
     {
       "i": 31,
-      "pt": "composed_of",
+      "pt": "influences",
       "pass": true,
       "evidence_support": true,
       "slot_binding": true,
       "polarity_ok": true,
-      "reason": "The text explicitly describes the layer's composition using the specified filters and activation function."
+      "reason": "The evidence states sequences are input to the algorithm, validly implying influence/dependency with correct node bindin"
     },
     {
       "i": 32,
-      "pt": "composed_of",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The evidence states the second layer has 64 filters/stride 2, contradicting the edge's 32 filters/stride 4."
-    },
-    {
-      "i": 33,
-      "pt": "composed_of",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": ""
-    },
-    {
-      "i": 34,
-      "pt": "composed_of",
+      "pt": "influences",
       "pass": true,
       "evidence_support": true,
       "slot_binding": true,
       "polarity_ok": true,
-      "reason": "The evidence text explicitly states the layer consists of the units, matching the composed_of relation and node roles pe"
+      "reason": "The evidence text explicitly states the dependency ('depending upon'), the nodes faithfully match the text spans, and th"
     },
     {
-      "i": 35,
-      "pt": "composed_of",
+      "i": 33,
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence text explicitly states the definitional identity between sequences and states within the MDP context, match"
+    },
+    {
+      "i": 34,
+      "pt": "defines",
       "pass": false,
       "evidence_support": false,
       "slot_binding": false,
       "polarity_ok": true,
-      "reason": "Evidence describes output property not composition, and component slot lacks a named part entity."
+      "reason": "The text describes applying methods via a usage condition, not asserting a definitional identity relation between the en"
     },
     {
-      "i": 36,
-      "pt": "influences",
+      "i": 35,
+      "pt": "defines",
       "pass": false,
       "evidence_support": false,
       "slot_binding": false,
@@ -2299,26 +1864,35 @@
       "reason": ""
     },
     {
-      "i": 37,
-      "pt": "influences",
-      "pass": false,
-      "evidence_support": false,
+      "i": 36,
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
       "slot_binding": true,
-      "polarity_ok": false,
-      "reason": "The evidence describes a configuration setting (epsilon annealing schedule) rather than a causal influence, and the dire"
+      "polarity_ok": true,
+      "reason": "Evidence text explicitly states the definition with exact surface matches for all node roles."
     },
     {
-      "i": 38,
-      "pt": "influences",
+      "i": 37,
+      "pt": "defines",
       "pass": false,
       "evidence_support": false,
       "slot_binding": false,
       "polarity_ok": false,
-      "reason": "The text defines k as a parameter of the technique, not an influenced output, and identical source/target nodes invalida"
+      "reason": "The evidence equation defines the function Q*, not the sequence s (bound as object), and the text 'some sequence s' is a"
+    },
+    {
+      "i": 38,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": ""
     },
     {
       "i": 39,
-      "pt": "influences",
+      "pt": "defines",
       "pass": false,
       "evidence_support": false,
       "slot_binding": false,
@@ -2328,74 +1902,74 @@
     {
       "i": 40,
       "pt": "influences",
-      "pass": true,
-      "evidence_support": true,
+      "pass": false,
+      "evidence_support": false,
       "slot_binding": true,
-      "polarity_ok": true,
-      "reason": "The text explicitly states visual images motivated the network choice, confirming the dependency direction and entity ma"
+      "polarity_ok": false,
+      "reason": "The text describes the value as a property of the sequence ('value ... of the sequence'), not as a factor that influence"
     },
     {
       "i": 41,
-      "pt": "outperforms_on",
+      "pt": "influences",
       "pass": true,
       "evidence_support": true,
       "slot_binding": true,
       "polarity_ok": true,
-      "reason": "The evidence sentence explicitly states DQN outperformed the expert human on the listed games using the normalized perfo"
+      "reason": "The evidence text explicitly defines the optimal strategy as selecting action a9, establishing a determinative relations"
     },
     {
       "i": 42,
-      "pt": "influences",
+      "pt": "defines",
       "pass": false,
       "evidence_support": false,
-      "slot_binding": false,
+      "slot_binding": true,
       "polarity_ok": false,
-      "reason": "The text defines the task setup structure rather than asserting a causal influence or dependency relationship; 'interact"
+      "reason": "The evidence describes a conditional behavioral equivalence under clipping rather than a general definitional identity b"
     },
     {
       "i": 43,
-      "pt": "influences",
+      "pt": "improves",
       "pass": false,
-      "evidence_support": true,
+      "evidence_support": false,
       "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "'game score' is an effect modified by the action, not a 'cause' or driver of the influence."
+      "polarity_ok": true,
+      "reason": "The evidence sentence subject is 'error clipping', not the 'absolute value loss function' specified in the from-node."
     },
     {
       "i": 44,
-      "pt": "compares",
+      "pt": "composed_of",
       "pass": false,
       "evidence_support": false,
-      "slot_binding": true,
-      "polarity_ok": true,
-      "reason": "The evidence text describes baseline community usage rather than stating an explicit comparison relation or result betwe"
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": ""
     },
     {
       "i": 45,
-      "pt": "defines",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": true,
-      "reason": "The evidence text explicitly defines 'Q-network', not 'DQN', causing a subject entity mismatch and lack of direct eviden"
-    },
-    {
-      "i": 46,
-      "pt": "extends",
+      "pt": "influences",
       "pass": false,
       "evidence_support": false,
       "slot_binding": true,
-      "polarity_ok": false,
-      "reason": "The evidence states the framework generalizes Q-learning, but the edge claims Q-learning extends the framework (reversed"
+      "polarity_ok": true,
+      "reason": "Text describes conditional assignment algorithm step, not causal influence; 'random action' is a value option for 'actio"
+    },
+    {
+      "i": 46,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence text explicitly describes the causal procedure where executing an action in the emulator yields the reward "
     },
     {
       "i": 47,
-      "pt": "defines",
+      "pt": "influences",
       "pass": false,
       "evidence_support": false,
       "slot_binding": false,
       "polarity_ok": false,
-      "reason": "The evidence asserts a property attribution ('is model-free') rather than a definitional identity, and the object node s"
+      "reason": "The term 'sequence' is absent from the evidence, which describes variable assignment rather than semantic influence."
     },
     {
       "i": 48,
@@ -2404,16 +1978,16 @@
       "evidence_support": true,
       "slot_binding": true,
       "polarity_ok": true,
-      "reason": "The text explicitly states that using experience replay (core to the source method) averages (influences) the behaviour "
+      "reason": "Evidence text explicitly describes the procedural dependency where the minibatch is used for the gradient step which act"
     },
     {
       "i": 49,
-      "pt": "draws_on",
+      "pt": "influences",
       "pass": false,
       "evidence_support": false,
       "slot_binding": false,
       "polarity_ok": false,
-      "reason": "The text describes a hypothetical future modification ('might') rather than stating the current algorithm draws on prior"
+      "reason": ""
     },
     {
       "i": 50,
@@ -2421,143 +1995,17 @@
       "pass": false,
       "evidence_support": false,
       "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The evidence describes cloning a separate network instance, not establishing definitional identity between the two entit"
+      "polarity_ok": true,
+      "reason": "Evidence text explicitly mentions 'Q-network' not 'DQN', so the subject node is not grounded in the provided span."
     },
     {
       "i": 51,
-      "pt": "constitutive_law",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "Text describes an equivalence between loss formulations, not a computational law where 'absolute value loss' serves as a"
-    },
-    {
-      "i": 52,
-      "pt": "improves",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": ""
-    },
-    {
-      "i": 53,
-      "pt": "defines",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The evidence describes initialization steps for components, not a definitional identity relation where the algorithm def"
-    },
-    {
-      "i": 54,
-      "pt": "composed_of",
-      "pass": true,
-      "evidence_support": true,
-      "slot_binding": true,
-      "polarity_ok": true,
-      "reason": "The evidence text lists the core structural elements initialized under the algorithm's title, validly implying compositi"
-    },
-    {
-      "i": 55,
-      "pt": "defines",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The text describes an initialization action, not a definitional identity; Q is not defined as the weights."
-    },
-    {
-      "i": 56,
-      "pt": "defines",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": true,
-      "polarity_ok": true,
-      "reason": "The evidence text describes an initialization step ('Initialize... with') rather than a definitional identity, so the 'd"
-    },
-    {
-      "i": 57,
-      "pt": "defines",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The evidence describes procedural initialization steps in an algorithm rather than a semantic definitional relationship "
-    },
-    {
-      "i": 58,
-      "pt": "defines",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "Evidence describes mutually exclusive options (random vs greedy), contradicting the claim that 'random action' is define"
-    },
-    {
-      "i": 59,
-      "pt": "defines",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The text describes a causal sequence of execution and observation, not a definitional identity between action and reward"
-    },
-    {
-      "i": 60,
-      "pt": "defines",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The evidence text describes sequential algorithmic assignments rather than a definitional identity where the first equat"
-    },
-    {
-      "i": 61,
       "pt": "composed_of",
       "pass": false,
       "evidence_support": false,
       "slot_binding": false,
       "polarity_ok": false,
-      "reason": "The text indicates transitions are stored in D, meaning D contains transitions, contradicting the edge claim that the tr"
-    },
-    {
-      "i": 62,
-      "pt": "composed_of",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "Evidence states sampling from D, not composition, and D is the source memory buffer not a constituent part of the miniba"
-    },
-    {
-      "i": 63,
-      "pt": "constitutive_law",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": ""
-    },
-    {
-      "i": 64,
-      "pt": "constitutive_law",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": true,
-      "reason": "Evidence text does not state the definition of $y_j$ claimed in the input node, and network weights are optimization var"
-    },
-    {
-      "i": 65,
-      "pt": "defines",
-      "pass": false,
-      "evidence_support": false,
-      "slot_binding": false,
-      "polarity_ok": false,
-      "reason": "The evidence describes a periodic parameter update operation between distinct networks, not a definitional identity rela"
+      "reason": "Evidence text does not mention 'target network' nor explicitly state that deep Q-networks are composed of these componen"
     }
   ]
 }

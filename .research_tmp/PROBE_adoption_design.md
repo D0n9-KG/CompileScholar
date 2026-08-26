@@ -32,7 +32,7 @@
 2. `_run_hg_node_multistep` 的 step3 format 传 schema_prompt。影响所有调用者（kernel 路径 + eval scifact/scirex + legacy 封存路径不跑）——eval 行为变化是**正确方向**（旧数字已判作废待重挣）。
 3. `_execute_core` 的 llm 由 ExtractionAgent 新参数 `executor_model`（默认 "deepseek" 保持兼容）传入；agent.py 构造时传 `self.llms[0]`。
 
-**不修（留给确定性修复/重写阶段）**：斜杠 prompt 清单本身、`_locate_chapter_text` 退化路径、切块确定性、单 writer。探针只修到"schema 可见"这一层，保持归因干净。
+**不修（留给确定性修复/重写阶段）**：`_locate_chapter_text` 退化路径、切块确定性、单 writer。探针只修到"schema 可见"这一层，保持归因干净。**一个例外**：重写 pattern_type 指引为"schema 优先"时，原句"extends/improves/compares"斜杠字面量保留会与新指引自相矛盾（一边教优先 schema、一边教复合字面量），故顺带加了一句"these are SEPARATE pattern names, never write them joined with slashes"消歧——这是一句话的一致性修补，不是完整斜杠清理（qualifier 清单等处的斜杠残留留给确定性修复阶段）。
 
 **探针臂设置**：
 - ~~Arm A（bug 复现臂：现状代码+注入）~~——**不跑**。代码级证据（上文 W1）+ 6 个现存 bundle（0/215）已足够证明断线态不可采纳，烧一次 run 无增量信息。
