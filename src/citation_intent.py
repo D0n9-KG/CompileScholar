@@ -40,6 +40,22 @@ _SUPERSCRIPT_RE = re.compile(
     r"[A-Za-z\)\]\.](\d{1,3}(?:[–\-—]\d{1,3})?(?:\s*[,;]\s*\d{1,3}(?:[–\-—]\d{1,3})?)*)(?=[\s,.;:)\]]|$)")
 _SENT_SPLIT = re.compile(r"(?<=[.!?])\s+(?=[A-Z(\[])")
 
+# Author-year citation mentions: "Mnih et al., 2015", "(Lin, 1992)",
+# "Simonyan et al. (2013)", "Sutton and Barto (1998)", "van Hasselt et al. (2015)".
+# Optional lowercase surname particle (van/von/de/...), optional "et al."/"and X"
+# connector, then a 19xx/20xx year (parenthesised or not).
+_AUTHOR_YEAR_RE = re.compile(
+    r"\b((?:van|von|de|del|di|da|della)\s+)?([A-Z][A-Za-z'’\-]+)"
+    r"(?:\s*,\s*[A-Z][A-Za-z'’\-]+)*"                       # "Hasselt, Guez," middles
+    r"(?:\s*,?\s+(?:et\s+al\.?|and\s+[A-Z][A-Za-z'’\-]+|&\s*[A-Z][A-Za-z'’\-]+))?"
+    r"\s*,?\s*\(?(19\d{2}|20\d{2})\)?")
+# month names read as surnames ("Received July 2014") — not citations
+_MONTHS = ("january", "february", "march", "april", "may", "june", "july",
+           "august", "september", "october", "november", "december")
+# sentences that are reference-entries themselves (author starts the line/sentence
+# and ends with a year-terminated citation) must not count as IN-TEXT mentions
+_REFENTRY_RE = re.compile(r"^\s*(?:\[?\d+\]?\s*)?[A-Z][A-Za-z'’\-]+,")
+
 
 def _sentences(text: str) -> list[str]:
     return [s.strip() for s in _SENT_SPLIT.split(text) if s.strip()]
@@ -96,6 +112,33 @@ def locate_citation_contexts(fulltext: str,
     return ctx
 
 
+def locate_author_year_contexts(fulltext: str,
+                                max_ctx_chars: int = 600) -> dict[str, list[str]]:
+    """Map mention-key "surnameYEAR" -> citation sentences (author-year format).
+
+    The dominant inline format of the DRL corpus (ICML/ICLR/arXiv style):
+    "Mnih et al., 2015", "(Lin, 1992)", "Simonyan et al. (2013)". The join to a
+    reference list happens downstream on (surname, year)."""
+    sents = _sentences(fulltext)
+    ctx: dict[str, list[str]] = {}
+    for i, s in enumerate(sents):
+        # skip reference-section entries themselves ("Mnih, V. ... 2015. ...")
+        if _REFENTRY_RE.match(s) and re.search(r"\(\d{4}\)\s*$|,\s*19\d{2}\.|,\s*20\d{2}\.", s):
+            continue
+        for m in _AUTHOR_YEAR_RE.finditer(s):
+            particle = (m.group(1) or "").strip()
+            surname = m.group(2)
+            year = m.group(3)
+            if surname.lower() in _MONTHS:
+                continue
+            key = f"{(particle + ' ' if particle else '')}{surname} {year}".lower()
+            window = " ".join(sents[max(0, i - 1):i + 2])
+            lst = ctx.setdefault(key, [])
+            if window and not any(window in prev for prev in lst):
+                lst.append(window[:max_ctx_chars])
+    return ctx
+
+
 # ---------------------------------------------------------------------------
 # stage 3: intent classification (LLM, existing pattern family)
 # ---------------------------------------------------------------------------
@@ -114,13 +157,21 @@ Output JSON:
 
 Definitions (same as the knowledge-graph schema):
 - extends: direct technical generalization/inheritance of the cited work
-- improves: fixes a stated limitation of the cited work
-- compares: explicit side-by-side evaluation against the cited work
+- improves: fixes a stated limitation of the cited work, OR is proposed as a
+  modification/variant of it that performs better ("we modify X to...",
+  "our improvement over X", "X suffers from ... we reduce/fix this")
+- compares: explicit side-by-side evaluation against the cited work (baseline
+  tables, "compared to X", "outperforms X")
 - replaces: supersedes/substitutes the cited approach
 - adapts: reuses the cited method in a NEW setting/domain/configuration
 - background: motivation/prior context only (no direct technical lineage)
-Default to background when the context only names the reference without a
-technical relation verb. No context -> {{"intent":"background","confidence":0.0,"note":"no mention found"}}."""
+
+Decision rule: scan ALL contexts for the STRONGEST technical-relation verb and
+classify by it — a single explicit "we improve/modify/compare against/combine
+with [rid]" beats several neutral name-drops. The paper being cited as a
+starting point it then modifies, combines, or evaluates against is NOT
+background. Only choose background when no context carries a technical
+relation to [{rid}] itself. No context -> {{"intent":"background","confidence":0.0,"note":"no mention found"}}."""
 
 
 def classify_intent(rid: int, contexts: list[str], llm_fn) -> dict:
