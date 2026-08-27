@@ -1,0 +1,567 @@
+[
+  {
+    "pattern_type": "compares",
+    "roles": [
+      "from",
+      "to",
+      "to",
+      "to"
+    ],
+    "evidence": "Nevertheless, games demanding more temporally extended planning strategies still"
+  },
+  {
+    "pattern_type": "composed_of",
+    "roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "evidence": "we developed a novel agent, a deep Q-network (DQN), which is able to combine rei"
+  },
+  {
+    "pattern_type": "measures",
+    "roles": [
+      "object",
+      "instrument"
+    ],
+    "evidence": "we use a deep convolutional neural network to approximate the optimal action-val"
+  },
+  {
+    "pattern_type": "composed_of",
+    "roles": [
+      "whole",
+      "component",
+      "component",
+      "component"
+    ],
+    "evidence": "the individual core components of the DQN agent—the replay memory, separate targ"
+  },
+  {
+    "pattern_type": "measures",
+    "roles": [
+      "object",
+      "instrument"
+    ],
+    "evidence": "the t-SNE algorithm tends to map the DQN representation of perceptually similar "
+  },
+  {
+    "pattern_type": "measures",
+    "roles": [
+      "object",
+      "instrument"
+    ],
+    "evidence": "the t-SNE algorithm generated similar embeddings for DQN representations of stat"
+  },
+  {
+    "pattern_type": "extends",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "the representations learned by DQN are able to generalize to data generated from"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "how the representations learned by DQN allow it to accurately predict state and "
+  },
+  {
+    "pattern_type": "background",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "This principle draws on neurobiological evidence"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "evidence": "reward signals during perceptual learning may influence the characteristics of r"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "evidence": "reward to continuously shape representations within the convolutional network"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "evidence": "the successful integration of reinforcement learning with deep network architect"
+  },
+  {
+    "pattern_type": "background",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "Convergent evidence suggests that the hippocampus may support the physical reali"
+  },
+  {
+    "pattern_type": "compares",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "In contrast to previous work"
+  },
+  {
+    "pattern_type": "claim_relation",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "privy only to the inputs a human player would have"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target",
+      "cause"
+    ],
+    "evidence": "reward signal ... representations ... convolutional network"
+  },
+  {
+    "pattern_type": "background",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "end-to-end reinforcement learning ... primate visual cortex"
+  },
+  {
+    "pattern_type": "compares",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "deep reinforcement learning agent ... previous work"
+  },
+  {
+    "pattern_type": "extends",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "experience replay algorithm ... prioritized sweeping"
+  },
+  {
+    "pattern_type": "claim_relation",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "deep reinforcement learning agent ... human player"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "target",
+      "source"
+    ],
+    "evidence": "the game score may depend on the whole previous sequence of actions and observat"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "target",
+      "source"
+    ],
+    "evidence": "which then learns game strategies depending upon these sequences"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "object"
+    ],
+    "evidence": "This formalism gives rise to a large but finite Markov decision process (MDP)"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "object"
+    ],
+    "evidence": "in which each sequence is a distinct state"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "object"
+    ],
+    "evidence": "simply by using the complete sequence st as the state representation at time t"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "target",
+      "source"
+    ],
+    "evidence": "future rewards are discounted by a factor of c per time-step"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "object"
+    ],
+    "evidence": "define the future discounted return at time t as $R _ { t } = \\sum _ { t ^ { \\pr"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "object"
+    ],
+    "evidence": "We define the optimal action-value function $\\boldsymbol { Q } ^ { * } ( s , a )"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "object"
+    ],
+    "evidence": "in which p is a policy mapping sequences to actions (or distributions over actio"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "target",
+      "source"
+    ],
+    "evidence": "The optimal action-value function obeys an important identity known as the Bellm"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "target",
+      "source"
+    ],
+    "evidence": "then the optimal strategy is to select the action a9 maximizing the expected val"
+  },
+  {
+    "pattern_type": "composed_of",
+    "roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "evidence": "We apply a basic preprocessing step aimed at reducing the input dimensionality a"
+  },
+  {
+    "pattern_type": "composed_of",
+    "roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "evidence": "The function w from algorithm 1 described below applies this preprocessing to th"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "evidence": "There are several possible ways of parameterizing Q using a neural network."
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "evidence": "Because Q maps history–action pairs to scalar estimates of their Q-value"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "evidence": "The outputs correspond to the predicted Q-values of the individual actions for t"
+  },
+  {
+    "pattern_type": "composed_of",
+    "roles": [
+      "whole",
+      "component"
+    ],
+    "evidence": "The input to the neural network consists of an $8 4 \\times 8 4 \\times 4$ image p"
+  },
+  {
+    "pattern_type": "composed_of",
+    "roles": [
+      "whole",
+      "component",
+      "component",
+      "component"
+    ],
+    "evidence": "The first hidden layer convolves 32 filters of 8 3 8 with stride 4 with the inpu"
+  },
+  {
+    "pattern_type": "composed_of",
+    "roles": [
+      "whole",
+      "component",
+      "component",
+      "component"
+    ],
+    "evidence": "The second hidden layer convolves 64 filters of $\\bar { 4 } \\times 4$ with strid"
+  },
+  {
+    "pattern_type": "composed_of",
+    "roles": [
+      "whole",
+      "component",
+      "component",
+      "component"
+    ],
+    "evidence": "This is followed by a third convolutional layer that convolves 64 filters of 3 3"
+  },
+  {
+    "pattern_type": "composed_of",
+    "roles": [
+      "whole",
+      "component"
+    ],
+    "evidence": "The final hidden layer is fully-connected and consists of 512 rectifier units."
+  },
+  {
+    "pattern_type": "composed_of",
+    "roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "evidence": "The output layer is a fully-connected linear layer with a single output for each"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target",
+      "effect"
+    ],
+    "evidence": "we clipped all positive rewards at 1 and all negative rewards ${ \\tt a t } - 1$ "
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target",
+      "effect"
+    ],
+    "evidence": "Clipping the rewards in this manner limits the scale of the error derivatives an"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "evidence": "For games where there is a life counter, the Atari 2600 emulator also sends the "
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "evidence": "The behaviour policy during training was e-greedy with e annealed linearly from "
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target",
+      "effect"
+    ],
+    "evidence": "with e annealed linearly from 1.0 to 0.1 over the first million frames, and fixe"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "evidence": "Following previous approaches to playing Atari 2600 games, we also use a simple "
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "evidence": "The values of all the hyperparameters and optimization parameters were selected "
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "evidence": "Our experimental setup amounts to using the following minimal prior knowledge: t"
+  },
+  {
+    "pattern_type": "compares",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "The random agent served as a baseline comparison and chose a random action at 10"
+  },
+  {
+    "pattern_type": "compares",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "We did also assess the performance of a random agent that selected an action at "
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target",
+      "effect"
+    ],
+    "evidence": "This had a minimal effect: changing the normalized DQN performance by more than "
+  },
+  {
+    "pattern_type": "compares",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "and in all these games DQN outperformed the expert human by a considerable margi"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "evidence": "The human performance is the average reward achieved from around 20 episodes of "
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "evidence": "At each time-step the agent selects an action at from the set of legal game acti"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target",
+      "effect"
+    ],
+    "evidence": "The action is passed to the emulator and modifies its internal state and the gam"
+  },
+  {
+    "pattern_type": "improves",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "This form of error clipping further improved the stability of the algorithm."
+  },
+  {
+    "pattern_type": "constitutive_law",
+    "roles": [
+      "output",
+      "input"
+    ],
+    "evidence": "estimate the action-value function by using the Bellman equation as an iterative"
+  },
+  {
+    "pattern_type": "compares",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "this is typically a linear function approximator, but sometimes a nonlinear func"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "evidence": "We refer to a neural network function approximator with weights h as a Q-network"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "target",
+      "source"
+    ],
+    "evidence": "the targets depend on the network weights"
+  },
+  {
+    "pattern_type": "compares",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "this is in contrast with the targets used for supervised learning, which are fix"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "target",
+      "source"
+    ],
+    "evidence": "randomizing the samples breaks these correlations and therefore reduces the vari"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "target",
+      "source"
+    ],
+    "evidence": "the parameters could get stuck in a poor local minimum, or even diverge catastro"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "target",
+      "source"
+    ],
+    "evidence": "By using experience replay the behaviour distribution is averaged over many of i"
+  }
+]

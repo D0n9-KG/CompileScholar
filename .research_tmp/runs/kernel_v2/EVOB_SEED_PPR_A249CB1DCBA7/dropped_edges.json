@@ -1,0 +1,1906 @@
+[
+  {
+    "edge_id": "n1_e4",
+    "pattern_type": "influences",
+    "evidence_span": "show that the problem is well-posed if µb > 1 - 7µ/6",
+    "node_ids": [
+      "n1_n8",
+      "n1_n10"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "bulk friction coefficient µb",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "well-posed",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states a condition for well-posedness based on the bulk friction coefficient, which is a dependency. The source is the coefficient, and the target is the well-posedness condition.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n2_e0",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "unidirectional granular shear flows are fairly well described using a single friction coefficient µ—ratio of the shear stress τ to the confinement pressure p—that varies with an inertial (dimensionless) number I",
+    "node_ids": [
+      "n2_n4",
+      "n2_n5",
+      "n2_n6",
+      "n2_n7"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "input",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "friction coefficient µ",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "shear stress τ",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "confinement pressure p",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "inertial number I",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e1",
+    "pattern_type": "defines",
+    "evidence_span": "defined as the ratio of a microscopic grain rearrangement time scale to a macroscopic flow time scale",
+    "node_ids": [
+      "n2_n7",
+      "n2_n8"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "inertial number I",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "ratio of a microscopic grain rearrangement time scale to a macroscopic flow time scale",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e2",
+    "pattern_type": "extends",
+    "evidence_span": "This rheology may be thought as a generalization of the basic Coulomb friction model $\\tau / p = \\mu$",
+    "node_ids": [
+      "n2_n1",
+      "n2_n9"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "µ(I)-rheology",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Coulomb friction model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e4",
+    "pattern_type": "extends",
+    "evidence_span": "we extend the Barker et al. (2015) analysis",
+    "node_ids": [
+      "n2_n13",
+      "n2_n12"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "compressible granular flow equations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Barker et al. (2015) analysis",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e5",
+    "pattern_type": "improves",
+    "evidence_span": "taking into account the weak compressibility of granular flows regularizes mostly the µ(I)-rheology",
+    "node_ids": [
+      "n2_n13",
+      "n2_n1"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "compressible granular flow equations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "µ(I)-rheology",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e6",
+    "pattern_type": "background",
+    "evidence_span": "Forterre & Pouliquen (2002) showed that kinetic theory taken in the compressible limit could reproduce the instability leading to the longitudinal vortices observed in their experiments",
+    "node_ids": [
+      "n2_n13",
+      "n2_n14"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "compressible granular flow equations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Forterre & Pouliquen (2002)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e7",
+    "pattern_type": "claim_relation",
+    "evidence_span": "We show that taking into account compressibility changes the conclusions of Barker et al. (2015) concerning the ill-posed behaviour of the µ(I) rheology",
+    "node_ids": [
+      "n2_n13",
+      "n2_n12"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "compressible granular flow equations",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Barker et al. (2015) analysis",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e11",
+    "pattern_type": "defines",
+    "evidence_span": "\\phi ^ { \\prime } = \\partial _ { I } \\phi",
+    "node_ids": [
+      "n4c0_n47",
+      "n4c0_n45"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "phi'",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "phi",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e12",
+    "pattern_type": "defines",
+    "evidence_span": "\\mu ^ { \\prime } = \\partial _ { I } \\mu",
+    "node_ids": [
+      "n4c0_n48",
+      "n4c0_n44"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mu'",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "mu",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e13",
+    "pattern_type": "defines",
+    "evidence_span": "\\alpha = \\mu _ { b } + 2 \\mu / 3",
+    "node_ids": [
+      "n4c0_n49",
+      "n4c0_n64",
+      "n4c0_n44"
+    ],
+    "node_roles": [
+      "subject",
+      "object",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "alpha",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "mu_b",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "mu",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e14",
+    "pattern_type": "defines",
+    "evidence_span": "\\beta = 2 / I",
+    "node_ids": [
+      "n4c0_n50",
+      "n4c0_n46"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "beta",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "I",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e15",
+    "pattern_type": "defines",
+    "evidence_span": "\\theta \\ = \\ 2 \\tan ^ { - 1 } ( \\xi _ { 1 } / \\xi _ { 2 } )",
+    "node_ids": [
+      "n4c0_n51",
+      "n4c0_n23"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "theta",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "perturbation wavevector",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e16",
+    "pattern_type": "defines",
+    "evidence_span": "r ~ = ~ \\mu ^ { \\prime } / \\beta",
+    "node_ids": [
+      "n4c0_n52",
+      "n4c0_n48",
+      "n4c0_n50"
+    ],
+    "node_roles": [
+      "subject",
+      "object",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "r",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "mu'",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "beta",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e17",
+    "pattern_type": "defines",
+    "evidence_span": "\\theta / 2 is the angle between the wavevector and the x _ { 2 } axis",
+    "node_ids": [
+      "n4c0_n53",
+      "n4c0_n51",
+      "n4c0_n23"
+    ],
+    "node_roles": [
+      "subject",
+      "object",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "angle between the wavevector and the x_2 axis",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "theta",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "perturbation wavevector",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e18",
+    "pattern_type": "influences",
+    "evidence_span": "two different scaling arises for λ at large | \\pmb { \\xi } |",
+    "node_ids": [
+      "n4c0_n54",
+      "n4c0_n23"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "lambda",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "perturbation wavevector",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e19",
+    "pattern_type": "defines",
+    "evidence_span": "Writing \\lambda = \\lambda ^ { \\prime } | \\pmb { \\xi } | ^ { 2 }",
+    "node_ids": [
+      "n4c0_n55",
+      "n4c0_n54",
+      "n4c0_n23"
+    ],
+    "node_roles": [
+      "subject",
+      "object",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "lambda'",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "lambda",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "perturbation wavevector",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e24",
+    "pattern_type": "influences",
+    "evidence_span": "The ill-posed direction is found where b takes a minimum, that is for \\theta / 2 = \\pi / 4",
+    "node_ids": [
+      "n4c0_n66",
+      "n4c0_n67"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "ill-posed direction",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "theta/2 = pi/4",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e25",
+    "pattern_type": "influences",
+    "evidence_span": "the growth rate \\mathrm { R e } ( \\lambda ) is always bounded for large ξ",
+    "node_ids": [
+      "n4c0_n68",
+      "n4c0_n23"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "growth rate",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "perturbation wavevector",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e30",
+    "pattern_type": "defines",
+    "evidence_span": "the determinant \\varDelta = \\mu ^ { 2 } \\left( \\mu - r \\right) ^ { 2 } - 8 r \\left( \\mu - r \\right)",
+    "node_ids": [
+      "n4c0_n75",
+      "n4c0_n44",
+      "n4c0_n52"
+    ],
+    "node_roles": [
+      "subject",
+      "object",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "determinant",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "mu",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "r",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e31",
+    "pattern_type": "influences",
+    "evidence_span": "the stability condition simplifies to",
+    "node_ids": [
+      "n4c0_n77",
+      "n4c0_n75"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "stability condition",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "determinant",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c1_e0",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "μ(I) rheology in the plane (I/I0, Δμ)",
+    "node_ids": [
+      "n4c1_n1",
+      "n4c1_n2",
+      "n4c1_n3",
+      "n4c1_n4"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "μ(I) rheology",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "I",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "I0",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Δμ",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence span 'μ(I) rheology in the plane (I/I0, Δμ)' is not a verbatim substring of the source text. The source text mentions 'μ' and 'I' as variables and discusses the stability domain in the plane (I/I0, Δμ), but it does not explicitly state a constitutive law 'μ(I)' with I0 and Δμ as parameters. The relation is implied by the context but not directly stated in the provided evidence span. The edge is dropped due to lack of direct evidence support.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e4",
+    "pattern_type": "influences",
+    "evidence_span": "the coupling precludes from any analytical treatment",
+    "node_ids": [
+      "n4c0_n32",
+      "n4c0_n33"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "coupling",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "analytical treatment",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence span states that 'the coupling precludes from any analytical treatment', which is a negative relation (precludes). This does not establish a positive 'influences' relation where 'coupling' is the target and 'analytical treatment' is the source. The relation is one of prevention, not dependence. The edge is dropped.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e5",
+    "pattern_type": "influences",
+    "evidence_span": "the coupling precludes from any analytical treatment and numerical resolution is required",
+    "node_ids": [
+      "n4c0_n32",
+      "n4c0_n34"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "coupling",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "numerical resolution",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence span states that 'the coupling precludes from any analytical treatment and numerical resolution is required'. This does not establish a positive 'influences' relation where 'coupling' is the target and 'numerical resolution' is the source. The relation is one of requirement, not dependence. The edge is dropped.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e26",
+    "pattern_type": "influences",
+    "evidence_span": "so that this particular solution does not lead to ill-posedness of the problem",
+    "node_ids": [
+      "n4c0_n69",
+      "n4c0_n68"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "ill-posedness",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "growth rate",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states a NEGATION: 'does not lead to ill-posedness'. This is an independence/absence of relation, not a positive influences edge. The edge claims ill-posedness depends on growth rate, but the text explicitly negates this dependency. Also, 'ill-posedness' is a property/state, not a quantity that can be a target of influence in the intended sense.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e28",
+    "pattern_type": "influences",
+    "evidence_span": "the problem remains wellposed",
+    "node_ids": [
+      "n4c0_n73",
+      "n4c0_n70"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "problem",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "lambda_3",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence 'the problem remains wellposed' does not state a dependency relation between lambda_3 and the problem. It is a standalone statement about the problem's state, not a causal or functional dependence. The edge claims lambda_3 influences the problem, but the text only states the problem remains wellposed without attributing this to lambda_3. This is an unsupported inference, not a stated relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n5_e11",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "Taking $I = 2 d \\| \\pmb { \\mathsf { S } } \\| / \\sqrt { p _ { \\mathrm { e q } } / ( \\varrho \\phi ) }$",
+    "node_ids": [
+      "n5_n32",
+      "n5_n33",
+      "n5_n34",
+      "n5_n35",
+      "n5_n36",
+      "n5_n37"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "input",
+      "input",
+      "input",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "I",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "d",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "||S||",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "p_eq",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "ϱ",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "φ",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5_e3",
+    "pattern_type": "influences",
+    "evidence_span": "the stability domain in the high wavenumber limits of compressible flows defined by (4.12) is independent of flow compressibility $\\phi ^ { \\prime }$",
+    "node_ids": [
+      "n5_n10",
+      "n5_n9"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "flow compressibility φ'",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "stability domain in the high wavenumber limits of compressible flows defined by (4.12)",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence explicitly states that the stability domain is 'independent of' φ', which is a negation of the claimed influences relation. The edge claims a dependency but the text states independence, so the relation does not exist.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n5_e8",
+    "pattern_type": "influences",
+    "evidence_span": "Another interesting limit is obtained putting $\\mu ^ { \\prime } = 0$ , which yields the classical Coulomb constant friction model",
+    "node_ids": [
+      "n5_n22",
+      "n5_n23"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "μ'",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "classical Coulomb constant friction model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-missed-bad-role",
+    "verifier_note": "The sentence states that setting μ'=0 yields the Coulomb model. This is a functional dependence (the model is a function of the parameter μ'), not a definitional identity. The relation is real but the pattern is wrong.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "retype:influences"
+  },
+  {
+    "edge_id": "n6_e0",
+    "pattern_type": "measures",
+    "evidence_span": "we solve numerically the stability problem at arbitrary wavenumbers",
+    "node_ids": [
+      "n6_n2",
+      "n6_n3"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "stability problem",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "arbitrary wavenumbers",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a numerical solution setup, not a measurement of a quantity by an instrument. 'Stability problem' is not a measured quantity, and 'arbitrary wavenumbers' is a condition, not an instrument. This is a setup description, not a measures relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6_e2",
+    "pattern_type": "influences",
+    "evidence_span": "the maximum growth rate is now located at a finite wavenumber",
+    "node_ids": [
+      "n6_n6",
+      "n6_n7"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "maximum growth rate",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "finite wavenumber",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states a location of the maximum growth rate, not a causal dependence. 'Maximum growth rate' is not influenced by 'finite wavenumber'; rather, the maximum occurs at a finite wavenumber. This is a locational statement, not a dependency relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6_e3",
+    "pattern_type": "defines",
+    "evidence_span": "the condition $\\mu _ { b } \\geqslant 1 - 7 \\mu / 6$ for well-posedeness is verified almost everywhere",
+    "node_ids": [
+      "n6_n8",
+      "n6_n9"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "condition $\\mu _ { b } \\geqslant 1 - 7 \\mu / 6$ for well-posedeness",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "well-posedeness",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that a condition is verified, not that it defines well-posedness. The condition is a criterion for well-posedness, not a definition of it. This is a verification statement, not a definitional identity.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6_e4",
+    "pattern_type": "compares",
+    "evidence_span": "To test the validity of the normal mode decomposition in the short wave limit",
+    "node_ids": [
+      "n6_n1",
+      "n6_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "normal mode decomposition",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "stability problem",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a test of validity, not a comparison between two entities. 'Normal mode decomposition' is not compared with 'stability problem'; rather, the decomposition is tested against the stability problem. This is a validation test, not a compares relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6_e5",
+    "pattern_type": "claim_relation",
+    "evidence_span": "the ill-posed criteria $\\mu _ { b } < 1 - 7 \\mu / 6$ is not modified by such finite size effect and can thus be considered as general",
+    "node_ids": [
+      "n6_n10",
+      "n6_n8"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "ill-posed criteria $\\mu _ { b } < 1 - 7 \\mu / 6$",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "condition $\\mu _ { b } \\geqslant 1 - 7 \\mu / 6$ for well-posedeness",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the ill-posed criteria is not modified and is general, not that it supports the well-posedness condition. These are two separate conditions (one for ill-posedness, one for well-posedness), not a support relation between them. This is a statement about generality, not a discourse relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7_e2",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "This condition is expressed in terms of an inequality between $\\mu _ { b }$ , the bulk friction coefficient associated with volume changes and $\\mu$ the friction coefficient associated with shear, which reads $\\mu _ { b } > 1 - 7 \\mu / 6$",
+    "node_ids": [
+      "n7_n5",
+      "n7_n3",
+      "n7_n4"
+    ],
+    "node_roles": [
+      "output",
+      "parameter",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "well-posedness",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "μ_b",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "μ",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7_e3",
+    "pattern_type": "influences",
+    "evidence_span": "Volume changes need to be associated with a sufficient dissipation to make the problem well-posed at all inertial numbers",
+    "node_ids": [
+      "n7_n3",
+      "n7_n5"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "μ_b",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "well-posedness",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7_e1",
+    "pattern_type": "extends",
+    "evidence_span": "the compressible $\\mu ( I )$ -rheology",
+    "node_ids": [
+      "n7_n1",
+      "n7_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "compressible μ(I)-rheology",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "incompressible μ(I)-rheology",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence span is just a noun phrase, not a statement of generalization. The text says the compressible rheology 'regularizes' the incompressible one, which is an improvement, not a generalization. The edge is redundant with n7_e0 and the evidence does not support an 'extends' relation.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7_e6",
+    "pattern_type": "background",
+    "evidence_span": "this study more generally shows that the generation and propagation of acoustic waves inside granular flows are likely to play a crucial role in their rheology",
+    "node_ids": [
+      "n7_n1",
+      "n7_n9"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "compressible μ(I)-rheology",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "acoustic waves",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence does not state that the compressible rheology uses acoustic waves as background/motivation. Instead, it says the study shows acoustic waves play a crucial role in rheology. This is a claim about the importance of acoustic waves, not a background relation. The edge is a mischaracterization of the evidence.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7_e7",
+    "pattern_type": "claim_relation",
+    "evidence_span": "While being generally well-posed, the compressible $\\mu ( I )$ -rheology was also shown to be unstable for some flow conditions, both at large and small inertial number",
+    "node_ids": [
+      "n7_n1",
+      "n7_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "compressible μ(I)-rheology",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "incompressible μ(I)-rheology",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the compressible rheology is unstable under some conditions, but it does not contrast it with the incompressible rheology. The sentence is about the compressible rheology alone, not a discourse relation between two claims. The edge is not supported by the evidence.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n8_e0",
+    "pattern_type": "compares",
+    "evidence_span": "both formulations are shown to be equivalent in Appendix A",
+    "node_ids": [
+      "n8_n1",
+      "n8_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "compressibility model based on critical state concept (Barker et al. 2017)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "fluid mechanics-like formulation based on a second viscosity (our model)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e1",
+    "pattern_type": "compares",
+    "evidence_span": "Although the methods diverge",
+    "node_ids": [
+      "n8_n1",
+      "n8_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "compressibility model based on critical state concept (Barker et al. 2017)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "fluid mechanics-like formulation based on a second viscosity (our model)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e2",
+    "pattern_type": "claim_relation",
+    "evidence_span": "both studies points to the same conclusion—that compressibility generally regularizes the μ(I) rheology",
+    "node_ids": [
+      "n8_n1",
+      "n8_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "compressibility model based on critical state concept (Barker et al. 2017)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "fluid mechanics-like formulation based on a second viscosity (our model)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e3",
+    "pattern_type": "influences",
+    "evidence_span": "compressibility generally regularizes the μ(I) rheology",
+    "node_ids": [
+      "n8_n7",
+      "n8_n8"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "compressibility",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "μ(I) rheology",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence directly states that compressibility regularizes the μ(I) rheology, which is a genuine causal dependence. The source (compressibility) and target (μ(I) rheology) are correctly bound. The direction is correct: compressibility is the cause/source and the rheology is the affected target.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n8_e4",
+    "pattern_type": "influences",
+    "evidence_span": "providing that certain criteria on the parameters are respected",
+    "node_ids": [
+      "n8_n9",
+      "n8_n8"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "parameters",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "μ(I) rheology",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence span is a conditional clause stating that the regularizing effect holds only if certain parameter criteria are met. It does not state that parameters influence the rheology; it merely sets a condition for the main claim. This is not a genuine causal or scaling dependence between parameters and the rheology. The edge is a misreading of a conditional qualifier as a dependency relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n8_e5",
+    "pattern_type": "defines",
+    "evidence_span": "critical state concept borrowed from soil mechanics",
+    "node_ids": [
+      "n8_n3",
+      "n8_n4"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "critical state concept",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "soil mechanics",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the critical state concept was borrowed from soil mechanics, which is a provenance/origin statement, not a definitional identity. The edge claims a 'defines' relation, but the text does not define the critical state concept as soil mechanics. This is a misclassification of a provenance relation as a definition.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n8_e6",
+    "pattern_type": "defines",
+    "evidence_span": "fluid mechanics-like formulation based on a second viscosity",
+    "node_ids": [
+      "n8_n5",
+      "n8_n6"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "second viscosity",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "fluid mechanics",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the formulation is based on a second viscosity, which is a methodological basis, not a definitional identity. The edge claims a 'defines' relation, but the text does not define second viscosity as fluid mechanics. This is a misclassification of a methodological basis as a definition.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n9_e1",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "where $p$ is the total normal stress, $\\lVert \\boldsymbol { \\tau } \\rVert$ is the shear stress, $\\phi$ is the volumic fraction, $p _ { \\mathrm { e q } } ( \\phi )$ 号 the pressure at the critical state (when the material deforms without volume change) at the volume fraction $\\phi$ (given by an empirical equation of state), $\\mu$ is the friction coefficient and  a function controlling the curvature of the yield surface close to the critical state.",
+    "node_ids": [
+      "n9_n2",
+      "n9_n3",
+      "n9_n4",
+      "n9_n5"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter",
+      "coefficient"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "p",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "phi",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "p_eq(phi)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "mu",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e2",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "The stress-strain relationship then reads with $\\delta$ the identity tensor (Krishnaraj & Nott 2016). Linearizing for small volume changes gives with $\\mu _ { b } = ( m - 1 ) / ( m \\mu )$ , the equivalent of a bulk friction.",
+    "node_ids": [
+      "n9_n7",
+      "n9_n2",
+      "n9_n3",
+      "n9_n8"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "input",
+      "coefficient"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "stress-strain relationship",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "p",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "phi",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "mu_b",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e3",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "tan $\\psi$ is taken as a function of $\\phi - \\phi _ { \\mathrm { e q } }$ (Paihla & Pouliquen 2009)",
+    "node_ids": [
+      "n9_n10",
+      "n9_n3",
+      "n9_n11"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "dilatancy angle",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "phi",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "phi_eq",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e4",
+    "pattern_type": "compares",
+    "evidence_span": "This formulation shares similarities with Eqs. (A 3) and (A 1), but differs in that $p$ do not appear explicitly in the equations.",
+    "node_ids": [
+      "n9_n6",
+      "n9_n12"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "critical state theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "dilatancy model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e5",
+    "pattern_type": "extends",
+    "evidence_span": "It is possible to interpret this model as a compressible rheology of the type (3.9) by equating tr(D) in Eq. (3.10) and Eq.A 7 to yield which, upon linearization around $\\phi = \\phi _ { \\mathrm { e q } }$ gives",
+    "node_ids": [
+      "n9_n12",
+      "n9_n6"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "dilatancy model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "critical state theory",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e7",
+    "pattern_type": "influences",
+    "evidence_span": "$p _ { \\mathrm { e q } } ( \\phi )$ 号 the pressure at the critical state (when the material deforms without volume change) at the volume fraction $\\phi$",
+    "node_ids": [
+      "n9_n4",
+      "n9_n3"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "p_eq(phi)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "phi",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e0",
+    "pattern_type": "defines",
+    "evidence_span": "A.1. Critical state theory In plasticity, a material is assumed to flow on a yield surface taking the general form",
+    "node_ids": [
+      "n9_n1",
+      "n9_n6"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "yield surface",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "critical state theory",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that a material flows on a yield surface, not that the yield surface is defined as or named by critical state theory. The section heading 'Critical state theory' is a title, not a definitional identity. The relation is not stated; it is merely adjacent to the heading.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n10_e1",
+    "pattern_type": "influences",
+    "evidence_span": "we find ‖S‖ = 2‖S0‖|S̃12|",
+    "node_ids": [
+      "n10_n3",
+      "n10_n4",
+      "n10_n5"
+    ],
+    "node_roles": [
+      "target",
+      "source",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "‖S‖",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "‖S0‖",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "S̃12",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The equation explicitly states that ‖S‖ is proportional to ‖S0‖ and S̃12. The direction is correct: ‖S0‖ and S̃12 are sources (inputs), and ‖S‖ is the target (output).",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n10_e2",
+    "pattern_type": "influences",
+    "evidence_span": "the definition of I gives which allows us to eliminate p_eq in the equations",
+    "node_ids": [
+      "n10_n6",
+      "n10_n2"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "p_eq",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "I",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states that the definition of I allows elimination of p_eq, implying p_eq is a function of I. The direction is correct: I is the source, p_eq is the target.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n10_e4",
+    "pattern_type": "defines",
+    "evidence_span": "leads to an eigenvalue problem of the form (A - λB)ỹ = 0",
+    "node_ids": [
+      "n10_n9",
+      "n10_n10"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "eigenvalue problem",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "(A - λB)ỹ = 0",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly identifies the eigenvalue problem as having the form (A - λB)ỹ = 0. This is a definitional identity, and the roles are correct.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n10_e5",
+    "pattern_type": "composed_of",
+    "evidence_span": "leads to an eigenvalue problem of the form (A - λB)ỹ = 0",
+    "node_ids": [
+      "n10_n9",
+      "n10_n11",
+      "n10_n12",
+      "n10_n13"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "eigenvalue problem",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "A",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "B",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "λ",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The eigenvalue problem (A - λB)ỹ = 0 is structurally composed of the matrices A, B, and the eigenvalue λ. The roles are correct: the eigenvalue problem is the whole, and A, B, λ are its components.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  }
+]

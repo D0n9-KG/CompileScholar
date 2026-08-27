@@ -1,0 +1,805 @@
+[
+  {
+    "edge_id": "n1c1_e0",
+    "pattern_type": "outperforms",
+    "evidence_span": "Our DQN method outperforms the best existing reinforcement learning methods on 43 of the games",
+    "node_ids": [
+      "n1c1_n1",
+      "n1c1_n2",
+      "n1c1_n3"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "applies_in_regime"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "DQN",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "best existing reinforcement learning methods",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "43 of the games",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c1_e1",
+    "pattern_type": "compares",
+    "evidence_span": "our DQN agent performed at a level that was comparable to that of a professional human games tester across the set of 49 games",
+    "node_ids": [
+      "n1c1_n1",
+      "n1c1_n4",
+      "n1c1_n5"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "applies_in_regime"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "DQN",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "professional human games tester",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "49 games",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e3",
+    "pattern_type": "background",
+    "evidence_span": "phasic signals emitted by dopaminergic neurons and temporal difference reinforcement learning algorithms",
+    "node_ids": [
+      "n1c0_n1",
+      "n1c0_n12"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "deep Q-network",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "temporal difference reinforcement learning algorithms",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e4",
+    "pattern_type": "background",
+    "evidence_span": "harmonious combination of reinforcement learning and hierarchical sensory processing systems",
+    "node_ids": [
+      "n1c0_n1",
+      "n1c0_n13"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "deep Q-network",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "hierarchical sensory processing systems",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e6",
+    "pattern_type": "improves",
+    "evidence_span": "we address these instabilities with a novel variant of Q-learning",
+    "node_ids": [
+      "n1c0_n9",
+      "n1c0_n10"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Q-learning",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "action-value function",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e7",
+    "pattern_type": "improves",
+    "evidence_span": "these methods, unlike our algorithm, are too inefficient to be used successfully with large neural networks",
+    "node_ids": [
+      "n1c0_n1",
+      "n1c0_n7"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "deep Q-network",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "neural fitted Q-iteration",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e8",
+    "pattern_type": "composed_of",
+    "evidence_span": "we used a biologically inspired mechanism termed experience replay... Second, we used an iterative update that adjusts the action-values (Q) towards target values that are only periodically updated",
+    "node_ids": [
+      "n1c0_n1",
+      "n1c0_n6",
+      "n1c0_n18"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "deep Q-network",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "experience replay",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "target network",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e10",
+    "pattern_type": "measures",
+    "evidence_span": "To evaluate our DQN agent, we took advantage of the Atari 2600 platform",
+    "node_ids": [
+      "n1c0_n8",
+      "n1c0_n1"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Atari 2600 platform",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "deep Q-network",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e11",
+    "pattern_type": "composed_of",
+    "evidence_span": "train large neural networks using a reinforcement learning signal and stochastic gradient descent",
+    "node_ids": [
+      "n1c0_n1",
+      "n1c0_n19",
+      "n1c0_n20"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "deep Q-network",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "stochastic gradient descent",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "reinforcement learning signal",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c2_e0",
+    "pattern_type": "contrasts_with",
+    "evidence_span": "games demanding more temporally extended planning strategies still constitute a major challenge for all existing agents",
+    "node_ids": [
+      "n1c2_n1",
+      "n1c2_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "games demanding more temporally extended planning strategies",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "all existing agents",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that certain games are a challenge for all existing agents. This is a statement of difficulty, not a contrast or opposition between the games and the agents. The relation is not 'contrasts_with'; it is a statement about a limitation or challenge. The edge does not establish a discourse-level contrast.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c2_e1",
+    "pattern_type": "contrasts_with",
+    "evidence_span": "games demanding more temporally extended planning strategies still constitute a major challenge for all existing agents including DQN",
+    "node_ids": [
+      "n1c2_n1",
+      "n1c2_n3"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "games demanding more temporally extended planning strategies",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "DQN",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that certain games are a challenge for DQN. This is a statement of a limitation, not a contrast or opposition. The relation is not 'contrasts_with'; it is a statement about a challenge. The edge does not establish a discourse-level contrast.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c2_e2",
+    "pattern_type": "contrasts_with",
+    "evidence_span": "games demanding more temporally extended planning strategies still constitute a major challenge for all existing agents including DQN (for example, Montezuma’s Revenge)",
+    "node_ids": [
+      "n1c2_n1",
+      "n1c2_n4"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "games demanding more temporally extended planning strategies",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "Montezuma’s Revenge",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that certain games are a challenge for all existing agents, with Montezuma's Revenge as an example. This is a statement of difficulty, not a contrast or opposition. The relation is not 'contrasts_with'; it is a statement about a challenge. The edge does not establish a discourse-level contrast.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e3",
+    "pattern_type": "influences",
+    "evidence_span": "the t-SNE algorithm tends to map the DQN representation of perceptually similar states to nearby points",
+    "node_ids": [
+      "n1c1_n9",
+      "n1c1_n10",
+      "n1c1_n11"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "t-SNE",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "DQN representation of perceptually similar states",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "nearby points",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a mapping operation performed by t-SNE. It does not state a causal or functional dependence between t-SNE and the DQN representation. The relation is not 'influences'; it is a description of a visualization technique's behavior. The edge does not establish a dependency relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c1_e5",
+    "pattern_type": "learns_approximation",
+    "evidence_span": "Breakout: the agent learns the optimal strategy, which is to first dig a tunnel around the side of the wall allowing the ball to be sent around the back to destroy a large number of blocks",
+    "node_ids": [
+      "n1c1_n1",
+      "n1c1_n15"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "DQN",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "optimal strategy",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the agent learns the optimal strategy. This is a statement of learning a strategy, not learning an approximation of a target function or property. The relation is not 'learns_approximation'; it is a statement about learning a policy. The edge does not establish an approximation relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c0_e1",
+    "pattern_type": "composed_of",
+    "evidence_span": "the deep convolutional network, which uses hierarchical layers of tiled convolutional filters to mimic the effects of receptive fields",
+    "node_ids": [
+      "n1c0_n4",
+      "n1c0_n16"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "deep convolutional network",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "receptive fields",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states that the deep convolutional network USES hierarchical layers of tiled convolutional filters to MIMIC the effects of receptive fields. This is a functional/behavioral mimicry, not a structural composition. The network is not composed of receptive fields; it mimics their effects. The relation is better captured by 'influences' or 'background', but the current edge is incorrect. The 'receptive fields' are not a structural component of the network.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n1c0_e9",
+    "pattern_type": "influences",
+    "evidence_span": "the action-value (also known as Q) function",
+    "node_ids": [
+      "n1c0_n10",
+      "n1c0_n5"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "action-value function",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "optimal action-value function",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence span is a parenthetical definition, not a statement of influence or dependence. It merely states that the action-value function is also known as the Q function. This is a definitional identity, not a causal or functional dependence. The edge claims an 'influences' relation, but the evidence does not support it. The relation is 'defines', not 'influences'.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n2c1_e4",
+    "pattern_type": "composed_of",
+    "evidence_span": "critically dependent on our incorporation of a replay algorithm",
+    "node_ids": [
+      "n2c1_n8",
+      "n2c1_n9"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "single architecture",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "replay algorithm",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c1_e5",
+    "pattern_type": "background",
+    "evidence_span": "hippocampus may support the physical realization of such a process",
+    "node_ids": [
+      "n2c1_n9",
+      "n2c1_n10"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "replay algorithm",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "hippocampus",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c1_e7",
+    "pattern_type": "compares",
+    "evidence_span": "Partially completed screens are assigned lower state values",
+    "node_ids": [
+      "n2c1_n13",
+      "n2c1_n14"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "partially completed screens",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "full screens",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e4",
+    "pattern_type": "composed_of",
+    "evidence_span": "the successful integration of reinforcement learning with deep network architectures was critically dependent on our incorporation of a replay algorithm",
+    "node_ids": [
+      "n2c0_n1",
+      "n2c0_n9"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "single architecture",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "replay algorithm",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e7",
+    "pattern_type": "compares",
+    "evidence_span": "Partially completed screens (bottom screenshots) are assigned lower state values",
+    "node_ids": [
+      "n2c0_n13",
+      "n2c0_n14",
+      "n2c0_n12"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "metric"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Partially completed screens",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "full screens",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "state values",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e5",
+    "pattern_type": "background",
+    "evidence_span": "the hippocampus may support the physical realization of such a process",
+    "node_ids": [
+      "n2c0_n9",
+      "n2c0_n10"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "replay algorithm",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "hippocampus",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states that the hippocampus supports the physical realization of the replay process, which is a background/motivation relation. The replay algorithm is the subject (from) and the hippocampus is the supporting biological evidence (to). The direction is correct.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3c1_e0",
+    "pattern_type": "obtained_from",
+    "evidence_span": "the agent observes an image $x _ { t } \\in \\mathbb { R } ^ { d }$ from the emulator",
+    "node_ids": [
+      "n3c1_n2",
+      "n3c1_n3"
+    ],
+    "node_roles": [
+      "data",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "image $x_t \\in \\mathbb{R}^d$",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "emulator",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "gate:slot-type-mismatch",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c1_e14",
+    "pattern_type": "defines",
+    "evidence_span": "in which T is the t0~ttime-step at which the game terminates",
+    "node_ids": [
+      "n3c1_n36",
+      "n3c1_n37"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "T",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "time-step at which the game terminates",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence defines T as the time-step at which the game terminates. The subject and definition roles are correctly bound.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3c1_e18",
+    "pattern_type": "influences",
+    "evidence_span": "if the optimal value $\\boldsymbol { Q } ^ { * } ( s ^ { \\prime } , a ^ { \\prime } )$ of the sequence s9 at the next time-step was known for all possible actions ${ \\boldsymbol { a } } ^ { \\prime } ,$ then the optimal strategy is to select the action a9 maximizing the expected value of $\\dot { \\boldsymbol { r } } + \\gamma \\boldsymbol { Q } ^ { * } ( \\boldsymbol { s } ^ { \\prime } , \\boldsymbol { a } ^ { \\prime } )$",
+    "node_ids": [
+      "n3c1_n48",
+      "n3c1_n52"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "optimal value $Q^*(s',a')$",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "optimal strategy",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence states that the optimal strategy depends on the optimal value of the next state. The source (the known optimal value) influences the target (the optimal strategy). The direction is correct: the known value is the source/cause, and the strategy is the target/effect.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  }
+]

@@ -1,0 +1,1239 @@
+[
+  {
+    "edge_id": "n1_e1",
+    "pattern_type": "influences",
+    "evidence_span": "Flowing droplets are deformed due to forces from neighboring droplets",
+    "node_ids": [
+      "n1_n3",
+      "n1_n4"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "forces from neighboring droplets",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "droplet deformations",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1_e2",
+    "pattern_type": "influences",
+    "evidence_span": "these deformations are decreased by nearby T1 events",
+    "node_ids": [
+      "n1_n5",
+      "n1_n4"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "nearby T1 events",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "droplet deformations",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1_e5",
+    "pattern_type": "measures",
+    "evidence_span": "observing the flow of a concentrated oil-in-water emulsion in a thin chamber with a constricting hopper shape",
+    "node_ids": [
+      "n1_n10",
+      "n1_n11"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "flow of a concentrated oil-in-water emulsion",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "concentrated oil-in-water emulsion",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes the experimental setup (observing the flow) but does not state a measurement relation where the flow is measured by the emulsion. The emulsion is the object being observed, not an instrument. The relation is a setup description, not a measurement.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n2c1_e2",
+    "pattern_type": "defines",
+    "evidence_span": "a 'T1 event,' a topological change of four droplets exchanging neighbors",
+    "node_ids": [
+      "n2c1_n5",
+      "n2c1_n6"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "T1 event",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "topological change of four droplets exchanging neighbors",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence explicitly defines a T1 event as a topological change of four droplets exchanging neighbors. This is a clear definitional identity.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n2c1_e3",
+    "pattern_type": "influences",
+    "evidence_span": "Jamming occurs when φ exceeds a critical value φ_J, and it is for φ ≥ φ_J that these samples have a yield stress.",
+    "node_ids": [
+      "n2c1_n1",
+      "n2c1_n7",
+      "n2c1_n8"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "volume fraction φ",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "jamming",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "yield stress",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence states that jamming occurs when φ exceeds φ_J and that yield stress exists for φ ≥ φ_J. This establishes a causal dependence of jamming and yield stress on volume fraction. The direction is correct: volume fraction is the source/cause.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n2c0_e3",
+    "pattern_type": "influences",
+    "evidence_span": "Jamming occurs when φ exceeds a critical value φ_J, and it is for φ ≥ φ_J that these samples have a yield stress.",
+    "node_ids": [
+      "n2c0_n1",
+      "n2c0_n7",
+      "n2c0_n8"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "volume fraction φ",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "jamming",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "yield stress",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence states that jamming occurs when φ exceeds φ_J, and that for φ ≥ φ_J, samples have a yield stress. This establishes a causal dependence of jamming and yield stress on volume fraction. The direction is correct: volume fraction is the source/cause, and jamming/yield stress are the targets/effects.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3c0_e4",
+    "pattern_type": "defines",
+    "evidence_span": "The adhesive tape is cut into a constricting hopper shape.",
+    "node_ids": [
+      "n3c0_n12",
+      "n3c0_n5"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "constricting hopper shape",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "thin film of double-sided adhesive tape",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e10",
+    "pattern_type": "defines",
+    "evidence_span": "the jamming point is φ_J ≈ 0.84 for our samples",
+    "node_ids": [
+      "n3c0_n24",
+      "n3c0_n23"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "jamming point φ_J ≈ 0.84",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "jammed",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e16",
+    "pattern_type": "measures",
+    "evidence_span": "From these outlines we identify the center of mass of each droplet area and also the perimeters of each droplet [38].",
+    "node_ids": [
+      "n3c0_n34",
+      "n3c0_n27"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "center of mass of each droplet area",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "bright-field microscope",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e17",
+    "pattern_type": "measures",
+    "evidence_span": "From these outlines we identify the center of mass of each droplet area and also the perimeters of each droplet [38].",
+    "node_ids": [
+      "n3c0_n35",
+      "n3c0_n27"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "perimeters of each droplet",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "bright-field microscope",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e19",
+    "pattern_type": "drops_out_of",
+    "evidence_span": "we discard these droplets (r < 0.03mm) from our analysis",
+    "node_ids": [
+      "n3c0_n36",
+      "n3c0_n38"
+    ],
+    "node_roles": [
+      "dropped",
+      "container"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "tiny droplets",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "r < 0.03mm",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e23",
+    "pattern_type": "defines",
+    "evidence_span": "This can be regarded as the uncertainty in D",
+    "node_ids": [
+      "n3c0_n48",
+      "n3c0_n47"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "uncertainty in D",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "D ≈ 0.03",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e26",
+    "pattern_type": "influences",
+    "evidence_span": "These contact forces then deform the droplets further from round.",
+    "node_ids": [
+      "n3c0_n53",
+      "n3c0_n25"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "contact forces",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "deformation",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e0",
+    "pattern_type": "composed_of",
+    "evidence_span": "The sample chamber has a gap of 0.10 ± 0.02 mm, controlled by a thin film of double-sided adhesive tape sandwiched between two glass plates.",
+    "node_ids": [
+      "n3c0_n3",
+      "n3c0_n5",
+      "n3c0_n6"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "sample chamber",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "thin film of double-sided adhesive tape",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "two glass plates",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly states the sample chamber is composed of the tape and glass plates. The relation is structural and correctly typed.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3c0_e2",
+    "pattern_type": "sourced_from",
+    "evidence_span": "The droplets are silicone oil (poly-dimethylsiloxane, ρ = 1 g/mL, η = 350 mPa·s) in water, made by the “co-flow” microfluidic technique [44].",
+    "node_ids": [
+      "n3c0_n7",
+      "n3c0_n9"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "silicone oil (poly-dimethylsiloxane, ρ = 1 g/mL, η = 350 mPa·s)",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "co-flow microfluidic technique",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-missed-bad-role",
+    "verifier_note": "The evidence states the droplets are 'made by' the co-flow technique, which is a source/origin relation, not a definitional identity. The correct pattern is sourced_from.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "retype:sourced_from"
+  },
+  {
+    "edge_id": "n3c0_e6",
+    "pattern_type": "compares",
+    "evidence_span": "The droplets have a diameter at least twice as large as the gap thickness",
+    "node_ids": [
+      "n3c0_n16",
+      "n3c0_n17",
+      "n3c0_n18"
+    ],
+    "node_roles": [
+      "target",
+      "source",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "droplets",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "diameter",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "gap thickness",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-missed-bad-role",
+    "verifier_note": "The evidence states a comparative relationship between the droplet diameter and gap thickness, not a causal dependence. The correct pattern is compares.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "retype:compares"
+  },
+  {
+    "edge_id": "n3c0_e8",
+    "pattern_type": "exhibits_property",
+    "evidence_span": "At a low area fraction, these droplets are circular in shape when viewed from below.",
+    "node_ids": [
+      "n3c0_n20",
+      "n3c0_n21"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "low area fraction",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "circular in shape",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-missed-bad-role",
+    "verifier_note": "The evidence states the droplets exhibit a circular shape, which is a property, not a definitional identity. The correct pattern is exhibits_property.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "retype:exhibits_property"
+  },
+  {
+    "edge_id": "n3c0_e9",
+    "pattern_type": "influences",
+    "evidence_span": "the samples have area fraction φ ≥ 0.90, at which the samples are jammed",
+    "node_ids": [
+      "n3c0_n22",
+      "n3c0_n23"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "area fraction φ ≥ 0.90",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "jammed",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states that at an area fraction of φ ≥ 0.90, the samples are jammed. This is a threshold dependence where the area fraction (source) causes the jamming (target). The roles are correctly assigned with the causal quantity as source and the dependent state as target.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3c0_e13",
+    "pattern_type": "composed_of",
+    "evidence_span": "We use a bright-field microscope coupled to a CCD camera to record movies of our flowing emulsions at 30 frames per second.",
+    "node_ids": [
+      "n3c0_n27",
+      "n3c0_n28"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "bright-field microscope",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "CCD camera",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes an experimental setup where a microscope is coupled to a camera. This is a description of equipment, not a structural composition of a model or method. The pattern boundary explicitly states 'NOT experimental setup description'. The relation does not exist as composed_of.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e18",
+    "pattern_type": "influences",
+    "evidence_span": "As these droplets always fit into the interstices of the larger droplets",
+    "node_ids": [
+      "n3c0_n36",
+      "n3c0_n37"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "tiny droplets",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "interstices of the larger droplets",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a spatial relationship where tiny droplets fit into the interstices of larger droplets. This is a spatial configuration, not a causal or scaling dependence. The pattern boundary for influences states it is NOT a co-listing of parallel items. The relation does not exist as influences.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e22",
+    "pattern_type": "influences",
+    "evidence_span": "pixelation results in D ≈ 0.03 in these cases.",
+    "node_ids": [
+      "n3c0_n46",
+      "n3c0_n47"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "pixelation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "D ≈ 0.03",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The sentence explicitly states that pixelation causes D ≈ 0.03. The edge correctly identifies 'pixelation' as the source (cause) and 'D ≈ 0.03' as the target (effect).",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3c0_e32",
+    "pattern_type": "influences",
+    "evidence_span": "We cannot measure the exact forces in these experiments as the data were acquired with resolution inadequate to resolve forces",
+    "node_ids": [
+      "n3c0_n65",
+      "n3c0_n66"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "exact forces",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "resolution inadequate to resolve forces",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence states a limitation of the measurement setup, not a causal or functional dependence between 'exact forces' and 'resolution'. It describes why forces cannot be measured, not how one influences the other. This is a setup/limitation statement, not a dependency relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c1_e2",
+    "pattern_type": "notes_similarity",
+    "evidence_span": "A connection between large deformation drops and T1 events has been observed before in foams",
+    "node_ids": [
+      "n4c1_n5",
+      "n4c1_n6"
+    ],
+    "node_roles": [
+      "similar_work",
+      "referenced_work"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "large deformation drops",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "T1 events",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:slot-type-mismatch",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c1_e3",
+    "pattern_type": "notes_similarity",
+    "evidence_span": "as well as in our prior analysis of these emulsion experiments",
+    "node_ids": [
+      "n4c1_n5",
+      "n4c1_n6"
+    ],
+    "node_roles": [
+      "similar_work",
+      "referenced_work"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "large deformation drops",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "T1 events",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:slot-type-mismatch",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e14",
+    "pattern_type": "contrasts_with",
+    "evidence_span": "Our distribution is slightly broader than a previous foam experiment, which found a Gaussian distribution for a similar quantity",
+    "node_ids": [
+      "n4c0_n48",
+      "n4c0_n51"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "probability distribution of event sizes",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "Gaussian distribution",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c1_e13",
+    "pattern_type": "influences",
+    "evidence_span": "no systematic dependence on $\\tilde{A}$ is seen",
+    "node_ids": [
+      "n4c1_n36",
+      "n4c1_n4"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "no systematic dependence on $\\tilde{A}$",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "$\\tilde{A}$",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence explicitly states that there is NO systematic dependence on Ã, which is a statement of independence. This directly negates the 'influences' relation claimed by the edge. The edge should be dropped.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e1",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "The narrowing width of the channel is given by w(x) = 2 tan(Θ)(x0 - x)",
+    "node_ids": [
+      "n4c0_n5",
+      "n4c0_n6",
+      "n4c0_n7",
+      "n4c0_n8"
+    ],
+    "node_roles": [
+      "output",
+      "parameter",
+      "parameter",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "w(x)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "x0",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Θ",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "x",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence provides an explicit formula for w(x) as a function of x, with x0 and Θ as parameters. This is a formal quantitative law, fitting the 'constitutive_law' pattern. The roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n4c0_e4",
+    "pattern_type": "influences",
+    "evidence_span": "The fit parameters kα and kβ appear fairly independent of the flux rate",
+    "node_ids": [
+      "n4c0_n12",
+      "n4c0_n11"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "kα",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "A",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence explicitly states 'independent of the flux rate', which negates the claimed positive influences/dependency relation. The edge claims kα depends on A, but the text states it does not.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e5",
+    "pattern_type": "influences",
+    "evidence_span": "The fit parameters kα and kβ appear fairly independent of the flux rate",
+    "node_ids": [
+      "n4c0_n13",
+      "n4c0_n11"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "kβ",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "A",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence explicitly states 'independent of the flux rate', which negates the claimed positive influences/dependency relation. The edge claims kβ depends on A, but the text states it does not.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e6",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "kα - kβ / 12 = 1 is required for constant flux",
+    "node_ids": [
+      "n4c0_n14",
+      "n4c0_n11"
+    ],
+    "node_roles": [
+      "output",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "kα - kβ / 12 = 1",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "A",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states a constraint/requirement (kα - kβ/12 = 1) for constant flux, not a constitutive law relating an output to inputs. The node 'A' is not part of this equation, making the slot binding incorrect. The relation is a constraint, not a law.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e10",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "⟨D⟩y,t(x)=D0[1+A/kvw(x)]",
+    "node_ids": [
+      "n4c0_n28",
+      "n4c0_n25",
+      "n4c0_n11",
+      "n4c0_n29",
+      "n4c0_n5"
+    ],
+    "node_roles": [
+      "output",
+      "parameter",
+      "input",
+      "parameter",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "⟨D⟩y,t(x)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "D0",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "A",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "kv",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "w(x)",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence provides an explicit formula for ⟨D⟩y,t(x) as a function of A and w(x), with parameters D0 and kv. This matches the constitutive_law pattern. The roles are correctly assigned: output is ⟨D⟩, inputs are A and w(x), parameters are D0 and kv.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n4c0_e11",
+    "pattern_type": "influences",
+    "evidence_span": "A/w(x) is proportional to the mean flow speed ⟨Vx⟩y",
+    "node_ids": [
+      "n4c0_n31",
+      "n4c0_n32"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "A/w(x)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "⟨Vx⟩y",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states a proportional relationship between A/w(x) and ⟨Vx⟩y. The direction is correct: ⟨Vx⟩y (source) is proportional to A/w(x) (target), meaning A/w(x) depends on ⟨Vx⟩y.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n5c0_e3",
+    "pattern_type": "compares",
+    "evidence_span": "The relaxation is asymmetric among the two pairs of droplets in the T1 event. The length of the blue region along the time axis for the diverging pair is much longer than for the converging pair. This suggests the diverging droplets have their shape relaxed more significantly than the converging droplets.",
+    "node_ids": [
+      "n5c0_n7",
+      "n5c0_n8"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "deformation relaxation of diverging pair",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "deformation relaxation of converging pair",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5c0_e4",
+    "pattern_type": "compares",
+    "evidence_span": "The cluster sizes formed after this shuffling are smaller by 0.4 on average (that is, ≈1.6 particles rather than ≈2.0).",
+    "node_ids": [
+      "n5c0_n9",
+      "n5c0_n10"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "cluster sizes from real data",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "cluster sizes from shuffled data",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5c0_e5",
+    "pattern_type": "exhibits_property",
+    "evidence_span": "This strongly suggests that our clusters, while quite small, nonetheless indicate some true spatial correlations between T1 events.",
+    "node_ids": [
+      "n5c0_n11",
+      "n5c0_n12"
+    ],
+    "node_roles": [
+      "entity",
+      "property"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "T1 clusters",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "true spatial correlations",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5c0_e7",
+    "pattern_type": "defines",
+    "evidence_span": "we investigate clusters of neighboring T1 events with separations less than 6⟨r⟩",
+    "node_ids": [
+      "n5c0_n15",
+      "n5c0_n16"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "T1 cluster",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "neighboring T1 events with separations less than 6⟨r⟩",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5c0_e6",
+    "pattern_type": "exhibits_property",
+    "evidence_span": "the sizes of those largest clusters N_cluster are fairly small (a mean value close to 2) and have no dependence on the flux rate in these experiments",
+    "node_ids": [
+      "n5c0_n13",
+      "n5c0_n14"
+    ],
+    "node_roles": [
+      "entity",
+      "property"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "N_cluster",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "flux rate",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence explicitly states that N_cluster has 'no dependence on the flux rate', which is a negation of any dependency or influence relation. The exhibits_property pattern is also incorrect because the sentence states independence, not a property. The edge should be dropped.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6_e5",
+    "pattern_type": "influences",
+    "evidence_span": "We also find that T1 events decrease the deformation of nearby droplets, with a spatial pattern related to the local spatial structure of the droplets.",
+    "node_ids": [
+      "n6_n1",
+      "n6_n11"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "local rearrangement events (T1 events)",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "deformation of nearby droplets",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  }
+]

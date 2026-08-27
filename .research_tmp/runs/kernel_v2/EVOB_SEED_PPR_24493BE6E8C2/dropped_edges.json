@@ -1,0 +1,1529 @@
+[
+  {
+    "edge_id": "n1c0_e1",
+    "pattern_type": "improves",
+    "evidence_span": "we address these instabilities with a novel variant of Q-learning",
+    "node_ids": [
+      "n1c0_n7",
+      "n1c0_n6"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Q-learning",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "neural fitted Q-iteration",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e2",
+    "pattern_type": "improves",
+    "evidence_span": "these methods, unlike our algorithm, are too inefficient to be used successfully with large neural networks",
+    "node_ids": [
+      "n1c0_n6",
+      "n1c0_n7"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "neural fitted Q-iteration",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Q-learning",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e4",
+    "pattern_type": "composed_of",
+    "evidence_span": "we used a biologically inspired mechanism termed experience replay... Second, we used an iterative update that adjusts the action-values (Q) towards target values that are only periodically updated",
+    "node_ids": [
+      "n1c0_n1",
+      "n1c0_n5",
+      "n1c0_n13"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "deep Q-network",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "experience replay",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "target network",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e5",
+    "pattern_type": "influences",
+    "evidence_span": "the parameters (that is, weights) of the Q-network at iteration i",
+    "node_ids": [
+      "n1c0_n10",
+      "n1c0_n12"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "optimal action-value function",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "Q-network",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e6",
+    "pattern_type": "influences",
+    "evidence_span": "The target network parameters are only updated with the Q-network parameters",
+    "node_ids": [
+      "n1c0_n10",
+      "n1c0_n13"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "optimal action-value function",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "target network",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c0_e7",
+    "pattern_type": "influences",
+    "evidence_span": "our method was able to train large neural networks using a reinforcement learning signal and stochastic gradient descent in a stable manner",
+    "node_ids": [
+      "n1c0_n1",
+      "n1c0_n14",
+      "n1c0_n15"
+    ],
+    "node_roles": [
+      "target",
+      "source",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "deep Q-network",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "stochastic gradient descent",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "reinforcement learning signal",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c1_e0",
+    "pattern_type": "compares",
+    "evidence_span": "Our DQN method outperforms the best existing reinforcement learning methods on 43 of the games",
+    "node_ids": [
+      "n1c1_n1",
+      "n1c1_n2",
+      "n1c1_n3"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "applies_in_regime"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "DQN",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "best existing reinforcement learning methods",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "43 of the games",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c1_e1",
+    "pattern_type": "compares",
+    "evidence_span": "our DQN agent performed at a level that was comparable to that of a professional human games tester across the set of 49 games",
+    "node_ids": [
+      "n1c1_n4",
+      "n1c1_n5",
+      "n1c1_n6"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "applies_in_regime"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "DQN agent",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "professional human games tester",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "49 games",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1c1_e7",
+    "pattern_type": "defines",
+    "evidence_span": "Breakout: the agent learns the optimal strategy",
+    "node_ids": [
+      "n1c1_n23",
+      "n1c1_n24",
+      "n1c1_n22"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "agent",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "optimal strategy",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Breakout",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence span states that the agent 'learns' a strategy, which is a process of acquiring a behavior, not a definitional identity. The edge incorrectly frames this as a 'defines' relation where 'agent' is defined as 'optimal strategy' in the context of 'Breakout'. This is a mischaracterization of the text; the agent learns the strategy, it is not defined by it. The relation is not a definition, and the slot binding is semantically wrong.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n2c0_e5",
+    "pattern_type": "influences",
+    "evidence_span": "providing a putative mechanism by which value functions may be efficiently updated through interactions with the basal ganglia",
+    "node_ids": [
+      "n2c0_n12",
+      "n2c0_n13",
+      "n2c0_n12",
+      "n2c0_n13"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "hippocampus",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "value functions",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "hippocampus",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "value functions",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c0_e6",
+    "pattern_type": "extends",
+    "evidence_span": "relates to the notion of ‘prioritized sweeping’",
+    "node_ids": [
+      "n2c0_n10",
+      "n2c0_n15"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "replay algorithm",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "prioritized sweeping",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2c1_e0",
+    "pattern_type": "composed_of",
+    "evidence_span": "deep reinforcement learning agent ... end-to-end reinforcement learning ... convolutional network ... experience replay algorithm",
+    "node_ids": [
+      "n2c1_n1",
+      "n2c1_n2",
+      "n2c1_n3",
+      "n2c1_n4"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "deep reinforcement learning agent",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "end-to-end reinforcement learning",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "convolutional network",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "experience replay algorithm",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence span describes the components of the deep reinforcement learning agent, which is a structural composition relation. The whole and component roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n2c1_e3",
+    "pattern_type": "background",
+    "evidence_span": "experience replay algorithm ... hippocampus",
+    "node_ids": [
+      "n2c1_n4",
+      "n2c1_n8"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "experience replay algorithm",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "hippocampus",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The text states the replay algorithm is inspired by the hippocampus, which is a background/motivation relation.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n2c1_e6",
+    "pattern_type": "influences",
+    "evidence_span": "experience replay algorithm ... value function",
+    "node_ids": [
+      "n2c1_n4",
+      "n2c1_n11"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "experience replay algorithm",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "value function",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The text states the replay algorithm provides a mechanism for updating value functions, which is a causal influence.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3c0_e4",
+    "pattern_type": "improves",
+    "evidence_span": "We instead use an architecture in which there is a separate output unit for each possible action, and only the state representation is an input to the neural network.",
+    "node_ids": [
+      "n3c0_n18",
+      "n3c0_n17"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "separate output unit for each possible action",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "history and the action",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e12",
+    "pattern_type": "defines",
+    "evidence_span": "The number of valid actions varied between 4 and 18 on the games we considered.",
+    "node_ids": [
+      "n3c0_n40",
+      "n3c0_n41",
+      "n3c0_n42"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "number of valid actions",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "4 and 18",
+        "labels": [
+          "NUMERIC"
+        ]
+      },
+      {
+        "surface": "49 Atari 2600 games",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e16",
+    "pattern_type": "influences",
+    "evidence_span": "At the same time, it could affect the performance of our agent since it cannot differentiate between rewards of different magnitude.",
+    "node_ids": [
+      "n3c0_n49",
+      "n3c0_n50",
+      "n3c0_n56"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "positive rewards",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "1",
+        "labels": [
+          "NUMERIC"
+        ]
+      },
+      {
+        "surface": "performance of our agent",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e21",
+    "pattern_type": "influences",
+    "evidence_span": "Because running the emulator forward for one step requires much less computation than having the agent select an action, this technique allows the agent to play roughly k times more games without significantly increasing the runtime.",
+    "node_ids": [
+      "n3c0_n77",
+      "n3c0_n78",
+      "n3c0_n79"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "emulator forward for one step",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "computation",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "agent to select an action",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e24",
+    "pattern_type": "defines",
+    "evidence_span": "The trained agents were evaluated by playing each game 30 times for up to 5 min each time with different initial random conditions (‘noop’; see Extended Data Table 1) and an e-greedy policy with $\\varepsilon = 0 . 0 5$ .",
+    "node_ids": [
+      "n3c0_n94",
+      "n3c0_n95",
+      "n3c0_n96"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "trained agents",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "30 times",
+        "labels": [
+          "NUMERIC"
+        ]
+      },
+      {
+        "surface": "5 min",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "gate:slot-discipline",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e25",
+    "pattern_type": "influences",
+    "evidence_span": "This procedure is adopted to minimize the possibility of overfitting during evaluation.",
+    "node_ids": [
+      "n3c0_n100",
+      "n3c0_n94",
+      "n3c0_n97"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "overfitting",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "trained agents",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "different initial random conditions",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e13",
+    "pattern_type": "defines",
+    "evidence_span": "A different network was trained on each game: the same network architecture, learning algorithm and hyperparameter settings (see Extended Data Table 1) were used across all games",
+    "node_ids": [
+      "n3c0_n43",
+      "n3c0_n44",
+      "n3c0_n45"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "different network",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "same network architecture",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "learning algorithm",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence describes a training configuration (different networks, same hyperparameters), not a definitional identity. The edge incorrectly frames this as a 'defines' relation. The relation is not a definition, and the slot binding is incorrect.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e27",
+    "pattern_type": "compares",
+    "evidence_span": "10 Hz is about the fastest that a human player can select the ‘fire’ button, and setting the random agent to this frequency avoids spurious baseline scores in a handful of the games.",
+    "node_ids": [
+      "n3c0_n106",
+      "n3c0_n104",
+      "n3c0_n105"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "fastest that a human player can select the ‘fire’ button",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "10 Hz",
+        "labels": [
+          "NUMERIC"
+        ]
+      },
+      {
+        "surface": "every sixth frame",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "verifier-missed-bad-role",
+    "verifier_note": "The sentence states that 10 Hz is approximately the fastest speed a human can select the fire button. This is a comparison/equivalence between the frequency (10 Hz) and the human capability, not a definitional identity. The edge claims a definition, but the relation is better characterized as a comparison (equivalence/contrast of formulations).",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "retype:compares"
+  },
+  {
+    "edge_id": "n3c0_e31",
+    "pattern_type": "compares",
+    "evidence_span": "The professional human tester used the same emulator engine as the agents, and played under controlled conditions.",
+    "node_ids": [
+      "n3c0_n117",
+      "n3c0_n118",
+      "n3c0_n119"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "professional human tester",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "same emulator engine",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "controlled conditions",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "verifier-missed-bad-role",
+    "verifier_note": "The sentence describes the setup of the human tester, stating they used the same emulator engine as the agents. This is a comparison of the testing conditions between the human and the agents, not a definitional identity. The edge claims a definition, but the relation is better characterized as a comparison.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "retype:compares"
+  },
+  {
+    "edge_id": "n3c0_e33",
+    "pattern_type": "influences",
+    "evidence_span": "We consider tasks in which an agent interacts with an environment, in this case the Atari emulator, in a sequence of actions, observations and rewards.",
+    "node_ids": [
+      "n3c0_n132",
+      "n3c0_n133",
+      "n3c0_n135"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "agent",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "environment",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "sequence of actions, observations and rewards",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "verifier-missed-bad-role",
+    "verifier_note": "The sentence describes an interaction between the agent and the environment, which is a functional dependence (the agent's actions influence the environment and vice versa). This is not a definitional identity. The edge claims a definition, but the relation is better characterized as an influence/dependency.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "retype:influences"
+  },
+  {
+    "edge_id": "n4c1_e1",
+    "pattern_type": "composed_of",
+    "evidence_span": "Algorithm 1: deep Q-learning with experience replay. Initialize replay memory D to capacity N Initialize action-value function Q with random weights h Initialize target action-value function $\\hat { \\boldsymbol Q }$ with weights $\\theta ^ { - } = \\theta$",
+    "node_ids": [
+      "n4c1_n5",
+      "n4c1_n6",
+      "n4c1_n8",
+      "n4c1_n10"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Algorithm 1: deep Q-learning with experience replay",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "replay memory D",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "action-value function Q",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "target action-value function Q̂",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c1_e2",
+    "pattern_type": "defines",
+    "evidence_span": "Initialize sequence $s _ { 1 } = \\{ x _ { 1 } \\}$ and preprocessed sequence $\\phi _ { 1 } = \\phi ( s _ { 1 } )$",
+    "node_ids": [
+      "n4c1_n12",
+      "n4c1_n13"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "sequence s₁ = {x₁}",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "preprocessed sequence φ₁ = φ(s₁)",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c1_e5",
+    "pattern_type": "defines",
+    "evidence_span": "$\\mathrm { S e t } y _ { j } = \\left\\{ \\begin{array} { c } { r _ { j } } \\\\ { r _ { j } + \\gamma \\operatorname* { m a x } _ { a ^ { \\prime } } \\hat { Q } \\Big ( \\phi _ { j + 1 } , a ^ { \\prime } ; \\theta ^ { - } \\Big ) } \\end{array} \\right.$",
+    "node_ids": [
+      "n4c1_n26",
+      "n4c1_n27",
+      "n4c1_n28",
+      "n4c1_n29"
+    ],
+    "node_roles": [
+      "subject",
+      "object",
+      "parameter",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "y_j",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "r_j",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "γ",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "max_{a'} Q̂(φ_{j+1}, a'; θ⁻)",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:illegal-role",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c1_e6",
+    "pattern_type": "defines",
+    "evidence_span": "Every C steps reset $\\scriptstyle { \\hat { Q } } = Q$",
+    "node_ids": [
+      "n4c1_n33",
+      "n4c1_n10"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Q̂ = Q",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "target action-value function Q̂",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e7",
+    "pattern_type": "influences",
+    "evidence_span": "The final term is the variance of the targets, which does not depend on the parameters hi that we are currently optimizing",
+    "node_ids": [
+      "n4c0_n16",
+      "n4c0_n14"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "variance of the targets",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "network weights",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e13",
+    "pattern_type": "composed_of",
+    "evidence_span": "The algorithm modifies standard online Q-learning in two ways to make it suitable for training large neural networks without diverging. First, we use a technique known as experience replay... The second modification to online Q-learning aimed at further improving the stability of our method with neural networks is to use a separate network for generating the targets yj",
+    "node_ids": [
+      "n4c0_n25",
+      "n4c0_n26",
+      "n4c0_n37"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "deep Q-networks",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "experience replay",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "target network",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e14",
+    "pattern_type": "influences",
+    "evidence_span": "each step of experience is potentially used in many weight updates, which allows for greater data efficiency",
+    "node_ids": [
+      "n4c0_n29",
+      "n4c0_n26"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "data efficiency",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "experience replay",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e16",
+    "pattern_type": "influences",
+    "evidence_span": "when learning onpolicy the current parameters determine the next data sample that the parameters are trained on... It is easy to see how unwanted feedback loops may arise",
+    "node_ids": [
+      "n4c0_n32",
+      "n4c0_n22"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "feedback loops",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "greedy policy",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e19",
+    "pattern_type": "compares",
+    "evidence_span": "A more sophisticated sampling strategy might emphasize transitions from which we can learn the most, similar to prioritized sweeping",
+    "node_ids": [
+      "n4c0_n26",
+      "n4c0_n36"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "experience replay",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "prioritized sweeping",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e20",
+    "pattern_type": "improves",
+    "evidence_span": "The second modification to online Q-learning aimed at further improving the stability of our method with neural networks is to use a separate network for generating the targets yj",
+    "node_ids": [
+      "n4c0_n37",
+      "n4c0_n18"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "target network",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Q-learning algorithm",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e21",
+    "pattern_type": "influences",
+    "evidence_span": "We also found it helpful to clip the error term from the update $r + \\gamma$ maxa0 $Q$ $\\left( s ^ { \\prime } , a ^ { \\prime } ; \\theta _ { i } ^ { - } \\right) - Q ( s , a ; \\theta _ { i } )$ to be between 21 and 1",
+    "node_ids": [
+      "n4c0_n38",
+      "n4c0_n37"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "error term",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "target network",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c1_e3",
+    "pattern_type": "defines",
+    "evidence_span": "With probability e select a random action $a _ { t }$ otherwise select $a _ { t } = \\operatorname { a r g m a x } _ { a } Q ( \\phi ( s _ { t } ) , a ; \\theta )$",
+    "node_ids": [
+      "n4c1_n16",
+      "n4c1_n14"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "action a_t = argmax_a Q(φ(s_t), a; θ)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "random action a_t",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a conditional action selection policy (with probability e do X, otherwise do Y), not a definitional identity. The edge incorrectly frames this as a 'defines' relation, and the roles are misassigned.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c1_e4",
+    "pattern_type": "defines",
+    "evidence_span": "Set $s _ { t + 1 } = s _ { t } , a _ { t } , x _ { t + 1 }$ 1 and preprocess $\\phi _ { t + 1 } = \\phi ( s _ { t + 1 } )$",
+    "node_ids": [
+      "n4c1_n21",
+      "n4c1_n22"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "s_{t+1} = s_t, a_t, x_{t+1}",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "φ_{t+1} = φ(s_{t+1})",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a procedural step in the algorithm (setting a state and preprocessing it), not a definitional identity. The edge incorrectly frames this as a 'defines' relation, and the roles are misassigned.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e1",
+    "pattern_type": "extends",
+    "evidence_span": "Such value iteration algorithms converge to the optimal action-value function",
+    "node_ids": [
+      "n4c0_n3",
+      "n4c0_n4"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "value iteration algorithms",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "optimal action-value function",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states a convergence property of value iteration algorithms, not a generalization/extension relation. The edge incorrectly frames this as an 'extends' relation, and the roles are misassigned.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e2",
+    "pattern_type": "improves",
+    "evidence_span": "In practice, this basic approach is impractical, because the action-value function is estimated separately for each sequence, without any generalization. Instead, it is common to use a function approximator to estimate the action-value function",
+    "node_ids": [
+      "n4c0_n5",
+      "n4c0_n1"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "function approximator",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "action-value function",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a practical alternative (using a function approximator) to an impractical approach, not an improvement that resolves a specific limitation. The edge incorrectly frames this as an 'improves' relation, and the roles are misassigned.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e8",
+    "pattern_type": "improves",
+    "evidence_span": "it is often computationally expedient to optimize the loss function by stochastic gradient descent",
+    "node_ids": [
+      "n4c0_n17",
+      "n4c0_n12"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "stochastic gradient descent",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "loss functions",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that SGD is used to optimize the loss function, which is a method-to-object relation, not an improvement of one method over another. It does not claim SGD improves the loss function itself. The relation is 'optimizes', not 'improves'.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e9",
+    "pattern_type": "defines",
+    "evidence_span": "The familiar Q-learning algorithm19 can be recovered in this framework by updating the weights after every time step, replacing the expectations using single samples, and setting $\\theta _ { i } ^ { - } = \\theta _ { i - 1 }$",
+    "node_ids": [
+      "n4c0_n18",
+      "n4c0_n17"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Q-learning algorithm",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "stochastic gradient descent",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states Q-learning is a special case of the framework, not that it is defined as stochastic gradient descent. The relation is 'special_case_of', not a definitional identity. The slot binding is wrong: SGD is not the definition of Q-learning.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e10",
+    "pattern_type": "defines",
+    "evidence_span": "this algorithm is model-free: it solves the reinforcement learning task directly using samples from the emulator, without explicitly estimating the reward and transition dynamics",
+    "node_ids": [
+      "n4c0_n19",
+      "n4c0_n20"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "model-free",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "reward and transition dynamics",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence defines 'model-free' by what it does NOT do (not estimating dynamics), not by identifying it with the dynamics. The relation is a characterization, not a definitional identity. The slot binding is wrong: 'reward and transition dynamics' is what is not estimated, not a definition.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e11",
+    "pattern_type": "defines",
+    "evidence_span": "It is also off-policy: it learns about the greedy policy, while following a behaviour distribution",
+    "node_ids": [
+      "n4c0_n21",
+      "n4c0_n22",
+      "n4c0_n23"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "off-policy",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "greedy policy",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "behaviour distribution",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence describes what off-policy means (learning about one policy while following another), but it is not a definitional identity. The relation is a characterization, not a definition. The slot binding is wrong: 'greedy policy' and 'behaviour distribution' are not definitions of 'off-policy'.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e12",
+    "pattern_type": "defines",
+    "evidence_span": "the behaviour distribution is often selected by an e-greedy policy that follows the greedy policy with probability $1 - \\varepsilon$ and selects a random action with probability e",
+    "node_ids": [
+      "n4c0_n24",
+      "n4c0_n22",
+      "n4c0_n23"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "e-greedy policy",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "greedy policy",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "behaviour distribution",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states the behaviour distribution is selected by the e-greedy policy, which is a selection relation, not a definition. The slot binding is wrong: 'greedy policy' is not a definition of 'e-greedy policy'.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  }
+]

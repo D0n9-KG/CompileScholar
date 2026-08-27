@@ -1,0 +1,382 @@
+[
+  {
+    "pattern_type": "composed_of",
+    "roles": [
+      "whole",
+      "component",
+      "component",
+      "component"
+    ],
+    "evidence": "we demonstrate the importance of the individual core components of the DQN agent"
+  },
+  {
+    "pattern_type": "extends",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "the representations learned by DQN are able to generalize to data generated from"
+  },
+  {
+    "pattern_type": "composed_of",
+    "roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "evidence": "we developed a novel agent, a deep Q-network (DQN), which is able to combine rei"
+  },
+  {
+    "pattern_type": "learns_approximation",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "we use a deep convolutional neural network to approximate the optimal action-val"
+  },
+  {
+    "pattern_type": "background",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "inspired by Hubel and Wiesel’s seminal work on feedforward processing in early v"
+  },
+  {
+    "pattern_type": "contrasts_with",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "In contrast to previous work24,26"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "reward to continuously shape representations"
+  },
+  {
+    "pattern_type": "background",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "draws on neurobiological evidence"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "reward signals during perceptual learning may influence"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "completing a screen leads to a new screen full of enemy ships"
+  },
+  {
+    "pattern_type": "contrasts_with",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "In contrast to previous work24,26, our approach incorporates ‘end-to-end’ reinfo"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "uses reward to continuously shape representations"
+  },
+  {
+    "pattern_type": "background",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "This principle draws on neurobiological evidence"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "reward signals during perceptual learning may influence the characteristics of r"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "completing a screen leads to a new screen full of enemy ships"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition"
+    ],
+    "evidence": "which is a vector of pixel values representing the current screen"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition"
+    ],
+    "evidence": "it receives a reward rt representing the change in game score"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "the game score may depend on the whole previous sequence of actions and observat"
+  },
+  {
+    "pattern_type": "exhibits_property",
+    "roles": [
+      "entity",
+      "property"
+    ],
+    "evidence": "the task is partially observed"
+  },
+  {
+    "pattern_type": "exhibits_property",
+    "roles": [
+      "entity",
+      "property"
+    ],
+    "evidence": "many emulator states are perceptually aliased"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "it is impossible to fully understand the current situation from only the current"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "which then learns game strategies depending upon these sequences"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition"
+    ],
+    "evidence": "This formalism gives rise to a large but finite Markov decision process (MDP) in"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition"
+    ],
+    "evidence": "in which each sequence is a distinct state"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition"
+    ],
+    "evidence": "using the complete sequence st as the state representation at time t"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "selecting actions in a way that maximizes future rewards"
+  },
+  {
+    "pattern_type": "assigns",
+    "roles": [
+      "assigned_variable",
+      "assigned_value"
+    ],
+    "evidence": "c was set to 0.99 throughout"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition"
+    ],
+    "evidence": "define the future discounted return at time t as $R _ { t } = \\sum _ { t ^ { \\pr"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition"
+    ],
+    "evidence": "define the optimal action-value function $\\boldsymbol { Q } ^ { * } ( s , a )$ a"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition"
+    ],
+    "evidence": "p is a policy mapping sequences to actions"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition"
+    ],
+    "evidence": "The optimal action-value function obeys an important identity known as the Bellm"
+  },
+  {
+    "pattern_type": "defines",
+    "roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "evidence": "clipping the squared error to be between 21 and 1 corresponds to using an absolu"
+  },
+  {
+    "pattern_type": "improves",
+    "roles": [
+      "from",
+      "to"
+    ],
+    "evidence": "This form of error clipping further improved the stability of the algorithm"
+  },
+  {
+    "pattern_type": "assigns",
+    "roles": [
+      "assigned_variable",
+      "assigned_value"
+    ],
+    "evidence": "Initialize replay memory D to capacity N"
+  },
+  {
+    "pattern_type": "assigns",
+    "roles": [
+      "assigned_variable",
+      "assigned_value"
+    ],
+    "evidence": "Initialize action-value function Q with random weights h"
+  },
+  {
+    "pattern_type": "assigns",
+    "roles": [
+      "assigned_variable",
+      "assigned_value"
+    ],
+    "evidence": "Initialize target action-value function $\\hat { \\boldsymbol Q }$ with weights $\\"
+  },
+  {
+    "pattern_type": "assigns",
+    "roles": [
+      "assigned_variable",
+      "assigned_value"
+    ],
+    "evidence": "Initialize sequence $s _ { 1 } = \\{ x _ { 1 } \\}$ and preprocessed sequence $\\ph"
+  },
+  {
+    "pattern_type": "assigns",
+    "roles": [
+      "assigned_variable",
+      "assigned_value"
+    ],
+    "evidence": "With probability e select a random action $a _ { t }$ otherwise select $a _ { t "
+  },
+  {
+    "pattern_type": "assigns",
+    "roles": [
+      "assigned_variable",
+      "assigned_value"
+    ],
+    "evidence": "Set $s _ { t + 1 } = s _ { t } , a _ { t } , x _ { t + 1 }$ 1 and preprocess $\\p"
+  },
+  {
+    "pattern_type": "assigns",
+    "roles": [
+      "assigned_variable",
+      "assigned_value"
+    ],
+    "evidence": "Store transition $\\left( \\phi _ { t } , a _ { t } , r _ { t } , \\phi _ { t + 1 }"
+  },
+  {
+    "pattern_type": "obtained_from",
+    "roles": [
+      "data",
+      "source"
+    ],
+    "evidence": "Sample random minibatch of transitions $\\left( \\phi _ { j } , a _ { j } , r _ { "
+  },
+  {
+    "pattern_type": "assigns",
+    "roles": [
+      "assigned_variable",
+      "assigned_value"
+    ],
+    "evidence": "$\\mathrm { S e t } y _ { j } = \\left\\{ \\begin{array} { c } { r _ { j } } \\\\ { r "
+  },
+  {
+    "pattern_type": "assigns",
+    "roles": [
+      "assigned_variable",
+      "assigned_value"
+    ],
+    "evidence": "$\\mathrm { S e t } y _ { j } = \\left\\{ \\begin{array} { c } { r _ { j } } \\\\ { r "
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "$r _ { j } + \\gamma \\operatorname* { m a x } _ { a ^ { \\prime } } \\hat { Q } \\Bi"
+  },
+  {
+    "pattern_type": "influences",
+    "roles": [
+      "source",
+      "target"
+    ],
+    "evidence": "$r _ { j } + \\gamma \\operatorname* { m a x } _ { a ^ { \\prime } } \\hat { Q } \\Bi"
+  },
+  {
+    "pattern_type": "assigns",
+    "roles": [
+      "assigned_variable",
+      "assigned_value"
+    ],
+    "evidence": "Perform a gradient descent step on $\\left( y _ { j } - Q \\big ( \\phi _ { j } , a"
+  },
+  {
+    "pattern_type": "assigns",
+    "roles": [
+      "assigned_variable",
+      "assigned_value"
+    ],
+    "evidence": "Every C steps reset $\\scriptstyle { \\hat { Q } } = Q$"
+  }
+]

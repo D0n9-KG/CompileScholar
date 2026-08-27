@@ -1,0 +1,1022 @@
+[
+  {
+    "edge_id": "n1_e5",
+    "pattern_type": "background",
+    "evidence_span": "By application of the equations of diffusion, theoretical expressions for the kinetics of the process have been derived.",
+    "node_ids": [
+      "n1_n1",
+      "n1_n5"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "quantitative theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "equations of diffusion",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1_e0",
+    "pattern_type": "influences",
+    "evidence_span": "A quantitative theory is presented which describes the mixing of two identical powders in a horizontal barrel mixer.",
+    "node_ids": [
+      "n1_n1",
+      "n1_n2"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "quantitative theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "mixing of two identical powders in a horizontal barrel mixer",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-missed-bad-role",
+    "verifier_note": "The sentence states that the theory 'describes' the mixing process. This is a functional dependence (the theory describes/accounts for the phenomenon), not a definitional identity. The theory is not defined as the mixing; it describes it. The correct pattern is influences (source: theory, target: mixing).",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "retype:influences"
+  },
+  {
+    "edge_id": "n1_e1",
+    "pattern_type": "influences",
+    "evidence_span": "mixing can occur only by diffusion",
+    "node_ids": [
+      "n1_n3",
+      "n1_n4"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mixing",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "diffusion",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-missed-bad-role",
+    "verifier_note": "The sentence states that mixing 'can occur only by diffusion', which is a causal/dependency relation (mixing depends on diffusion), not a definitional identity. Mixing is not defined as diffusion; diffusion is the mechanism by which mixing occurs. The correct pattern is influences (source: diffusion, target: mixing).",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "retype:influences"
+  },
+  {
+    "edge_id": "n2_e1",
+    "pattern_type": "defines",
+    "evidence_span": "These two independent mechanisms will be referred to as \"macromixing\"",
+    "node_ids": [
+      "n2_n5",
+      "n2_n7"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "macromixing",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "components brought together",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e2",
+    "pattern_type": "defines",
+    "evidence_span": "and \"micromixing,\" respectively",
+    "node_ids": [
+      "n2_n6",
+      "n2_n8"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "micromixing",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "particles diffuse across boundaries",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e3",
+    "pattern_type": "composed_of",
+    "evidence_span": "In any mixing process there are two fundamental mechanisms which must occur for a high degree of mixedness to be achieved: (1) the separate components must be brought together, and (2) individual particles must diffuse across boundaries between regions rich in one component into regions rich in another.",
+    "node_ids": [
+      "n2_n4",
+      "n2_n5",
+      "n2_n6"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mixing process",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "macromixing",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "micromixing",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e6",
+    "pattern_type": "measures",
+    "evidence_span": "Such a system has been devised and used to obtain data with which the validity of the theory of diffusional mixing can be established.",
+    "node_ids": [
+      "n2_n1",
+      "n2_n10"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "degree of mixedness",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "ideal system",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e1",
+    "pattern_type": "composed_of",
+    "evidence_span": "This consists of a vacuum chamber connected to a hypodermic needle.",
+    "node_ids": [
+      "n4c0_n4",
+      "n4c0_n5",
+      "n4c0_n6"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "sampling apparatus",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "vacuum chamber",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "hypodermic needle",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e4",
+    "pattern_type": "measures",
+    "evidence_span": "The movable arm, to which the chamber and needle are attached, can be raised and lowered through the sampling template so that sampling at any depth within the bed of particle is possible.",
+    "node_ids": [
+      "n4c0_n13",
+      "n4c0_n14"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "concentration",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "sampling apparatus",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e5",
+    "pattern_type": "measures",
+    "evidence_span": "A piece of tracing paper was placed over the glass screen and a marking pen, which electrically operated a counter, was used to count first the white (or yellow) beads and then the yellow (or white).",
+    "node_ids": [
+      "n4c0_n15",
+      "n4c0_n16"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "bead type",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "particle counting apparatus",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5_e1",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "A normal probability plot of $C(x, N)$ v. $x$ would therefore yield a straight line of slope $1 / \\sqrt{2DN}$ .",
+    "node_ids": [
+      "n5_n3",
+      "n5_n4",
+      "n5_n5",
+      "n5_n6"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "concentration C(x,N)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "distance x",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "diffusion coefficient",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "number of revolutions N",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5_e3",
+    "pattern_type": "compares",
+    "evidence_span": "The values of the diffusion coefficient evaluated by the four methods outlined above are compared in Table 3.",
+    "node_ids": [
+      "n5_n10",
+      "n5_n11"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "diffusion coefficient values",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "four methods",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5_e4",
+    "pattern_type": "defines",
+    "evidence_span": "Although the mixing process is completely described by Eq. (4), the kinetics of the process are shown more clearly in terms of the degree of mixedness $M_{N}$ .",
+    "node_ids": [
+      "n5_n7",
+      "n5_n7"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "degree of mixedness M_N",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "degree of mixedness M_N",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence does not state a definitional identity. It merely says the kinetics are 'shown more clearly in terms of' the degree of mixedness, which is a presentation choice, not a definition. The edge incorrectly assigns the same surface to both subject and object roles, which is a slot binding error. The pattern 'defines' is not supported by the evidence.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6_e0",
+    "pattern_type": "defines",
+    "evidence_span": "the process of mixing is described by a single kinetic equation viz. Eq. (15)",
+    "node_ids": [
+      "n6_n2",
+      "n6_n3",
+      "n6_n1"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "single kinetic equation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Eq. (15)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "general theory of diffusional mixing",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6_e3",
+    "pattern_type": "compares",
+    "evidence_span": "the close agreement between the values of the diffusion coefficient obtained from the four approaches",
+    "node_ids": [
+      "n6_n9",
+      "n6_n4"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "diffusion coefficient from four approaches",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "diffusion coefficient",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6_e4",
+    "pattern_type": "claim_relation",
+    "evidence_span": "Clearly this concept has no theoretical or physical justification",
+    "node_ids": [
+      "n6_n10",
+      "n6_n1"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "reflection concept",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "general theory of diffusional mixing",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6_e5",
+    "pattern_type": "extends",
+    "evidence_span": "As soon as the kinetics of mixing are influenced by the finite length of the mixer, the analysis culminating in Eq. (26) must be applied",
+    "node_ids": [
+      "n6_n11",
+      "n6_n12"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Eq. (25)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Eq. (26)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6_e1",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "The coincidence of the experimental data with the theoretical relationships for the concentration-distance behavior and for the kinetics of mixing is substantial verification of the validity of the general theory of diffusional mixing",
+    "node_ids": [
+      "n6_n4",
+      "n6_n5",
+      "n6_n6"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "diffusion coefficient",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "concentration-distance behavior",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "kinetics of mixing",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that experimental data coincides with theoretical relationships, which is a validation/verification statement, not a constitutive law. The edge claims a formal quantitative law (diffusion coefficient = f(concentration-distance, kinetics)), but the text only says the data agrees with theory. No formula or explicit functional relation is stated. The 'diffusion coefficient' is not defined as a function of the other two nodes in this sentence. This is a compares/verification relation, not a constitutive law.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6_e7",
+    "pattern_type": "measures",
+    "evidence_span": "slight inaccuracies in the location of the sampling probe will result in large deviations of the sample concentration",
+    "node_ids": [
+      "n6_n15",
+      "n6_n14"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "unmixed sample variance",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "sampling probe",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that sampling probe location inaccuracies cause deviations in sample concentration. This is an influences relation (probe location → concentration deviations), not a measures relation. The edge claims 'unmixed sample variance is measured by sampling probe', but the text does not state this. The sampling probe is used to take samples, but the variance is calculated from those samples, not directly measured by the probe. The evidence describes an error source, not a measurement relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7_e5",
+    "pattern_type": "background",
+    "evidence_span": "APPENDIX Solution of Fick's second law",
+    "node_ids": [
+      "n7_n1",
+      "n7_n10"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "general theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Fick's second law",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7_e0",
+    "pattern_type": "defines",
+    "evidence_span": "A general theory has been developed to describe the diffusional mixing",
+    "node_ids": [
+      "n7_n1",
+      "n7_n2"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "general theory",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "diffusional mixing",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence states that a theory was developed to DESCRIBE diffusional mixing. This is a functional/descriptive relation, not a definitional identity. 'General theory' is not defined as 'diffusional mixing'; rather, the theory describes the phenomenon. The 'defines' pattern requires a definitional identity (X is defined as Y), which is not present here. The relation is better captured by 'influences' or 'background', but as a 'defines' edge it is wrong.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7_e2",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "the degree of mixedness as a function of the number of revolutions of the mixer is described by an exponential relationship",
+    "node_ids": [
+      "n7_n3",
+      "n7_n5",
+      "n7_n6"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "degree of mixedness",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "number of revolutions",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "exponential relationship",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The sentence states that the degree of mixedness is described by an exponential relationship as a function of the number of revolutions. This is a constitutive law, but the slot binding is wrong: 'exponential relationship' is not a parameter; it is the function form. The edge incorrectly assigns 'exponential relationship' to the 'parameter' role. The correct structure would have 'degree of mixedness' as output and 'number of revolutions' as input, with the function form qualifier set to 'exponential'. Since the parameter slot is misbound, the edge should be dropped or re-extracted with correct structure.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7_e4",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "the degree of mixedness as a function of the number of revolutions",
+    "node_ids": [
+      "n7_n5",
+      "n7_n3"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "number of revolutions",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "degree of mixedness",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-missed-bad-role",
+    "verifier_note": "The sentence states that the degree of mixedness is a function of the number of revolutions. This is a functional dependence, but it is more specifically a constitutive law because it describes a quantitative relationship (exponential) between the two quantities. The 'influences' pattern is for general dependence, but here the relationship is formal and quantitative, fitting the constitutive_law pattern better. The slots are correctly bound: 'number of revolutions' is the source/cause and 'degree of mixedness' is the target/effect. The polarity is correct.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "retype:constitutive_law"
+  },
+  {
+    "edge_id": "n8_e0",
+    "pattern_type": "defines",
+    "evidence_span": "Defining, the initial condition then becomes",
+    "node_ids": [
+      "n8_n1",
+      "n8_n2",
+      "n8_n3"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "initial condition",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "transformation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "G(x, N)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e2",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "Equation (3) can be rewritten as",
+    "node_ids": [
+      "n8_n7",
+      "n8_n8",
+      "n8_n9",
+      "n8_n10"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "input",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "diffusion equation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "C(x, N)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "x",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "N",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e3",
+    "pattern_type": "defines",
+    "evidence_span": "it is permissible to use, as a trial function, the sum of all of the G_n",
+    "node_ids": [
+      "n8_n11",
+      "n8_n12",
+      "n8_n13"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "general solution",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "sum of all of the G_n",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Fourier series expansion",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e4",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "This is of the form of a Fourier's series expansion for a constant; A_n can then be evaluated using the relation",
+    "node_ids": [
+      "n8_n14",
+      "n8_n1",
+      "n8_n13"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "A_n",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "initial condition",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Fourier series expansion",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e6",
+    "pattern_type": "composed_of",
+    "evidence_span": "since $C(x, N) = G(x, N) + \\frac{1}{2}$, the final solution becomes",
+    "node_ids": [
+      "n8_n17",
+      "n8_n3",
+      "n8_n18"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "final solution",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "G(x, N)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "1/2",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e1",
+    "pattern_type": "defines",
+    "evidence_span": "Since there is no transport of material across the ends of the mixer, the boundary conditions which must be satisfied are",
+    "node_ids": [
+      "n8_n4",
+      "n8_n5",
+      "n8_n6"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "boundary conditions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "no transport of material",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "ends of the mixer",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states a physical condition (no transport) that gives rise to boundary conditions, not a definitional identity. The boundary conditions are not defined as 'no transport'; rather, they are derived from that physical constraint. The 'object' slot (ends of the mixer) is a location, not a definitional object. This is a setup/derivation statement, not a defines relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n8_e5",
+    "pattern_type": "influences",
+    "evidence_span": "Equation (42) can only be satisfied if $K_{2}=0$",
+    "node_ids": [
+      "n8_n4",
+      "n8_n15",
+      "n8_n16"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "boundary conditions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "λ",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "K2",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states a mathematical constraint: for Eq. (42) to hold, K2 must be zero. This is a condition for equation satisfaction, not a dependency/influence relation between boundary conditions, λ, and K2. The boundary conditions are not a source that influences λ or K2; rather, the boundary conditions impose a constraint that forces K2=0. The direction is also wrong: the boundary conditions constrain K2, not the other way around. This is a mathematical derivation step, not an influences relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  }
+]

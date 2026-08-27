@@ -1,0 +1,1326 @@
+[
+  {
+    "edge_id": "n1_e0",
+    "pattern_type": "background",
+    "evidence_span": "However, this rheology was shown to be ill-posed in the mathematical sense for a large range of parameters, notably in the low and large inertial number limits (Barker et al. 2015).",
+    "node_ids": [
+      "n1_n1",
+      "n1_n3"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "µ(I)-rheology",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Barker et al. (2015)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1_e4",
+    "pattern_type": "influences",
+    "evidence_span": "In addition to the usual Coulomb shear friction coefficient µ, we introduce a bulk friction coefficient µb, associated with volume changes and show that the problem is well-posed if µ_b > 1 - 7µ/6.",
+    "node_ids": [
+      "n1_n10",
+      "n1_n12"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "bulk friction coefficient µb",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "well-posedness",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n1_e6",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "The µ(I)-rheology is a constitutive law relating shear stress to inertial number and friction coefficient.",
+    "node_ids": [
+      "n1_n16",
+      "n1_n17",
+      "n1_n18"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "shear stress",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "inertial number (I)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Coulomb shear friction coefficient (µ)",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e0",
+    "pattern_type": "extends",
+    "evidence_span": "This rheology may be thought as a generalization of the basic Coulomb friction model",
+    "node_ids": [
+      "n2_n1",
+      "n2_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "µ(I)-rheology",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Coulomb friction model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e2",
+    "pattern_type": "influences",
+    "evidence_span": "using a single friction coefficient µ—ratio of the shear stress τ to the confinement pressure p—that varies with an inertial (dimensionless) number I",
+    "node_ids": [
+      "n2_n3",
+      "n2_n5"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "friction coefficient µ",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "inertial number I",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e5",
+    "pattern_type": "extends",
+    "evidence_span": "we extend the Barker et al. (2015) analysis and show that taking into account the weak compressibility of granular flows regularizes mostly the µ(I)-rheology",
+    "node_ids": [
+      "n2_n9",
+      "n2_n10"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Barker et al. (2015) analysis",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "this paper's compressible model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e6",
+    "pattern_type": "background",
+    "evidence_span": "Forterre & Pouliquen (2002) showed that kinetic theory taken in the compressible limit could reproduce the instability",
+    "node_ids": [
+      "n2_n10",
+      "n2_n11"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "this paper's compressible model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Forterre & Pouliquen (2002)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e3",
+    "pattern_type": "contrasts_with",
+    "evidence_span": "granular flows enter the collisional regime and are best described by kinetic theory",
+    "node_ids": [
+      "n2_n1",
+      "n2_n7"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "µ(I)-rheology",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "kinetic theory",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence does not state a contrast between µ(I)-rheology and kinetic theory. It describes granular flows entering a different regime where kinetic theory applies, which is a regime transition, not a discourse-level contrast. The relation is not explicitly stated.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n2_e4",
+    "pattern_type": "becomes",
+    "evidence_span": "the µ(I)-rheology was also recently shown to lead to ill-posed problems",
+    "node_ids": [
+      "n2_n1",
+      "n2_n8"
+    ],
+    "node_roles": [
+      "initial_state",
+      "final_state"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "µ(I)-rheology",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "ill-posed problems",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the rheology 'leads to' ill-posed problems, which is a causal or resultative relation, not a state transition ('becomes'). The rheology does not transition into ill-posed problems; it causes them. The relation is misidentified.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e0",
+    "pattern_type": "defines",
+    "evidence_span": "Differential problems are termed “well-posed” if they yield unique solutions depending continuously on the boundary or initial conditions.",
+    "node_ids": [
+      "n3c0_n1",
+      "n3c0_n2"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "well-posed Cauchy problems",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "ill-posed problems",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e2",
+    "pattern_type": "influences",
+    "evidence_span": "For instance, the governing equations of Kelvin-Helmholtz and Rayleigh-Taylor instabilities neglecting surface tension suffer from the catastrophic short-wave instabilities of the Hadamard type",
+    "node_ids": [
+      "n3c0_n4",
+      "n3c0_n6",
+      "n3c0_n5",
+      "n3c0_n6"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Kelvin-Helmholtz instabilities",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "surface tension",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "Rayleigh-Taylor instabilities",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "surface tension",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e3",
+    "pattern_type": "improves",
+    "evidence_span": "Including higher-order contributions in the equations (invoking viscous terms for instance), allows generally to stabilize the instability by cutting off high wavenumbers, making the problem well-posed and suitable to numerical modelling.",
+    "node_ids": [
+      "n3c0_n7",
+      "n3c0_n4",
+      "n3c0_n5"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "higher-order contributions",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Kelvin-Helmholtz instabilities",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "Rayleigh-Taylor instabilities",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e17",
+    "pattern_type": "influences",
+    "evidence_span": "At smaller volume fractions, Mach numbers much larger than 1 may be observed for typical parameter values observed in dense granular flows in the inertial regime",
+    "node_ids": [
+      "n3c0_n50",
+      "n3c0_n22"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Mach number of a granular flow",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "volume fraction $\\phi$",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e26",
+    "pattern_type": "compares",
+    "evidence_span": "Note that Eq. (3.9) simplifies to Jop et al. (2006) incompressible formulation in the case of isochoric deformations.",
+    "node_ids": [
+      "n3c0_n79",
+      "n3c0_n75"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Jop et al. (2006) incompressible formulation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "admissible stress-strain relationship",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e4",
+    "pattern_type": "defines",
+    "evidence_span": "$\\| \\bar { \\pmb { S } } ^ { 0 } \\| = 1 / 2 , \\dot { \\phi } ^ { 0 } = 1$ and $p _ { \\mathrm { e q } } ^ { 0 } = 1$",
+    "node_ids": [
+      "n4c0_n24",
+      "n4c0_n25",
+      "n4c0_n26"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "‖S̄⁰‖",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "φ̇⁰",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "p_eq⁰",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e5",
+    "pattern_type": "defines",
+    "evidence_span": "$\\mathbf { \\boldsymbol { y } } = ( \\mathbf { \\boldsymbol { u } } , I ) ^ { T }$ is the vector of independent variables; $\\boldsymbol { y } ^ { 0 }$ their values at the base state and $\\tilde { \\boldsymbol { y } }$ the perturbation intensity",
+    "node_ids": [
+      "n4c0_n29",
+      "n4c0_n30",
+      "n4c0_n31"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "y",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "y⁰",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "ỹ",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e26",
+    "pattern_type": "influences",
+    "evidence_span": "roots are pure reals and they must lie in the interval $] - 1 , 1 [$",
+    "node_ids": [
+      "n4c0_n88",
+      "n4c0_n89"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "roots",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "interval ]-1, 1[",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e36",
+    "pattern_type": "influences",
+    "evidence_span": "the real roots lie inside the interval $[ - 1 , 1 ]$",
+    "node_ids": [
+      "n4c0_n114",
+      "n4c0_n115"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "real roots",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "interval [-1, 1]",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5_e7",
+    "pattern_type": "exhibits_property",
+    "evidence_span": "compressible shear flows described by a simple Coulomb friction are always unstable but remain well-posed",
+    "node_ids": [
+      "n5_n7",
+      "n5_n12"
+    ],
+    "node_roles": [
+      "entity",
+      "property"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Coulomb constant friction model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "well-posedness",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n5_e6",
+    "pattern_type": "background",
+    "evidence_span": "equivalent to the well-posed domain defined by Barker et al. (2015) in the incompressible limit",
+    "node_ids": [
+      "n5_n1",
+      "n5_n4"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "compressible μ(I)-rheology",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "well-posed domain defined by Barker et al. (2015)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states the stability domain is 'equivalent to' the well-posed domain from Barker et al. (2015). This is a direct comparison/equivalence, not a background/motivation relation. The edge misrepresents the relation as background when it is actually a comparison. The correct pattern would be 'compares'.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n5_e9",
+    "pattern_type": "influences",
+    "evidence_span": "the well-posedness criteria is not affected by this other possible definition of the inertial number",
+    "node_ids": [
+      "n5_n18",
+      "n5_n5"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "well-posedness criteria",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "φ'",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence explicitly states 'is not affected by', which is a statement of INDEPENDENCE, not a positive dependency. The edge claims an 'influences' relation with dependency_type 'independence', which is a contradiction. The sentence negates the relation, so the edge must be dropped.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6_e0",
+    "pattern_type": "measures",
+    "evidence_span": "Following the value of sup(Re(λ)) while varying ξ₁ allows us to probe the stability of the coupled system",
+    "node_ids": [
+      "n6_n3",
+      "n6_n1"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "growth rate",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "numerical solution at arbitrary wavenumbers",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6_e1",
+    "pattern_type": "influences",
+    "evidence_span": "the growth rate of perturbation dramatically increase as ξ₁²",
+    "node_ids": [
+      "n6_n4",
+      "n6_n3"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "wavenumber",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "growth rate",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6_e3",
+    "pattern_type": "defines",
+    "evidence_span": "the condition for well-posedeness is defined by this inequality",
+    "node_ids": [
+      "n6_n6",
+      "n6_n7"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "well-posedeness condition",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "μ_b ≥ 1 - 7μ/6",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6_e4",
+    "pattern_type": "validates",
+    "evidence_span": "We explored the domain of μ and μ_b values and found that the condition μ_b ≥ 1 - 7μ/6 for well-posedeness is verified almost everywhere",
+    "node_ids": [
+      "n6_n1",
+      "n6_n6"
+    ],
+    "node_roles": [
+      "evidence",
+      "validated"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "numerical solution at arbitrary wavenumbers",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "well-posedeness condition",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6_e6",
+    "pattern_type": "composed_of",
+    "evidence_span": "solved numerically via a Chebychev collocation method",
+    "node_ids": [
+      "n6_n1",
+      "n6_n8"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "numerical solution at arbitrary wavenumbers",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Chebychev collocation method",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6_e7",
+    "pattern_type": "exhibits_property",
+    "evidence_span": "compressible shear flows appear stable in the highwavenumber limit",
+    "node_ids": [
+      "n6_n9",
+      "n6_n10"
+    ],
+    "node_roles": [
+      "entity",
+      "property"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "compressible shear flows",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "stability in high-wavenumber limit",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n6_e5",
+    "pattern_type": "compares",
+    "evidence_span": "To test the validity of the normal mode decomposition in the short wave limit",
+    "node_ids": [
+      "n6_n1",
+      "n6_n2"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "numerical solution at arbitrary wavenumbers",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "normal mode decomposition",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence span describes the purpose of the numerical solution (to test the validity of the normal mode decomposition), which is a validation or testing relation, not a comparison. The sentence does not put the numerical solution and the normal mode decomposition side-by-side as alternatives or compare their predictions. The relation is better captured by 'validates' (evidence validates a theory) or 'measures' (testing validity), but not 'compares'. The slot binding is also wrong: the numerical solution is not being compared with the normal mode decomposition; it is being used to test it. The relation does not exist as stated.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n7_e1",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "This condition is expressed in terms of an inequality between $\\mu _ { b }$ , the bulk friction coefficient associated with volume changes and $\\mu$ the friction coefficient associated with shear, which reads $\\mu _ { b } > 1 - 7 \\mu / 6$",
+    "node_ids": [
+      "n7_n5",
+      "n7_n3",
+      "n7_n4"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "well-posedness",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "bulk friction coefficient μ_b",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "shear friction coefficient μ",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n7_e4",
+    "pattern_type": "raises_questions_about",
+    "evidence_span": "the compressible $\\mu ( I )$ -rheology was also shown to be unstable for some flow conditions, both at large and small inertial number, calling for a deeper analysis of the unstable modes appearing in compressible flows",
+    "node_ids": [
+      "n7_n1",
+      "n7_n8"
+    ],
+    "node_roles": [
+      "source",
+      "questioned"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "compressible μ(I)-rheology",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "linear stability",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e1",
+    "pattern_type": "background",
+    "evidence_span": "compressibility is introduced based on the critical state concept borrowed from soil mechanics",
+    "node_ids": [
+      "n8_n2",
+      "n8_n3"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Barker et al. 2017",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "critical state concept",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e2",
+    "pattern_type": "background",
+    "evidence_span": "we preferred a fluid mechanics-like formulation based on a second viscosity",
+    "node_ids": [
+      "n8_n1",
+      "n8_n5"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "our paper",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "second viscosity",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e6",
+    "pattern_type": "validates",
+    "evidence_span": "both formulations are shown to be equivalent in Appendix A",
+    "node_ids": [
+      "n8_n9",
+      "n8_n1"
+    ],
+    "node_roles": [
+      "evidence",
+      "validated"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Appendix A",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "our paper",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n8_e3",
+    "pattern_type": "influences",
+    "evidence_span": "compressibility generally regularizes the μ(I) rheology",
+    "node_ids": [
+      "n8_n7",
+      "n8_n8"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "compressibility",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "μ(I) rheology",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states that compressibility regularizes the μ(I) rheology, which is a direct causal influence. The edge correctly captures this dependency.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n9_e0",
+    "pattern_type": "defines",
+    "evidence_span": "A.1. Critical state theory In plasticity, a material is assumed to flow on a yield surface taking the general form",
+    "node_ids": [
+      "n9_n1",
+      "n9_n20"
+    ],
+    "node_roles": [
+      "subject",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "yield surface F",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "critical state theory",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e1",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "a material is assumed to flow on a yield surface taking the general form where $p$ is the total normal stress, $\\lVert \\boldsymbol { \\tau } \\rVert$ is the shear stress, $\\phi$ is the volumic fraction, $p _ { \\mathrm { e q } } ( \\phi )$ 号 the pressure at the critical state (when the material deforms without volume change) at the volume fraction $\\phi$ (given by an empirical equation of state), $\\mu$ is the friction coefficient",
+    "node_ids": [
+      "n9_n1",
+      "n9_n2",
+      "n9_n3",
+      "n9_n4",
+      "n9_n5",
+      "n9_n6"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "input",
+      "input",
+      "input",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "yield surface F",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "p",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "τ",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "φ",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "p_eq(φ)",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "μ",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e4",
+    "pattern_type": "compares",
+    "evidence_span": "This formulation shares similarities with Eqs. (A 3) and (A 1), but differs in that $p$ do not appear explicitly in the equations.",
+    "node_ids": [
+      "n9_n21",
+      "n9_n22"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "dilatancy model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "Eqs. (A 3) and (A 1)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n9_e2",
+    "pattern_type": "influences",
+    "evidence_span": "the rate of volume change is linked to the gradient of the yield surface",
+    "node_ids": [
+      "n9_n8",
+      "n9_n9"
+    ],
+    "node_roles": [
+      "output",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "rate of volume change",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "gradient of the yield surface",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-missed-bad-role",
+    "verifier_note": "The evidence states a qualitative dependence ('is linked to') without a formal functional form or explicit formula. This is a prose dependence, not a formal constitutive law. The pattern boundary for constitutive_law explicitly excludes prose 'X depends on Y' (that is influences).",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "retype:influences"
+  },
+  {
+    "edge_id": "n9_e6",
+    "pattern_type": "influences",
+    "evidence_span": "The dilatancy also modifies the shear stress with $p _ { \\mathrm { { e q } } } .$ the pressure at equilibrium.",
+    "node_ids": [
+      "n9_n16",
+      "n9_n14",
+      "n9_n17"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "shear stress",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "tan ψ",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "p_eq",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-missed-bad-role",
+    "verifier_note": "The evidence states that dilatancy 'modifies' the shear stress, which is a qualitative causal dependence, not a formal constitutive law with an explicit functional form. The pattern boundary for constitutive_law excludes prose 'X depends on Y' (that is influences).",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "retype:influences"
+  },
+  {
+    "edge_id": "n10_e4",
+    "pattern_type": "becomes",
+    "evidence_span": "inserting the perturbed variables and stresses into (3.12) and keeping only linear contributions and leading-order terms in the high-wavenumber limit (according to Table 1) leads to an eigenvalue problem of the form $( { \\pmb A } - \\lambda { \\pmb B } ) \\tilde { \\pmb y } = 0$",
+    "node_ids": [
+      "n10_n1",
+      "n10_n7"
+    ],
+    "node_roles": [
+      "initial_state",
+      "final_state"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "perturbed deformation rates",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "eigenvalue problem",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n10_e5",
+    "pattern_type": "composed_of",
+    "evidence_span": "eigenvalue problem of the form $( { \\pmb A } - \\lambda { \\pmb B } ) \\tilde { \\pmb y } = 0$",
+    "node_ids": [
+      "n10_n7",
+      "n10_n8",
+      "n10_n9",
+      "n10_n10"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "eigenvalue problem",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "A",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "B",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "ỹ",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  }
+]

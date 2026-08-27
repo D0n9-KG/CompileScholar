@@ -1,0 +1,1687 @@
+[
+  {
+    "edge_id": "n2_e0",
+    "pattern_type": "defines",
+    "evidence_span": "The operator of segregation relates the granular material composition in surface flow to the composition of the layer generated at the surface of a growing pile or filling.",
+    "node_ids": [
+      "n2_n1",
+      "n2_n2",
+      "n2_n3"
+    ],
+    "node_roles": [
+      "subject",
+      "object",
+      "definition"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "segregation operator",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "granular material composition in surface flow",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "composition of the layer generated at the surface",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e1",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "The operator of segregation relates the granular material composition in surface flow to the composition of the layer generated at the surface of a growing pile or filling.",
+    "node_ids": [
+      "n2_n2",
+      "n2_n3",
+      "n2_n1"
+    ],
+    "node_roles": [
+      "input",
+      "output",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "granular material composition in surface flow",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "composition of the layer generated at the surface",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "segregation operator",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e3",
+    "pattern_type": "extends",
+    "evidence_span": "In the present study we use the same constitutive relation to predict the evolution of spatial distribution of particles in a rotating drum",
+    "node_ids": [
+      "n2_n7",
+      "n2_n1",
+      "n2_n8"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "macroscopic model of granular body formation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "segregation operator",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "rotating drum",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e5",
+    "pattern_type": "background",
+    "evidence_span": "the segregation of differing particles pouring down the free surface of a filling, plague the handling of bulk solids, although they are used sometimes for the separation of different fractions",
+    "node_ids": [
+      "n2_n11",
+      "n2_n12",
+      "n2_n13"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "free-surface segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "bulk solids",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "segregation of differing particles",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e6",
+    "pattern_type": "claim_relation",
+    "evidence_span": "such models are unable to describe size segregation",
+    "node_ids": [
+      "n2_n14",
+      "n2_n15"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "models based on repose angles",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "size segregation",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e7",
+    "pattern_type": "compares",
+    "evidence_span": "The difference in the repose angles of mixture components has been chosen in @8# as the macroscopic parameter entirely determining segregation. However, such models are unable to describe size segregation",
+    "node_ids": [
+      "n2_n1",
+      "n2_n16"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "segregation operator",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "repose angles of mixture components",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n2_e4",
+    "pattern_type": "compares",
+    "evidence_span": "a good agreement of theoretical predictions and the experimental data has been achieved without any fitting of model parameters",
+    "node_ids": [
+      "n2_n9",
+      "n2_n10",
+      "n2_n8"
+    ],
+    "node_roles": [
+      "from",
+      "to",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "theoretical predictions",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "experimental data",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "rotating drum",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e4",
+    "pattern_type": "composed_of",
+    "evidence_span": "two sizes of spherical particles, $d _ { 1 } = 1 . 3 7$ and $d _ { 2 } = 2 . 5 1$ mm",
+    "node_ids": [
+      "n3c0_n9",
+      "n3c0_n10"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "two sizes of spherical particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "d1 = 1.37",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e5",
+    "pattern_type": "composed_of",
+    "evidence_span": "two sizes of spherical particles, $d _ { 1 } = 1 . 3 7$ and $d _ { 2 } = 2 . 5 1$ mm",
+    "node_ids": [
+      "n3c0_n9",
+      "n3c0_n11"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "two sizes of spherical particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "d2 = 2.51 mm",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e6",
+    "pattern_type": "composed_of",
+    "evidence_span": "All particles were made of zirconium oxide",
+    "node_ids": [
+      "n3c0_n9",
+      "n3c0_n13"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "two sizes of spherical particles",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "zirconium oxide",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e8",
+    "pattern_type": "measures",
+    "evidence_span": "The material dynamic angle of repose, measured after a typical avalanche, was about $2 7 ^ { \\circ } - 2 8 ^ { \\circ }$",
+    "node_ids": [
+      "n3c0_n15",
+      "n3c0_n16"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "material dynamic angle of repose",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "about 27° - 28°",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e12",
+    "pattern_type": "influences",
+    "evidence_span": "the drum was rotated a number of times until the evolving nonuniform ~\\due to segregation! radial distribution of large and small particles looked stable",
+    "node_ids": [
+      "n3c0_n29",
+      "n3c0_n30"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "approximately uniform initial distribution of species",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "nonuniform radial distribution of large and small particles",
+        "labels": [
+          "PHENOMENON"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e14",
+    "pattern_type": "composed_of",
+    "evidence_span": "It was done only after a rigid plate was fastened to the open side of the drum",
+    "node_ids": [
+      "n3c0_n31",
+      "n3c0_n33"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "sampling procedure",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "rigid plate",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e15",
+    "pattern_type": "composed_of",
+    "evidence_span": "A rectangular metallic piece was introduced through the incision into the mixer",
+    "node_ids": [
+      "n3c0_n31",
+      "n3c0_n34"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "sampling procedure",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "rectangular metallic piece",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e16",
+    "pattern_type": "composed_of",
+    "evidence_span": "flexible material was inserted between the rectangular piece and the drum wall",
+    "node_ids": [
+      "n3c0_n31",
+      "n3c0_n35"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "sampling procedure",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "flexible material",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e17",
+    "pattern_type": "composed_of",
+    "evidence_span": "the sampling circular plate ~\\which had a diameter equal to the external diameter of the drum, a thickness 20 mm, and contained holes 22 mm in diameter at the specified distances from the center! was placed upon the drum",
+    "node_ids": [
+      "n3c0_n31",
+      "n3c0_n36"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "sampling procedure",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "sampling circular plate",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e23",
+    "pattern_type": "influences",
+    "evidence_span": "As the speed increases, the time intervals between avalanches become shorter",
+    "node_ids": [
+      "n3c0_n25",
+      "n3c0_n51"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "speed of rotation",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "time intervals between avalanches",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c0_e24",
+    "pattern_type": "influences",
+    "evidence_span": "then a continuous surface flow regime is established",
+    "node_ids": [
+      "n3c0_n25",
+      "n3c0_n52"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "speed of rotation",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "continuous surface flow regime",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n3c1_e0",
+    "pattern_type": "influences",
+    "evidence_span": "A purely deterministic macroscopic model allows us to calculate these distributions",
+    "node_ids": [
+      "n3c1_n1",
+      "n3c1_n2"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "purely deterministic macroscopic model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "these distributions",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The model enables calculation of distributions, a genuine functional dependence. The source is the model, target is the distributions. Polarity is correct.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n3c0_e0",
+    "pattern_type": "defines",
+    "evidence_span": "The mixer used in the experiments was a cylindrical vessel",
+    "node_ids": [
+      "n3c0_n1",
+      "n3c0_n2"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mixer",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "cylindrical vessel",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "verifier-missed-bad-role",
+    "verifier_note": "This is a definitional identity ('mixer' is defined as a 'cylindrical vessel'), not a structural composition. The pattern boundary for composed_of explicitly excludes classification/definition. The defines pattern is the correct fit.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "retype:defines"
+  },
+  {
+    "edge_id": "n3c0_e1",
+    "pattern_type": "composed_of",
+    "evidence_span": "a cylindrical vessel, 141 mm in internal diameter and 36 mm in length",
+    "node_ids": [
+      "n3c0_n2",
+      "n3c0_n3"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "cylindrical vessel",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "141 mm in internal diameter and 36 mm in length",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The dimensions are properties/parameters of the vessel, not components. This is not a structural composition. The relation is a property assignment, not a part-of relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e2",
+    "pattern_type": "defines",
+    "evidence_span": "It is made of transparent plastic",
+    "node_ids": [
+      "n3c0_n2",
+      "n3c0_n4"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "cylindrical vessel",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "transparent plastic",
+        "labels": [
+          "MATERIAL"
+        ]
+      }
+    ],
+    "reason": "verifier-missed-bad-role",
+    "verifier_note": "This is a material identity/classification ('made of' = material composition, which is a definitional property), not a structural part-of relation. The composed_of pattern is for model/mechanism composition, not material constitution.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "retype:defines"
+  },
+  {
+    "edge_id": "n3c0_e7",
+    "pattern_type": "composed_of",
+    "evidence_span": "zirconium oxide with a material density of 4.14 g/cm 3",
+    "node_ids": [
+      "n3c0_n13",
+      "n3c0_n14"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "zirconium oxide",
+        "labels": [
+          "MATERIAL"
+        ]
+      },
+      {
+        "surface": "material density of 4.14 g/cm 3",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The material density is a property of zirconium oxide, not a component. This is a property assignment, not a structural composition.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e9",
+    "pattern_type": "measures",
+    "evidence_span": "the incline of the free surface before an avalanche was usually between 30° and 35°",
+    "node_ids": [
+      "n3c0_n17",
+      "n3c0_n18"
+    ],
+    "node_roles": [
+      "object",
+      "instrument"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "incline of the free surface before an avalanche",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "between 30° and 35°",
+        "labels": [
+          "NUMERIC"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The value 'between 30° and 35°' is a measurement result, not an instrument. The measures pattern requires an instrument/method as the second slot. This is a property value assignment, not a measurement relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e13",
+    "pattern_type": "composed_of",
+    "evidence_span": "The sampling procedure was as follows. When the drum was stopped, an incision was made in the nylon film wall",
+    "node_ids": [
+      "n3c0_n31",
+      "n3c0_n32"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "sampling procedure",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "incision",
+        "labels": [
+          "THING"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence describes a procedural step in the sampling method, not a structural composition. The pattern boundary explicitly excludes 'experimental setup description'. The relation is a step in a procedure, not a part-of composition.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e18",
+    "pattern_type": "composed_of",
+    "evidence_span": "which had a diameter equal to the external diameter of the drum",
+    "node_ids": [
+      "n3c0_n36",
+      "n3c0_n37"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "sampling circular plate",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "diameter equal to the external diameter of the drum",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states a property of the sampling plate, not a structural composition. The pattern boundary explicitly excludes 'X has control params' and 'experimental setup description'. A property is not a component.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e19",
+    "pattern_type": "composed_of",
+    "evidence_span": "a thickness 20 mm",
+    "node_ids": [
+      "n3c0_n36",
+      "n3c0_n38"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "sampling circular plate",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "thickness 20 mm",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states a property (thickness) of the sampling plate, not a structural composition. The pattern boundary explicitly excludes 'experimental setup description' and property statements.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e20",
+    "pattern_type": "composed_of",
+    "evidence_span": "contained holes 22 mm in diameter",
+    "node_ids": [
+      "n3c0_n36",
+      "n3c0_n39"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "sampling circular plate",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "holes 22 mm in diameter",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the plate contains holes, which is a property/feature, not a structural composition. The pattern boundary explicitly excludes 'experimental setup description' and property statements.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e22",
+    "pattern_type": "composed_of",
+    "evidence_span": "with an external diameter 22 mm, internal diameter 20 mm, and a height 61 mm",
+    "node_ids": [
+      "n3c0_n40",
+      "n3c0_n42"
+    ],
+    "node_roles": [
+      "whole",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "samplers",
+        "labels": [
+          "THING"
+        ]
+      },
+      {
+        "surface": "external diameter 22 mm, internal diameter 20 mm, and a height 61 mm",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states dimensions/properties of the samplers, not structural composition. The pattern boundary explicitly excludes 'experimental setup description' and property statements.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n3c0_e26",
+    "pattern_type": "compares",
+    "evidence_span": "a finite difference approximation of a simple continuous flow mixing model",
+    "node_ids": [
+      "n3c0_n68",
+      "n3c0_n69"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "finite difference approximation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "simple continuous flow mixing model",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "verifier-missed-bad-role",
+    "verifier_note": "The sentence states that the model @11# is a finite difference approximation of a simple continuous flow mixing model. This is a comparison/equivalence relation between two models, not a definitional identity. The pattern 'compares' with relation_type 'equivalent' fits better than 'defines'.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "retype:compares"
+  },
+  {
+    "edge_id": "n3c0_e29",
+    "pattern_type": "influences",
+    "evidence_span": "the continuous model @10# was able to predict the resulting size distributions of particles in a pile",
+    "node_ids": [
+      "n3c0_n71",
+      "n3c0_n72"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "continuous model @10#",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "resulting size distributions of particles in a pile",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-missed-bad-role",
+    "verifier_note": "The sentence states that the continuous model predicts the size distributions. This is a functional dependence where the model (or its parameters) influences the predicted distributions, not a comparison between two entities. The 'influences' pattern is more appropriate.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": false,
+    "verifier_fix": "retype:influences"
+  },
+  {
+    "edge_id": "n4c0_e5",
+    "pattern_type": "defines",
+    "evidence_span": "If J ( s , t ) is the total surface flux at point s",
+    "node_ids": [
+      "n4c0_n17",
+      "n4c0_n18"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "J(s,t)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "total surface flux",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e6",
+    "pattern_type": "defines",
+    "evidence_span": "the surface flux of the ith type of particles is κ _ { + } ^ { i } J",
+    "node_ids": [
+      "n4c0_n19",
+      "n4c0_n15",
+      "n4c0_n17"
+    ],
+    "node_roles": [
+      "subject",
+      "definition",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "surface flux of the ith type of particles",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "κ_+^i(s,t)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "J(s,t)",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e12",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "we arrive at the equation for total surface flux: ∂ _ { s } J = - ω s",
+    "node_ids": [
+      "n4c0_n30",
+      "n4c0_n17"
+    ],
+    "node_roles": [
+      "output",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "∂_s J = -ωs",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "J(s,t)",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e13",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "the solution is J = ( ω / 2 ) ( a ^ 2 - s ^ 2 )",
+    "node_ids": [
+      "n4c0_n31",
+      "n4c0_n25",
+      "n4c0_n17"
+    ],
+    "node_roles": [
+      "output",
+      "parameter",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "J = (ω/2)(a^2 - s^2)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "ω",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "J(s,t)",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e18",
+    "pattern_type": "influences",
+    "evidence_span": "Using Eq. (3) we find first the concentrations of the surface flux at the point s = 0",
+    "node_ids": [
+      "n4c0_n48",
+      "n4c0_n49"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "Equation (3)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "concentrations of the surface flux at the point s = 0",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e24",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "κ _ { - } ( s , t ) = S ( κ _ { + } ( s , t ) )",
+    "node_ids": [
+      "n4c0_n64",
+      "n4c0_n61",
+      "n4c0_n62",
+      "n4c0_n63"
+    ],
+    "node_roles": [
+      "output",
+      "parameter",
+      "input",
+      "input"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "κ_-(s,t) = S(κ_+(s,t))",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "operator of segregation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "local composition of the surface flux",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "local composition of a generated surface layer",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e30",
+    "pattern_type": "constitutive_law",
+    "evidence_span": "We can write this equation as ∂ _ { s } { κ _ { + } ^ { 1 } ( a ^ { 2 } - s ^ { 2 } ) } = - 2 s S ( κ _ { + } ^ { 1 } )",
+    "node_ids": [
+      "n4c0_n81",
+      "n4c0_n84",
+      "n4c0_n75"
+    ],
+    "node_roles": [
+      "output",
+      "input",
+      "parameter"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "∂_s {κ_+^1(a^2 - s^2)} = -2s S(κ_+^1)",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "flux concentration κ_+^1(s)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "operator S",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  },
+  {
+    "edge_id": "n4c0_e0",
+    "pattern_type": "influences",
+    "evidence_span": "We neglect the dependence of the bulk density and repose angle on material composition",
+    "node_ids": [
+      "n4c0_n1",
+      "n4c0_n2",
+      "n4c0_n3"
+    ],
+    "node_roles": [
+      "source",
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "bulk density",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "repose angle",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "material composition",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that the dependence is NEGLECTED, not that it exists. This is a statement of independence/assumption, not a positive dependency relation.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e1",
+    "pattern_type": "influences",
+    "evidence_span": "the percolation of small particles through the bulk of material is also neglected. This is justified if the particle sizes are not too different.",
+    "node_ids": [
+      "n4c0_n4",
+      "n4c0_n5"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "percolation of small particles through the bulk of material",
+        "labels": [
+          "PHENOMENON"
+        ]
+      },
+      {
+        "surface": "particle sizes",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states that percolation is NEGLECTED, not that it depends on particle size. This is a statement of independence/assumption, not a positive dependency relation.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n4c0_e2",
+    "pattern_type": "defines",
+    "evidence_span": "Let κ = { κ ^ 1 ( x , y , t ) , κ ^ 2 ( x , y , t ) } be the time-dependent bulk composition of a filling",
+    "node_ids": [
+      "n4c0_n11",
+      "n4c0_n12"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "κ",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "time-dependent bulk composition of a filling",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence clearly defines κ as the time-dependent bulk composition. The definitional identity is correctly captured.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n4c0_e3",
+    "pattern_type": "defines",
+    "evidence_span": "We denote by κ _ { - } ^ { i } ( s , t ) the concentrations in the filling surface layer",
+    "node_ids": [
+      "n4c0_n13",
+      "n4c0_n14"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "κ_-^i(s,t)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "concentrations in the filling surface layer",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence clearly defines κ_-^i as the concentrations in the filling surface layer. The definitional identity is correctly captured.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n4c0_e4",
+    "pattern_type": "defines",
+    "evidence_span": "by κ _ { + } ^ { i } ( s , t ) the concentrations in the flux of material pouring down the free surface",
+    "node_ids": [
+      "n4c0_n15",
+      "n4c0_n16"
+    ],
+    "node_roles": [
+      "subject",
+      "object"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "κ_+^i(s,t)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "concentrations in the flux of material pouring down the free surface",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence clearly defines κ_+^i as the concentrations in the flux of material pouring down the free surface. The definitional identity is correctly captured.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n4c0_e29",
+    "pattern_type": "influences",
+    "evidence_span": "The midpoint flux concentration κ _ { 0 } ^ { 1 } serves as the initial condition for ordinary differential equation (3)",
+    "node_ids": [
+      "n4c0_n78",
+      "n4c0_n79"
+    ],
+    "node_roles": [
+      "source",
+      "target"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "midpoint flux concentration κ_0^1",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "initial condition for ordinary differential equation (3)",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence states that the midpoint flux concentration serves as the initial condition, a dependence. The source and target roles are correctly assigned.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n4c0_e31",
+    "pattern_type": "composed_of",
+    "evidence_span": "Each step of the numerical simulation should consist of (1) determining the midpoint flux concentration κ _ { 0 } ^ { 1 } from Eq. (5); (2) calculating the flux concentration κ _ { + } ^ { 1 } ( s ) for 0 ≤ s ≤ a using (6); (3) finding the new surface layer composition κ _ { - } ^ { 1 } { = } S ( κ _ { + } ^ { 1 } ) for 0 ≤ s ≤ a ; (4) rotation at a small angle [a step in the finite difference approximation of Eq.",
+    "node_ids": [
+      "n4c0_n82",
+      "n4c0_n83",
+      "n4c0_n84",
+      "n4c0_n85",
+      "n4c0_n86"
+    ],
+    "node_roles": [
+      "whole",
+      "component",
+      "component",
+      "component",
+      "component"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "numerical simulation",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "midpoint flux concentration κ_0^1",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "flux concentration κ_+^1(s)",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "new surface layer composition κ_-^1",
+        "labels": [
+          "PARAMETER"
+        ]
+      },
+      {
+        "surface": "rotation at a small angle",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly states the numerical simulation consists of the four listed steps, which are the components. The relation is structural composition, matching the composed_of pattern. All roles are correctly bound to the components of the simulation procedure.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n5c0_e3",
+    "pattern_type": "influences",
+    "evidence_span": "S should be a smooth monotone function of κ + 1",
+    "node_ids": [
+      "n5c0_n14",
+      "n5c0_n15"
+    ],
+    "node_roles": [
+      "target",
+      "source"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "S",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "κ + 1",
+        "labels": [
+          "PARAMETER"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly states that S is a function of κ+1. The direction is correct: κ+1 is the source, S is the target.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n5c0_e4",
+    "pattern_type": "compares",
+    "evidence_span": "Numerical solution of Eq. 12 allowed us to calculate, using Eq. 11, distributions κ - 1 and compare them with the distributions obtained by Drahun and Bridgwater in experiments",
+    "node_ids": [
+      "n5c0_n21",
+      "n5c0_n22"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "distributions κ - 1",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "distributions obtained by Drahun and Bridgwater",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "evidence-not-locatable",
+    "verifier_note": "The evidence explicitly states a comparison between theoretical distributions and experimental distributions. This fits the theory-vs-experiment validation subtype of compares. The direction is correct: theoretical distributions are compared with experimental data.",
+    "verifier_role_correct": true,
+    "verifier_type_correct": true,
+    "verifier_fix": "keep"
+  },
+  {
+    "edge_id": "n5c1_e1",
+    "pattern_type": "compares",
+    "evidence_span": "The calculated and experimentally determined sampler concentrations are very close",
+    "node_ids": [
+      "n5c1_n9",
+      "n5c1_n9"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "calculated and experimentally determined sampler concentrations",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "calculated and experimentally determined sampler concentrations",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states a comparison between calculated and experimental concentrations, but the edge assigns the same surface to both 'from' and 'to' roles, making the comparison meaningless. The two entities being compared are distinct (calculated vs. experimental), so the node binding is incorrect.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": true,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n5c1_e2",
+    "pattern_type": "compares",
+    "evidence_span": "The correspondence of theoretical and experimental concentrations is also quite satisfactory",
+    "node_ids": [
+      "n5c1_n17",
+      "n5c1_n17"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "theoretical and experimental concentrations",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "theoretical and experimental concentrations",
+        "labels": [
+          "PROPERTY"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "Similar to e1, the edge assigns the same surface to both 'from' and 'to' roles, but the evidence compares theoretical and experimental concentrations, which are distinct entities. The node binding is incorrect.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": true,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n5c1_e3",
+    "pattern_type": "influences",
+    "evidence_span": "our mixing and segregation model is able to predict the material distributions for various drum fillings and mixture compositions",
+    "node_ids": [
+      "n5c1_n18",
+      "n5c1_n19",
+      "n5c1_n20",
+      "n5c1_n21"
+    ],
+    "node_roles": [
+      "source",
+      "target",
+      "cause",
+      "effect"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "mixing and segregation model",
+        "labels": [
+          "METHOD"
+        ]
+      },
+      {
+        "surface": "material distributions",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "various drum fillings",
+        "labels": [
+          "REGIME"
+        ]
+      },
+      {
+        "surface": "mixture compositions",
+        "labels": [
+          "REGIME"
+        ]
+      }
+    ],
+    "reason": "verifier-drop:drop",
+    "verifier_note": "The evidence states a predictive capability of the model, not a functional dependence. The edge incorrectly uses 'influences' with 'model' as source and 'material distributions' as target. The model predicts distributions, it does not influence them. The 'cause' and 'effect' roles are also mislabeled; 'various drum fillings' and 'mixture compositions' are conditions, not causes/effects. This is a claim about model capability, not a dependency relation.",
+    "verifier_role_correct": false,
+    "verifier_type_correct": false,
+    "verifier_fix": "drop"
+  },
+  {
+    "edge_id": "n6_e7",
+    "pattern_type": "claim_relation",
+    "evidence_span": "This confirms the conjecture @10# that the material distribution inside granular bodies formed under various conditions can be predicted by a model in which the transport equations account for all “external” conditions such as the geometrical configuration or the distribution of material sources.",
+    "node_ids": [
+      "n6_n18",
+      "n6_n19"
+    ],
+    "node_roles": [
+      "from",
+      "to"
+    ],
+    "node_surfaces": [
+      {
+        "surface": "this model's prediction",
+        "labels": [
+          "PROPERTY"
+        ]
+      },
+      {
+        "surface": "conjecture @10#",
+        "labels": [
+          "METHOD"
+        ]
+      }
+    ],
+    "reason": "gate:binding-not-local",
+    "verifier_note": ""
+  }
+]

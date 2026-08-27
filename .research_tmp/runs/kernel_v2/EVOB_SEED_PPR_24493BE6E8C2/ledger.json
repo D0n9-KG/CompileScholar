@@ -1,0 +1,3654 @@
+[
+  {
+    "mutations": [
+      {
+        "op": "add_edge",
+        "target": "n1c2_e0",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to",
+            "to",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "games demanding more temporally extended planning strategies",
+              "type": "PHENOMENON",
+              "role": "from",
+              "evidence": "games demanding more temporally extended planning strategies",
+              "central": false
+            },
+            {
+              "surface": "all existing agents",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "all existing agents",
+              "central": false
+            },
+            {
+              "surface": "DQN",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "DQN",
+              "central": false
+            },
+            {
+              "surface": "Montezuma’s Revenge",
+              "type": "PROPERTY",
+              "role": "to",
+              "evidence": "Montezuma’s Revenge",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "challenge",
+            "applies_in_regime": "temporally extended planning",
+            "_evidence_offset": "11833"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "front_matter (part 1)",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "assumed"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "Nevertheless, games demanding more temporally extended planning strategies still constitute a major challenge for all existing agents including DQN (for example, Montezuma’s Revenge).",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-27T04:32:04Z",
+        "mutation_id": "mut_000001",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1c0_e0",
+        "payload": {
+          "kind": "composed_of",
+          "roles": [
+            "whole",
+            "component",
+            "component"
+          ],
+          "concepts": [
+            {
+              "surface": "deep Q-network",
+              "type": "METHOD",
+              "role": "whole",
+              "evidence": "we developed a novel agent, a deep Q-network (DQN)",
+              "central": false
+            },
+            {
+              "surface": "reinforcement learning",
+              "type": "METHOD",
+              "role": "component",
+              "evidence": "combine reinforcement learning with a class of artificial neural network",
+              "central": true
+            },
+            {
+              "surface": "deep neural networks",
+              "type": "METHOD",
+              "role": "component",
+              "evidence": "combine reinforcement learning with a class of artificial neural network known as deep neural networks",
+              "central": true
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "combines",
+            "_evidence_offset": "2667"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "front_matter (part 1)",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "we developed a novel agent, a deep Q-network (DQN), which is able to combine reinforcement learning with a class of artificial neural network known as deep neural networks",
+        "rationale": "extracted composed_of",
+        "timestamp": "2026-08-27T04:32:04Z",
+        "mutation_id": "mut_000002",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1c0_e3",
+        "payload": {
+          "kind": "measures",
+          "roles": [
+            "object",
+            "instrument"
+          ],
+          "concepts": [
+            {
+              "surface": "action-value function",
+              "type": "PROPERTY",
+              "role": "object",
+              "evidence": "we use a deep convolutional neural network to approximate the optimal action-value function",
+              "central": false
+            },
+            {
+              "surface": "deep convolutional neural network",
+              "type": "METHOD",
+              "role": "instrument",
+              "evidence": "we use a deep convolutional neural network to approximate the optimal action-value function",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "condition": "approximation",
+            "_evidence_offset": "3815"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "front_matter (part 1)",
+            "cited_from": "this_work",
+            "method": "simulation",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "we use a deep convolutional neural network to approximate the optimal action-value function",
+        "rationale": "extracted measures",
+        "timestamp": "2026-08-27T04:32:04Z",
+        "mutation_id": "mut_000003",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1c1_e2",
+        "payload": {
+          "kind": "composed_of",
+          "roles": [
+            "whole",
+            "component",
+            "component",
+            "component"
+          ],
+          "concepts": [
+            {
+              "surface": "DQN agent",
+              "type": "METHOD",
+              "role": "whole",
+              "evidence": "the individual core components of the DQN agent",
+              "central": false
+            },
+            {
+              "surface": "replay memory",
+              "type": "METHOD",
+              "role": "component",
+              "evidence": "the replay memory, separate target Q-network and deep convolutional network architecture",
+              "central": false
+            },
+            {
+              "surface": "separate target Q-network",
+              "type": "METHOD",
+              "role": "component",
+              "evidence": "the replay memory, separate target Q-network and deep convolutional network architecture",
+              "central": false
+            },
+            {
+              "surface": "deep convolutional network architecture",
+              "type": "METHOD",
+              "role": "component",
+              "evidence": "the replay memory, separate target Q-network and deep convolutional network architecture",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "composed_of",
+            "_evidence_offset": "9160"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "front_matter (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "the individual core components of the DQN agent—the replay memory, separate target Q-network and deep convolutional network architecture",
+        "rationale": "extracted composed_of",
+        "timestamp": "2026-08-27T04:32:04Z",
+        "mutation_id": "mut_000004",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1c1_e3",
+        "payload": {
+          "kind": "measures",
+          "roles": [
+            "object",
+            "instrument"
+          ],
+          "concepts": [
+            {
+              "surface": "DQN representation",
+              "type": "METHOD",
+              "role": "object",
+              "evidence": "the t-SNE algorithm tends to map the DQN representation of perceptually similar states to nearby points",
+              "central": false
+            },
+            {
+              "surface": "t-SNE",
+              "type": "METHOD",
+              "role": "instrument",
+              "evidence": "a technique developed for the visualization of high-dimensional data called ‘t-SNE’",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "condition": "visualization",
+            "_evidence_offset": "9717"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "front_matter (part 1)",
+            "cited_from": "prior_art",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "the t-SNE algorithm tends to map the DQN representation of perceptually similar states to nearby points",
+        "rationale": "extracted measures",
+        "timestamp": "2026-08-27T04:32:04Z",
+        "mutation_id": "mut_000005",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1c1_e4",
+        "payload": {
+          "kind": "measures",
+          "roles": [
+            "object",
+            "instrument"
+          ],
+          "concepts": [
+            {
+              "surface": "DQN representations",
+              "type": "METHOD",
+              "role": "object",
+              "evidence": "the t-SNE algorithm generated similar embeddings for DQN representations of states that are close in terms of expected reward",
+              "central": false
+            },
+            {
+              "surface": "t-SNE",
+              "type": "METHOD",
+              "role": "instrument",
+              "evidence": "a technique developed for the visualization of high-dimensional data called ‘t-SNE’",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "condition": "visualization",
+            "_evidence_offset": "9870"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "front_matter (part 1)",
+            "cited_from": "prior_art",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "the t-SNE algorithm generated similar embeddings for DQN representations of states that are close in terms of expected reward",
+        "rationale": "extracted measures",
+        "timestamp": "2026-08-27T04:32:04Z",
+        "mutation_id": "mut_000006",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1c1_e5",
+        "payload": {
+          "kind": "extends",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "representations learned by DQN",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "the representations learned by DQN are able to generalize to data generated from policies other than its own",
+              "central": false
+            },
+            {
+              "surface": "data generated from policies other than its own",
+              "type": "PROPERTY",
+              "role": "to",
+              "evidence": "the representations learned by DQN are able to generalize to data generated from policies other than its own",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "generalizes",
+            "_evidence_offset": "10685"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "front_matter (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "the representations learned by DQN are able to generalize to data generated from policies other than its own",
+        "rationale": "extracted extends",
+        "timestamp": "2026-08-27T04:32:04Z",
+        "mutation_id": "mut_000007",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n1c1_e6",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target"
+          ],
+          "concepts": [
+            {
+              "surface": "representations learned by DQN",
+              "type": "METHOD",
+              "role": "source",
+              "evidence": "how the representations learned by DQN allow it to accurately predict state and action values",
+              "central": false
+            },
+            {
+              "surface": "state and action values",
+              "type": "PROPERTY",
+              "role": "target",
+              "evidence": "how the representations learned by DQN allow it to accurately predict state and action values",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "enables",
+            "_evidence_offset": "11136"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "front_matter (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "how the representations learned by DQN allow it to accurately predict state and action values",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-27T04:32:04Z",
+        "mutation_id": "mut_000008",
+        "status": "committed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.1",
+      "validated": [
+        "mut_000001",
+        "mut_000002",
+        "mut_000003",
+        "mut_000004",
+        "mut_000005",
+        "mut_000006",
+        "mut_000007",
+        "mut_000008"
+      ],
+      "rejected": [],
+      "routed": []
+    },
+    "version_diff": {
+      "before": "0.1",
+      "after": "0.1"
+    }
+  },
+  {
+    "mutations": [
+      {
+        "op": "add_edge",
+        "target": "n2c0_e0",
+        "payload": {
+          "kind": "background",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "end-to-end reinforcement learning",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "our approach incorporates ‘end-to-end’ reinforcement learning",
+              "central": true
+            },
+            {
+              "surface": "neurobiological evidence",
+              "type": "THING",
+              "role": "to",
+              "evidence": "This principle draws on neurobiological evidence",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "draws_on",
+            "_evidence_offset": "629"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "front_matter (part 2)",
+            "cited_from": "prior_art",
+            "evidence_strength": "hypothesized"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "This principle draws on neurobiological evidence",
+        "rationale": "extracted background",
+        "timestamp": "2026-08-27T04:33:19Z",
+        "mutation_id": "mut_000009",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n2c0_e1",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target",
+            "cause",
+            "effect"
+          ],
+          "concepts": [
+            {
+              "surface": "reward signals",
+              "type": "PROPERTY",
+              "role": "source",
+              "evidence": "reward signals during perceptual learning",
+              "central": false
+            },
+            {
+              "surface": "characteristics of representations",
+              "type": "PROPERTY",
+              "role": "target",
+              "evidence": "influence the characteristics of representations within primate visual cortex",
+              "central": false
+            },
+            {
+              "surface": "reward signals",
+              "type": "PROPERTY",
+              "role": "cause",
+              "evidence": "reward signals during perceptual learning",
+              "central": false
+            },
+            {
+              "surface": "characteristics of representations",
+              "type": "PROPERTY",
+              "role": "effect",
+              "evidence": "influence the characteristics of representations within primate visual cortex",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "influences",
+            "applies_in_regime": "perceptual learning",
+            "_evidence_offset": "683"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "front_matter (part 2)",
+            "cited_from": "prior_art",
+            "evidence_strength": "hypothesized"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "reward signals during perceptual learning may influence the characteristics of representations within primate visual cortex",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-27T04:33:19Z",
+        "mutation_id": "mut_000010",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n2c0_e2",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target",
+            "cause",
+            "effect"
+          ],
+          "concepts": [
+            {
+              "surface": "reward",
+              "type": "PROPERTY",
+              "role": "source",
+              "evidence": "reward to continuously shape representations",
+              "central": false
+            },
+            {
+              "surface": "representations",
+              "type": "PROPERTY",
+              "role": "target",
+              "evidence": "shape representations within the convolutional network",
+              "central": false
+            },
+            {
+              "surface": "reward",
+              "type": "PROPERTY",
+              "role": "cause",
+              "evidence": "reward to continuously shape representations",
+              "central": false
+            },
+            {
+              "surface": "representations",
+              "type": "PROPERTY",
+              "role": "effect",
+              "evidence": "shape representations within the convolutional network",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "shapes",
+            "applies_in_regime": "end-to-end reinforcement learning",
+            "_evidence_offset": "473"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "front_matter (part 2)",
+            "cited_from": "this_work",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "reward to continuously shape representations within the convolutional network",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-27T04:33:19Z",
+        "mutation_id": "mut_000011",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n2c0_e3",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target",
+            "cause",
+            "effect"
+          ],
+          "concepts": [
+            {
+              "surface": "replay algorithm",
+              "type": "METHOD",
+              "role": "source",
+              "evidence": "our incorporation of a replay algorithm",
+              "central": false
+            },
+            {
+              "surface": "deep network architectures",
+              "type": "METHOD",
+              "role": "target",
+              "evidence": "integration of reinforcement learning with deep network architectures",
+              "central": false
+            },
+            {
+              "surface": "replay algorithm",
+              "type": "METHOD",
+              "role": "cause",
+              "evidence": "our incorporation of a replay algorithm",
+              "central": false
+            },
+            {
+              "surface": "deep network architectures",
+              "type": "METHOD",
+              "role": "effect",
+              "evidence": "integration of reinforcement learning with deep network architectures",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "critically_dependent_on",
+            "_evidence_offset": "822"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "front_matter (part 2)",
+            "cited_from": "this_work",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "the successful integration of reinforcement learning with deep network architectures was critically dependent on our incorporation of a replay algorithm",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-27T04:33:19Z",
+        "mutation_id": "mut_000012",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n2c0_e4",
+        "payload": {
+          "kind": "background",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "replay algorithm",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "our incorporation of a replay algorithm",
+              "central": false
+            },
+            {
+              "surface": "hippocampus",
+              "type": "THING",
+              "role": "to",
+              "evidence": "the hippocampus may support the physical",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "supported_by",
+            "_evidence_offset": "1058"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "front_matter (part 2)",
+            "cited_from": "prior_art",
+            "evidence_strength": "hypothesized"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "Convergent evidence suggests that the hippocampus may support the physical realization of such a process",
+        "rationale": "extracted background",
+        "timestamp": "2026-08-27T04:33:19Z",
+        "mutation_id": "mut_000013",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n2c0_e7",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "single architecture",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "a single architecture can successfully learn control policies",
+              "central": false
+            },
+            {
+              "surface": "previous work",
+              "type": "THING",
+              "role": "to",
+              "evidence": "In contrast to previous work",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "in_contrast_to",
+            "_evidence_offset": "366"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "front_matter (part 2)",
+            "cited_from": "prior_art",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "In contrast to previous work",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-27T04:33:19Z",
+        "mutation_id": "mut_000014",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n2c0_e8",
+        "payload": {
+          "kind": "claim_relation",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "single architecture",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "a single architecture can successfully learn control policies",
+              "central": false
+            },
+            {
+              "surface": "human player",
+              "type": "THING",
+              "role": "to",
+              "evidence": "privy only to the inputs a human player would have",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "comparable_to",
+            "_evidence_offset": "314"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "front_matter (part 2)",
+            "cited_from": "this_work",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "privy only to the inputs a human player would have",
+        "rationale": "extracted claim_relation",
+        "timestamp": "2026-08-27T04:33:19Z",
+        "mutation_id": "mut_000015",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n2c1_e1",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target",
+            "cause"
+          ],
+          "concepts": [
+            {
+              "surface": "reward signal",
+              "type": "PROPERTY",
+              "role": "source",
+              "evidence": "reward signal",
+              "central": false
+            },
+            {
+              "surface": "representations",
+              "type": "PROPERTY",
+              "role": "target",
+              "evidence": "representations",
+              "central": false
+            },
+            {
+              "surface": "convolutional network",
+              "type": "METHOD",
+              "role": "cause",
+              "evidence": "convolutional network",
+              "central": true
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "causal",
+            "_evidence_offset": "468"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "front_matter (part 2)",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "assumed"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "reward signal ... representations ... convolutional network",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-27T04:33:19Z",
+        "mutation_id": "mut_000016",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n2c1_e2",
+        "payload": {
+          "kind": "background",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "end-to-end reinforcement learning",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "end-to-end reinforcement learning",
+              "central": true
+            },
+            {
+              "surface": "primate visual cortex",
+              "type": "THING",
+              "role": "to",
+              "evidence": "primate visual cortex",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "motivation",
+            "_evidence_offset": "629"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "front_matter (part 2)",
+            "cited_from": "prior_art",
+            "method": "theory",
+            "evidence_strength": "assumed"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "end-to-end reinforcement learning ... primate visual cortex",
+        "rationale": "extracted background",
+        "timestamp": "2026-08-27T04:33:19Z",
+        "mutation_id": "mut_000017",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n2c1_e4",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "deep reinforcement learning agent",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "deep reinforcement learning agent",
+              "central": true
+            },
+            {
+              "surface": "previous work",
+              "type": "THING",
+              "role": "to",
+              "evidence": "previous work",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "contrast",
+            "_evidence_offset": "366"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "front_matter (part 2)",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "assumed"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "deep reinforcement learning agent ... previous work",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-27T04:33:19Z",
+        "mutation_id": "mut_000018",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n2c1_e5",
+        "payload": {
+          "kind": "extends",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "experience replay algorithm",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "experience replay algorithm",
+              "central": true
+            },
+            {
+              "surface": "prioritized sweeping",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "prioritized sweeping",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "generalization",
+            "_evidence_offset": "2301"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "front_matter (part 2)",
+            "cited_from": "prior_art",
+            "method": "theory",
+            "evidence_strength": "assumed"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "experience replay algorithm ... prioritized sweeping",
+        "rationale": "extracted extends",
+        "timestamp": "2026-08-27T04:33:19Z",
+        "mutation_id": "mut_000019",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n2c1_e7",
+        "payload": {
+          "kind": "claim_relation",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "deep reinforcement learning agent",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "deep reinforcement learning agent",
+              "central": true
+            },
+            {
+              "surface": "human player",
+              "type": "THING",
+              "role": "to",
+              "evidence": "human player",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "equivalence",
+            "_evidence_offset": "173"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "front_matter (part 2)",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "assumed"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "deep reinforcement learning agent ... human player",
+        "rationale": "extracted claim_relation",
+        "timestamp": "2026-08-27T04:33:19Z",
+        "mutation_id": "mut_000020",
+        "status": "committed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.1",
+      "validated": [
+        "mut_000009",
+        "mut_000010",
+        "mut_000011",
+        "mut_000012",
+        "mut_000013",
+        "mut_000014",
+        "mut_000015",
+        "mut_000016",
+        "mut_000017",
+        "mut_000018",
+        "mut_000019",
+        "mut_000020"
+      ],
+      "rejected": [],
+      "routed": []
+    },
+    "version_diff": {
+      "before": "0.1",
+      "after": "0.1"
+    }
+  },
+  {
+    "mutations": [
+      {
+        "op": "add_edge",
+        "target": "n3c1_e0",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "target",
+            "source"
+          ],
+          "concepts": [
+            {
+              "surface": "game score",
+              "type": "PROPERTY",
+              "role": "target",
+              "evidence": "the game score may depend on the whole previous sequence of actions and observations",
+              "central": false
+            },
+            {
+              "surface": "whole previous sequence of actions and observations",
+              "type": "THING",
+              "role": "source",
+              "evidence": "the game score may depend on the whole previous sequence of actions and observations",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "dependence",
+            "applies_in_regime": "general",
+            "_evidence_offset": "8241"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "assumed"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "the game score may depend on the whole previous sequence of actions and observations",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000021",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c1_e1",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "target",
+            "source"
+          ],
+          "concepts": [
+            {
+              "surface": "game strategies",
+              "type": "THING",
+              "role": "target",
+              "evidence": "which then learns game strategies depending upon these sequences",
+              "central": false
+            },
+            {
+              "surface": "these sequences",
+              "type": "THING",
+              "role": "source",
+              "evidence": "which then learns game strategies depending upon these sequences",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "dependence",
+            "applies_in_regime": "general",
+            "_evidence_offset": "8824"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "assumed"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "which then learns game strategies depending upon these sequences",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000022",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c1_e2",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "This formalism",
+              "type": "THING",
+              "role": "subject",
+              "evidence": "This formalism gives rise to a large but finite Markov decision process (MDP)",
+              "central": false
+            },
+            {
+              "surface": "large but finite Markov decision process (MDP)",
+              "type": "THING",
+              "role": "object",
+              "evidence": "This formalism gives rise to a large but finite Markov decision process (MDP)",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "gives_rise_to",
+            "_evidence_offset": "8978"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "assumed"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "This formalism gives rise to a large but finite Markov decision process (MDP)",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000023",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c1_e3",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "each sequence",
+              "type": "THING",
+              "role": "subject",
+              "evidence": "in which each sequence is a distinct state",
+              "central": false
+            },
+            {
+              "surface": "distinct state",
+              "type": "THING",
+              "role": "object",
+              "evidence": "in which each sequence is a distinct state",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "is",
+            "_evidence_offset": "9056"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "assumed"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "in which each sequence is a distinct state",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000024",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c1_e4",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "complete sequence st",
+              "type": "THING",
+              "role": "subject",
+              "evidence": "simply by using the complete sequence st as the state representation at time t",
+              "central": false
+            },
+            {
+              "surface": "state representation at time t",
+              "type": "THING",
+              "role": "object",
+              "evidence": "simply by using the complete sequence st as the state representation at time t",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "using_as",
+            "_evidence_offset": "9176"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "assumed"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "simply by using the complete sequence st as the state representation at time t",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000025",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c1_e5",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "target",
+            "source"
+          ],
+          "concepts": [
+            {
+              "surface": "future rewards",
+              "type": "THING",
+              "role": "target",
+              "evidence": "We make the standard assumption that future rewards are discounted by a factor of c per time-step",
+              "central": false
+            },
+            {
+              "surface": "factor of c",
+              "type": "PARAMETER",
+              "role": "source",
+              "evidence": "We make the standard assumption that future rewards are discounted by a factor of c per time-step",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "discounting",
+            "applies_in_regime": "general",
+            "_evidence_offset": "9409"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "assumed"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "future rewards are discounted by a factor of c per time-step",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000026",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c1_e6",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "future discounted return at time t as $R _ { t } = \\sum _ { t ^ { \\prime } = t } ^ { I } \\gamma ^ { t ^ { \\prime } - t } r _ { t ^ { \\prime } }$ T",
+              "type": "THING",
+              "role": "subject",
+              "evidence": "define the future discounted return at time t as $R _ { t } = \\sum _ { t ^ { \\prime } = t } ^ { I } \\gamma ^ { t ^ { \\prime } - t } r _ { t ^ { \\prime } }$ T",
+              "central": false
+            },
+            {
+              "surface": "T",
+              "type": "PARAMETER",
+              "role": "object",
+              "evidence": "in which T is the t0~ttime-step at which the game terminates",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "defined_as",
+            "_math_binding_review": "1",
+            "_evidence_offset": "9506"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "assumed"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "define the future discounted return at time t as $R _ { t } = \\sum _ { t ^ { \\prime } = t } ^ { I } \\gamma ^ { t ^ { \\prime } - t } r _ { t ^ { \\prime } }$ T",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000027",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c1_e7",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "optimal action-value function $\\boldsymbol { Q } ^ { * } ( s , a )$",
+              "type": "THING",
+              "role": "subject",
+              "evidence": "We define the optimal action-value function $\\boldsymbol { Q } ^ { * } ( s , a )$ as the maximum expected return achievable by following any policy",
+              "central": false
+            },
+            {
+              "surface": "maximum expected return",
+              "type": "THING",
+              "role": "object",
+              "evidence": "We define the optimal action-value function $\\boldsymbol { Q } ^ { * } ( s , a )$ as the maximum expected return achievable by following any policy",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "defined_as",
+            "_math_binding_review": "1",
+            "_evidence_offset": "9729"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "assumed"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "We define the optimal action-value function $\\boldsymbol { Q } ^ { * } ( s , a )$ as the maximum expected return achievable by following any policy",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000028",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c1_e8",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "p",
+              "type": "PARAMETER",
+              "role": "subject",
+              "evidence": "in which p is a policy mapping sequences to actions (or distributions over actions)",
+              "central": false
+            },
+            {
+              "surface": "policy mapping sequences to actions (or distributions over actions)",
+              "type": "THING",
+              "role": "object",
+              "evidence": "in which p is a policy mapping sequences to actions (or distributions over actions)",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "is",
+            "_evidence_offset": "10041"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "assumed"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "in which p is a policy mapping sequences to actions (or distributions over actions)",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000029",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c1_e9",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "target",
+            "source"
+          ],
+          "concepts": [
+            {
+              "surface": "optimal action-value function",
+              "type": "THING",
+              "role": "target",
+              "evidence": "The optimal action-value function obeys an important identity known as the Bellman equation",
+              "central": false
+            },
+            {
+              "surface": "important identity known as the Bellman equation",
+              "type": "THING",
+              "role": "source",
+              "evidence": "The optimal action-value function obeys an important identity known as the Bellman equation",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "obeys",
+            "applies_in_regime": "general",
+            "_evidence_offset": "10126"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "assumed"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "The optimal action-value function obeys an important identity known as the Bellman equation",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000030",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c1_e10",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "target",
+            "source"
+          ],
+          "concepts": [
+            {
+              "surface": "optimal strategy",
+              "type": "THING",
+              "role": "target",
+              "evidence": "then the optimal strategy is to select the action a9 maximizing the expected value of $\\dot { \\boldsymbol { r } } + \\gamma \\boldsymbol { Q } ^ { * } ( \\boldsymbol { s } ^ { \\prime } , \\boldsymbol { a } ^ { \\prime } )$",
+              "central": false
+            },
+            {
+              "surface": "action a9",
+              "type": "THING",
+              "role": "source",
+              "evidence": "then the optimal strategy is to select the action a9 maximizing the expected value of $\\dot { \\boldsymbol { r } } + \\gamma \\boldsymbol { Q } ^ { * } ( \\boldsymbol { s } ^ { \\prime } , \\boldsymbol { a } ^ { \\prime } )$",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "maximizing",
+            "applies_in_regime": "general",
+            "_evidence_offset": "10463"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "assumed"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "then the optimal strategy is to select the action a9 maximizing the expected value of $\\dot { \\boldsymbol { r } } + \\gamma \\boldsymbol { Q } ^ { * } ( \\boldsymbol { s } ^ { \\prime } , \\boldsymbol { a } ^ { \\prime } )$",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000031",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c0_e0",
+        "payload": {
+          "kind": "composed_of",
+          "roles": [
+            "whole",
+            "component",
+            "component"
+          ],
+          "concepts": [
+            {
+              "surface": "preprocessing step",
+              "type": "METHOD",
+              "role": "whole",
+              "evidence": "We apply a basic preprocessing step",
+              "central": false
+            },
+            {
+              "surface": "maximum value for each pixel colour value",
+              "type": "METHOD",
+              "role": "component",
+              "evidence": "we take the maximum value for each pixel colour value over the frame being encoded and the previous frame",
+              "central": false
+            },
+            {
+              "surface": "Y channel",
+              "type": "PROPERTY",
+              "role": "component",
+              "evidence": "we then extract the Y channel",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "structural",
+            "_evidence_offset": "194"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "We apply a basic preprocessing step aimed at reducing the input dimensionality and dealing with some artefacts of the Atari 2600 emulator. First, to encode a single frame we take the maximum value for each pixel colour value over the frame being encoded and the previous frame. This was necessary to remove flickering that is present in games where some objects appear only in even frames while other objects appear only in odd frames, an artefact caused by the limited number of sprites Atari 2600 can display at once. Second, we then extract the Y channel, also known as luminance, from the RGB frame and rescale it to 84 3 84.",
+        "rationale": "extracted composed_of",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000032",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c0_e1",
+        "payload": {
+          "kind": "composed_of",
+          "roles": [
+            "whole",
+            "component",
+            "component"
+          ],
+          "concepts": [
+            {
+              "surface": "function w",
+              "type": "METHOD",
+              "role": "whole",
+              "evidence": "The function w from algorithm 1",
+              "central": false
+            },
+            {
+              "surface": "m most recent frames",
+              "type": "THING",
+              "role": "component",
+              "evidence": "applies this preprocessing to the m most recent frames",
+              "central": false
+            },
+            {
+              "surface": "input to the Q-function",
+              "type": "THING",
+              "role": "component",
+              "evidence": "stacks them to produce the input to the Q-function",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "structural",
+            "_evidence_offset": "824"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "The function w from algorithm 1 described below applies this preprocessing to the m most recent frames and stacks them to produce the input to the Q-function",
+        "rationale": "extracted composed_of",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000033",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c0_e2",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "definition",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "Q",
+              "type": "METHOD",
+              "role": "subject",
+              "evidence": "parameterizing Q",
+              "central": false
+            },
+            {
+              "surface": "neural network",
+              "type": "METHOD",
+              "role": "definition",
+              "evidence": "using a neural network",
+              "central": false
+            },
+            {
+              "surface": "history–action pairs",
+              "type": "THING",
+              "role": "object",
+              "evidence": "Q maps history–action pairs",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "parameterization",
+            "_evidence_offset": "1232"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "There are several possible ways of parameterizing Q using a neural network.",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000034",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c0_e3",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "definition",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "Q",
+              "type": "METHOD",
+              "role": "subject",
+              "evidence": "parameterizing Q",
+              "central": false
+            },
+            {
+              "surface": "scalar estimates of their Q-value",
+              "type": "PROPERTY",
+              "role": "definition",
+              "evidence": "to scalar estimates of their Q-value",
+              "central": false
+            },
+            {
+              "surface": "history–action pairs",
+              "type": "THING",
+              "role": "object",
+              "evidence": "Q maps history–action pairs",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "mapping",
+            "_evidence_offset": "1308"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "Because Q maps history–action pairs to scalar estimates of their Q-value",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000035",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c0_e5",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "definition",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "separate output unit for each possible action",
+              "type": "METHOD",
+              "role": "subject",
+              "evidence": "we instead use an architecture in which there is a separate output unit for each possible action",
+              "central": false
+            },
+            {
+              "surface": "predicted Q-values",
+              "type": "PROPERTY",
+              "role": "definition",
+              "evidence": "The outputs correspond to the predicted Q-values",
+              "central": false
+            },
+            {
+              "surface": "input state",
+              "type": "THING",
+              "role": "object",
+              "evidence": "for the input state",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "correspondence",
+            "_evidence_offset": "1856"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "The outputs correspond to the predicted Q-values of the individual actions for the input state.",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000036",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c0_e6",
+        "payload": {
+          "kind": "composed_of",
+          "roles": [
+            "whole",
+            "component"
+          ],
+          "concepts": [
+            {
+              "surface": "8 4 × 8 4 × 4 image",
+              "type": "THING",
+              "role": "whole",
+              "evidence": "The input to the neural network consists of an $8 4 \\times 8 4 \\times 4$ image",
+              "central": false
+            },
+            {
+              "surface": "preprocessing map w",
+              "type": "METHOD",
+              "role": "component",
+              "evidence": "produced by the preprocessing map w",
+              "central": true
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "structural",
+            "_evidence_offset": "2200"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "The input to the neural network consists of an $8 4 \\times 8 4 \\times 4$ image produced by the preprocessing map w.",
+        "rationale": "extracted composed_of",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000037",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c0_e7",
+        "payload": {
+          "kind": "composed_of",
+          "roles": [
+            "whole",
+            "component",
+            "component",
+            "component"
+          ],
+          "concepts": [
+            {
+              "surface": "first hidden layer",
+              "type": "METHOD",
+              "role": "whole",
+              "evidence": "The first hidden layer",
+              "central": false
+            },
+            {
+              "surface": "32 filters of 8 3 8",
+              "type": "PARAMETER",
+              "role": "component",
+              "evidence": "convolves 32 filters of 8 3 8",
+              "central": false
+            },
+            {
+              "surface": "stride 4",
+              "type": "PARAMETER",
+              "role": "component",
+              "evidence": "with stride 4",
+              "central": false
+            },
+            {
+              "surface": "rectifier nonlinearity",
+              "type": "METHOD",
+              "role": "component",
+              "evidence": "applies a rectifier nonlinearity",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "structural",
+            "_evidence_offset": "2316"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "The first hidden layer convolves 32 filters of 8 3 8 with stride 4 with the input image and applies a rectifier nonlinearity31,32.",
+        "rationale": "extracted composed_of",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000038",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c0_e8",
+        "payload": {
+          "kind": "composed_of",
+          "roles": [
+            "whole",
+            "component",
+            "component",
+            "component"
+          ],
+          "concepts": [
+            {
+              "surface": "second hidden layer",
+              "type": "METHOD",
+              "role": "whole",
+              "evidence": "The second hidden layer",
+              "central": false
+            },
+            {
+              "surface": "64 filters of $\\bar { 4 } \\times 4$",
+              "type": "PARAMETER",
+              "role": "component",
+              "evidence": "convolves 64 filters of $\\bar { 4 } \\times 4$",
+              "central": false
+            },
+            {
+              "surface": "stride 2",
+              "type": "PARAMETER",
+              "role": "component",
+              "evidence": "with stride 2",
+              "central": false
+            },
+            {
+              "surface": "rectifier nonlinearity",
+              "type": "METHOD",
+              "role": "component",
+              "evidence": "applies a rectifier nonlinearity",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "structural",
+            "_math_binding_review": "1",
+            "_evidence_offset": "2447"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "The second hidden layer convolves 64 filters of $\\bar { 4 } \\times 4$ with stride 2, again followed by a rectifier nonlinearity.",
+        "rationale": "extracted composed_of",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000039",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c0_e9",
+        "payload": {
+          "kind": "composed_of",
+          "roles": [
+            "whole",
+            "component",
+            "component",
+            "component"
+          ],
+          "concepts": [
+            {
+              "surface": "third convolutional layer",
+              "type": "METHOD",
+              "role": "whole",
+              "evidence": "a third convolutional layer",
+              "central": false
+            },
+            {
+              "surface": "64 filters of 3 3 3",
+              "type": "PARAMETER",
+              "role": "component",
+              "evidence": "convolves 64 filters of 3 3 3",
+              "central": false
+            },
+            {
+              "surface": "stride 1",
+              "type": "PARAMETER",
+              "role": "component",
+              "evidence": "with stride 1",
+              "central": false
+            },
+            {
+              "surface": "rectifier nonlinearity",
+              "type": "METHOD",
+              "role": "component",
+              "evidence": "applies a rectifier nonlinearity",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "structural",
+            "_evidence_offset": "2576"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "This is followed by a third convolutional layer that convolves 64 filters of 3 3 3 with stride 1 followed by a rectifier.",
+        "rationale": "extracted composed_of",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000040",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c0_e10",
+        "payload": {
+          "kind": "composed_of",
+          "roles": [
+            "whole",
+            "component"
+          ],
+          "concepts": [
+            {
+              "surface": "final hidden layer",
+              "type": "METHOD",
+              "role": "whole",
+              "evidence": "The final hidden layer",
+              "central": false
+            },
+            {
+              "surface": "512 rectifier units",
+              "type": "PARAMETER",
+              "role": "component",
+              "evidence": "consists of 512 rectifier units",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "structural",
+            "_evidence_offset": "2698"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "The final hidden layer is fully-connected and consists of 512 rectifier units.",
+        "rationale": "extracted composed_of",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000041",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c0_e11",
+        "payload": {
+          "kind": "composed_of",
+          "roles": [
+            "whole",
+            "component",
+            "component"
+          ],
+          "concepts": [
+            {
+              "surface": "output layer",
+              "type": "METHOD",
+              "role": "whole",
+              "evidence": "The output layer",
+              "central": false
+            },
+            {
+              "surface": "fully-connected linear layer",
+              "type": "METHOD",
+              "role": "component",
+              "evidence": "a fully-connected linear layer",
+              "central": false
+            },
+            {
+              "surface": "single output for each valid action",
+              "type": "PARAMETER",
+              "role": "component",
+              "evidence": "with a single output for each valid action",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "structural",
+            "_evidence_offset": "2777"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "The output layer is a fully-connected linear layer with a single output for each valid action.",
+        "rationale": "extracted composed_of",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000042",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c0_e14",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target",
+            "effect"
+          ],
+          "concepts": [
+            {
+              "surface": "positive rewards",
+              "type": "PROPERTY",
+              "role": "source",
+              "evidence": "we clipped all positive rewards at 1",
+              "central": false
+            },
+            {
+              "surface": "1",
+              "type": "NUMERIC",
+              "role": "target",
+              "evidence": "clipped all positive rewards at 1",
+              "central": false
+            },
+            {
+              "surface": "scale of the error derivatives",
+              "type": "PROPERTY",
+              "role": "effect",
+              "evidence": "limits the scale of the error derivatives",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "causal",
+            "applies_in_regime": "training",
+            "_evidence_offset": "3587"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "we clipped all positive rewards at 1 and all negative rewards ${ \\tt a t } - 1$ , leaving 0 rewards unchanged. Clipping the rewards in this manner limits the scale of the error derivatives",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000043",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c0_e15",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target",
+            "effect"
+          ],
+          "concepts": [
+            {
+              "surface": "positive rewards",
+              "type": "PROPERTY",
+              "role": "source",
+              "evidence": "we clipped all positive rewards at 1",
+              "central": false
+            },
+            {
+              "surface": "1",
+              "type": "NUMERIC",
+              "role": "target",
+              "evidence": "clipped all positive rewards at 1",
+              "central": false
+            },
+            {
+              "surface": "same learning rate",
+              "type": "PARAMETER",
+              "role": "effect",
+              "evidence": "makes it easier to use the same learning rate",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "causal",
+            "applies_in_regime": "training",
+            "_evidence_offset": "3698"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "Clipping the rewards in this manner limits the scale of the error derivatives and makes it easier to use the same learning rate across multiple games.",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000044",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c0_e17",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "definition",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "number of lives left",
+              "type": "PROPERTY",
+              "role": "subject",
+              "evidence": "the Atari 2600 emulator also sends the number of lives left",
+              "central": false
+            },
+            {
+              "surface": "end of an episode",
+              "type": "THING",
+              "role": "definition",
+              "evidence": "used to mark the end of an episode",
+              "central": false
+            },
+            {
+              "surface": "life counter",
+              "type": "THING",
+              "role": "object",
+              "evidence": "there is a life counter",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "usage",
+            "_evidence_offset": "3982"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "For games where there is a life counter, the Atari 2600 emulator also sends the number of lives left in the game, which is then used to mark the end of an episode during training.",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000045",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c0_e18",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "definition",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "behaviour policy",
+              "type": "METHOD",
+              "role": "subject",
+              "evidence": "The behaviour policy during training",
+              "central": false
+            },
+            {
+              "surface": "e-greedy",
+              "type": "METHOD",
+              "role": "definition",
+              "evidence": "was e-greedy",
+              "central": false
+            },
+            {
+              "surface": "e",
+              "type": "PARAMETER",
+              "role": "object",
+              "evidence": "with e annealed linearly",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "policy",
+            "_evidence_offset": "4325"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "The behaviour policy during training was e-greedy with e annealed linearly from 1.0 to 0.1 over the first million frames, and fixed at 0.1 thereafter.",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000046",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c0_e19",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target",
+            "effect"
+          ],
+          "concepts": [
+            {
+              "surface": "e",
+              "type": "PARAMETER",
+              "role": "source",
+              "evidence": "with e annealed linearly",
+              "central": false
+            },
+            {
+              "surface": "1.0 to 0.1",
+              "type": "NUMERIC",
+              "role": "target",
+              "evidence": "from 1.0 to 0.1",
+              "central": false
+            },
+            {
+              "surface": "first million frames",
+              "type": "THING",
+              "role": "effect",
+              "evidence": "over the first million frames",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "temporal",
+            "applies_in_regime": "training",
+            "_evidence_offset": "4375"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "with e annealed linearly from 1.0 to 0.1 over the first million frames, and fixed at 0.1 thereafter.",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000047",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c0_e20",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "definition",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "frame-skipping technique",
+              "type": "METHOD",
+              "role": "subject",
+              "evidence": "we also use a simple frame-skipping technique",
+              "central": false
+            },
+            {
+              "surface": "agent",
+              "type": "THING",
+              "role": "definition",
+              "evidence": "the agent sees and selects actions",
+              "central": false
+            },
+            {
+              "surface": "every kth frame",
+              "type": "THING",
+              "role": "object",
+              "evidence": "on every kth frame",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "technique",
+            "_evidence_offset": "4632"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "Following previous approaches to playing Atari 2600 games, we also use a simple frame-skipping technique15. More precisely, the agent sees and selects actions on every kth frame instead of every frame, and its last action is repeated on skipped frames.",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000048",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c0_e22",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "definition",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "values of all the hyperparameters and optimization parameters",
+              "type": "PARAMETER",
+              "role": "subject",
+              "evidence": "The values of all the hyperparameters and optimization parameters",
+              "central": false
+            },
+            {
+              "surface": "informal search",
+              "type": "METHOD",
+              "role": "definition",
+              "evidence": "were selected by performing an informal search",
+              "central": false
+            },
+            {
+              "surface": "Pong, Breakout, Seaquest, Space Invaders and Beam Rider",
+              "type": "THING",
+              "role": "object",
+              "evidence": "on the games Pong, Breakout, Seaquest, Space Invaders and Beam Rider",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "selection",
+            "_evidence_offset": "5149"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "The values of all the hyperparameters and optimization parameters were selected by performing an informal search on the games Pong, Breakout, Seaquest, Space Invaders and Beam Rider.",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000049",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c0_e23",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "definition",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "minimal prior knowledge",
+              "type": "PROPERTY",
+              "role": "subject",
+              "evidence": "amounts to using the following minimal prior knowledge",
+              "central": false
+            },
+            {
+              "surface": "visual images",
+              "type": "THING",
+              "role": "definition",
+              "evidence": "the input data consisted of visual images",
+              "central": false
+            },
+            {
+              "surface": "convolutional deep network",
+              "type": "METHOD",
+              "role": "object",
+              "evidence": "motivating our use of a convolutional deep network",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "prior_knowledge",
+            "_evidence_offset": "5566"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "Our experimental setup amounts to using the following minimal prior knowledge: that the input data consisted of visual images (motivating our use of a convolutional deep network), the game-specific score (with no modification), number of actions, although not their correspondences (for example, specification of the up ‘button’) and the life count.",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000050",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c0_e26",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "random agent",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "The random agent served as a baseline comparison",
+              "central": false
+            },
+            {
+              "surface": "baseline comparison",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "served as a baseline comparison",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "baseline",
+            "_evidence_offset": "6247"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "The random agent served as a baseline comparison and chose a random action at 10 Hz which is every sixth frame, repeating its last action on intervening frames.",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000051",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c0_e28",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "random agent that selected an action at 60 Hz",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "We did also assess the performance of a random agent that selected an action at 60 Hz",
+              "central": false
+            },
+            {
+              "surface": "random agent",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "The random agent served as a baseline comparison",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "comparison",
+            "_evidence_offset": "6591"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "We did also assess the performance of a random agent that selected an action at 60 Hz (that is, every frame).",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000052",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c0_e29",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target",
+            "effect"
+          ],
+          "concepts": [
+            {
+              "surface": "random agent that selected an action at 60 Hz",
+              "type": "METHOD",
+              "role": "source",
+              "evidence": "We did also assess the performance of a random agent that selected an action at 60 Hz",
+              "central": false
+            },
+            {
+              "surface": "normalized DQN performance",
+              "type": "PROPERTY",
+              "role": "target",
+              "evidence": "changing the normalized DQN performance",
+              "central": false
+            },
+            {
+              "surface": "5%",
+              "type": "NUMERIC",
+              "role": "effect",
+              "evidence": "by more than 5%",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "causal",
+            "applies_in_regime": "evaluation",
+            "_evidence_offset": "6701"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "This had a minimal effect: changing the normalized DQN performance by more than 5% in only six games (Boxing, Breakout, Crazy Climber, Demon Attack, Krull and Robotank)",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000053",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c0_e30",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "DQN",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "DQN outperformed the expert human",
+              "central": false
+            },
+            {
+              "surface": "expert human",
+              "type": "THING",
+              "role": "to",
+              "evidence": "DQN outperformed the expert human",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "outperforms",
+            "_evidence_offset": "6871"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "and in all these games DQN outperformed the expert human by a considerable margin.",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000054",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c0_e32",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "definition",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "human performance",
+              "type": "PROPERTY",
+              "role": "subject",
+              "evidence": "The human performance is the average reward",
+              "central": false
+            },
+            {
+              "surface": "average reward",
+              "type": "PROPERTY",
+              "role": "definition",
+              "evidence": "is the average reward",
+              "central": false
+            },
+            {
+              "surface": "20 episodes",
+              "type": "NUMERIC",
+              "role": "object",
+              "evidence": "from around 20 episodes",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "definition",
+            "_evidence_offset": "7314"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "The human performance is the average reward achieved from around 20 episodes of each game lasting a maximum of 5 min each, following around 2 h of practice playing each game.",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000055",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c0_e34",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "definition",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "action at",
+              "type": "THING",
+              "role": "subject",
+              "evidence": "the agent selects an action at",
+              "central": false
+            },
+            {
+              "surface": "set of legal game actions",
+              "type": "THING",
+              "role": "definition",
+              "evidence": "from the set of legal game actions",
+              "central": false
+            },
+            {
+              "surface": "$\\mathcal { A } = \\left\\{ 1 , \\ldots , K \\right\\}$",
+              "type": "THING",
+              "role": "object",
+              "evidence": "$\\mathcal { A } = \\left\\{ 1 , \\ldots , K \\right\\}$",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "selection",
+            "_math_binding_review": "1",
+            "_evidence_offset": "7652"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "At each time-step the agent selects an action at from the set of legal game actions, $\\mathcal { A } = \\left\\{ 1 , \\ldots , K \\right\\}$ .",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000056",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n3c0_e35",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "source",
+            "target",
+            "effect"
+          ],
+          "concepts": [
+            {
+              "surface": "action",
+              "type": "THING",
+              "role": "source",
+              "evidence": "The action is passed to the emulator",
+              "central": false
+            },
+            {
+              "surface": "internal state",
+              "type": "PROPERTY",
+              "role": "target",
+              "evidence": "modifies its internal state",
+              "central": false
+            },
+            {
+              "surface": "game score",
+              "type": "PROPERTY",
+              "role": "effect",
+              "evidence": "and the game score",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "causal",
+            "applies_in_regime": "training",
+            "_evidence_offset": "7790"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 1)",
+            "cited_from": "this_work",
+            "method": "experiment",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "The action is passed to the emulator and modifies its internal state and the game score.",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-27T04:36:16Z",
+        "mutation_id": "mut_000057",
+        "status": "committed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.1",
+      "validated": [
+        "mut_000021",
+        "mut_000022",
+        "mut_000023",
+        "mut_000024",
+        "mut_000025",
+        "mut_000026",
+        "mut_000027",
+        "mut_000028",
+        "mut_000029",
+        "mut_000030",
+        "mut_000031",
+        "mut_000032",
+        "mut_000033",
+        "mut_000034",
+        "mut_000035",
+        "mut_000036",
+        "mut_000037",
+        "mut_000038",
+        "mut_000039",
+        "mut_000040",
+        "mut_000041",
+        "mut_000042",
+        "mut_000043",
+        "mut_000044",
+        "mut_000045",
+        "mut_000046",
+        "mut_000047",
+        "mut_000048",
+        "mut_000049",
+        "mut_000050",
+        "mut_000051",
+        "mut_000052",
+        "mut_000053",
+        "mut_000054",
+        "mut_000055",
+        "mut_000056",
+        "mut_000057"
+      ],
+      "rejected": [],
+      "routed": []
+    },
+    "version_diff": {
+      "before": "0.1",
+      "after": "0.1"
+    }
+  },
+  {
+    "mutations": [
+      {
+        "op": "add_pattern",
+        "target": "varies_between",
+        "payload": {
+          "pattern": {
+            "pattern_id": "varies_between",
+            "description": "X varies between range Y (numerical range specification, not a definition or comparison)",
+            "role_slots": [
+              {
+                "role": "subject",
+                "type": "THING"
+              },
+              {
+                "role": "range",
+                "type": "NUMERIC"
+              }
+            ],
+            "allowed_qualifiers": [
+              "method",
+              "evidence_strength",
+              "cited_from",
+              "applies_in_regime"
+            ],
+            "deprecated": false,
+            "split_from": "",
+            "is_abstract": false,
+            "family": "measure",
+            "semantic_boundary": "Applies when a single subject’s value is stated as lying between two numbers, not when defining a quantity or comparing two separate measurements."
+          }
+        },
+        "proposer_role": "evolver",
+        "domain": "granular flow physics",
+        "base_version": "0.1",
+        "evidence": "The number of valid actions varied between 4 and 18 on the games we considered",
+        "rationale": "HE1 describes a numerical range (4-18) for a property, which is neither a definition (defines) nor a comparison (compares). This is a distinct pattern for range specification.",
+        "timestamp": "2026-08-27T04:36:57Z",
+        "mutation_id": "mut_000058",
+        "status": "rejected"
+      }
+    ],
+    "result": {
+      "ok": false,
+      "version": "0.1",
+      "validated": [],
+      "rejected": [
+        {
+          "mutation_id": "mut_000058",
+          "op": "add_pattern",
+          "reason": "domain-not-registered:granular flow physics"
+        }
+      ],
+      "routed": []
+    },
+    "version_diff": null
+  },
+  {
+    "mutations": [
+      {
+        "op": "add_pattern",
+        "target": "requires_less_than",
+        "payload": {
+          "pattern": {
+            "pattern_id": "requires_less_than",
+            "description": "X requires less resource than Y (efficiency comparison, not a general comparison or improvement)",
+            "role_slots": [
+              {
+                "role": "subject",
+                "type": "THING"
+              },
+              {
+                "role": "comparison",
+                "type": "THING"
+              }
+            ],
+            "allowed_qualifiers": [
+              "relation_type",
+              "method",
+              "evidence_strength",
+              "cited_from"
+            ],
+            "deprecated": false,
+            "split_from": "",
+            "is_abstract": false,
+            "family": "claim",
+            "semantic_boundary": "Applies only when X explicitly uses fewer units of a countable resource than Y; NOT for general superiority, cost, time, or qualitative improvement."
+          }
+        },
+        "proposer_role": "evolver",
+        "domain": "granular flow physics",
+        "base_version": "0.1",
+        "evidence": "Because running the emulator forward for one step requires much less computation than having the agent select an action",
+        "rationale": "HE3 describes a resource efficiency comparison (less computation), which is distinct from compares (side-by-side evaluation) and improves (fixing limitations). This is a specific claim about resource requirements.",
+        "timestamp": "2026-08-27T04:37:03Z",
+        "mutation_id": "mut_000059",
+        "status": "rejected"
+      }
+    ],
+    "result": {
+      "ok": false,
+      "version": "0.1",
+      "validated": [],
+      "rejected": [
+        {
+          "mutation_id": "mut_000059",
+          "op": "add_pattern",
+          "reason": "domain-not-registered:granular flow physics"
+        }
+      ],
+      "routed": []
+    },
+    "version_diff": null
+  },
+  {
+    "mutations": [
+      {
+        "op": "add_edge",
+        "target": "n4c1_e0",
+        "payload": {
+          "kind": "improves",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "error clipping",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "This form of error clipping further improved the stability of the algorithm.",
+              "central": false
+            },
+            {
+              "surface": "stability of the algorithm",
+              "type": "PROPERTY",
+              "role": "to",
+              "evidence": "This form of error clipping further improved the stability of the algorithm.",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "improves",
+            "_evidence_offset": "8028"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 2)",
+            "cited_from": "this_work",
+            "evidence_strength": "measured"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "This form of error clipping further improved the stability of the algorithm.",
+        "rationale": "extracted improves",
+        "timestamp": "2026-08-27T04:38:12Z",
+        "mutation_id": "mut_000060",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n4c0_e0",
+        "payload": {
+          "kind": "constitutive_law",
+          "roles": [
+            "output",
+            "input"
+          ],
+          "concepts": [
+            {
+              "surface": "action-value function",
+              "type": "PROPERTY",
+              "role": "output",
+              "evidence": "estimate the action-value function",
+              "central": true
+            },
+            {
+              "surface": "Bellman equation",
+              "type": "METHOD",
+              "role": "input",
+              "evidence": "using the Bellman equation as an iterative update",
+              "central": true
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "iterative_update",
+            "function_form": "Q_{i+1}(s,a) = E[r + γ max Q_i(s',a') | s,a]",
+            "_evidence_offset": "67"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 2)",
+            "cited_from": "prior_art",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "estimate the action-value function by using the Bellman equation as an iterative update, $Q _ { i + 1 } ( s , a ) = \\mathbb { E } _ { i s ^ { \\prime } } [ r + \\gamma \\operatorname* { m a x } _ { a ^ { \\prime } } \\mathbf { \\bar { Q } } _ { i } ( s ^ { \\prime } , \\bar { a } ^ { \\prime } ) | s , a ]$",
+        "rationale": "extracted constitutive_law",
+        "timestamp": "2026-08-27T04:38:12Z",
+        "mutation_id": "mut_000061",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n4c0_e3",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "linear function approximator",
+              "type": "METHOD",
+              "role": "from",
+              "evidence": "this is typically a linear function approximator",
+              "central": false
+            },
+            {
+              "surface": "nonlinear function approximator",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "but sometimes a nonlinear function approximator is used instead",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "alternative",
+            "_evidence_offset": "857"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 2)",
+            "cited_from": "prior_art",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "this is typically a linear function approximator, but sometimes a nonlinear function approximator is used instead",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-27T04:38:12Z",
+        "mutation_id": "mut_000062",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n4c0_e4",
+        "payload": {
+          "kind": "defines",
+          "roles": [
+            "subject",
+            "definition",
+            "object"
+          ],
+          "concepts": [
+            {
+              "surface": "Q-network",
+              "type": "METHOD",
+              "role": "subject",
+              "evidence": "We refer to a neural network function approximator with weights h as a Q-network",
+              "central": true
+            },
+            {
+              "surface": "neural network",
+              "type": "METHOD",
+              "role": "definition",
+              "evidence": "such as a neural network",
+              "central": false
+            },
+            {
+              "surface": "weights h",
+              "type": "PARAMETER",
+              "role": "object",
+              "evidence": "with weights h",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "named_as",
+            "_evidence_offset": "998"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 2)",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "We refer to a neural network function approximator with weights h as a Q-network",
+        "rationale": "extracted defines",
+        "timestamp": "2026-08-27T04:38:12Z",
+        "mutation_id": "mut_000063",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n4c0_e5",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "target",
+            "source"
+          ],
+          "concepts": [
+            {
+              "surface": "targets",
+              "type": "PROPERTY",
+              "role": "target",
+              "evidence": "the targets depend on the network weights",
+              "central": false
+            },
+            {
+              "surface": "network weights",
+              "type": "PARAMETER",
+              "role": "source",
+              "evidence": "the targets depend on the network weights",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "functional_dependence",
+            "_evidence_offset": "1717"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 2)",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "the targets depend on the network weights",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-27T04:38:12Z",
+        "mutation_id": "mut_000064",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n4c0_e6",
+        "payload": {
+          "kind": "compares",
+          "roles": [
+            "from",
+            "to"
+          ],
+          "concepts": [
+            {
+              "surface": "targets",
+              "type": "PROPERTY",
+              "role": "from",
+              "evidence": "the targets depend on the network weights",
+              "central": false
+            },
+            {
+              "surface": "supervised learning",
+              "type": "METHOD",
+              "role": "to",
+              "evidence": "in contrast with the targets used for supervised learning",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "relation_type": "contrast",
+            "_evidence_offset": "1760"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 2)",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "this is in contrast with the targets used for supervised learning, which are fixed before learning begins",
+        "rationale": "extracted compares",
+        "timestamp": "2026-08-27T04:38:12Z",
+        "mutation_id": "mut_000065",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n4c0_e15",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "target",
+            "source"
+          ],
+          "concepts": [
+            {
+              "surface": "variance of the updates",
+              "type": "PROPERTY",
+              "role": "target",
+              "evidence": "reduces the variance of the updates",
+              "central": false
+            },
+            {
+              "surface": "correlations",
+              "type": "PROPERTY",
+              "role": "source",
+              "evidence": "owing to the strong correlations between the samples",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "reduces",
+            "_evidence_offset": "4932"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 2)",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "randomizing the samples breaks these correlations and therefore reduces the variance of the updates",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-27T04:38:12Z",
+        "mutation_id": "mut_000066",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n4c0_e17",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "target",
+            "source"
+          ],
+          "concepts": [
+            {
+              "surface": "local minimum",
+              "type": "PHENOMENON",
+              "role": "target",
+              "evidence": "the parameters could get stuck in a poor local minimum",
+              "central": false
+            },
+            {
+              "surface": "feedback loops",
+              "type": "PHENOMENON",
+              "role": "source",
+              "evidence": "unwanted feedback loops may arise",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "leads_to",
+            "_evidence_offset": "5448"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 2)",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "the parameters could get stuck in a poor local minimum, or even diverge catastrophically",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-27T04:38:12Z",
+        "mutation_id": "mut_000067",
+        "status": "committed"
+      },
+      {
+        "op": "add_edge",
+        "target": "n4c0_e18",
+        "payload": {
+          "kind": "influences",
+          "roles": [
+            "target",
+            "source"
+          ],
+          "concepts": [
+            {
+              "surface": "oscillations",
+              "type": "PHENOMENON",
+              "role": "target",
+              "evidence": "smoothing out learning and avoiding oscillations or divergence",
+              "central": false
+            },
+            {
+              "surface": "experience replay",
+              "type": "METHOD",
+              "role": "source",
+              "evidence": "we use a technique known as experience replay",
+              "central": false
+            }
+          ],
+          "qualifiers": {
+            "dependency_type": "prevents",
+            "_evidence_offset": "5566"
+          },
+          "provenance": {
+            "paper_id": "PPR_24493BE6E8C2",
+            "year": "",
+            "section": "METHODS (part 2)",
+            "cited_from": "this_work",
+            "method": "theory",
+            "evidence_strength": "derived"
+          }
+        },
+        "proposer_role": "extractor",
+        "domain": "ml",
+        "base_version": "0.1",
+        "evidence": "By using experience replay the behaviour distribution is averaged over many of its previous states, smoothing out learning and avoiding oscillations or divergence in the parameters",
+        "rationale": "extracted influences",
+        "timestamp": "2026-08-27T04:38:12Z",
+        "mutation_id": "mut_000068",
+        "status": "committed"
+      }
+    ],
+    "result": {
+      "ok": true,
+      "version": "0.1",
+      "validated": [
+        "mut_000060",
+        "mut_000061",
+        "mut_000062",
+        "mut_000063",
+        "mut_000064",
+        "mut_000065",
+        "mut_000066",
+        "mut_000067",
+        "mut_000068"
+      ],
+      "rejected": [],
+      "routed": []
+    },
+    "version_diff": {
+      "before": "0.1",
+      "after": "0.1"
+    }
+  }
+]
