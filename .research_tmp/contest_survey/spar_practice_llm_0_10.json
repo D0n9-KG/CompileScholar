@@ -29,7 +29,7 @@
     "ToxiLab: How Well Do Open-Source LLMs Generate Synthetic Toxicity Data?",
     "AugmenToxic: Leveraging Reinforcement Learning to Optimize LLM Instruction Fine-Tuning for Data Augmentation to Enhance Toxicity Detection",
     "Seed-Free Synthetic Data Generation Framework for Instruction-Tuning LLMs: A Case Study in Thai",
-    "Automating Opinion Extraction from Semi-Structured Webpages: Leveraging Language Models and Instruction Finetuning on Synthetic Data"
+    "KNN-Instruct: Automatic Instruction Construction with K Nearest Neighbor Deduction"
    ],
    "n_recall": 2306,
    "score": {
@@ -75,11 +75,13 @@
     "Generalization Gap in Data Augmentation: Insights from Illumination"
    ],
    "pred": [
+    "Simple and Scalable Predictive Uncertainty Estimation using Deep Ensembles",
     "Adversarial Discriminative Domain Adaptation",
     "Domain Adaptation via Transfer Component Analysis",
     "Tent: Fully Test-Time Adaptation by Entropy Minimization",
     "Distributionally Robust Neural Networks for Group Shifts: On the Importance of Regularization for Worst-Case Generalization",
     "Domain Generalization: A Survey",
+    "AugMix: A Simple Data Processing Method to Improve Robustness and Uncertainty",
     "Manifold Mixup: Better Representations by Interpolating Hidden States",
     "Wasserstein Distance Guided Representation Learning for Domain Adaptation",
     "Learning to Generalize: Meta-Learning for Domain Generalization",
@@ -87,9 +89,7 @@
     "FCNs in the Wild: Pixel-level Adversarial and Constraint-based Adaptation",
     "Domain Generalization via Model-Agnostic Learning of Semantic Features",
     "MetaReg: Towards Domain Generalization using Meta-Regularization",
-    "Towards Out-Of-Distribution Generalization: A Survey",
-    "Domain Generalization for Object Recognition with Multi-task Autoencoders",
-    "Adversarial Multiple Source Domain Adaptation"
+    "Towards Out-Of-Distribution Generalization: A Survey"
    ],
    "n_recall": 9421,
    "score": {
@@ -240,8 +240,8 @@
     "Improving Speech Emotion Recognition With Adversarial Data Augmentation Network",
     "Generative adversarial networks for speech processing: A review",
     "Stargan for Emotional Speech Conversion: Validated by Data Augmentation of End-To-End Emotion Recognition",
-    "CycleGAN-VC3: Examining and Improving CycleGAN-VCs for Mel-Spectrogram Conversion",
     "Code-switching Sentence Generation by Generative Adversarial Networks and its Application to Data Augmentation",
+    "CycleGAN-VC3: Examining and Improving CycleGAN-VCs for Mel-Spectrogram Conversion",
     "Data augmentation using generative adversarial networks for robust speech recognition",
     "Enhancing Pre-Trained ASR System Fine-Tuning for Dysarthric Speech Recognition Using Adversarial Data Augmentation",
     "Voice Conversion Based Data Augmentation to Improve Children's Speech Recognition in Limited Data Scenario",
@@ -293,12 +293,12 @@
     "KnowPrompt: Knowledge-aware Prompt-tuning with Synergistic Optimization for Relation Extraction",
     "Dynamic Prompt Learning via Policy Gradient for Semi-structured Mathematical Reasoning",
     "Efficient Few-Shot Learning Without Prompts",
-    "Generating Training Data with Language Models: Towards Zero-Shot Language Understanding",
-    "GPT3Mix: Leveraging Large-scale Language Models for Text Augmentation",
     "Many-Shot In-Context Learning",
-    "In-context Examples Selection for Machine Translation",
     "Noisy Channel Language Model Prompting for Few-Shot Text Classification",
-    "Entailment as Few-Shot Learner"
+    "Entailment as Few-Shot Learner",
+    "Prototypical Verbalizer for Prompt-based Few-shot Tuning",
+    "FLEX: Unifying Evaluation for Few-Shot NLP",
+    "FlipDA: Effective and Robust Data Augmentation for Few-Shot Learning"
    ],
    "n_recall": 2583,
    "score": {
@@ -334,8 +334,8 @@
     "Multimodaltrace: Deepfake Detection using Audiovisual Representation Learning",
     "\"Glitch in the Matrix!\": A Large Scale Benchmark for Content Driven Audio-Visual Forgery Detection and Localization",
     "Cross Attentional Audio-Visual Fusion for Dimensional Emotion Recognition",
-    "Attention-based Audio-Visual Fusion for Robust Automatic Speech Recognition",
     "Robust Audiovisual Emotion Recognition: Aligning Modalities, Capturing Temporal Information, and Handling Missing Features",
+    "Attention-based Audio-Visual Fusion for Robust Automatic Speech Recognition",
     "Vision + X: A Survey on Multimodal Learning in the Light of Data",
     "AuxFormer: Robust Approach to Audiovisual Emotion Recognition",
     "Unveiling the Power of Audio-Visual Early Fusion Transformers with Dense Interactions Through Masked Modeling"
@@ -366,7 +366,6 @@
     "Deep Meta-learning in Recommendation Systems: A Survey"
    ],
    "pred": [
-    "Deep reinforcement learning: a survey",
     "Deep reinforcement learning for page-wise recommendations",
     "Reinforcement Learning based Recommender Systems: A Survey",
     "Self-Supervised Reinforcement Learning for Recommender Systems",
@@ -374,22 +373,23 @@
     "Deep Reinforcement Learning for List-wise Recommendations",
     "Interactive Recommender System via Knowledge Graph-enhanced Reinforcement Learning",
     "Deep reinforcement learning in recommender systems: A survey and new perspectives",
-    "RecoGym: A Reinforcement Learning Environment for the problem of Product Recommendation in Online Advertising",
     "Unified Conversational Recommendation Policy Learning via Graph-based Reinforcement Learning",
     "A Reinforcement Learning Framework for Explainable Recommendation",
     "Pseudo Dyna-Q: A Reinforcement Learning Framework for Interactive Recommendation",
     "\"Deep reinforcement learning for search, recommendation, and online advertising: a survey\" by Xiangyu Zhao, Long Xia, Jiliang Tang, and Dawei Yin with Martin Vesely as coordinator",
     "Keeping Dataset Biases out of the Simulation: A Debiased Simulator for Reinforcement Learning based Recommender Systems",
-    "A Survey of Deep Reinforcement Learning in Recommender Systems: A Systematic Review and Future Directions"
+    "A Survey of Deep Reinforcement Learning in Recommender Systems: A Systematic Review and Future Directions",
+    "A Survey on Reinforcement Learning for Recommender Systems",
+    "Deep Reinforcement Learning for Information Retrieval: Fundamentals and Advances"
    ],
    "n_recall": 2987,
    "score": {
-    "tp": 3,
+    "tp": 4,
     "n_pred": 15,
     "n_gold": 11,
-    "precision": 0.2,
-    "recall": 0.273,
-    "f1": 0.231
+    "precision": 0.267,
+    "recall": 0.364,
+    "f1": 0.308
    }
   },
   {
@@ -442,11 +442,11 @@
   }
  ],
  "summary": {
-  "micro_f1": 0.0932,
-  "micro_p": 0.0867,
-  "micro_r": 0.1008,
-  "macro_f1": 0.0902,
+  "micro_f1": 0.1004,
+  "micro_p": 0.0933,
+  "micro_r": 0.1085,
+  "macro_f1": 0.0979,
   "n": 10,
-  "rank": "authority"
+  "rank": "llm"
  }
 }
