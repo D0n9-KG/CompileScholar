@@ -392,7 +392,7 @@ class ConceptGraph:
                 continue
             for i in range(0, len(items), batch_size):
                 batch = items[i:i+batch_size]
-                groups = _llm_align_batch(batch, t, llm_fn)
+                groups, _related = _llm_align_batch(batch, t, llm_fn)
                 for group in groups:
                     if len(group) < 2:
                         continue
@@ -458,14 +458,24 @@ _ALIGN_PROMPT = """下面是抽取出的多个{type_label}实体(每个有一个
 {type_label}列表(id: surface [symbol] (定义)):
 {items}
 
-输出 JSON: {{"groups": [[id1, id2], [id3], ...]}}  每组是同一概念的id列表, 单个的也列出.
+输出 JSON:
+{{"groups": [[id1, id2], [id3], ...],   // 每组是同一概念的id列表, 单个的也列出
+ "related_pairs": [[idA, idB, "一句话说明关系"], ...]}}   // 可选: 不是同一概念但明确相关
+ (同一方法族/同一量在不同模型里的对应/衍生关系), 会建立 relate 边(不合并).
+例: "kinetic theory formula"与"kinetic theory"(前者是后者的具体应用产物) → related_pair.
+只写确有明确关系的对, 没有就省略此字段.
 """
 
 
 def _llm_align_batch(items, type_label, llm_fn, max_tokens: int = 2000):
-    """items: list[(concept_id, surface, symbol)]. Returns list of groups
-    (each a list of concept_ids). Uses INDEX-based mapping so the LLM
-    returning index numbers (not raw ids) still maps correctly.
+    """items: list[(concept_id, surface, symbol)] or 4-tuples with definition.
+    Returns (groups, related_pairs): groups = list of concept_id lists (merge
+    groups); related_pairs = list of (cid_a, cid_b, note) — same-family /
+    derivative concepts that must NOT merge but get a relate edge (the
+    alignment audit's '准而不连' gap: merge judgments got precise, but family
+    connectivity for downstream retrieval needs the relate path).
+    Uses INDEX-based mapping so the LLM returning index numbers (not raw ids)
+    still maps correctly.
     For PARAMETER/NUMERIC, the symbol (if any) is shown to the LLM as context
     — it helps judge 'inertial number I' ~ 'I' (both share symbol I), but the
     LLM judges semantically (same concept), not by rule.
@@ -505,19 +515,40 @@ def _llm_align_batch(items, type_label, llm_fn, max_tokens: int = 2000):
         groups = obj.get("groups", [])
         out = []
         ids = [item[0] for item in items]
+
+        def _map(x):
+            """index (int-like) or raw cid -> concept_id or None."""
+            try:
+                idx = int(x)
+                if 0 <= idx < len(items):
+                    return items[idx][0]
+            except (ValueError, TypeError):
+                if x in ids:
+                    return x
+            return None
+
         for g in groups:
             # g may be list of int indices OR strings; map to concept_ids
-            cids = []
-            for x in g:
-                try:
-                    idx = int(x)
-                    if 0 <= idx < len(items):
-                        cids.append(items[idx][0])
-                except (ValueError, TypeError):
-                    if x in ids:
-                        cids.append(x)
+            cids = [c for c in (_map(x) for x in g) if c]
             out.append(cids)
-        return out
+        # related_pairs: [(cid_a, cid_b, note)] — entries inside a merge
+        # group are already merging; relate only across DIFFERENT groups
+        merged_into = {}
+        for g in out:
+            for c in g[1:]:
+                merged_into[c] = g[0] if g else None
+        rel = []
+        for pair in (obj.get("related_pairs") or []):
+            if not isinstance(pair, (list, tuple)) or len(pair) < 2:
+                continue
+            a, b = _map(pair[0]), _map(pair[1])
+            note = str(pair[2])[:200] if len(pair) > 2 else ""
+            if not a or not b or a == b:
+                continue
+            if a in merged_into or b in merged_into:
+                continue   # will merge anyway — relate edge is redundant
+            rel.append((a, b, note))
+        return out, rel
     except Exception as e:
         # surface the error instead of silently returning [] (m3 fix — a silent
         # [] previously masked BLOCKER-level bugs: signature mismatch, parse

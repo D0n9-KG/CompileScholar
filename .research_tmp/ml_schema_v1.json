@@ -1,0 +1,1409 @@
+{
+ "version": "0.57",
+ "meta_nodes": {
+  "THING": {
+   "type_id": "THING",
+   "description": "root: any node type is-a THING",
+   "is_abstract": false
+  },
+  "MATERIAL": {
+   "type_id": "MATERIAL",
+   "description": "a granular material or substance",
+   "is_abstract": false
+  },
+  "METHOD": {
+   "type_id": "METHOD",
+   "description": "a named modeling approach/theory/law/model (e.g. μ(I) rheology, kinetic theory, NGF, DEM, RFT)",
+   "is_abstract": false
+  },
+  "PARAMETER": {
+   "type_id": "PARAMETER",
+   "description": "a named physical quantity/constant/coefficient in equations (e.g. μ, I, d, P, τ, g, ρ_s, T, A, ξ, μ_s, b)",
+   "is_abstract": false
+  },
+  "PHENOMENON": {
+   "type_id": "PHENOMENON",
+   "description": "a physical effect/behavior methods capture (e.g. nonlocal creep, thin-body strengthening, secondary rheology, segregation, clogging)",
+   "is_abstract": false
+  },
+  "PROPERTY": {
+   "type_id": "PROPERTY",
+   "description": "a generic physical property/quantity not fitting the above (kept for residual cases)",
+   "is_abstract": false
+  },
+  "NUMERIC": {
+   "type_id": "NUMERIC",
+   "description": "a numeric value / measured number",
+   "is_abstract": false
+  },
+  "REGIME": {
+   "type_id": "REGIME",
+   "description": "a flow regime (dense/quasi-static/inertial)",
+   "is_abstract": false
+  }
+ },
+ "patterns": {
+  "constitutive_law": {
+   "pattern_id": "constitutive_law",
+   "description": "a constitutive law relating output quantity/quantities to >=1 input quantity (n-ary)",
+   "role_slots": [
+    {
+     "role": "output",
+     "type": "THING",
+     "repeatable": true
+    },
+    {
+     "role": "input",
+     "type": "THING",
+     "repeatable": true
+    },
+    {
+     "role": "parameter",
+     "type": "THING",
+     "repeatable": true
+    },
+    {
+     "role": "coefficient",
+     "type": "THING",
+     "repeatable": true
+    },
+    {
+     "role": "exponent",
+     "type": "THING",
+     "repeatable": true
+    }
+   ],
+   "allowed_qualifiers": [
+    "applies_in_regime",
+    "function_form",
+    "parameters",
+    "method",
+    "evidence_strength",
+    "cited_from"
+   ],
+   "deprecated": false,
+   "is_abstract": false,
+   "split_from": "",
+   "family": "constitutive_law",
+   "semantic_boundary": "a FORMAL/QUANTITATIVE law output=f(inputs+params), stated as a formula or explicit functional relation. NOT a prose 'X depends on Y' (that is influences), NOT a definition (defines), NOT a measurement setup (measures)."
+  },
+  "influences": {
+   "pattern_id": "influences",
+   "description": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+   "role_slots": [
+    {
+     "role": "source",
+     "type": "THING",
+     "repeatable": true
+    },
+    {
+     "role": "target",
+     "type": "THING",
+     "repeatable": true
+    },
+    {
+     "role": "cause",
+     "type": "THING",
+     "repeatable": true
+    },
+    {
+     "role": "effect",
+     "type": "THING",
+     "repeatable": true
+    }
+   ],
+   "allowed_qualifiers": [
+    "dependency_type",
+    "applies_in_regime",
+    "method",
+    "evidence_strength",
+    "cited_from"
+   ],
+   "deprecated": false,
+   "is_abstract": false,
+   "split_from": "",
+   "family": "dependency",
+   "semantic_boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of)."
+  },
+  "defines": {
+   "pattern_id": "defines",
+   "description": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+   "role_slots": [
+    {
+     "role": "subject",
+     "type": "THING",
+     "repeatable": true
+    },
+    {
+     "role": "definition",
+     "type": "THING",
+     "repeatable": true
+    },
+    {
+     "role": "object",
+     "type": "THING",
+     "repeatable": true
+    }
+   ],
+   "allowed_qualifiers": [
+    "relation_type",
+    "method",
+    "evidence_strength",
+    "cited_from"
+   ],
+   "deprecated": false,
+   "is_abstract": false,
+   "split_from": "",
+   "family": "definition",
+   "semantic_boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition."
+  },
+  "composed_of": {
+   "pattern_id": "composed_of",
+   "description": "one whole is composed-of / part-of >=1 component (n-ary composition)",
+   "role_slots": [
+    {
+     "role": "whole",
+     "type": "THING",
+     "repeatable": true
+    },
+    {
+     "role": "component",
+     "type": "THING",
+     "repeatable": true
+    }
+   ],
+   "allowed_qualifiers": [
+    "relation_type",
+    "method",
+    "evidence_strength",
+    "cited_from"
+   ],
+   "deprecated": false,
+   "is_abstract": false,
+   "split_from": "",
+   "family": "composition",
+   "semantic_boundary": "STRUCTURAL composition: parts that make up a whole (model A = B + C). NOT classification (defines), NOT 'X has control params' (influences), NOT experimental setup description, NOT 'we tested X by doing Y'."
+  },
+  "measures": {
+   "pattern_id": "measures",
+   "description": "a quantity is measured by / characterizes >=1 measure",
+   "role_slots": [
+    {
+     "role": "object",
+     "type": "THING"
+    },
+    {
+     "role": "instrument",
+     "type": "THING",
+     "repeatable": true
+    }
+   ],
+   "allowed_qualifiers": [
+    "condition",
+    "applies_in_regime",
+    "method",
+    "evidence_strength",
+    "cited_from"
+   ],
+   "deprecated": false,
+   "is_abstract": false,
+   "split_from": "",
+   "family": "measure",
+   "semantic_boundary": "a measurement/evaluation relation: X is measured/evaluated by instrument/method Y. NOT a functional law (constitutive_law), NOT a dependence (influences)."
+  },
+  "claim_relation": {
+   "pattern_id": "claim_relation",
+   "description": "a discourse relation between >=2 claims/approaches (supports/contrasts/extends/...)",
+   "role_slots": [
+    {
+     "role": "from",
+     "type": "THING",
+     "repeatable": true
+    },
+    {
+     "role": "to",
+     "type": "THING",
+     "repeatable": true
+    }
+   ],
+   "allowed_qualifiers": [
+    "relation_type",
+    "applies_in_regime",
+    "method",
+    "evidence_strength",
+    "cited_from"
+   ],
+   "deprecated": false,
+   "is_abstract": false,
+   "split_from": "",
+   "family": "claim",
+   "semantic_boundary": "a DISCOURSE relation between claims/findings (supports/contrasts/outperforms). NOT a method-to-method development (extends/improves/compares — those are evolution), NOT a measurement (measures)."
+  },
+  "extends": {
+   "pattern_id": "extends",
+   "description": "X generalizes/extends Y (X METHOD/PHENOMENON -> Y)",
+   "role_slots": [
+    {
+     "role": "from",
+     "type": "THING",
+     "repeatable": true
+    },
+    {
+     "role": "to",
+     "type": "THING",
+     "repeatable": true
+    }
+   ],
+   "allowed_qualifiers": [
+    "relation_type",
+    "cited_from",
+    "evidence_strength",
+    "method"
+   ],
+   "deprecated": false,
+   "is_abstract": false,
+   "split_from": "",
+   "family": "evolution",
+   "semantic_boundary": "X GENERALIZES Y (X extends Y's scope/regime/params; X is a direct technical extension of Y). NOT improves (X need not be more accurate, just broader), NOT background (X is a direct technical inheritance, not a motivation citation), NOT claim_relation (this is method-to-method)."
+  },
+  "improves": {
+   "pattern_id": "improves",
+   "description": "X improves Y's accuracy/applicability, resolving Y's limitation",
+   "role_slots": [
+    {
+     "role": "from",
+     "type": "THING",
+     "repeatable": true
+    },
+    {
+     "role": "to",
+     "type": "THING",
+     "repeatable": true
+    }
+   ],
+   "allowed_qualifiers": [
+    "relation_type",
+    "cited_from",
+    "evidence_strength",
+    "method"
+   ],
+   "deprecated": false,
+   "is_abstract": false,
+   "split_from": "",
+   "family": "evolution",
+   "semantic_boundary": "X RESOLVES a limitation of Y (X is more accurate/applicable BECAUSE it fixes something Y fails at; first-principles vs phenomenological = improves). NOT compares (X is NOT a parallel different-mechanism alternative; X builds on Y and is better), NOT extends (X is better not just broader)."
+  },
+  "compares": {
+   "pattern_id": "compares",
+   "description": "X is compared with Y",
+   "role_slots": [
+    {
+     "role": "from",
+     "type": "THING",
+     "repeatable": true
+    },
+    {
+     "role": "to",
+     "type": "THING",
+     "repeatable": true
+    }
+   ],
+   "allowed_qualifiers": [
+    "relation_type",
+    "cited_from",
+    "evidence_strength",
+    "method"
+   ],
+   "deprecated": false,
+   "is_abstract": false,
+   "split_from": "",
+   "family": "evolution",
+   "semantic_boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiments', 'in contrast with'), or (iii) equivalence/contrast of formulations ('equivalent', 'the same as', 'rather than'). NOT improves (neither fixes the other's limitation), NOT extends (neither generalizes the other)."
+  },
+  "replaces": {
+   "pattern_id": "replaces",
+   "description": "X replaces Y",
+   "role_slots": [
+    {
+     "role": "from",
+     "type": "THING",
+     "repeatable": true
+    },
+    {
+     "role": "to",
+     "type": "THING",
+     "repeatable": true
+    }
+   ],
+   "allowed_qualifiers": [
+    "relation_type",
+    "cited_from",
+    "evidence_strength",
+    "method"
+   ],
+   "deprecated": false,
+   "is_abstract": false,
+   "split_from": "",
+   "family": "evolution",
+   "semantic_boundary": "X SUBSTITUTES Y outright (X is used INSTEAD of Y; Y is retired). NOT improves (replaces = Y is gone, improves = Y still used + X better)."
+  },
+  "adapts": {
+   "pattern_id": "adapts",
+   "description": "X adapts Y to a new scenario",
+   "role_slots": [
+    {
+     "role": "from",
+     "type": "THING",
+     "repeatable": true
+    },
+    {
+     "role": "to",
+     "type": "THING",
+     "repeatable": true
+    }
+   ],
+   "allowed_qualifiers": [
+    "relation_type",
+    "cited_from",
+    "evidence_strength",
+    "method"
+   ],
+   "deprecated": false,
+   "is_abstract": false,
+   "split_from": "",
+   "family": "evolution",
+   "semantic_boundary": "X PORTS Y to a NEW scenario/regime/domain Y wasn't designed for (adaptation of Y's mechanism). NOT extends (adapts = new scenario, extends = broader scope within same setting)."
+  },
+  "background": {
+   "pattern_id": "background",
+   "description": "X uses Y as background/motivation",
+   "role_slots": [
+    {
+     "role": "from",
+     "type": "THING",
+     "repeatable": true
+    },
+    {
+     "role": "to",
+     "type": "THING",
+     "repeatable": true
+    }
+   ],
+   "allowed_qualifiers": [
+    "relation_type",
+    "cited_from",
+    "evidence_strength",
+    "method"
+   ],
+   "deprecated": false,
+   "is_abstract": false,
+   "split_from": "",
+   "family": "evolution",
+   "semantic_boundary": "X cites Y as MOTIVATION/prior context only (Y inspired X but X is NOT a direct technical extension/inheritance of Y). NOT extends (no direct technical lineage), NOT improves (no limitation fix)."
+  },
+  "contrasts_with": {
+   "pattern_id": "contrasts_with",
+   "description": "X contrasts with Y, where X is presented as different from or in opposition to Y (often 'in contrast to previous work'). This is a discourse-level relation between approaches/methods where the contrast is the primary point, not a direct technical extension or improvement.",
+   "role_slots": [
+    {
+     "role": "from",
+     "type": "THING"
+    },
+    {
+     "role": "to",
+     "type": "THING"
+    }
+   ],
+   "allowed_qualifiers": [
+    "relation_type",
+    "cited_from",
+    "evidence_strength",
+    "method"
+   ],
+   "deprecated": false,
+   "is_abstract": false,
+   "split_from": "",
+   "family": "claim",
+   "semantic_boundary": "Use only when the text explicitly frames X as opposed to or different from Y as the main point, not when X merely improves, extends, or builds upon Y."
+  },
+  "assigns": {
+   "pattern_id": "assigns",
+   "description": "X is assigned/set to Y (e.g., setting a variable to a value, assigning a sequence to a preprocessed version). This is a procedural assignment relation distinct from defines (which is definitional identity) and composed_of (which is structural parts). The relation captures the act of assigning a value or expression to a variable in an algorithmic context.",
+   "role_slots": [
+    {
+     "role": "assigned_variable",
+     "type": "THING"
+    },
+    {
+     "role": "assigned_value",
+     "type": "THING"
+    }
+   ],
+   "allowed_qualifiers": [
+    "relation_type",
+    "method",
+    "evidence_strength",
+    "cited_from"
+   ],
+   "deprecated": false,
+   "is_abstract": false,
+   "split_from": "",
+   "family": "composition",
+   "semantic_boundary": "Use when a variable or slot is explicitly set to a value in an algorithmic step, not for defining identity (defines) or describing structural parts (composed_of)."
+  },
+  "learns_approximation": {
+   "pattern_id": "learns_approximation",
+   "description": "A method learns an approximation of a target function or property, e.g., learning a parameterized value function Q(s,a;θ_t) to approximate the optimal action-value function. This is a distinct relation from 'extends' (which implies generalization) and 'improves' (which implies fixing limitations).",
+   "role_slots": [
+    {
+     "role": "from",
+     "type": "METHOD"
+    },
+    {
+     "role": "to",
+     "type": "PROPERTY"
+    }
+   ],
+   "allowed_qualifiers": [
+    "relation_type",
+    "method",
+    "evidence_strength",
+    "cited_from"
+   ],
+   "deprecated": false,
+   "is_abstract": false,
+   "split_from": "",
+   "family": "evolution",
+   "semantic_boundary": "Applies when a method explicitly learns a proxy for a target property (e.g., Q-function for optimal value), NOT when it generalizes (extends) or fixes a limitation (improves)."
+  },
+  "obtained_from": {
+   "pattern_id": "obtained_from",
+   "description": "A data source relation where a value or property is obtained from a specific source (e.g., reward values obtained from the Arcade Learning Environment). This is distinct from measures (which involves measurement instruments) and background (which is about motivation).",
+   "role_slots": [
+    {
+     "role": "data",
+     "type": "PROPERTY"
+    },
+    {
+     "role": "source",
+     "type": "METHOD"
+    }
+   ],
+   "allowed_qualifiers": [
+    "relation_type",
+    "method",
+    "evidence_strength",
+    "cited_from"
+   ],
+   "deprecated": false,
+   "is_abstract": false,
+   "split_from": "",
+   "family": "dependency",
+   "semantic_boundary": "Use obtained_from when a property/value is explicitly sourced from a method, not when a method measures it (measures) or provides motivation (background)."
+  },
+  "becomes": {
+   "pattern_id": "becomes",
+   "description": "X becomes Y, where an entity or phenomenon transitions into a different state or form over time or under certain conditions. This captures state transitions and temporal evolution, distinct from influences (causal dependence) and defines (definitional identity).",
+   "role_slots": [
+    {
+     "role": "initial_state",
+     "type": "THING"
+    },
+    {
+     "role": "final_state",
+     "type": "THING"
+    }
+   ],
+   "allowed_qualifiers": [
+    "relation_type",
+    "method",
+    "evidence_strength",
+    "cited_from",
+    "applies_in_regime"
+   ],
+   "deprecated": false,
+   "is_abstract": false,
+   "split_from": "",
+   "family": "evolution",
+   "semantic_boundary": "Use “becomes” only for a change in state or form over time; not for causal influence (“causes”) or definitional identity (“is defined as”)."
+  },
+  "validates": {
+   "pattern_id": "validates",
+   "description": "X validates Y, where empirical evidence or observation X confirms or supports the correctness of a theoretical formulation Y. This is distinct from compares (side-by-side comparison) and measures (quantitative evaluation).",
+   "role_slots": [
+    {
+     "role": "evidence",
+     "type": "THING"
+    },
+    {
+     "role": "validated",
+     "type": "THING"
+    }
+   ],
+   "allowed_qualifiers": [
+    "relation_type",
+    "method",
+    "evidence_strength",
+    "cited_from"
+   ],
+   "deprecated": false,
+   "is_abstract": false,
+   "split_from": "",
+   "family": "claim",
+   "semantic_boundary": "Use when evidence directly supports or confirms a theory/model; NOT for side-by-side comparisons or quantitative measurements."
+  },
+  "drops_out_of": {
+   "pattern_id": "drops_out_of",
+   "description": "X drops out of Y, where an entity X exits or is removed from a container or system Y over time. This captures removal/expulsion dynamics, distinct from composed_of (structural parts) and influences (causal dependence).",
+   "role_slots": [
+    {
+     "role": "dropped",
+     "type": "THING"
+    },
+    {
+     "role": "container",
+     "type": "THING"
+    }
+   ],
+   "allowed_qualifiers": [
+    "relation_type",
+    "method",
+    "evidence_strength",
+    "cited_from"
+   ],
+   "deprecated": false,
+   "is_abstract": false,
+   "split_from": "",
+   "family": "evolution",
+   "semantic_boundary": "Use when an entity leaves or is expelled from a container/system over time; NOT for structural composition (composed_of) or causal influence (influences)."
+  },
+  "outperforms": {
+   "pattern_id": "outperforms",
+   "description": "X outperforms Y, where X achieves better performance than Y on a task or metric. This is a comparative evaluation relation distinct from compares (which is side-by-side without claiming superiority) and improves (which implies building on and fixing limitations).",
+   "role_slots": [
+    {
+     "role": "from",
+     "type": "THING"
+    },
+    {
+     "role": "to",
+     "type": "THING"
+    }
+   ],
+   "allowed_qualifiers": [
+    "relation_type",
+    "method",
+    "evidence_strength",
+    "cited_from",
+    "applies_in_regime"
+   ],
+   "deprecated": false,
+   "is_abstract": false,
+   "split_from": "",
+   "family": "claim",
+   "semantic_boundary": "Use only when a source explicitly states or clearly implies X beats Y on a shared metric/task; not for side-by-side comparisons or when X builds on Y."
+  },
+  "sourced_from": {
+   "pattern_id": "sourced_from",
+   "description": "X is sourced from Y, where a dataset, problem, or property originates from or is attributed to a specific source (e.g., a benchmark, a paper, a repository). This is distinct from obtained_from (which is about values from methods) and measures (which involves instruments).",
+   "role_slots": [
+    {
+     "role": "data",
+     "type": "THING"
+    },
+    {
+     "role": "source",
+     "type": "THING"
+    }
+   ],
+   "allowed_qualifiers": [
+    "relation_type",
+    "method",
+    "evidence_strength",
+    "cited_from"
+   ],
+   "deprecated": false,
+   "is_abstract": false,
+   "split_from": "",
+   "family": "composition",
+   "semantic_boundary": "Use sourced_from only when X is a dataset, problem, or property that originates from or is attributed to a specific source (benchmark, paper, repository) — not for method outputs (obtained_from) or instrument measurements (measures)."
+  },
+  "propagates_to": {
+   "pattern_id": "propagates_to",
+   "description": "X propagates to Y, where information, signal, or influence flows backward or forward through a system from one component to another. This is distinct from 'influences' (direct causal dependence) and 'composed_of' (structural parts).",
+   "role_slots": [
+    {
+     "role": "source",
+     "type": "THING"
+    },
+    {
+     "role": "target",
+     "type": "THING"
+    }
+   ],
+   "allowed_qualifiers": [
+    "relation_type",
+    "method",
+    "evidence_strength",
+    "cited_from",
+    "direction"
+   ],
+   "deprecated": false,
+   "is_abstract": false,
+   "split_from": "",
+   "family": "evolution",
+   "semantic_boundary": "Use when X is the origin and Y the recipient of a propagating signal, influence, or change over time/space; NOT for static structural parts or direct one-step causal dependence."
+  },
+  "approximates": {
+   "pattern_id": "approximates",
+   "description": "X approximates Y, where one data structure or method serves as an approximation of another, typically for computational efficiency. This is distinct from compares (side-by-side without claiming substitution) and improves (fixing limitations).",
+   "role_slots": [
+    {
+     "role": "approximation",
+     "type": "METHOD"
+    },
+    {
+     "role": "approximated",
+     "type": "METHOD"
+    }
+   ],
+   "allowed_qualifiers": [
+    "relation_type",
+    "method",
+    "evidence_strength",
+    "cited_from",
+    "applies_in_regime"
+   ],
+   "deprecated": false,
+   "is_abstract": false,
+   "split_from": "",
+   "family": "claim",
+   "semantic_boundary": "Use when one method explicitly substitutes for another to reduce cost or complexity; not for side-by-side comparison (compares) or fixing flaws (improves)."
+  },
+  "notes_similarity": {
+   "pattern_id": "notes_similarity",
+   "description": "X notes similarity to Y, where a source acknowledges that another work or approach is similar to the current one, without claiming direct lineage, comparison, or contrast. This is a discourse-level acknowledgment distinct from compares (side-by-side evaluation) and contrasts_with (opposition).",
+   "role_slots": [
+    {
+     "role": "similar_work",
+     "type": "METHOD"
+    },
+    {
+     "role": "referenced_work",
+     "type": "METHOD"
+    }
+   ],
+   "allowed_qualifiers": [
+    "relation_type",
+    "cited_from",
+    "evidence_strength",
+    "method"
+   ],
+   "deprecated": false,
+   "is_abstract": false,
+   "split_from": "",
+   "family": "claim",
+   "semantic_boundary": "Apply when a source explicitly states one method is similar to another without evaluating or opposing it; not for comparisons, contrasts, or lineage claims."
+  },
+  "presents_pseudocode": {
+   "pattern_id": "presents_pseudocode",
+   "description": "X presents pseudocode for Y, where a method or algorithm is accompanied by its pseudocode in a supplementary section or algorithm block. This is a discourse-level relation distinct from defines (which is definitional identity) and composed_of (which is structural parts).",
+   "role_slots": [
+    {
+     "role": "method",
+     "type": "METHOD"
+    },
+    {
+     "role": "pseudocode",
+     "type": "THING"
+    }
+   ],
+   "allowed_qualifiers": [
+    "relation_type",
+    "method",
+    "evidence_strength",
+    "cited_from"
+   ],
+   "deprecated": false,
+   "is_abstract": false,
+   "split_from": "",
+   "family": "claim",
+   "semantic_boundary": "Apply when a method is explicitly accompanied by its pseudocode block or algorithm listing, not when defining the method or listing its structural components."
+  },
+  "estimates": {
+   "pattern_id": "estimates",
+   "description": "X is an estimate of Y, where one quantity serves as an approximation or estimator of another quantity. This is distinct from defines (which is definitional identity) and approximates (which is about methods substituting for each other).",
+   "role_slots": [
+    {
+     "role": "estimate",
+     "type": "PROPERTY"
+    },
+    {
+     "role": "estimated",
+     "type": "PROPERTY"
+    }
+   ],
+   "allowed_qualifiers": [
+    "relation_type",
+    "method",
+    "evidence_strength",
+    "cited_from"
+   ],
+   "deprecated": false,
+   "is_abstract": false,
+   "split_from": "",
+   "family": "dependency",
+   "semantic_boundary": "Use when one property is explicitly derived from or predicts another, not when they merely co-occur or when one defines the other."
+  },
+  "explores": {
+   "pattern_id": "explores",
+   "description": "X explores Y, where an agent or method navigates or investigates an environment or domain. This is distinct from adapts (which implies porting to a new scenario) and measures (which involves evaluation).",
+   "role_slots": [
+    {
+     "role": "agent",
+     "type": "THING"
+    },
+    {
+     "role": "environment",
+     "type": "REGIME"
+    }
+   ],
+   "allowed_qualifiers": [
+    "relation_type",
+    "method",
+    "evidence_strength",
+    "cited_from"
+   ],
+   "deprecated": false,
+   "is_abstract": false,
+   "split_from": "",
+   "family": "evolution",
+   "semantic_boundary": "Use explores when X actively navigates or investigates Y, not when X is ported to Y (adapts) or when X is evaluated against Y (measures)."
+  },
+  "exhibits_property": {
+   "pattern_id": "exhibits_property",
+   "description": "X exhibits property Y, where a method, system, or entity demonstrates or displays a characteristic or behavior (e.g., superlinear speedups). This is distinct from measures (which involves an instrument) and influences (which is causal dependence).",
+   "role_slots": [
+    {
+     "role": "entity",
+     "type": "THING"
+    },
+    {
+     "role": "property",
+     "type": "PROPERTY"
+    }
+   ],
+   "allowed_qualifiers": [
+    "relation_type",
+    "method",
+    "evidence_strength",
+    "cited_from",
+    "applies_in_regime"
+   ],
+   "deprecated": false,
+   "is_abstract": false,
+   "split_from": "",
+   "family": "measure",
+   "semantic_boundary": "Use when an entity shows a trait or behavior directly, not when measured by an instrument (measures) or causally affected (influences)."
+  },
+  "raises_questions_about": {
+   "pattern_id": "raises_questions_about",
+   "description": "X raises questions about Y, where introducing a method or concept creates new considerations or challenges regarding aspects of a system. This is a discourse-level relation distinct from influences (causal dependence) and composed_of (structural parts).",
+   "role_slots": [
+    {
+     "role": "source",
+     "type": "THING"
+    },
+    {
+     "role": "questioned",
+     "type": "THING"
+    }
+   ],
+   "allowed_qualifiers": [
+    "relation_type",
+    "method",
+    "evidence_strength",
+    "cited_from"
+   ],
+   "deprecated": false,
+   "is_abstract": false,
+   "split_from": "",
+   "family": "claim",
+   "semantic_boundary": "Use when introducing a method or concept creates new considerations or challenges about an aspect, not when it causes an effect (influences) or forms a part (composed_of)."
+  }
+ },
+ "meta_edges": [
+  {
+   "src": "MATERIAL",
+   "dst": "THING",
+   "relation": "subclass_of",
+   "props": {}
+  },
+  {
+   "src": "METHOD",
+   "dst": "THING",
+   "relation": "subclass_of",
+   "props": {}
+  },
+  {
+   "src": "PARAMETER",
+   "dst": "THING",
+   "relation": "subclass_of",
+   "props": {}
+  },
+  {
+   "src": "PHENOMENON",
+   "dst": "THING",
+   "relation": "subclass_of",
+   "props": {}
+  },
+  {
+   "src": "PROPERTY",
+   "dst": "THING",
+   "relation": "subclass_of",
+   "props": {}
+  },
+  {
+   "src": "NUMERIC",
+   "dst": "THING",
+   "relation": "subclass_of",
+   "props": {}
+  },
+  {
+   "src": "REGIME",
+   "dst": "THING",
+   "relation": "subclass_of",
+   "props": {}
+  },
+  {
+   "src": "contrasts_with",
+   "dst": "claim_relation",
+   "relation": "subclass_of",
+   "props": {
+    "paper_id": "ml",
+    "evidence": "In contrast to previous work, our approach incorporates 'end-to-end' reinforcement learning",
+    "via": "family_root"
+   }
+  },
+  {
+   "src": "assigns",
+   "dst": "composed_of",
+   "relation": "subclass_of",
+   "props": {
+    "paper_id": "ml",
+    "evidence": "Initialize sequence $s _ { 1 } = \\{ x _ { 1 } \\}$ and preprocessed sequence $\\phi _ { 1 } = \\phi ( s _ { 1 } )$",
+    "via": "family_root"
+   }
+  },
+  {
+   "src": "composed_of",
+   "dst": "defines",
+   "relation": "depends_on",
+   "props": {
+    "paper_id": "PPR_24493BE6E8C2",
+    "evidence": "node 'separate target Q-network' co-referenced"
+   }
+  },
+  {
+   "src": "extends",
+   "dst": "defines",
+   "relation": "depends_on",
+   "props": {
+    "paper_id": "PPR_24493BE6E8C2",
+    "evidence": "node 'deep neural networks' co-referenced"
+   }
+  },
+  {
+   "src": "influences",
+   "dst": "defines",
+   "relation": "depends_on",
+   "props": {
+    "paper_id": "PPR_24493BE6E8C2",
+    "evidence": "node 'Q-learning' co-referenced"
+   }
+  },
+  {
+   "src": "composed_of",
+   "dst": "defines",
+   "relation": "composes",
+   "props": {
+    "paper_id": "PPR_24493BE6E8C2",
+    "evidence": "node 'separate target Q-network' is a component of a composition + referenced by another pattern"
+   }
+  },
+  {
+   "src": "composed_of",
+   "dst": "extends",
+   "relation": "composes",
+   "props": {
+    "paper_id": "PPR_24493BE6E8C2",
+    "evidence": "node 'deep convolutional network architecture' is a component of a composition + referenced by another pattern"
+   }
+  },
+  {
+   "src": "composed_of",
+   "dst": "background",
+   "relation": "composes",
+   "props": {
+    "paper_id": "PPR_24493BE6E8C2",
+    "evidence": "node 'reinforcement learning' is a component of a composition + referenced by another pattern"
+   }
+  },
+  {
+   "src": "composed_of",
+   "dst": "influences",
+   "relation": "composes",
+   "props": {
+    "paper_id": "PPR_24493BE6E8C2",
+    "evidence": "node 'Q-learning' is a component of a composition + referenced by another pattern"
+   }
+  },
+  {
+   "src": "learns_approximation",
+   "dst": "background",
+   "relation": "subclass_of",
+   "props": {
+    "paper_id": "ml",
+    "evidence": "Instead, we can learn a parameterized value function Q(s, a; θ_t)",
+    "via": "family_root"
+   }
+  },
+  {
+   "src": "obtained_from",
+   "dst": "influences",
+   "relation": "subclass_of",
+   "props": {
+    "paper_id": "ml",
+    "evidence": "reward values (obtained from the Arcade Learning Environment (Bellemare et al., 2013))",
+    "via": "family_root"
+   }
+  },
+  {
+   "src": "improves",
+   "dst": "defines",
+   "relation": "depends_on",
+   "props": {
+    "paper_id": "PPR_DD48410E18B3",
+    "evidence": "node 'Q-learning' co-referenced"
+   }
+  },
+  {
+   "src": "contrasts_with",
+   "dst": "defines",
+   "relation": "depends_on",
+   "props": {
+    "paper_id": "PPR_DD48410E18B3",
+    "evidence": "node 'optimism in the face of uncertainty' co-referenced"
+   }
+  },
+  {
+   "src": "composed_of",
+   "dst": "compares",
+   "relation": "composes",
+   "props": {
+    "paper_id": "PPR_DD48410E18B3",
+    "evidence": "node 'DQN' is a component of a composition + referenced by another pattern"
+   }
+  },
+  {
+   "src": "composed_of",
+   "dst": "improves",
+   "relation": "composes",
+   "props": {
+    "paper_id": "PPR_DD48410E18B3",
+    "evidence": "node 'DQN' is a component of a composition + referenced by another pattern"
+   }
+  },
+  {
+   "src": "assigns",
+   "dst": "influences",
+   "relation": "composes",
+   "props": {
+    "paper_id": "PPR_DD48410E18B3",
+    "evidence": "node 'θ' is a component of a composition + referenced by another pattern"
+   }
+  },
+  {
+   "src": "learns_approximation",
+   "dst": "defines",
+   "relation": "depends_on",
+   "props": {
+    "paper_id": "PPR_FC0F6B04EEBF",
+    "evidence": "node 'state-value function' co-referenced"
+   }
+  },
+  {
+   "src": "obtained_from",
+   "dst": "defines",
+   "relation": "depends_on",
+   "props": {
+    "paper_id": "PPR_FC0F6B04EEBF",
+    "evidence": "node 'Q values' co-referenced"
+   }
+  },
+  {
+   "src": "constitutive_law",
+   "dst": "influences",
+   "relation": "constrains",
+   "props": {
+    "paper_id": "PPR_FC0F6B04EEBF",
+    "evidence": "node 'max_a Q_t(s,a)' governed by authority + used by consumer"
+   }
+  },
+  {
+   "src": "composed_of",
+   "dst": "obtained_from",
+   "relation": "composes",
+   "props": {
+    "paper_id": "PPR_FC0F6B04EEBF",
+    "evidence": "node 'temporal difference learning' is a component of a composition + referenced by another pattern"
+   }
+  },
+  {
+   "src": "composed_of",
+   "dst": "learns_approximation",
+   "relation": "composes",
+   "props": {
+    "paper_id": "PPR_FC0F6B04EEBF",
+    "evidence": "node 'state-value function' is a component of a composition + referenced by another pattern"
+   }
+  },
+  {
+   "src": "composed_of",
+   "dst": "adapts",
+   "relation": "composes",
+   "props": {
+    "paper_id": "PPR_FC0F6B04EEBF",
+    "evidence": "node 'dueling architecture' is a component of a composition + referenced by another pattern"
+   }
+  },
+  {
+   "src": "composed_of",
+   "dst": "contrasts_with",
+   "relation": "composes",
+   "props": {
+    "paper_id": "PPR_FC0F6B04EEBF",
+    "evidence": "node 'dueling architecture' is a component of a composition + referenced by another pattern"
+   }
+  },
+  {
+   "src": "becomes",
+   "dst": "background",
+   "relation": "subclass_of",
+   "props": {
+    "paper_id": "ml",
+    "evidence": "and found that it becomes close to a heavy-tailed distribution as learning progresses",
+    "via": "family_root"
+   }
+  },
+  {
+   "src": "validates",
+   "dst": "claim_relation",
+   "relation": "subclass_of",
+   "props": {
+    "paper_id": "ml",
+    "evidence": "this empirically validates the form of Equation 1",
+    "via": "family_root"
+   }
+  },
+  {
+   "src": "drops_out_of",
+   "dst": "background",
+   "relation": "subclass_of",
+   "props": {
+    "paper_id": "ml",
+    "evidence": "some fraction of the visited transitions are never replayed before they drop out of the sliding window memory",
+    "via": "family_root"
+   }
+  },
+  {
+   "src": "outperforms",
+   "dst": "claim_relation",
+   "relation": "subclass_of",
+   "props": {
+    "paper_id": "ml",
+    "evidence": "Prioritized sampling (uninformed...) outperforms the uninformed uniform baseline...",
+    "via": "family_root"
+   }
+  },
+  {
+   "src": "sourced_from",
+   "dst": "composed_of",
+   "relation": "subclass_of",
+   "props": {
+    "paper_id": "ml",
+    "evidence": "we conducted a preliminary experiment on a class-imbalanced variant of the classical MNIST digit classification problem (LeCun et al., 1998)",
+    "via": "family_root"
+   }
+  },
+  {
+   "src": "propagates_to",
+   "dst": "background",
+   "relation": "subclass_of",
+   "props": {
+    "paper_id": "ml",
+    "evidence": "Similarly to eligibility traces, this lets information trickle backward from a future outcome to the value estimates of the actions and states that led to it.",
+    "via": "family_root"
+   }
+  },
+  {
+   "src": "approximates",
+   "dst": "claim_relation",
+   "relation": "subclass_of",
+   "props": {
+    "paper_id": "ml",
+    "evidence": "The heap array was then directly used as an approximation of a sorted array",
+    "via": "family_root"
+   }
+  },
+  {
+   "src": "notes_similarity",
+   "dst": "claim_relation",
+   "relation": "subclass_of",
+   "props": {
+    "paper_id": "ml",
+    "evidence": "We also note that a similar way of parallelizing DQN was proposed by (Chavez et al., 2015).",
+    "via": "family_root"
+   }
+  },
+  {
+   "src": "presents_pseudocode",
+   "dst": "claim_relation",
+   "relation": "subclass_of",
+   "props": {
+    "paper_id": "ml",
+    "evidence": "The pseudocode for the algorithm is presented in Supplementary Algorithm S3",
+    "via": "family_root"
+   }
+  },
+  {
+   "src": "estimates",
+   "dst": "influences",
+   "relation": "subclass_of",
+   "props": {
+    "paper_id": "ml",
+    "evidence": "A(s_t,a_t;θ,θ_v) is an estimate of the advantage function given by ∑_{i=0}^{k-1}γ^i r_{t+i} + γ^k V(s_{t+k};θ_v) - V(s_t;θ_v)",
+    "via": "family_root"
+   }
+  },
+  {
+   "src": "explores",
+   "dst": "background",
+   "relation": "subclass_of",
+   "props": {
+    "paper_id": "ml",
+    "evidence": "A video showing one of the agents exploring previously unseen mazes",
+    "via": "family_root"
+   }
+  },
+  {
+   "src": "exhibits_property",
+   "dst": "measures",
+   "relation": "subclass_of",
+   "props": {
+    "paper_id": "ml",
+    "evidence": "asynchronous one-step Q-learning and Sarsa algorithms exhibit superlinear speedups",
+    "via": "family_root"
+   }
+  },
+  {
+   "src": "measures",
+   "dst": "defines",
+   "relation": "depends_on",
+   "props": {
+    "paper_id": "PPR_F8D5D4C3C2B1",
+    "evidence": "node 'asynchronous advantage actor-critic (A3C)' co-referenced"
+   }
+  },
+  {
+   "src": "exhibits_property",
+   "dst": "defines",
+   "relation": "depends_on",
+   "props": {
+    "paper_id": "PPR_F8D5D4C3C2B1",
+    "evidence": "node 'asynchronous advantage actor-critic (A3C)' co-referenced"
+   }
+  },
+  {
+   "src": "adapts",
+   "dst": "defines",
+   "relation": "depends_on",
+   "props": {
+    "paper_id": "PPR_F8D5D4C3C2B1",
+    "evidence": "node 'asynchronous advantage actor-critic (A3C)' co-referenced"
+   }
+  },
+  {
+   "src": "outperforms",
+   "dst": "defines",
+   "relation": "depends_on",
+   "props": {
+    "paper_id": "PPR_F8D5D4C3C2B1",
+    "evidence": "node 'asynchronous advantage actor-critic (A3C)' co-referenced"
+   }
+  },
+  {
+   "src": "compares",
+   "dst": "defines",
+   "relation": "depends_on",
+   "props": {
+    "paper_id": "PPR_F8D5D4C3C2B1",
+    "evidence": "node 'n-step methods' co-referenced"
+   }
+  },
+  {
+   "src": "background",
+   "dst": "defines",
+   "relation": "depends_on",
+   "props": {
+    "paper_id": "PPR_F8D5D4C3C2B1",
+    "evidence": "node 'n-step methods' co-referenced"
+   }
+  },
+  {
+   "src": "composed_of",
+   "dst": "measures",
+   "relation": "composes",
+   "props": {
+    "paper_id": "PPR_F8D5D4C3C2B1",
+    "evidence": "node 'asynchronous advantage actor-critic (A3C)' is a component of a composition + referenced by another pattern"
+   }
+  },
+  {
+   "src": "composed_of",
+   "dst": "exhibits_property",
+   "relation": "composes",
+   "props": {
+    "paper_id": "PPR_F8D5D4C3C2B1",
+    "evidence": "node 'asynchronous advantage actor-critic (A3C)' is a component of a composition + referenced by another pattern"
+   }
+  },
+  {
+   "src": "composed_of",
+   "dst": "outperforms",
+   "relation": "composes",
+   "props": {
+    "paper_id": "PPR_F8D5D4C3C2B1",
+    "evidence": "node 'asynchronous advantage actor-critic (A3C)' is a component of a composition + referenced by another pattern"
+   }
+  },
+  {
+   "src": "raises_questions_about",
+   "dst": "claim_relation",
+   "relation": "subclass_of",
+   "props": {
+    "paper_id": "ml",
+    "evidence": "introducing prioritized sequence replay raises questions of how to store, replay and prioritise sequences",
+    "via": "family_root"
+   }
+  },
+  {
+   "src": "constitutive_law",
+   "dst": "defines",
+   "relation": "depends_on",
+   "props": {
+    "paper_id": "PPR_65EB3FEB4B1B",
+    "evidence": "node 'max_a Q_t(s,a)' co-referenced"
+   }
+  },
+  {
+   "src": "assigns",
+   "dst": "defines",
+   "relation": "depends_on",
+   "props": {
+    "paper_id": "PPR_65EB3FEB4B1B",
+    "evidence": "node 'discount factor' co-referenced"
+   }
+  },
+  {
+   "src": "replaces",
+   "dst": "defines",
+   "relation": "depends_on",
+   "props": {
+    "paper_id": "PPR_65EB3FEB4B1B",
+    "evidence": "node 'their noisy equivalent' co-referenced"
+   }
+  },
+  {
+   "src": "sourced_from",
+   "dst": "measures",
+   "relation": "composes",
+   "props": {
+    "paper_id": "PPR_65EB3FEB4B1B",
+    "evidence": "node '57 Atari games' is a component of a composition + referenced by another pattern"
+   }
+  },
+  {
+   "src": "sourced_from",
+   "dst": "explores",
+   "relation": "composes",
+   "props": {
+    "paper_id": "PPR_65EB3FEB4B1B",
+    "evidence": "node '57 Atari games' is a component of a composition + referenced by another pattern"
+   }
+  },
+  {
+   "src": "sourced_from",
+   "dst": "compares",
+   "relation": "composes",
+   "props": {
+    "paper_id": "PPR_65EB3FEB4B1B",
+    "evidence": "node '57 Atari games' is a component of a composition + referenced by another pattern"
+   }
+  },
+  {
+   "src": "sourced_from",
+   "dst": "influences",
+   "relation": "composes",
+   "props": {
+    "paper_id": "PPR_65EB3FEB4B1B",
+    "evidence": "node '57 Atari games' is a component of a composition + referenced by another pattern"
+   }
+  },
+  {
+   "src": "sourced_from",
+   "dst": "outperforms",
+   "relation": "composes",
+   "props": {
+    "paper_id": "PPR_65EB3FEB4B1B",
+    "evidence": "node '57 Atari games' is a component of a composition + referenced by another pattern"
+   }
+  },
+  {
+   "src": "sourced_from",
+   "dst": "improves",
+   "relation": "composes",
+   "props": {
+    "paper_id": "PPR_65EB3FEB4B1B",
+    "evidence": "node '57 Atari games' is a component of a composition + referenced by another pattern"
+   }
+  },
+  {
+   "src": "assigns",
+   "dst": "defines",
+   "relation": "composes",
+   "props": {
+    "paper_id": "PPR_65EB3FEB4B1B",
+    "evidence": "node 'discount factor' is a component of a composition + referenced by another pattern"
+   }
+  },
+  {
+   "src": "assigns",
+   "dst": "becomes",
+   "relation": "composes",
+   "props": {
+    "paper_id": "PPR_65EB3FEB4B1B",
+    "evidence": "node '0' is a component of a composition + referenced by another pattern"
+   }
+  }
+ ],
+ "family_roots": {
+  "constitutive_law": "constitutive_law",
+  "dependency": "influences",
+  "definition": "defines",
+  "composition": "composed_of",
+  "measure": "measures",
+  "claim": "claim_relation",
+  "evolution": "background"
+ }
+}

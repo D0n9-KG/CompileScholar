@@ -308,7 +308,7 @@ class AlignmentAgent:
             # share a batch; the LLM still judges the merge semantically.
             for batch in _precluster_batches(items, batch_size):
                 # delegate candidate-group discovery to the verified内核
-                groups = _llm_align_batch(batch, t, self.llm_judge)
+                groups, related = _llm_align_batch(batch, t, self.llm_judge)
                 report.n_candidates += len(groups)
                 for group in groups:
                     if len(group) < 2:
@@ -318,6 +318,23 @@ class AlignmentAgent:
                     if len(cands) < 2:
                         continue
                     self._route_group(cands, domain, report)
+                # relate path (2026-08-27, the '准而不连' gap): same-family /
+                # derivative concept pairs the judge explicitly declined to
+                # merge get a RELATE edge instead — downstream family
+                # connectivity without polluting merge precision.
+                for a, b, note in related:
+                    if a in self.kb.abox.concepts and b in self.kb.abox.concepts:
+                        r = self.kb.commit([Mutation(
+                            op=Op.ADD_CONCEPT_RELATION, target=a,
+                            proposer_role=Role.ALIGNER, domain=domain,
+                            evidence=note or "same-family (aligner relate)",
+                            rationale="LLM-judged related, not same concept",
+                            payload={"node_ids": [a, b],
+                                     "roles": ["from", "to"]})])
+                        if r.ok:
+                            report.n_relate += 1
+                            report.merges.append({"keep": a, "merged": [b],
+                                                  "outcome": "related"})
         return report
 
     def _concept_in_domain(self, c: Concept, domain: str) -> bool:
