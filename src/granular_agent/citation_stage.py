@@ -89,11 +89,15 @@ def extract_citation_intents(kb, paper_id: str, fulltext: str, llm_fn,
         target_pid = idx.get(key)
         if target_pid:
             rec["corpus_pid"] = target_pid
-            # deterministic post-check: the evidence window must contain the
-            # surname token of the mention (verbatim binding)
+            # deterministic post-check: SOME window of this mention must contain
+            # the surname token (verbatim binding). The mention regex found it
+            # somewhere by construction; windows[0] may be a different occurrence
+            # (measured: PER's 'mnih 2015' first window carries the Double DQN
+            # sentence, the citation itself sits in window 2).
             surname = key.rsplit(" ", 1)[0].split()[-1]
-            window = ay_ctx[key][0] or ""
-            if surname.lower() not in window.lower():
+            window = next((w for w in ay_ctx[key]
+                           if surname.lower() in w.lower()), "")
+            if not window:
                 rec["postcheck"] = "mention-not-in-evidence"
             else:
                 mutations.append((target_pid, rec, window))

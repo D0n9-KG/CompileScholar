@@ -226,9 +226,16 @@ class ConceptGraph:
             return None
         if len(set(node_ids)) == 1:
             return None  # self-loop
-        key = (frozenset(node_ids), kind)
+        # direction-agnostic dedup for n-ary hyperedges (same node SET + kind =
+        # same edge: composed_of(A,B,C) has no direction). EXCEPT 'cites': a
+        # citation is inherently directional (PER cites Dueling ≠ Dueling cites
+        # PER — measured collapse: the second edge merged into the first and
+        # its intent was lost). Ordered key for directional kinds only.
+        directional = kind in ("cites",)
+        key = (tuple(node_ids) if directional else frozenset(node_ids), kind)
         for he in self.hyperedges:
-            if (frozenset(he.node_ids), he.kind) == key:
+            he_key = (tuple(he.node_ids) if directional else frozenset(he.node_ids), he.kind)
+            if he_key == key:
                 if paper_id:
                     he.provenance.append({"paper_id": paper_id, "evidence": evidence,
                                           "year": year, "section": section})
