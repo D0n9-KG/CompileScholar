@@ -37,9 +37,27 @@
 - sci-evo `discovery_candidates_to_rows` 新增 `citation_count` 透出
   （crossref is-referenced-by-count / openalex cited_by_count）。
 
-## 四、结论与下一步
+## 四、轮次实验链（同 10 query，每轮只动一个变量）
 
-1. 召回主干切换：S2 bulk（多改写查询）+ crossref（权威被引数补充）+ OpenAlex（解封后
-   并入，元数据最全）。arXiv API 备用。
-2. 权威重排的真实 A/B 在 S2 bulk 池上跑（进行中）。
+| 轮 | 配置 | micro-F1 | 关键变化 |
+|---|---|---|---|
+| R1a | crossref-only, LLM 排序 | 0.007 | 覆盖墙（gold in pool 5/129） |
+| R1b | crossref-only, 权威重排 | 0.000 | 覆盖墙之下两臂同盲 |
+| R2 | +S2 bulk（4 改写/查询） | 0.007 | 池变大但改写太窄 |
+| R3 | S2 bulk 8 改写（含 survey 变体） | 0.014 | q1/q2 首命中；gold in S2 pool 14→更大 |
+| R4 | +per-query top-20 trim +缓存 v2 修被引埋没 | **待出** | q0 首条即 F1=0.4（P=0.333/R=0.5，5/10 gold） |
+
+R4 的两个修复：
+1. **S2 缓存版本 bug**：早轮缓存条目无 citationCount 字段（后加），被引预排序把它们
+   当 0 被引沉底——facet gold（被引 12-65）排到 128-254 名，切出 top-100 判分窗口。
+2. **全局被引排序 vs facet 多样性**：1930 池全局排序必然挤掉低被引 facet gold。
+   改为 per-query top-20（保每个改写查询的代表）→ 并集再全局被引排序。
+
+## 五、结论与下一步
+
+1. 召回主干切换：S2 bulk（多改写查询+survey 变体）+ crossref（权威被引数补充）+
+   OpenAlex（解封后并入，元数据最全）。arXiv API 备用。
+2. 权威重排的真实 A/B 在 S2 bulk 池上跑（R4 起池健康）。
 3. 长期：申请 S2 API key（免费表单，100 req/5min）。
+4. q5 类极窄查询（gold=1 篇 voice conversion GAN）单靠 keyword recall 结构性难命中，
+   引文滚雪球（L1 的第二腿）才是正解——下个实现位。
