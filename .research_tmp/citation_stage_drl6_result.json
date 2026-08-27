@@ -1,0 +1,101 @@
+{
+ "n_cites_edges": 16,
+ "edges": [
+  {
+   "from": "PPR_DD48410E18B3",
+   "to": "PPR_24493BE6E8C2",
+   "intent": "background",
+   "evidence": "Thrun and Schwartz (1993) give specific examples in which this leads to suboptimal policies, even asymptotically. To test whether overestimations occur in practice and at scale, we investigate the per"
+  },
+  {
+   "from": "PPR_746E68D2E93B",
+   "to": "PPR_24493BE6E8C2",
+   "intent": "compares",
+   "evidence": "Our hypothesis is that prioritized replay is generally useful, so that it will make learning with experience replay more efficient without requiring careful problem-specific hyperparameter tuning. We "
+  },
+  {
+   "from": "PPR_746E68D2E93B",
+   "to": "PPR_DD48410E18B3",
+   "intent": "compares",
+   "evidence": "Furthermore, Hinton (2007) introduced a form of non-uniform sampling based on error, with an importance sampling correction, which led to a 3x speed-up on MNIST digit classification. There have been s"
+  },
+  {
+   "from": "PPR_746E68D2E93B",
+   "to": "PPR_FC0F6B04EEBF",
+   "intent": "background",
+   "evidence": "There have been several proposed methods for playing Atari with deep reinforcement learning, including deep Q-networks (DQN) (Mnih et al., 2013; 2015; Guo et al., 2014; Stadie et al., 2015; Nair et al"
+  },
+  {
+   "from": "PPR_F8D5D4C3C2B1",
+   "to": "PPR_DD48410E18B3",
+   "intent": "compares",
+   "evidence": "However, it was previously thought that the combination of simple online RL algorithms with deep neural networks was fundamentally unstable. Instead, a variety of solutions have been proposed to stabi"
+  },
+  {
+   "from": "PPR_F8D5D4C3C2B1",
+   "to": "PPR_24493BE6E8C2",
+   "intent": "compares",
+   "evidence": "Our parallel reinforcement learning paradigm also offers practical benefits. Whereas previous approaches to deep reinforcement learning rely heavily on specialized hardware such as GPUs (Mnih et al., "
+  },
+  {
+   "from": "PPR_F8D5D4C3C2B1",
+   "to": "PPR_746E68D2E93B",
+   "intent": "compares",
+   "evidence": "Our parallel reinforcement learning paradigm also offers practical benefits. Whereas previous approaches to deep reinforcement learning rely heavily on specialized hardware such as GPUs (Mnih et al., "
+  },
+  {
+   "from": "PPR_F8D5D4C3C2B1",
+   "to": "PPR_FC0F6B04EEBF",
+   "intent": "compares",
+   "evidence": "This is one of the most commonly used benchmark environments for RL algorithms. We use the Atari domain to compare against state of the art results (Van Hasselt et al., 2015; Wang et al., 2015; Schaul"
+  },
+  {
+   "from": "PPR_FC0F6B04EEBF",
+   "to": "PPR_24493BE6E8C2",
+   "intent": "improves",
+   "evidence": "One exciting application is the sequential decision-making setting of reinforcement learning (RL) and control. Notable examples include deep Q-learning (Mnih et al., 2015), deep visuomotor policies (L"
+  },
+  {
+   "from": "PPR_FC0F6B04EEBF",
+   "to": "PPR_746E68D2E93B",
+   "intent": "adapts",
+   "evidence": "(2015). The combination of prioritized replay (Schaul et al., 2016) with the proposed dueling network results in the new state-of-the-art for this popular domain. 1.1. Related Work The notion of maint"
+  },
+  {
+   "from": "PPR_FC0F6B04EEBF",
+   "to": "PPR_DD48410E18B3",
+   "intent": "background",
+   "evidence": "At the end of this section, we incorporate prioritized experience replay (Schaul et al., 2016). Our network architecture has the same low-level convolutional structure of DQN (Mnih et al., 2015; van H"
+  },
+  {
+   "from": "PPR_65EB3FEB4B1B",
+   "to": "PPR_24493BE6E8C2",
+   "intent": "background",
+   "evidence": "The parameters of these networks are trained by gradient descent to minimize some suitable loss function. In DQN (Mnih et al. 2015) deep networks and reinforcement learning were successfully combined "
+  },
+  {
+   "from": "PPR_65EB3FEB4B1B",
+   "to": "PPR_F8D5D4C3C2B1",
+   "intent": "background",
+   "evidence": "The dueling network architecture (Wang et al. 2016) helps to generalize across actions by separately representing state values and action advantages. Learning from multi-step bootstrap targets (Sutton"
+  },
+  {
+   "from": "PPR_65EB3FEB4B1B",
+   "to": "PPR_746E68D2E93B",
+   "intent": "background",
+   "evidence": "Double DQN (DDQN; van Hasselt, Guez, and Silver 2016) addresses an overestimation bias of Q-learning (van Hasselt 2010), by decoupling selection and evaluation of the bootstrap action. Prioritized exp"
+  },
+  {
+   "from": "PPR_65EB3FEB4B1B",
+   "to": "PPR_DD48410E18B3",
+   "intent": "improves",
+   "evidence": "Since then, many extensions have been proposed that enhance its speed or stability. Double DQN (DDQN; van Hasselt, Guez, and Silver 2016) addresses an overestimation bias of Q-learning (van Hasselt 20"
+  },
+  {
+   "from": "PPR_65EB3FEB4B1B",
+   "to": "PPR_FC0F6B04EEBF",
+   "intent": "background",
+   "evidence": "Prioritized experience replay (Schaul et al. 2015) improves data efficiency, by replaying more often transitions from which there is more to learn. The dueling network architecture (Wang et al. 2016) "
+  }
+ ]
+}
