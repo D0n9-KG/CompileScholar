@@ -846,12 +846,15 @@ class KnowledgeBase:
     def _apply_add_concept_relation(self, mut: Mutation) -> None:
         """A 'relate' outcome's body: add an n-ary edge that RELATES (not merges)
         the concepts, kind='relates', so the partial-overlap case keeps both
-        hyperedges distinct and adds a cross-link."""
+        hyperedges distinct and adds a cross-link.
+        payload.kind overrides (citation-intent edges: kind='cites' + intent=
+        extends/improves/... — paper-level relation, same op, same contract)."""
         self.abox.add_hyperedge(mut.payload.get("node_ids", []),
-                                kind="relates",
+                                kind=mut.payload.get("kind", "relates"),
                                 roles=mut.payload.get("roles", []),
                                 paper_id=mut.domain,
-                                evidence=mut.evidence)
+                                evidence=mut.evidence,
+                                pattern_type=mut.payload.get("intent", ""))
 
     # ===================================================================
     # Phase 2: route (aligner only, 5-outcome, non-atomic per-edge)

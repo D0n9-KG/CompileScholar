@@ -299,6 +299,22 @@ class GranularFlowAgent:
         else:
             align_rep = None
 
+        # Stage 3.5: citation intent — paper-level 'cites' edges (extends/
+        # improves/compares/...) into the SAME graph, committed through the
+        # kernel contract (2026-08-28: was a bypass JSON writer; integrating it
+        # is the 'one working memory' architecture requirement). Runs in every
+        # arm incl. frozen (intent is extraction, not evolution). Needs corpus
+        # papers registered as PAPER nodes first (caller does via
+        # citation_stage.register_corpus_papers; without registration this
+        # stage only classifies mentions, no intra-corpus edges).
+        cit_rep = None
+        try:
+            from granular_agent.citation_stage import extract_citation_intents
+            cit_rep = extract_citation_intents(
+                kb, paper_id, full_text, self._kernel_llm_extract)
+        except Exception as e:
+            print(f"  [kernel] citation stage failed: {e!r}", flush=True)
+
         # 优化: build_abox_instance ONCE, share across rich_topology + active_repair
         # + T-box拓扑. Must be BEFORE all consumers.
         inst_abox = None
@@ -376,6 +392,9 @@ class GranularFlowAgent:
             "rich_topology": {"total": len(rt_edges), "by_kind": rt_by_kind},
             "active_repair": active_repair,   # 真漏 fix #9: split/merge/rename detect
             "tbox_topology": tbox_topo,        # 真漏 fix #10/#11: T-box富拓扑+violations
+            "citation_intents": ({"n_mentions": cit_rep["n_numeric"] + cit_rep["n_author_year"],
+                                  "n_committed": cit_rep["n_committed"]}
+                                 if cit_rep else None),
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
         self.hg_results.append(result)
