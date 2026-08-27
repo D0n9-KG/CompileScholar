@@ -171,12 +171,12 @@ def grade_and_rank(query: str, cands: list[dict], max_out: int = 15,
     the old grade-order output as the baseline arm."""
     if not cands:
         return []
-    # pools can reach 4000+ with S2 bulk (unranked firehose): before the 100-paper
-    # grading window, sort by citation count so the representative end of the pool
-    # is what the LLM sees (gold diagnosis: expert-picked representative papers).
+    # pools can reach 4000+ with S2 bulk (unranked firehose): before the grading
+    # window, sort by citation count so the representative end of the pool is what
+    # the LLM sees (gold diagnosis: expert-picked representative papers).
     # Measured on q0: global citation sort puts facet-matched gold (cited 12-65)
-    # at ranks 128-254, outside the window — so first cap PER QUERY SOURCE (top 20
-    # by citation per recall query, preserving facet diversity), then global sort.
+    # at ranks 128-254 — so first cap PER QUERY SOURCE (top 20 by citation per
+    # recall query, preserving facet diversity), then global sort.
     by_query: dict[str, list[dict]] = {}
     for c in cands:
         by_query.setdefault(c.get("_q") or "", []).append(c)
@@ -186,34 +186,44 @@ def grade_and_rank(query: str, cands: list[dict], max_out: int = 15,
         trimmed.extend(lst[:20])
     if len(trimmed) < 100:            # small pools: fall back to global sort
         trimmed = cands
-    cands = sorted(trimmed, key=lambda c: -(c.get("citation_count") or c.get("citationCount") or 0))
-    listing = "\n".join(
-        f"{i}: {c.get('title','')} ({c.get('year','')}, cited {c.get('citation_count') or 0})"
-        for i, c in enumerate(cands[:150]))
-    p = ("A researcher's academic search request:\n"
-         f"«{query}»\n\n"
-         "Candidate papers (index: title (year, citation count)):\n" + listing + "\n\n"
-         "Grade each candidate: H = directly about the request's specific "
-         "technique/task/point; S = relevant to the broader request but not the "
-         "specific point; N = not relevant. Judge by title (and year if the "
-         "request implies recency). When the request asks for representative/"
-         "top-tier/influential works or wants to 'expand ideas'/'get started', "
-         "REPRESENTATIVE high-citation works are the H papers — recent niche "
-         "variants of the same topic stay S. Be GENEROUS with S — the request "
-         "wants comprehensive coverage.\n"
-         'Output JSON: {"H": [indices], "S": [indices]}')
-    raw = call_paratera(p, model="DeepSeek-V4-Flash", max_tokens=600, enable_thinking=False)
-    obj = parse_json_response(raw) or {}
-
-    def _idx(x):
-        try:
-            i = int(x)
-            return i if 0 <= i < len(cands[:150]) else None
-        except (ValueError, TypeError):
-            return None
-
-    high = [cands[i] for i in filter(None, (_idx(x) for x in obj.get("H") or []))]
-    some = [cands[i] for i in filter(None, (_idx(x) for x in obj.get("S") or []))]
+    cands = sorted(trimmed, key=lambda c: -(c.get("citation_count") or c.get("citationCount") or 0))[:150]
+    # chunked grading: a 150-item monolithic listing measurably dilutes attention
+    # (q2: 3 window-gold present, 0 graded; isolated or 50-chunked: 3/3). Grade in
+    # 50-item chunks and merge — chunk-local H inflation is handled by the rank cap.
+    high, some = [], []
+    for ci in range(0, len(cands), 50):
+        chunk = cands[ci:ci + 50]
+        listing = "\n".join(
+            f"{i}: {c.get('title','')} ({c.get('year','')}, cited {c.get('citation_count') or c.get('citationCount') or 0})"
+            for i, c in enumerate(chunk))
+        p = ("A researcher's academic search request:\n"
+             f"«{query}»\n\n"
+             "Candidate papers (index: title (year, citation count)):\n" + listing + "\n\n"
+             "Grade each candidate: H = directly about the request's specific "
+             "technique/task/point; S = relevant to the broader request but not the "
+             "specific point; N = not relevant. Judge by title (and year if the "
+             "request implies recency). When the request asks for representative/"
+             "top-tier/influential works or wants to 'expand ideas'/'get started', "
+             "REPRESENTATIVE high-citation works directly on the topic are H — "
+             "recent niche variants of the same topic stay S. Be GENEROUS with S — "
+             "the request wants comprehensive coverage.\n"
+             'Output JSON: {"H": [indices], "S": [indices]}')
+        raw = call_paratera(p, model="DeepSeek-V4-Flash", max_tokens=600, enable_thinking=False)
+        obj = parse_json_response(raw) or {}
+        for x in (obj.get("H") or []):
+            try:
+                i = int(x)
+                if 0 <= i < len(chunk):
+                    high.append(chunk[i])
+            except (ValueError, TypeError):
+                pass
+        for x in (obj.get("S") or []):
+            try:
+                i = int(x)
+                if 0 <= i < len(chunk):
+                    some.append(chunk[i])
+            except (ValueError, TypeError):
+                pass
     # archive the graded pool for paired offline A/B (ranker comparison without
     # re-grading — grader variance between runs measured at q2: 0.0 vs 0.148)
     try:
@@ -248,7 +258,8 @@ def rerank_authority(high: list[dict], some: list[dict], max_out: int = 12) -> l
     import math
     def _ck(c):
         try:
-            return math.log10(1 + int(c.get("citation_count") or 0))
+            # S2 rows carry 'citationCount', sci-evo rows 'citation_count'
+            return math.log10(1 + int(c.get("citation_count") or c.get("citationCount") or 0))
         except (TypeError, ValueError):
             return 0.0
     pool = high + some
