@@ -44,7 +44,21 @@ def rewrite_query(query: str) -> list[str]:
     raw = call_paratera(p, model="DeepSeek-V4-Flash", max_tokens=400, enable_thinking=False)
     obj = parse_json_response(raw) or {}
     qs = [q for q in (obj.get("queries") or []) if q][:8]
-    return qs or [query]
+    qs = qs or [query]
+    # provider-side nondeterminism (temp 0 still varies) → pool and F1 vary run-to-run
+    # (measured q0: 0.16 vs 0.40). Cache the rewrite so runs are comparable.
+    try:
+        import hashlib
+        key = hashlib.md5(query.encode()).hexdigest()[:12]
+        cpath = f".research_tmp/contest_survey/_rewrite_cache/{key}.json"
+        os.makedirs(os.path.dirname(cpath), exist_ok=True)
+        if os.path.exists(cpath):
+            return json.loads(open(cpath, encoding="utf-8").read())
+        with open(cpath, "w", encoding="utf-8") as f:
+            json.dump(qs, f, ensure_ascii=False)
+    except Exception:
+        pass
+    return qs
 
 
 _CACHE_DIR = ".research_tmp/contest_survey/_oa_cache"
@@ -175,7 +189,7 @@ def grade_and_rank(query: str, cands: list[dict], max_out: int = 15,
     cands = sorted(trimmed, key=lambda c: -(c.get("citation_count") or c.get("citationCount") or 0))
     listing = "\n".join(
         f"{i}: {c.get('title','')} ({c.get('year','')}, cited {c.get('citation_count') or 0})"
-        for i, c in enumerate(cands[:100]))
+        for i, c in enumerate(cands[:150]))
     p = ("A researcher's academic search request:\n"
          f"«{query}»\n\n"
          "Candidate papers (index: title (year, citation count)):\n" + listing + "\n\n"
@@ -194,15 +208,37 @@ def grade_and_rank(query: str, cands: list[dict], max_out: int = 15,
     def _idx(x):
         try:
             i = int(x)
-            return i if 0 <= i < len(cands[:100]) else None
+            return i if 0 <= i < len(cands[:150]) else None
         except (ValueError, TypeError):
             return None
 
     high = [cands[i] for i in filter(None, (_idx(x) for x in obj.get("H") or []))]
     some = [cands[i] for i in filter(None, (_idx(x) for x in obj.get("S") or []))]
+    # archive the graded pool for paired offline A/B (ranker comparison without
+    # re-grading — grader variance between runs measured at q2: 0.0 vs 0.148)
+    try:
+        _archive_grade(query, cands[:150], high, some)
+    except Exception:
+        pass
     if rank == "llm":
         return (high + some)[:max_out]
     return rerank_authority(high, some, max_out)
+
+
+_GRADE_ARCHIVE = ".research_tmp/contest_survey/_grade_archive.jsonl"
+
+
+def _archive_grade(query, cands, high, some):
+    """Append {query, titles, H, S} once per (query) — the paired-A/B material."""
+    import hashlib
+    qid = hashlib.md5(query.encode()).hexdigest()[:12]
+    line = {"qid": qid, "query": query,
+            "titles": [c.get("title", "") for c in cands],
+            "cited": [c.get("citation_count") or c.get("citationCount") or 0 for c in cands],
+            "H": [c.get("title", "") for c in high],
+            "S": [c.get("title", "") for c in some]}
+    with open(_GRADE_ARCHIVE, "a", encoding="utf-8") as f:
+        f.write(json.dumps(line, ensure_ascii=False) + "\n")
 
 
 def rerank_authority(high: list[dict], some: list[dict], max_out: int = 12) -> list[dict]:
