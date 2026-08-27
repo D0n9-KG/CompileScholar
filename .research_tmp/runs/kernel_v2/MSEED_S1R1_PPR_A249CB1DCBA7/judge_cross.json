@@ -1,0 +1,4599 @@
+{
+  "summary": {
+    "GLM-5-Turbo": {
+      "pass": 52,
+      "total": 123,
+      "rate": 0.423
+    },
+    "gpt-oss-120b": {
+      "pass": 69,
+      "total": 123,
+      "rate": 0.561
+    },
+    "agreement": "102/123",
+    "both_pass": "50/123",
+    "either_pass": "71/123"
+  },
+  "edges": [
+    {
+      "pt": "composed_of",
+      "desc": "one whole is composed-of / part-of >=1 component (n-ary composition)",
+      "boundary": "STRUCTURAL composition: parts that make up a whole (model A = B + C). NOT classification (defines), NOT 'X has control params' (influences), NOT experimental setup description, NOT 'we tested X by doing Y'.",
+      "nodes": [
+        [
+          "whole",
+          "deep Q-network"
+        ],
+        [
+          "component",
+          "reinforcement learning"
+        ],
+        [
+          "component",
+          "deep neural networks"
+        ]
+      ],
+      "ev": "we developed a novel agent, a deep Q-network (DQN), which is able to combine reinforcement learning with a class of artificial neural network known as deep neural networks",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "extends",
+      "desc": "X generalizes/extends Y (X METHOD/PHENOMENON -> Y)",
+      "boundary": "X GENERALIZES Y (X extends Y's scope/regime/params; X is a direct technical extension of Y). NOT improves (X need not be more accurate, just broader), NOT background (X is a direct technical inheritance, not a motivation citation), NOT claim_relation (this is method-to-method).",
+      "nodes": [
+        [
+          "from",
+          "deep convolutional network"
+        ],
+        [
+          "to",
+          "deep neural networks"
+        ]
+      ],
+      "ev": "We use one particularly successful architecture, the deep convolutional network, which uses hierarchical layers of tiled convolutional filters to mimic the effects of receptive fields—inspired by Hubel and Wiesel’s seminal work on feedforward processing in early visual cortex—thereby exploiting the local spatial correlations present in images, and building in robustness to natural transformations such as changes of viewpoint or scale",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "target",
+          "action-value function"
+        ],
+        [
+          "source",
+          "deep convolutional neural network"
+        ]
+      ],
+      "ev": "we use a deep convolutional neural network to approximate the optimal action-value function",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiment",
+      "nodes": [
+        [
+          "from",
+          "games demanding more temporally extended planning strategies"
+        ],
+        [
+          "to",
+          "all existing agents"
+        ],
+        [
+          "to",
+          "DQN"
+        ],
+        [
+          "to",
+          "Montezuma’s Revenge"
+        ]
+      ],
+      "ev": "Nevertheless, games demanding more temporally extended planning strategies still constitute a major challenge for all existing agents including DQN (for example, Montezuma’s Revenge).",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "composed_of",
+      "desc": "one whole is composed-of / part-of >=1 component (n-ary composition)",
+      "boundary": "STRUCTURAL composition: parts that make up a whole (model A = B + C). NOT classification (defines), NOT 'X has control params' (influences), NOT experimental setup description, NOT 'we tested X by doing Y'.",
+      "nodes": [
+        [
+          "whole",
+          "DQN agent"
+        ],
+        [
+          "component",
+          "replay memory"
+        ],
+        [
+          "component",
+          "separate target Q-network"
+        ],
+        [
+          "component",
+          "deep convolutional network architecture"
+        ]
+      ],
+      "ev": "the individual core components of the DQN agent—the replay memory, separate target Q-network and deep convolutional network architecture",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "measures",
+      "desc": "a quantity is measured by / characterizes >=1 measure",
+      "boundary": "a measurement/evaluation relation: X is measured/evaluated by instrument/method Y. NOT a functional law (constitutive_law), NOT a dependence (influences).",
+      "nodes": [
+        [
+          "object",
+          "DQN representation"
+        ],
+        [
+          "instrument",
+          "t-SNE"
+        ]
+      ],
+      "ev": "the t-SNE algorithm tends to map the DQN representation of perceptually similar states to nearby points",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "extends",
+      "desc": "X generalizes/extends Y (X METHOD/PHENOMENON -> Y)",
+      "boundary": "X GENERALIZES Y (X extends Y's scope/regime/params; X is a direct technical extension of Y). NOT improves (X need not be more accurate, just broader), NOT background (X is a direct technical inheritance, not a motivation citation), NOT claim_relation (this is method-to-method).",
+      "nodes": [
+        [
+          "from",
+          "representations learned by DQN"
+        ],
+        [
+          "to",
+          "data generated from policies other than its own"
+        ]
+      ],
+      "ev": "the representations learned by DQN are able to generalize to data generated from policies other than its own",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "optimal strategy"
+        ],
+        [
+          "object",
+          "Breakout"
+        ]
+      ],
+      "ev": "Breakout: the agent learns the optimal strategy",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "background",
+      "desc": "X uses Y as background/motivation",
+      "boundary": "X cites Y as MOTIVATION/prior context only (Y inspired X but X is NOT a direct technical extension/inheritance of Y). NOT extends (no direct technical lineage), NOT improves (no limitation fix).",
+      "nodes": [
+        [
+          "from",
+          "end-to-end reinforcement learning"
+        ],
+        [
+          "to",
+          "neurobiological evidence"
+        ]
+      ],
+      "ev": "This principle draws on neurobiological evidence",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "background",
+      "desc": "X uses Y as background/motivation",
+      "boundary": "X cites Y as MOTIVATION/prior context only (Y inspired X but X is NOT a direct technical extension/inheritance of Y). NOT extends (no direct technical lineage), NOT improves (no limitation fix).",
+      "nodes": [
+        [
+          "from",
+          "replay algorithm"
+        ],
+        [
+          "to",
+          "hippocampus"
+        ]
+      ],
+      "ev": "Convergent evidence suggests that the hippocampus may support the physical realization of such a process",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "reward signals"
+        ],
+        [
+          "target",
+          "characteristics of representations"
+        ]
+      ],
+      "ev": "reward signals during perceptual learning may influence the characteristics of representations",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "replay algorithm"
+        ],
+        [
+          "target",
+          "successful integration"
+        ]
+      ],
+      "ev": "the successful integration of reinforcement learning with deep network architectures was critically dependent on our incorporation of a replay algorithm",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "reward signals"
+        ],
+        [
+          "target",
+          "representations"
+        ],
+        [
+          "cause",
+          "reward"
+        ],
+        [
+          "effect",
+          "characteristics"
+        ]
+      ],
+      "ev": "reward signals during perceptual learning may influence the characteristics of representations",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "replay algorithm"
+        ],
+        [
+          "target",
+          "integration"
+        ],
+        [
+          "cause",
+          "replay"
+        ],
+        [
+          "effect",
+          "successful integration"
+        ]
+      ],
+      "ev": "successful integration was critically dependent on our incorporation of a replay algorithm",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "target",
+          "game score"
+        ],
+        [
+          "source",
+          "whole previous sequence of actions and observations"
+        ]
+      ],
+      "ev": "the game score may depend on the whole previous sequence of actions and observations",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "target",
+          "game strategies"
+        ],
+        [
+          "source",
+          "these sequences"
+        ]
+      ],
+      "ev": "which then learns game strategies depending upon these sequences",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "This formalism"
+        ],
+        [
+          "object",
+          "large but finite Markov decision process (MDP)"
+        ]
+      ],
+      "ev": "This formalism gives rise to a large but finite Markov decision process (MDP)",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "each sequence"
+        ],
+        [
+          "object",
+          "distinct state"
+        ]
+      ],
+      "ev": "in which each sequence is a distinct state",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "complete sequence st"
+        ],
+        [
+          "object",
+          "state representation at time t"
+        ]
+      ],
+      "ev": "simply by using the complete sequence st as the state representation at time t",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "future discounted return at time t as $R _ { t } = \\sum _ { t ^ { \\prime } = t } ^ { I } \\gamma ^ { t ^ { \\prime } - t } r _ { t ^ { \\prime } }$ T"
+        ],
+        [
+          "definition",
+          "T"
+        ],
+        [
+          "object",
+          "t0~ttime-step"
+        ],
+        [
+          "object",
+          "game"
+        ]
+      ],
+      "ev": "define the future discounted return at time t as $R _ { t } = \\sum _ { t ^ { \\prime } = t } ^ { I } \\gamma ^ { t ^ { \\prime } - t } r _ { t ^ { \\prime } }$ T , in which T is the t0~ttime-step at which the game terminates",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "optimal action-value function $\\boldsymbol { Q } ^ { * } ( s , a )$"
+        ],
+        [
+          "definition",
+          "maximum expected return"
+        ],
+        [
+          "object",
+          "any policy"
+        ]
+      ],
+      "ev": "We define the optimal action-value function $\\boldsymbol { Q } ^ { * } ( s , a )$ as the maximum expected return achievable by following any policy",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "$Q ^ { * } ( s , a ) =$ max $_ \\tau \\mathbb { E } [ R _ { t } | s _ { t } = s , a _ { t } = a , \\pi ]$"
+        ],
+        [
+          "definition",
+          "p"
+        ],
+        [
+          "object",
+          "policy"
+        ],
+        [
+          "object",
+          "sequences"
+        ],
+        [
+          "object",
+          "actions (or distributions over actions)"
+        ]
+      ],
+      "ev": "$Q ^ { * } ( s , a ) =$ max $_ \\tau \\mathbb { E } [ R _ { t } | s _ { t } = s , a _ { t } = a , \\pi ]$ in which p is a policy mapping sequences to actions (or distributions over actions)",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "squared error"
+        ],
+        [
+          "object",
+          "absolute value loss function"
+        ]
+      ],
+      "ev": "clipping the squared error to be between 21 and 1 corresponds to using an absolute value loss function for errors outside of the $( - 1 , 1 )$ interval",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "improves",
+      "desc": "X improves Y's accuracy/applicability, resolving Y's limitation",
+      "boundary": "X RESOLVES a limitation of Y (X is more accurate/applicable BECAUSE it fixes something Y fails at; first-principles vs phenomenological = improves). NOT compares (X is NOT a parallel different-mechanism alternative; X builds on Y and is better), NOT extends (X is better not just broader).",
+      "nodes": [
+        [
+          "from",
+          "error clipping"
+        ],
+        [
+          "to",
+          "stability of the algorithm"
+        ]
+      ],
+      "ev": "This form of error clipping further improved the stability of the algorithm",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "composed_of",
+      "desc": "one whole is composed-of / part-of >=1 component (n-ary composition)",
+      "boundary": "STRUCTURAL composition: parts that make up a whole (model A = B + C). NOT classification (defines), NOT 'X has control params' (influences), NOT experimental setup description, NOT 'we tested X by doing Y'.",
+      "nodes": [
+        [
+          "whole",
+          "Algorithm 1: deep Q-learning with experience replay"
+        ],
+        [
+          "component",
+          "replay memory D"
+        ],
+        [
+          "component",
+          "action-value function Q"
+        ],
+        [
+          "component",
+          "target action-value function $\\hat { \\boldsymbol Q }$"
+        ]
+      ],
+      "ev": "Algorithm 1: deep Q-learning with experience replay. Initialize replay memory D to capacity N Initialize action-value function Q with random weights h Initialize target action-value function $\\hat { \\boldsymbol Q }$ with weights $\\theta ^ { - } = \\theta$",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "sequence $s _ { 1 } = \\{ x _ { 1 } \\}$"
+        ],
+        [
+          "object",
+          "preprocessed sequence $\\phi _ { 1 } = \\phi ( s _ { 1 } )$"
+        ]
+      ],
+      "ev": "Initialize sequence $s _ { 1 } = \\{ x _ { 1 } \\}$ and preprocessed sequence $\\phi _ { 1 } = \\phi ( s _ { 1 } )$",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "$s _ { t + 1 } = s _ { t } , a _ { t } , x _ { t + 1 }$"
+        ],
+        [
+          "object",
+          "$\\phi _ { t + 1 } = \\phi ( s _ { t + 1 } )$"
+        ]
+      ],
+      "ev": "Set $s _ { t + 1 } = s _ { t } , a _ { t } , x _ { t + 1 }$ 1 and preprocess $\\phi _ { t + 1 } = \\phi ( s _ { t + 1 } )$",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "$y _ { j }$"
+        ],
+        [
+          "object",
+          "$r _ { j }$"
+        ],
+        [
+          "object",
+          "$\\gamma$"
+        ],
+        [
+          "object",
+          "$\\hat { Q } \\Big ( \\phi _ { j + 1 } , a ^ { \\prime } ; \\theta ^ { - } \\Big )$"
+        ]
+      ],
+      "ev": "$\\mathrm { S e t } y _ { j } = \\left\\{ \\begin{array} { c } { r _ { j } } \\\\ { r _ { j } + \\gamma \\operatorname* { m a x } _ { a ^ { \\prime } } \\hat { Q } \\Big ( \\phi _ { j + 1 } , a ^ { \\prime } ; \\theta ^ { - } \\Big ) } \\end{array} \\right.$",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "$\\scriptstyle { \\hat { Q } } = Q$"
+        ],
+        [
+          "object",
+          "action-value function Q"
+        ]
+      ],
+      "ev": "Every C steps reset $\\scriptstyle { \\hat { Q } } = Q$",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "constitutive_law",
+      "desc": "a constitutive law relating output quantity/quantities to >=1 input quantity (n-ary)",
+      "boundary": "a FORMAL/QUANTITATIVE law output=f(inputs+params), stated as a formula or explicit functional relation. NOT a prose 'X depends on Y' (that is influences), NOT a definition (defines), NOT a measurement setup (measures).",
+      "nodes": [
+        [
+          "output",
+          "action-value function"
+        ],
+        [
+          "input",
+          "Bellman equation"
+        ]
+      ],
+      "ev": "estimate the action-value function by using the Bellman equation as an iterative update, Qi+1(s,a)=Eis′[r+γmaxa′Q¯i(s′,a¯′)|s,a]",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "Q-network"
+        ],
+        [
+          "definition",
+          "neural network"
+        ],
+        [
+          "object",
+          "weights h"
+        ]
+      ],
+      "ev": "We refer to a neural network function approximator with weights h as a Q-network",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "network weights"
+        ],
+        [
+          "target",
+          "targets"
+        ]
+      ],
+      "ev": "the targets depend on the network weights",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiment",
+      "nodes": [
+        [
+          "from",
+          "targets"
+        ],
+        [
+          "to",
+          "targets used for supervised learning"
+        ]
+      ],
+      "ev": "this is in contrast with the targets used for supervised learning, which are fixed before learning begins",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "Q-learning algorithm"
+        ],
+        [
+          "definition",
+          "stochastic gradient descent"
+        ]
+      ],
+      "ev": "The familiar Q-learning algorithm19 can be recovered in this framework by updating the weights after every time step, replacing the expectations using single samples, and setting θi−=θi−1",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "deep Q-networks"
+        ],
+        [
+          "definition",
+          "Algorithm 1"
+        ]
+      ],
+      "ev": "The full algorithm for training deep Q-networks is presented in Algorithm 1",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "fixed length representation of histories"
+        ],
+        [
+          "definition",
+          "function w"
+        ]
+      ],
+      "ev": "our Q-function instead works on a fixed length representation of histories produced by the function w described above",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "strong correlations"
+        ],
+        [
+          "target",
+          "variance of the updates"
+        ]
+      ],
+      "ev": "learning directly from consecutive samples is inefficient, owing to the strong correlations between the samples; randomizing the samples breaks these correlations and therefore reduces the variance of the updates",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "current parameters"
+        ],
+        [
+          "target",
+          "next data sample"
+        ]
+      ],
+      "ev": "when learning onpolicy the current parameters determine the next data sample that the parameters are trained on",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "unwanted feedback loops"
+        ],
+        [
+          "target",
+          "poor local minimum"
+        ],
+        [
+          "target",
+          "diverge catastrophically"
+        ]
+      ],
+      "ev": "It is easy to see how unwanted feedback loops may arise and the parameters could get stuck in a poor local minimum, or even diverge catastrophically",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "finite memory size N"
+        ],
+        [
+          "target",
+          "last N experience tuples"
+        ]
+      ],
+      "ev": "our algorithm only stores the last N experience tuples in the replay memory, and samples uniformly at random from D when performing updates. This approach is in some respects limited because the memory buffer does not differentiate important transitions and always overwrites with recent transitions owing to the finite memory size N",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiment",
+      "nodes": [
+        [
+          "from",
+          "uniform sampling"
+        ],
+        [
+          "to",
+          "prioritized sweeping"
+        ]
+      ],
+      "ev": "Similarly, the uniform sampling gives equal importance to all transitions in the replay memory. A more sophisticated sampling strategy might emphasize transitions from which we can learn the most, similar to prioritized sweeping30",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "target network"
+        ],
+        [
+          "definition",
+          "network Q"
+        ]
+      ],
+      "ev": "every C updates we clone the network Q to obtain a target network Q^",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "older set of parameters"
+        ],
+        [
+          "target",
+          "delay"
+        ]
+      ],
+      "ev": "Generating the targets using an older set of parameters adds a delay between the time an update to Q is made and the time the update affects the targets γj, making divergence or oscillations much more unlikely",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "extends",
+      "desc": "X generalizes/extends Y (X METHOD/PHENOMENON -> Y)",
+      "boundary": "X GENERALIZES Y (X extends Y's scope/regime/params; X is a direct technical extension of Y). NOT improves (X need not be more accurate, just broader), NOT background (X is a direct technical inheritance, not a motivation citation), NOT claim_relation (this is method-to-method).",
+      "nodes": [
+        [
+          "from",
+          "stability analysis of Barker et al. (2015)"
+        ],
+        [
+          "to",
+          "compressible flows"
+        ]
+      ],
+      "ev": "we extend the stability analysis of Barker et al. (2015) to compressible flows",
+      "ctx_before": " the mathematical sense for a large range of parameters, notably in the low and large inertial number limits (Barker et al. 2015). In this rapid communication, ",
+      "ctx_after": ". We show that compressibility regularizes mostly the equations, making the problem well-posed for all parameters, with the condition that sufficient dissipatio"
+    },
+    {
+      "pt": "improves",
+      "desc": "X improves Y's accuracy/applicability, resolving Y's limitation",
+      "boundary": "X RESOLVES a limitation of Y (X is more accurate/applicable BECAUSE it fixes something Y fails at; first-principles vs phenomenological = improves). NOT compares (X is NOT a parallel different-mechanism alternative; X builds on Y and is better), NOT extends (X is better not just broader).",
+      "nodes": [
+        [
+          "from",
+          "compressibility"
+        ],
+        [
+          "to",
+          "equations"
+        ]
+      ],
+      "ev": "compressibility regularizes mostly the equations",
+      "ctx_before": "l number limits (Barker et al. 2015). In this rapid communication, we extend the stability analysis of Barker et al. (2015) to compressible flows. We show that ",
+      "ctx_after": ", making the problem well-posed for all parameters, with the condition that sufficient dissipation be associated with volume changes. In addition to the usual C"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "bulk friction coefficient µb"
+        ],
+        [
+          "object",
+          "volume changes"
+        ]
+      ],
+      "ev": "we introduce a bulk friction coefficient µb, associated with volume changes",
+      "ctx_before": "ll parameters, with the condition that sufficient dissipation be associated with volume changes. In addition to the usual Coulomb shear friction coefficient µ, ",
+      "ctx_after": " and show that the problem is well-posed if $\\mu _ { b } > 1 - 7 \\mu / 6$ . Moreover, we show that the ill-posed domain defined by Barker et al. (2015) transfor"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "ill-posed domain defined by Barker et al. (2015)"
+        ],
+        [
+          "target",
+          "domain where the flow is unstable but remains well-posed"
+        ]
+      ],
+      "ev": "the ill-posed domain defined by Barker et al. (2015) transforms into a domain where the flow is unstable but remains well-posed",
+      "ctx_before": " bulk friction coefficient µb, associated with volume changes and show that the problem is well-posed if $\\mu _ { b } > 1 - 7 \\mu / 6$ . Moreover, we show that ",
+      "ctx_after": " when compressibility is taken into account. These results suggest the importance of taking into account dynamic compressibility for the modelling of dense gran"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "granular temperature"
+        ],
+        [
+          "target",
+          "volume occupied by granular flows"
+        ]
+      ],
+      "ev": "the volume occupied by granular flows depends directly on the granular temperature",
+      "ctx_before": "y effects would “greatly regularize the equations”. Granular flows are indeed prone to dilate or contract in response to deformation. In the collisional limit, ",
+      "ctx_after": ", which itself is a function of the imposed shear, thus allowing the propagation of acoustic waves. Forterre & Pouliquen (2002) showed that kinetic theory taken"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "imposed shear"
+        ],
+        [
+          "target",
+          "granular temperature"
+        ]
+      ],
+      "ev": "which itself is a function of the imposed shear",
+      "ctx_before": "to dilate or contract in response to deformation. In the collisional limit, the volume occupied by granular flows depends directly on the granular temperature, ",
+      "ctx_after": ", thus allowing the propagation of acoustic waves. Forterre & Pouliquen (2002) showed that kinetic theory taken in the compressible limit could reproduce the in"
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiment",
+      "nodes": [
+        [
+          "from",
+          "$\\mu ( I )$ rheology"
+        ],
+        [
+          "to",
+          "kinetic theory"
+        ]
+      ],
+      "ev": "at very high inertial numbers, granular flows enter the collisional regime and are best described by kinetic theory",
+      "ctx_before": "aling was shown to break at low inertial numbers close to the jamming limit, where non-local effects become important (Kamrin & Koval 2012). On the other hand, ",
+      "ctx_after": ". Regarding two-dimensional incompressible flows, the µ(I)-rheology was also recently shown to lead to ill-posed problems for a large range of parameters, notab"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "$\\mu _ { b }$"
+        ],
+        [
+          "target",
+          "amplitude of the pressure variations"
+        ]
+      ],
+      "ev": "$\\mu _ { b }$ directly controls the amplitude of the pressure variations in the compressible flow",
+      "ctx_before": "n in the case of isochoric deformations. When dilation or compression occurs, the normal stress in the medium departs from $p _ { \\mathrm { e q } }$ by so that ",
+      "ctx_after": ". In contrast to $\\mu ,$ little is known about its value and its variations with $\\phi ;$ as a first approximation, we take it as a constant. The compressible r"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "target",
+          "pressure at equilibrium $p _ { \\mathrm { e q } }$"
+        ],
+        [
+          "source",
+          "$\\phi$"
+        ]
+      ],
+      "ev": "$p _ { \\mathrm { e q } }$ is a one-to-one function of $\\phi$",
+      "ctx_before": "ds number $( \\varrho , \\Phi , U , P ,$ L are respectively the grain density, a unit volume fraction, a unit velocity, a unit pressure and a unit length). Since ",
+      "ctx_after": "\\ ( \\mathrm { E q . \\ ( 3 . 3 ) } )$ , so does I, and we can equivalently choose the latter as the independent variable in the mass conservation equation, which"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "target",
+          "I"
+        ],
+        [
+          "source",
+          "$\\phi$"
+        ]
+      ],
+      "ev": "Since $p _ { \\mathrm { e q } }$ is a one-to-one function of $\\phi \\ ( \\mathrm { E q . \\ ( 3 . 3 ) } )$ , so does I",
+      "ctx_before": "Reynolds number $( \\varrho , \\Phi , U , P ,$ L are respectively the grain density, a unit volume fraction, a unit velocity, a unit pressure and a unit length). ",
+      "ctx_after": ", and we can equivalently choose the latter as the independent variable in the mass conservation equation, which transforms into where the primes stand for a de"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "target",
+          "mass conservation equation"
+        ],
+        [
+          "source",
+          "I"
+        ]
+      ],
+      "ev": "we can equivalently choose the latter as the independent variable in the mass conservation equation",
+      "ctx_before": "ty, a unit pressure and a unit length). Since $p _ { \\mathrm { e q } }$ is a one-to-one function of $\\phi \\ ( \\mathrm { E q . \\ ( 3 . 3 ) } )$ , so does I, and ",
+      "ctx_after": ", which transforms into where the primes stand for a derivative with respect to I. φ and $\\phi ^ { \\prime }$ are then directly given by eq. (3.2). This form is "
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "well-posed"
+        ],
+        [
+          "object",
+          "ill-posed"
+        ]
+      ],
+      "ev": "Differential problems are termed “well-posed” if they yield unique solutions depending continuously on the boundary or initial conditions.",
+      "ctx_before": " and ill posed problems The distinction between well- and ill-posed (equivalently well- or ill-set) Cauchy problems is generally attributed to Hadamard (1922). ",
+      "ctx_after": " These mathematical properties are extremely important for numerical modelling, insuring that numerical schemes will converge to a unique solution, regardless o"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "target",
+          "numerical “viscosity”"
+        ],
+        [
+          "source",
+          "numerical method"
+        ]
+      ],
+      "ev": "However, numerical “viscosity” obviously depends on the chosen numerical method.",
+      "ctx_before": "t numerical schemes themselves introduce some “viscosity”, that may regularize by chance the system and give an apparent good behaviour to numerical solutions. ",
+      "ctx_after": " Regularization has thus to be provided at a lower level, by including the missing physics in the equations. Pitman & Schaeffer (1987) showed that including com"
+    },
+    {
+      "pt": "improves",
+      "desc": "X improves Y's accuracy/applicability, resolving Y's limitation",
+      "boundary": "X RESOLVES a limitation of Y (X is more accurate/applicable BECAUSE it fixes something Y fails at; first-principles vs phenomenological = improves). NOT compares (X is NOT a parallel different-mechanism alternative; X builds on Y and is better), NOT extends (X is better not just broader).",
+      "nodes": [
+        [
+          "from",
+          "compressible effects"
+        ],
+        [
+          "to",
+          "classical Coulomb friction rheology"
+        ]
+      ],
+      "ev": "Pitman & Schaeffer (1987) showed that including compressible effects may regularize the classical Coulomb friction rheology for shear flows.",
+      "ctx_before": "” obviously depends on the chosen numerical method. Regularization has thus to be provided at a lower level, by including the missing physics in the equations. ",
+      "ctx_after": " We show in the following that, under certain conditions, compressibility may also be a regularizing mechanism for the $\\mu ( I )$ rheology. As suggested by Bir"
+    },
+    {
+      "pt": "improves",
+      "desc": "X improves Y's accuracy/applicability, resolving Y's limitation",
+      "boundary": "X RESOLVES a limitation of Y (X is more accurate/applicable BECAUSE it fixes something Y fails at; first-principles vs phenomenological = improves). NOT compares (X is NOT a parallel different-mechanism alternative; X builds on Y and is better), NOT extends (X is better not just broader).",
+      "nodes": [
+        [
+          "from",
+          "compressibility"
+        ],
+        [
+          "to",
+          "$\\mu ( I )$ rheology"
+        ]
+      ],
+      "ev": "We show in the following that, under certain conditions, compressibility may also be a regularizing mechanism for the $\\mu ( I )$ rheology.",
+      "ctx_before": " in the equations. Pitman & Schaeffer (1987) showed that including compressible effects may regularize the classical Coulomb friction rheology for shear flows. ",
+      "ctx_after": " As suggested by Birkhoff (1954), we infer the well-posed behaviour of the problem by ensuring that the growth rates of perturbations are bounded in the short-w"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "target",
+          "average friction coefficient $\\mu = \\tau / p$"
+        ],
+        [
+          "source",
+          "inertial number"
+        ]
+      ],
+      "ev": "Some experiments have shown that simple unidirectional shear flows the dense inertial regime present an average friction coefficient $\\mu = \\tau / p$ and volume fraction $\\phi$ that scale with a so-called inertial number",
+      "ctx_before": "l-posed behaviour of the problem by ensuring that the growth rates of perturbations are bounded in the short-wave limit. 3. A compressible $\\mu ( I )$ rheology ",
+      "ctx_after": " defined as with d the grain size, $\\rho$ the material density, $\\dot { \\gamma }$ the shear rate, $\\tau$ the shear stress and $p$ the imposed pressure (GDR MiDi"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "target",
+          "volume fraction $\\phi$"
+        ],
+        [
+          "source",
+          "inertial number"
+        ]
+      ],
+      "ev": "Some experiments have shown that simple unidirectional shear flows the dense inertial regime present an average friction coefficient $\\mu = \\tau / p$ and volume fraction $\\phi$ that scale with a so-called inertial number",
+      "ctx_before": "l-posed behaviour of the problem by ensuring that the growth rates of perturbations are bounded in the short-wave limit. 3. A compressible $\\mu ( I )$ rheology ",
+      "ctx_after": " defined as with d the grain size, $\\rho$ the material density, $\\dot { \\gamma }$ the shear rate, $\\tau$ the shear stress and $p$ the imposed pressure (GDR MiDi"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "target",
+          "$\\varDelta \\mu \\approx 0 . 3$"
+        ],
+        [
+          "source",
+          "material properties"
+        ]
+      ],
+      "ev": "$\\varDelta \\mu \\approx 0 . 3$ , $I _ { 0 } \\approx 0 . 3$ and $\\varDelta _ { \\phi } \\approx 0 . 1$ are empirical parameters which depend on material properties",
+      "ctx_before": " $\\mathrm { { a } \\ ^ { 6 } \\tilde { \\ s t a t i c } ^ { 3 } }$ friction coefficient and $\\phi _ { \\mathrm { m a x } }$ is the maximal random packing fraction. ",
+      "ctx_after": " (GDR MiDi 2004; da Cruz et al. 2005; Jop et al. 2006). These scaling laws were established in the hypothesis of flow incompressibility, transferring them to co"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "target",
+          "$I _ { 0 } \\approx 0 . 3$"
+        ],
+        [
+          "source",
+          "material properties"
+        ]
+      ],
+      "ev": "$\\varDelta \\mu \\approx 0 . 3$ , $I _ { 0 } \\approx 0 . 3$ and $\\varDelta _ { \\phi } \\approx 0 . 1$ are empirical parameters which depend on material properties",
+      "ctx_before": " $\\mathrm { { a } \\ ^ { 6 } \\tilde { \\ s t a t i c } ^ { 3 } }$ friction coefficient and $\\phi _ { \\mathrm { m a x } }$ is the maximal random packing fraction. ",
+      "ctx_after": " (GDR MiDi 2004; da Cruz et al. 2005; Jop et al. 2006). These scaling laws were established in the hypothesis of flow incompressibility, transferring them to co"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "target",
+          "$\\varDelta _ { \\phi } \\approx 0 . 1$"
+        ],
+        [
+          "source",
+          "material properties"
+        ]
+      ],
+      "ev": "$\\varDelta \\mu \\approx 0 . 3$ , $I _ { 0 } \\approx 0 . 3$ and $\\varDelta _ { \\phi } \\approx 0 . 1$ are empirical parameters which depend on material properties",
+      "ctx_before": " $\\mathrm { { a } \\ ^ { 6 } \\tilde { \\ s t a t i c } ^ { 3 } }$ friction coefficient and $\\phi _ { \\mathrm { m a x } }$ is the maximal random packing fraction. ",
+      "ctx_after": " (GDR MiDi 2004; da Cruz et al. 2005; Jop et al. 2006). These scaling laws were established in the hypothesis of flow incompressibility, transferring them to co"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "target",
+          "material density $\\rho$"
+        ],
+        [
+          "source",
+          "grain density $\\varrho$"
+        ],
+        [
+          "cause",
+          "volume fraction $\\phi$"
+        ]
+      ],
+      "ev": "Indeed, the material density $\\rho$ appears in the definition of $I ,$ so that the inertial number is expected to show a direct dependence upon $\\phi$ through $\\rho = \\varrho \\phi$ , with $\\varrho$ the grain density.",
+      "ctx_before": " 2006). These scaling laws were established in the hypothesis of flow incompressibility, transferring them to compressible flow requires thus some precautions. ",
+      "ctx_after": " This dependence may be justified physically by considering that, for equal confinement pressure, the more dilute the flow, the higher the forces transmitted th"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "target",
+          "forces transmitted through the granular skeleton"
+        ],
+        [
+          "cause",
+          "confinement pressure"
+        ],
+        [
+          "source",
+          "volume fraction $\\phi$"
+        ]
+      ],
+      "ev": "This dependence may be justified physically by considering that, for equal confinement pressure, the more dilute the flow, the higher the forces transmitted through the granular skeleton.",
+      "ctx_before": "tion of $I ,$ so that the inertial number is expected to show a direct dependence upon $\\phi$ through $\\rho = \\varrho \\phi$ , with $\\varrho$ the grain density. ",
+      "ctx_after": " These forces scale as $d ^ { 2 } p / \\phi$ , implying a dependence of the microscopic rearrangement time scale on volume fraction. However, as the flow dilutes"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "target",
+          "microscopic rearrangement time scale"
+        ],
+        [
+          "source",
+          "volume fraction $\\phi$"
+        ]
+      ],
+      "ev": "These forces scale as $d ^ { 2 } p / \\phi$ , implying a dependence of the microscopic rearrangement time scale on volume fraction.",
+      "ctx_before": "fied physically by considering that, for equal confinement pressure, the more dilute the flow, the higher the forces transmitted through the granular skeleton. ",
+      "ctx_after": " However, as the flow dilutes, rearrangement between grains are likely to take place over lengths of the order of $d / \\phi$ so that both effects may eventually"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "target",
+          "dynamical pressure"
+        ],
+        [
+          "source",
+          "main flow"
+        ]
+      ],
+      "ev": "At this point, it is interesting to estimate the importance of the dynamical pressure developing while shearing a granular media and its possible coupling with the main flow",
+      "ctx_before": "e thus chose to retain the usual incompressible definition of the inertial number taking the grain density $\\varrho$ instead of the material density $\\rho .$ . ",
+      "ctx_after": " (Trulsson et al. 2013). Based on the experimental scaling (3.2) and the definition of the inertial number (3.1), we may express the friction coefficient $\\mu$ "
+    },
+    {
+      "pt": "constitutive_law",
+      "desc": "a constitutive law relating output quantity/quantities to >=1 input quantity (n-ary)",
+      "boundary": "a FORMAL/QUANTITATIVE law output=f(inputs+params), stated as a formula or explicit functional relation. NOT a prose 'X depends on Y' (that is influences), NOT a definition (defines), NOT a measurement setup (measures).",
+      "nodes": [
+        [
+          "output",
+          "pressure at equilibrium $p _ { \\mathrm { e q } }$"
+        ],
+        [
+          "input",
+          "volume fraction $\\phi$"
+        ],
+        [
+          "parameter",
+          "average friction coefficient $\\mu = \\tau / p$"
+        ]
+      ],
+      "ev": "Based on the experimental scaling (3.2) and the definition of the inertial number (3.1), we may express the friction coefficient $\\mu$ and the pressure at equilibrium $p _ { \\mathrm { e q } }$ as a function of the volume fraction $\\phi \\colon$",
+      "ctx_before": "timate the importance of the dynamical pressure developing while shearing a granular media and its possible coupling with the main flow (Trulsson et al. 2013). ",
+      "ctx_after": " The latter expression plays the role of an equation of state for the granular flow, linking pressure and volume fraction to the kinetic properties of the mediu"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "equation of state for the granular flow"
+        ],
+        [
+          "object",
+          "pressure at equilibrium $p _ { \\mathrm { e q } }$"
+        ],
+        [
+          "object",
+          "volume fraction $\\phi$"
+        ],
+        [
+          "object",
+          "kinetic properties of the medium"
+        ]
+      ],
+      "ev": "The latter expression plays the role of an equation of state for the granular flow, linking pressure and volume fraction to the kinetic properties of the medium and was assessed numerically for unidirectional shear flows",
+      "ctx_before": ".1), we may express the friction coefficient $\\mu$ and the pressure at equilibrium $p _ { \\mathrm { e q } }$ as a function of the volume fraction $\\phi \\colon$ ",
+      "ctx_after": " (Trulsson et al. 2013). From this equation, the typical propagation speed of a pressure wave is This “dynamic” compressibility mechanism differs significantly "
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiment",
+      "nodes": [
+        [
+          "from",
+          "acoustical wave propagation in static media"
+        ],
+        [
+          "to",
+          "typical propagation speed of a pressure wave"
+        ]
+      ],
+      "ev": "This “dynamic” compressibility mechanism differs significantly from acoustical wave propagation in static media in that, in the absence of shear rate, no propagation is possible $( c = 0 )$ .",
+      "ctx_before": "ium and was assessed numerically for unidirectional shear flows (Trulsson et al. 2013). From this equation, the typical propagation speed of a pressure wave is ",
+      "ctx_after": " Taking $U = L \\dot { \\gamma }$ as a characteristic flow velocity (L being a characteristic length scale), the Mach number of a granular flow reads due to volum"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "random close packing fraction $\\phi _ { \\mathrm { m a x } }$"
+        ],
+        [
+          "target",
+          "Mach number of a granular flow"
+        ]
+      ],
+      "ev": "When approaching the random close packing fraction $\\phi _ { \\mathrm { m a x } }$ , the wave speed diverges leading to a flow with infinitely small Mach numbers.",
+      "ctx_before": "U = L \\dot { \\gamma }$ as a characteristic flow velocity (L being a characteristic length scale), the Mach number of a granular flow reads due to volume change ",
+      "ctx_after": " Close to the jamming point, decoupling between flow and compressibility waves is thus likely to occur. At smaller volume fractions, Mach numbers much larger th"
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiment",
+      "nodes": [
+        [
+          "from",
+          "classical plasticity models"
+        ],
+        [
+          "to",
+          "associated flow rule"
+        ],
+        [
+          "to",
+          "von Mises yield criterion"
+        ]
+      ],
+      "ev": "This expression is similar to classical plasticity models with associated flow rule and von Mises yield criterion, but with a rate dependence of the friction coefficient",
+      "ctx_before": " $\\| \\pmb { D } \\| = \\sqrt { \\mathrm { t r } ( \\pmb { D } ^ { 2 } ) / 2 }$ , they proposed with $I = 2 d \\| \\pmb { { \\cal D } } \\| / \\sqrt { p / \\varrho } .$ . ",
+      "ctx_after": " (Goddard 2014). Barker et al. (2015) showed that the rheology (3.6) together with the incompressible equations of motion led to ill-posed problems for a large "
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "rheology (3.6)"
+        ],
+        [
+          "target",
+          "ill-posed"
+        ]
+      ],
+      "ev": "Barker et al. (2015) showed that the rheology (3.6) together with the incompressible equations of motion led to ill-posed problems for a large range of parameters, motivating an extension of the theory to compressible flows.",
+      "ctx_before": " to classical plasticity models with associated flow rule and von Mises yield criterion, but with a rate dependence of the friction coefficient (Goddard 2014). ",
+      "ctx_after": " In the compressible case, isochoric deformations (pure shear) need to be distinguished from the deformations associated with a net change in volume by splittin"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "incompressible equations of motion"
+        ],
+        [
+          "target",
+          "ill-posed"
+        ]
+      ],
+      "ev": "Barker et al. (2015) showed that the rheology (3.6) together with the incompressible equations of motion led to ill-posed problems for a large range of parameters, motivating an extension of the theory to compressible flows.",
+      "ctx_before": " to classical plasticity models with associated flow rule and von Mises yield criterion, but with a rate dependence of the friction coefficient (Goddard 2014). ",
+      "ctx_after": " In the compressible case, isochoric deformations (pure shear) need to be distinguished from the deformations associated with a net change in volume by splittin"
+    },
+    {
+      "pt": "extends",
+      "desc": "X generalizes/extends Y (X METHOD/PHENOMENON -> Y)",
+      "boundary": "X GENERALIZES Y (X extends Y's scope/regime/params; X is a direct technical extension of Y). NOT improves (X need not be more accurate, just broader), NOT background (X is a direct technical inheritance, not a motivation citation), NOT claim_relation (this is method-to-method).",
+      "nodes": [
+        [
+          "from",
+          "compressible flows"
+        ],
+        [
+          "to",
+          "rheology (3.6)"
+        ]
+      ],
+      "ev": "Barker et al. (2015) showed that the rheology (3.6) together with the incompressible equations of motion led to ill-posed problems for a large range of parameters, motivating an extension of the theory to compressible flows.",
+      "ctx_before": " to classical plasticity models with associated flow rule and von Mises yield criterion, but with a rate dependence of the friction coefficient (Goddard 2014). ",
+      "ctx_after": " In the compressible case, isochoric deformations (pure shear) need to be distinguished from the deformations associated with a net change in volume by splittin"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "isochoric deformations"
+        ],
+        [
+          "object",
+          "deviatoric and isotropic parts"
+        ]
+      ],
+      "ev": "In the compressible case, isochoric deformations (pure shear) need to be distinguished from the deformations associated with a net change in volume by splitting the strain rate tensor into deviatoric and isotropic parts",
+      "ctx_before": " the incompressible equations of motion led to ill-posed problems for a large range of parameters, motivating an extension of the theory to compressible flows. ",
+      "ctx_after": ", yielding where $\\delta _ { i j }$ is the Kronecker symbol and $\\operatorname { t r } ( \\pmb { \\mathsf { S } } ) = 0$ . In addition, the instantaneous pressure"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "Kronecker symbol $\\delta _ { i j }$"
+        ],
+        [
+          "object",
+          "deviatoric and isotropic parts"
+        ]
+      ],
+      "ev": "where $\\delta _ { i j }$ is the Kronecker symbol and $\\operatorname { t r } ( \\pmb { \\mathsf { S } } ) = 0$ .",
+      "ctx_before": "be distinguished from the deformations associated with a net change in volume by splitting the strain rate tensor into deviatoric and isotropic parts, yielding ",
+      "ctx_after": " In addition, the instantaneous pressure p may now differ from the equilibrium pressure $p _ { \\mathrm { e q } }$ so that we take the inertial number to be $I ="
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "target",
+          "instantaneous pressure p"
+        ],
+        [
+          "source",
+          "pressure at equilibrium $p _ { \\mathrm { e q } }$"
+        ]
+      ],
+      "ev": "In addition, the instantaneous pressure p may now differ from the equilibrium pressure $p _ { \\mathrm { e q } }$ so that we take the inertial number to be $I = 2 d \\| \\pmb { S } \\| / \\sqrt { p _ { \\mathrm { e q } } / \\varrho } .$ .",
+      "ctx_before": "sor into deviatoric and isotropic parts, yielding where $\\delta _ { i j }$ is the Kronecker symbol and $\\operatorname { t r } ( \\pmb { \\mathsf { S } } ) = 0$ . ",
+      "ctx_after": " Dimensional analysis then constrains the admissible stress-strain relationship, where $\\mu ( \\phi )$ is the classical friction coefficient associated with shea"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "bulk friction coefficient µb"
+        ],
+        [
+          "object",
+          "non-isochoric deformations"
+        ]
+      ],
+      "ev": "$\\mu _ { b } ( \\phi )$ is a bulk friction coefficient associated with non-isochoric deformations",
+      "ctx_before": " constrains the admissible stress-strain relationship, where $\\mu ( \\phi )$ is the classical friction coefficient associated with shear and given by eq. (3.2), ",
+      "ctx_after": " (Alam & Nott 1997; Nott 2009; Trulsson et al. 2013) and $p _ { \\mathrm { e q } }$ is given by the equation of state (3.3). Note that Eq. (3.9) simplifies to Jo"
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiment",
+      "nodes": [
+        [
+          "from",
+          "Jop et al. (2006) incompressible formulation"
+        ],
+        [
+          "to",
+          "$\\mu ( I )$ rheology"
+        ]
+      ],
+      "ev": "Note that Eq. (3.9) simplifies to Jop et al. (2006) incompressible formulation in the case of isochoric deformations.",
+      "ctx_before": "ated with non-isochoric deformations (Alam & Nott 1997; Nott 2009; Trulsson et al. 2013) and $p _ { \\mathrm { e q } }$ is given by the equation of state (3.3). ",
+      "ctx_after": " When dilation or compression occurs, the normal stress in the medium departs from $p _ { \\mathrm { e q } }$ by so that $\\mu _ { b }$ directly controls the ampl"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "plane shear"
+        ],
+        [
+          "object",
+          "isochoric deformations"
+        ]
+      ],
+      "ev": "Plane shear is an isochoric deformation",
+      "ctx_before": "-zero component $\\pmb { u } = ( u _ { 1 } , 0 )$ . The strain rate matrix has thus a unique non-zero component $D _ { 1 2 } = \\partial _ { 2 } u _ { 1 } / 2$ . ",
+      "ctx_after": " $( \\mathrm { t r } \\pmb { D } = 0 )$ so that $\\pmb { D } = \\pmb { S } .$ . Conservation of momentum implies that the pressure and the shear stress are uniform "
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "D"
+        ],
+        [
+          "object",
+          "S"
+        ]
+      ],
+      "ev": "\\pmb { D } = \\pmb { S }",
+      "ctx_before": "nique non-zero component $D _ { 1 2 } = \\partial _ { 2 } u _ { 1 } / 2$ . Plane shear is an isochoric deformation $( \\mathrm { t r } \\pmb { D } = 0 )$ so that $",
+      "ctx_after": " .$ . Conservation of momentum implies that the pressure and the shear stress are uniform through the flow, yielding a uniform friction coefficient $\\mu _ { : }"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "target",
+          "u_1"
+        ],
+        [
+          "source",
+          "x_2"
+        ]
+      ],
+      "ev": "u _ { 1 } is a linear function of x _ { 2 }",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "target",
+          "coupling terms"
+        ],
+        [
+          "source",
+          "leading-order terms"
+        ]
+      ],
+      "ev": "coupling terms scale as ξ while leading-order terms as | \\xi | ^ { 2 }",
+      "ctx_before": "rmal modes in both the $x _ { 1 }$ and $x _ { 2 }$ direction is valid in the high-wavenumber limit because the perturbation and the base flow appear decoupled (",
+      "ctx_after": "} )$ . For arbitrary wavenumbers, the coupling precludes from any analytical treatment and numerical resolution is required. Note also that we are only interest"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "target",
+          "linear analysis"
+        ],
+        [
+          "source",
+          "short time"
+        ]
+      ],
+      "ev": "limit at which linear analysis remains valid",
+      "ctx_before": " analytical treatment and numerical resolution is required. Note also that we are only interested here in the early growth rate of perturbations at short time, ",
+      "ctx_after": ". Other methods are necessary to probe the asymptotic stability behaviour of the flow (Alam & Nott 1997). Inserting the perturbed variables in equations (3.12)-"
+    },
+    {
+      "pt": "background",
+      "desc": "X uses Y as background/motivation",
+      "boundary": "X cites Y as MOTIVATION/prior context only (Y inspired X but X is NOT a direct technical extension/inheritance of Y). NOT extends (no direct technical lineage), NOT improves (no limitation fix).",
+      "nodes": [
+        [
+          "from",
+          "Other methods"
+        ],
+        [
+          "to",
+          "Alam & Nott 1997"
+        ]
+      ],
+      "ev": "Other methods are necessary to probe the asymptotic stability behaviour of the flow (Alam & Nott 1997)",
+      "ctx_before": " is required. Note also that we are only interested here in the early growth rate of perturbations at short time, limit at which linear analysis remains valid. ",
+      "ctx_after": ". Inserting the perturbed variables in equations (3.12)-(3.13)-(3.3), and keeping only linear contributions and leading-order terms in the high-wavenumber limit"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "eigenvalue problem"
+        ],
+        [
+          "definition",
+          "A"
+        ],
+        [
+          "object",
+          "B"
+        ]
+      ],
+      "ev": "leads to an eigenvalue problem of the form ( { \\pmb A } - \\lambda { \\pmb B } ) \\tilde { \\pmb y } = 0 with \\tilde { \\pmb { y } } = ( \\tilde { \\pmb { u } } , \\tilde { I } ) ^ { T } and A and \\pmb { B } are 3 \\times 3 constant coefficients matrices",
+      "ctx_before": "iables in equations (3.12)-(3.13)-(3.3), and keeping only linear contributions and leading-order terms in the high-wavenumber limit (see details in Appendix B) ",
+      "ctx_after": "matrices defined by where $\\mu , \\phi$ and I are taken at the base dimensionless state. The prime symbols stand for derivatives with respect to I $( \\phi ^ { \\p"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "target",
+          "growth rate of the unique eigenvalue λ = -a₀/a₁"
+        ],
+        [
+          "source",
+          "B"
+        ]
+      ],
+      "ev": "When b > 0 , \\varDelta < 1 so that \\mathrm { R e } ( \\lambda _ { 1 , 2 } ) < 0 and thus the growth rate is always negative",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "target",
+          "ill-posed behaviour"
+        ],
+        [
+          "source",
+          "B"
+        ]
+      ],
+      "ev": "When b < 0 , then \\varDelta > 1 and one of the roots become positive with a growth rate scaling as | \\pmb { \\xi } | ^ { 2 } , indicating ill-posed behaviour of the equations",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "target",
+          "lower bound"
+        ],
+        [
+          "source",
+          "mu_b"
+        ]
+      ],
+      "ev": "This gives a lower bound \\mu _ { b } > 1 - 7 \\mu / 6 under which b becomes negative and the rheology becomes illposed",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "target",
+          "lambda_3"
+        ],
+        [
+          "source",
+          "flow"
+        ]
+      ],
+      "ev": "if \\lambda _ { 3 } becomes positive, the flow becomes unstable in the high-wavenumber limit",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "target",
+          "sign of lambda_3"
+        ],
+        [
+          "source",
+          "sign of the nominator"
+        ]
+      ],
+      "ev": "the sign of \\lambda _ { 3 } is determined by the sign of the nominator",
+      "ctx_before": "",
+      "ctx_after": ""
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "compressible μ(I)-rheology"
+        ],
+        [
+          "target",
+          "plane shear"
+        ],
+        [
+          "effect",
+          "domain defined by Eq. (4.12)"
+        ]
+      ],
+      "ev": "the compressible $\\mu ( I )$ )-rheology leads to plane shear flows that are unstable outside of the domain defined by Eq. (4.12)",
+      "ctx_before": "condition simplifies to The stability domain is shown in Fig. 2(b) in the plane $( I / I _ { 0 } , \\varDelta \\mu )$ . 4.3. Summary and discussion To summarize, ",
+      "ctx_after": " (Fig. 2). However, if compressibility is associated with sufficient dissipation (i.e., $\\mu _ { b } > 1 \\mathrm { - } 7 \\mu / 6 \\AA$ the growth rate of the uns"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "bulk viscosity μ_b"
+        ],
+        [
+          "target",
+          "growth rate of the unique eigenvalue λ = -a₀/a₁"
+        ],
+        [
+          "effect",
+          "high wavenumber limit"
+        ]
+      ],
+      "ev": "if compressibility is associated with sufficient dissipation (i.e., $\\mu _ { b } > 1 \\mathrm { - } 7 \\mu / 6 \\AA$ the growth rate of the unstable modes remains bounded in the high wavenumber limit",
+      "ctx_before": " summarize, the compressible $\\mu ( I )$ )-rheology leads to plane shear flows that are unstable outside of the domain defined by Eq. (4.12) (Fig. 2). However, ",
+      "ctx_after": ", and the rheology remains wellposed at any inertial number. It is instructive to note that the stability domain in the high wavenumber limits of compressible f"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "bulk viscosity μ_b"
+        ],
+        [
+          "target",
+          "rheology"
+        ]
+      ],
+      "ev": "the rheology remains wellposed at any inertial number",
+      "ctx_before": "icient dissipation (i.e., $\\mu _ { b } > 1 \\mathrm { - } 7 \\mu / 6 \\AA$ the growth rate of the unstable modes remains bounded in the high wavenumber limit, and ",
+      "ctx_after": ". It is instructive to note that the stability domain in the high wavenumber limits of compressible flows defined by (4.12) is independent of flow compressibili"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "growth rate of the unique eigenvalue λ = -a₀/a₁"
+        ],
+        [
+          "target",
+          "|ξ|²"
+        ]
+      ],
+      "ev": "The growth rate of the unique eigenvalue $\\lambda = - a _ { 0 } / a _ { 1 }$ is now scaling as $| \\pmb { \\xi } | ^ { 2 }$",
+      "ctx_before": " to the well-posed domain defined by Barker et al. (2015) in the incompressible limit. Another way to see this is by letting $\\phi ^ { \\prime } 0$ in Eq.(4.5). ",
+      "ctx_after": " so that, when λ becomes positive outside of the domain defined by (4.12), the incompressible rheology becomes ill-posed. In the compressible case however, the "
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "growth rate of the unique eigenvalue λ = -a₀/a₁"
+        ],
+        [
+          "target",
+          "incompressible rheology"
+        ]
+      ],
+      "ev": "when λ becomes positive outside of the domain defined by (4.12), the incompressible rheology becomes ill-posed",
+      "ctx_before": "^ { \\prime } 0$ in Eq.(4.5). The growth rate of the unique eigenvalue $\\lambda = - a _ { 0 } / a _ { 1 }$ is now scaling as $| \\pmb { \\xi } | ^ { 2 }$ so that, ",
+      "ctx_after": ". In the compressible case however, the growth rate of the positive eigenvalue is bounded since $\\lambda _ { 3 } \\propto O ( 1 )$ . Another interesting limit is"
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiment",
+      "nodes": [
+        [
+          "from",
+          "growth rate of the unique eigenvalue λ = -a₀/a₁"
+        ],
+        [
+          "to",
+          "λ₃"
+        ]
+      ],
+      "ev": "In the compressible case however, the growth rate of the positive eigenvalue is bounded since $\\lambda _ { 3 } \\propto O ( 1 )$",
+      "ctx_before": " scaling as $| \\pmb { \\xi } | ^ { 2 }$ so that, when λ becomes positive outside of the domain defined by (4.12), the incompressible rheology becomes ill-posed. ",
+      "ctx_after": " . Another interesting limit is obtained putting $\\mu ^ { \\prime } = 0$ , which yields the classical Coulomb constant friction model. In this case, it is immedi"
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiment",
+      "nodes": [
+        [
+          "from",
+          "compressible μ(I)-rheology"
+        ],
+        [
+          "to",
+          "classical Coulomb friction rheology"
+        ]
+      ],
+      "ev": "Another interesting limit is obtained putting $\\mu ^ { \\prime } = 0$ , which yields the classical Coulomb constant friction model",
+      "ctx_before": "e rheology becomes ill-posed. In the compressible case however, the growth rate of the positive eigenvalue is bounded since $\\lambda _ { 3 } \\propto O ( 1 )$ . ",
+      "ctx_after": ". In this case, it is immediate to see that (4.12) is never verified for $\\mu > 0$ so that compressible shear flows described by a simple Coulomb friction are a"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "volume fraction variations"
+        ],
+        [
+          "target",
+          "material density"
+        ],
+        [
+          "effect",
+          "I = 2d||S||/√(p_eq/(ϱφ))"
+        ]
+      ],
+      "ev": "embracing the volume fraction variations in the definition of the inertial number through the material density",
+      "ctx_before": " remain well-posed since the condition $\\mu _ { b } > 1 - 7 \\mu / 6$ is not affected by the value of $\\mu ^ { \\prime }$ . Let us infer afterwards the impact of ",
+      "ctx_after": ". Taking $I = 2 d \\| \\pmb { \\mathsf { S } } \\| / \\sqrt { p _ { \\mathrm { e q } } / ( \\varrho \\phi ) }$ has the sole effect of changing the coefficient $\\beta$ t"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "I = 2d||S||/√(p_eq/(ϱφ))"
+        ],
+        [
+          "target",
+          "coefficient β"
+        ],
+        [
+          "effect",
+          "2/I - φ'"
+        ]
+      ],
+      "ev": "Taking $I = 2 d \\| \\pmb { \\mathsf { S } } \\| / \\sqrt { p _ { \\mathrm { e q } } / ( \\varrho \\phi ) }$ has the sole effect of changing the coefficient $\\beta$ to $2 / I - \\phi ^ { \\prime }$",
+      "ctx_before": "rime }$ . Let us infer afterwards the impact of embracing the volume fraction variations in the definition of the inertial number through the material density. ",
+      "ctx_after": " , making thus the stability domain (4.12) dependent of the particular value chosen for compressibility. In contrast, the well-posedness criteria is not affecte"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "I = 2d||S||/√(p_eq/(ϱφ))"
+        ],
+        [
+          "target",
+          "domain defined by Eq. (4.12)"
+        ]
+      ],
+      "ev": "making thus the stability domain (4.12) dependent of the particular value chosen for compressibility",
+      "ctx_before": "hsf { S } } \\| / \\sqrt { p _ { \\mathrm { e q } } / ( \\varrho \\phi ) }$ has the sole effect of changing the coefficient $\\beta$ to $2 / I - \\phi ^ { \\prime }$ , ",
+      "ctx_after": ". In contrast, the well-posedness criteria is not affected by this other possible definition of the inertial number so that it can be considered as general. A l"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "I = 2d||S||/√(p_eq/(ϱφ))"
+        ],
+        [
+          "target",
+          "well-posed"
+        ]
+      ],
+      "ev": "the well-posedness criteria is not affected by this other possible definition of the inertial number",
+      "ctx_before": "ent $\\beta$ to $2 / I - \\phi ^ { \\prime }$ , making thus the stability domain (4.12) dependent of the particular value chosen for compressibility. In contrast, ",
+      "ctx_after": " so that it can be considered as general. A last remark can also to be made on the choice, in the expression of the inertial number, of the equilibrium pressure"
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiment",
+      "nodes": [
+        [
+          "from",
+          "equilibrium pressure"
+        ],
+        [
+          "to",
+          "instantaneous pressure"
+        ]
+      ],
+      "ev": "the choice, in the expression of the inertial number, of the equilibrium pressure rather than the instantaneous pressure",
+      "ctx_before": "criteria is not affected by this other possible definition of the inertial number so that it can be considered as general. A last remark can also to be made on ",
+      "ctx_after": " (A 4). As long as a linear analysis is concerned, choosing the latter has no impact on the stability and well-posed criteria derived above, since the terms int"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "instantaneous pressure"
+        ],
+        [
+          "target",
+          "well-posed"
+        ]
+      ],
+      "ev": "choosing the latter has no impact on the stability and well-posed criteria derived above",
+      "ctx_before": " in the expression of the inertial number, of the equilibrium pressure rather than the instantaneous pressure (A 4). As long as a linear analysis is concerned, ",
+      "ctx_after": ", since the terms introduced in the expansion are all of higher order. 5. Numerical solution at arbitrary wavenumbers To test the validity of the normal mode de"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "bulk viscosity μ_b"
+        ],
+        [
+          "target",
+          "short waves"
+        ]
+      ],
+      "ev": "Increasing the bulk viscosity has the effect of regularizing the system against short waves",
+      "ctx_before": "he ill-posedness of the system clearly appears for $\\xi _ { 1 } > 1 0$ , where the growth rate of perturbation dramatically increase as $\\xi _ { 1 } ^ { 2 }$ . ",
+      "ctx_after": ". It is interesting to note that in this case, while remaining bounded, growth rates may not cancel at infinitely large wavenumbers (Fig 5b). In contrast to the"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "wavenumber"
+        ],
+        [
+          "target",
+          "growth rate of the unique eigenvalue λ = -a₀/a₁"
+        ]
+      ],
+      "ev": "the maximum growth rate is now located at a finite wavenumber",
+      "ctx_before": "n this case, while remaining bounded, growth rates may not cancel at infinitely large wavenumbers (Fig 5b). In contrast to the low bulk viscosity case however, ",
+      "ctx_after": ", giving an upper bound for the necessary grid size in order to capture the evolution of the most unstable mode in numerical simulations. To check the validity "
+    },
+    {
+      "pt": "compares",
+      "desc": "X is compared with Y",
+      "boundary": "A and B are put side by side: either (i) PARALLEL different-mechanism alternatives with overlapping scope (both model the same phenomenon, different assumptions), or (ii) THEORY-vs-EXPERIMENT / prediction-vs-observation validation ('data compared with predictions', 'simulations agree with experiment",
+      "nodes": [
+        [
+          "from",
+          "asymptotic analysis at large wavenumbers"
+        ],
+        [
+          "to",
+          "full dispersion relation"
+        ]
+      ],
+      "ev": "Although the asymptotic analysis at large wavenumbers provides precious information on the good behaviour of the problem, it is not sufficient to probe the general linear stability picture of the flow, neither its asymptotic stability at long times. To go further, the full dispersion relation needs to be solved numerically",
+      "ctx_before": "dense inertial granular flows may originate from such instabilities (B¨orzs¨onyi et al. 2009; Trulsson et al. 2013; Brodu et al. 2015; Krishnaraj & Nott 2016). ",
+      "ctx_after": " to find the most unstable wavelength which will predominate in the system. Finally, it is legitimate to wonder if any hypothetical variations of $\\mu _ { b }$ "
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "variations of μ_b"
+        ],
+        [
+          "target",
+          "pure shear base flow"
+        ],
+        [
+          "cause",
+          "linearized equations"
+        ]
+      ],
+      "ev": "In the case of a pure shear base flow, the contributions arising from the variations of $\\mu _ { b }$ would not appear in the linearized equations",
+      "ctx_before": "ly, it is legitimate to wonder if any hypothetical variations of $\\mu _ { b }$ with I or other flow variables would modify significantly the preceding results. ",
+      "ctx_after": " so that our conclusions are still valid. In any case, additional experimental and numerical work is needed to quantify the bulk friction associated with volume"
+    },
+    {
+      "pt": "improves",
+      "desc": "X improves Y's accuracy/applicability, resolving Y's limitation",
+      "boundary": "X RESOLVES a limitation of Y (X is more accurate/applicable BECAUSE it fixes something Y fails at; first-principles vs phenomenological = improves). NOT compares (X is NOT a parallel different-mechanism alternative; X builds on Y and is better), NOT extends (X is better not just broader).",
+      "nodes": [
+        [
+          "from",
+          "compressible μ(I)-rheology"
+        ],
+        [
+          "to",
+          "incompressible rheology"
+        ]
+      ],
+      "ev": "In addition to provide a possible way to regularize the short-wave instabilities appearing in numerical simulations of the incompressible $\\mu ( I )$ rheology",
+      "ctx_before": " valid. In any case, additional experimental and numerical work is needed to quantify the bulk friction associated with volume changes in dense granular flows. ",
+      "ctx_after": ", this study more generally shows that the generation and propagation of acoustic waves inside granular flows are likely to play a crucial role in their rheolog"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "boundaries"
+        ],
+        [
+          "target",
+          "acoustic energy"
+        ]
+      ],
+      "ev": "boundaries may also absorb or restitute part of the acoustic energy to the flow and produce apparent non-local effects",
+      "ctx_before": "pagation of acoustic waves inside granular flows are likely to play a crucial role in their rheology. Depending on their geometry and their elastic properties, ",
+      "ctx_after": ". In this aspect, the acoustic probing and characterization of flowing granular media form a rather new and promising perspective to improve our knowledge of de"
+    },
+    {
+      "pt": "improves",
+      "desc": "X improves Y's accuracy/applicability, resolving Y's limitation",
+      "boundary": "X RESOLVES a limitation of Y (X is more accurate/applicable BECAUSE it fixes something Y fails at; first-principles vs phenomenological = improves). NOT compares (X is NOT a parallel different-mechanism alternative; X builds on Y and is better), NOT extends (X is better not just broader).",
+      "nodes": [
+        [
+          "from",
+          "acoustic probing"
+        ],
+        [
+          "to",
+          "knowledge of dense granular flows"
+        ]
+      ],
+      "ev": "the acoustic probing and characterization of flowing granular media form a rather new and promising perspective to improve our knowledge of dense granular flows",
+      "ctx_before": "eir elastic properties, boundaries may also absorb or restitute part of the acoustic energy to the flow and produce apparent non-local effects. In this aspect, ",
+      "ctx_after": ". 7. Acknowledgement We acknowledge the fact that, by the time our paper was considered for publication in Journal of Fluid Mechanics, a similar study had been "
+    },
+    {
+      "pt": "constitutive_law",
+      "desc": "a constitutive law relating output quantity/quantities to >=1 input quantity (n-ary)",
+      "boundary": "a FORMAL/QUANTITATIVE law output=f(inputs+params), stated as a formula or explicit functional relation. NOT a prose 'X depends on Y' (that is influences), NOT a definition (defines), NOT a measurement setup (measures).",
+      "nodes": [
+        [
+          "output",
+          "p_eq(φ)"
+        ],
+        [
+          "input",
+          "φ"
+        ]
+      ],
+      "ev": "$p _ { \\mathrm { e q } } ( \\phi )$ 号 the pressure at the critical state (when the material deforms without volume change) at the volume fraction $\\phi$ (given by an empirical equation of state)",
+      "ctx_before": "surface taking the general form where $p$ is the total normal stress, $\\lVert \\boldsymbol { \\tau } \\rVert$ is the shear stress, $\\phi$ is the volumic fraction, ",
+      "ctx_after": ", $\\mu$ is the friction coefficient and a function controlling the curvature of the yield surface close to the critical state. Prakash & Rao (1988) proposed whe"
+    },
+    {
+      "pt": "constitutive_law",
+      "desc": "a constitutive law relating output quantity/quantities to >=1 input quantity (n-ary)",
+      "boundary": "a FORMAL/QUANTITATIVE law output=f(inputs+params), stated as a formula or explicit functional relation. NOT a prose 'X depends on Y' (that is influences), NOT a definition (defines), NOT a measurement setup (measures).",
+      "nodes": [
+        [
+          "output",
+          "rate of volume change"
+        ],
+        [
+          "input",
+          "gradient of the yield surface"
+        ]
+      ],
+      "ev": "the rate of volume change is linked to the gradient of the yield surface",
+      "ctx_before": "88) proposed where $1 < m < \\mu$ is an empirical constant. Postulating the existence of an associated flow rule (co-axiality of stain rate and stress tensors), ",
+      "ctx_after": " by In addition, it is required that the derivative of $\\mathcal { F }$ is a monotonic function so that $p$ can be uniquely determined from Eqs. (A 3),(A 2) and"
+    },
+    {
+      "pt": "equivalent_to",
+      "desc": "X is equivalent to Y in a specific regime or limit (formal equivalence of domains, formulations, or conditions)",
+      "boundary": "Use for formal equivalence under stated conditions; not for mere similarity, definitional identity, or co-occurrence without a specified regime.",
+      "nodes": [
+        [
+          "from",
+          "Eq. (A 6)"
+        ],
+        [
+          "to",
+          "Eq. (3.9)"
+        ]
+      ],
+      "ev": "Eq. (A 6) is equivalent to Eq. (3.9)",
+      "ctx_before": "ity tensor (Krishnaraj & Nott 2016). Linearizing for small volume changes gives with $\\mu _ { b } = ( m - 1 ) / ( m \\mu )$ , the equivalent of a bulk friction. ",
+      "ctx_after": ". A.2. Dilatancy model Based on geometrical considerations, Roux & Radjai (1998) proposed a description of the deformation of granular flows through a dilatancy"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "μ"
+        ],
+        [
+          "source",
+          "φ"
+        ],
+        [
+          "target",
+          "I"
+        ]
+      ],
+      "ev": "Since $\\mu$ and $\\phi$ are considered sole functions of I",
+      "ctx_before": "Eq. (A 6) with $\\mu _ { b } = 1 / K _ { p }$ and $\\mu =$ (tan δ + tan ψ). Appendix B. Derivation of the eigenvalue problem The perturbed deformation rates read ",
+      "ctx_after": ", we write $\\tilde { \\mu } = \\mu ^ { \\prime } \\tilde { I }$ and $\\tilde { \\phi } = \\phi ^ { \\prime } \\tilde { I } ,$ , where the primes stand for a derivative w"
+    },
+    {
+      "pt": "constitutive_law",
+      "desc": "a constitutive law relating output quantity/quantities to >=1 input quantity (n-ary)",
+      "boundary": "a FORMAL/QUANTITATIVE law output=f(inputs+params), stated as a formula or explicit functional relation. NOT a prose 'X depends on Y' (that is influences), NOT a definition (defines), NOT a measurement setup (measures).",
+      "nodes": [
+        [
+          "output",
+          "μ'"
+        ],
+        [
+          "output",
+          "φ'"
+        ],
+        [
+          "input",
+          "I"
+        ]
+      ],
+      "ev": "we write $\\tilde { \\mu } = \\mu ^ { \\prime } \\tilde { I }$ and $\\tilde { \\phi } = \\phi ^ { \\prime } \\tilde { I }$",
+      "ctx_before": "an δ + tan ψ). Appendix B. Derivation of the eigenvalue problem The perturbed deformation rates read Since $\\mu$ and $\\phi$ are considered sole functions of I, ",
+      "ctx_after": ",$ , where the primes stand for a derivative with respect to $I ^ { 0 }$ . To first order, we find $\\| \\pmb { S } \\| =$ $2 \\| \\pmb { S } ^ { 0 } \\| | \\tilde { S"
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "definition of I"
+        ],
+        [
+          "object",
+          "I"
+        ]
+      ],
+      "ev": "the definition of I gives",
+      "ctx_before": "s stand for a derivative with respect to $I ^ { 0 }$ . To first order, we find $\\| \\pmb { S } \\| =$ $2 \\| \\pmb { S } ^ { 0 } \\| | \\tilde { S } _ { 1 2 } |$ and ",
+      "ctx_after": " which allows us to eliminate $\\tilde { p } _ { \\mathrm { e q } }$ in the equations. Given the rheological law (3.9), the stresses are, to first order, Normaliz"
+    },
+    {
+      "pt": "influences",
+      "desc": "one quantity influences / depends on >=1 target quantity (n-ary, general dependence)",
+      "boundary": "X functionally depends on / varies with Y (a genuine causal or scaling dependence). NOT a co-listing of parallel items (composed_of), NOT a classification (defines), NOT 'we tested X' (measures), NOT 'X is part of Y' (composed_of).",
+      "nodes": [
+        [
+          "source",
+          "definition of I"
+        ],
+        [
+          "target",
+          "p_eq"
+        ]
+      ],
+      "ev": "the definition of I gives which allows us to eliminate $\\tilde { p } _ { \\mathrm { e q } }$",
+      "ctx_before": "s stand for a derivative with respect to $I ^ { 0 }$ . To first order, we find $\\| \\pmb { S } \\| =$ $2 \\| \\pmb { S } ^ { 0 } \\| | \\tilde { S } _ { 1 2 } |$ and ",
+      "ctx_after": " in the equations. Given the rheological law (3.9), the stresses are, to first order, Normalizing with respect to the base flow $( \\| \\pmb { \\mathsf { S } } ^ {"
+    },
+    {
+      "pt": "composed_of",
+      "desc": "one whole is composed-of / part-of >=1 component (n-ary composition)",
+      "boundary": "STRUCTURAL composition: parts that make up a whole (model A = B + C). NOT classification (defines), NOT 'X has control params' (influences), NOT experimental setup description, NOT 'we tested X by doing Y'.",
+      "nodes": [
+        [
+          "whole",
+          "eigenvalue problem"
+        ],
+        [
+          "component",
+          "A"
+        ],
+        [
+          "component",
+          "B"
+        ],
+        [
+          "component",
+          "y"
+        ]
+      ],
+      "ev": "leads to an eigenvalue problem of the form $( { \\pmb A } - \\lambda { \\pmb B } ) \\tilde { \\pmb y } = 0$",
+      "ctx_before": "iables in equations (3.12)-(3.13)-(3.3), and keeping only linear contributions and leading-order terms in the high-wavenumber limit (see details in Appendix B) ",
+      "ctx_after": " with $\\tilde { \\pmb { y } } = ( \\tilde { \\pmb { u } } , \\tilde { I } ) ^ { T }$ and A and $\\pmb { B }$ are $3 \\times 3$ constant coefficients matrices defined "
+    },
+    {
+      "pt": "defines",
+      "desc": "one entity is defined-as / identified-with / named-by another (definitional identity, n-ary)",
+      "boundary": "a DEFINITIONAL identity: X is defined as / is / denotes / is named / is classified into Y. NOT a structural part-of (composed_of), NOT a functional dependence (influences). 'X is analogous to Y' is a CLAIM not a definition.",
+      "nodes": [
+        [
+          "subject",
+          "μ⁰"
+        ],
+        [
+          "object",
+          "μ"
+        ]
+      ],
+      "ev": "we used the simplified notation $\\mu \\equiv \\mu ^ { 0 }$",
+      "ctx_before": " the form $( { \\pmb A } - \\lambda { \\pmb B } ) \\tilde { \\pmb y } = 0$ with $\\tilde { \\pmb { y } } = ( \\tilde { \\pmb { u } } , \\tilde { I } ) ^ { T }$ and where ",
+      "ctx_after": " and $I \\equiv I ^ { 0 }$ together with $\\alpha = \\mu _ { b } + 2 \\mu / 3$ and $\\beta = 2 / I$ . REFERENCES"
+    },
+    {
+      "pt": "constitutive_law",
+      "desc": "a constitutive law relating output quantity/quantities to >=1 input quantity (n-ary)",
+      "boundary": "a FORMAL/QUANTITATIVE law output=f(inputs+params), stated as a formula or explicit functional relation. NOT a prose 'X depends on Y' (that is influences), NOT a definition (defines), NOT a measurement setup (measures).",
+      "nodes": [
+        [
+          "output",
+          "α"
+        ],
+        [
+          "input",
+          "μ"
+        ]
+      ],
+      "ev": "$\\alpha = \\mu _ { b } + 2 \\mu / 3$",
+      "ctx_before": " state. The prime symbols stand for derivatives with respect to I $( \\phi ^ { \\prime } = \\partial _ { I } \\phi , \\mu ^ { \\prime } = \\partial _ { I } \\mu )$ and ",
+      "ctx_after": " and $\\beta = 2 / I$ . Non-trivial solutions to this system are obtained if det $( \\pmb { A } - \\lambda \\pmb { B } ) = 0$ , which simplifies to where $\\theta \\ "
+    },
+    {
+      "pt": "constitutive_law",
+      "desc": "a constitutive law relating output quantity/quantities to >=1 input quantity (n-ary)",
+      "boundary": "a FORMAL/QUANTITATIVE law output=f(inputs+params), stated as a formula or explicit functional relation. NOT a prose 'X depends on Y' (that is influences), NOT a definition (defines), NOT a measurement setup (measures).",
+      "nodes": [
+        [
+          "output",
+          "β"
+        ],
+        [
+          "input",
+          "I"
+        ]
+      ],
+      "ev": "$\\beta = 2 / I$",
+      "ctx_before": "ivatives with respect to I $( \\phi ^ { \\prime } = \\partial _ { I } \\phi , \\mu ^ { \\prime } = \\partial _ { I } \\mu )$ and $\\alpha = \\mu _ { b } + 2 \\mu / 3$ and ",
+      "ctx_after": " . Non-trivial solutions to this system are obtained if det $( \\pmb { A } - \\lambda \\pmb { B } ) = 0$ , which simplifies to where $\\theta \\ = \\ 2 \\tan ^ { - 1 }"
+    }
+  ],
+  "glm": [
+    {
+      "i": 0,
+      "pt": "composed_of",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text states DQN 'combines' two learning paradigms, which is a conceptual integration, not a structural composition o"
+    },
+    {
+      "i": 1,
+      "pt": "extends",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence text describes the architecture and inspiration of deep convolutional networks but never mentions 'deep neu"
+    },
+    {
+      "i": 2,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence states that a neural network is used to approximate a function, which is a 'measures' or 'used_for' relatio"
+    },
+    {
+      "i": 3,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The sentence states that certain games pose a challenge to agents, not that the games are compared side-by-side with the"
+    },
+    {
+      "i": 4,
+      "pt": "composed_of",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly lists the exact components that make up the DQN agent, perfectly matching the composed_of pattern an"
+    },
+    {
+      "i": 5,
+      "pt": "measures",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text states t-SNE maps the representation, not that it measures or evaluates it."
+    },
+    {
+      "i": 6,
+      "pt": "extends",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The text states the representations generalize 'to' the data (applying to a new domain), not that the representations 'e"
+    },
+    {
+      "i": 7,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The text states that in the game Breakout, the agent learns the optimal strategy, not that Breakout is defined as the op"
+    },
+    {
+      "i": 8,
+      "pt": "background",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The source text refers to 'This principle', not 'end-to-end reinforcement learning', so the from-node binding is halluci"
+    },
+    {
+      "i": 9,
+      "pt": "background",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence text mentions the hippocampus supporting a physical process but does not mention 'replay algorithm' or stat"
+    },
+    {
+      "i": 10,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states that reward signals influence the characteristics of representations, correctly binding t"
+    },
+    {
+      "i": 11,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states that the successful integration was 'critically dependent on' the replay algorithm, perfectly"
+    },
+    {
+      "i": 12,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states that reward signals influence the characteristics of representations, correctly mapping t"
+    },
+    {
+      "i": 13,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states that successful integration depends on the replay algorithm, correctly mapping the cause "
+    },
+    {
+      "i": 14,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states that the game score depends on the sequence, correctly binding the target and source with"
+    },
+    {
+      "i": 15,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states that game strategies depend on these sequences, correctly binding the target and source roles"
+    },
+    {
+      "i": 16,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "'Gives rise to' indicates generation or creation, not a definitional identity."
+    },
+    {
+      "i": 17,
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states the definitional identity 'each sequence is a distinct state', correctly binding the subj"
+    },
+    {
+      "i": 18,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "Using X 'as' Y in a practical setup is a functional usage, not a strict definitional identity (e.g., 'is defined as', 'd"
+    },
+    {
+      "i": 19,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The slot binding is incorrect because 'T' is the subject being defined as the 't0~ttime-step', not the definition itself"
+    },
+    {
+      "i": 20,
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly defines the subject as the definition conditioned on the object, perfectly matching the roles an"
+    },
+    {
+      "i": 21,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The sentence defines 'p' as a policy, not the Q* equation, making the subject binding incorrect."
+    },
+    {
+      "i": 22,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "'Corresponds to' indicates a functional equivalence or mapping, not a definitional identity (defined as / denotes / is n"
+    },
+    {
+      "i": 23,
+      "pt": "improves",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states that error clipping improved the stability of the algorithm, correctly binding both nodes wit"
+    },
+    {
+      "i": 24,
+      "pt": "composed_of",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly lists the initialization of the replay memory, action-value function, and target action-value fu"
+    },
+    {
+      "i": 25,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text initializes two separate variables rather than defining one as the other."
+    },
+    {
+      "i": 26,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The text describes an algorithmic step to 'set' a variable and 'preprocess' another, not a definitional identity."
+    },
+    {
+      "i": 27,
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly sets/defines the subject $y_j$ using the exact object terms provided."
+    },
+    {
+      "i": 28,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence describes a periodic operational reset, not a definitional identity for the action-value function."
+    },
+    {
+      "i": 29,
+      "pt": "constitutive_law",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The Bellman equation is the name of the constitutive law itself, not an input quantity to the formula."
+    },
+    {
+      "i": 30,
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly defines 'Q-network' as a 'neural network' with 'weights h', perfectly matching the node roles and po"
+    },
+    {
+      "i": 31,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states that the targets depend on the network weights, correctly binding the source and target n"
+    },
+    {
+      "i": 32,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The sentence contrasts 'this' with 'the targets', not 'targets' with 'the targets', so the 'from' node is incorrectly bo"
+    },
+    {
+      "i": 33,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence text states how Q-learning can be recovered within a framework but does not mention or define 'stochastic g"
+    },
+    {
+      "i": 34,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The text states that the training algorithm is 'presented in' Algorithm 1, not that deep Q-networks are 'defined as' Alg"
+    },
+    {
+      "i": 35,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text states the representation is 'produced by' the function, not 'defined as' the function, failing both the defini"
+    },
+    {
+      "i": 36,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states that the variance of the updates is reduced by breaking the strong correlations, correctly es"
+    },
+    {
+      "i": 37,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states that the current parameters determine the next data sample, correctly mapping the source and "
+    },
+    {
+      "i": 38,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly links the arising of unwanted feedback loops to the negative outcomes of getting stuck in a poor loc"
+    },
+    {
+      "i": 39,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The text states the memory stores the tuples owing to the finite size N (a capacity constraint), not that one quantity f"
+    },
+    {
+      "i": 40,
+      "pt": "compares",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly contrasts uniform sampling with a more sophisticated strategy similar to prioritized sweeping, corre"
+    },
+    {
+      "i": 41,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text describes an operational step of cloning a network to obtain another, not a definitional identity."
+    },
+    {
+      "i": 42,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states that using an older set of parameters adds a delay, correctly binding the source as the cause"
+    },
+    {
+      "i": 43,
+      "pt": "extends",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The sentence extends the 2015 analysis (base/Y) to compressible flows (new scope/X), but the edge binds the base to 'fro"
+    },
+    {
+      "i": 44,
+      "pt": "improves",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states that compressibility regularizes the equations, which the surrounding context confirms re"
+    },
+    {
+      "i": 45,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "'Associated with' indicates a functional relationship or correlation, not a definitional identity as required by the 'de"
+    },
+    {
+      "i": 46,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "'Transforms into' describes a state change under a condition, not a functional or causal dependence between the two doma"
+    },
+    {
+      "i": 47,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states the target depends on the source, correctly mapping to an 'influences' relation."
+    },
+    {
+      "i": 48,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states the granular temperature is a function of the imposed shear, correctly binding the target"
+    },
+    {
+      "i": 49,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence text mentions only kinetic theory and does not state a comparison with μ(I) rheology."
+    },
+    {
+      "i": 50,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states that $\\mu_b$ directly controls the amplitude of the pressure variations, perfectly matchi"
+    },
+    {
+      "i": 51,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states that $p_{eq}$ is a function of $\\phi$, correctly binding $\\phi$ as the source and $p_{eq}"
+    },
+    {
+      "i": 52,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states I is a one-to-one function of $\\phi$, correctly binding I as the dependent target and $\\phi$ "
+    },
+    {
+      "i": 53,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states I is chosen as the independent variable in the mass conservation equation, correctly mapping "
+    },
+    {
+      "i": 54,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence defines 'well-posed' by its mathematical properties, not as 'ill-posed', and 'ill-posed' is completely abse"
+    },
+    {
+      "i": 55,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states that numerical 'viscosity' depends on the numerical method, correctly binding the target "
+    },
+    {
+      "i": 56,
+      "pt": "improves",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "In this context, 'regularize' explicitly means resolving the ill-posedness (a known limitation) of the rheology, perfect"
+    },
+    {
+      "i": 57,
+      "pt": "improves",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states compressibility acts as a regularizing mechanism for the μ(I) rheology, correctly binding com"
+    },
+    {
+      "i": 58,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states that the average friction coefficient 'scales with' the inertial number, correctly binding th"
+    },
+    {
+      "i": 59,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states that the volume fraction scales with the inertial number, correctly binding the dependent and"
+    },
+    {
+      "i": 60,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states that the parameter $\\varDelta \\mu \\approx 0.3$ depends on material properties, correctly "
+    },
+    {
+      "i": 61,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states that I_0 is an empirical parameter which depends on material properties, correctly bindin"
+    },
+    {
+      "i": 62,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states that the parameter Δφ ≈ 0.1 depends on material properties, correctly binding it as the t"
+    },
+    {
+      "i": 63,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states the dependence of material density on volume fraction and grain density via the equation "
+    },
+    {
+      "i": 64,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The evidence span explicitly holds 'confinement pressure' constant ('for equal confinement pressure') to isolate the eff"
+    },
+    {
+      "i": 65,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states a 'dependence of the microscopic rearrangement time scale on volume fraction', perfectly "
+    },
+    {
+      "i": 66,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text only mentions estimating the 'possible coupling' as a future or interesting direction, not stating an actual fu"
+    },
+    {
+      "i": 67,
+      "pt": "constitutive_law",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence is prose stating a dependence rather than a formal formula, and it incorrectly binds the friction coefficie"
+    },
+    {
+      "i": 68,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "'Plays the role of' linking variables is a functional dependence, not a definitional identity, and the subject is incorr"
+    },
+    {
+      "i": 69,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence compares the 'dynamic' compressibility mechanism to acoustical wave propagation, not to the typical propaga"
+    },
+    {
+      "i": 70,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states that approaching the packing fraction leads to infinitely small Mach numbers, correctly bindi"
+    },
+    {
+      "i": 71,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The associated flow rule and von Mises yield criterion are components of the classical plasticity models, not separate e"
+    },
+    {
+      "i": 72,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states that the rheology (3.6) led to ill-posed problems, correctly binding the rheology as the sour"
+    },
+    {
+      "i": 73,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states that the incompressible equations of motion 'led to ill-posed problems', correctly binding th"
+    },
+    {
+      "i": 74,
+      "pt": "extends",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "'Compressible flows' is the target regime of the extension, not the method doing the extending."
+    },
+    {
+      "i": 75,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text states the strain rate tensor is split into deviatoric and isotropic parts to distinguish deformations, not tha"
+    },
+    {
+      "i": 76,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence text only states that a variable is the Kronecker symbol, but does not define it as the deviatoric and isot"
+    },
+    {
+      "i": 77,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text states that instantaneous pressure may differ from equilibrium pressure, not that one functionally influences o"
+    },
+    {
+      "i": 78,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text states the coefficient is 'associated with' the deformations, not defined as the deformations themselves."
+    },
+    {
+      "i": 79,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence states a simplification/specialization relationship, not a comparison, and the target node is not even ment"
+    },
+    {
+      "i": 80,
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states 'Plane shear is an isochoric deformation', correctly binding the subject to the defined c"
+    },
+    {
+      "i": 81,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The equation 'D = S' is a derived mathematical equality resulting from the isochoric deformation condition ('so that'), "
+    },
+    {
+      "i": 82,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states u_1 is a function of x_2, correctly binding u_1 as the dependent target and x_2 as the indepe"
+    },
+    {
+      "i": 83,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence text co-lists the scaling rates of two parallel items rather than stating a functional dependence or causal"
+    },
+    {
+      "i": 84,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text states a temporal condition for validity ('at short time, [the] limit at which linear analysis remains valid'),"
+    },
+    {
+      "i": 85,
+      "pt": "background",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "'Other methods' is not the entity citing Alam & Nott 1997; the current paper cites it as background."
+    },
+    {
+      "i": 86,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text states that an eigenvalue problem takes a specific mathematical form involving matrices A and B, but it does no"
+    },
+    {
+      "i": 87,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The evidence mentions lowercase 'b' and 'λ_{1,2}', not 'B' or a 'unique eigenvalue λ = -a₀/a₁', failing both support and"
+    },
+    {
+      "i": 88,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The evidence text mentions the variable 'b', not 'B', causing a strict slot binding mismatch for the source node."
+    },
+    {
+      "i": 89,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text defines a lower bound for mu_b, it does not state that mu_b influences the lower bound."
+    },
+    {
+      "i": 90,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The roles are reversed; lambda_3 is the source that influences the flow (target), not the other way around."
+    },
+    {
+      "i": 91,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states the sign of lambda_3 is determined by the sign of the nominator, correctly mapping the depend"
+    },
+    {
+      "i": 92,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The 'effect' node is incorrectly bound to 'domain defined by Eq. (4.12)', which is a boundary condition, whereas the act"
+    },
+    {
+      "i": 93,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The target node hallucinates 'unique eigenvalue λ = -a₀/a₁' instead of the text's 'unstable modes', and the effect node "
+    },
+    {
+      "i": 94,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence text does not mention bulk viscosity or state any influence relation between it and rheology."
+    },
+    {
+      "i": 95,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states that the growth rate scales as |ξ|², correctly binding the source to the dependent quanti"
+    },
+    {
+      "i": 96,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states that the growth rate of the eigenvalue becoming positive causes the incompressible rheolo"
+    },
+    {
+      "i": 97,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence text states that the growth rate is bounded because λ₃ is O(1), but it does not compare the growth rate of "
+    },
+    {
+      "i": 98,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence text only states that setting a parameter to zero yields the Coulomb model; it does not mention or compare "
+    },
+    {
+      "i": 99,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence states that volume fraction variations are incorporated into the inertial number *through* the material den"
+    },
+    {
+      "i": 100,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states that taking the specific definition of I changes the coefficient β to 2/I - φ', perfectly mat"
+    },
+    {
+      "i": 101,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence explicitly states the stability domain depends on the 'particular value chosen for compressibility', not on"
+    },
+    {
+      "i": 102,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence explicitly states the well-posedness criteria is 'not affected' by the definition, negating any 'influences"
+    },
+    {
+      "i": 103,
+      "pt": "compares",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly contrasts the choice of equilibrium pressure against instantaneous pressure, correctly binding both "
+    },
+    {
+      "i": 104,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text explicitly states there is 'no impact' (failing evidence and polarity), and 'the latter' refers to equilibrium "
+    },
+    {
+      "i": 105,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states that increasing the bulk viscosity regularizes the system against short waves, correctly "
+    },
+    {
+      "i": 106,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The evidence text mentions 'the maximum growth rate', not the highly specific 'growth rate of the unique eigenvalue λ = "
+    },
+    {
+      "i": 107,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text describes a limitation of one method and the need for another to go further, not a side-by-side comparison of p"
+    },
+    {
+      "i": 108,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text explicitly states the variations of μ_b would NOT appear in the linearized equations under a pure shear base fl"
+    },
+    {
+      "i": 109,
+      "pt": "improves",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The evidence text attributes the regularization to 'this study', not explicitly to 'compressible μ(I)-rheology', violati"
+    },
+    {
+      "i": 110,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states that boundaries act upon the acoustic energy by absorbing or restituting it, correctly mappin"
+    },
+    {
+      "i": 111,
+      "pt": "improves",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "Describing a 'new and promising perspective' implies extending knowledge rather than resolving a specific limitation of "
+    },
+    {
+      "i": 112,
+      "pt": "constitutive_law",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence text explicitly defines what the variable represents rather than stating the formal quantitative formula re"
+    },
+    {
+      "i": 113,
+      "pt": "constitutive_law",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence span is a prose statement ('is linked to') rather than a formal/quantitative formula or explicit functional"
+    },
+    {
+      "i": 114,
+      "pt": "equivalent_to",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states the exact equivalence between the two equations in the specified regime."
+    },
+    {
+      "i": 115,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states μ and φ are functions of I, correctly binding them as sources that depend on the target I."
+    },
+    {
+      "i": 116,
+      "pt": "constitutive_law",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": ""
+    },
+    {
+      "i": 117,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence text 'the definition of I gives' is an incomplete fragment indicating that a definition yields a result, no"
+    },
+    {
+      "i": 118,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text states that a definition is used to algebraically eliminate a variable in an equation, not that one quantity fu"
+    },
+    {
+      "i": 119,
+      "pt": "composed_of",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The text provides a mathematical equation defining the form of the eigenvalue problem, but does not explicitly state a s"
+    },
+    {
+      "i": 120,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The text states μ is defined as μ⁰ (μ ≡ μ⁰), so the subject and object nodes are swapped."
+    },
+    {
+      "i": 121,
+      "pt": "constitutive_law",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states the exact formula with α as the output and μ as an input."
+    },
+    {
+      "i": 122,
+      "pt": "constitutive_law",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The evidence explicitly states the exact formula β = 2 / I, correctly binding β as the output and I as the input."
+    }
+  ],
+  "gpt_oss": [
+    {
+      "i": 0,
+      "pt": "composed_of",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence says DQN can combine reinforcement learning and deep neural networks, but does not explicitly state that DQ"
+    },
+    {
+      "i": 1,
+      "pt": "extends",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The excerpt mentions only a deep convolutional network and its properties; it never states that it extends or generalize"
+    },
+    {
+      "i": 2,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence says the network is used to approximate the action‑value function, which describes a method/approximation r"
+    },
+    {
+      "i": 3,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence states that games are challenging for agents, not a direct comparison between X and Y."
+    },
+    {
+      "i": 4,
+      "pt": "composed_of",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly lists the replay memory, target Q-network, and CNN architecture as the core components that make"
+    },
+    {
+      "i": 5,
+      "pt": "measures",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The sentence describes t‑SNE mapping DQN representations, not a measurement of them."
+    },
+    {
+      "i": 6,
+      "pt": "extends",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states that DQN representations generalize to data from other policies, matching the extends rel"
+    },
+    {
+      "i": 7,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The sentence states that in Breakout the agent learns the optimal strategy; it does not define 'optimal strategy' as 'Br"
+    },
+    {
+      "i": 8,
+      "pt": "background",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The sentence only mentions neurobiological evidence and does not reference end-to-end reinforcement learning, so it does"
+    },
+    {
+      "i": 9,
+      "pt": "background",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The sentence says the hippocampus may support the process, not that the replay algorithm uses the hippocampus as backgro"
+    },
+    {
+      "i": 10,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states that reward signals may influence the characteristics of representations, correctly bindi"
+    },
+    {
+      "i": 11,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence directly states that successful integration depended on the replay algorithm, fulfilling the influence patt"
+    },
+    {
+      "i": 12,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The sentence states that reward signals may influence characteristics of representations, but it does not explicitly men"
+    },
+    {
+      "i": 13,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence states that successful integration depended critically on the replay algorithm, correctly linking replay al"
+    },
+    {
+      "i": 14,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states that the game score depends on (is influenced by) the whole previous sequence of actions "
+    },
+    {
+      "i": 15,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence 'which then learns game strategies depending upon these sequences' explicitly states that game strategies d"
+    },
+    {
+      "i": 16,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The sentence says the formalism 'gives rise to' an MDP, which is a causal relation, not a definitional identity."
+    },
+    {
+      "i": 17,
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states \"each sequence is a distinct state\", matching a definitional identity with correct slots "
+    },
+    {
+      "i": 18,
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states that the complete sequence st is used as the state representation at time t, directly mat"
+    },
+    {
+      "i": 19,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The sentence defines T as the termination time-step, but the extracted nodes assign the wrong entities to subject/defini"
+    },
+    {
+      "i": 20,
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states that Q* is defined as the maximum expected return achievable by following any policy, mat"
+    },
+    {
+      "i": 21,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The sentence says \"p is a policy mapping sequences to actions\" but does not state that the formula defines p; the direct"
+    },
+    {
+      "i": 22,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The sentence links squared error to an absolute value loss function via correspondence, not a definitional identity."
+    },
+    {
+      "i": 23,
+      "pt": "improves",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "Sentence explicitly states that error clipping improves the algorithm's stability, matching the improve pattern."
+    },
+    {
+      "i": 24,
+      "pt": "composed_of",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The excerpt explicitly lists replay memory D, Q, and target Q as initialized parts of Algorithm 1, satisfying the compos"
+    },
+    {
+      "i": 25,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The sentence initializes s₁ and φ₁, but does not state that s₁ defines φ₁; the roles are not explicitly linked as a defi"
+    },
+    {
+      "i": 26,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The sentence defines φ_{t+1} in terms of s_{t+1}, so the direction of the definition is opposite to the edge."
+    },
+    {
+      "i": 27,
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly defines y_j as the set containing r_j and r_j + γ·max_a' ĤQ(...), matching the defines pattern."
+    },
+    {
+      "i": 28,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The sentence only describes resetting \\hat{Q} to Q, not a definitional statement linking \\hat{Q}=Q to the action‑value f"
+    },
+    {
+      "i": 29,
+      "pt": "constitutive_law",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly gives the Bellman update formula that defines the action‑value function."
+    },
+    {
+      "i": 30,
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly defines Q-network as a neural network function approximator with weights h, matching all roles a"
+    },
+    {
+      "i": 31,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states that targets depend on network weights, directly matching the influences pattern with cor"
+    },
+    {
+      "i": 32,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The sentence states a contrast (comparison) but does not explicitly mention the first node ('targets'), only refers to i"
+    },
+    {
+      "i": 33,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The sentence only says Q‑learning can be recovered by certain update steps; it does not state that Q‑learning is defined"
+    },
+    {
+      "i": 34,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The sentence says the algorithm for training deep Q‑networks is presented in Algorithm 1, not that deep Q‑networks are d"
+    },
+    {
+      "i": 35,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The sentence says the representation is produced by function w, which is a generation relation, not a definitional ident"
+    },
+    {
+      "i": 36,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly links strong correlations to the variance of updates, showing a causal influence with correct no"
+    },
+    {
+      "i": 37,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly says current parameters determine (influence) the next data sample, matching the roles and direc"
+    },
+    {
+      "i": 38,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence states that unwanted feedback loops can cause parameters to get stuck in a poor local minimum or diverge ca"
+    },
+    {
+      "i": 39,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states that because of the finite memory size N, the replay memory stores only the last N experience"
+    },
+    {
+      "i": 40,
+      "pt": "compares",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence contrasts uniform sampling (equal importance) with prioritized sweeping (emphasizes important transitions),"
+    },
+    {
+      "i": 41,
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence states that the target network is obtained by cloning network Q, defining the target network in terms of ne"
+    },
+    {
+      "i": 42,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states that using an older set of parameters adds a delay, matching the influences relation from"
+    },
+    {
+      "i": 43,
+      "pt": "extends",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states the analysis is extended to compressible flows, and the nodes correspond correctly."
+    },
+    {
+      "i": 44,
+      "pt": "improves",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states that compressibility regularizes the equations, improving their well‑posedness, matching "
+    },
+    {
+      "i": 45,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The sentence says µb is introduced and is associated with volume changes, not that µb is defined as volume changes."
+    },
+    {
+      "i": 46,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states that the ill-posed domain transforms into the unstable‑but‑well‑posed domain, matching th"
+    },
+    {
+      "i": 47,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "Sentence directly states that the volume occupied by granular flows depends on granular temperature."
+    },
+    {
+      "i": 48,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states that granular temperature is a function of the imposed shear, establishing a direct influ"
+    },
+    {
+      "i": 49,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The sentence only states that kinetic theory best describes high‑inertial‑number flows; it does not mention µ(I) rheolog"
+    },
+    {
+      "i": 50,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states that μ_b directly controls (influences) the amplitude of the pressure variations."
+    },
+    {
+      "i": 51,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states p_eq depends on φ, matching source‑target roles and direction."
+    },
+    {
+      "i": 52,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states that I is a one-to-one function of φ, establishing a functional dependence of I on φ."
+    },
+    {
+      "i": 53,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence states that I can be used as the independent variable in the mass conservation equation, showing the equati"
+    },
+    {
+      "i": 54,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The evidence defines 'well-posed' but does not define it as or relate it to 'ill-posed'; thus the relation is not stated"
+    },
+    {
+      "i": 55,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states that numerical viscosity depends on (is influenced by) the chosen numerical method, corre"
+    },
+    {
+      "i": 56,
+      "pt": "improves",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states that adding compressible effects regularizes (improves) the classical Coulomb friction rh"
+    },
+    {
+      "i": 57,
+      "pt": "improves",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly says compressibility may be a regularizing mechanism for the μ(I) rheology, indicating it improv"
+    },
+    {
+      "i": 58,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states that the average friction coefficient μ scales with (i.e., depends on) the inertial numbe"
+    },
+    {
+      "i": 59,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly says volume fraction φ scales with (depends on) the inertial number, matching source→target infl"
+    },
+    {
+      "i": 60,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states that Δμ (and other parameters) depend on material properties, matching source→target infl"
+    },
+    {
+      "i": 61,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states that I₀ (≈0.3) is an empirical parameter that depends on material properties, matching so"
+    },
+    {
+      "i": 62,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly says Δ_φ ≈ 0.1 is an empirical parameter that depends on material properties, matching the sourc"
+    },
+    {
+      "i": 63,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states ρ = ϱ φ, showing material density depends on grain density and volume fraction."
+    },
+    {
+      "i": 64,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The sentence links volume fraction (dilution) to higher forces under constant confinement pressure; it does not state th"
+    },
+    {
+      "i": 65,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly says the time scale depends on volume fraction, correctly binding the nodes and matching the inf"
+    },
+    {
+      "i": 66,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The sentence mentions both terms but does not explicitly state that the main flow influences the dynamical pressure."
+    },
+    {
+      "i": 67,
+      "pt": "constitutive_law",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The sentence only says μ and p_eq can be expressed as functions of φ without giving an explicit formula, and treats μ as"
+    },
+    {
+      "i": 68,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence describes the equation of state as linking variables, not explicitly defining them."
+    },
+    {
+      "i": 69,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The sentence only compares the dynamic compressibility mechanism to acoustical wave propagation in static media; it neve"
+    },
+    {
+      "i": 70,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence directly states that approaching the random close packing fraction causes Mach numbers to become infinitesi"
+    },
+    {
+      "i": 71,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The sentence says the expression is similar to classical plasticity models that include an associated flow rule and von "
+    },
+    {
+      "i": 72,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states that the rheology (3.6) leads to ill‑posed problems, matching the influence direction and"
+    },
+    {
+      "i": 73,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly says the incompressible equations of motion (with the rheology) lead to ill-posed problems, matc"
+    },
+    {
+      "i": 74,
+      "pt": "extends",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The sentence states an extension of the theory to compressible flows, not that compressible flows extends rheology (3.6)"
+    },
+    {
+      "i": 75,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The sentence describes splitting the strain rate tensor to distinguish isochoric deformations, not defining them as devi"
+    },
+    {
+      "i": 76,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The sentence says δ_ij is the Kronecker symbol; it does not define δ_ij as the deviatoric and isotropic parts."
+    },
+    {
+      "i": 77,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The sentence only states that instantaneous pressure may differ from equilibrium pressure, not that one quantitatively i"
+    },
+    {
+      "i": 78,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The sentence states µb is a coefficient associated with non‑isochoric deformations, not that µb is defined as those defo"
+    },
+    {
+      "i": 79,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The sentence merely states that Eq. (3.9) simplifies to the Jop et al. (2006) formulation under a condition; it does not"
+    },
+    {
+      "i": 80,
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states that plane shear is an isochoric deformation, correctly linking the subject and object wi"
+    },
+    {
+      "i": 81,
+      "pt": "defines",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states 'D = S', directly linking D (subject) to S (object) as a definitional identity."
+    },
+    {
+      "i": 82,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states that u₁ depends on (is a linear function of) x₂, correctly binding source x₂ to target u₁"
+    },
+    {
+      "i": 83,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The text only compares scaling of coupling and leading-order terms; it does not state that one influences or depends on "
+    },
+    {
+      "i": 84,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence links short time to the limit where linear analysis remains valid, showing a dependence of linear analysis "
+    },
+    {
+      "i": 85,
+      "pt": "background",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence states 'Other methods are necessary ... (Alam & Nott 1997)', directly linking the concept of other methods "
+    },
+    {
+      "i": 86,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The sentence defines A and B as matrices but does not state that the eigenvalue problem is defined as A or B; node roles"
+    },
+    {
+      "i": 87,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The sentence links b>0 to a negative growth rate of Re(λ_{1,2}), not specifically to the unique eigenvalue λ = -a₀/a₁, a"
+    },
+    {
+      "i": 88,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence states that a negative B (b) makes the equations exhibit ill‑posed behaviour, directly linking B as the cau"
+    },
+    {
+      "i": 89,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The sentence states a bound μ_b > ..., linking μ_b and a lower‑bound condition, but it does not claim that μ_b influence"
+    },
+    {
+      "i": 90,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The sentence states that λ₃ affects the flow (λ₃→flow), not that flow influences λ₃, so the claimed direction is not sup"
+    },
+    {
+      "i": 91,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states that the sign of λ₃ is determined by the sign of the nominator, matching the claimed infl"
+    },
+    {
+      "i": 92,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence directly states that the compressible μ(I)-rheology causes (influences) plane shear flows to be unstable ou"
+    },
+    {
+      "i": 93,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence states that a sufficiently large bulk viscosity μ_b causes the growth rate of the eigenvalue (unstable mode"
+    },
+    {
+      "i": 94,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence links a condition on bulk viscosity μ_b to the rheology being well‑posed, indicating a causal influence."
+    },
+    {
+      "i": 95,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly says the growth rate scales with |ξ|², correctly binds the mentioned quantities, and the directi"
+    },
+    {
+      "i": 96,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly links λ (the growth rate) becoming positive to the incompressible rheology becoming ill‑posed, c"
+    },
+    {
+      "i": 97,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The sentence does not state a direct comparison between the growth rate of λ = -a₀/a₁ and λ₃, and it does not explicitly"
+    },
+    {
+      "i": 98,
+      "pt": "compares",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The sentence only states that a limiting case of the compressible μ(I)-rheology yields the classical Coulomb model; it d"
+    },
+    {
+      "i": 99,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The text mentions volume fraction variations and material density in the definition of I, but does not state a direct in"
+    },
+    {
+      "i": 100,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states that defining I as given changes coefficient β to 2/I – φ', matching source, target, and "
+    },
+    {
+      "i": 101,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "Sentence explicitly says the definition of I changes β, making the stability domain (Eq. 4.12) dependent on compressibil"
+    },
+    {
+      "i": 102,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The sentence says the well‑posedness criteria is *not* affected by the inertial‑number definition, so it does not state "
+    },
+    {
+      "i": 103,
+      "pt": "compares",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly compares equilibrium pressure with instantaneous pressure using ‘rather than’, correctly binds t"
+    },
+    {
+      "i": 104,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The sentence says choosing the instantaneous pressure has *no impact* on the well‑posed criteria, which does not state a"
+    },
+    {
+      "i": 105,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence directly states that increasing bulk viscosity regularizes (i.e., influences) short waves, correctly bindin"
+    },
+    {
+      "i": 106,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence states that the maximum growth rate occurs at a finite wavenumber, linking wavenumber to the growth rate an"
+    },
+    {
+      "i": 107,
+      "pt": "compares",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence directly contrasts the asymptotic analysis with the full dispersion relation, stating the former is insuffi"
+    },
+    {
+      "i": 108,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The sentence says variations of μ_b do NOT appear in the linearized equations for a pure shear base flow, indicating no "
+    },
+    {
+      "i": 109,
+      "pt": "improves",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": true,
+      "reason": "The sentence only says the study may provide a way to regularize instabilities in the incompressible μ(I) rheology, with"
+    },
+    {
+      "i": 110,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states that boundaries can absorb or restitute acoustic energy, evidencing an influence of bound"
+    },
+    {
+      "i": 111,
+      "pt": "improves",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence claims acoustic probing will improve knowledge, but does not state that it resolves a specific limitation o"
+    },
+    {
+      "i": 112,
+      "pt": "constitutive_law",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text only describes p_eq(φ) as the pressure at the critical state given by an empirical equation of state, but does "
+    },
+    {
+      "i": 113,
+      "pt": "constitutive_law",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The text only says the rate is 'linked' to the gradient, missing a formal quantitative constitutive law and clear direct"
+    },
+    {
+      "i": 114,
+      "pt": "equivalent_to",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence directly states that Eq. (A 6) is equivalent to Eq. (3.9), matching the specified roles and direction."
+    },
+    {
+      "i": 115,
+      "pt": "influences",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": false,
+      "reason": "The text states μ and φ are functions of I, confirming the relation and correctly binding the nodes, but the direction i"
+    },
+    {
+      "i": 116,
+      "pt": "constitutive_law",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The sentence gives a linear perturbation relation (tilde μ = μ'·tilde I) but does not define μ' (or φ') as a function of"
+    },
+    {
+      "i": 117,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": false,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The sentence only mentions “the definition of I gives …” and does not state that the definition defines I, nor does it p"
+    },
+    {
+      "i": 118,
+      "pt": "influences",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence explicitly states that the definition of I enables the elimination of p_eq, indicating a causal influence f"
+    },
+    {
+      "i": 119,
+      "pt": "composed_of",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The sentence defines the eigenvalue problem as (A‑λB) ỹ = 0, explicitly linking the problem to matrices A, B and vector "
+    },
+    {
+      "i": 120,
+      "pt": "defines",
+      "pass": false,
+      "evidence_support": true,
+      "slot_binding": false,
+      "polarity_ok": false,
+      "reason": "The sentence states μ ≡ μ⁰, defining μ in terms of μ⁰, but the extracted edge swaps the subject and object."
+    },
+    {
+      "i": 121,
+      "pt": "constitutive_law",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The excerpt explicitly states the formula α = μ_b + 2μ/3, defining α in terms of μ (and a parameter μ_b), satisfying a c"
+    },
+    {
+      "i": 122,
+      "pt": "constitutive_law",
+      "pass": true,
+      "evidence_support": true,
+      "slot_binding": true,
+      "polarity_ok": true,
+      "reason": "The text explicitly states the quantitative law β = 2 / I, correctly binding β as output and I as input."
+    }
+  ]
+}
