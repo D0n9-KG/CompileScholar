@@ -338,12 +338,13 @@ class ExtractionAgent:
                 # set — cross-paper connectivity and evaluation depend on those
                 # type names being stable, so a near-miss of them is a real
                 # error (e.g. 'extend' or 'improves_on') and gets the old drop.
-                # SOFT_ROUTING env (SOFTB verdict 2026-08-26: preregistered
-                # main gate FAIL, -5.4pt within single-run variance band →
-                # 改动① demoted to a tested variable): SOFT_ROUTING=0 restores
-                # the OLD hard gate (any unknown pattern_type = drop); =1
-                # (default) keeps the soft pass-through. Multi-seed runs both.
-                soft_routing = os.environ.get("SOFT_ROUTING", "1") == "1"
+                # SOFT_ROUTING env (multiseed verdict 2026-08-27: G1 PASS but
+                # novel production = 0 across all 6 runs — the soft
+                # pass-through has no object; default flipped to 0 per the
+                # preregistered fallback branch): SOFT_ROUTING=0 = old hard
+                # gate (unknown pattern_type = drop, the default); =1 restores
+                # the soft pass-through for future experiments.
+                soft_routing = os.environ.get("SOFT_ROUTING", "0") == "1"
                 if he.pattern_type.lower() in _EVOLUTION_TYPE_MISS_RE or not soft_routing:
                     dropped.append(self._gate_drop(he, nid2node,
                                   "gate:evolution-type-miss" if he.pattern_type.lower() in _EVOLUTION_TYPE_MISS_RE
