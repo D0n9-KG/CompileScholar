@@ -81,19 +81,25 @@ def _search_one(q: str, mode: str, k: int):
 def recall(query: str) -> list[dict]:
     """Parallel recall: each rewritten query x {keyword, semantic}, merged,
     PLUS S2 bulk search (the only arXiv-covering source up today — crossref
-    gold coverage measured at 4%: arXiv-only golds are invisible to it)."""
+    gold coverage measured at 4%: arXiv-only golds are invisible to it).
+    Candidates carry _q (their recall query) for per-query trimming later."""
     queries = rewrite_query(query)
     jobs = [(q, m) for q in queries for m in ("keyword", "semantic")]
     out, seen = [], {}
+
+    def _merge(cands, q):
+        for c in cands:
+            key = _norm_title(c.get("title", ""))
+            if key and key not in seen:
+                seen[key] = c
+                c["_q"] = q
+                out.append(c)
+
     with ThreadPoolExecutor(max_workers=3) as ex:
         futs = [ex.submit(_search_one, j[0], j[1], 40) for j in jobs]
         futs += [ex.submit(_s2_bulk_one, q) for q in queries]
-        for f in futs:
-            for c in f.result():
-                key = _norm_title(c.get("title", ""))
-                if key and key not in seen:
-                    seen[key] = c
-                    out.append(c)
+        for f, j in zip(futs, [(q, m) for q in queries for m in ("keyword", "semantic")] + [(q, "") for q in queries]):
+            _merge(f.result(), j[0])
     return out
 
 
@@ -106,7 +112,9 @@ def _s2_bulk_one(q: str, max_pages: int = 2) -> list[dict]:
     candidates shaped like the sci-evo rows (title/year/venue/citation_count),
     disk-cached. Bulk endpoint is not behind the普通search 429 wall."""
     import hashlib, urllib.request
-    key = hashlib.md5(f"s2bulk|{q}|{max_pages}".encode()).hexdigest()[:16]
+    # v2: early runs cached entries without citationCount (field added later);
+    # citation presort silently buried them. Version-bump forces one clean refetch.
+    key = hashlib.md5(f"s2bulk|{q}|{max_pages}|v2".encode()).hexdigest()[:16]
     cpath = os.path.join(_S2_CACHE_DIR, key + ".json")
     if os.path.exists(cpath):
         try:
@@ -151,8 +159,20 @@ def grade_and_rank(query: str, cands: list[dict], max_out: int = 15,
         return []
     # pools can reach 4000+ with S2 bulk (unranked firehose): before the 100-paper
     # grading window, sort by citation count so the representative end of the pool
-    # is what the LLM sees (gold diagnosis: expert-picked representative papers)
-    cands = sorted(cands, key=lambda c: -(c.get("citation_count") or 0))
+    # is what the LLM sees (gold diagnosis: expert-picked representative papers).
+    # Measured on q0: global citation sort puts facet-matched gold (cited 12-65)
+    # at ranks 128-254, outside the window — so first cap PER QUERY SOURCE (top 20
+    # by citation per recall query, preserving facet diversity), then global sort.
+    by_query: dict[str, list[dict]] = {}
+    for c in cands:
+        by_query.setdefault(c.get("_q") or "", []).append(c)
+    trimmed = []
+    for ql, lst in by_query.items():
+        lst.sort(key=lambda c: -(c.get("citation_count") or c.get("citationCount") or 0))
+        trimmed.extend(lst[:20])
+    if len(trimmed) < 100:            # small pools: fall back to global sort
+        trimmed = cands
+    cands = sorted(trimmed, key=lambda c: -(c.get("citation_count") or c.get("citationCount") or 0))
     listing = "\n".join(
         f"{i}: {c.get('title','')} ({c.get('year','')}, cited {c.get('citation_count') or 0})"
         for i, c in enumerate(cands[:100]))
