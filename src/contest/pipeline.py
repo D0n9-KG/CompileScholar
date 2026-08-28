@@ -326,7 +326,13 @@ def rerank_authority(high: list[dict], some: list[dict], max_out: int | None = N
     a 2-H query outputs 12; capacity follows the grader's own confidence."""
     import math
     if max_out is None:
-        max_out = max(12, len(high) + 3)
+        # fixed moderate cap (R10 lesson: keying output size to len(H) trusted
+        # an inflated signal — abstract grading pushes H to 34-109 — and the
+        # output exploded 37-112/query, precision collapsed. Recall DID rise
+        # (q4 R=0.571 best ever): the information is there, the calibration
+        # wasn't. 20 = between the old 15 and the inflated regime; final call
+        # deferred to the 50-query 3-arm full run.)
+        max_out = 20
     def _ck(c):
         try:
             return math.log10(1 + int(c.get("citation_count") or c.get("citationCount") or 0))
@@ -335,10 +341,18 @@ def rerank_authority(high: list[dict], some: list[dict], max_out: int | None = N
     pool = high + some
     pool_max = max((_ck(c) for c in pool), default=1.0) or 1.0
 
+    # order-mode switch (50-query 3-arm experiment; env-gated, single code path —
+    # the stale-copy lesson). hybrid = semantic-majority + citation-minority;
+    # semantic/citation = pure arms.
+    _mode = os.environ.get("CONTEST_ORDER", "hybrid")
     def _score(c, grade_w):
         sem = c.get("_sem") or 0.0          # embedding cosine to the query
         auth = _ck(c) / pool_max            # normalized log citations
-        return grade_w * (0.3 + 0.6 * sem + 0.2 + 0.2 * auth)
+        if _mode == "semantic":
+            return grade_w * (0.3 + 0.7 * sem)
+        if _mode == "citation":
+            return grade_w * (0.5 + 0.5 * auth)
+        return grade_w * (0.3 + 0.6 * sem + 0.2 + 0.2 * auth)  # hybrid
 
     ranked = sorted(
         [(_score(c, 1.0), -i, c) for i, c in enumerate(high)]
