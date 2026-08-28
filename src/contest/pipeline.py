@@ -238,23 +238,30 @@ def grade_and_rank(query: str, cands: list[dict], max_out: int = 15,
     # chunked grading: a 150-item monolithic listing measurably dilutes attention
     # (q2: 3 window-gold present, 0 graded; isolated or 50-chunked: 3/3). Grade in
     # 50-item chunks and merge — chunk-local H inflation is handled by the rank cap.
+    # (2026-08-28) abstract-assisted grading: title-only grading was systemically
+    # blind to niche-venue gold ('Research on...' generic titles — q2: 7/12 in
+    # pool, 0 graded). Abstracts come free with the S2 bulk v3 cache (82%
+    # coverage); the first ~180 chars disambiguate generic titles at modest
+    # token cost. Judge by title+abstract, year, citations as before.
     high, some = [], []
     for ci in range(0, len(cands), 50):
         chunk = cands[ci:ci + 50]
         listing = "\n".join(
             f"{i}: {c.get('title','')} ({c.get('year','')}, cited {c.get('citation_count') or c.get('citationCount') or 0})"
+            + (f" — {(c.get('abstract') or '')[:180]}" if c.get("abstract") else "")
             for i, c in enumerate(chunk))
         p = ("A researcher's academic search request:\n"
              f"«{query}»\n\n"
-             "Candidate papers (index: title (year, citation count)):\n" + listing + "\n\n"
+             "Candidate papers (index: title (year, citation count) — abstract excerpt):\n"
+             + listing + "\n\n"
              "Grade each candidate: H = directly about the request's specific "
              "technique/task/point; S = relevant to the broader request but not the "
-             "specific point; N = not relevant. Judge by title (and year if the "
-             "request implies recency). When the request asks for representative/"
-             "top-tier/influential works or wants to 'expand ideas'/'get started', "
-             "REPRESENTATIVE high-citation works directly on the topic are H — "
-             "recent niche variants of the same topic stay S. Be GENEROUS with S — "
-             "the request wants comprehensive coverage.\n"
+             "specific point; N = not relevant. Judge by title AND abstract. When "
+             "the request asks for representative/top-tier/influential works or "
+             "wants to 'expand ideas'/'get started', REPRESENTATIVE high-citation "
+             "works directly on the topic are H — recent niche variants of the same "
+             "topic stay S. Be GENEROUS with S — the request wants comprehensive "
+             "coverage.\n"
              'Output JSON: {"H": [indices], "S": [indices]}')
         raw = ledger.llm("DeepSeek-V4-Flash", p, max_tokens=600, enable_thinking=False)
         obj = parse_json_response(raw) or {}
