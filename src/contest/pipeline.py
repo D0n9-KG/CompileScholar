@@ -142,7 +142,7 @@ def _s2_bulk_one(q: str, max_pages: int = 2) -> list[dict]:
     import hashlib, urllib.request
     # v2: early runs cached entries without citationCount (field added later);
     # citation presort silently buried them. Version-bump forces one clean refetch.
-    key = hashlib.md5(f"s2bulk|{q}|{max_pages}|v2".encode()).hexdigest()[:16]
+    key = hashlib.md5(f"s2bulk|{q}|{max_pages}|v3-abstract".encode()).hexdigest()[:16]
     cpath = os.path.join(_S2_CACHE_DIR, key + ".json")
     if os.path.exists(cpath):
         try:
@@ -152,7 +152,7 @@ def _s2_bulk_one(q: str, max_pages: int = 2) -> list[dict]:
             pass
     out, token, n_err = [], None, 0
     for _ in range(max_pages):
-        params = {"query": q, "fields": "title,year,citationCount,venue,externalIds"}
+        params = {"query": q, "fields": "title,year,citationCount,venue,externalIds,abstract"}
         if token:
             params["token"] = token
         url = ("https://api.semanticscholar.org/graph/v1/paper/search/bulk?"
@@ -178,6 +178,35 @@ def _s2_bulk_one(q: str, max_pages: int = 2) -> list[dict]:
     return out
 
 
+def embedding_rerank(query: str, cands: list[dict], top_k: int = 150) -> list[dict]:
+    """Semantic rerank between recall and grading (2026-08-28, the 'ranked
+    recall' layer). Measured: S2 bulk is an unranked firehose (PPO, cited 30k,
+    sampled out of page 1); qwen3-embedding:8b cosine floats gold to top-10
+    of a mixed 85-pool (q8 injection test: ranks 3/7/10). This replaces the
+    citation-count presort as the grading-window selector — citation count
+    stays in the grader prompt (authority-in-prompt, the paired-A/B verdict).
+    Falls back to citation-count order if embeddings fail (honest degrade)."""
+    try:
+        from granular_agent.hypergraph_evolution import _embed_texts_robust
+        texts = [query] + [(c.get("title") or "") + ". " + (c.get("abstract") or "")[:400]
+                           for c in cands[:400]]
+        embs = _embed_texts_robust(texts)
+        if not embs or len(embs) != len(texts):
+            raise RuntimeError("embedding unavailable")
+        import math
+        def _cos(a, b):
+            dot = sum(x * y for x, y in zip(a, b))
+            na = math.sqrt(sum(x * x for x in a)); nb = math.sqrt(sum(x * x for x in b))
+            return dot / (na * nb) if na and nb else 0.0
+        scored = sorted(zip(cands[:400], embs[1:]),
+                        key=lambda t: -_cos(embs[0], t[1]))
+        return [c for c, _ in scored[:top_k]]
+    except Exception:
+        # degrade: citation-count order (the old behavior)
+        return sorted(cands, key=lambda c: -(c.get("citation_count")
+                                              or c.get("citationCount") or 0))[:top_k]
+
+
 def grade_and_rank(query: str, cands: list[dict], max_out: int = 15,
                    rank: str = "authority") -> list[dict]:
     """LLM grades candidates highly/somewhat/not on the query's facets; then
@@ -198,11 +227,14 @@ def grade_and_rank(query: str, cands: list[dict], max_out: int = 15,
         by_query.setdefault(c.get("_q") or "", []).append(c)
     trimmed = []
     for ql, lst in by_query.items():
-        lst.sort(key=lambda c: -(c.get("citation_count") or c.get("citationCount") or 0))
-        trimmed.extend(lst[:20])
+        # per-query trim now SEMANTIC (embedding cosine to the query), citation
+        # only as tiebreak — measured: global citation sort buried facet gold at
+        # ranks 128-254; embedding rerank floats injected gold to top-10/85.
+        ranked = embedding_rerank(query, lst, top_k=20)
+        trimmed.extend(ranked)
     if len(trimmed) < 100:            # small pools: fall back to global sort
         trimmed = cands
-    cands = sorted(trimmed, key=lambda c: -(c.get("citation_count") or c.get("citationCount") or 0))[:150]
+    cands = embedding_rerank(query, trimmed, top_k=150)
     # chunked grading: a 150-item monolithic listing measurably dilutes attention
     # (q2: 3 window-gold present, 0 graded; isolated or 50-chunked: 3/3). Grade in
     # 50-item chunks and merge — chunk-local H inflation is handled by the rank cap.

@@ -134,7 +134,8 @@ class GranularFlowAgent:
         """KB-backed pipeline: run the four builder agents on each
         section of a paper, writing through KnowledgeBase.commit. Returns a
         report per section + aggregate. arm: full/add_only/no_intra_dag/frozen
-        — frozen skips evolution+align."""
+        — frozen skips SCHEMA evolution only; A-box alignment runs in every
+        arm (2026-08-28 fix — see the Stage 3 note below)."""
         from granular_agent.extraction_agent import ExtractionAgent
         from granular_agent.evolution_agent import EvolutionAgent, TriggerSource
         from granular_agent.alignment_agent import AlignmentAgent, AlignmentReport
@@ -289,15 +290,19 @@ class GranularFlowAgent:
                                               paper_id=paper_id, domain=self.domain)
             evo.drain()
 
-        # Stage 3: align — Define + Canonicalize on the new concepts ingested
-        if arm != "frozen":
-            try:
-                align_rep = align.align_new(domain=self.domain)
-            except Exception as e:
-                align_rep = AlignmentReport()
-                print(f"  [kernel] align failed: {e!r}", flush=True)
-        else:
-            align_rep = None
+        # Stage 3: align — Define + Canonicalize on the new concepts ingested.
+        # Runs in EVERY arm including frozen (2026-08-28 fix): frozen skips
+        # SCHEMA evolution (T-box writes), not A-box alignment — cross-paper
+        # concept merges are the extractor's job, not evolution. Measured cost
+        # of the old gate: frozen runs left the variant dictionary empty
+        # (420/428 single-surface concepts), killing the online side of the
+        # 'offline-evolve + online-frozen' architecture (query expansion,
+        # graph vocabulary) — the A-box islanded per paper.
+        try:
+            align_rep = align.align_new(domain=self.domain)
+        except Exception as e:
+            align_rep = AlignmentReport()
+            print(f"  [kernel] align failed: {e!r}", flush=True)
 
         # Stage 3.5: citation intent — paper-level 'cites' edges (extends/
         # improves/compares/...) into the SAME graph, committed through the
