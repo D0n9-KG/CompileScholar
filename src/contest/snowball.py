@@ -14,7 +14,9 @@ Budget discipline (the $0.1/day = 1000-request lesson):
   - dedup against the existing pool BEFORE fetching metadata
 """
 import json, os, re, time
+import urllib.error
 import urllib.parse
+import urllib.request
 
 from .cost_ledger import ledger
 
@@ -31,41 +33,62 @@ def _cache_path(key: str) -> str:
     return os.path.join(_CACHE_DIR, key + ".json")
 
 
-def _get(url: str, timeout: float = 40) -> dict | None:
+def _get(url: str, timeout: float = 40, retries: int = 3) -> dict | None:
+    """OpenAlex GET with retry. The API flaps under cluster recovery (measured
+    6/6 failures for ~1 min, then clean) AND rate-limits per-day — retry with
+    backoff on 5xx/transient only; a 429 budget-exhausted response returns
+    None immediately (retrying can't help within the day)."""
     if "mailto=" not in url:
         url += ("&" if "?" in url else "?") + "mailto=" + _MAILTO
-    t0 = time.time()
-    try:
-        req = urllib.request.Request(url, headers={"User-Agent": f"LogicKG-research (mailto:{_MAILTO})"})
-        with urllib.request.urlopen(req, timeout=timeout) as r:
-            d = json.loads(r.read())
-        ledger._record("http", source="openalex", dt=time.time() - t0, ok=True)
-        return d
-    except Exception as e:
-        ledger._record("http", source="openalex", dt=time.time() - t0, ok=False,
-                       err=repr(e)[:80])
-        return None
+    for attempt in range(retries):
+        t0 = time.time()
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": f"LogicKG-research (mailto:{_MAILTO})"})
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                d = json.loads(r.read())
+            ledger._record("http", source="openalex", dt=time.time() - t0, ok=True)
+            return d
+        except urllib.error.HTTPError as e:
+            if e.code == 429:
+                ledger._record("http", source="openalex", dt=time.time() - t0,
+                               ok=False, err="429-budget-exhausted")
+                return None
+            ledger._record("http", source="openalex", dt=time.time() - t0,
+                           ok=False, err=f"HTTP{e.code}")
+        except Exception as e:
+            ledger._record("http", source="openalex", dt=time.time() - t0,
+                           ok=False, err=repr(e)[:80])
+        time.sleep(2 * (attempt + 1))
+    return None
 
 
-def resolve_seeds(titles: list[str]) -> dict[str, str]:
-    """Title -> openalex W-id via /works?search=title (1 request per title,
-    cached). Returns {norm_title: W-id}."""
+def resolve_seeds(titles: list[str], dois: dict[str, str] | None = None) -> dict[str, str]:
+    """Title -> openalex W-id. Primary path = /works/doi:{doi} (from the S2
+    pool's externalIds — the search= endpoint is paused under cluster recovery
+    and title.match is unreliable for arXiv preprints; measured 2026-08-28).
+    Fallback = /works?search= (when it recovers). dois: {norm_title: doi}."""
     out = {}
+    dois = dois or {}
     for t in titles:
-        key = "seed_" + _norm_title(t)[:40]
+        nt = _norm_title(t)
+        key = "seed_" + nt[:40]
         cp = _cache_path(key)
+        d = None
         if os.path.exists(cp):
             d = json.loads(open(cp, encoding="utf-8").read())
-        else:
-            d = _get("https://api.openalex.org/works?" + urllib.parse.urlencode(
-                {"search": t, "per-page": "1"})) or {}
-            json.dump(d, open(cp, "w", encoding="utf-8"), ensure_ascii=False)
-        results = d.get("results") or []
-        if results:
-            wid = results[0].get("id", "").split("/")[-1]
-            if wid:
-                out[_norm_title(t)] = wid
-        time.sleep(0.15)   # ~6 rps polite ceiling under 1 rps key-less budget
+        if not d:
+            doi = dois.get(nt)
+            if doi:
+                d = _get(f"https://api.openalex.org/works/doi:{doi}?select=id,title")
+            if not d or not d.get("id"):
+                d = _get("https://api.openalex.org/works?" + urllib.parse.urlencode(
+                    {"search": t, "per-page": "1"})) or {}
+            if d:
+                json.dump(d, open(cp, "w", encoding="utf-8"), ensure_ascii=False)
+        wid = (d or {}).get("id", "").split("/")[-1] if d else ""
+        if wid and wid.startswith("W"):
+            out[nt] = wid
+        time.sleep(0.15)
     return out
 
 
@@ -124,10 +147,11 @@ def works_metadata(wids: list[str]) -> list[dict]:
 
 
 def snowball(seed_titles: list[str], pool_titles: set[str],
-             max_seeds: int = 8) -> list[dict]:
+             max_seeds: int = 8, dois: dict[str, str] | None = None) -> list[dict]:
     """One-hop expansion: seeds' references ∪ seed-resolution works, minus the
-    existing pool. Returns new candidate rows."""
-    seeds = resolve_seeds(seed_titles[:max_seeds])
+    existing pool. Returns new candidate rows. dois: {norm_title: doi} from the
+    S2 pool's externalIds (primary seed-resolution path)."""
+    seeds = resolve_seeds(seed_titles[:max_seeds], dois)
     if not seeds:
         return []
     refs = references_batch(list(seeds.values()))
