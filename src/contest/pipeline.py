@@ -200,6 +200,10 @@ def embedding_rerank(query: str, cands: list[dict], top_k: int = 150) -> list[di
             return dot / (na * nb) if na and nb else 0.0
         scored = sorted(zip(cands[:400], embs[1:]),
                         key=lambda t: -_cos(embs[0], t[1]))
+        # carry the semantic score on the candidate — the output ranker
+        # (rerank_authority) reuses it instead of re-embedding
+        for c, e in scored:
+            c["_sem"] = round(_cos(embs[0], e), 4)
         return [c for c, _ in scored[:top_k]]
     except Exception:
         # degrade: citation-count order (the old behavior)
@@ -287,7 +291,7 @@ def grade_and_rank(query: str, cands: list[dict], max_out: int = 15,
         pass
     if rank == "llm":
         return (high + some)[:max_out]
-    return rerank_authority(high, some, max_out)
+    return rerank_authority(high, some, max_out, query=query)
 
 
 _GRADE_ARCHIVE = ".research_tmp/contest_survey/_grade_archive.jsonl"
@@ -306,21 +310,30 @@ def _archive_grade(query, cands, high, some):
         f.write(json.dumps(line, ensure_ascii=False) + "\n")
 
 
-def rerank_authority(high: list[dict], some: list[dict], max_out: int = 12) -> list[dict]:
-    """Fuse relevance grade with citation-count authority: H papers outrank S;
-    within a grade, log-citations break ties (normalized by pool max). An S
-    paper can never jump above an H paper (0.55 + 0.35 < 0.65)."""
+def rerank_authority(high: list[dict], some: list[dict], max_out: int = 12,
+                     query: str = "") -> list[dict]:
+    """Fuse relevance grade with SEMANTIC score first, citation authority as
+    secondary. H papers outrank S; within a grade, the embedding-rerank score
+    (query-cosine, carried on each candidate as '_sem') orders first and
+    log-citations break ties. R8 diagnosis: citation-only ordering within H let
+    abstract-grading's H inflation crowd gold out of the top-15 cut (q8: gold
+    cited 75/37/23 lost to non-gold cited 100+); semantic ordering keeps the
+    most query-relevant H on top regardless of citation fashion."""
     import math
     def _ck(c):
         try:
-            # S2 rows carry 'citationCount', sci-evo rows 'citation_count'
             return math.log10(1 + int(c.get("citation_count") or c.get("citationCount") or 0))
         except (TypeError, ValueError):
             return 0.0
     pool = high + some
     pool_max = max((_ck(c) for c in pool), default=1.0) or 1.0
+
     def _score(c, grade_w):
-        return grade_w * (0.65 + 0.35 * _ck(c) / pool_max)
+        sem = c.get("_sem") or 0.0          # embedding cosine to the query
+        auth = _ck(c) / pool_max            # normalized log citations
+        # semantic 60% + authority 40% within grade; grade weight dominates
+        return grade_w * (0.3 + 0.6 * sem + 0.4 * (0.5 + 0.5 * auth) * 0.5)
+
     ranked = sorted(
         [(_score(c, 1.0), -i, c) for i, c in enumerate(high)]
         + [(_score(c, 0.55), -i, c) for i, c in enumerate(some)],
