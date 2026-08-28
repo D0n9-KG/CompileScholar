@@ -76,16 +76,32 @@ def extract_citation_intents(kb, paper_id: str, fulltext: str, llm_fn,
                 idx[f"{sn} {yr}"] = pid
 
     mutations = []
+    # classify ALL mentions concurrently (measured: Paratera tolerates 8-16
+    # parallel calls at ~1.1-1.6 calls/s throughput vs ~0.3 serial — a survey
+    # paper's 200+ mentions go from ~10min to ~2.5min). Mentions are fully
+    # independent (pure function per mention); deterministic order preserved
+    # by mapping over sorted keys.
+    from concurrent.futures import ThreadPoolExecutor
+
+    num_keys = sorted(num_ctx)[:max_refs]
+    ay_keys = sorted(ay_ctx)
+    classify_jobs = [(str(rid), num_ctx[rid]) for rid in num_keys] + \
+                    [(key, ay_ctx[key]) for key in ay_keys]
+    with ThreadPoolExecutor(max_workers=8) as ex:
+        classified = list(ex.map(
+            lambda j: classify_intent(j[0], j[1], llm_fn), classify_jobs))
+    by_key = {j[0]: rec for j, rec in zip(classify_jobs, classified)}
+
     # numeric mentions: join via ref list (rid -> title -> corpus title match)
-    for rid in sorted(num_ctx)[:max_refs]:
-        rec = classify_intent(str(rid), num_ctx[rid], llm_fn)
+    for rid in num_keys:
+        rec = by_key[str(rid)]
         if ref_titles and rid in ref_titles:
             rec["ref_title"] = ref_titles[rid][:160]
         report["edges"].append({**rec, "mention_kind": "numeric"})
 
     # author-year mentions: corpus join -> PAPER-level 'cites' edge
-    for key in sorted(ay_ctx):
-        rec = classify_intent(key, ay_ctx[key], llm_fn)
+    for key in ay_keys:
+        rec = by_key[key]
         target_pid = idx.get(key)
         if target_pid:
             rec["corpus_pid"] = target_pid
