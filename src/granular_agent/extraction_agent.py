@@ -493,11 +493,37 @@ class ExtractionAgent:
         edges) — an unverified edge must never silently enter the A-box."""
         if not edges:
             return []
+        batches = [edges[i:i + 8] for i in range(0, len(edges), 8)]
+        if len(batches) == 1:
+            return self._verify_batch(batches[0], nodes, section_text, domain)
+        # batch concurrency (2026-08-28 perf): batches are independent 8-edge
+        # calls; the API tolerates 8+ parallel (measured on Paratera). Order is
+        # restored by index so verdicts map back to edges exactly as serial.
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=min(4, len(batches))) as ex:
+            results = list(ex.map(
+                lambda b: self._verify_batch(b, nodes, section_text, domain),
+                batches))
         out: list[Verdict] = []
-        for i in range(0, len(edges), 8):
-            batch = edges[i:i + 8]
-            out.extend(self._verify_batch(batch, nodes, section_text, domain))
+        for r in results:
+            out.extend(r)
         return out
+
+    def _verify_schema_hint(self, edges: list[Hyperedge]) -> str:
+        """Compact schema context for verify: the distinct pattern types in
+        THIS batch only, one line each (id + one-line description). Replaces
+        the full-schema prompt in verify calls — per-edge pattern
+        desc/boundary already ride in edges_for_prompt."""
+        seen = {}
+        for he in edges:
+            if he.pattern_type and he.pattern_type not in seen:
+                pat = self.kb.tbox.patterns.get(he.pattern_type)
+                seen[he.pattern_type] = (pat.description[:120] if pat else "")
+        if not seen:
+            return ""
+        lines = [f"- {pid}: {desc}" for pid, desc in seen.items()]
+        return ("Patterns referenced by the edges below (full definitions are "
+                "attached per-edge):\n" + "\n".join(lines))
 
     def _verify_batch(self, edges: list[Hyperedge], nodes: list[HGNode],
                       section_text: str, domain: str) -> list[Verdict]:
@@ -532,7 +558,15 @@ class ExtractionAgent:
                 "evidence_span": he.evidence_span,
             })
         p = _VERIFY_PROMPT.format(
-            domain=domain, schema_prompt=self.kb.tbox.to_prompt(),
+            domain=domain,
+            # schema prompt: COMPACT role map only (2026-08-28 perf fix).
+            # The full tbox.to_prompt() (~3.4k tokens for 29 patterns) was sent
+            # with EVERY 8-edge verify batch — but edges_for_prompt already
+            # carries each edge's OWN pattern_desc/boundary/allowed_roles.
+            # The duplicated full schema was pure input-token overhead
+            # (-60% verify latency); the pattern-level definitions per edge
+            # carry all the semantics the three checks need.
+            schema_prompt=self._verify_schema_hint(edges),
             section_text=section_text,
             edges_json=json.dumps(edges_for_prompt, ensure_ascii=False))
         raw = self.llm_verify(p, 4000)
