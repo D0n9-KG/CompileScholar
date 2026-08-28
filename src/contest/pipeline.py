@@ -293,7 +293,7 @@ def grade_and_rank(query: str, cands: list[dict], max_out: int = 15,
         pass
     if rank == "llm":
         return (high + some)[:max_out]
-    return rerank_authority(high, some, max_out, query=query)
+    return rerank_authority(high, some, None, query=query)
 
 
 _GRADE_ARCHIVE = ".research_tmp/contest_survey/_grade_archive.jsonl"
@@ -312,16 +312,21 @@ def _archive_grade(query, cands, high, some):
         f.write(json.dumps(line, ensure_ascii=False) + "\n")
 
 
-def rerank_authority(high: list[dict], some: list[dict], max_out: int = 12,
+def rerank_authority(high: list[dict], some: list[dict], max_out: int | None = None,
                      query: str = "") -> list[dict]:
-    """Fuse relevance grade with SEMANTIC score first, citation authority as
-    secondary. H papers outrank S; within a grade, the embedding-rerank score
-    (query-cosine, carried on each candidate as '_sem') orders first and
-    log-citations break ties. R8 diagnosis: citation-only ordering within H let
-    abstract-grading's H inflation crowd gold out of the top-15 cut (q8: gold
-    cited 75/37/23 lost to non-gold cited 100+); semantic ordering keeps the
-    most query-relevant H on top regardless of citation fashion."""
+    """R10: adaptive output + hybrid ordering. Two measured failure modes
+    fixed at once:
+      R8 (citation-only order): specific-query gold (low-cited niche papers)
+      buried under fashionable non-gold — q4 stuck at 0.091 for six rounds.
+      R9 (semantic-only order): broad/survey queries collapsed (q1 0.136→0.045)
+      — when every on-topic paper scores similar, citation authority was the
+      only thing separating 'expert-picked' from 'merely relevant'.
+    So: semantic 60% + authority 40% within grade (hybrid), AND the output cap
+    grows with the H-grade size (max(12, len(H)+3)) — a 13-H query outputs 16,
+    a 2-H query outputs 12; capacity follows the grader's own confidence."""
     import math
+    if max_out is None:
+        max_out = max(12, len(high) + 3)
     def _ck(c):
         try:
             return math.log10(1 + int(c.get("citation_count") or c.get("citationCount") or 0))
@@ -333,8 +338,7 @@ def rerank_authority(high: list[dict], some: list[dict], max_out: int = 12,
     def _score(c, grade_w):
         sem = c.get("_sem") or 0.0          # embedding cosine to the query
         auth = _ck(c) / pool_max            # normalized log citations
-        # semantic 60% + authority 40% within grade; grade weight dominates
-        return grade_w * (0.3 + 0.6 * sem + 0.4 * (0.5 + 0.5 * auth) * 0.5)
+        return grade_w * (0.3 + 0.6 * sem + 0.2 + 0.2 * auth)
 
     ranked = sorted(
         [(_score(c, 1.0), -i, c) for i, c in enumerate(high)]
