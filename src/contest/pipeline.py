@@ -12,9 +12,11 @@ import argparse, json, os, re, sys, time
 import urllib.parse
 from concurrent.futures import ThreadPoolExecutor
 
+# path bootstrap only — NO chdir (a module-level chdir hijacks the importer's
+# cwd: importing contest.pipeline from a runner in another directory silently
+# broke the runner's relative paths — the R9 FileNotFoundError root cause).
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src"))
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
 from granular_agent.llm_client import call_paratera, parse_json_response
 from contest.cost_ledger import ledger

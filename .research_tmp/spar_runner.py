@@ -10,7 +10,10 @@ import argparse, json, os, sys, time
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src"))
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+# resolve the repo root from this file's absolute location (background tasks
+# may start in a different cwd — measured FileNotFoundError otherwise)
+_REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+os.chdir(_REPO)
 
 from contest.pipeline import recall, grade_and_rank, _norm_title
 
