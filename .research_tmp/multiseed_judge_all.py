@@ -29,11 +29,14 @@ def run_judge(tag, p, d):
     jc = os.path.join(d, "judge_cross.json")
     if os.path.exists(jc) and os.path.getsize(jc) > 100:
         return (tag, p, "cached")
-    r = subprocess.run([sys.executable, ".research_tmp/judge_cross.py",
-                        f"{tag}_{p}"], capture_output=True, text=True,
-                       encoding="utf-8", errors="replace", timeout=1800)
-    ok = os.path.exists(jc)
-    return (tag, p, "ok" if ok else f"FAIL: {r.stdout[-200:]} {r.stderr[-200:]}")
+    try:
+        r = subprocess.run([sys.executable, ".research_tmp/judge_cross.py",
+                            f"{tag}_{p}"], capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", timeout=2400)
+        ok = os.path.exists(jc)
+        return (tag, p, "ok" if ok else f"FAIL: {r.stdout[-200:]} {r.stderr[-200:]}")
+    except subprocess.TimeoutExpired:
+        return (tag, p, "TIMEOUT")
 
 
 def aggregate():
@@ -93,9 +96,12 @@ if __name__ == "__main__":
     else:
         bs = bundles()
         print(f"[judge] {len(bs)} bundles")
-        with ThreadPoolExecutor(max_workers=8) as ex:
+        with ThreadPoolExecutor(max_workers=3) as ex:
             futs = [ex.submit(run_judge, t, p, d) for t, p, d in bs]
             for f in as_completed(futs):
-                t, p, msg = f.result()
+                try:
+                    t, p, msg = f.result()
+                except Exception as e:
+                    t, p, msg = "?", "?", f"CRASH: {e!r}"
                 print(f"[judge] {t}_{p}: {msg}", flush=True)
         aggregate()

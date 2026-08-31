@@ -76,6 +76,10 @@ if __name__ == "__main__":
     ap.add_argument("--offset", type=int, default=0)
     ap.add_argument("--rank", choices=["authority", "llm"], default="authority")
     a = ap.parse_args()
+    # include the order-mode in the filename: all three ablation arms use
+    # --rank authority, so without this the citation arm overwrites the
+    # semantic arm's file (hybrid 0.035 was already clobbered-once; backed up).
+    _mode = os.environ.get("CONTEST_ORDER", "hybrid")
     run(a.limit, a.offset,
-        f".research_tmp/contest_survey/spar_practice_{a.rank}_{a.offset}_{a.limit}.json",
+        f".research_tmp/contest_survey/spar_practice_{a.rank}_{_mode}_{a.offset}_{a.limit}.json",
         rank=a.rank)

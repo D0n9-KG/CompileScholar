@@ -5,6 +5,7 @@
 用法: python .research_tmp/judge_cross.py REWRITE_PPR_24493BE6E8C2
 """
 import json, os, sys
+sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 sys.path.insert(0, 'src')
 
 BASE = os.path.join('.research_tmp', 'runs', 'kernel_v2')
@@ -102,8 +103,8 @@ def judge_edges(dirname):
     jobs = [(i, e, judge, fn, model)
             for i, e in enumerate(edges)
             for judge, fn, model in (('GLM-5-Turbo', call_paratera, 'GLM-5-Turbo'),
-                                     ('qwen3.5', call_cst, 'qwen3.5'))]
-    results = {'GLM-5-Turbo': [], 'qwen3.5': []}
+                                     ('gpt-oss-120b', call_cst, 'gpt-oss-120b'))]
+    results = {'GLM-5-Turbo': [], 'gpt-oss-120b': []}
     from concurrent.futures import ThreadPoolExecutor, as_completed
     with ThreadPoolExecutor(max_workers=8) as pool:
         futs = [pool.submit(_one, j) for j in jobs]
@@ -122,25 +123,25 @@ def judge_edges(dirname):
         p = sum(1 for r in rs if r['pass'])
         summary[judge] = {'pass': p, 'total': n, 'rate': round(p / n, 3) if n else None}
     # agreement
-    agree = sum(1 for a, b in zip(results['GLM-5-Turbo'], results['qwen3.5'])
+    agree = sum(1 for a, b in zip(results['GLM-5-Turbo'], results['gpt-oss-120b'])
                 if a['pass'] == b['pass'])
     summary['agreement'] = f"{agree}/{len(edges)}"
     # both-pass rate (strict) and either-pass (lenient)
-    both = sum(1 for a, b in zip(results['GLM-5-Turbo'], results['qwen3.5'])
+    both = sum(1 for a, b in zip(results['GLM-5-Turbo'], results['gpt-oss-120b'])
                if a['pass'] and b['pass'])
-    either = sum(1 for a, b in zip(results['GLM-5-Turbo'], results['qwen3.5'])
+    either = sum(1 for a, b in zip(results['GLM-5-Turbo'], results['gpt-oss-120b'])
                  if a['pass'] or b['pass'])
     summary['both_pass'] = f"{both}/{len(edges)}"
     summary['either_pass'] = f"{either}/{len(edges)}"
 
     out = {'summary': summary, 'edges': edges,
-           'glm': results['GLM-5-Turbo'], 'qwen': results['qwen3.5']}
+           'glm': results['GLM-5-Turbo'], 'gpt_oss': results['gpt-oss-120b']}
     with open(os.path.join(d, 'judge_cross.json'), 'w', encoding='utf-8') as f:
         json.dump(out, f, ensure_ascii=False, indent=2)
     print(json.dumps(summary, ensure_ascii=False, indent=1))
     # failures detail for the report
     print("\n=== both-judge failures ===")
-    for a, b, e in zip(results['GLM-5-Turbo'], results['qwen3.5'], edges):
+    for a, b, e in zip(results['GLM-5-Turbo'], results['gpt-oss-120b'], edges):
         if not (a['pass'] or b['pass']):
             print(f"[{a['i']}] {e['pt']} | {a['reason'][:60]} | {b['reason'][:60]}")
 
