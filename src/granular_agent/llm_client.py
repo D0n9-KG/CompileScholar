@@ -324,6 +324,13 @@ def embed_batch(texts: list[str], model: str = "GLM-Embedding-2") -> list[list[f
             for d in data:
                 out[i + d.get("index", 0)] = d["embedding"]
         except Exception as e:
+            if isinstance(e, TimeoutError):
+                # wall timeout = provider slow-drip-dead (not a bad text):
+                # per-item retry would multiply the wall 16x per batch
+                # (measured avalanche 2026-08-31: embed_batch joined >400s on
+                # a dead Paratera while walls fired correctly beneath).
+                # Fail fast so _embed_texts_robust falls to the CST tier.
+                raise
             # whole batch failed (likely one bad text); retry each individually
             for j, t in enumerate(chunk):
                 if any(out[i + j]):
