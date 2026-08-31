@@ -43,12 +43,32 @@ def _api_key() -> str:
     return ""
 
 
-def _open(url: str, data=None, timeout=30):
-    """urllib that ignores the Windows system proxy (it hijacks requests to
-    some hosts — measured: google.serper.dev times out via proxy, direct
-    curl works). SerpAPI/S2 are directly reachable."""
+def _get(url: str, data=None, timeout=30) -> bytes:
+    """(walled 2026-08-31) open+read inside a daemon thread with a hard wall.
+    urllib's timeout does not stop slow-drip servers — same disease as the
+    Paratera walls in granular_agent.llm_client (an s2match hang froze the
+    demo server mid-recording). Also ignores the Windows system proxy (it
+    hijacks requests to some hosts; SerpAPI/S2 are directly reachable)."""
+    import threading
     direct = urllib.request.build_opener(urllib.request.ProxyHandler({}))
-    return direct.open(urllib.request.Request(url, data=data), timeout=timeout)
+    req = urllib.request.Request(url, data=data)
+    box = {}
+
+    def _run():
+        try:
+            with direct.open(req, timeout=timeout) as r:
+                box["b"] = r.read()
+        except Exception as e:
+            box["e"] = e
+
+    t = threading.Thread(target=_run, daemon=True)
+    t.start()
+    t.join(timeout + 30)
+    if "b" in box:
+        return box["b"]
+    if "e" in box:
+        raise box["e"]
+    raise TimeoutError(f"http wall {timeout + 30}s (thread-abandon): {url[:80]}")
 
 
 def _cache_path(key: str) -> str:
@@ -70,7 +90,7 @@ def _serp_search(q: str, num: int = 20) -> list[dict]:
     url = ("https://serpapi.com/search?" + urllib.parse.urlencode(
         {"q": q, "num": num, "api_key": _api_key()}))
     t0 = time.time()
-    d = json.loads(_open(url, timeout=60).read())
+    d = json.loads(_get(url, timeout=60))
     out = []
     for r in (d.get("organic_results") or [])[:num]:
         link = r.get("link", "")
@@ -100,7 +120,7 @@ def _s2_batch_resolve(arxiv_ids: list[str]) -> dict[str, dict]:
         for attempt in range(3):           # transient 429s measured on bursts
             t0 = time.time()
             try:
-                d = json.loads(_open(url, data=body, timeout=60).read())
+                d = json.loads(_get(url, data=body, timeout=60))
                 ledger._record("http", source="s2batch",
                                dt=round(time.time() - t0, 2), ok=True)
                 break
@@ -189,7 +209,7 @@ def _s2_match_title(title: str) -> dict | None:
     for attempt in range(2):
         t0 = time.time()
         try:
-            d = json.loads(_open(url, timeout=30).read())
+            d = json.loads(_get(url, timeout=30))
             ledger._record("http", source="s2match",
                            dt=round(time.time() - t0, 2), ok=True)
             data = (d.get("data") or [None])[0]
