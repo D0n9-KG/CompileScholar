@@ -114,8 +114,47 @@ def recall(query: str) -> list[dict]:
         queries = expanded_rewrites(query, queries, _CD)[:10]
     except Exception:
         pass
+    # ①③ schema intent expansion (GOAL 2026-08-29; GO + holdout-GO,
+    # goal_log_0829.md): frozen-schema patterns -> entity-vocabulary queries
+    # + one representative-narrowing variant per pattern. Blind (query+schema
+    # only). Validated: dev +30.4pt / holdout +16.7pt pool coverage.
+    try:
+        from contest.intent_recall import schema_expansion_queries
+        queries = (queries + schema_expansion_queries(query))[:16]
+    except Exception:
+        pass
+    # term-of-art field disambiguation (GOAL 2026-08-29 深夜, env-gated,
+    # default OFF). Diagnosed on AutoScholar q1: context-free queries hide
+    # the gold's FIELD ("reconstruction-based techniques" = anomaly
+    # detection jargon, not image reconstruction); verbatim S2 AND Google
+    # both land in the wrong field. One LLM call enumerates field readings
+    # with each field's own title vocabulary.
+    if os.environ.get("CONTEST_DISAMBIG") == "on":
+        try:
+            from contest.disambig_recall import disambiguation_queries
+            queries = (queries + disambiguation_queries(query))[:20]
+        except Exception:
+            pass
     jobs = [(q, m) for q in queries for m in ("keyword", "semantic")]
     out, seen = [], {}
+    # Google source (SerpAPI; GOAL 2026-08-29 晚, env-gated, default OFF —
+    # budget ~249 searches/month makes every run count). GA-baseline evidence:
+    # bare site:arxiv.org Google = 0.2451 SPARBench F1 (SPAR paper table),
+    # strongest public proxy for the expert-picked-representative gold culture.
+    # Appends BEFORE the S2/crossref merge loop so existing-pool papers keep
+    # a google:* _q group (<=20 candidates) that survives per-query trim as a
+    # whole group — Google's ranking signal passes intact into the funnel.
+    if os.environ.get("CONTEST_GOOGLE") in ("on", "plain"):
+        try:
+            from contest.google_recall import google_recall
+            for c in google_recall(query, queries,
+                                   plain=os.environ["CONTEST_GOOGLE"] == "plain"):
+                key = _norm_title(c.get("title", ""))
+                if key and key not in seen:
+                    seen[key] = c
+                    out.append(c)
+        except Exception:
+            pass
 
     def _merge(cands, q):
         for c in cands:
@@ -130,6 +169,87 @@ def recall(query: str) -> list[dict]:
         futs += [ex.submit(_s2_bulk_one, q) for q in queries]
         for f, j in zip(futs, [(q, m) for q in queries for m in ("keyword", "semantic")] + [(q, "") for q in queries]):
             _merge(f.result(), j[0])
+    # ③b slot-fill direct recall (GOAL 2026-08-29): matched patterns ->
+    # graph hyperedges -> provenance papers straight into the pool. No extra
+    # LLM (intent_parse is disk-cached; graph lookup is offline). Dev-set
+    # gold∩graph was 0/23 — the value grows with the explore graph; wired
+    # because the design says so, measured honestly in the arm numbers.
+    try:
+        from contest.intent_recall import graph_direct_hits, intent_parse
+        matches = intent_parse(query)
+        if matches:
+            papers_all = []
+            for h in graph_direct_hits([m["pattern_id"] for m in matches],
+                                       max_edges=20):
+                for p in h.get("papers", []):
+                    papers_all.append((h['pattern_type'], p))
+            # resolve REAL citation counts (GOAL 2026-08-30 fix): graph papers
+            # carried citationCount=0 into a grader prompt that reads
+            # "REPRESENTATIVE high-citation works are H" — systematically
+            # suppressed. S2 batch resolve (same resolver as google_recall).
+            try:
+                from contest.google_recall import _s2_batch_resolve
+                # no arxiv ids on graph papers — resolve by title via match
+                # endpoint is 1-call-each; cap at 12 (graph hits are few)
+                from contest.google_recall import _s2_match_title
+                for _, p in papers_all[:12]:
+                    m = _s2_match_title(p.get("title", ""))
+                    if m:
+                        p["citationCount"] = m.get("citationCount", 0)
+                        p["year"] = m.get("year") or p.get("year", "")
+                        p["abstract"] = m.get("abstract", "")
+            except Exception:
+                pass
+            for ptype, p in papers_all:
+                key = _norm_title(p.get("title", ""))
+                if key and key not in seen:
+                    seen[key] = {"title": p["title"],
+                                 "year": p.get("year", ""),
+                                 "citationCount": p.get("citationCount", 0),
+                                 "_q": f"graph:{ptype}"}
+                    out.append(seen[key])
+    except Exception:
+        pass
+    # ② schema-gated citation-intent exploration (GOAL 2026-08-29), env-gated
+    # (single code path, CONTEST_ORDER precedent): ingest top pool papers
+    # cites-only into the 'explore' graph, mine their classified references,
+    # resolve mined titles via S2 bulk back into the pool. Default OFF — the
+    # +①③ ablation arm must stay clean; set CONTEST_EXPLORE=on to enable.
+    if os.environ.get("CONTEST_EXPLORE") == "on":
+        try:
+            from contest.explore_recall import explore
+            k = int(os.environ.get("CONTEST_EXPLORE_K", "2"))
+            new, _stats = explore(query, out, k_seeds=k)
+            for c in new:
+                key = _norm_title(c.get("title", ""))
+                if key and key not in seen:
+                    seen[key] = c
+                    out.append(c)
+        except Exception:
+            pass
+    # memory recall (GOAL 2026-08-30 下午): semantic match of the query
+    # against ALL titles ever mined by ② across previous queries (cached
+    # citreports — 4k+ titles, growing). Compensates the one-hop structural
+    # ceiling: 5/10 boost1 misses sat in titles mined by earlier queries.
+    # Zero new LLM cost; own _q group so MECH_BOOST trim quota applies.
+    if os.environ.get("CONTEST_MEMORY") == "on":
+        try:
+            from contest.memory_recall import memory_recall, hub_recall
+            for c in memory_recall(query):
+                key = _norm_title(c.get("title", ""))
+                if key and key not in seen:
+                    seen[key] = c
+                    out.append(c)
+            # hub recall — minimal 2nd hop (GOAL 2026-08-30): papers cited
+            # by >=3 distinct ingested seeds = representative-paper detector
+            # (cross-seed co-citation); pure cache query, zero ingestion
+            for c in hub_recall(query):
+                key = _norm_title(c.get("title", ""))
+                if key and key not in seen:
+                    seen[key] = c
+                    out.append(c)
+        except Exception:
+            pass
     return out
 
 
@@ -214,12 +334,26 @@ def embedding_rerank(query: str, cands: list[dict], top_k: int = 150) -> list[di
 
 
 def grade_and_rank(query: str, cands: list[dict], max_out: int = 15,
-                   rank: str = "authority") -> list[dict]:
+                   rank: str = "authority", semantic_trim: bool = True,
+                   # GOAL 2026-08-29 晚: window reverted to 150 (pre-registered
+                   # decision). The 300 default was reverted because the
+                   # funnel-replay needed to justify it costs ~10h under
+                   # evening embedding throttling (4.3 texts/s measured) for
+                   # an expected +-0.002, and mechanism reasoning says
+                   # embed-rank 151-300 gold scores too low in hybrid ordering
+                   # to crack the top-20 cap (corroborated by the cap30
+                   # negative: marginal precision 0.012 < half the average).
+                   grade_window: int = 150, grade_chunk: int = 50) -> list[dict]:
     """LLM grades candidates highly/somewhat/not on the query's facets; then
     rank. rank='authority' fuses the grade with a citation-count signal
     (SPARBench diagnosis: gold = expert-picked REPRESENTATIVE papers; pure
     relevance ranking returns niche recent works instead). rank='llm' keeps
-    the old grade-order output as the baseline arm."""
+    the old grade-order output as the baseline arm.
+
+    semantic_trim/grade_window/grade_chunk default to the SPAR-measured
+    configuration. The demo endpoint passes a faster config (citation trim +
+    one global embedding pass + a single grading chunk) — it changes the demo
+    latency, NOT the SPARM arm behavior (spar_runner calls with defaults)."""
     if not cands:
         return []
     # pools can reach 4000+ with S2 bulk (unranked firehose): before the grading
@@ -232,15 +366,31 @@ def grade_and_rank(query: str, cands: list[dict], max_out: int = 15,
     for c in cands:
         by_query.setdefault(c.get("_q") or "", []).append(c)
     trimmed = []
+    # GOAL 2026-08-30: mechanism groups (explore:*/graph:*) carry pool golds
+    # that die OUTSIDE the grading window (measured q21-22 boost run: in-pool
+    # golds incl. Visual Instruction Tuning all crowded out of the 150 window
+    # by 13k-pool wide queries). Their titles came from REAL reference lists
+    # (title-precise by construction) — they get a HIGHER per-group trim
+    # quota than generic search groups. Env-gated so the running arms' module
+    # state (already loaded) is unaffected; RSQ/pre-registered runs only.
+    _mech_boost = os.environ.get("CONTEST_MECH_BOOST") == "on"
     for ql, lst in by_query.items():
-        # per-query trim now SEMANTIC (embedding cosine to the query), citation
-        # only as tiebreak — measured: global citation sort buried facet gold at
-        # ranks 128-254; embedding rerank floats injected gold to top-10/85.
-        ranked = embedding_rerank(query, lst, top_k=20)
+        is_mech = str(ql).startswith(("explore:", "graph:"))
+        cap_q = 40 if (is_mech and _mech_boost) else 20
+        if semantic_trim:
+            # per-query trim SEMANTIC (embedding cosine to the query), citation
+            # only as tiebreak — measured: global citation sort buried facet gold
+            # at ranks 128-254; embedding rerank floats injected gold to top-10/85.
+            ranked = embedding_rerank(query, lst, top_k=cap_q)
+        else:
+            # fast (demo) trim: citation order per recall query, no per-group
+            # embedding — keeps facet diversity, one global embed happens below.
+            ranked = sorted(lst, key=lambda c: -(c.get("citation_count")
+                                                 or c.get("citationCount") or 0))[:cap_q]
         trimmed.extend(ranked)
     if len(trimmed) < 100:            # small pools: fall back to global sort
         trimmed = cands
-    cands = embedding_rerank(query, trimmed, top_k=150)
+    cands = embedding_rerank(query, trimmed, top_k=grade_window)
     # chunked grading: a 150-item monolithic listing measurably dilutes attention
     # (q2: 3 window-gold present, 0 graded; isolated or 50-chunked: 3/3). Grade in
     # 50-item chunks and merge — chunk-local H inflation is handled by the rank cap.
@@ -250,8 +400,8 @@ def grade_and_rank(query: str, cands: list[dict], max_out: int = 15,
     # coverage); the first ~180 chars disambiguate generic titles at modest
     # token cost. Judge by title+abstract, year, citations as before.
     high, some = [], []
-    for ci in range(0, len(cands), 50):
-        chunk = cands[ci:ci + 50]
+    for ci in range(0, len(cands), grade_chunk):
+        chunk = cands[ci:ci + grade_chunk]
         listing = "\n".join(
             f"{i}: {c.get('title','')} ({c.get('year','')}, cited {c.get('citation_count') or c.get('citationCount') or 0})"
             + (f" — {(c.get('abstract') or '')[:180]}" if c.get("abstract") else "")
@@ -269,7 +419,33 @@ def grade_and_rank(query: str, cands: list[dict], max_out: int = 15,
              "topic stay S. Be GENEROUS with S — the request wants comprehensive "
              "coverage.\n"
              'Output JSON: {"H": [indices], "S": [indices]}')
+        if os.environ.get("CONTEST_PRECISION") == "on":
+            # precision mode (GOAL 2026-08-29 深夜): small-gold regime — the
+            # request is a SPECIFIC question typically answered by 1-5 papers
+            # (AutoScholar: mean gold 2.4/query). Generous-S grading drowns the
+            # exact match in near-neighbors (q2: gold in pool, out of window).
+            # Strict prompt: only precise matches are H/S; output is H-first
+            # with a small cap (rerank_authority honors CONTEST_CAP).
+            p = ("A researcher's SPECIFIC academic search request:\n"
+                 f"«{query}»\n\n"
+                 "Candidate papers (index: title (year, citation count) — abstract excerpt):\n"
+                 + listing + "\n\n"
+                 "This kind of request is typically answered by only 1-5 papers. "
+                 "Grade each candidate: H = the paper IS one of the specific "
+                 "studies the request asks about (its core contribution matches "
+                 "the named technique/task/point); S = closely adjacent work on "
+                 "the same specific point but not itself an answer; N = merely "
+                 "the same broad topic. Judge by title AND abstract. Be "
+                 "CONSERVATIVE: when in doubt between S and N, choose N — the "
+                 "requester wants the exact studies, not the neighborhood.\n"
+                 'Output JSON: {"H": [indices], "S": [indices]}')
         raw = ledger.llm("DeepSeek-V4-Flash", p, max_tokens=600, enable_thinking=False)
+        if raw is None:
+            # grading is the conversion bottleneck — a transient provider
+            # failure must not silently zero a query (GOAL 2026-08-29: q1 of
+            # the final run pred=0 from a rate-limit burst). One bounded retry.
+            time.sleep(8)
+            raw = ledger.llm("DeepSeek-V4-Flash", p, max_tokens=600, enable_thinking=False)
         obj = parse_json_response(raw) or {}
         for x in (obj.get("H") or []):
             try:
@@ -286,9 +462,12 @@ def grade_and_rank(query: str, cands: list[dict], max_out: int = 15,
             except (ValueError, TypeError):
                 pass
     # archive the graded pool for paired offline A/B (ranker comparison without
-    # re-grading — grader variance between runs measured at q2: 0.0 vs 0.148)
+    # re-grading — grader variance between runs measured at q2: 0.0 vs 0.148).
+    # cands is ALREADY windowed here (embedding_rerank top_k=grade_window) —
+    # the old cands[:150] slice silently truncated window-300 runs and made the
+    # offline order-replay unfaithful (GOAL 2026-08-29 fix).
     try:
-        _archive_grade(query, cands[:150], high, some)
+        _archive_grade(query, cands, high, some)
     except Exception:
         pass
     if rank == "llm":
@@ -297,6 +476,33 @@ def grade_and_rank(query: str, cands: list[dict], max_out: int = 15,
 
 
 _GRADE_ARCHIVE = ".research_tmp/contest_survey/_grade_archive.jsonl"
+
+
+def _slot_token_sets(query: str) -> list[set]:
+    """⑤ helper: token sets of the parsed query's slot-filler phrases (each
+    set must be fully contained in a candidate title to count). Disk-cached
+    per query (intent_parse is cached; this is a pure transform)."""
+    import hashlib
+    cache = getattr(_slot_token_sets, "_c", None)
+    if cache is None:
+        cache = _slot_token_sets._c = {}
+    k = hashlib.md5(query.encode()).hexdigest()[:12]
+    if k in cache:
+        return cache[k]
+    sets = []
+    try:
+        from contest.intent_recall import intent_parse
+        for m in intent_parse(query):
+            for v in (m.get("slots") or {}).values():
+                toks = {t for t in re.sub(r"[^a-z0-9 ]", " ",
+                                          (v or "").lower()).split()
+                        if len(t) > 3}
+                if toks:
+                    sets.append(toks)
+    except Exception:
+        pass
+    cache[k] = sets
+    return sets
 
 
 def _archive_grade(query, cands, high, some):
@@ -326,13 +532,19 @@ def rerank_authority(high: list[dict], some: list[dict], max_out: int | None = N
     a 2-H query outputs 12; capacity follows the grader's own confidence."""
     import math
     if max_out is None:
-        # fixed moderate cap (R10 lesson: keying output size to len(H) trusted
-        # an inflated signal — abstract grading pushes H to 34-109 — and the
-        # output exploded 37-112/query, precision collapsed. Recall DID rise
-        # (q4 R=0.571 best ever): the information is there, the calibration
-        # wasn't. 20 = between the old 15 and the inflated regime; final call
-        # deferred to the 50-query 3-arm full run.)
-        max_out = 20
+        # fixed moderate cap. R10 lesson: keying output size to len(H) trusts
+        # an inflated signal (abstract grading pushes H to 34-109 -> output
+        # exploded 37-112/query, precision collapsed). GOAL 2026-08-29 cap
+        # experiment 20->30: NEGATIVE — micro-F1 0.032 vs baseline 0.0347
+        # (+6 tp but P diluted 0.027->0.022 across 1500 pred slots; R rose
+        # 0.049->0.060). Uniform cap expansion recovers fewer graded-gold
+        # than the precision it costs. Reverted to 20; the remaining
+        # conversion lever is the grading WINDOW (goal_log_0829.md).
+        # CONTEST_CAP env: per-benchmark output discipline (small-gold
+        # benchmarks want 5, e.g. AutoScholar mean gold 2.4/query — cap 20
+        # caps F1 at 0.21 even with perfect recall). Env knob, single code
+        # path (stale-copy lesson).
+        max_out = int(os.environ.get("CONTEST_CAP", "20"))
     def _ck(c):
         try:
             return math.log10(1 + int(c.get("citation_count") or c.get("citationCount") or 0))
@@ -345,14 +557,26 @@ def rerank_authority(high: list[dict], some: list[dict], max_out: int | None = N
     # the stale-copy lesson). hybrid = semantic-majority + citation-minority;
     # semantic/citation = pure arms.
     _mode = os.environ.get("CONTEST_ORDER", "hybrid")
+    # ⑤ schema-match rerank (GOAL 2026-08-29): candidates whose title covers
+    # a parsed slot-filler phrase of the query intent get a small boost.
+    # Lexical (no LLM here), cached per query, blind to gold by construction
+    # (slot fillers come from the query text via the frozen schema).
+    _slot_sets = _slot_token_sets(query)
+    def _slot_hit(c):
+        if not _slot_sets:
+            return False
+        tt = set(re.findall(r"[a-z0-9]{4,}", (c.get("title") or "").lower()))
+        return any(ts <= tt for ts in _slot_sets)
     def _score(c, grade_w):
         sem = c.get("_sem") or 0.0          # embedding cosine to the query
         auth = _ck(c) / pool_max            # normalized log citations
         if _mode == "semantic":
-            return grade_w * (0.3 + 0.7 * sem)
-        if _mode == "citation":
-            return grade_w * (0.5 + 0.5 * auth)
-        return grade_w * (0.3 + 0.6 * sem + 0.2 + 0.2 * auth)  # hybrid
+            s = grade_w * (0.3 + 0.7 * sem)
+        elif _mode == "citation":
+            s = grade_w * (0.5 + 0.5 * auth)
+        else:
+            s = grade_w * (0.3 + 0.6 * sem + 0.2 + 0.2 * auth)  # hybrid
+        return s * (1.15 if _slot_hit(c) else 1.0)
 
     ranked = sorted(
         [(_score(c, 1.0), -i, c) for i, c in enumerate(high)]

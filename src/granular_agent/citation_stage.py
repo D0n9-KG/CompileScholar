@@ -66,14 +66,17 @@ def extract_citation_intents(kb, paper_id: str, fulltext: str, llm_fn,
     report = {"paper_id": paper_id, "n_numeric": len(num_ctx),
               "n_author_year": len(ay_ctx), "edges": [], "n_background": 0}
 
-    # intra-corpus joins need the registry
+    # intra-corpus joins need the registry. Mention keys are LOWERCASED by
+    # locate_author_year_contexts (citation_intent), so the index must be too —
+    # otherwise the join never matches (this is why cites edges were 0 even with
+    # a populated registry).
     idx = {}
     for pid, info in CORPUS_REGISTRY.items():
         if pid == paper_id:
             continue
         for sn in info["surnames"]:
             for yr in info["years"]:
-                idx[f"{sn} {yr}"] = pid
+                idx[f"{sn} {yr}".lower()] = pid
 
     mutations = []
     # classify ALL mentions concurrently (measured: Paratera tolerates 8-16

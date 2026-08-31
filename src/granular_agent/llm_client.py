@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import socket
 import ssl
 import time
 import urllib.request
@@ -97,6 +98,53 @@ def call_log_summary() -> dict:
             "by_model": {f"{p}/{m}": v for (p, m), v in sorted(agg.items())}}
 
 
+
+def _walled_open(req, sock_timeout: float = 60, wall_s: float | None = None):
+    """(v3) thin alias: opens via _timed_open (daemon-thread wall) then the
+    caller reads via _walled_read. Kept as the stable entry point name."""
+    return _timed_open(req, sock_timeout=sock_timeout, wall_s=wall_s)
+
+
+def _timed_open(req, sock_timeout: float = 60, wall_s: float | None = None):
+    """THE FINAL WALL (GOAL 2026-08-30 v3): urlopen executed in a DAEMON
+    thread; main flow joins with a hard timeout. Whatever the SSL/socket
+    stack does on Windows (socket-timeout silently unapplied to blocked
+    reads — measured twice today), the MAIN thread proceeds at wall_s and
+    the hung reader is abandoned to its daemon grave. The only construct
+    that cannot be bypassed by any network-stack behavior."""
+    import threading
+    if wall_s is None:
+        wall_s = float(os.environ.get("LLM_WALL_TIMEOUT", "240"))
+    box = {}
+    def _run():
+        try:
+            box["r"] = urllib.request.urlopen(req, context=_CTX,
+                                              timeout=sock_timeout)
+        except Exception as e:
+            box["e"] = e
+    t = threading.Thread(target=_run, daemon=True)
+    t.start()
+    t.join(wall_s)
+    if "r" in box:
+        return box["r"]
+    if "e" in box:
+        raise box["e"]
+    raise TimeoutError(f"open wall {wall_s}s (thread-abandon)")
+
+
+def _walled_read(r, t0: float, wall_s: float | None = None) -> bytes:
+    if wall_s is None:
+        wall_s = float(os.environ.get("LLM_WALL_TIMEOUT", "240"))
+    chunks = []
+    while True:
+        if time.time() - t0 > wall_s:
+            raise TimeoutError(f"wall-clock {wall_s}s exceeded (slow-drip)")
+        b = r.read(65536)
+        if not b:
+            break
+        chunks.append(b)
+    return b"".join(chunks)
+
 def _chat_once(url, key, body, timeout):
     """Single HTTP POST to an OpenAI-compat chat endpoint. Returns
     (content, usage). Raises on any failure."""
@@ -104,7 +152,9 @@ def _chat_once(url, key, body, timeout):
         url, data=body,
         headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
     )
-    raw = urllib.request.urlopen(req, context=_CTX, timeout=timeout).read()
+    _t0 = time.time()
+    r = _walled_open(req, sock_timeout=min(timeout, 60))
+    raw = _walled_read(r, _t0)
     resp = json.loads(raw)
     return resp["choices"][0]["message"]["content"], resp.get("usage") or {}
 
@@ -189,6 +239,18 @@ def call_paratera(prompt: str, model: str = "Kimi-K2.6", max_tokens: int = 4000,
         # correct param per DeepSeek official docs (api-docs.deepseek.com)
         payload["thinking"] = {"type": "disabled"}
     body = json.dumps(payload).encode()
+
+    # WALL-CLOCK WATCHDOG (GOAL 2026-08-30): urllib's timeout only bounds
+    # connect + each socket read — a server that drips bytes (measured
+    # twice today: boost2/boost3 hung 30+ min inside ONE call while the
+    # ledger went silent) never trips it. Hard total-deadline via a socket
+    # poll: read in chunks, abort the moment total elapsed exceeds the cap.
+    _WALL = float(os.environ.get("LLM_WALL_TIMEOUT", "240"))
+
+    def _open_with_wall(req, wall_s: float, sock_timeout: float = 60):
+        r = urllib.request.urlopen(req, context=_CTX, timeout=sock_timeout)
+        return r
+
     req = urllib.request.Request(
         base + "/chat/completions",
         data=body,
@@ -197,7 +259,19 @@ def call_paratera(prompt: str, model: str = "Kimi-K2.6", max_tokens: int = 4000,
     for attempt in range(2):
         t0 = time.time()
         try:
-            raw = urllib.request.urlopen(req, context=_CTX, timeout=120).read()
+            r = _walled_open(req, sock_timeout=60)
+            chunks = []
+            while True:
+                if time.time() - t0 > _WALL:
+                    raise TimeoutError(f"wall-clock {_WALL}s exceeded (slow-drip server)")
+                try:
+                    b = r.read(65536)
+                except socket.timeout:
+                    raise
+                if not b:
+                    break
+                chunks.append(b)
+            raw = b"".join(chunks)
             resp = json.loads(raw)
             _log_call("paratera", model, True, (time.time() - t0) * 1000,
                       resp.get("usage") or {}, attempt, fallback_for)
@@ -230,7 +304,21 @@ def embed_batch(texts: list[str], model: str = "GLM-Embedding-2") -> list[list[f
             headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
         )
         try:
-            raw = urllib.request.urlopen(req, context=_CTX, timeout=60).read()
+            # wall-clock watchdog (GOAL 2026-08-30): same slow-drip hole as
+            # chat — boost3's second hang was HERE (embedding endpoint,
+            # verified via netstat to Paratera IP while ledger silent).
+            r = _walled_open(req, sock_timeout=60)
+            _t0 = time.time()
+            _wall = float(os.environ.get("LLM_WALL_TIMEOUT", "240"))
+            chunks = []
+            while True:
+                if time.time() - _t0 > _wall:
+                    raise TimeoutError(f"embed wall-clock {_wall}s exceeded")
+                b = r.read(65536)
+                if not b:
+                    break
+                chunks.append(b)
+            raw = b"".join(chunks)
             data = json.loads(raw).get("data", [])
             data.sort(key=lambda x: x.get("index", 0))
             for d in data:
@@ -245,7 +333,9 @@ def embed_batch(texts: list[str], model: str = "GLM-Embedding-2") -> list[list[f
                     base + "/embeddings", data=b,
                     headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"})
                 try:
-                    r = urllib.request.urlopen(rq, context=_CTX, timeout=30).read()
+                    _t2 = time.time()
+                    _rr2 = _walled_open(rq, sock_timeout=30)
+                    r = _walled_read(_rr2, _t2)
                     d = json.loads(r).get("data", [])
                     if d:
                         out[i + j] = d[0]["embedding"]
@@ -298,7 +388,8 @@ def call_cst(prompt: str, model: str = "qwen3.5", max_tokens: int = 4000,
     for attempt in range(2):
         t0 = time.time()
         try:
-            raw = urllib.request.urlopen(req, context=_CTX, timeout=120).read()
+            _r3 = _walled_open(req, sock_timeout=60)
+            raw = _walled_read(_r3, t0)
             resp = json.loads(raw)
             _log_call("cst", model, True, (time.time() - t0) * 1000,
                       resp.get("usage") or {}, attempt)

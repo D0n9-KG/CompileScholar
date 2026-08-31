@@ -34,6 +34,7 @@ mechanism mirrors chained_extractor's schema_dirty flag.
 from __future__ import annotations
 
 import os
+import time
 import re
 import sys
 from typing import Any
@@ -792,7 +793,21 @@ def _embed_texts_robust(texts: list[str]) -> list[list[float]] | None:
             req = urllib.request.Request(
                 base + "/embeddings", data=body,
                 headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"})
-            raw = urllib.request.urlopen(req, context=_CTX, timeout=60).read()
+            # wall-clock watchdog (GOAL 2026-08-30, THIRD blind spot: this
+            # CST fallback tier lives OUTSIDE llm_client — boost3 hung here
+            # with both llm_client dogs armed; slow-drip hole is identical)
+            r = urllib.request.urlopen(req, context=_CTX, timeout=60)
+            _t0 = time.time()
+            _wall = float(os.environ.get("LLM_WALL_TIMEOUT", "240"))
+            _chunks = []
+            while True:
+                if time.time() - _t0 > _wall:
+                    raise TimeoutError(f"cst-embed wall {_wall}s exceeded")
+                _b = r.read(65536)
+                if not _b:
+                    break
+                _chunks.append(_b)
+            raw = b"".join(_chunks)
             data = json.loads(raw).get("data", [])
             data.sort(key=lambda x: x.get("index", 0))
             embs = [d["embedding"] for d in data]

@@ -34,8 +34,9 @@ class CostLedger:
         t0 = time.time()
         try:
             req = urllib.request.Request(url, headers={"User-Agent": "LogicKG-research/0.1"})
-            with urllib.request.urlopen(req, timeout=timeout) as r:
-                d = json.loads(r.read())
+            with urllib.request.urlopen(req, timeout=min(timeout, 60)) as r:
+                from granular_agent.llm_client import _walled_read
+                d = json.loads(_walled_read(r, t0))
             self._record("http", source=source, dt=time.time() - t0, ok=True)
             return d
         except Exception as e:
