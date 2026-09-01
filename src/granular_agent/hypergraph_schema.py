@@ -1117,7 +1117,10 @@ def seed_meta_hypergraph() -> MetaHypergraph:
                    "not a motivation citation), NOT claim_relation (this is method-to-method).",
         "improves": "X RESOLVES a limitation of Y (X is more accurate/applicable BECAUSE "
                     "it fixes something Y fails at; first-principles vs phenomenological = "
-                    "improves). NOT compares (X is NOT a parallel different-mechanism "
+                    "improves). The 'to' slot may be a METHOD/PHENOMENON being improved OR "
+                    "the abstract quality/performance it improves ('stability of learning', "
+                    "'policy evaluation', 'data efficiency', 'convergence speed') — bind what "
+                    "the sentence names. NOT compares (X is NOT a parallel different-mechanism "
                     "alternative; X builds on Y and is better), NOT extends (X is better "
                     "not just broader).",
         "compares": "A and B are put side by side: either (i) PARALLEL different-mechanism "
@@ -1139,7 +1142,7 @@ def seed_meta_hypergraph() -> MetaHypergraph:
     }
     for _eid, _desc in [
         ("extends", "X generalizes/extends Y (X METHOD/PHENOMENON -> Y)"),
-        ("improves", "X improves Y's accuracy/applicability, resolving Y's limitation"),
+        ("improves", "X improves Y — Y may be a method/phenomenon OR an abstract quality (stability, data efficiency, convergence speed) the sentence says X improves"),
         ("compares", "X is compared with Y"),
         ("replaces", "X replaces Y"),
         ("adapts", "X adapts Y to a new scenario"),
@@ -1243,9 +1246,12 @@ def seed_meta_hypergraph_general() -> MetaHypergraph:
                    "just broader), NOT background (X is a direct technical inheritance, "
                    "not a motivation citation), NOT claim_relation (this is method-to-method).",
         "improves": "X RESOLVES a limitation of Y (X is more accurate/applicable BECAUSE "
-                    "it fixes something Y fails at). NOT compares (X is NOT a parallel "
-                    "different-mechanism alternative; X builds on Y and is better), NOT "
-                    "extends (X is better not just broader).",
+                    "it fixes something Y fails at). The 'to' slot may be a METHOD/PHENOMENON "
+                    "being improved OR the abstract quality/performance it improves "
+                    "('stability of learning', 'policy evaluation', 'data efficiency', "
+                    "'convergence speed') — bind what the sentence names. NOT compares (X is "
+                    "NOT a parallel different-mechanism alternative; X builds on Y and is "
+                    "better), NOT extends (X is better not just broader).",
         "compares": "A and B are put side by side: either (i) PARALLEL different-mechanism "
                     "alternatives with overlapping scope, or (ii) THEORY-vs-EXPERIMENT "
                     "validation ('data compared with predictions', 'agree with'), or (iii) "
@@ -1263,7 +1269,7 @@ def seed_meta_hypergraph_general() -> MetaHypergraph:
     }
     for _eid, _desc in [
         ("extends", "X generalizes/extends Y (X METHOD/PHENOMENON -> Y)"),
-        ("improves", "X improves Y's accuracy/applicability, resolving Y's limitation"),
+        ("improves", "X improves Y — Y may be a method/phenomenon OR an abstract quality (stability, data efficiency, convergence speed) the sentence says X improves"),
         ("compares", "X is compared with Y"),
         ("replaces", "X replaces Y"),
         ("adapts", "X adapts Y to a new scenario"),

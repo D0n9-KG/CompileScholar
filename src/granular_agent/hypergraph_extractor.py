@@ -618,6 +618,12 @@ HARD RULES (a post-check rejects violations — a rule-violating edge is a waste
 1. An edge's evidence_span = the MINIMAL CONTINUOUS sentence(s) from the text that STATE this relation. Copy VERBATIM.
 2. EVERY node of an edge must have its surface LITERALLY PRESENT inside that edge's evidence_span. Bind participants from the SAME sentence that states the relation — NEVER substitute an entity from a different sentence, and NEVER generalize ("these 6 games" must not become "49 games").
 3. The evidence sentence must STATE the relation (not imply it, not describe a setup). A sentence that only describes what a baseline IS does not support a comparison edge; a sentence that only says what was done does not support a result edge.
+   ASSERTION MOOD: only ASSERTED sentences state relations. Hypotheticals ("might
+   eventually surpass", "could potentially improve", "would allow"),
+   open questions ("whether X outperforms Y remains an open question", "it is
+   unclear if"), future work framing ("a future extension might..."), and
+   pure-contrast denials ("unlike X, Y is not a Z" — the point is what Y is
+   NOT) are NOT assertions — NEVER emit an edge from them, in any pattern.
 4. POLARITY: bind roles to match the sentence's direction exactly. 'A outperforms B' → winner=A, loser=B. 'A is comparable to B' or 'A achieves 75% of B' is NOT outperforming. 'A fails where B works' reverses the roles.
 5. n-ary: parallel participants in one sentence go into ONE edge — a comparison with a task and a metric is ONE edge with 4 nodes (method A, method B, task, metric), not separate edges.
 6. node_roles MUST be exactly the roles DECLARED for that pattern_type in the schema above (the schema's role slots override anything else you remember).
@@ -638,6 +644,165 @@ If nothing extractable, output {{"nodes":[],"hyperedges":[]}}.
 """
 
 
+# ============================================================================
+# HARNESS REWRITE (2026-09-01, DESIGN-2026-09-01-harness-rewrite.md).
+# Evidence: the bare-prompt ablation (harness_ablation.py) showed the ~8.8k
+# fixed-rule layer above is a RECALL SUPPRESSOR, not a precision gate —
+# canary S1 positive recall 4/6 -> 6/6 with trap rate and verbatim unchanged
+# when the rules were cut and ONLY the schema kept. Every rule dropped from
+# pass 1 is still enforced POST-HOC: structural rules by the deterministic
+# gate, semantic criteria by the LLM verifier (CHECK 1/2/3) — that is where
+# they belong per DESIGN_rules_vs_llm_boundary.md.
+# HARNESS_MODE env switch:
+#   heavy         - legacy single-pass _JOINT_PROMPT (paper ablation column 1)
+#   slim          - pass 1 only (isolates the slimming contribution, column 2)
+#   slim+refine   - pass 1 + EDC+R-style second pass (the new main path, column 3)
+# Default: slim+refine.
+# ============================================================================
+HARNESS_MODE = os.environ.get("HARNESS_MODE", "slim+refine").strip().lower()
+
+# Pass-2 refine top-K: patterns retrieved per chunk for the second pass.
+# Smaller than pass-1's RETRIEVAL_K because pass 2 shows FULL boundaries.
+REFINE_K = 10
+
+# Few-shot examples for the slim prompt. DISCIPLINE: examples are taken ONLY
+# from non-gold corpus papers (never the gold five / canary injections) so
+# they cannot leak evaluation answers. Format-teaching (input sentence ->
+# output JSON) instead of rule-teaching — the literature's consistent finding
+# for the Format Tax / capacity-competition failure mode of long rule lists.
+_SLIM_EXAMPLES = """
+Example input sentence: "The resulting algorithm not only reduces the observed overestimations, but that this also leads to much better performance on several games."
+Example output: {{"nodes":[{{"nid":"n1","surface":"Double Q-learning","type":"METHOD","evidence_span":"Double Q-learning"}}], "hyperedges":[{{"eid":"e1","pattern_type":"improves","node_ids":["n1"],"node_roles":["from"],"evidence_span":"leads to much better performance on several games","qualifiers":{{}}}}]}}
+
+Example input sentence: "The model consists of a shared feature-learning module F, followed by two parallel streams."
+Example output: {{"nodes":[{{"nid":"n1","surface":"the model","type":"METHOD","evidence_span":"The model"}},{{"nid":"n2","surface":"shared feature-learning module F","type":"METHOD","evidence_span":"a shared feature-learning module F"}},{{"nid":"n3","surface":"two parallel streams","type":"METHOD","evidence_span":"two parallel streams"}}], "hyperedges":[{{"eid":"e1","pattern_type":"composed_of","node_ids":["n1","n2","n3"],"node_roles":["whole","component","component"],"evidence_span":"consists of a shared feature-learning module F, followed by two parallel streams","qualifiers":{{}}}}]}}
+
+Example input sentence: "We find that the replay ratio strongly affects final agent performance, with higher ratios reducing the variance of the updates."
+Example output: {{"nodes":[{{"nid":"n1","surface":"replay ratio","type":"PARAMETER","evidence_span":"the replay ratio"}},{{"nid":"n2","surface":"agent performance","type":"PROPERTY","evidence_span":"agent performance"}},{{"nid":"n3","surface":"variance of the updates","type":"PROPERTY","evidence_span":"the variance of the updates"}}], "hyperedges":[{{"eid":"e1","pattern_type":"influences","node_ids":["n1","n2","n3"],"node_roles":["source","target","effect"],"evidence_span":"the replay ratio strongly affects final agent performance, with higher ratios reducing the variance of the updates","qualifiers":{{}}}}]}}
+
+Example input sentence: "Both variants perform well; there was no significant difference between them."
+Example output: {{"nodes":[],"hyperedges":[]}}
+(No asserted comparative CLAIM — a null result of this shape is not an edge unless the schema has an explicit absence/independence pattern.)
+
+Example input sentence: "A future extension might combine this with model-based planning to improve sample efficiency."
+Example output: {{"nodes":[],"hyperedges":[]}}
+(Hypothetical future-work sentence — nothing asserted, no edge in any pattern.)
+"""
+
+_SLIM_PROMPT = """You are extracting a SCIENTIFIC KNOWLEDGE HYPERGRAPH from ONE chunk of a {domain} paper section ({section_name}).
+
+Schema patterns (the CURRENT schema — pick pattern_type from here; [boundary: ...] tells you WHEN each applies):
+{schema_prompt}
+
+Section chunk text:
+{section_text}
+
+Task: extract the entities AND the n-ary hyperedges connecting them. Read every sentence; extract every relation the sentence ASSERTS, using the schema's pattern_type and the schema's declared roles. Err toward extracting a real relation over skipping it — a later verification stage judges each edge, so a borderline edge is recoverable but a never-extracted one is lost.
+
+Output JSON:
+{{"nodes":[{{"nid":"n1","surface":"...","type":"METHOD","evidence_span":"verbatim phrase where the entity appears"}}],
+ "hyperedges":[{{"eid":"e1","pattern_type":"...","node_ids":["n1","n2"],"node_roles":["...","..."],"evidence_span":"...","qualifiers":{{}}}}]}}
+
+Entity types (pick the best fit per entity):
+- METHOD: a NAMED scientific modeling approach/theory/law/model (μ(I) rheology, Transformer, DQN, Arrhenius kinetics). NOT measurement tools/procedure
+- PARAMETER: a named quantity/symbol in equations (μ, learning rate, E_a). NOT generic quantities (stress, accuracy) → PROPERTY.
+- PHENOMENON: an effect/behavior (overfitting, nonlocal creep).
+- REGIME: an operational condition (dense/quasi-static, training/inference).
+- MATERIAL: a substance/sample/cell line.
+- NUMERIC: a specific value (0.38, 75%).
+- PROPERTY: a generic quantity/metric/benchmark/task that fits none of the above (Atari 2600, game score, accuracy).
+
+STRUCTURAL RULES (a deterministic post-check rejects violations):
+1. evidence_span = the MINIMAL CONTINUOUS sentence(s) from the text that STATE this relation. Copy VERBATIM. Every node's surface must appear inside its edge's evidence_span.
+2. n-ary: parallel participants in one sentence go into ONE edge — a comparison with a task and a metric is ONE edge with 4 nodes.
+3. Prefer a schema pattern over inventing a new pattern_type. New pattern names (only if nothing fits): clean snake_case, never slash-joined compounds. node_roles must be exactly the roles DECLARED for that pattern_type in the schema above.
+
+{examples}If nothing extractable, output {{"nodes":[],"hyperedges":[]}}.
+"""
+
+# Pass 2 (EDC+R-style refine): the FIRST pass is recall-oriented and schema-
+# light on criteria; this pass re-reads the chunk with the schema's FULL
+# per-pattern boundaries injected for the top-K patterns most relevant to
+# this chunk — the retrieval pool the schema's EVOLVED patterns land in.
+# This is where "find relations the LLM would not think to look for" lives
+# (EDC's R step), and the measurable pathway for schema evolution value:
+# evolving-arm patterns enter this retrieval pool; frozen-arm ones never do.
+_REFINE_PROMPT = """You are RE-EXAMINING one chunk of a {domain} paper section for MISSED relations.
+
+Section chunk text:
+{section_text}
+
+Relations ALREADY extracted from this chunk (do NOT output these again):
+{extracted_list}
+
+Patterns to re-examine for (with their full decision criteria — [boundary: ...] tells you WHEN each applies):
+{refined_schema}
+
+Task: for EACH pattern above, check whether the chunk contains an instance of it that the first pass missed (a different sentence, or participants the first pass did not bind). Also extract any MISSED ENTITIES those new relations need. Only output NEW relations — never repeat an already-extracted one, never restate an existing relation with different wording.
+
+Output JSON (same shape as extraction):
+{{"nodes":[{{"nid":"n1","surface":"...","type":"METHOD","evidence_span":"..."}}],
+ "hyperedges":[{{"eid":"e1","pattern_type":"...","node_ids":["n1","n2"],"node_roles":["...","..."],"evidence_span":"...","qualifiers":{{}}}}]}}
+
+If nothing was missed, output {{"nodes":[],"hyperedges":[]}}.
+"""
+
+
+def _refine_extracted_list(edges: list[Hyperedge], nodes: list[HGNode]) -> str:
+    """Render pass-1 edges compactly for the refine prompt: one line each
+    (pattern + roles + evidence prefix) — enough for the LLM to avoid
+    re-extracting them, without blowing the prompt."""
+    if not edges:
+        return "(none)"
+    by_nid = {n.nid: n.surface for n in nodes}
+    lines = []
+    for e in edges[:60]:  # bounded: a 60-edge first pass is already huge
+        parts = ",".join(f"{r}={by_nid.get(nid, nid)}" for nid, r in zip(e.node_ids, e.node_roles))
+        lines.append(f"- {e.pattern_type}({parts}) — {e.evidence_span[:60]}")
+    if len(edges) > 60:
+        lines.append(f"... and {len(edges) - 60} more")
+    return "\n".join(lines)
+
+
+def _refined_schema_prompt(meta, chunk_text: str) -> str:
+    """Full-criteria schema prompt for the top-REFINE_K patterns most relevant
+    to this chunk. Unlike pass 1's compact rendering (boundary[:100]), this
+    renders the COMPLETE boundary — pass 2 is where pattern criteria live."""
+    if meta is None:
+        return ""
+    try:
+        from granular_agent.hypergraph_evolution import _ensure_pattern_embeds, _embed_texts_robust
+        from granular_agent.llm_client import cosine_sim
+        active = meta.active_patterns()
+        scored_all = []
+        if len(active) > REFINE_K:
+            pat_embs = _ensure_pattern_embeds(meta)
+            chunk_emb = _embed_texts_robust([chunk_text[:2000]])
+            if pat_embs and chunk_emb:
+                ce = chunk_emb[0]
+                scored_all = sorted(
+                    ((pid, cosine_sim(emb, ce)) for pid, emb in pat_embs.items()
+                     if pid in active),
+                    key=lambda x: -x[1])
+        keep = {pid for pid, _ in scored_all[:REFINE_K]} if scored_all else set(active)
+        keep |= {p for p in SEED_PATTERN_IDS if p in active}
+        lines = []
+        for pid in sorted(keep):
+            pat = meta.patterns.get(pid)
+            if not pat or pat.deprecated:
+                continue
+            slots = ", ".join(f"{s.get('role')}:{s.get('type', '?')}" for s in pat.role_slots)
+            line = f"- {pid}({slots}) — {pat.description or ''}"
+            if pat.semantic_boundary:
+                line += f" [boundary: {pat.semantic_boundary}]"
+            lines.append(line)
+        return "\n".join(lines)
+    except Exception:
+        # retrieval failed (embeddings unavailable): fall back to the full
+        # schema prompt — criteria are never silently dropped in pass 2
+        return meta.to_prompt() if meta is not None else ""
+
+
 def _run_hg_node_joint(node: dict, sections: list, blocks: list,
                        schema_prompt: str, bb, llm: str, domain: str,
                        meta=None, feedback_hint: str = "") -> tuple[list[HGNode], list[Hyperedge], str]:
@@ -646,9 +811,27 @@ def _run_hg_node_joint(node: dict, sections: list, blocks: list,
     sentence context (the three-step decomposition bound entities to roles
     from a decontextualized list — the probe's slot-binding failure mode).
 
+    ITERATION-3 (2026-09-01): k-sample vote. The model (temp=0) is only
+    partially deterministic — probe: same input 3x gives a stable CORE
+    (~half the edges identical) plus a high-variance fringe (each run swaps
+    different fringe sentences). To lift the stable core and discard the
+    fringe: each chunk is sampled VOTE_SAMPLES times concurrently; an edge
+    seen in >= VOTE_KEEP of the samples survives, keyed by
+    (pattern_type, participant surfaces, evidence prefix). Cost xk per
+    chunk (chunk-level parallelism absorbs part of it).
+
+    HARNESS REWRITE (2026-09-01): HARNESS_MODE selects the prompt regime —
+    'heavy' (legacy single-pass _JOINT_PROMPT), 'slim' (lightweight pass 1
+    only), 'slim+refine' (pass 1 + EDC+R second pass; default). Voting is
+    env-toggled (VOTE_SAMPLES, default 3 under heavy, 1=off otherwise: its
+    jobs are split between the refine pass (recall) and the verifier
+    (errors); run-to-run variance is handled by the >=4-seed discipline).
+
     Deterministic post-checks (binding-locality etc.) live in
     ExtractionAgent's rule gate, not here — this function is the LLM call +
     parse. Returns (nodes, edges, summary) like the old runners."""
+    VOTE_SAMPLES = int(os.environ.get("VOTE_SAMPLES", "3" if HARNESS_MODE == "heavy" else "1"))
+    VOTE_KEEP = 2
     sec_text = section_text_for_node(node, sections, blocks)
     if not sec_text:
         print(f"  [joint] {node.get('id','?')}: no sec_text", flush=True)
@@ -660,27 +843,9 @@ def _run_hg_node_joint(node: dict, sections: list, blocks: list,
     summary = ""
     print(f"  [joint] {node.get('id','?')}: {len(chunks)} chunks, sec_text={len(sec_text)} chars", flush=True)
 
-    def _process_chunk(ci_chunk):
-        ci, chunk = ci_chunk
-        nid_prefix = f"{node['id']}c{ci}" if len(chunks) > 1 else node["id"]
-        p = _JOINT_PROMPT.format(domain=domain,
-                                 section_name=node.get("section", ""),
-                                 schema_prompt=schema_prompt,
-                                 section_text=chunk)
-        if predecessor:
-            p = p + "\n\nPredecessor context:\n" + predecessor
-        if feedback_hint:
-            p = p + "\n\nFEEDBACK (prioritize):\n" + feedback_hint
-        raw = _call(p, llm, max_tokens=12288)
-        parsed = parse_json_response(raw) or {}
-        if not parsed and raw:
-            p_retry = p + "\n\nIMPORTANT: output ONLY valid JSON, no prose."
-            raw2 = _call(p_retry, llm, max_tokens=8192)
-            parsed = parse_json_response(raw2) or {}
-            print(f"  [joint] c{ci} RETRY parsed nodes={len(parsed.get('nodes',[]) or [])} "
-                  f"hes={len(parsed.get('hyperedges',[]) or [])}", flush=True)
-
-        # --- nodes ---
+    def _parse_chunk_payload(parsed: dict, nid_prefix: str):
+        """LLM JSON payload -> (chunk_nodes, chunk_edges) with nid remap.
+        Shared by pass 1 and the refine pass (same output shape)."""
         chunk_nodes: list[HGNode] = []
         local2gid: dict[str, str] = {}
         for n in (parsed.get("nodes", []) or []):
@@ -700,8 +865,6 @@ def _run_hg_node_joint(node: dict, sections: list, blocks: list,
                 surface=str(n.get("surface", "")),
                 evidence_span=str(n.get("evidence_span", "")),
             ))
-
-        # --- hyperedges (node_ids remapped local -> prefixed gid) ---
         chunk_edges: list[Hyperedge] = []
         for i, h in enumerate((parsed.get("hyperedges", []) or [])):
             if not isinstance(h, dict):
@@ -716,22 +879,130 @@ def _run_hg_node_joint(node: dict, sections: list, blocks: list,
                 node_ids=gids, node_roles=roles, qualifiers=quals,
                 evidence_span=str(h.get("evidence_span", "")),
             ))
+        return chunk_nodes, chunk_edges
+
+    def _process_chunk(ci_chunk):
+        ci, chunk = ci_chunk
+        nid_prefix = f"{node['id']}c{ci}" if len(chunks) > 1 else node["id"]
+        if HARNESS_MODE == "heavy":
+            p = _JOINT_PROMPT.format(domain=domain,
+                                     section_name=node.get("section", ""),
+                                     schema_prompt=schema_prompt,
+                                     section_text=chunk)
+        else:
+            # slim pass 1 (harness rewrite): schema + 3 structural rules +
+            # few-shot examples; every dropped semantic criterion is enforced
+            # post-hoc by the deterministic gate and the LLM verifier
+            sp = schema_prompt
+            if meta is not None:
+                sp = _retrieved_schema_prompt(meta, chunk)
+            p = _SLIM_PROMPT.format(domain=domain,
+                                    section_name=node.get("section", ""),
+                                    schema_prompt=sp,
+                                    section_text=chunk,
+                                    examples=_SLIM_EXAMPLES)
+        if predecessor:
+            p = p + "\n\nPredecessor context:\n" + predecessor
+        if feedback_hint:
+            p = p + "\n\nFEEDBACK (prioritize):\n" + feedback_hint
+        raw = _call(p, llm, max_tokens=12288)
+        parsed = parse_json_response(raw) or {}
+        if not parsed and raw:
+            p_retry = p + "\n\nIMPORTANT: output ONLY valid JSON, no prose."
+            raw2 = _call(p_retry, llm, max_tokens=8192)
+            parsed = parse_json_response(raw2) or {}
+            print(f"  [joint] c{ci} RETRY parsed nodes={len(parsed.get('nodes',[]) or [])} "
+                  f"hes={len(parsed.get('hyperedges',[]) or [])}", flush=True)
+
+        chunk_nodes, chunk_edges = _parse_chunk_payload(parsed, nid_prefix)
         csum = str(parsed.get("summary", ""))[:300]
         print(f"  [joint] c{ci} parsed nodes={len(chunk_nodes)} hes={len(chunk_edges)}", flush=True)
+
+        # --- pass 2: EDC+R-style refine (slim+refine mode only) ---
+        if HARNESS_MODE == "slim+refine" and meta is not None:
+            try:
+                rp = _REFINE_PROMPT.format(
+                    domain=domain,
+                    section_text=chunk,
+                    extracted_list=_refine_extracted_list(chunk_edges, chunk_nodes),
+                    refined_schema=_refined_schema_prompt(meta, chunk))
+                rraw = _call(rp, llm, max_tokens=12288)
+                rparsed = parse_json_response(rraw) or {}
+                rnodes, redges = _parse_chunk_payload(rparsed, f"{nid_prefix}r")
+                if rnodes or redges:
+                    print(f"  [refine] c{ci} +nodes={len(rnodes)} +hes={len(redges)}", flush=True)
+                chunk_nodes.extend(rnodes)
+                chunk_edges.extend(redges)
+            except Exception as e:  # noqa: BLE001
+                print(f"  [refine] c{ci} FAILED (pass-1 output kept): {e!r}", flush=True)
+
         return chunk_nodes, chunk_edges, csum
 
     # chunk-level concurrency (independent text segments). 8 workers — joint
-    # is 1 call/chunk (vs 3 in the old multistep), so the same API budget
-    # supports deeper parallelism.
+    # is VOTE_SAMPLES calls/chunk (parallel), so budget per chunk scales but
+    # wall-clock stays bounded by the provider's concurrency tolerance.
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
+    def _edge_key(e: Hyperedge, nodes_by_id: dict):
+        parts = tuple(sorted((nodes_by_id.get(n, HGNode(nid=n, labels=[], surface=n))
+                              .surface.casefold() for n in e.node_ids)))
+        ev = _WS_CACHE_norm(e.evidence_span[:60])
+        return (e.pattern_type, parts, ev)
+
+    _ws_re = re.compile(r"\s+")
+
+    def _WS_CACHE_norm(s: str) -> str:
+        return _ws_re.sub(" ", s).strip().casefold()
+
+    def _vote_chunk(ci_chunk):
+        """Sample the chunk VOTE_SAMPLES times; keep edges seen in >=VOTE_KEEP
+        samples. Nodes are the union over surviving samples (an edge needs its
+        nodes). Falls back to single-shot when VOTE_SAMPLES==1 or when only
+        one sample returned anything."""
+        ci, chunk = ci_chunk
+        if VOTE_SAMPLES <= 1:
+            return _process_chunk(ci_chunk)
+        jobs = [(ci, chunk)] * VOTE_SAMPLES
+        with ThreadPoolExecutor(max_workers=VOTE_SAMPLES) as pool:
+            outs = list(pool.map(_process_chunk, jobs))
+        outs = [(cn, ce, cs) for cn, ce, cs in outs if cn or ce]
+        if len(outs) <= 1:
+            return outs[0] if outs else ([], [], "")
+        # vote on edges: key = (pattern, participant surfaces, evidence prefix)
+        from collections import defaultdict
+        key2edges = defaultdict(list)   # key -> [ (sample_idx, edge, node_map) ]
+        for si, (cn, ce, cs) in enumerate(outs):
+            by_id = {n.nid: n for n in cn}
+            for e in ce:
+                key2edges[_edge_key(e, by_id)].append((si, e, by_id))
+        kept_edges: list[Hyperedge] = []
+        kept_node_ids = set()
+        for key, occurrences in key2edges.items():
+            if len({si for si, _, _ in occurrences}) >= VOTE_KEEP:
+                e = occurrences[0][1]
+                kept_edges.append(e)
+                kept_node_ids.update(e.node_ids)
+        # nodes: union of node sets from the samples that produced kept edges
+        kept_nodes: list[HGNode] = []
+        seen_nids = set()
+        for cn, ce, cs in outs:
+            for n in cn:
+                if n.nid in kept_node_ids and n.nid not in seen_nids:
+                    kept_nodes.append(n)
+                    seen_nids.add(n.nid)
+        summary = next((cs for _, _, cs in outs if cs), "")
+        print(f"  [vote] c{ci}: {sum(len(ce) for _,ce,_ in outs)} sampled -> "
+              f"{len(kept_edges)} kept (>= {VOTE_KEEP}/{VOTE_SAMPLES})", flush=True)
+        return kept_nodes, kept_edges, summary
+
     if len(chunks) <= 1:
         for ci_chunk in enumerate(chunks):
-            cn, ce, cs = _process_chunk(ci_chunk)
+            cn, ce, cs = _vote_chunk(ci_chunk)
             all_nodes.extend(cn); all_edges.extend(ce); summary = cs or summary
     else:
-        from concurrent.futures import ThreadPoolExecutor, as_completed
         max_workers = min(8, len(chunks))
         with ThreadPoolExecutor(max_workers=max_workers) as pool:
-            futures = {pool.submit(_process_chunk, (ci, chunk)): ci
+            futures = {pool.submit(_vote_chunk, (ci, chunk)): ci
                        for ci, chunk in enumerate(chunks)}
             for future in as_completed(futures):
                 try:

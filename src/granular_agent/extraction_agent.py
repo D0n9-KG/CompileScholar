@@ -161,7 +161,11 @@ relation? Reject if it (a) merely describes a setup/baseline without a result,
 the fact, (d) NEGATES the relation — "does not depend", "is independent of",
 "not affected by", "no impact on", "would not influence", "is fairly constant
 as ... varies" state INDEPENDENCE, so a positive influences/dependency edge
-from them is wrong. relation_exists=false → fix=drop.
+from them is wrong, (e) is NOT AN ASSERTION — hypotheticals ("might
+eventually surpass", "could potentially"), open questions ("whether X
+outperforms Y remains an open question", "it is unclear if"), future-work
+framing, and pure-contrast denials ("unlike X, Y is not a Z") do not state
+any relation. relation_exists=false → fix=drop.
 
 CHECK 2 — SLOT BINDING: is each node really the thing its role claims, IN THIS
 SENTENCE? winner really outperformed the loser; the METHOD slot really holds a
