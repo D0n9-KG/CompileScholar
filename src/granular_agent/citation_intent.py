@@ -180,6 +180,11 @@ def classify_intent(rid: int, contexts: list[str], llm_fn) -> dict:
     p = _INTENT_PROMPT.format(rid=rid, contexts=ctx_text)
     raw = llm_fn(p, 300)
     obj = parse_json_response(raw) or {}
+    if isinstance(obj, list):
+        # CST occasionally wraps the object in a one-element array — the
+        # balanced-JSON parser returns it verbatim; guard before .get
+        # (the R5 run's 'list' object has no attribute 'get' crashes)
+        obj = next((x for x in obj if isinstance(x, dict)), {})
     intent = obj.get("intent", "background")
     if intent not in INTENT_TYPES:
         intent = "background"
