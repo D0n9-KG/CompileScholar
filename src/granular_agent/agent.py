@@ -117,13 +117,16 @@ class GranularFlowAgent:
         return self._kb
 
     def _kernel_llm_extract(self, prompt, max_tokens=8000):
-        # extractor LLM = self.llms[0] (default DeepSeek-V4-Flash via Paratera,
-        # thinking disabled). (MA2 fix: removed a dead `if llm == "deepseek"`
-        # branch that never triggered since llms holds model names like
-        # "DeepSeek-V4-Flash", not the literal "deepseek".)
-        from granular_agent.llm_client import call_paratera
+        # extractor LLM = self.llms[0], routed by hypergraph_extractor._call
+        # (the single routing point: the NAME decides the provider —
+        # "DeepSeek-V4-Flash" -> Paratera; lowercase "deepseek-v4-flash" ->
+        # CSTCloud, same model; "gpt-oss-120b"/"qwen3.5" -> CST). Was a
+        # hardcoded call_paratera, which silently ignored CST model names
+        # (provider switch 2026-09-01: Paratera browned out 4+ times in one
+        # evening and kept killing whole rounds).
+        from granular_agent.hypergraph_extractor import _call
         llm = self.llms[0] if self.llms else "DeepSeek-V4-Flash"
-        return call_paratera(prompt, model=llm, max_tokens=max_tokens, enable_thinking=False)
+        return _call(prompt, llm, max_tokens=max_tokens)
 
     def _kernel_llm_verify(self, prompt, max_tokens=4000):
         # verifier ≠ extraction model (avoid self-endorsement). Use deepseek-chat
