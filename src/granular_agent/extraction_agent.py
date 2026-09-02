@@ -44,6 +44,7 @@ Honest scope / no-downgrade:
 from __future__ import annotations
 
 import json
+import math
 import os
 import re
 import unicodedata
@@ -152,8 +153,12 @@ Edges to verify (each has pattern_type + the pattern's description/boundary/allo
 roles, node surfaces+roles, qualifiers, evidence_span):
 {edges_json}
 
-For EACH edge answer THREE mandatory checks (be strict — a wrong edge is worse
-than a dropped one):
+For EACH edge answer THREE mandatory checks. CALIBRATION: a wrong edge and a
+lost true relation are EQUALLY bad. Drop ONLY on a concrete, nameable
+violation of CHECK 1/2/3 (the evidence does not state the relation, the
+participant is misbound, the polarity is inverted). A borderline-but-plausible
+edge whose evidence genuinely states the relation must be KEPT — reject only
+what you can point to the text and refute:
 
 CHECK 1 — EVIDENCE SUPPORT: does the evidence_span sentence actually STATE this
 relation? Reject if it (a) merely describes a setup/baseline without a result,
@@ -234,6 +239,8 @@ class ExtractionAgent:
         # planner ran on V4-Flash while the actual edge-typing calls ran on
         # deepseek-chat. Model provenance requires the caller to pin this.
         self.executor_model = executor_model
+        # gate repair counters (observability for the repair-not-drop fix)
+        self._gate_stats: dict = {}
 
     # ---- planner ----
     def plan(self, section_text: str, discourse_role: str,
@@ -329,6 +336,7 @@ class ExtractionAgent:
             ev_types[_normalize_latex(he.evidence_span)[:400]].add(he.pattern_type)
 
         for he in edges:
+            n_binding_repairs = 0
             pat = self.kb.tbox.patterns.get(he.pattern_type)
             # --- 2. role legality (pattern must exist too) ---
             if pat is None:
@@ -402,14 +410,31 @@ class ExtractionAgent:
                     math_review = True   # verifier judges math bindings semantically
                     continue
                 if not _binding_local(nd.surface, he.evidence_span, section_text):
-                    bad_binding = True
-                    break
+                    # REPAIR, NOT DROP (2026-09-01 recall audit: 52/182 missed
+                    # gold edges died here — the model names participants with
+                    # paraphrased surfaces in real prose; canary texts never
+                    # trigger it, which is why the gate looked innocent).
+                    # Fuzzy-locate the participant in the evidence window and
+                    # rewrite the surface to the verbatim span. Only a
+                    # participant we cannot locate AT ALL is a real kill.
+                    win = _evidence_window(he.evidence_span, section_text)
+                    repaired = (_fuzzy_localize(nd.surface, _normalize_latex(he.evidence_span))
+                                or _fuzzy_localize(nd.surface, win))
+                    if repaired:
+                        nd.surface = repaired.strip(" .,;:()")
+                        n_binding_repairs += 1
+                    else:
+                        bad_binding = True
+                        break
             if math_review:
                 he.qualifiers = dict(he.qualifiers) if he.qualifiers else {}
                 he.qualifiers["_math_binding_review"] = "1"
             if bad_binding:
                 dropped.append(self._gate_drop(he, nid2node, "gate:binding-not-local"))
                 continue
+            if n_binding_repairs:
+                self._gate_stats["binding_repaired"] = \
+                    self._gate_stats.get("binding_repaired", 0) + n_binding_repairs
             # --- 1b. slot discipline (adverbials/person names are not entities) ---
             if not _slot_discipline_ok(he, nid2node):
                 dropped.append(self._gate_drop(he, nid2node, "gate:slot-discipline"))
@@ -1088,6 +1113,62 @@ def _is_math_surface(surface: str) -> bool:
     they are routed to the LLM verifier's semantic binding check instead
     (rule-for-structure, LLM-for-semantics — the project's iron law)."""
     return bool(_MATH_SURFACE_RE.search(surface or ""))
+
+
+# ---- fuzzy surface repair (2026-09-01 recall audit) ----
+# The 3-round NB2 attribution showed gate:binding-not-local is the single
+# largest recall killer (52/182 missed gold edges): the model extracts the
+# right fact but names a participant with a PARAPHRASED surface ("best
+# performing methods" vs the text's "best existing methods") and the whole
+# edge dies on the verbatim rule. Our own L2 matcher, meanwhile, accepts
+# fuzzy surface equivalence — the gate was stricter than the eval. Repair,
+# not drop: when strict localization fails, fuzzy-locate the participant in
+# the evidence window and REWRITE the surface to the verbatim span.
+_FUZZY_STOP = {
+    "a", "an", "the", "of", "in", "on", "at", "to", "for", "from", "by",
+    "with", "and", "or", "as", "is", "are", "was", "were", "be", "been",
+    "its", "this", "that", "these", "those", "we", "our", "it", "their",
+    "than", "then", "such", "also", "both", "each", "into", "over", "via",
+}
+_WORD_RE = re.compile(r"[a-z0-9]+")
+
+
+def _fuzzy_localize(surface: str, window: str, min_frac: float = 0.6) -> str | None:
+    """Best fuzzy match of a paraphrased surface inside the (normalized)
+    evidence window. Returns the RAW matched span for surface repair, or
+    None if no span shares >= min_frac of the surface's content tokens.
+
+    Match shape: a contiguous token run of ~len(S) tokens (S = surface's
+    content tokens, stopwords dropped) containing >= min_frac of S's
+    DISTINCT tokens. Verified on the audit case: surface 'best performing
+    methods from the reinforcement learning literature' vs window text
+    'the best existing reinforcement learning methods' -> repairs to the
+    latter (4/6 content tokens)."""
+    toks = [t for t in _WORD_RE.findall(surface or "") if t not in _FUZZY_STOP]
+    if len(toks) < 2:
+        return None  # single-token paraphrases are ambiguous — no repair
+    s_set = set(toks)
+    need = max(2, math.ceil(min_frac * len(s_set)))
+    w = [(m.group(0), m.start(), m.end())
+         for m in _WORD_RE.finditer(window or "")]
+    if not w:
+        return None
+    best = None  # (distinct_matches, start_char, end_char)
+    n = len(w)
+    for i in range(n):
+        if w[i][0] not in s_set:
+            continue  # anchor on a surface token
+        for k in range(max(2, len(toks) - 1), len(toks) + 2):
+            j = i + k
+            if j > n:
+                break
+            run = {wt for wt, _, _ in w[i:j]}
+            hits = len(s_set & run)
+            if hits >= need and (best is None or hits > best[0]):
+                best = (hits, w[i][1], w[j - 1][2])
+    if best is None:
+        return None
+    return window[best[1]:best[2]]
 
 
 def _binding_local(surface: str, evidence: str, section_text: str) -> bool:
