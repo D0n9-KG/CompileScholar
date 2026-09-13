@@ -301,6 +301,10 @@ class KBTools:
                 out.append({"paper_id": pid, "claim": claim,
                             "claim_type": r.get("claim_type"),
                             "strength": r.get("strength"),
+                            # schema v1.4: provenance axis flows to the answer
+                            # side — attribution wording ("the paper states /
+                            # restates X et al.") needs this at read time
+                            "epistemic": r.get("epistemic"),
                             "condition": r.get("condition"),
                             "scope": scope, "target": target,
                             "record_id": r.get("id"),

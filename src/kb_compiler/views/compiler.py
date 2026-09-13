@@ -410,7 +410,9 @@ def build_cards(recs, registry, manifest, matrix):
                            "record_id": r.get("id")}
                           for r in results if r.get("role") == "ablation"][:30],
             "findings": [{"claim": r.get("claim"), "claim_type": r.get("claim_type"),
-                          "strength": r.get("strength"), "paper_id": r.get("paper_id"),
+                          "strength": r.get("strength"),
+                          "epistemic": r.get("epistemic"),  # schema v1.4 provenance axis
+                          "paper_id": r.get("paper_id"),
                           "record_id": r.get("id")}
                          for r in findings[:40]],
             "lineage_out": [{"relation": r.get("relation"),
