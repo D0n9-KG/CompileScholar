@@ -46,6 +46,12 @@ SECTION_CITED = re.compile(
     r"(related\s+work|references|bibliography|literature)", re.I)
 NUMCELL = re.compile(r"^[^A-Za-z]*[-+]?\d")          # starts like a number
 LATEX_NUM = re.compile(r"(?:(?<=\$)|(?<=\s))[-+]?\d[\d\s,]*\.?[\d\s]*(?=(?:\\pm|\$|\s|$))")
+# AirQA tablecheck fix A (2026-09-13): SOTA columns in ACL-style tables carry
+# the OTHER paper's number with an inline citation ("12.11 (He et al., 2021)")
+# — semantically epistemic=cited regardless of the table's section. Cell-level
+# detection overrides the section-level default; the citation itself stays in
+# the verbatim quote (no invented fields).
+CELL_CITE = re.compile(r"\(\s*[A-Z][\w\.\-]+[^()]{0,40}?\b(?:19|20)\d{2}[a-z]?\s*\)")
 
 
 _FULLNUM = re.compile(r"^\d{2,}[\d,]*\.?\d*$|^\d+\.\d+$")
@@ -233,6 +239,32 @@ def _is_header_cell(t):
     return t is not None and t != "" and not _is_data_cell(t)
 
 
+def _group_row_text(raw_row):
+    """Full-width section-divider row inside a table -> its text, else None.
+
+    AirQA tablecheck fix B (2026-09-13): benchmark tables commonly re-group
+    rows mid-table with a colspan banner ("Summaries generated via
+    incremental updating", "1-2B Base Models"). Without tracking, rows after a
+    mid-table banner inherit the LEADING group label (BooookScore: GPT-4's
+    incremental-updating score 82.5 was labelled hierarchical-merging) —
+    value right, group attribution wrong.
+
+    Conservative by design (never guess): all non-empty physical cells must
+    carry the SAME text, total colspan >= 3, and the text must be a phrase
+    (contains a space, >= 6 chars, non-numeric). Single-token full-width
+    cells ('ReduceLROnPlateau', '// code comments') are NOT treated as groups
+    — they stay silently skipped exactly as before."""
+    texts = [t.strip() for t, rs, cs in raw_row if t and t.strip()]
+    if not texts or len(set(texts)) != 1:
+        return None
+    if sum(cs for _, _, cs in raw_row) < 3:
+        return None
+    txt = texts[0]
+    if _is_data_cell(txt) or " " not in txt or len(txt) < 6:
+        return None
+    return txt
+
+
 def parse_pipe_tables(text):
     """Markdown pipe tables -> same row format as _TableHTML (no spans).
     Separator row optional (canary validation catch: synthetic/hand-written
@@ -307,8 +339,50 @@ def extract_tables(pid, text, own_methods=(), manifest_title=""):
                 break
         if n_hdr == 0 or n_hdr >= len(grid):
             continue
-        headers = grid[:n_hdr]
+        # AirQA tablecheck fix B: full-width banner rows that DIRECTLY
+        # PRECEDE data (last header row, or mid-table) are row-GROUP context
+        # — track them so a mid-table banner change updates the label
+        # (BooookScore: incremental-updating rows were labelled with the
+        # leading group). Banners ABOVE the column-name row are table
+        # captions/tiers (FhQS shape: caption spans the value columns only)
+        # — they stay header tiers exactly as in v1, else the caption leaks
+        # onto uncovered columns ("Algorithm > F1 score..." pollution).
+        # Emitted path keeps the v1 shape: "colname > group". Banner-ONLY
+        # header zones (fragment tables whose column-name row was split off
+        # by the parser — mw1P shape) keep the v1 tier fallback: dropping
+        # them wholesale lost 90 manually-validated PS16 records.
+        # Banner position semantics (s7xWeJ stats-table lesson): a banner
+        # ABOVE the column-name rows is a table caption/tier when it has no
+        # siblings (FhQS: 'F1 score for skeleton...' stays a colpath tier),
+        # but a SECTION GROUP when the table also carries mid-data banners
+        # (s7xWeJ: 'Single Sentence Tasks' heads the first stats section,
+        # its sibling 'Sentence Pair Tasks' appears mid-table — keeping the
+        # leader as a tier produced mixed 'Single... > |D| > Sentence Pair'
+        # paths for MNLI rows). Trailing header-zone banners (directly above
+        # data) are always groups (BooookScore). Banner-only header zones
+        # (mw1P fragment tables) keep the v1 tier fallback — dropping them
+        # wholesale lost 90 manually-validated PS16 records.
         data = grid[n_hdr:]
+        data_has_banner = any(_group_row_text(rows[n_hdr + di]) is not None
+                              for di in range(len(data)))
+        cur_group = ""
+        headers = list(grid[:n_hdr])
+        if data_has_banner:
+            kept, first_g = [], ""
+            for gi in range(n_hdr):
+                g = _group_row_text(rows[gi])
+                if g:
+                    first_g = first_g or g
+                else:
+                    kept.append(grid[gi])
+            if kept:
+                headers = kept
+                cur_group = first_g
+        elif n_hdr >= 2:
+            g = _group_row_text(rows[n_hdr - 1])
+            if g:
+                headers = grid[:n_hdr - 1]
+                cur_group = g
         # ---- column header paths (multi-tier join) ----
         ncol = len(grid[0])
         colpath = []
@@ -329,7 +403,16 @@ def extract_tables(pid, text, own_methods=(), manifest_title=""):
                 rh = c + 1
             else:
                 break
-        rh = min(rh, max(0, ncol - 2))   # keep >=2 value columns
+        # AirQA tablecheck fix C2 (2026-09-13): 2-column label|value tables
+        # (13/192 in the AirQA sample) were zeroed wholesale by the
+        # >=2-value-columns clamp (rh forced to 0 -> empty rowhead -> every
+        # row skipped). Allow exactly one value column when ncol==2 (single-
+        # value quoting is safe via fix C's head+value dual probe). For
+        # ncol>=3 the clamp STAYS: observed 3-col [text,text,num] shapes
+        # carry fused cells in col1 where the mid-row guard (visible residue)
+        # is the honest outcome — a loosened rh would silently fold the fused
+        # text into the rowhead instead.
+        rh = min(rh, 1 if ncol == 2 else max(0, ncol - 2))
         # ---- numeric-column detection + per-cell emission ----
         numeric_cols = []
         for c in range(rh, ncol):
@@ -339,15 +422,44 @@ def extract_tables(pid, text, own_methods=(), manifest_title=""):
                 numeric_cols.append(c)
         if len(numeric_cols) < 1:
             continue   # text/taxonomy table -> out of v0 scope
+        # Fix C guard (lXuC table #6, 2026-09-13): single-value quote
+        # recovery is enabled only for tables WITHOUT fused-cell damage in
+        # the value zone. Misaligned parses (dropped corner header cell +
+        # fused columns) shift column identities silently, and a lone value
+        # cannot self-verify its binding — whole-table honest skip for the
+        # recovery path (multi-value rows keep the 60% best-match probe).
+        table_fused = False
+        for frow in data:
+            for c in range(rh, ncol):
+                x = frow[c] if c < len(frow) else None
+                if x not in (None, "") and not _fold_num(str(x)) and \
+                        re.search(r"\d\s+\d|\d\.\d+\.\d", str(x)):
+                    table_fused = True
+                    break
+            if table_fused:
+                break
         section = _nearest_heading(text, tpos)
         epistemic = "cited" if SECTION_CITED.search(section or "") else "demonstrated"
         emitted_any = False
         fused_rows = []
-        for row in data:
+        for di, row in enumerate(data):
+            g = _group_row_text(rows[n_hdr + di])   # fix B: mid-table banner
+            if g:
+                cur_group = g
+                continue
             rowhead = " ".join(str(row[c]) for c in range(rh)
                                if c < len(row) and row[c] not in (None, ""))
             if not rowhead.strip():
                 continue
+            # NOTE (AirQA tablecheck, C3 rejected 2026-09-13): a rowhead
+            # dirt guard (>=2 leaked number tokens / leading LaTeX) was
+            # implemented and REVERTED — it dropped 77 manually-validated
+            # pPh9 ED-Pose records whose rowhead carries the known mineru
+            # misalignment signature while value/metric/quote bindings were
+            # human-verified correct. Dirty rowhead SURFACES are governance
+            # debt (entity arbitration queue), not a row-drop reason; fix-C
+            # recoveries with dirty surfaces stay bound via the head+value
+            # dual probe and are disclosed in the tablecheck report.
             # fused-cell guard: any numeric-position cell that is not cleanly
             # foldable AND carries multiple number tokens -> row ambiguous ->
             # visible residue (never guess column mapping)
@@ -391,7 +503,7 @@ def extract_tables(pid, text, own_methods=(), manifest_title=""):
             # span (PS16-validation fix: full-text probe found prose mentions
             # of the row-head word first -> wrong quote -> wrong provenance)
             cellvals = [str(row[c]) for c in cells]
-            q = _row_quote(traw, rowhead, cellvals)
+            q = _row_quote(traw, rowhead, cellvals, allow_single=not table_fused)
             if not q:
                 continue
             hdr_q = _row_quote(traw, str(headers[-1][rh] if rh < len(headers[-1]) else ""),
@@ -400,6 +512,8 @@ def extract_tables(pid, text, own_methods=(), manifest_title=""):
                          for o in own)
             for c, v in cells.items():
                 head = colpath[c] if c < len(colpath) else ""
+                if cur_group:   # fix B: group context joins the column path
+                    head = f"{head} > {cur_group}" if head else cur_group
                 metric = re.sub(r"\s+", " ", head).strip()[:80]
                 direction = ""
                 if "↑" in head or "higher" in head.lower():
@@ -420,7 +534,10 @@ def extract_tables(pid, text, own_methods=(), manifest_title=""):
                     "role": "main_result" if is_own else "baseline_comparison",
                     "role_provisional": True,   # brief §2.1 (own-method anchor)
                     "dims": {},
-                    "epistemic": epistemic,
+                    # fix A: cell-level inline citation ("12.11 (He et al.,
+                    # 2021)") = another paper's number -> cited, overriding
+                    # the section-level default
+                    "epistemic": "cited" if CELL_CITE.search(str(row[c])) else epistemic,
                     "quote": q[:400],
                     "table_header": hdr_q[:300],
                     "paper_id": pid,
@@ -428,7 +545,7 @@ def extract_tables(pid, text, own_methods=(), manifest_title=""):
                     "section": section or "(table)",
                     "chunk_char_start": tpos,
                     "id": _rid(pid, "result", fp),
-                    "provenance": "table_channel_v1",
+                    "provenance": "table_channel_v2",
                 })
                 emitted_any = True
         if fused_rows:
@@ -439,7 +556,7 @@ def extract_tables(pid, text, own_methods=(), manifest_title=""):
     return records, residue
 
 
-def _row_quote(table_raw, rowhead, cellvals):
+def _row_quote(table_raw, rowhead, cellvals, allow_single=True):
     """Verbatim row segment WITHIN the table's raw source span. Best-match
     scoring: the segment containing the MOST of this row's cell values wins
     (row-head word is a tie-breaker bonus, NOT a hard requirement — rowspan
@@ -449,6 +566,11 @@ def _row_quote(table_raw, rowhead, cellvals):
     one value coincided (LLaMA-13B 4-bit's MMLU 47.4 == Original's 47.4 ->
     wrong provenance; postcheck correctly rejected 18 such records).
     Threshold: >=60% of values present, else None (honest skip, never guess).
+
+    allow_single=False blocks the single-value branch (fix C) for tables
+    carrying fused-cell damage — see the table_fused guard in extract_tables
+    (lXuC table #6 lesson: a lone value cannot self-verify its column
+    identity when the parse dropped/fused cells).
     """
     vals = [re.sub(r"\s+", "", str(v)) for v in cellvals]
     vals = [v for v in vals if len(v) >= 2]
@@ -461,6 +583,21 @@ def _row_quote(table_raw, rowhead, cellvals):
     segs = re.findall(r"<tr>.*?</tr>", table_raw, flags=re.S)
     if not segs:
         segs = [l.strip() for l in table_raw.split("\n") if l.strip().startswith("|")]
+    if len(vals) == 1:
+        # AirQA tablecheck fix C (2026-09-13): the max(2, 60%) floor made
+        # single-value rows structurally unquotable (max attainable score was
+        # 1.5 < 2) — every row of a narrow table was silently dropped (e653:
+        # the paper's only table, 4 config rows, 0 records). Single value:
+        # require value AND row-head probe in the SAME segment. Head-less
+        # single-value rows stay skipped (rowspan continuation with one value
+        # is ambiguous — never guess, the LLaMA-4bit lesson).
+        if not allow_single or not probe_head:
+            return None
+        for seg in segs:
+            segn = re.sub(r"\s+", "", seg)
+            if vals[0] in segn and probe_head in segn:
+                return seg.strip()
+        return None
     best, best_score = None, -1.0
     for seg in segs:
         segn = re.sub(r"\s+", "", seg)
