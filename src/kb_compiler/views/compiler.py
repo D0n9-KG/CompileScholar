@@ -304,12 +304,35 @@ def build_coverage(recs, registry, vocab, manifest):
     # PSV4: popular = governed vocab families only (see grid comment above)
     _gov_fams = {_norm(f) for f in families}
     popular = {f for f, c in fam_counts.items() if c >= 3 and _norm(f) in _gov_fams}
+    # AirQA stage-1 (2026-09-13, explosion guard fired at 13115): the pure
+    # cross product assumes a SINGLE-DOMAIN corpus (PS16: 17 RL papers — any
+    # sibling method could plausibly have been on any family). A multi-domain
+    # corpus (NLP+CV+RL+audio) makes almost every pair trivially true and
+    # useless ("CV method has no results on ACE05-R"). PAPER-ANCHORED rule:
+    # derive absence(e, f) only when some paper that evaluates e ALSO
+    # evaluates f on >=3 entities — the informative PS16 form ("in this
+    # paper's own comparison table, siblings have f-results but e does not").
+    paper_fam_ents = defaultdict(lambda: defaultdict(set))
+    for r in recs:
+        if r.get("kind") != "result":
+            continue
+        ent = _ref_name(r.get("method_ref"))
+        if _norm(ent) not in _cov_si:
+            continue
+        _subj_n = _norm(_eff_subject(r))
+        if not _subj_n:
+            continue
+        paper_fam_ents[r.get("paper_id")][fam_of.get(_subj_n, _subj_n)].add(_norm(ent))
     derived = []
     for e, fams in grid.items():
+        e_papers = set()
+        for c in fams.values():
+            e_papers.update(c.get("papers") or ())
         for f in popular - set(fams):
-            derived.append({"entity": e, "subject_family": f,
-                            "claim": f"no result records for {e} on {f} in corpus",
-                            "provenance": "derived"})
+            if any(len(paper_fam_ents.get(p, {}).get(f, ())) >= 3 for p in e_papers):
+                derived.append({"entity": e, "subject_family": f,
+                                "claim": f"no result records for {e} on {f} in corpus",
+                                "provenance": "derived"})
     return {"grid": grid, "flags": dict(flags), "families": families,
             "absences_extracted": extracted, "absences_derived": derived}
 
