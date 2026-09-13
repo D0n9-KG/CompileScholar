@@ -42,6 +42,7 @@ ENUM_FIELDS = {
 }
 _NUM_IN_VAL = re.compile(r"\d[\d,]*\.?\d*|\d+")
 _FORMULA_CHARS = set("^_{}=+*/()αβγελητ")
+FG7_MIGRATED = [0]  # schema v1.4 finding strength='cited' -> epistemic migration count
 
 
 # ---------- text normalization with offset map ----------
@@ -176,6 +177,19 @@ def check_record(rec: dict, normc: str, idx_c: list, normf: str, idx_f: list,
     whitespace-free (containment + numeric/formula channels)."""
     v, w = [], []
     kind = rec.get("kind")
+    # FG7 (schema v1.4, 2026-09-13, user-arbitrated Option A): deterministic
+    # provenance migration BEFORE the gates. Historical form (53 drops in the
+    # KB v3 era, largest enum-violation class): the model stuffed 'cited' into
+    # finding.strength — semantic intuition correct (restatement of ANOTHER
+    # paper's claim), frozen schema had no slot. v1.4 gives finding the
+    # epistemic template slot; strength='cited' MIGRATES instead of dropping:
+    # provenance -> epistemic, strength -> 'stated' (the citing paper at least
+    # states it — faithful on both axes). Counter observable for run reports.
+    if kind == "finding" and rec.get("strength") == "cited":
+        if not rec.get("epistemic"):
+            rec["epistemic"] = "cited"
+        rec["strength"] = "stated"
+        FG7_MIGRATED[0] += 1
     # 1. required fields
     for f in REQUIRED_FIELDS.get(kind, ()):
         val = rec.get(f)

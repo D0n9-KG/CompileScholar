@@ -11,7 +11,19 @@ agenda pairs the addition list with a USAGE-AUDIT deletion list (fill rate +
 downstream reference rate per field).
 """
 
-SCHEMA_VERSION = "1.3"
+SCHEMA_VERSION = "1.4"
+# v1.4 (finding-epistemic arbitration 2026-09-13, user-approved Option A;
+# briefed as "v1.3" in SCHEMA-V13-ARBITRATION-BRIEF.md, which predated the
+# notation bump consuming 1.3): finding gains the epistemic TEMPLATE slot
+# (enum was already record-legal via COMMON_FIELDS — the gap was prompt-side:
+# the finding template offered no epistemic field, so the model stuffed
+# provenance into strength; strength='cited' was enum-dropped, 53 records in
+# the KB v3 era = largest violation class; manual read confirmed the semantic
+# intuition was right, the slot was missing). Postcheck FG7 migrates
+# strength='cited' deterministically instead of dropping. Canary v3 adds
+# F7 (cited finding survives) / T6 (own-paper finding flipped to cited).
+# NO retro-fill: legacy records keep epistemic=None (backward compatible);
+# the value materializes only on new extraction.
 
 # ---- record types (spec §1) ----
 # v1.3 (granular-pilot arbitration 2026-09-06): +notation — symbol/quantity

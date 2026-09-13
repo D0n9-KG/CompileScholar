@@ -58,6 +58,8 @@ KIND_SLICES = {
     "finding": ('{"kind":"finding","claim":"<命题化陈述>","scope_ref":"<所属实体表面名,可空>",'
                 '"target_ref":"<被批评/反驳的实体表面名,可空>","condition":{dims子集},'
                 '"strength":"' + "|".join(FINDING_STRENGTH) + '",'
+                '"epistemic":"stated|demonstrated|cited（cited=转述他篇的机制/结论/批评——相关工作与对比讨论中的合法材料；'
+                'demonstrated=本篇实验支持；stated=本篇声称）",'
                 '"claim_type":"mechanism|criticism|definition|recommendation|qualitative_ablation|observation（可选）","quote":"<逐字>"}'),
     "shift": ('{"kind":"shift","from_state":"<领域旧状态>","to_state":"<领域新状态>",'
               '"driver":"<because Z>","scope":"<子领域>","time_range":"<原文时间措辞>",'
@@ -81,7 +83,7 @@ QUOTE_FIRST_RULES = f"""抽取纪律（逐条遵守）：
 4. dims 的 subject/setup/variant 值只能从注入词表选；hyperparam.item 只能从注入超参名单选。需要但词表没有的值→写入该记录的 "dims_new" 字段（{{"维度名":"值"}}），dims 里不要写。
 5. overflow 纪律：装不进任何允许类型、但对研究者有价值的**具体事实**→必须进 overflow（{{"reason":"装不进的原因","quote":"逐字"}}）——overflow 是可见的残差，静默丢弃才是错误。同一内容不得既输出记录又输出 overflow。类型间拿不准→按最接近的类型抽（不要因拿不准而进 overflow）。以下内容**不抽也不进 overflow**：无关系断言的引用句、纯背景叙述、图注/图片描述（图表信息第一遍卡片已登记）。
 6. 定性比较结论（"更稳定"/"显著变差"无数值）→ finding（strength=demonstrated），不要造 result。数值→ result。公式型取值（形如 y=a·x^{{-b}} 的表达式）→ config.value 逐字。
-7. 背景性叙述（他人方法如何工作/领域现状）→ 若含关系动词（uses/extends/proposes 等）抽 lineage；定义性内容（某方法/指标是什么）→ finding（claim_type=definition）；纯背景不抽。finding 只收研究性结论：机制主张/批评/定义操作化/建议，不要灌背景。
+7. 背景性叙述（他人方法如何工作/领域现状）→ 若含关系动词（uses/extends/proposes 等）抽 lineage；定义性内容（某方法/指标是什么）→ finding（claim_type=definition）；**对他篇论文的研究性机制主张/结论/批评（相关工作、对比讨论中常见）→ finding + epistemic=cited——这是合法材料不要当背景丢弃，'cited' 填 epistemic 字段，严禁填进 strength**；纯背景不抽。finding 只收研究性结论：机制主张/批评/定义操作化/建议，不要灌背景。
 8. 限定条件保留（操作化）：claim/结论含 only/when/under/仅/在…下 类限定词时，condition 字段不得为空——限定词在词表内→写进 condition 对应维度；词表没有→写记录**顶层**的 dims_new 字段（形状 {{"dims_new":{{"setup":["<限定词>"]}}}}，不要嵌套进 condition）。condition 留空而限定词只活在 claim 文本里=记录错误（typed 条件查询会失效）。"""
 
 CHUNK_PROMPT = """你是科学文献知识编译器的第二遍（槽位深抽取）。论文：{title}（本篇方法：{identity}）

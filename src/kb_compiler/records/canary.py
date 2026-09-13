@@ -5,16 +5,19 @@ Design pattern carried from the legacy harness (canary batch monitoring),
 rebuilt for schema v1.1. The canary paper goes through the SAME slot+postcheck
 pipeline as real papers; scoring is rule-based (no LLM judge — deterministic).
 
-Facts (recall side, 6): F1 main result / F2 baseline binding / F3 config /
-F4 lineage / F5 explicit absence / F6 wide-table column binding (v2).
-Traps (precision side, 5): T1 negation-as-affirmation / T2 cited-result
+Facts (recall side, 7): F1 main result / F2 baseline binding / F3 config /
+F4 lineage / F5 explicit absence / F6 wide-table column binding (v2) /
+F7 cited-source finding survives (v3, schema v1.4).
+Traps (precision side, 6): T1 negation-as-affirmation / T2 cited-result
 epistemic flip / T3 condition drop / T4 near-duplicate number binding /
 T5 wide-table column-label misbinding (v2, the A7 form measured in the PS16
-rebuild manual read).
+rebuild manual read) / T6 own-paper finding epistemic flip (v3).
 
 Gates: v1 (SMOKE-PREREG.md): fact_recall >= 4/5, trap_fired == 0.
 v2 (PSFIX-PREREG.md FX-D, 2026-09-11): fact_recall >= 5/6, trap_fired == 0.
-CANARY_TEXT changed in v2 (Table 2 added) — v1 scores are not comparable.
+v3 (schema v1.4, 2026-09-13): fact_recall >= 6/7, trap_fired == 0.
+CANARY_TEXT changed in v2 (Table 2) and v3 (TRACE sentence in Related Work)
+— scores across text versions are not comparable.
 """
 from __future__ import annotations
 
@@ -69,6 +72,8 @@ its strongest transfer task, while UNIFORM reaches 66.8 on the same task.
 ## 4. Related Work
 Value aggregation for control was introduced by LUNA (Doe et al., 2019).
 Prior methods typically rely on prioritized sampling to accelerate learning.
+TRACE (Kim et al., 2020) argues that prioritized sampling introduces bias
+into value estimates, and corrects it with per-sample importance weights.
 
 ## 5. Conclusion
 We presented NOVA and showed strong results on BenchX. We do not evaluate on
@@ -147,6 +152,20 @@ def score(records):
             return False
         return not any(w in lab for w in ("qa", "roberta", "summ", "t5", "seg", "vit"))
     out["facts"]["F6_widetable_binding"] = any(_f6(r) for r in R)
+
+    # F7 (canary v3, schema v1.4 user-approved Option A): cited-source finding —
+    # the TRACE (Kim et al., 2020) mechanism claim in Related Work must survive
+    # as a finding with epistemic='cited'. Ground truth for the 53-drop KB-v3-era
+    # class: the model wrote strength='cited', the frozen schema had no slot, the
+    # enum gate dropped correct-intuition records. v1.4: template slot + FG7
+    # migration; this fact verifies the channel end to end.
+    def _f7(r):
+        if r.get("kind") != "finding" or r.get("epistemic") != "cited":
+            return False
+        blob = (str(r.get("claim", "")) + " " + str(r.get("quote", ""))).lower()
+        return ("trace" in blob or "kim" in blob
+                or "importance weight" in blob or "bias" in blob)
+    out["facts"]["F7_cited_finding"] = any(_f7(r) for r in R)
 
     # T1: negation flipped to affirmation (NOVA uses prioritized sampling)
     t1 = False
@@ -247,7 +266,21 @@ def score(records):
                 t5 = True
     out["traps"]["T5_widetable_misbinding"] = t5
 
-    out["fact_recall"] = f"{sum(out['facts'].values())}/6"
+    # T6 (canary v3, schema v1.4): own-paper finding epistemic flip — NOVA's
+    # OWN mechanism/conclusion marked epistemic='cited' (mirror of T2 on the
+    # finding axis; cited is for restatements of OTHER papers' claims only).
+    t6 = False
+    for r in R:
+        if r.get("kind") != "finding" or r.get("epistemic") != "cited":
+            continue
+        blob = (str(r.get("claim", "")) + " " + str(r.get("quote", ""))).lower()
+        if "stabiliz" in blob or ("nova" in blob and "trace" not in blob
+                                  and "kim" not in blob
+                                  and "importance weight" not in blob):
+            t6 = True
+    out["traps"]["T6_finding_epistemic_flip"] = t6
+
+    out["fact_recall"] = f"{sum(out['facts'].values())}/7"
     out["trap_fired"] = sum(out["traps"].values())
     return out
 

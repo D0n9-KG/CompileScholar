@@ -59,7 +59,7 @@ def test_schema_frozen_vocabulary_consistency():
     """schema.py constants must match spec v1.1 §1-§2 (guard against silent drift)."""
     sys.path.insert(0, str(SRC))
     from kb_compiler.records import schema as s
-    assert s.SCHEMA_VERSION == "1.3"
+    assert s.SCHEMA_VERSION == "1.4"  # v1.4 = finding epistemic slot (brief's "v1.3" agenda, user-approved Option A 2026-09-13)
     assert s.RECORD_KINDS == ("result", "config", "lineage", "finding", "absence",
                               "shift", "notation")
     assert s.REQUIRED_FIELDS["notation"] == ("symbol", "definition", "quote")
