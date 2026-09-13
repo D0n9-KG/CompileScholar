@@ -15,12 +15,46 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 import threading
 from concurrent.futures import ThreadPoolExecutor
 
 from .common import (MAX_PAPER_CHARS, call_json, load_corpus, load_json,
-                     load_manifest, save_json)
+                     load_manifest, route_model, save_json)
+from kb_infra.llm import call_paratera, call_cst, parse_json_response
+
+SKELETON_REPAIRED = [0]   # observability: cards saved by the escape-repair tier
+
+_VALID_ESC = set('"\\/bfnrt')
+
+
+def _repair_json_escapes(s):
+    """State-machine repair of invalid backslash escapes in LLM JSON output.
+
+    Verbatim-caption discipline meets LaTeX: a caption like 'Ent (sp)
+    n^{\\gg}' copied faithfully into a JSON string yields an invalid \\g
+    escape — and because the card is ONE json object (unlike records, which
+    survive per-blob salvage), a single bad escape killed the whole card
+    (AirQA HuCurl case, deterministic at temp 0: 3 retries = 3 identical
+    failures). Repair = double every invalid backslash; valid escape pairs
+    are consumed untouched. A regex lookahead is WRONG here: it 'repairs'
+    the second backslash of a valid \\\\ pair and breaks it ('\\\\S3.4'
+    real-case regression). Returns (fixed, n_repaired).
+    """
+    out, i, n, nfix = [], 0, len(s), 0
+    while i < n:
+        c = s[i]
+        if c == "\\":
+            if i + 1 < n:
+                nx = s[i + 1]
+                if nx in _VALID_ESC:
+                    out.append(c); out.append(nx); i += 2; continue
+                if nx == "u" and re.fullmatch(r"[0-9a-fA-F]{4}", s[i + 2:i + 6] or ""):
+                    out.append(s[i:i + 6]); i += 6; continue
+            out.append("\\\\"); nfix += 1; i += 1; continue
+        out.append(c); i += 1
+    return "".join(out), nfix
 
 CARD_PROMPT = """你是科学文献知识编译器的第一遍（结构通读）。通读论文全文，输出该论文的"论文卡片"（JSON）。纪律：只输出文中明确写出的内容；不使用外部知识；不猜测；拿不准的字段留空。
 
@@ -73,8 +107,24 @@ def build_card(pid: str, text: str, title: str, model: str):
         "{text}", text[:MAX_PAPER_CHARS])
     card = call_json(prompt, model, max_tokens=8000, retries=3)
     if not isinstance(card, dict):
+        # Escape-repair tier (one extra call): LaTeX-in-caption invalid
+        # escapes are deterministic at temp 0, so retrying call_json alone
+        # cannot recover — repair the raw output instead. Card-level only;
+        # the shared records parser is untouched (frozen PS protocol).
+        prov, mname = route_model(model)
+        fn = call_cst if prov == "cst" else call_paratera
+        raw = fn(prompt, model=mname, max_tokens=8000,
+                 temperature=0.0, enable_thinking=False) or ""
+        fixed, nfix = _repair_json_escapes(raw)
+        card = parse_json_response(fixed)
+        if isinstance(card, dict) and nfix:
+            SKELETON_REPAIRED[0] += 1
+            with _print_lock:
+                print(f"[{pid}] card recovered by escape repair "
+                      f"({nfix} backslashes fixed)", flush=True)
+    if not isinstance(card, dict):
         with _print_lock:
-            print(f"[{pid}] CARD FAIL (unparseable after retries)", flush=True)
+            print(f"[{pid}] CARD FAIL (unparseable after retries+repair)", flush=True)
         return pid, None
     card["_paper_id"] = pid
     card["_title_used"] = title
