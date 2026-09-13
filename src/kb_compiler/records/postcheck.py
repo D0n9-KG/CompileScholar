@@ -44,6 +44,30 @@ _NUM_IN_VAL = re.compile(r"\d[\d,]*\.?\d*|\d+")
 _FORMULA_CHARS = set("^_{}=+*/()αβγελητ")
 FG7_MIGRATED = [0]  # schema v1.4 finding strength='cited' -> epistemic migration count
 
+# ---- lenient quote channels (AirQA stage-1, 2026-09-13, prereg IL-5) ----
+# Measured on the AirQA b9 drop cohort (114 quote_not_in_text): 70% are
+# TABLE-RENDERED quotes (model cites cells as rendered text 'SFGC 0.26%
+# 31.6±1.2' while the source carries raw <td> HTML between cells — the
+# ws-stripped channel cannot see through tags), 25% are PDF line-break
+# hyphenation ('dis- covered' in TOC text vs 'discovered' in quote). Both
+# source forms are DETERMINISTIC PROJECTIONS of the same verbatim content,
+# so a tag-stripped + de-hyphenated lookup channel preserves the
+# anti-fabrication discipline (every word still must exist in the source).
+# OPT-IN only (lenient_quote_channels=True): default path is byte-identical
+# to the frozen PS protocol.
+_LENIENT_TAG = re.compile(r"<[^>]+>")
+_LENIENT_DEHYPH = re.compile(r"(?<=[a-z])-\s+(?=[a-z])")
+
+
+def lenient_text_transform(text: str) -> str:
+    """Text side: HTML tags -> space, then join line-break hyphenation."""
+    return _LENIENT_DEHYPH.sub("", _LENIENT_TAG.sub(" ", text))
+
+
+def lenient_quote_transform(quote: str) -> str:
+    """Quote side: join line-break hyphenation (quotes never carry tags)."""
+    return _LENIENT_DEHYPH.sub("", quote)
+
 
 # ---------- text normalization with offset map ----------
 
@@ -171,7 +195,7 @@ def _is_formula(s: str) -> bool:
 # ---------- individual checks ----------
 
 def check_record(rec: dict, normc: str, idx_c: list, normf: str, idx_f: list,
-                 vocab_sets: dict):
+                 vocab_sets: dict, lenient_nf: str = None):
     """Returns (violations: list[str], warnings: list[str], loc: dict|None).
     normc/idx_c = whitespace-collapsed (fuzzy locator); normf/idx_f =
     whitespace-free (containment + numeric/formula channels)."""
@@ -253,6 +277,12 @@ def check_record(rec: dict, normc: str, idx_c: list, normf: str, idx_f: list,
                     loc = {"char_start": idx_c[min(start, len(idx_c) - 1)],
                            "char_end": idx_c[min(start + len(nqc), len(idx_c) - 1)] + 1,
                            "match": f"fuzzy:{r:.2f}"}
+            if loc is None and lenient_nf is not None:
+                # lenient channel (opt-in, IL-5): tag-stripped + de-hyphenated
+                nql, _ = _norm_text(lenient_quote_transform(qfold), drop_ws=True)
+                if nql and nql in lenient_nf:
+                    loc = {"char_start": None, "char_end": None,
+                           "match": "lenient:tag_stripped+dehyphenated"}
             if loc is None:
                 v.append("quote_not_in_text")
     # 3b. table_header verbatim containment (v2 table protocol: quote = data
@@ -261,7 +291,10 @@ def check_record(rec: dict, normc: str, idx_c: list, normf: str, idx_f: list,
     if th:
         nth, _ = _norm_text(_fold_latex(th)[0], drop_ws=True)
         if nth and nth not in normf:
-            v.append("table_header_not_in_text")
+            nth_l, _ = _norm_text(lenient_quote_transform(_fold_latex(th)[0]),
+                                  drop_ws=True)
+            if not (lenient_nf is not None and nth_l and nth_l in lenient_nf):
+                v.append("table_header_not_in_text")
     # 4. numeric verbatim (fatal) — values must appear in the quote
     if quote:
         nq_nums = _num_forms(qfold) | {qfold.replace(",", "").lower()}
@@ -389,7 +422,11 @@ def _triage_skip(violations: list, triage: dict) -> bool:
     return bool(classes) and all(c in skip_all for c in classes)
 
 
-def run_postcheck(records_by_paper, texts, vocab, model, dry=False, triage=None):
+def run_postcheck(records_by_paper, texts, vocab, model, dry=False, triage=None,
+                  lenient_quote_channels=False):
+    """lenient_quote_channels (AirQA IL-5, opt-in): add the tag-stripped +
+    de-hyphenated lookup channel for quote/table_header containment. Default
+    False = frozen PS protocol, byte-identical behavior."""
     vocab_sets = build_vocab_sets(vocab)
     stats = Counter()
     checked, dropped, warnings = {}, [], []
@@ -401,9 +438,14 @@ def run_postcheck(records_by_paper, texts, vocab, model, dry=False, triage=None)
         nf, iff = _norm_text(folded, drop_ws=True)
         idx_f = [fmap[j] for j in iff]
         normc, normf = nc, nf
+        lenient_nf = None
+        if lenient_quote_channels:
+            lenient_nf = _norm_text(
+                _fold_latex(lenient_text_transform(text))[0], drop_ws=True)[0]
         out_recs = []
         for rec in payload.get("records", []):
-            v, w, loc = check_record(rec, normc, idx_c, normf, idx_f, vocab_sets)
+            v, w, loc = check_record(rec, normc, idx_c, normf, idx_f, vocab_sets,
+                                     lenient_nf=lenient_nf)
             warnings.extend({"paper_id": pid, "record_id": rec.get("id"), "w": x} for x in w)
             if loc:
                 rec["loc"] = loc
@@ -424,7 +466,8 @@ def run_postcheck(records_by_paper, texts, vocab, model, dry=False, triage=None)
             v_orig = list(v)  # FG-archive fix (2026-09-10): dropped entries used to
             fixed = repair_record(rec, v, text, model)  # pair the ORIGINAL record with
             if fixed:  # the POST-REPAIR violations — misattribution found in FG1
-                v2, w2, loc2 = check_record(fixed, normc, idx_c, normf, idx_f, vocab_sets)  # diagnosis (5/25 'passes_now' were this artifact).
+                v2, w2, loc2 = check_record(fixed, normc, idx_c, normf, idx_f, vocab_sets,
+                                             lenient_nf=lenient_nf)  # diagnosis (5/25 'passes_now' were this artifact).
                 if not v2:
                     fixed["repair_history"] = {"violations": v}
                     if loc2:
