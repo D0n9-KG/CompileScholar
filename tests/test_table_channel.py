@@ -254,6 +254,127 @@ def test_provenance_v2():
     assert recs and recs[0]["provenance"] == "table_channel_v2"
 
 
+# ---------------- F32: retrieval-layer linkage (2026-09-16) ----------------
+
+_F32_GROUP_TABLE = (
+    "<table>"
+    "<tr><td></td><td>IHS [14]</td><td>IHS [14]</td>"
+    "<td>SoyVein500 [7]</td><td>SoyVein500 [7]</td></tr>"
+    "<tr><td>Method</td><td>IoU</td><td>Dice</td><td>IoU</td><td>Dice</td></tr>"
+    "<tr><td>U-net [21]</td><td>72.76</td><td>83.93</td><td>61.38</td><td>75.48</td></tr>"
+    "<tr><td>PSPNet [23]</td><td>75.68</td><td>86.62</td><td>63.95</td><td>77.48</td></tr>"
+    "</table>")
+
+
+def test_f32_subject_from_real_group_tier():
+    recs, _ = _recs(_F32_GROUP_TABLE)
+    by = {(r["dims_new"]["dims.subject"][0], r["measure"]["metric"]):
+          r["measure"]["value"] for r in recs if r.get("dims_new")}
+    assert ("IHS", "IoU") in by and ("SoyVein500", "Dice") in by, by
+    unet_ihs_iou = [r for r in recs if r.get("dims_new")
+                    and r["dims_new"]["dims.subject"] == ["IHS"]
+                    and r["measure"]["metric"] == "IoU"
+                    and "U-net" in r["method_ref"]["surface"]]
+    assert unet_ihs_iou and unet_ihs_iou[0]["measure"]["value"] == "72.76"
+    # citation markers stripped from display fields
+    assert all("[14]" not in r["measure"]["metric"] for r in recs)
+    assert all("[14]" not in s for r in recs
+               for s in (r.get("dims_new") or {}).get("dims.subject", []))
+
+
+def test_f32_caption_tier_yields_no_subject():
+    # FhQS shape: full-width caption (colspan) above the column-name row —
+    # tier-1 has a single distinct cell -> not a group row -> no subject
+    recs, _ = _recs(
+        "<table>"
+        '<tr><td colspan="3">F1 score for skeleton variables</td></tr>'
+        "<tr><td>Setting</td><td>Ours</td><td>Baseline</td></tr>"
+        "<tr><td>clean</td><td>0.84</td><td>0.36</td></tr>"
+        "</table>")
+    assert recs and all(not r.get("dims_new") for r in recs), recs
+    assert any(r["measure"]["value"] == "0.84"
+               and "F1 score" in r["measure"]["metric"] for r in recs)
+
+
+def test_f32_generic_tier_rejected():
+    recs, _ = _recs(
+        "<table>"
+        "<tr><td></td><td>Results</td><td>Results</td>"
+        "<td>Comparison</td><td>Comparison</td></tr>"
+        "<tr><td>Method</td><td>IoU</td><td>Dice</td><td>IoU</td><td>Dice</td></tr>"
+        "<tr><td>FooNet</td><td>55.5</td><td>66.6</td><td>57.7</td><td>68.8</td></tr>"
+        "</table>")
+    assert recs and all(not r.get("dims_new") for r in recs), recs
+    # metric keeps the full path (minus citations), nothing fabricated
+    assert any("Results" in r["measure"]["metric"] for r in recs)
+
+
+def test_f32_method_ref_registry_linkage():
+    reg = {"entities": [
+        {"canonical": "PSPNet", "entity_id": "e1psp", "aliases": ["PSPNet"]},
+        {"canonical": "U-net", "entity_id": "e2unet", "aliases": ["UNet"]},
+    ]}
+    recs, _ = extract_tables("t1", f"## Experiments\n{_F32_GROUP_TABLE}\n",
+                             registry=reg)
+    psp = [r for r in recs if "PSPNet" in r["method_ref"]["surface"]][0]
+    assert psp["method_ref"]["canonical"] == "PSPNet"
+    assert psp["method_ref"]["entity_id"] == "e1psp"
+    unet = [r for r in recs if "U-net" in r["method_ref"]["surface"]][0]
+    assert unet["method_ref"]["canonical"] == "U-net"   # alias-normalized hit
+
+
+def test_f32_no_registry_keeps_unlinked():
+    recs, _ = _recs(_F32_GROUP_TABLE)     # registry=None default
+    assert recs and all(r["method_ref"]["canonical"] is None for r in recs)
+    assert all(r["method_ref"]["entity_id"] is None for r in recs)
+
+
+def test_f32_unmatched_surface_stays_unlinked():
+    reg = {"entities": [{"canonical": "PSPNet", "entity_id": "e1",
+                         "aliases": []}]}
+    recs, _ = extract_tables("t1", f"## Experiments\n{_F32_GROUP_TABLE}\n",
+                             registry=reg)
+    unet = [r for r in recs if "U-net" in r["method_ref"]["surface"]][0]
+    assert unet["method_ref"]["canonical"] is None   # never fuzzy-guess
+
+
+def test_f32_ambiguous_fused_rowhead_stays_unlinked():
+    # 'GCNet [24] SegNeXt [25]' lesson: a rowhead naming 2+ registry entities
+    # is ambiguous ownership — never captured by the first/longest match.
+    reg = {"entities": [
+        {"canonical": "PSPNet", "entity_id": "e1", "aliases": []},
+        {"canonical": "Resnet-101", "entity_id": "e2", "aliases": []},
+        {"canonical": "U-net", "entity_id": "e3", "aliases": []},
+    ]}
+    recs, _ = extract_tables(
+        "t1",
+        "## Experiments\n<table>"
+        "<tr><td></td><td>DSOne</td><td>DSOne</td></tr>"
+        "<tr><td>Method</td><td>IoU</td><td>Dice</td></tr>"
+        "<tr><td>PSPNet [23] Resnet-101</td><td>75.68</td><td>86.62</td></tr>"
+        "<tr><td>U-net [21]</td><td>72.76</td><td>83.93</td></tr>"
+        "</table>\n", registry=reg)
+    psp = [r for r in recs if "PSPNet" in r["method_ref"]["surface"]][0]
+    assert psp["method_ref"]["canonical"] is None      # ambiguous: PSPNet+Resnet-101
+    assert psp["method_ref"]["surface"] == "PSPNet Resnet-101"   # cites stripped
+    unet = [r for r in recs if "U-net" in r["method_ref"]["surface"]][0]
+    assert unet["method_ref"]["canonical"] == "U-net"  # unique match links
+    assert unet["method_ref"]["entity_id"] == "e3"
+
+
+def test_f32_same_row_metric_different_subjects_distinct_ids():
+    recs, _ = _recs(
+        "<table>"
+        "<tr><td></td><td>DSOne</td><td>DSTwo</td></tr>"
+        "<tr><td>Method</td><td>IoU</td><td>IoU</td></tr>"
+        "<tr><td>SharedNet</td><td>72.76</td><td>72.76</td></tr>"
+        "</table>")
+    iou = [r for r in recs if r["measure"]["value"] == "72.76"]
+    assert len(iou) == 2, iou
+    assert {r["dims_new"]["dims.subject"][0] for r in iou} == {"DSOne", "DSTwo"}
+    assert iou[0]["id"] != iou[1]["id"]
+
+
 if __name__ == "__main__":
     fns = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     fails = 0

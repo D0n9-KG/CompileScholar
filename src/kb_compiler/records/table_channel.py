@@ -56,6 +56,74 @@ CELL_CITE = re.compile(r"\(\s*[A-Z][\w\.\-]+[^()]{0,40}?\b(?:19|20)\d{2}[a-z]?\s
 
 _FULLNUM = re.compile(r"^\d{2,}[\d,]*\.?\d*$|^\d+\.\d+$")
 
+# ---- F32 (2026-09-16): retrieval-layer linkage for table records ----
+# Measured pathology (AirQA IL-15 + PS cross-domain check): 100% of
+# table_channel_v2 records had _eff_subject()=="" (dataset fused into
+# measure.metric like "IHS [14] > IoU") and method_ref hardcoded
+# canonical=None -> all 5286 (AirQA) / 1369 (PS) records invisible to
+# compare()/matrix and unlinkable by card(). Fix = emit the dataset tier
+# into dims_new["dims.subject"] (the residue channel _eff_subject already
+# reads), strip [N] citation markers from display fields, and link
+# method_ref against the registry when one is provided. All rules are
+# structural/corpus-generic (no benchmark-specific logic); conservative
+# fallbacks keep the pre-F32 behavior whenever the split/link is unsure.
+CITE_MARK = re.compile(r"\s*\[\d+(?:\s*[,;]\s*\d+)*\]\s*")
+# table-section words that are never dataset/task subjects (corpus-generic)
+GENERIC_TIER = {
+    "results", "result", "performance", "comparison", "comparisons",
+    "main results", "overall", "average", "avg", "mean", "method",
+    "methods", "model", "models", "dataset", "datasets", "benchmark",
+    "benchmarks", "metric", "metrics", "score", "scores", "evaluation",
+    "experiments", "all", "total", "accuracy", "error",
+}
+
+
+def _strip_cites(s):
+    """'IHS [14] > IoU' -> 'IHS > IoU' (citation semantics live in the
+    epistemic channel; [N] markers in display fields only pollute keys)."""
+    return CITE_MARK.sub(" ", str(s or "")).strip()
+
+
+def _norm_tier(s):
+    return re.sub(r"\s+", " ", str(s or "").lower()).strip(" .:;_")
+
+
+def _build_entity_lookup(registry):
+    lookup = {}
+    for e in (registry or {}).get("entities", []):
+        ent = {"canonical": e.get("canonical"), "entity_id": e.get("entity_id")}
+        names = [e.get("canonical")] + list(e.get("aliases") or [])
+        for name in names:
+            k = _norm_tier(name)
+            if k and k not in lookup:
+                lookup[k] = ent
+    return lookup
+
+
+def _link_method(surface, lookup):
+    """Registry linkage for a rowhead surface: citation-stripped, then match
+    every contiguous token subsequence against the lookup. Link ONLY when
+    exactly ONE distinct registry entity matches — a fused rowhead
+    ('GCNet [24] SegNeXt [25] Resnet-101' = 3 entities) or a method+backbone
+    combo ('PSPNet [23] Resnet-101' = 2 entities when both are registered)
+    is AMBIGUOUS ownership: never guess, stay unlinked (matrix labels fall
+    back to the full surface, which keeps every name visible). Exact
+    normalized matches only — never fuzzy."""
+    if not lookup:
+        return None
+    s = re.sub(r"\s+", " ", _strip_cites(surface)).strip()
+    toks = s.split(" ")
+    hits = {}
+    for i in range(len(toks)):
+        for j in range(i + 1, len(toks) + 1):
+            k = _norm_tier(" ".join(toks[i:j]))
+            if len(k) >= 2 and k in lookup:
+                ent = lookup[k]
+                hits[ent.get("entity_id") or ent.get("canonical")] = ent
+    if len(hits) == 1:
+        return next(iter(hits.values()))
+    return None
+
 
 def _fold_num(cell: str) -> str:
     """Numeric cell -> clean value string, or '' when not cleanly numeric.
@@ -303,11 +371,15 @@ def _rid(pid, kind, fp):
     return hashlib.md5(f"{pid}|{kind}|{fp}".encode("utf-8")).hexdigest()[:14]
 
 
-def extract_tables(pid, text, own_methods=(), manifest_title=""):
+def extract_tables(pid, text, own_methods=(), manifest_title="", registry=None):
     """Deterministic table -> result records + overflow residue.
     own_methods: normalized surfaces of the paper's own method (identity card
-    canonical+aliases) for the provisional role decision."""
+    canonical+aliases) for the provisional role decision.
+    registry (F32): optional entity registry for method_ref linkage —
+    canonical/entity_id filled on exact normalized match only; None keeps
+    the pre-F32 unlinked behavior."""
     records, residue = [], []
+    lookup = _build_entity_lookup(registry)
     blocks = []   # (rows, char_pos, raw_quote_getter)
     # HTML tables with their source spans (verbatim row quotes come from text)
     for m in re.finditer(r"<table>.*?</table>", text, flags=re.S):
@@ -385,6 +457,17 @@ def extract_tables(pid, text, own_methods=(), manifest_title=""):
                 cur_group = g
         # ---- column header paths (multi-tier join) ----
         ncol = len(grid[0])
+        # F32: is the FIRST header tier a real column-GROUP row (multiple
+        # distinct cells partitioning the columns, e.g. [IHS x4 | SoyVein500
+        # x4]) or a full-width caption/tier banner (single text, FhQS/mw1P
+        # shape)? Only a real group row may yield a subject — captions are
+        # metric phrases, splitting them would emit garbage subjects
+        # (guard test: test_b_caption_without_siblings_stays_tier).
+        tier1_group = False
+        if headers:
+            distinct = {str(x).strip() for x in headers[0]
+                        if x not in (None, "")}
+            tier1_group = len(distinct) >= 2
         colpath = []
         for c in range(ncol):
             parts = []
@@ -512,9 +595,25 @@ def extract_tables(pid, text, own_methods=(), manifest_title=""):
                          for o in own)
             for c, v in cells.items():
                 head = colpath[c] if c < len(colpath) else ""
+                # F32: multi-tier column paths carry the dataset/task in
+                # tier-1 ("IHS [14] > IoU" shape) — split it into subject so
+                # the matrix view can see the record (_eff_subject reads
+                # dims_new["dims.subject"]). Conservative gates: >=2 tiers,
+                # tier-1 has letters, <=60 chars, not a generic section word;
+                # otherwise subject stays EMPTY (pre-F32 behavior, never
+                # fabricate). Split happens BEFORE the fix-B group join so
+                # banner semantics are untouched.
+                subject = ""
+                if " > " in head and tier1_group:
+                    tiers = [t.strip() for t in head.split(" > ")]
+                    cand = _strip_cites(tiers[0])
+                    if cand and len(cand) <= 60 and re.search(r"[A-Za-z]", cand) \
+                            and _norm_tier(cand) not in GENERIC_TIER:
+                        subject = cand
+                        head = " > ".join(tiers[1:])
                 if cur_group:   # fix B: group context joins the column path
                     head = f"{head} > {cur_group}" if head else cur_group
-                metric = re.sub(r"\s+", " ", head).strip()[:80]
+                metric = _strip_cites(re.sub(r"\s+", " ", head)).strip()[:80]
                 direction = ""
                 if "↑" in head or "higher" in head.lower():
                     direction = "higher_better"
@@ -522,11 +621,18 @@ def extract_tables(pid, text, own_methods=(), manifest_title=""):
                     direction = "lower_better"
                 unit = _cell_unit(row[c] if c < len(row) else "") or \
                     ("%" if "%" in head else "")
-                fp = re.sub(r"\s+", " ", f"{rowhead}|{metric}|{v}").strip().lower()
-                records.append({
+                # F32: subject joins the fingerprint (same rowhead+metric+
+                # value under two datasets = two records, distinct ids)
+                fp = re.sub(r"\s+", " ",
+                            f"{rowhead}|{subject}|{metric}|{v}").strip().lower()
+                link = _link_method(rowhead, lookup)
+                rec = {
                     "kind": "result",
-                    "method_ref": {"surface": rowhead.strip()[:60], "canonical": None,
-                                   "entity_id": None},
+                    # F32: surface strips [N] citation markers (display /
+                    # resolver-matching layer only; quote stays verbatim)
+                    "method_ref": {"surface": _strip_cites(rowhead)[:60],
+                                   "canonical": (link or {}).get("canonical"),
+                                   "entity_id": (link or {}).get("entity_id")},
                     "measure": {"metric": metric or (rowhead.strip()[:40]),
                                 "value": v, "unit": unit,
                                 "direction": direction, "aggregation": "",
@@ -546,7 +652,10 @@ def extract_tables(pid, text, own_methods=(), manifest_title=""):
                     "chunk_char_start": tpos,
                     "id": _rid(pid, "result", fp),
                     "provenance": "table_channel_v2",
-                })
+                }
+                if subject:   # F32: residue channel the views compiler reads
+                    rec["dims_new"] = {"dims.subject": [subject]}
+                records.append(rec)
                 emitted_any = True
         if fused_rows:
             residue.append({"reason": "table_channel: fused/ambiguous cells — "
@@ -642,11 +751,15 @@ def main():
     ap.add_argument("--texts", required=True)
     ap.add_argument("--checked", required=True, help="existing records_checked.json (dedup base)")
     ap.add_argument("--cards", default="", help="identity cards for own-method role anchor")
+    ap.add_argument("--registry", default="",
+                    help="F32: entity registry for method_ref linkage (optional)")
     ap.add_argument("--out", required=True)
     args = ap.parse_args()
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     checked = json.load(open(args.checked, encoding="utf-8"))
     cards = json.load(open(args.cards, encoding="utf-8")) if args.cards and os.path.exists(args.cards) else {}
+    registry = json.load(open(args.registry, encoding="utf-8")) \
+        if args.registry and os.path.exists(args.registry) else None
     all_new, all_res, per_paper = [], [], {}
     for fn in sorted(os.listdir(args.texts)):
         if not fn.endswith((".md", ".txt")) or fn.rsplit(".", 1)[0] == "canary":
@@ -655,7 +768,7 @@ def main():
         text = open(os.path.join(args.texts, fn), encoding="utf-8", errors="replace").read()
         mi = (cards.get(pid) or {}).get("method_identity") or {}
         own = [mi.get("canonical_name") or ""] + (mi.get("aliases") or [])
-        recs, res = extract_tables(pid, text, own_methods=own)
+        recs, res = extract_tables(pid, text, own_methods=own, registry=registry)
         per_paper[pid] = {"records": len(recs), "residue": len(res)}
         all_new += recs
         all_res += res
