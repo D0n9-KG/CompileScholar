@@ -153,7 +153,17 @@ def _fold_num(cell: str) -> str:
     toks = [x for x in re.split(r"\s+", t2) if x]
     full = [x for x in toks if _FULLNUM.match(x.replace(",", "").rstrip("."))]
     if len(full) >= 2:
-        return ""                      # two+ complete numbers in one cell
+        # F33 (2026-09-17): mean±std is ONE value with a spread, not a fused
+        # pair. '0.046 ± 0.002' (double-spaced) was rejected while
+        # '0.034±0.001' (unspaced) folded — purely space-sensitive
+        # inconsistency; measured blast radius: 89 AirQA cells (17% of 530
+        # mean±std cells; PS 0/92), whole columns lost when >=50% of a
+        # column's cells were double-spaced (053401b8 MAE table: k-NN column
+        # halved, IDW column zeroed). Real fusion artifacts ('1536 85.3',
+        # mineru colspan) carry NO ± separator. Admit exactly [num, ±, num];
+        # anything with 2+ ± or extra tokens stays rejected.
+        if not (len(toks) == 3 and toks[1] == "±" and t2.count("±") == 1):
+            return ""                  # two+ complete numbers in one cell
     if t2.count(".") > 1 and "±" not in t2 and " " not in t2.strip():
         return ""                      # '91.691.4' single-token multi-dot fuse
     # (2) fold latex digit spacing

@@ -375,6 +375,45 @@ def test_f32_same_row_metric_different_subjects_distinct_ids():
     assert iou[0]["id"] != iou[1]["id"]
 
 
+# ---------------- F33: mean±std spaced cells (2026-09-17) ----------------
+
+def test_f33_spaced_mean_std_folds():
+    from kb_compiler.records.table_channel import _fold_num
+    # double-spaced mean±std now folds (was rejected as fused pre-F33)
+    assert _fold_num("0.046 ± 0.002") == "0.046 ± 0.002"
+    # unspaced / single-spaced forms unchanged (consistency)
+    assert _fold_num("0.034±0.001") == "0.034 ± 0.001"
+    assert _fold_num("0.038 ±0.002") == "0.038 ± 0.002"
+
+
+def test_f33_true_fusion_still_rejected():
+    from kb_compiler.records.table_channel import _fold_num
+    assert _fold_num("1536 85.3") == ""      # mineru colspan artifact
+    assert _fold_num("39.7 33.6") == ""
+    assert _fold_num("0.046 ± 0.002 ± 0.001") == ""   # two ± = ambiguous
+    assert _fold_num("0.046 ± 0.002 extra") == ""     # extra tokens
+
+
+def test_f33_mae_table_all_columns_emitted():
+    # 053401b8 shape: mixed ± spacing across columns — pre-F33 the k-NN
+    # column lost double-spaced cells and IDW zeroed; post-F33 all three
+    # method columns emit for every row.
+    html = ("<table>"
+            "<tr><td>Dataset</td><td>Grid</td><td>k-NN</td><td>Linear</td><td>IDW</td></tr>"
+            '<tr><td rowspan="2">ShallowWater</td><td>Coarser</td>'
+            "<td>0.046 ± 0.002</td><td>0.034±0.001</td><td>0.038 ±0.002</td></tr>"
+            "<tr><td>Original</td>"
+            "<td>0.017± 0.002</td><td>0.016 ±0.002</td><td>0.017 ± 0.003</td></tr>"
+            "</table>")
+    recs, _ = _recs(html)
+    by_metric = {}
+    for r in recs:
+        by_metric.setdefault(r["measure"]["metric"], []).append(r["measure"]["value"])
+    assert by_metric.get("k-NN") == ["0.046 ± 0.002", "0.017 ± 0.002"], by_metric
+    assert by_metric.get("Linear") == ["0.034 ± 0.001", "0.016 ± 0.002"], by_metric
+    assert by_metric.get("IDW") == ["0.038 ± 0.002", "0.017 ± 0.003"], by_metric
+
+
 if __name__ == "__main__":
     fns = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     fails = 0
