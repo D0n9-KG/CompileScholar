@@ -120,6 +120,35 @@ def _lines(items: list[tuple[int, str, int]]) -> str:
     return "\n".join(f"[{i}] {s} | n={n}" for i, s, n in items)
 
 
+def _split_plus_variants(groups: list, keys: list, mentions: dict) -> list:
+    """F34 (2026-09-17): a '+' suffix is a naming-convention DISTINCT method
+    variant (mCLIP+ vs mCLIP). airs4p probe: the LLM merge folded 'mCLIP+'
+    into 'mCLIP', 24 records carried canonical='mCLIP', matrix labels made
+    the variant literally invisible to retrieval (a ranking gold element
+    could not be seen under its own name). Deterministic post-LLM guard: a
+    member surface ending in '+' never shares an entity with its
+    '+'-stripped base. Corpus-generic naming rule, zero benchmark refs."""
+    out = []
+    for g in groups:
+        idxs = list(g["members"])
+        norms = {i: _norm(mentions[keys[i]]["surface"]).replace(" ", "")
+                 for i in idxs}
+        pulled = [i for i in idxs
+                  if norms[i].endswith("+")
+                  and norms[i][:-1] in {norms[j] for j in idxs if j != i}]
+        keep = [i for i in idxs if i not in pulled]
+        if keep:
+            gg = dict(g)
+            gg["members"] = keep
+            if gg.get("canonical") not in keep:
+                gg["canonical"] = keep[0]
+            out.append(gg)
+        for i in pulled:
+            out.append({"members": [i], "canonical": i,
+                        "entity_type": g.get("entity_type")})
+    return out
+
+
 def _covered_groups(groups: list, n_items: int, label: str) -> list:
     """Machine coverage check: every index in exactly one group; missing ->
     singleton fallback (truncation cannot silently drop items)."""
@@ -165,6 +194,7 @@ def merge_entities(mentions: dict, cards: dict, model: str) -> list[dict]:
         "{lines}", "\n".join(lines))
     obj = call_json(prompt, model, max_tokens=16000, retries=3)
     groups = _covered_groups((obj or {}).get("groups"), len(keys), "registry")
+    groups = _split_plus_variants(groups, keys, mentions)   # F34 guard
 
     entities = []
     for g in groups:
