@@ -496,6 +496,81 @@ def call_cst(prompt: str, model: str = "qwen3.5", max_tokens: int = 4000,
     return None
 
 
+# ---- LOCAL provider (self-hosted vLLM, OpenAI-compatible; added 2026-09-16
+#      for the local Qwen3.8-27B deployment) ----
+_LOCAL_SEM = threading.Semaphore(int(os.environ.get("LOCAL_MAX_CONCURRENT", "4")))
+
+
+def call_local(prompt: str, model: str = "qwen3.8-27b-local", max_tokens: int = 4000,
+               temperature: float = 0.0, seed: int | None = None,
+               enable_thinking: bool | None = None) -> str | None:
+    """Call a local vLLM OpenAI-compatible server.
+
+    Config: LOCAL_BASE_URL (default http://127.0.0.1:8000/v1) and optional
+    LOCAL_API_KEY, read from .env first then os.environ (deployment can set
+    either). Served model name must start with 'qwen' for the thinking-off
+    path below (same convention as call_cst); thinking is disabled via the
+    Qwen-family form chat_template_kwargs={"enable_thinking": False} — the
+    only form verified to work on our stack (Paratera probe + CST probe;
+    the bare 'enable_thinking' param silently leaves reasoning ON).
+    FIRST-USE CANARY: verify usage shows reasoning_tokens=0 in the ledger
+    (GLM-4.6V lesson: thinking models mis-read table values; GLM-5.3
+    lesson: thinking eats the output budget).
+
+    Retries absorb server warm-up / transient 5xx with short backoff.
+    No cross-channel fallback: a dead local server returns None and the
+    batch runner stops-and-resumes (arm purity)."""
+    base = (ENV.get("LOCAL_BASE_URL")
+            or os.environ.get("LOCAL_BASE_URL", "http://127.0.0.1:8000/v1")).rstrip("/")
+    key = ENV.get("LOCAL_API_KEY") or os.environ.get("LOCAL_API_KEY", "local")
+    payload = {
+        "model": model,
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+    }
+    if seed is None:
+        seed = _env_seed()
+    if seed is not None:
+        payload["seed"] = seed
+    if enable_thinking is False and model.lower().startswith("qwen"):
+        payload["chat_template_kwargs"] = {"enable_thinking": False}
+    body = json.dumps(payload).encode()
+    attempts = int(os.environ.get("LOCAL_MAX_ATTEMPTS", "4"))
+    sock_to = float(os.environ.get("LOCAL_SOCK_TIMEOUT", "300"))
+    for attempt in range(attempts):
+        t0 = time.time()
+        try:
+            req = urllib.request.Request(
+                base + "/chat/completions",
+                data=body,
+                headers={"Authorization": f"Bearer {key}",
+                         "Content-Type": "application/json"},
+            )
+            with _LOCAL_SEM:
+                _rl = _walled_open(req, sock_timeout=sock_to)
+                raw = _walled_read(_rl, t0)
+            resp = json.loads(raw)
+            _log_call("local", model, True, (time.time() - t0) * 1000,
+                      resp.get("usage") or {}, attempt)
+            return resp["choices"][0]["message"]["content"]
+        except urllib.error.HTTPError as e:
+            _log_call("local", model, False, (time.time() - t0) * 1000,
+                      None, attempt)
+            if e.code in (429, 500, 502, 503, 504) and attempt < attempts - 1:
+                time.sleep(2 * (attempt + 1))
+                continue
+            return None
+        except Exception:
+            _log_call("local", model, False, (time.time() - t0) * 1000,
+                      None, attempt)
+            if attempt < attempts - 1:
+                time.sleep(2 * (attempt + 1))
+                continue
+            return None
+    return None
+
+
 def check_arm_purity(log_path: str | None = None,
                      allowed_pairs: list[tuple[str, str]] | None = None) -> dict:
     """D8 arm-purity assertion. Reads a JSONL call log (default: env
