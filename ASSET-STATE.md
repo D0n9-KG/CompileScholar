@@ -29,7 +29,7 @@
 |---|---|---|---|
 | **PS16**（PaperScope 16 gold 篇） | `STAGEB/psfix_2026-09-11/psv5/`（血统见其中 STAGING-LINEAGE.md） | records v323（4206）+views v323（matrix 308/cards 1205/derived 8）+registry v35_f34（1725 实体） | 冻结（历史 +0.133/+0.83 判决口径） |
 | **AirQA**（25 篇） | `STAGEB/airqa/s1_qa/`（staging）+ `airqa/s1_build/`（构建产物） | records v34（5515+表格）+views v34+registry v2s_f34 | 冻结（阶段一+批3a 收口） |
-| **PS-53**（16 gold+37 干扰，规模实验专用） | `STAGEB/paperscope_r2/ps53/` | records_checked_ps53（**17822**=LLM 10691+表格 7131）+ views_ps53_full（matrix 1026/cards 1205/genealogy 416）+ views_ps53_16（同 KB 过滤 16 篇：4269 条/matrix 302）+ build_summary_ps53.json；建库 15.78M/2532 calls 全 Qwen3.6-27B | **活跃**（视图 2026-09-16 建成，F13 双臂 PASS；round2 实体生长=预注册决策点：distractor37 实体链接仅 6.3%） |
+| **PS-53**（16 gold+37 干扰，规模实验专用） | `STAGEB/paperscope_r2/ps53/` | records_checked_ps53（**17822**=LLM 10691+表格 7131）+ views_ps53_full（matrix 1026/cards 1205/genealogy 416）+ views_ps53_16（同 KB 过滤 16 篇：4269 条/matrix 302）+ build_summary_ps53.json；建库 15.78M/2532 calls 全 Qwen3.6-27B | **活跃**（视图 2026-09-16 建成，F13 双臂 PASS；round2=OFF 已冻结[预注册 v1.0]；distractor37 实体链接仅 6.3%=披露项；**观察项 2026-09-16**：overflow 队列 1294 条被 References 节协议噪声主导[非 schema 压力]，下次建库 text prep 应过滤 References[IL-2 先例]或 triage 加确定性过滤） |
 
 ## 3. 答题栈（冻结态，解冻需用户授权）
 
