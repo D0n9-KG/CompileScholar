@@ -59,6 +59,8 @@
 
 ## 6. 关键档案地图（绝对定位）
 
+> 工作区两级索引：repo 根=本页（资产状态）；`.research_tmp/INDEX.md`=实验区内部地图（2026-09-16 整理后建立，新目录必须登记）。根目录死形态已归档 `archive/pre_stageB_root_2026-09-16/`（清单+恢复方法见 archive/MANIFEST-pre_stageB_root_2026-09-16.md，commit bc72a742）。
+
 - 预注册/判决档：`STAGEB/airqa/`（AIRQA-PREREG/AIRQA-S1-VERDICT/AIRQA-B3A-VERDICT/MATERIAL-LEDGER/F35-SPEC/NAV-SPEC/F31V2-SPEC/TYPEB-RETRIEVAL-SPEC）+ `STAGEB/paperscope_r2/`（PILOT-PREREG/PAPERSCOPE-R2-PREREG/OFFICIAL-REPO-NOTES）
 - 创新定位材料（转向后，只认这些）：memory 目录 `v6-review-round1-verdict` / `research-direction-pivot-need-driven` / `workload-catalog-2026-09-03` / `competitive-landscape-2026-09-03` / `sciatlas-v2-mechanist-recheck` / `e2-r2-scaling-verdict`；全文 `.research_tmp/docs_decisions/PROPOSAL-2026-09-03-v6-*`
 - 基准调研：`.research_tmp/literature/survey_homecourt_benchmark_2026-09-17/`（判决表+§五追记）+ `survey_harness_design_2026-09-15/`；**本轮查新（进行中）**：`.research_tmp/literature/survey_positioning_2026-09-16/`（AGENT-A 规模条件性/B demand-driven content/C 保真度治理/D delta 继承）
