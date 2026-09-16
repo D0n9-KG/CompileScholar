@@ -20,7 +20,7 @@
 | `kb_compiler/verification/consistency.py` `maintenance.py` | 一致性验证/维护 | 活跃 |
 | `kb_infra/` | LLM provider 网关（Paratera/CSTCloud）+ embedding | 活跃 |
 | `claim_coverage.py` | 独立 stdlib 工具 | 活跃 |
-| `tests/`（65 个） | 含 `test_kb_compiler_import_gate`=机器闸（kb_compiler 禁 import 旧栈+schema 冻结守卫） | 活跃 |
+| `tests/`（65 个） | 含 `test_kb_compiler_import_gate`=机器闸（AST 扫描 src/ 全部 import：禁 granular_agent+kb_infra 仅 stdlib+kb_compiler 白名单+schema 冻结守卫）。**闸边界=仅 src/**；.research_tmp 实验脚本不在闸内，靠物理隔离（旧栈在 archive/legacy，sys.path 不含）+纪律：实验脚本禁加 archive 路径，Type B 等若升格进 src/ 必须 fresh rewrite 过闸（2026-09-16 依赖图全链 grep 核验：识图/F35/TypeB/答题栈零旧栈引用） | 活跃 |
 | `archive/legacy/`（gitignored） | 死代码：granular_agent（Stage A 超图）/contest/run_kernel/run_cases/8 死测试 | 死·可逆归档 |
 
 ## 2. 知识库与 staging（三套）
