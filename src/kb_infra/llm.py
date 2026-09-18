@@ -305,6 +305,70 @@ def call_paratera(prompt: str, model: str = "Kimi-K2.6", max_tokens: int = 4000,
     return None
 
 
+def call_paratera_vision(prompt: str, image_path: str,
+                         model: str = "GLM-4V-Flash", max_tokens: int = 4000,
+                         temperature: float = 0.0) -> str | None:
+    """Call a Paratera vision model (GLM-4.5V / GLM-4.6V / GLM-4V-Flash / ...)
+    with one local image. Multimodal OpenAI-compatible content array.
+
+    figure_channel v2 (2026-09-18 batch-1 parallel line): the VLM is a
+    PROPOSER only — every value it reads is gated deterministically
+    downstream (FIGURE-FIND-REDESIGN-SPEC G1-G5). Same wall-clock watchdog
+    and ledger discipline as call_paratera; vision input is NOT token-counted
+    by the ledger (image tokens vary by model), chat-side tokens are.
+    """
+    import base64
+    import mimetypes
+    key = ENV.get("PARATERA_API_KEY")
+    base = ENV.get("PARATERA_BASE_URL", "").rstrip("/")
+    if not key:
+        return None
+    mime = mimetypes.guess_type(image_path)[0] or "image/png"
+    with open(image_path, "rb") as f:
+        b64 = base64.b64encode(f.read()).decode()
+    payload = {
+        "model": model,
+        "messages": [{"role": "user", "content": [
+            {"type": "image_url",
+             "image_url": {"url": f"data:{mime};base64,{b64}"}},
+            {"type": "text", "text": prompt},
+        ]}],
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+    }
+    body = json.dumps(payload).encode()
+    _WALL = float(os.environ.get("LLM_WALL_TIMEOUT", "240"))
+
+    req = urllib.request.Request(
+        base + "/chat/completions", data=body,
+        headers={"Authorization": f"Bearer {key}",
+                 "Content-Type": "application/json"})
+    _sock_to = float(os.environ.get("LLM_SOCK_TIMEOUT", "60"))
+    for attempt in range(2):
+        t0 = time.time()
+        try:
+            r = _walled_open(req, sock_timeout=_sock_to)
+            chunks = []
+            while True:
+                if time.time() - t0 > _WALL:
+                    raise TimeoutError(f"wall-clock {_WALL}s exceeded (slow-drip server)")
+                b = r.read(65536)
+                if not b:
+                    break
+                chunks.append(b)
+            raw = b"".join(chunks)
+            resp = json.loads(raw)
+            _log_call("paratera-vision", model, True, (time.time() - t0) * 1000,
+                      resp.get("usage") or {}, attempt)
+            return resp["choices"][0]["message"]["content"]
+        except Exception:
+            _log_call("paratera-vision", model, False, (time.time() - t0) * 1000,
+                      None, attempt)
+            if attempt == 1:
+                return None
+    return None
+
+
 def embed_batch(texts: list[str], model: str = "GLM-Embedding-2") -> list[list[float]]:
     """Call Paratera embedding API. Returns one embedding per input text; texts
     that 400 (empty/oversized/odd chars) get a zero vector so callers keep
