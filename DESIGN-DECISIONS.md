@@ -75,6 +75,8 @@
 
 **F1 Type B 海量外部检索未集成**（只有通道消融原型：query-decomp 最大杠杆/纯向量输词面/引用通道小杠杆）——系统范式是"有界语料预编译"，无廉价海量前端；所有大规模外部基准都考 Type B。
 **F2 公式不产记录**（AirQA 公式题材料面全灭）；**F3 图内容未集成**（figure_channel 已建排队）；**F4 单层表头 56% 残留**（F35 排队）；**F5 负载遥测未标准化**（信号散落：usage_audit/NAV/auto_rows/PROJ_LEDGER，无统一 workload ledger）；**F6 计算型派生值无通道**（gold 需推算时结构性弃分）。
+**F7 PS-53 实体链接断裂**（2026-09-17 一手核验新增）：建库时 registry_round2=OFF（round2: false 在 build_summary），用旧注册表 seed → gold16 method_ref entity_id 链接率 46.3%、distractor37 仅 6.3%。typed tools 到达性的头号短板+matrix 表键碎片化同源。修复=round2 补跑+仲裁消化（代码在位，~1-2M）。
+**F8 答题栈形态债务**（2026-09-17 一手核验新增）：笔记写入路径 6 层补丁（IL-C1/C4/C5/C6+F27+F31 防伪）、compact 三层 monkey-patch、AirQA 内容伪装 PS 文件名靠注释维系——工程可用、发表形态不合格。定位候选=论文评测消费端而非系统组件（决策待用户）。
 
 ## G. 实验方法层
 

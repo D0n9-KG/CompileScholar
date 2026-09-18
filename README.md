@@ -7,7 +7,7 @@
 | 文档 | 回答什么问题 |
 |---|---|
 | [ASSET-STATE.md](ASSET-STATE.md) | 现在有什么：活代码/三套 KB/答题栈/五条工作线状态 |
-| [DIRECTION.md](DIRECTION.md) | 往哪打：论文大方向三线+监控阈值+执行队列 |
+| [DIRECTION.md](DIRECTION.md) | 往哪打：现行方向+监控阈值+执行队列（完整推导见 `ccfa-workfiles/idea/logickg-idea-plan-2026-09-17/`） |
 | `.research_tmp/paper_drafts/RESULTS-LEDGER.md` | 权威数字：各考场成绩（唯一可引用口径） |
 
 ## 仓库布局
