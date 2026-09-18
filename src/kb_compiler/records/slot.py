@@ -269,27 +269,42 @@ def _fingerprint(rec):
     return re.sub(r"\s+", " ", f"{m}|{v}").strip().lower()
 
 
-def extract_paper(pid, text, card, registry, vocab, model, title):
+def extract_paper(pid, text, card, registry, vocab, model, title, chunk_threads=1):
     inj = build_injection(pid, card, registry, vocab)
     chunks = chunk_text(pid, text)
     records, overflow, entity_queue = [], [], []
     chunk_fails = 0  # FG2 (2026-09-10): silent chunk-loss counter — gate1 C arm
     # lost ~35% of yield to exhausted-retry chunks with NO count anywhere
     # (discovered only via cross-arm comparison). Counted + surfaced in stats.
+    # B2 chunk-level parallelism (2026-09-18 batch 1): prompts are pure
+    # functions of the chunk; execution is optionally threaded and results
+    # are post-processed in ORIGINAL chunk order, so output is byte-comparable
+    # to the serial path (record order, entity_queue order and the
+    # order-independent dedup merge are all preserved).
+    chunk_prompts = []
     for ch in chunks:
         schemas = "\n".join(KIND_SLICES[k] for k in ch["kinds"] if k in KIND_SLICES)
-        prompt = (CHUNK_PROMPT.replace("{title}", title or pid)
-                  .replace("{identity}", inj["identity"])
-                  .replace("{schemas}", schemas)
-                  .replace("{entities}", inj["entities"])
-                  .replace("{subjects}", inj["subjects"])
-                  .replace("{setups}", inj["setups"])
-                  .replace("{variants}", inj["variants"])
-                  .replace("{hparams}", inj["hparams"])
-                  .replace("{rules}", QUOTE_FIRST_RULES)
-                  .replace("{section}", ch["section"])
-                  .replace("{chunk}", ch["text"]))
-        obj = call_json(prompt, model, max_tokens=9000, retries=3, salvage=True)
+        chunk_prompts.append((ch, CHUNK_PROMPT.replace("{title}", title or pid)
+                              .replace("{identity}", inj["identity"])
+                              .replace("{schemas}", schemas)
+                              .replace("{entities}", inj["entities"])
+                              .replace("{subjects}", inj["subjects"])
+                              .replace("{setups}", inj["setups"])
+                              .replace("{variants}", inj["variants"])
+                              .replace("{hparams}", inj["hparams"])
+                              .replace("{rules}", QUOTE_FIRST_RULES)
+                              .replace("{section}", ch["section"])
+                              .replace("{chunk}", ch["text"])))
+    if chunk_threads > 1 and len(chunk_prompts) > 1:
+        with ThreadPoolExecutor(max_workers=chunk_threads) as cex:
+            objs = list(cex.map(
+                lambda p: call_json(p, model, max_tokens=9000,
+                                    retries=3, salvage=True),
+                [p for _, p in chunk_prompts]))
+    else:
+        objs = [call_json(p, model, max_tokens=9000, retries=3, salvage=True)
+                for _, p in chunk_prompts]
+    for (ch, _), obj in zip(chunk_prompts, objs):
         if isinstance(obj, list):  # bare-array output normalization
             obj = {"records": obj}
         if not isinstance(obj, dict):
@@ -401,6 +416,9 @@ def main():
     ap.add_argument("--out", required=True)
     ap.add_argument("--model", default="DeepSeek-V4-Flash")
     ap.add_argument("--workers", type=int, default=3)
+    ap.add_argument("--chunk-threads", type=int, default=1,
+                    help="threads per paper for chunk calls (workers x this "
+                         "<= ~16-20 for Paratera; results order-preserving)")
     ap.add_argument("--only", default="")
     args = ap.parse_args()
 
@@ -420,7 +438,8 @@ def main():
     print(f"slot: {len(todo)} papers to run, model={args.model}", flush=True)
     with ThreadPoolExecutor(max_workers=args.workers) as ex:
         futs = [ex.submit(extract_paper, pid, text, cards[pid], registry, vocab,
-                          args.model, (manifest.get(pid) or {}).get("title"))
+                          args.model, (manifest.get(pid) or {}).get("title"),
+                          args.chunk_threads)
                 for pid, text in todo]
         for f in futs:
             pid, out = f.result()
