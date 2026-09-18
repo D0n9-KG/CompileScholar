@@ -501,6 +501,48 @@ class KBTools:
             except Exception:
                 pass
 
+    def describe_kb(self) -> dict:
+        """B6 (2026-09-18 batch 2): deterministic KB self-description, zero
+        LLM. Root cause addressed: compare usage fell 36% when the corpus
+        grew 4.5x (D53 forensics) — the answering agent stopped knowing what
+        the KB contains and retreated to card-scanning. This is orientation,
+        not per-question coaching: inventory + how each view is reached."""
+        st = dict(self.views.get("stats") or {})
+        n_papers = len([p for p in self.records if p != "canary"])
+        kinds = {}
+        for pid, payload in self.records.items():
+            if pid == "canary":
+                continue
+            recs = payload.get("records", payload) if isinstance(payload, dict) else payload
+            for r in recs:
+                kinds[r.get("kind")] = kinds.get(r.get("kind"), 0) + 1
+        return {
+            "tool": "describe_kb",
+            "corpus_papers": n_papers,
+            "records_total": st.get("n_records"),
+            "records_by_kind": {k: v for k, v in sorted(kinds.items(),
+                                                        key=lambda x: -x[1])},
+            "views": {
+                "compare": {"matrix_tables": st.get("matrix_tables"),
+                            "note": "pre-aligned comparison tables; give "
+                                    "entities/subject to hit one directly"},
+                "lineage": {"edges": st.get("genealogy_edges"),
+                            "nodes_with_year": st.get("genealogy_nodes_with_year")},
+                "coverage": {"entities": st.get("coverage_entities"),
+                             "absences_extracted": st.get("absences_extracted"),
+                             "absences_derived": st.get("absences_derived")},
+                "cards": {"entity_dossiers": st.get("cards"),
+                          "note": "card(entity) = per-entity panorama"},
+                "pair_deltas": st.get("pair_deltas_derived"),
+                "notation_index": st.get("notation"),
+            },
+            "registry_entities": len(self.byid),
+            "hint": ("matrix/coverage/lineage are compiled views over "
+                     "records: broad multi-entity questions should name the "
+                     "entities and use compare/entities, not scan cards one "
+                     "by one"),
+        }
+
     def search(self, query: str, k: int = 10) -> dict:
         """long-tail fallback ONLY (typed tools first). Same-model-same-dim
         discipline enforced via kb_infra provider tag."""
