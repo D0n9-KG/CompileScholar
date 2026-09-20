@@ -2,6 +2,11 @@
 
 > **仓库更名（2026-09-20）**：LogicKG → **CompileScholar**（GitHub 仓库+本地目录同步改名，旧链接自动重定向；范式主张=编译 vs 检索）。历史文档中的 LogicKG 字样均指本仓库。
 
+> **09-20 深夜状态块（基准切换+归档，本块优先于下文相关小节）**：
+> ①基准切换定案——PaperScope 弃用（41% 脏 gold），新三考场=ScholarQA-Multi 108 主轴/QASA 1375 量盘/LitSearch 597 检索轨（判据与对照表格局见 DIRECTION.md §2）；本页 §4 五条工作线按 09-18 深挖+终判数据全部收口或改判。
+> ②归档完成——本页 §2/§3 所列 stageB 路径中 `paperscope_r2/`（含 ps53/d2）、`paperscope_full/`、`airqa/` 已整体搬入 `.research_tmp/experiments/archive/paperscope_2026-09/`（`stageB/` 下的同名空壳目录是进程锁残留，内容已空）；活跃资产=`.research_tmp/experiments/benchmarks/`（`_shared/tools/` 答题栈工具副本+`_shared/corpus_pool/mineru500/` 492 篇全解析语料池）。权威导航=同目录 ARCHIVE-INDEX.md。
+> ③当前执行=Multi 前修复队列（批 5 结构感知抽取/F35 apply/批 4 自由表/答案适配层等，session 任务清单 #1-#9）→ Multi-108 预注册→建库→首跑；外部检索模块（语料生长 broker）设计已定稿，访问层+存储底座=sci-evo-extract（已配 S2 客户端+compile_level 档位，commit 9e833a6）。
+
 > 目的：终结"状态散在 memory 恢复点/台账/判决档/LINEAGE 四处互相引用"的混乱。
 > 任何"现在有什么/什么状态"的问题先查这页。路径缩写：`STAGEB` = `.research_tmp/experiments/stageB`。
 > 更新纪律：每次换装 staging / 完成战役 / 冻结解冻一条线，当轮更新本页。
