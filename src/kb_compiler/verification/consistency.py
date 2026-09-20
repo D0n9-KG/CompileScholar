@@ -200,7 +200,7 @@ def run_all(records_by_paper, registry, vocab):
 
 
 if __name__ == "__main__":
-    sys.path.insert(0, "C:/Users/D0n9/Desktop/LogicKG/src")
+    sys.path.insert(0, "C:/Users/D0n9/Desktop/CompileScholar/src")
     import argparse
     from kb_compiler.records.common import load_json, save_json
     ap = argparse.ArgumentParser()

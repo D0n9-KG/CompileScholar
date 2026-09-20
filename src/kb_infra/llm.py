@@ -33,7 +33,7 @@ _CTX.check_hostname = False
 _CTX.verify_mode = ssl.CERT_NONE
 
 
-def load_env(path: str = "C:/Users/D0n9/Desktop/LogicKG/.env") -> dict:
+def load_env(path: str = "C:/Users/D0n9/Desktop/CompileScholar/.env") -> dict:
     env = {}
     with open(path, encoding="utf-8") as f:
         for line in f:

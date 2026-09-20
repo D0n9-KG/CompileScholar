@@ -1,5 +1,7 @@
 # ASSET-STATE — 单一事实源（2026-09-16 建立，随进展更新）
 
+> **仓库更名（2026-09-20）**：LogicKG → **CompileScholar**（GitHub 仓库+本地目录同步改名，旧链接自动重定向；范式主张=编译 vs 检索）。历史文档中的 LogicKG 字样均指本仓库。
+
 > 目的：终结"状态散在 memory 恢复点/台账/判决档/LINEAGE 四处互相引用"的混乱。
 > 任何"现在有什么/什么状态"的问题先查这页。路径缩写：`STAGEB` = `.research_tmp/experiments/stageB`。
 > 更新纪律：每次换装 staging / 完成战役 / 冻结解冻一条线，当轮更新本页。

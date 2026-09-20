@@ -4,7 +4,7 @@ tag-stripped (table-rendered quotes) + de-hyphenated (PDF line-break) lookup.
 Default OFF must be byte-identical to the frozen PS protocol behavior."""
 import sys
 
-sys.path.insert(0, r"C:\Users\D0n9\Desktop\LogicKG\src")
+sys.path.insert(0, r"C:\Users\D0n9\Desktop\CompileScholar\src")
 from kb_compiler.records.postcheck import run_postcheck  # noqa: E402
 
 TEXT = ("# Paper\n\n## Experiments\n"

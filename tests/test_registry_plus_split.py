@@ -2,7 +2,7 @@
 """F34 unit tests: '+'-suffix variant split guard in registry merges."""
 import sys
 
-sys.path.insert(0, r"C:\Users\D0n9\Desktop\LogicKG\src")
+sys.path.insert(0, r"C:\Users\D0n9\Desktop\CompileScholar\src")
 from kb_compiler.records.registry import _split_plus_variants  # noqa: E402
 
 
