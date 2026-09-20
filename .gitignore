@@ -91,9 +91,16 @@ skills-lock.json
 # Local sample output
 paper1.json
 
-# Research session temp (shared scratch area, not version-controlled)
-.research_tmp/
-.research_tmp
+# Research session temp (shared scratch area) — contents ignored EXCEPT the
+# active benchmark battlefield (2026-09-20): the answer-stack harness +
+# runners are load-bearing for the paper era. Directory-content exclusion
+# (star form) is REQUIRED: a plain .research_tmp/ dir rule makes child
+# re-inclusion impossible (gitignore spec).
+.research_tmp/*
+!.research_tmp/experiments/
+.research_tmp/experiments/*
+!.research_tmp/experiments/benchmarks/
+.research_tmp/experiments/benchmarks/**/__pycache__/
 .survey_tmp/
 .gapscan/
 .occ_survey/
