@@ -622,7 +622,7 @@ def call_intern(prompt: str, model: str = "qwen3.8-27b", max_tokens: int = 4000,
     return None
 
 
-def call_local(prompt: str, model: str = "qwen3.8-27b-local", max_tokens: int = 4000,
+def call_local(prompt: str, model: str = "Qwen3.8-27B", max_tokens: int = 4000,
                temperature: float = 0.0, seed: int | None = None,
                enable_thinking: bool | None = None) -> str | None:
     """Call a local vLLM OpenAI-compatible server.
