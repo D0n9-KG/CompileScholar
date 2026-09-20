@@ -30,7 +30,7 @@ Usage:
 import json, os, re, sys, argparse
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from kb_infra.llm import call_paratera, parse_json_response
+from kb_infra.llm import call_paratera, call_local, parse_json_response
 from kb_compiler.records.table_channel import (
     _strip_cites, _norm_tier, _build_entity_lookup, _link_method, GENERIC_TIER,
 )
@@ -180,8 +180,15 @@ def build_prompt(repr_, caption, context, registry_names):
     )
 
 
-def llm_propose(prompt, model):
-    raw = call_paratera(prompt, model=model, max_tokens=400) or ""
+def llm_propose(prompt, model, provider="paratera"):
+    if provider == "local":
+        # enable_thinking=False is load-bearing: without it the 400-token
+        # budget is eaten by visible reasoning (canary live-run lesson
+        # 2026-09-20: "llm_unparseable" = chain-of-thought + truncation).
+        raw = call_local(prompt, model=model, max_tokens=400,
+                         enable_thinking=False) or ""
+    else:
+        raw = call_paratera(prompt, model=model, max_tokens=400) or ""
     obj = parse_json_response(raw)
     if isinstance(obj, list):
         obj = next((x for x in obj if isinstance(x, dict)), None)
@@ -274,6 +281,102 @@ def apply_correction(recs, proposal, lookup):
 
 
 # ---------------------------------------------------------------- main
+# ---------------------------------------------------------------- canary (G5)
+# Spec §5 G5: "F24 canary 14 表（已知角色分配）必须全过；任一 canary 表提案与
+# 地面真值冲突→整批停线". The live canary below targets F35's OWN failure mode
+# (role-reversed single-tier tables) with synthetic ground truth, following the
+# canary.py pattern (embedded synthetic tables, deterministic scoring):
+#   C1 role-reversed table: methods wrongly emitted as column-header metrics,
+#      datasets wrongly emitted as method surfaces, true metric only in the
+#      caption. Expected: method_axis=column, metric grounded in caption,
+#      apply() swaps method<-header / subject<-row / metric<-caption.
+#   C2 normal table: methods are row labels (deterministic default is already
+#      correct). Expected: method_axis=row OR gate degrades safely — the
+#      canary fails only if apply() FLIPS a correct table (method_axis=column
+#      with ungrounded metric would corrupt C2).
+# Hard stop: any conflict -> exit(1) BEFORE real tables are processed.
+_CANARY_HTML_REV = (
+    '<table><tr><td>Method</td><td>TD3+BC</td><td>SAC</td><td>DDPG</td></tr>'
+    '<tr><td>halfcheetah</td><td>96.4</td><td>97.8</td><td>85.9</td></tr>'
+    '<tr><td>walker2d</td><td>81.7</td><td>95.5</td><td>79.3</td></tr></table>'
+)
+_CANARY_CAPTION_REV = "Average return over 3 seeds (higher is better)."
+_CANARY_HTML_NORM = (
+    '<table><tr><td>Method</td><td>halfcheetah</td><td>walker2d</td></tr>'
+    '<tr><td>TD3+BC</td><td>96.4</td><td>81.7</td></tr>'
+    '<tr><td>SAC</td><td>97.8</td><td>95.5</td></tr></table>'
+)
+_CANARY_CAPTION_NORM = "Average return (3 seeds, higher is better)."
+
+
+def _canary_record(metric, surface, value, quote):
+    """A post-F32-shaped result record for the canary tables (trigger form:
+    subject empty, metric/surface as the deterministic channel mis-emitted)."""
+    return {"kind": "result", "paper_id": "canary",
+            "measure": {"metric": metric, "value": value, "unit": "",
+                        "direction": "higher_better", "aggregation": ""},
+            "method_ref": {"surface": surface},
+            "dims": {}, "role": "main_result", "quote": quote,
+            "record_id": f"canary_{abs(hash((metric, surface, value))) % 10**8}",
+            "chunk_char_start": 0, "table_header": ""}
+
+
+def _canary_case_reversed():
+    recs = [_canary_record("TD3+BC", "halfcheetah", "96.4",
+                           "TD3+BC 96.4 on halfcheetah (table)"),
+            _canary_record("SAC", "halfcheetah", "97.8",
+                           "SAC 97.8 on halfcheetah (table)"),
+            _canary_record("TD3+BC", "walker2d", "81.7",
+                           "TD3+BC 81.7 on walker2d (table)")]
+    return {"name": "C1_role_reversed", "records": recs,
+            "html": _CANARY_HTML_REV, "caption": _CANARY_CAPTION_REV,
+            "expect_axis": "column",
+            "expect_metric_words": {"average", "return"}}
+
+
+def _canary_case_normal():
+    recs = [_canary_record("halfcheetah", "TD3+BC", "96.4",
+                           "TD3+BC 96.4 on halfcheetah (table)"),
+            _canary_record("walker2d", "TD3+BC", "81.7",
+                           "TD3+BC 81.7 on walker2d (table)"),
+            _canary_record("halfcheetah", "SAC", "97.8",
+                           "SAC 97.8 on halfcheetah (table)")]
+    # normal table: the deterministic default (methods as rows) is CORRECT —
+    # ground truth is method_axis=row; flipping it to column would corrupt.
+    return {"name": "C2_normal_rows", "records": recs,
+            "html": _CANARY_HTML_NORM, "caption": _CANARY_CAPTION_NORM,
+            "expect_axis": "row", "expect_metric_words": set()}
+
+
+def run_canary(provider, model):
+    """Live G5 preflight. Returns True iff every case matches ground truth.
+    Semantic correctness is anchored HERE, not by rules — a canary failure
+    means the LLM or the chain is systematically untrustworthy: hard stop."""
+    cases = [_canary_case_reversed(), _canary_case_normal()]
+    all_ok = True
+    for case in cases:
+        repr_ = table_repr(case["records"])
+        prompt = build_prompt(repr_, case["caption"], case["html"], set())
+        prop = llm_propose(prompt, model, provider=provider)
+        if prop is None:
+            print(f"[canary:{case['name']}] FAIL: llm_unparseable", flush=True)
+            all_ok = False
+            continue
+        verdict, prop2, reasons = gate(prop, repr_, case["caption"], case["html"], {})
+        axis_ok = prop2.get("method_axis") == case["expect_axis"]
+        metric = str(prop2.get("metric_name") or "")
+        metric_ok = (not case["expect_metric_words"]) or \
+            bool(case["expect_metric_words"] & set(metric.split()))
+        ok = verdict != "reject" and axis_ok and metric_ok
+        print(f"[canary:{case['name']}] {'PASS' if ok else 'FAIL'} "
+              f"axis={prop2.get('method_axis')} (expect {case['expect_axis']}) "
+              f"metric='{metric}' conf={prop2.get('confidence')} "
+              f"gate={verdict} reasons={reasons}", flush=True)
+        if not ok:
+            all_ok = False
+    return all_ok
+
+
 def load_texts(texts_dir):
     tx = {}
     if texts_dir and os.path.isdir(texts_dir):
@@ -291,10 +394,25 @@ def main():
     ap.add_argument("--registry", required=True)
     ap.add_argument("--out-dir", required=True)
     ap.add_argument("--model", default="Qwen3.6-27B")
+    ap.add_argument("--provider", default="paratera", choices=["paratera", "local"],
+                    help="LLM provider (local = self-hosted GPUStack, zero cost)")
+    ap.add_argument("--canary", action="store_true",
+                    help="G5 preflight: run live canary first; hard-stop on any conflict")
+    ap.add_argument("--canary-only", action="store_true",
+                    help="run only the canary preflight, then exit")
     ap.add_argument("--dry", action="store_true", help="no LLM; report trigger surface only")
     ap.add_argument("--limit", type=int, default=0, help="cap tables processed (0=all)")
     args = ap.parse_args()
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
+    if args.canary or args.canary_only:
+        if not run_canary(args.provider, args.model):
+            print("CANARY HARD STOP (G5): semantic layer untrustworthy on ground "
+                  "truth — batch not run. Spec: 回炉.", flush=True)
+            sys.exit(1)
+        print("[canary] all cases PASS — batch cleared to run", flush=True)
+        if args.canary_only:
+            return
 
     recs_by_paper = json.load(open(args.records, encoding="utf-8"))
     registry = json.load(open(args.registry, encoding="utf-8"))
@@ -327,7 +445,7 @@ def main():
         cs = t["records"][0].get("chunk_char_start") or 0
         caption, context = caption_and_context(texts.get(pid, ""), cs)
         prompt = build_prompt(repr_, caption, context, reg_names)
-        prop = llm_propose(prompt, args.model)
+        prop = llm_propose(prompt, args.model, provider=args.provider)
         if prop is None:
             rejected.append({"pid": pid, "th": th[:80], "reason": "llm_unparseable"}); n_rej += 1
             continue

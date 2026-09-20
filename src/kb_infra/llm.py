@@ -34,6 +34,11 @@ _CTX.verify_mode = ssl.CERT_NONE
 
 
 def load_env(path: str = "C:/Users/D0n9/Desktop/CompileScholar/.env") -> dict:
+    # Missing file -> empty env (providers fall back to os.environ). This is
+    # load-bearing during the LogicKG->CompileScholar folder rename window and
+    # for any fresh clone without a .env; a hard crash here killed imports.
+    if not os.path.exists(path):
+        return {}
     env = {}
     with open(path, encoding="utf-8") as f:
         for line in f:
