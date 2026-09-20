@@ -565,6 +565,63 @@ def call_cst(prompt: str, model: str = "qwen3.5", max_tokens: int = 4000,
 _LOCAL_SEM = threading.Semaphore(int(os.environ.get("LOCAL_MAX_CONCURRENT", "4")))
 
 
+def call_intern(prompt: str, model: str = "qwen3.8-27b", max_tokens: int = 4000,
+                temperature: float = 0.0, seed: int | None = None) -> str | None:
+    """Call the INTERN free channel (discovery-api.intern-ai.org.cn; Qwen3.8-27B
+    and other domestic models; free with quota).
+
+    Thinking-disable is INTERN-SPECIFIC (measured 2026-09-18): ONLY
+    {"thinking": {"type": "disabled"}} works — chat_template_kwargs and the
+    enable_thinking param are both ignored. Same wall-clock watchdog + ledger
+    discipline as the other providers. Use for: arbitration initial rulings,
+    smoke tests, low-stakes batch work; formal runs stay on billed channels.
+    """
+    key = ENV.get("INTERN_API_KEY")
+    base = ENV.get("INTERN_BASE_URL", "").rstrip("/")
+    if not key or not base:
+        return None
+    payload = {
+        "model": model,
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+        "thinking": {"type": "disabled"},
+    }
+    if seed is None:
+        seed = _env_seed()
+    if seed is not None:
+        payload["seed"] = seed
+    body = json.dumps(payload).encode()
+    _WALL = float(os.environ.get("LLM_WALL_TIMEOUT", "240"))
+    req = urllib.request.Request(
+        base + "/chat/completions", data=body,
+        headers={"Authorization": f"Bearer {key}",
+                 "Content-Type": "application/json"})
+    _sock_to = float(os.environ.get("LLM_SOCK_TIMEOUT", "60"))
+    for attempt in range(2):
+        t0 = time.time()
+        try:
+            r = _walled_open(req, sock_timeout=_sock_to)
+            chunks = []
+            while True:
+                if time.time() - t0 > _WALL:
+                    raise TimeoutError(f"wall-clock {_WALL}s exceeded (slow-drip server)")
+                b = r.read(65536)
+                if not b:
+                    break
+                chunks.append(b)
+            resp = json.loads(b"".join(chunks))
+            _log_call("intern", model, True, (time.time() - t0) * 1000,
+                      resp.get("usage") or {}, attempt)
+            return resp["choices"][0]["message"]["content"]
+        except Exception:
+            _log_call("intern", model, False, (time.time() - t0) * 1000,
+                      None, attempt)
+            if attempt == 1:
+                return None
+    return None
+
+
 def call_local(prompt: str, model: str = "qwen3.8-27b-local", max_tokens: int = 4000,
                temperature: float = 0.0, seed: int | None = None,
                enable_thinking: bool | None = None) -> str | None:
