@@ -62,12 +62,21 @@ def main():
                  "openalex_id": None, "doi": None, "arxiv_id": None,
                  "oa_pdf_url": None, "resolution": None, "score": None,
                  "review": False}
-        # --- primary: OpenAlex ---
+        # --- primary: OpenAlex (with rate-limit retries: sustained ~1 rps on the
+        # anonymous pool earned 429s — 35 "misses" in the first 220 were
+        # rate-limit artifacts incl. DPO, one of the most-cited NLP papers) ---
         cands = []
-        try:
-            cands = [c for c in oa.search_title(title, limit=3) if c.status == "ready"]
-        except Exception as e:
-            print(f"[{i}] oa err {e}", flush=True)
+        for attempt in range(4):
+            try:
+                raw_c = oa.search_title(title, limit=3)
+            except Exception as e:
+                print(f"[{i}] oa err {e}", flush=True)
+                raw_c = []
+            cands = [c for c in raw_c if c.status == "ready"]
+            if cands or not any(c.status == "failed" and "429" in (c.error_summary or "")
+                                for c in raw_c):
+                break
+            time.sleep(20 * (attempt + 1))  # 429: cool down before retrying
         best = None
         for c in sorted(cands, key=lambda c: (c.candidate_score or 0), reverse=True):
             best = c
@@ -119,7 +128,7 @@ def main():
             n_oa = sum(1 for e in done.values() if e.get("oa_pdf_url") and not e.get("arxiv_id"))
             n_miss = sum(1 for e in done.values() if e.get("resolution") == "miss")
             print(f"  [{i+1}/{len(todo)}] arxiv={n_arx} oa_pdf={n_oa} miss={n_miss}", flush=True)
-        time.sleep(1.1)  # OpenAlex polite pool courtesy
+        time.sleep(2.5)  # anonymous-pool courtesy (1.1s earned 429 bursts)
     OUT.write_text(json.dumps(done, ensure_ascii=False, indent=1), encoding="utf-8")
     n_arx = sum(1 for e in done.values() if e.get("arxiv_id"))
     n_oa = sum(1 for e in done.values() if e.get("oa_pdf_url") and not e.get("arxiv_id"))
