@@ -128,20 +128,66 @@ _TABLE_ROW_RE = re.compile(r"^\s*\|?.*\|.*\|", re.M)
 
 ROUTE_RULES = [
     (re.compile(r"nomenclature|notation|symbols?|definitions?", re.I),
-     ["notation", "config", "finding"]),
-    (re.compile(r"related\s+work|background|literature", re.I), ["lineage", "finding"]),
+     ["notation", "config", "finding"], "notation"),
+    (re.compile(r"related\s+work|background|literature", re.I),
+     ["lineage", "finding"], "related_work"),
     (re.compile(r"experiment|result|evaluation|benchmark|ablation|analysis|appendix|comparison", re.I),
-     ["result", "config"]),
-    (re.compile(r"introduction|discussion|conclusion|future", re.I), ["finding", "shift", "lineage"]),
+     ["result", "config"], "experiment"),
+    (re.compile(r"introduction|discussion|conclusion|future", re.I),
+     ["finding", "shift", "lineage"], "intro_discussion"),
     (re.compile(r"method|approach|model|algorithm|preliminar|framework|architecture|theory", re.I),
-     ["finding", "config", "lineage", "notation"]),
+     ["finding", "config", "lineage", "notation"], "method"),
 ]
 
 
-def chunk_text(pid: str, text: str) -> list[dict]:
+# ---------- section semantic map (task #12, 2026-09-20) ----------
+# Card-side LLM labels -> allowed kinds. Single source of truth in code; the
+# regex ROUTE_RULES below mirror these for the fallback path.
+SECTION_LABEL_KINDS = {
+    "experiment": ["result", "config"],
+    "method": ["finding", "config", "lineage", "notation"],
+    "related_work": ["lineage", "finding"],
+    "intro_discussion": ["finding", "shift", "lineage"],
+    "notation": ["notation", "config", "finding"],
+    "other": ["result", "config", "lineage", "finding", "shift", "notation"],
+}
+ROUTE_STATS = {"card": 0, "regex": 0, "fallback": 0, "mismatch": 0}
+
+
+def _norm_sec_title(t: str) -> str:
+    return re.sub(r"\s+", " ", (t or "").strip().lower())
+
+
+def _norm_label_map(section_labels) -> dict:
+    """Card 'sections' output -> {normalized title: label}. Deterministic gate:
+    labels outside the enum are dropped (regex fallback takes over)."""
+    out = {}
+    for s in section_labels or []:
+        if isinstance(s, dict) and s.get("title") and s.get("label") in SECTION_LABEL_KINDS:
+            out[_norm_sec_title(str(s.get("title")))] = s["label"]
+    return out
+
+
+def _regex_label(title: str) -> str | None:
+    """What the regex rules WOULD say (for the mismatch odometer only)."""
+    for pat, ks, label in ROUTE_RULES:
+        if pat.search(title):
+            return label
+    return None
+
+
+def chunk_text(pid: str, text: str, section_labels: list | None = None) -> list[dict]:
     """Section-aware chunks with char offsets. .md: split on headers; .txt or
     headerless: fixed windows. Chunks capped at MAX_CHUNK_CHARS (long sections
-    split on paragraph boundaries, offsets preserved)."""
+    split on paragraph boundaries, offsets preserved).
+
+    Kind routing (2026-09-20, task #12): the card's section_labels (skeleton
+    pass LLM classification, domain-general) is the PRIMARY route; the regex
+    ROUTE_RULES are the FALLBACK when the card map misses a title. Routing
+    source is counted in ROUTE_STATS (card / regex / fallback) and card-vs-
+    regex label mismatches are counted for the instrumentation window —
+    swap-the-mechanism-with-an-odometer discipline (F35 canary precedent)."""
+    labels = _norm_label_map(section_labels)
     text = text[:MAX_PAPER_CHARS]
     headers = [(m.start(), m.group(2).strip()) for m in _HEADER_RE.finditer(text)]
     sections = []
@@ -176,19 +222,30 @@ def chunk_text(pid: str, text: str) -> list[dict]:
             if len(piece.strip()) < 80:
                 continue
             kinds = None
-            for pat, ks in ROUTE_RULES:
-                if pat.search(title):
-                    # finding is the base kind for qualitative content —
-                    # excluding it manufactured artificial overflow (v2: model
-                    # literally reported "allowed kinds lack finding, must
-                    # overflow"). Every routed slice includes it.
-                    kinds = sorted(set(ks) | {"finding"})
-                    break
+            card_label = labels.get(_norm_sec_title(title))
+            regex_label = _regex_label(title)
+            if card_label:
+                kinds = sorted(set(SECTION_LABEL_KINDS[card_label]) | {"finding"})
+                ROUTE_STATS["card"] += 1
+                if regex_label and regex_label != card_label and regex_label != "other" \
+                        and card_label != "other":
+                    ROUTE_STATS["mismatch"] += 1
+            if kinds is None:
+                for pat, ks, _label in ROUTE_RULES:
+                    if pat.search(title):
+                        # finding is the base kind for qualitative content —
+                        # excluding it manufactured artificial overflow (v2: model
+                        # literally reported "allowed kinds lack finding, must
+                        # overflow"). Every routed slice includes it.
+                        kinds = sorted(set(ks) | {"finding"})
+                        ROUTE_STATS["regex"] += 1
+                        break
             if kinds is None:
                 # no routing signal (headerless window / unmatched title):
                 # full slice — artificial narrowness manufactured 62% overflow
                 # in the seed_PER trial (2026-09-05, see SMOKE-PREREG iteration log)
                 kinds = ["result", "config", "lineage", "finding", "shift", "notation"]
+                ROUTE_STATS["fallback"] += 1
             if _TABLE_ROW_RE.search(piece) and "result" not in kinds:
                 kinds = kinds + ["result", "config"]
             chunks.append({"chunk_id": f"{pid}#c{len(chunks)}", "section": title,
@@ -271,7 +328,7 @@ def _fingerprint(rec):
 
 def extract_paper(pid, text, card, registry, vocab, model, title, chunk_threads=1):
     inj = build_injection(pid, card, registry, vocab)
-    chunks = chunk_text(pid, text)
+    chunks = chunk_text(pid, text, section_labels=card.get("sections"))
     records, overflow, entity_queue = [], [], []
     chunk_fails = 0  # FG2 (2026-09-10): silent chunk-loss counter — gate1 C arm
     # lost ~35% of yield to exhausted-retry chunks with NO count anywhere
@@ -450,6 +507,12 @@ def main():
         for k in tot:
             tot[k] += o["stats"][k if k != "queue" else "queue"]
     print(f"\nsaved {len(results)} papers -> {args.out} | totals {tot}", flush=True)
+    # section-routing odometer (task #12): instrumentation window for the
+    # card-label vs regex swap — a rising fallback share means the card map is
+    # missing titles; heavy mismatch means one of the two routers is wrong.
+    print(f"route stats: card={ROUTE_STATS['card']} regex={ROUTE_STATS['regex']} "
+          f"fallback={ROUTE_STATS['fallback']} card_vs_regex_mismatch={ROUTE_STATS['mismatch']}",
+          flush=True)
 
 
 if __name__ == "__main__":

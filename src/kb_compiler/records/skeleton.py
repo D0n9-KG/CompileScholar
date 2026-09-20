@@ -91,10 +91,16 @@ CARD_PROMPT = """你是科学文献知识编译器的第一遍（结构通读）
      "entity_type": "method 或 mechanism 或 practice 或 out_of_corpus（文外被引实体选 out_of_corpus）",
      "relation_hint": "本篇原文对它的关系措辞（如 extends/improves/uses/compares 的原文动词短语，逐字）",
      "cited_year": "仅当文内引文逐字给出作者-年份时填（如 2018），否则留空"}}
+ ],
+ "sections": [
+   {{"title": "章节标题（逐字，含编号如有）",
+     "label": "experiment|method|related_work|intro_discussion|notation|other"}}
  ]
 }}
 
 只输出 JSON，不要其他文字。
+
+sections 标签释义（给全文每个章节一个）：experiment=实验/评测/消融/结果；method=方法/模型/算法/框架/理论推导；related_work=相关工作/背景/文献综述；intro_discussion=引言/讨论/结论/展望；notation=符号表/术语定义/记号约定；other=其余（附录/致谢/参考文献等）。拿不准选 other。
 
 论文全文：
 {text}"""
