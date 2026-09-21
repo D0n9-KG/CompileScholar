@@ -24,6 +24,15 @@ from kb_infra.llm import (call_paratera, call_cst, call_local,  # noqa: E402
 
 MAX_PAPER_CHARS = 110_000  # stage-A proven cap for single-call full-text passes
 
+# Chunk-based extraction cap (slot deep-extraction). Was MAX_PAPER_CHARS —
+# an API-billing-era cost bound that silently truncated 47/430 Multi corpus
+# texts (GPT-3 33%, Llama-3 Herd 27%, LSST book 6% covered). User-approved
+# 2026-09-21: free local/intern channels remove the cost rationale; 500k
+# covers every corpus text except the LSST book (disclosed separately).
+# Single-call passes (skeleton card, absence) KEEP MAX_PAPER_CHARS — that is
+# their physical context budget, not a cost knob.
+SLOT_MAX_CHARS = int(os.environ.get("SLOT_MAX_CHARS", "500000"))
+
 
 def route_model(spec: str):
     """'provider:model' or bare model -> (provider, model)."""

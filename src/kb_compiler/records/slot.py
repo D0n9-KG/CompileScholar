@@ -27,7 +27,8 @@ import threading
 
 from concurrent.futures import ThreadPoolExecutor
 
-from .common import MAX_PAPER_CHARS, call_json, load_corpus, load_json, load_manifest, save_json
+from .common import (MAX_PAPER_CHARS, SLOT_MAX_CHARS, call_json, load_corpus,
+                     load_json, load_manifest, save_json)
 from .schema import (RELATIONS, RESULT_ROLES, CONFIG_ROLES, ABSENCE_TYPES,
                      EPISTEMIC, FINDING_STRENGTH, LINEAGE_EVIDENCE,
                      SHIFT_SOURCES, DIRECTIONS, QUOTE_MAX_WORDS, SCHEMA_VERSION)
@@ -188,7 +189,12 @@ def chunk_text(pid: str, text: str, section_labels: list | None = None) -> list[
     regex label mismatches are counted for the instrumentation window —
     swap-the-mechanism-with-an-odometer discipline (F35 canary precedent)."""
     labels = _norm_label_map(section_labels)
-    text = text[:MAX_PAPER_CHARS]
+    # SLOT_MAX_CHARS (500k, user-approved 09-21): chunk-based extraction has
+    # no single-call budget; the old 110k cap truncated 11% of the Multi
+    # corpus. Card section_labels only cover the first MAX_PAPER_CHARS — the
+    # regex fallback + ROUTE_STATS instrumentation handle the tail (09-20
+    # card-primary/regex-fallback ruling).
+    text = text[:SLOT_MAX_CHARS]
     headers = [(m.start(), m.group(2).strip()) for m in _HEADER_RE.finditer(text)]
     sections = []
     if headers:
