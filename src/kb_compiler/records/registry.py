@@ -879,9 +879,33 @@ def _cross_merge_entries(entries: list[dict], name_of, model: str, prompt_tmpl: 
     def _run(b):
         lines = [entries[ei]["_line"](pos) for pos, ei in enumerate(b)]
         prompt = prompt_tmpl.replace("{lines}", "\n".join(lines))
-        obj = _must_json(call_json(prompt, model, max_tokens=12000, retries=3),
-                         f"vocab cross-merge:{tag}")
-        return _covered_groups(obj.get("groups"), len(b), tag)
+        # vocab dedup/family merge is BEST-EFFORT (a missed dedup leaves two
+        # equivalent canonical entries — harmless for routing), unlike
+        # registry entity merges (a miss = real fragmentation). Unknown
+        # output shapes degrade to "no merges for this block" with a QC
+        # event, never a stage abort (431-run: 4th shape species — bare list
+        # of non-dicts in dedup_setup).
+        try:
+            obj = _must_json(call_json(prompt, model, max_tokens=12000,
+                                       retries=3), f"vocab cross-merge:{tag}")
+        except ChannelDeadError as e:
+            VOCAB_COMPLIANCE.append({"tag": f"cross:{tag}",
+                                     "event": "shape_abort_downgraded",
+                                     "err": str(e)[:140]})
+            print(f"WARNING: cross-merge {tag}: {str(e)[:140]} — block kept "
+                  f"unmerged", flush=True)
+            return None
+        groups = obj.get("groups")
+        if groups is None:
+            groups = obj.get("families")
+        if not isinstance(groups, list) or not all(
+                isinstance(g, dict) for g in groups):
+            VOCAB_COMPLIANCE.append({"tag": f"cross:{tag}",
+                                     "event": "unusable_groups_shape"})
+            print(f"WARNING: cross-merge {tag}: groups shape unusable — "
+                  f"block kept unmerged", flush=True)
+            return None
+        return _covered_groups(groups, len(b), tag)
 
     results = dict(zip(range(len(call_blocks)), par_map(_run, call_blocks)))
     out_groups, n_merges = [], 0
@@ -892,6 +916,10 @@ def _cross_merge_entries(entries: list[dict], name_of, model: str, prompt_tmpl: 
             continue
         local = results[ci]
         ci += 1
+        if local is None:
+            for ei in b:
+                out_groups.append([ei])
+            continue
         for g in local:
             gidx = [b[m] for m in g["members"]]
             n_merges += len(gidx) - 1
