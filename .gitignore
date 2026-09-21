@@ -135,3 +135,12 @@ archive/
 
 # CCFA skills working files (idea/writing artifacts; promote finals deliberately)
 ccfa-workfiles/
+
+# Multi-108 corpus: version texts (.md) + metadata; never raw PDFs, caches,
+# or ledgers (822MB pdfs / 4096-dim embed caches / growing jsonl)
+.research_tmp/experiments/benchmarks/scholarqa_multi/corpus/pdfs/
+.research_tmp/experiments/benchmarks/scholarqa_multi/corpus/errata_quarantine/
+.research_tmp/experiments/benchmarks/scholarqa_multi/kb/embed_cache/
+.research_tmp/experiments/benchmarks/scholarqa_multi/kb/*.jsonl
+# LitSearch corpus = 1.2GB parquet shards (data artifact, re-downloadable)
+.research_tmp/experiments/benchmarks/litsearch/corpus/

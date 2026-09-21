@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 from collections import Counter
@@ -86,14 +87,70 @@ def _map_batch(batch: list[dict], registry_lines: str, model: str) -> list:
     return obj.get("assignments") or []
 
 
-def run_round2(registry: dict, queue: list[dict], model: str):
+UNION_CAP = 600   # per-chunk candidate anchor bound (prompt-size); scale mode
+                  # replaces the full registry anchor with top-k nearest
+                  # canonicals per surface (Multi-431: ~15k canonicals do not
+                  # fit any context window — KB-SCALING-DESIGN.md §2 round2)
+TOP_K = 12
+
+
+def _build_chunks(queue, canon_list, embed_cache_dir=None,
+                  top_k=TOP_K, union_cap=UNION_CAP):
+    """[(query_indices, registry_lines)] — legacy full-anchor batches when the
+    registry is small; embedding top-k candidate anchors when it is not."""
+    if len(canon_list) <= union_cap:
+        full = "\n".join(f"- {c}" for c in canon_list)
+        return [(list(range(b0, min(b0 + BATCH_SIZE, len(queue)))), full)
+                for b0 in range(0, len(queue), BATCH_SIZE)], "full-anchor"
+    from .embed_block import (embed_items, topk_candidates,
+                              chunk_by_candidate_union)
+    cemb = embed_items(canon_list,
+                       os.path.join(embed_cache_dir, "embed_r2_canon.json"))
+    qemb = embed_items([s["surface"] for s in queue],
+                       os.path.join(embed_cache_dir, "embed_r2_queue.json"))
+    cand = topk_candidates(qemb, cemb, top_k=top_k)
+    raw_chunks = chunk_by_candidate_union(cand, chunk_size=BATCH_SIZE,
+                                          union_cap=union_cap)
+    chunks = []
+    for ch in raw_chunks:
+        union = {ci for qi in ch for ci in cand[qi]}
+        if len(union) > union_cap:
+            # trim by candidate rank (best matches survive), deterministic
+            kept = []
+            seen = set()
+            for rank in range(top_k):
+                for qi in ch:
+                    if rank < len(cand[qi]) and cand[qi][rank] not in seen:
+                        seen.add(cand[qi][rank])
+                        kept.append(cand[qi][rank])
+                    if len(seen) >= union_cap:
+                        break
+                if len(seen) >= union_cap:
+                    break
+            union = set(kept)
+        lines = "\n".join(f"- {canon_list[ci]}" for ci in sorted(union))
+        chunks.append((ch, lines))
+    return chunks, "topk-anchor"
+
+
+def run_round2(registry: dict, queue: list[dict], model: str,
+               embed_cache_dir: str | None = None):
     canon_list = sorted({e["canonical"] for e in registry["entities"]})
-    registry_lines = "\n".join(f"- {c}" for c in canon_list)
-    # batched mapping (registry list is the shared join anchor across batches,
-    # so batching does not reintroduce the slice-isolation fragmentation)
+    ent_by_canon: dict[str, dict] = {}
+    for e in registry["entities"]:
+        ent_by_canon.setdefault(e["canonical"], e)
+    chunks, anchor_mode = _build_chunks(queue, canon_list,
+                                        embed_cache_dir=embed_cache_dir)
+    print(f"round2 anchors: {anchor_mode} ({len(canon_list)} canonicals, "
+          f"{len(chunks)} chunks)", flush=True)
+    # batched mapping (small registry: full list is the shared join anchor,
+    # so batching does not reintroduce slice-isolation fragmentation; large
+    # registry: per-chunk top-k candidate anchors — a true canonical missing
+    # from the top-k lands in `new` and is caught by the consolidation pass
+    # and the human arbitration queue, never silently dropped)
     assigns = []
-    for b0 in range(0, len(queue), BATCH_SIZE):
-        batch = queue[b0:b0 + BATCH_SIZE]
+    for bn, (ch, registry_lines) in enumerate(chunks):
+        batch = [queue[i] for i in ch]
         got = _map_batch(batch, registry_lines, model)
         by_i_batch = {}
         for a in got:
@@ -102,9 +159,9 @@ def run_round2(registry: dict, queue: list[dict], model: str):
         for i in range(len(batch)):
             a = dict(by_i_batch.get(i) or {"action": "new", "canonical": batch[i]["surface"],
                                            "entity_type": "method", "note": "batch_unassigned"})
-            a["_qidx"] = b0 + i
+            a["_qidx"] = ch[i]
             assigns.append(a)
-        print(f"  batch {b0//BATCH_SIZE + 1}: {len(batch)} surfaces, "
+        print(f"  batch {bn + 1}/{len(chunks)}: {len(batch)} surfaces, "
               f"{sum(1 for i in range(len(batch)) if i in by_i_batch)} assigned", flush=True)
     # consolidation pass over proposed NEW entities (dedupe cross-batch twins)
     new_props = {}
@@ -113,22 +170,43 @@ def run_round2(registry: dict, queue: list[dict], model: str):
             new_props.setdefault(re.sub(r"\s+", " ", str(a.get("canonical") or "").strip().lower()),
                                  []).append(a["_qidx"])
     if len(new_props) > 25:
-        prop_lines = "\n".join(f"[{i}] {c}" for i, c in enumerate(sorted(new_props)))
-        cobj = call_json(
-            "下面是新实体提案清单（编号|规范名）。合并指向同一实体的提案（缩写/变体/大小写）。"
-            "每个编号恰好出现一次。输出 JSON：{\"groups\": [{\"canonical\": 编号, \"members\": [编号,...]}]}\n\n"
-            + prop_lines, model, max_tokens=8000, retries=2) or {}
         prop_keys = sorted(new_props)
-        groups = (cobj.get("groups") or [])
+        _CONSOL_PROMPT = (
+            "下面是新实体提案清单（编号|规范名）。合并指向同一实体的提案（缩写/变体/大小写）。"
+            "每个编号恰好出现一次。输出 JSON：{\"groups\": [{\"canonical\": 编号, \"members\": [编号,...]}]}\n\n")
+        # scale mode: one call over thousands of proposals truncates (8k cap);
+        # embed-blocked consolidation, same conservative-block design as round1
+        if len(prop_keys) > 400 and embed_cache_dir:
+            from .embed_block import embed_items, block_indices
+            pembs = embed_items(prop_keys,
+                                os.path.join(embed_cache_dir, "embed_r2_props.json"))
+            pblocks = block_indices(pembs, prop_keys, tau=0.80, max_block=300)
+        else:
+            pblocks = [list(range(len(prop_keys)))]
+        groups = []
+        for pb in pblocks:
+            if len(pb) == 1:
+                continue
+            prop_lines = "\n".join(f"[{pos}] {prop_keys[gi]}"
+                                   for pos, gi in enumerate(pb))
+            cobj = call_json(_CONSOL_PROMPT + prop_lines, model,
+                             max_tokens=8000, retries=2) or {}
+            for g in (cobj.get("groups") or []):
+                mem = [pb[m] for m in (g.get("members") or [])
+                       if isinstance(m, int) and 0 <= m < len(pb)]
+                if not mem:
+                    continue
+                can = pb[g["canonical"]] if isinstance(g.get("canonical"), int) \
+                    and g["canonical"] in range(len(pb)) else mem[0]
+                groups.append({"canonical": can, "members": mem})
         seen_idx = set()
         rename = {}
         for g in groups:
-            mem = [m for m in (g.get("members") or []) if isinstance(m, int)
-                   and 0 <= m < len(prop_keys) and m not in seen_idx]
+            mem = [m for m in g["members"] if m not in seen_idx]
             if not mem:
                 continue
             seen_idx.update(mem)
-            can = g.get("canonical") if isinstance(g.get("canonical"), int) and g["canonical"] in mem else mem[0]
+            can = g["canonical"] if g["canonical"] in mem else mem[0]
             target = prop_keys[can]
             for m in mem:
                 rename[prop_keys[m]] = target
@@ -154,7 +232,7 @@ def run_round2(registry: dict, queue: list[dict], model: str):
         if a.get("action") == "match" and a.get("canonical") in canon_set:
             report["matched"].append({"surface": s["surface"],
                                       "canonical": a["canonical"]})
-            target = next(e for e in registry["entities"] if e["canonical"] == a["canonical"])
+            target = ent_by_canon[a["canonical"]]
             if s["surface"] not in target["aliases"]:
                 target["aliases"].append(s["surface"])
             index_additions[re.sub(r"\s+", " ", s["surface"].strip().lower())] = target["entity_id"]
@@ -191,6 +269,9 @@ def main():
     ap.add_argument("--records", nargs="+", required=True)
     ap.add_argument("--out-dir", required=True)
     ap.add_argument("--model", default="DeepSeek-V4-Flash")
+    ap.add_argument("--embed-cache", default="",
+                    help="dir for embedding caches (default: OUT_DIR/embed_cache); "
+                         "used only when the registry anchor exceeds UNION_CAP")
     args = ap.parse_args()
 
     registry = load_json(args.registry, {})
@@ -200,7 +281,10 @@ def main():
     if not queue:
         print("nothing to fold; registry unchanged", flush=True)
         return
-    registry2, report = run_round2(registry, queue, args.model)
+    cache = args.embed_cache or os.path.join(args.out_dir, "embed_cache")
+    os.makedirs(cache, exist_ok=True)
+    registry2, report = run_round2(registry, queue, args.model,
+                                   embed_cache_dir=cache)
     v = registry2["version"]
     save_json(registry2, f"{args.out_dir}/registry_v{v}.json")
     save_json(report, f"{args.out_dir}/registry_growth_report_v{v}.json")

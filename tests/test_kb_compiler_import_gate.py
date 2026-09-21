@@ -18,7 +18,15 @@ REPO = Path(__file__).resolve().parents[1]
 SRC = REPO / "src"
 
 STDLIB = set(sys.stdlib_module_names)
-THIRD_PARTY_WHITELIST = set()  # empty at Stage B kickoff; grow via arbitration
+THIRD_PARTY_WHITELIST = {
+    # 2026-09-21 arbitration: numpy for embed_block.py cosine blocking
+    # (Multi-431 registry/vocab/round2 scale wall; user-approved plan A,
+    # KB-SCALING-DESIGN.md §2). Pure-Python cosine over ~8k x 8k pairs at
+    # 4k dims is hours-slow; numpy matmul is seconds. Deterministic, no
+    # network, already the env's numerical base (2.5.1). Commit message
+    # carries the full justification per gate protocol.
+    "numpy",
+}
 BANNED_ROOTS = {"granular_agent"}
 
 
