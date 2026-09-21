@@ -35,6 +35,10 @@ def embed_cst(texts: list[str], batch_size: int = CST_EMBED_BATCH,
               workers: int = 4) -> list[list[float]]:
     """CST qwen3-embedding:8b, true batched (dim 4096). Raises RuntimeError
     if any batch still fails after retries — caller decides degradation."""
+    from .llm import _provider_allowed, _gate_block
+    if not _provider_allowed("cst"):
+        _gate_block("cst-embed", CST_EMBED_MODEL)
+        raise RuntimeError("CST embedding blocked by LLM_PROVIDER_ALLOWLIST")
     key = ENV.get("CST_API_KEY", "")
     base = (ENV.get("CST_BASE_URL", "") or "").rstrip("/")
     if not key or not base:

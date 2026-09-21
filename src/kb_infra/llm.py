@@ -402,6 +402,9 @@ def embed_batch(texts: list[str], model: str = "GLM-Embedding-2") -> list[list[f
     """Call Paratera embedding API. Returns one embedding per input text; texts
     that 400 (empty/oversized/odd chars) get a zero vector so callers keep
     index alignment rather than crashing the whole batch."""
+    if not _provider_allowed("paratera"):
+        _gate_block("paratera-embed", model)
+        return None
     key = ENV.get("PARATERA_API_KEY")
     base = ENV.get("PARATERA_BASE_URL", "").rstrip("/")
     if not key or not texts:
