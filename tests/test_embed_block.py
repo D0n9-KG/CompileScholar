@@ -230,6 +230,25 @@ def test_paper_neighbor_edges():
     assert len(edges) == 1
 
 
+def test_channel_death_aborts_not_singletons(monkeypatch):
+    """call_json None (dead channel/quota) must raise ChannelDeadError,
+    NOT silently fabricate all-singleton groups (production-run guard)."""
+    surfaces = list(ALIAS_ORACLE)
+    mentions = _mentions_from(surfaces)
+    gmap = {s: {"Q": 0, "G": 1, "S": 2}[ALIAS_ORACLE[s]] for s in surfaces}
+    monkeypatch.setattr(embed_block, "embed_items",
+                        lambda texts, cache_path=None, batch_log=None:
+                        make_fake_embed(gmap)(list(texts)))
+    monkeypatch.setattr(registry, "call_json", lambda *a, **k: None)
+    import pytest
+    with pytest.raises(registry.ChannelDeadError):
+        registry.merge_entities_blocked(mentions, {}, "dead-channel",
+                                        embed_cache_dir=None, tau1=1.01,
+                                        log=lambda *a: None)
+    with pytest.raises(registry.ChannelDeadError):
+        registry.merge_entities(mentions, {}, "dead-channel")
+
+
 if __name__ == "__main__":
     import pytest
     raise SystemExit(pytest.main([__file__, "-v"]))

@@ -81,9 +81,11 @@ def _map_batch(batch: list[dict], registry_lines: str, model: str) -> list:
     # IL-P1 (pilot): salvage tier ON — batch-1 of PS16 run lost 120 surfaces to
     # output truncation (3x parse fail, unassigned fallback flood); salvage_json_records
     # recovers truncated arrays, exactly its design purpose.
-    obj = call_json(MAP_PROMPT.replace("{registry_lines}", registry_lines)
-                    .replace("{queue_lines}", queue_lines),
-                    model, max_tokens=12000, retries=3, salvage=True) or {}
+    from .registry import _must_json
+    obj = _must_json(call_json(MAP_PROMPT.replace("{registry_lines}", registry_lines)
+                               .replace("{queue_lines}", queue_lines),
+                               model, max_tokens=12000, retries=3, salvage=True),
+                     "round2 mapping batch")
     return obj.get("assignments") or []
 
 
@@ -200,8 +202,10 @@ def run_round2(registry: dict, queue: list[dict], model: str,
                 continue
             prop_lines = "\n".join(f"[{pos}] {prop_keys[gi]}"
                                    for pos, gi in enumerate(pb))
-            cobj = call_json(_CONSOL_PROMPT + prop_lines, model,
-                             max_tokens=8000, retries=2) or {}
+            from .registry import _must_json
+            cobj = _must_json(call_json(_CONSOL_PROMPT + prop_lines, model,
+                                        max_tokens=8000, retries=2),
+                              "round2 proposal consolidation")
             for g in (cobj.get("groups") or []):
                 mem = [pb[m] for m in (g.get("members") or [])
                        if isinstance(m, int) and 0 <= m < len(pb)]

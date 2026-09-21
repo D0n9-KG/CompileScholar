@@ -42,6 +42,22 @@ def _norm(s: str) -> str:
 def _eid(canonical: str) -> str:
     return hashlib.md5(_norm(canonical).encode("utf-8")).hexdigest()[:12]
 
+class ChannelDeadError(RuntimeError):
+    """LLM channel returned unparseable output on all retries (quota
+    exhaustion / dead server / contract collapse). Aborts the stage instead
+    of letting coverage-fallback fabricate all-singleton groups (silent
+    registry fragmentation). Rerun the stage after switching channel —
+    embeddings are cached and every stage is deterministic."""
+
+
+def _must_json(obj, ctx: str):
+    if obj is None:
+        raise ChannelDeadError(
+            f"{ctx}: call_json returned None on all retries — channel dead or "
+            f"output contract violated; aborting to prevent singleton flood")
+    return obj
+
+
 
 # ---------- mention collection (deterministic) ----------
 
@@ -294,8 +310,9 @@ def merge_entities(mentions: dict, cards: dict, model: str) -> list[dict]:
               flush=True)
     prompt = MERGE_PROMPT.replace("{n_papers}", str(len(cards))).replace(
         "{lines}", _merge_lines(keys, mentions))
-    obj = call_json(prompt, model, max_tokens=16000, retries=3)
-    groups = _covered_groups((obj or {}).get("groups"), len(keys), "registry")
+    obj = _must_json(call_json(prompt, model, max_tokens=16000, retries=3),
+                     "registry single-call")
+    groups = _covered_groups(obj.get("groups"), len(keys), "registry")
     groups = _split_plus_variants(groups, keys, mentions)   # F34 guard
     return _groups_to_entities(groups, keys, mentions, cards)
 
@@ -377,8 +394,9 @@ def _recover_singletons(entities, keys, mentions, cards, embs, model, log,
                 for ci, cj in enumerate(cands))
             lines.append("[{}] {} | 提及篇数 {} | 候选: {}".format(
                 pos, e["canonical"], e["mention_count"], cpart))
-        obj = call_json(SINGLETON_RECOVERY_PROMPT.replace(
-            "{lines}", "\n".join(lines)), model, max_tokens=6000, retries=3)
+        obj = _must_json(call_json(SINGLETON_RECOVERY_PROMPT.replace(
+            "{lines}", "\n".join(lines)), model, max_tokens=6000, retries=3),
+            "singleton recovery")
         got = {}
         for a in (obj or {}).get("assignments", []):
             if isinstance(a, dict) and isinstance(a.get("i"), int):
@@ -477,8 +495,9 @@ def merge_entities_blocked(mentions: dict, cards: dict, model: str,
         n_papers = len(set().union(*(mentions[keys[i]]["papers"] for i in order)))
         prompt = MERGE_PROMPT.replace("{n_papers}", str(n_papers)).replace(
             "{lines}", _merge_lines(keys, mentions, order))
-        obj = call_json(prompt, model, max_tokens=16000, retries=3)
-        local = _covered_groups((obj or {}).get("groups"), len(order),
+        obj = _must_json(call_json(prompt, model, max_tokens=16000, retries=3),
+                         f"registry block {bi}")
+        local = _covered_groups(obj.get("groups"), len(order),
                                 f"registry:b{bi}")
         # local positions -> global key indices; F34 '+' guard runs directly
         # in global space (it only inspects members within each group)
@@ -530,8 +549,9 @@ def merge_entities_blocked(mentions: dict, cards: dict, model: str,
                     + (f" | own={e['in_corpus_paper_id']}"
                        if e["in_corpus_paper_id"] else ""))
             prompt = CROSS_MERGE_PROMPT.replace("{lines}", "\n".join(lines))
-            obj = call_json(prompt, model, max_tokens=16000, retries=3)
-            return _covered_groups((obj or {}).get("groups"), len(cb),
+            obj = _must_json(call_json(prompt, model, max_tokens=16000,
+                                       retries=3), f"cross round {rnd}")
+            return _covered_groups(obj.get("groups"), len(cb),
                                    f"cross:r{rnd}")
 
         cross_results = dict(zip(range(len(call_cbs)),
@@ -580,7 +600,8 @@ def _vocab_one_call(dim: str, items: list, model: str, tag: str) -> list[dict]:
     prompt = (VOCAB_PROMPT.replace("{dim_label}", DIM_LABELS[dim])
               .replace("{extra_task}", extra).replace("{out_shape}", shape)
               .replace("{lines}", lines))
-    obj = call_json(prompt, model, max_tokens=12000, retries=3) or {}
+    obj = _must_json(call_json(prompt, model, max_tokens=12000, retries=3),
+                     f"vocab:{dim}:{tag}")
     if dim == "subject":
         groups = [{"canonical": None, "members": g.get("members") or [],
                    "family": g.get("family")} for g in (obj.get("families") or [])]
@@ -613,8 +634,9 @@ def _cross_merge_entries(entries: list[dict], name_of, model: str, prompt_tmpl: 
     def _run(b):
         lines = [entries[ei]["_line"](pos) for pos, ei in enumerate(b)]
         prompt = prompt_tmpl.replace("{lines}", "\n".join(lines))
-        obj = call_json(prompt, model, max_tokens=12000, retries=3)
-        return _covered_groups((obj or {}).get("groups"), len(b), tag)
+        obj = _must_json(call_json(prompt, model, max_tokens=12000, retries=3),
+                         f"vocab cross-merge:{tag}")
+        return _covered_groups(obj.get("groups"), len(b), tag)
 
     results = dict(zip(range(len(call_blocks)), par_map(_run, call_blocks)))
     out_groups, n_merges = [], 0
