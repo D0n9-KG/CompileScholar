@@ -35,6 +35,28 @@ from kb_compiler.records.table_channel import (
     _strip_cites, _norm_tier, _build_entity_lookup, _link_method, GENERIC_TIER,
 )
 
+_BLOCKLIST_PATTERNS = None
+
+
+def _blocklist_patterns():
+    """Compiled word-boundary patterns over seed + extension list. Extension
+    file is package data (versioned, human-adjudicated); missing file = seed
+    only (frozen-protocol runs unaffected)."""
+    global _BLOCKLIST_PATTERNS
+    if _BLOCKLIST_PATTERNS is None:
+        names = {re.sub(r"[^a-z0-9 ]", "", b.strip().lower())
+                 for b in BENCHMARK_BLOCKLIST}
+        ext = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                           "data", "blocklist_ext_multi431.json")
+        if os.path.exists(ext):
+            names |= {re.sub(r"[^a-z0-9 ]", "", n.strip().lower())
+                      for n in json.load(open(ext, encoding="utf-8")) if n.strip()}
+        _BLOCKLIST_PATTERNS = [
+            re.compile(rf"(?<![a-z0-9]){re.escape(n)}(?![a-z0-9])")
+            for n in sorted(names) if n]
+    return _BLOCKLIST_PATTERNS
+
+
 # condition-level sub-headers that get mis-emitted as metric (0b1cad92 family)
 COND_SET = {"base", "top", "bottom", "random", "middle", "nd", "pn",
             "w/ outlier d", "w/o outlier d"}
@@ -224,11 +246,16 @@ def gate(proposal, repr_, caption, context, lookup):
         return "reject", p2, reasons + ["G1: method_axis=row but no row labels"]
 
     # G3 benchmark leakage: metric_name must not be a known benchmark/dataset.
+    # Word-boundary matching (09-21, user-delegated review): raw substring
+    # matching false-positives on the 534-name Multi extension ('DROP'
+    # inside 'dropout', 'GAP' inside 'gap size'); extension loaded from
+    # records/data/blocklist_ext_multi431.json when present.
     if mn:
         mnorm = re.sub(r"[^a-z0-9 ]", "", mn)
-        for b in BENCHMARK_BLOCKLIST:
-            if b in mnorm:
-                return "reject", p2, reasons + [f"G3: metric_name '{mn}' is a benchmark/dataset name"]
+        hit = next((pat.pattern for pat in _blocklist_patterns()
+                    if pat.search(mnorm)), None)
+        if hit:
+            return "reject", p2, reasons + [f"G3: metric_name '{mn}' is a benchmark/dataset name ({hit})"]
 
     # G4 caption provenance: metric_name must appear in caption/context.
     if mn:
