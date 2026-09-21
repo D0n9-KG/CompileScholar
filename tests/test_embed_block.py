@@ -299,6 +299,22 @@ def test_short_token_split_keeps_long_anchor():
     assert len(out) == 1 and len(out[0]["members"]) == 3
 
 
+def test_shape_coercion():
+    import pytest
+    MJ = registry._must_json
+    # bare list of groups -> wrapped
+    assert MJ([{"members": [0], "canonical": 0}], "x") == {"groups": [{"members": [0], "canonical": 0}]}
+    # bare list of assignments -> wrapped
+    assert MJ([{"i": 0, "match": None}], "x") == {"assignments": [{"i": 0, "match": None}]}
+    # dict passthrough
+    assert MJ({"groups": []}, "x") == {"groups": []}
+    # None / junk -> loud abort
+    with pytest.raises(registry.ChannelDeadError):
+        MJ(None, "x")
+    with pytest.raises(registry.ChannelDeadError):
+        MJ(["not", "dicts"], "x")
+
+
 if __name__ == "__main__":
     import pytest
     raise SystemExit(pytest.main([__file__, "-v"]))
