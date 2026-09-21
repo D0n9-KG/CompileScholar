@@ -148,6 +148,8 @@ DIM_LABELS = {"subject": "评测对象（数据集/基准/任务/环境）",
               "variant": "方法变体/组件开关名",
               "hyperparam_item": "被系统扫描的超参数名"}
 
+VOCAB_COMPLIANCE: list = []   # per-call compliance events (stashed to vocab_qc)
+
 VOCAB_MAX_ONE_CALL = 300   # compliance bound (09-21 forensics): a 600-item
                            # batch lost 453 items to lazy output; 47-item
                            # batches ALSO lapse — the completion retry below
@@ -761,10 +763,7 @@ def _vocab_extract(obj: dict, dim: str, ctx: str) -> list:
                 return [{"canonical": None, "members": g["members"],
                          "family": None} for g in groups]
             return groups
-        raise ChannelDeadError(
-            f"{ctx}: response keys {sorted(obj.keys())[:8]} contain neither "
-            f"groups/families/assignments — aborting instead of silent "
-            f"all-singleton fallback")
+        return None   # caller: compliance retry, then accept-as-no-merges
     return [g for g in raw if isinstance(g, dict)]
 
 
@@ -813,6 +812,18 @@ def _vocab_one_call(dim: str, items: list, model: str, tag: str,
         obj = _must_json(call_json(cur_prompt, model, max_tokens=12000,
                                    retries=3), ctx)
         groups = _vocab_extract(obj, dim, ctx)
+        if groups is None:
+            # well-formed but empty/keyless answer ({} — 431-run bio tail
+            # batch: 18 singleton surfaces, model said "nothing to merge" by
+            # returning an empty object). Semantically defensible for tail
+            # batches; compliance retry gets explicit attempts before we
+            # accept the all-singleton reading.
+            VOCAB_COMPLIANCE.append({"tag": f"{dim}:{tag}", "attempt": attempt,
+                                     "event": "empty_response",
+                                     "keys": sorted(obj.keys())[:6]})
+            print(f"WARNING: {ctx}: attempt {attempt} returned no usable "
+                  f"groups (keys={sorted(obj.keys())[:6]})", flush=True)
+            continue
         for g in groups:
             mapped = []
             for i in (g.get("members") or []):
@@ -835,6 +846,9 @@ def _vocab_one_call(dim: str, items: list, model: str, tag: str,
             break
         pending_idx = missing
     if pending_idx and len(pending_idx) > 0.3 * len(items):
+        VOCAB_COMPLIANCE.append({"tag": f"{dim}:{tag}", "attempt": compliance_tries,
+                                 "event": "final_shortfall",
+                                 "missing": len(pending_idx), "n": len(items)})
         print(f"WARNING: {ctx}: {len(pending_idx)}/{len(items)} items still "
               f"unassigned after {compliance_tries} tries — coverage fallback "
               f"will singleton them", flush=True)
@@ -1039,6 +1053,7 @@ def build_vocab(cards: dict, model: str, pid_subject: dict | None = None,
         log(f"  vocab {dim}: {len(items)} candidates ({batch_tag}, "
             f"{len(batches)} batches) -> {len(vocab[out_key])} groups, "
             f"cross-merges {n_merges}")
+    scale_qc["compliance_events"] = list(VOCAB_COMPLIANCE)
     vocab["_scale_qc"] = scale_qc
     return vocab
 

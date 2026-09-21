@@ -314,10 +314,10 @@ def test_vocab_extract_shape_tolerances():
     assert sorted(x["canonical"] for x in g) == [2, 5]
     five = next(x for x in g if x["canonical"] == 5)
     assert five["members"] == [0, 1]
-    # unusable shape -> loud abort WITH the actual keys in the message
-    with pytest.raises(registry.ChannelDeadError) as ei:
-        E({"results": []}, "setup", "x")
-    assert "results" in str(ei.value)
+    # unusable shape -> None (caller: compliance retry, then accept-as-
+    # no-merges with QC trail — 431-run bio tail batch {} semantics)
+    assert E({"results": []}, "setup", "x") is None
+    assert E({}, "setup", "x") is None
 
 
 def test_vocab_compliance_retry(monkeypatch):
