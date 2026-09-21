@@ -110,7 +110,9 @@ def main():
                     "LLM_PROVIDER_ALLOWLIST": ",".join(
                         c.split(":")[0] for c in channels)})
         if model.startswith("local"):
-            env.setdefault("LOCAL_MAX_CONCURRENT", "16")
+            # probed 09-21: zero-fail to conc=64, throughput peak 384k
+            # tok/min @ 32 (prefill-shaped calls); past 32 = queue, not speed
+            env.setdefault("LOCAL_MAX_CONCURRENT", "32")
         else:
             env.setdefault("INTERN_MAX_CONCURRENT", "8")
         print(f"[{args.name}] attempt on {model}: {' '.join(real[:6])}...",

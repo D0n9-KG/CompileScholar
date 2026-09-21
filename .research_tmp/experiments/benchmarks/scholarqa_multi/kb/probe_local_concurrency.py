@@ -81,7 +81,7 @@ def main():
         fails = [r[3] for r in results if r[3]]
         oks = [r for r in results if not r[3]]
         toks = sum(p + c for _, p, c, _ in oks)
-        rate = toks / wall / 1000 if wall > 0 else 0.0
+        rate = toks / wall * 60 / 1000 if wall > 0 else 0.0   # k-tok/MINUTE
         lats = sorted(r[0] for r in oks) or [0.0]
         p95 = lats[min(int(len(lats) * 0.95), len(lats) - 1)]
         print(f"  conc={level:>3}: {rate:>6.1f}k tok/min | "
