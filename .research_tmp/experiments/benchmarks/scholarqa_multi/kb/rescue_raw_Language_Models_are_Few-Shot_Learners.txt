@@ -1,0 +1,781 @@
+```json
+{
+ "method_identity": {
+   "canonical_name": "GPT-3",
+   "aliases": [
+    "GPT-3 175B",
+    "GPT-3 Small",
+    "GPT-3 Medium",
+    "GPT-3 Large",
+    "GPT-3 XL",
+    "GPT-3 2.7B",
+    "GPT-3 6.7B",
+    "GPT-3 13B"
+   ],
+   "entity_type": "method"
+  },
+  "affiliations": [
+   "OpenAI"
+  ],
+  "contributions": [
+   "train GPT-3, an autoregressive language model with 175 billion parameters",
+   "test its performance in the few-shot setting",
+   "GPT-3 is applied without any gradient updates or fine-tuning",
+   "identify some datasets where GPT-3's few-shot learning still struggles",
+   "identify some datasets where GPT-3 faces methodological issues related to training on large web corpora",
+   "GPT-3 can generate samples of news articles which human evaluators have difficulty distinguishing from articles written by humans",
+   "develop systematic tools to measure data contamination and quantify its distorting effects",
+   "train a series of smaller models in order to compare their performance to GPT-3"
+  ],
+  "experimental_matrix": [
+   {
+    "subject": "PTB",
+    "measures": [
+     "perplexity"
+    ],
+    "variants": [
+     "GPT-3 Zero-Shot"
+    ],
+    "where": "Table 3.1"
+   },
+   {
+    "subject": "LAMBADA",
+    "measures": [
+     "acc",
+     "ppl"
+    ],
+    "variants": [
+     "GPT-3 Zero-Shot",
+     "GPT-3 One-Shot",
+     "GPT-3 Few-Shot"
+    ],
+    "where": "Table 3.2"
+   },
+   {
+    "subject": "StoryCloze",
+    "measures": [
+     "acc"
+    ],
+    "variants": [
+     "GPT-3 Zero-Shot",
+     "GPT-3 One-Shot",
+     "GPT-3 Few-Shot"
+    ],
+    "where": "Table 3.2"
+   },
+   {
+    "subject": "HellaSwag",
+    "measures": [
+     "acc"
+    ],
+    "variants": [
+     "GPT-3 Zero-Shot",
+     "GPT-3 One-Shot",
+     "GPT-3 Few-Shot"
+    ],
+    "where": "Table 3.2"
+   },
+   {
+    "subject": "NaturalQS",
+    "measures": [
+     "accuracy"
+    ],
+    "variants": [
+     "GPT-3 Zero-Shot",
+     "GPT-3 One-Shot",
+     "GPT-3 Few-Shot"
+    ],
+    "where": "Table 3.3"
+   },
+   {
+    "subject": "WebQS",
+    "measures": [
+     "accuracy"
+    ],
+    "variants": [
+     "GPT-3 Zero-Shot",
+     "GPT-3 One-Shot",
+     "GPT-3 Few-Shot"
+    ],
+    "where": "Table 3.3"
+   },
+   {
+    "subject": "TriviaQA",
+    "measures": [
+     "accuracy"
+    ],
+    "variants": [
+     "GPT-3 Zero-Shot",
+     "GPT-3 One-Shot",
+     "GPT-3 Few-Shot"
+    ],
+    "where": "Table 3.3"
+   },
+   {
+    "subject": "WMT'14 Fr↔En",
+    "measures": [
+     "BLEU"
+    ],
+    "variants": [
+     "GPT-3 Zero-Shot",
+     "GPT-3 One-Shot",
+     "GPT-3 Few-Shot"
+    ],
+    "where": "Table 3.4"
+   },
+   {
+    "subject": "WMT'16 De↔En",
+    "measures": [
+     "BLEU"
+    ],
+    "variants": [
+     "GPT-3 Zero-Shot",
+     "GPT-3 One-Shot",
+     "GPT-3 Few-Shot"
+    ],
+    "where": "Table 3.4"
+   },
+   {
+    "subject": "WMT'16 Ro↔En",
+    "measures": [
+     "BLEU"
+    ],
+    "variants": [
+     "GPT-3 Zero-Shot",
+     "GPT-3 One-Shot",
+     "GPT-3 Few-Shot"
+    ],
+    "where": "Table 3.4"
+   },
+   {
+    "subject": "Winograd",
+    "measures": [
+     "accuracy"
+    ],
+    "variants": [
+     "GPT-3 Zero-Shot",
+     "GPT-3 One-Shot",
+     "GPT-3 Few-Shot"
+    ],
+    "where": "Table 3.5"
+   },
+   {
+    "subject": "Winogrande (XL)",
+    "measures": [
+     "accuracy"
+    ],
+    "variants": [
+     "GPT-3 Zero-Shot",
+     "GPT-3 One-Shot",
+     "GPT-3 Few-Shot"
+    ],
+    "where": "Table 3.5"
+   },
+   {
+    "subject": "PIQA",
+    "measures": [
+     "accuracy"
+    ],
+    "variants": [
+     "GPT-3 Zero-Shot",
+     "GPT-3 One-Shot",
+     "GPT-3 Few-Shot"
+    ],
+    "where": "Table 3.6"
+   },
+   {
+    "subject": "ARC (Easy)",
+    "measures": [
+     "accuracy"
+    ],
+    "variants": [
+     "GPT-3 Zero-Shot",
+     "GPT-3 One-Shot",
+     "GPT-3 Few-Shot"
+    ],
+    "where": "Table 3.6"
+   },
+   {
+    "subject": "ARC (Challenge)",
+    "measures": [
+     "accuracy"
+    ],
+    "variants": [
+     "GPT-3 Zero-Shot",
+     "GPT-3 One-Shot",
+     "GPT-3 Few-Shot"
+    ],
+    "where": "Table 3.6"
+   },
+   {
+    "subject": "OpenBookQA",
+    "measures": [
+     "accuracy"
+    ],
+    "variants": [
+     "GPT-3 Zero-Shot",
+     "GPT-3 One-Shot",
+     "GPT-3 Few-Shot"
+    ],
+    "where": "Table 3.6"
+   },
+   {
+    "subject": "CoQA",
+    "measures": [
+     "F1"
+    ],
+    "variants": [
+     "GPT-3 Zero-Shot",
+     "GPT-3 One-Shot",
+     "GPT-3 Few-Shot"
+    ],
+    "where": "Table 3.7"
+   },
+   {
+    "subject": "DROP",
+    "measures": [
+     "F1"
+    ],
+    "variants": [
+     "GPT-3 Zero-Shot",
+     "GPT-3 One-Shot",
+     "GPT-3 Few-Shot"
+    ],
+    "where": "Table 3.7"
+   },
+   {
+    "subject": "QuAC",
+    "measures": [
+     "F1"
+    ],
+    "variants": [
+     "GPT-3 Zero-Shot",
+     "GPT-3 One-Shot",
+     "GPT-3 Few-Shot"
+    ],
+    "where": "Table 3.7"
+   },
+   {
+    "subject": "SQuADv2",
+    "measures": [
+     "F1"
+    ],
+    "variants": [
+     "GPT-3 Zero-Shot",
+     "GPT-3 One-Shot",
+     "GPT-3 Few-Shot"
+    ],
+    "where": "Table 3.7"
+   },
+   {
+    "subject": "RACE-h",
+    "measures": [
+     "accuracy"
+    ],
+    "variants": [
+     "GPT-3 Zero-Shot",
+     "GPT-3 One-Shot",
+     "GPT-3 Few-Shot"
+    ],
+    "where": "Table 3.7"
+   },
+   {
+    "subject": "RACE-m",
+    "measures": [
+     "accuracy"
+    ],
+    "variants": [
+     "GPT-3 Zero-Shot",
+     "GPT-3 One-Shot",
+     "GPT-3 Few-Shot"
+    ],
+    "where": "Table 3.7"
+   },
+   {
+    "subject": "SuperGLUE",
+    "measures": [
+     "SuperGLUE Average",
+     "BoolQ Accuracy",
+     "CB Accuracy",
+     "CB F1",
+     "COPA Accuracy",
+     "RTE Accuracy",
+     "WiC Accuracy",
+     "WSC Accuracy",
+     "MultiRC Accuracy",
+     "MultiRC F1",
+     "ReCoRD Accuracy",
+     "ReCoRD F1"
+    ],
+    "variants": [
+     "GPT-3 Few-Shot"
+    ],
+    "where": "Table 3.8"
+   },
+   {
+    "subject": "ANLI Round 3",
+    "measures": [
+     "accuracy"
+    ],
+    "variants": [
+     "GPT-3 Zero-Shot",
+     "GPT-3 One-Shot",
+     "GPT-3 Few-Shot"
+    ],
+    "where": "Figure 3.9"
+   },
+   {
+    "subject": "Arithmetic Tasks",
+    "measures": [
+     "accuracy"
+    ],
+    "variants": [
+     "GPT-3 Zero-shot",
+     "GPT-3 One-shot",
+     "GPT-3 Few-shot"
+    ],
+    "where": "Table 3.9"
+   },
+   {
+    "subject": "Word Scrambling and Manipulation Tasks",
+    "measures": [
+     "accuracy"
+    ],
+    "variants": [
+     "GPT-3 Zero-shot",
+     "GPT-3 One-shot",
+     "GPT-3 Few-shot"
+    ],
+    "where": "Table 3.10"
+   },
+   {
+    "subject": "SAT Analogies",
+    "measures": [
+     "accuracy"
+    ],
+    "variants": [
+     "GPT-3 Zero-Shot",
+     "GPT-3 One-Shot",
+     "GPT-3 Few-Shot"
+    ],
+    "where": "Figure 3.12"
+   },
+   {
+    "subject": "News Article Generation",
+    "measures": [
+     "Mean accuracy"
+    ],
+    "variants": [
+     "GPT-3 Small",
+     "GPT-3 Medium",
+     "GPT-3 Large",
+     "GPT-3 XL",
+     "GPT-3 2.7B",
+     "GPT-3 6.7B",
+     "GPT-3 13B",
+     "GPT-3 175B"
+    ],
+    "where": "Table 3.11"
+   }
+  ],
+  "figures_tables": [
+   {
+    "ref": "Figure 1.1",
+    "kind": "figure",
+    "caption": "Language model meta-learning. During unsupervised pre-training, a language model develops a broad set of skills and pattern recognition abilities. It then uses these abilities at inference time to rapidly adapt to or recognize the desired task. We use the term “in-context learning” to describe the inner loop of this process, which occurs within the forward-pass upon each sequence. The sequences in this diagram are not intended to be representative of the data a model would see during pre-training, but are intended to show that there are sometimes repeated sub-tasks embedded within a single sequence."
+   },
+   {
+    "ref": "Figure 1.2",
+    "kind": "figure",
+    "caption": "Larger models make increasingly efficient use of in-context information. We show in-context learning performance on a simple task requiring the model to remove random symbols from a word, both with and without a natural language task description (see Sec. 3.9.2). The steeper “in-context learning curves” for large models demonstrate improved ability to learn a task from contextual information. We see qualitatively similar behavior across a wide range of tasks."
+   },
+   {
+    "ref": "Figure 1.3",
+    "kind": "figure",
+    "caption": "Aggregate performance for all 42 accuracy-denominated benchmarks While zero-shot performance improves steadily with model size, few-shot performance increases more rapidly, demonstrating that larger models are more proficient at in-context learning. See Figure 3.8 for a more detailed analysis on SuperGLUE, a standard NLP benchmark suite."
+   },
+   {
+    "ref": "Figure 2.1",
+    "kind": "figure",
+    "caption": "Zero-shot, one-shot and few-shot, contrasted with traditional fine-tuning. The panels above show four methods for performing a task with a language model – fine-tuning is the traditional method, whereas zero-, one-, and few-shot, which we study in this work, require the model to perform the task with only forward passes at test time. We typically present the model with a few dozen examples in the few shot setting. Exact phrasings for all task descriptions, examples and prompts can be found in Appendix G."
+   },
+   {
+    "ref": "Table 2.1",
+    "kind": "table",
+    "caption": "Sizes, architectures, and learning hyper-parameters (batch size in tokens and learning rate) of the models which we trained. All models were trained for a total of 300 billion tokens."
+   },
+   {
+    "ref": "Figure 2.2",
+    "kind": "figure",
+    "caption": "Total compute used during training. Based on the analysis in Scaling Laws For Neural Language Models [KMH+20] we train much larger models on many fewer tokens than is typical. As a consequence, although GPT-3 3B is almost 10x larger than RoBERTa-Large (355M params), both models took roughly 50 petaflop/s-days of compute during pre-training. Methodology for these calculations can be found in Appendix D."
+   },
+   {
+    "ref": "Table 2.2",
+    "kind": "table",
+    "caption": "Datasets used to train GPT-3. “Weight in training mix” refers to the fraction of examples during training that are drawn from a given dataset, which we intentionally do not make proportional to the size of the dataset. As a result, when we train for 300 billion tokens, some datasets are seen up to 3.4 times during training while other datasets are seen less than once."
+   },
+   {
+    "ref": "Figure 3.1",
+    "kind": "figure",
+    "caption": "Smooth scaling of performance with compute. Performance (measured in terms of cross-entropy validation loss) follows a power-law trend with the amount of compute used for training. The power-law behavior observed in [KMH+20] continues for an additional two orders of magnitude with only small deviations from the predicted curve. For this figure, we exclude embedding parameters from compute and parameter counts."
+   },
+   {
+    "ref": "Table 3.1",
+    "kind": "table",
+    "caption": "Zero-shot results on PTB language modeling dataset. Many other common language modeling datasets are omitted because they are derived from Wikipedia or other sources which are included in GPT-3's training data. a [RWC+19]"
+   },
+   {
+    "ref": "Table 3.2",
+    "kind": "table",
+    "caption": "Performance on cloze and completion tasks. GPT-3 significantly improves SOTA on LAMBADA while achieving respectable performance on two difficult completion prediction datasets. a [Tur20] b [RWC+19] c [LDL19] d [LCH+20]"
+   },
+   {
+    "ref": "Figure 3.2",
+    "kind": "figure",
+    "caption": "On LAMBADA, the few-shot capability of language models results in a strong boost to accuracy. GPT-3 2.7B outperforms the SOTA 17B parameter Turing-NLG [Tur20] in this setting, and GPT-3 175B advances the state of the art by 18%. Note zero-shot uses a different format from one-shot and few-shot as described in the text."
+   },
+   {
+    "ref": "Table 3.3",
+    "kind": "table",
+    "caption": "Results on three Open-Domain QA tasks. GPT-3 is shown in the few-, one-, and zero-shot settings, as compared to prior SOTA results for closed book and open domain settings. TriviaQA few-shot result is evaluated on the wiki split test server."
+   },
+   {
+    "ref": "Figure 3.3",
+    "kind": "figure",
+    "caption": "On TriviaQA GPT3's performance grows smoothly with model size, suggesting that language models continue to absorb knowledge as their capacity increases. One-shot and few-shot performance make significant gains over zero-shot behavior, matching and exceeding the performance of the SOTA fine-tuned open-domain model, RAG [LPP+20]"
+   },
+   {
+    "ref": "Table 3.4",
+    "kind": "table",
+    "caption": "Few-shot GPT-3 outperforms previous unsupervised NMT work by 5 BLEU when translating into English reflecting its strength as an English LM. We report BLEU scores on the WMT'14 Fr↔En, WMT'16 De↔En, and WMT'16 Ro↔En datasets as measured by multi-bleu.perl with XLM's tokenization in order to compare most closely with prior unsupervised NMT work. SacreBLEU f [Pos18] results reported in Appendix H. Underline indicates an unsupervised or few-shot SOTA, bold indicates supervised SOTA with relative confidence. a [EOAG18] b [DHKH14] c [WXH+18] d [oR16] e [LGG+20] f [SacreBLEU signature: BLEU+case.mixed+numrefs.1+smooth.exp+tok.intl+version.1.2.20]"
+   },
+   {
+    "ref": "Figure 3.4",
+    "kind": "figure",
+    "caption": "Few-shot translation performance on 6 language pairs as model capacity increases. There is a consistent trend of improvement across all datasets as the model scales, and as well as tendency for translation into English to be stronger than translation from English."
+   },
+   {
+    "ref": "Table 3.5",
+    "kind": "table",
+    "caption": "Results on the WSC273 version of Winograd schemas and the adversarial Winogrande dataset. See Section 4 for details on potential contamination of the Winograd test set. a [SBBC19] b [LYN+20]"
+   },
+   {
+    "ref": "Figure 3.5",
+    "kind": "figure",
+    "caption": "Zero-, one-, and few-shot performance on the adversarial Winogrande dataset as model capacity scales. Scaling is relatively smooth with the gains to few-shot learning increasing with model size, and few-shot GPT-3 175B is competitive with a fine-tuned RoBERTa-large."
+   },
+   {
+    "ref": "Table 3.6",
+    "kind": "table",
+    "caption": "GPT-3 results on three commonsense reasoning tasks, PIQA, ARC, and OpenBookQA. GPT-3 Few-Shot PIQA result is evaluated on the test server. See Section 4 for details on potential contamination issues on the PIQA test set."
+   },
+   {
+    "ref": "Figure 3.6",
+    "kind": "figure",
+    "caption": "GPT-3 results on PIQA in the zero-shot, one-shot, and few-shot settings. The largest model achieves a score on the development set in all three conditions that exceeds the best recorded score on the task."
+   },
+   {
+    "ref": "Table 3.7",
+    "kind": "table",
+    "caption": "Results on reading comprehension tasks. All scores are F1 except results for RACE which report accuracy. a [JZC+19] b [JN20] c [AI19] d [QIA20] e [SPP+19]"
+   },
+   {
+    "ref": "Figure 3.7",
+    "kind": "figure",
+    "caption": "GPT-3 results on CoQA reading comprehension task. GPT-3 175B achieves 85 F1 in the few-shot setting, only a few points behind measured human performance and state-of-the-art fine-tuned models. Zero-shot and one-shot performance is a few points behind, with the gains to few-shot being largest for bigger models."
+   },
+   {
+    "ref": "Table 3.8",
+    "kind": "table",
+    "caption": "Performance of GPT-3 on SuperGLUE compared to fine-tuned baselines and SOTA. All results are reported on the test set. GPT-3 few-shot is given a total of 32 examples within the context of each task and performs no gradient updates."
+   },
+   {
+    "ref": "Figure 3.8",
+    "kind": "figure",
+    "caption": "Performance on SuperGLUE increases with model size and number of examples in context. A value of K = 32 means that our model was shown 32 examples per task, for 256 examples total divided across the 8 tasks in SuperGLUE. We report GPT-3 values on the dev set, so our numbers are not directly comparable to the dotted reference lines (our test set results are in Table 3.8). The BERT-Large reference model was fine-tuned on the SuperGLUE training set (125K examples), whereas BERT++ was first fine-tuned on MultiNLI (392K examples) and SWAG (113K examples) before further fine-tuning on the SuperGLUE training set (for a total of 630K fine-tuning examples). We find the difference in performance between the BERT-Large and BERT++ to be roughly equivalent to the difference between GPT-3 with one example per context versus eight examples per context."
+   },
+   {
+    "ref": "Figure 3.9",
+    "kind": "figure",
+    "caption": "Performance of GPT-3 on ANLI Round 3. Results are on the dev-set, which has only 1500 examples and therefore has high variance (we estimate a standard deviation of 1.2%). We find that smaller models hover around random chance, while few-shot GPT-3 175B closes almost half the gap from random chance to SOTA. Results for ANLI rounds 1 and 2 are shown in the appendix."
+   },
+   {
+    "ref": "Figure 3.10",
+    "kind": "figure",
+    "caption": "Results on all 10 arithmetic tasks in the few-shot settings for models of different sizes. There is a significant jump from the second largest model (GPT-3 13B) to the largest model (GPT-3 175), with the latter being able to reliably accurate 2 digit arithmetic, usually accurate 3 digit arithmetic, and correct answers a significant fraction of the time on 4-5 digit arithmetic, 2 digit multiplication, and compound operations. Results for one-shot and zero-shot are shown in the appendix."
+   },
+   {
+    "ref": "Table 3.9",
+    "kind": "table",
+    "caption": "Results on basic arithmetic tasks for GPT-3 175B. {2,3,4,5}D{+,-} is 2, 3, 4, and 5 digit addition or subtraction, 2Dx is 2 digit multiplication. 1DC is 1 digit composite operations. Results become progressively stronger moving from the zero-shot to one-shot to few-shot setting, but even the zero-shot shows significant arithmetic abilities."
+   },
+   {
+    "ref": "Table 3.10",
+    "kind": "table",
+    "caption": "GPT-3 175B performance on various word unscrambling and word manipulation tasks, in zero-, one-, and few-shot settings. CL is “cycle letters in word”, A1 is anagrams of but the first and last letters, A2 is anagrams of all but the first and last two letters, RI is “Random insertion in word”, RW is “reversed words”."
+   },
+   {
+    "ref": "Figure 3.11",
+    "kind": "figure",
+    "caption": "Few-shot performance on the five word scrambling tasks for different sizes of model. There is generally smooth improvement with model size although the random insertion task shows an upward slope of improvement with the 175B model solving the task the majority of the time. Scaling of one-shot and zero-shot performance is shown in the appendix. All tasks are done with K = 100."
+   },
+   {
+    "ref": "Figure 3.12",
+    "kind": "figure",
+    "caption": "Zero-, one-, and few-shot performance on SAT analogy tasks, for different sizes of model. The largest model achieves 65% accuracy in the few-shot setting, and also demonstrates significant gains to in-context learning which are not present in smaller models."
+   },
+   {
+    "ref": "Table 3.11",
+    "kind": "table",
+    "caption": "Human accuracy in identifying whether short ( ~ 200 word) news articles are model generated. We find that human accuracy (measured by the ratio of correct assignments to non-neutral assignments) ranges from 86% on the control model to 52% on GPT-3 175B. This table compares mean accuracy between five different models, and shows the results of a two-sample T-Test for the difference in mean accuracy between each model and the control model (an unconditional GPT-3 Small model with increased output randomness)."
+   }
+  ],
+  "dimension_candidates": {
+   "subject": [
+    "PTB",
+    "LAMBADA",
+    "StoryCloze",
+    "HellaSwag",
+    "NaturalQS",
+    "WebQS",
+    "TriviaQA",
+    "WMT'14 Fr↔En",
+    "WMT'16 De↔En",
+    "WMT'16 Ro↔En",
+    "Winograd",
+    "Winogrande (XL)",
+    "PIQA",
+    "ARC (Easy)",
+    "ARC (Challenge)",
+    "OpenBookQA",
+    "CoQA",
+    "DROP",
+    "QuAC",
+    "SQuADv2",
+    "RACE-h",
+    "RACE-m",
+    "SuperGLUE",
+    "ANLI Round 3",
+    "Arithmetic Tasks",
+    "Word Scrambling and Manipulation Tasks",
+    "SAT Analogies",
+    "News Article Generation"
+   ],
+   "setup": [
+    "zero-shot",
+    "one-shot",
+    "few-shot",
+    "closed-book",
+    "open-domain",
+    "test server",
+    "development set",
+    "test set"
+   ],
+   "variant": [
+    "GPT-3 Small",
+    "GPT-3 Medium",
+    "GPT-3 Large",
+    "GPT-3 XL",
+    "GPT-3 2.7B",
+    "GPT-3 6.7B",
+    "GPT-3 13B",
+    "GPT-3 175B",
+    "GPT-3 Zero-Shot",
+    "GPT-3 One-Shot",
+    "GPT-3 Few-Shot"
+   ],
+   "hyperparam_item": [
+    "K",
+    "n_params",
+    "n_layers",
+    "d_model",
+    "n_heads",
+    "d_head",
+    "Batch Size",
+    "Learning Rate",
+    "beam width",
+    "length penalty"
+   ]
+  },
+  "related_methods": [
+   {
+    "name": "GPT-2",
+    "entity_type": "method",
+    "relation_hint": "use the same model and architecture as",
+    "cited_year": ""
+   },
+   {
+    "name": "Sparse Transformer",
+    "entity_type": "method",
+    "relation_hint": "similar to",
+    "cited_year": ""
+   },
+   {
+    "name": "RAG",
+    "entity_type": "method",
+    "relation_hint": "compared to prior SOTA results",
+    "cited_year": ""
+   },
+   {
+    "name": "T5-11B",
+    "entity_type": "method",
+    "relation_hint": "compared to",
+    "cited_year": ""
+   },
+   {
+    "name": "XLM",
+    "entity_type": "method",
+    "relation_hint": "compared to",
+    "cited_year": ""
+   },
+   {
+    "name": "MASS",
+    "entity_type": "method",
+    "relation_hint": "compared to",
+    "cited_year": ""
+   },
+   {
+    "name": "mBART",
+    "entity_type": "method",
+    "relation_hint": "compared to",
+    "cited_year": ""
+   },
+   {
+    "name": "RoBERTa",
+    "entity_type": "method",
+    "relation_hint": "competitive with a fine-tuned",
+    "cited_year": ""
+   },
+   {
+    "name": "BERT-Large",
+    "entity_type": "method",
+    "relation_hint": "outperforms a fine-tuned",
+    "cited_year": ""
+   },
+   {
+    "name": "UnifiedQA",
+    "entity_type": "method",
+    "relation_hint": "approaching the performance of a fine-tuned RoBERTa baseline from",
+    "cited_year": ""
+   }
+  ],
+  "sections": [
+   {
+    "title": "1 Introduction",
+    "label": "intro_discussion"
+   },
+   {
+    "title": "2 Approach",
+    "label": "method"
+   },
+   {
+    "title": "2.1 Model and Architectures",
+    "label": "method"
+   },
+   {
+    "title": "2.2 Training Dataset",
+    "label": "method"
+   },
+   {
+    "title": "2.3 Training Process",
+    "label": "method"
+   },
+   {
+    "title": "2.4 Evaluation",
+    "label": "method"
+   },
+   {
+    "title": "3 Results",
+    "label": "experiment"
+   },
+   {
+    "title": "3.1 Language Modeling, Cloze, and Completion Tasks",
+    "label": "experiment"
+   },
+   {
+    "title": "3.2 Closed Book Question Answering",
+    "label": "experiment"
+   },
+   {
+    "title": "3.3 Translation",
+    "label": "experiment"
+   },
+   {
+    "title": "3.4 Winograd-Style Tasks",
+    "label": "experiment"
+   },
+   {
+    "title": "3.5 Common Sense Reasoning",
+    "label": "experiment"
+   },
+   {
+    "title": "3.6 Reading Comprehension",
+    "label": "experiment"
+   },
+   {
+    "title": "3.7 SuperGLUE",
+    "label": "experiment"
+   },
+   {
+    "title": "3.8 NLI",
+    "label": "experiment"
+   },
+   {
+    "title": "3.9 Synthetic and Qualitative Tasks",
+    "label": "experiment"
+   },
+   {
+    "title": "4 Measuring and Preventing Memorization Of Benchmarks",
+    "label": "experiment"
+   },
+   {
+    "title": "5 Limitations",
+    "label": "intro_discussion"
+   },
+   {
+    "title": "6 Broader Impacts",
+    "label": "intro_discussion"
+   },
+   {
+    "title": "7 Related Work",
+    "label": "related_work"
+   },
+   {
+    "title": "8 Conclusion",
+    "label": "intro_discussion"
+   },
+   {
+    "title": "A Details of Common Crawl Filtering",
+    "label": "other"
+   },
+   {
+    "title": "B Details of Model Training",
+    "label": "other"
+   },
+   {
+    "title": "C Details of Test Set Contamination Studies",
+    "label": "other"
+   },
+   {
+    "title": "D Total Compute Used to Train Language Models",
+    "label": "other"
+   },
+   {
+    "title": "E Human Quality Assessment of Synthetic News Articles",
+    "label": "other"
+   },
+   {
+    "title": "F Additional Samples from GPT-3",
+    "label": "other"
+   },
+   {
+    "title": "G Details of Task Phrasing and Specifications",
+    "label": "other"
+   },
+   {
+    "title": "H Results on All Tasks for All Model Sizes",
+    "label": "other"
+   }
+  ]
+}
+```

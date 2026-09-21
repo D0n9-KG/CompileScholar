@@ -221,6 +221,27 @@ def call_llm(prompt: str, model: str = "deepseek-chat", max_tokens: int = 4000,
     return None
 
 
+def _provider_allowed(prov: str) -> bool:
+    """LLM_PROVIDER_ALLOWLIST env gate (user directive 09-21: no module may
+    silently run a non-Qwen3.8-27B model and break build/answer comparability).
+    Single choke point — every channel funnels through call_* below. Unset
+    allowlist = everything allowed (frozen-protocol scripts unaffected).
+    A blocked call returns None, which the ChannelDeadError guards turn into
+    a loud stage abort instead of a silent model mix."""
+    allow = os.environ.get("LLM_PROVIDER_ALLOWLIST", "")
+    if not allow:
+        return True
+    return prov in {p.strip() for p in allow.split(",") if p.strip()}
+
+
+def _gate_block(prov: str, model: str):
+    import sys as _sys
+    print(f"[llm-gate] BLOCKED {prov}:{model} — LLM_PROVIDER_ALLOWLIST="
+          f"{os.environ.get('LLM_PROVIDER_ALLOWLIST')!r}", file=_sys.stderr,
+          flush=True)
+    _log_call(prov, model, False, 0.0, None, 0)
+
+
 def call_paratera(prompt: str, model: str = "Kimi-K2.6", max_tokens: int = 4000,
                   temperature: float = 0.0, enable_thinking: bool = None,
                   seed: int | None = None, fallback_for: str = "") -> str | None:
@@ -234,6 +255,9 @@ def call_paratera(prompt: str, model: str = "Kimi-K2.6", max_tokens: int = 4000,
 
     fallback_for: set when this call serves as another provider's fallback
     (provenance marker, logged per call)."""
+    if not _provider_allowed("paratera"):
+        _gate_block("paratera", model)
+        return None
     key = ENV.get("PARATERA_API_KEY")
     base = ENV.get("PARATERA_BASE_URL", "").rstrip("/")
     if not key:
@@ -508,6 +532,9 @@ def call_cst(prompt: str, model: str = "qwen3.5", max_tokens: int = 4000,
     concurrency semaphore CST_MAX_CONCURRENT (default 4). No cross-channel
     fallback: a persistently dead channel returns None and the batch runner
     stops-and-resumes rather than switching models (arm purity)."""
+    if not _provider_allowed("cst"):
+        _gate_block("cst", model)
+        return None
     key = ENV.get("CST_API_KEY")
     base = ENV.get("CST_BASE_URL", "").rstrip("/")
     if not key:
@@ -596,6 +623,9 @@ def call_intern(prompt: str, model: str = "qwen3.8-27b", max_tokens: int = 4000,
     (arm purity): a dead channel returns None and the batch runner
     stops-and-resumes.
     """
+    if not _provider_allowed("intern"):
+        _gate_block("intern", model)
+        return None
     key = ENV.get("INTERN_API_KEY")
     base = ENV.get("INTERN_BASE_URL", "").rstrip("/")
     if not key or not base:
@@ -677,6 +707,9 @@ def call_local(prompt: str, model: str = "Qwen3.8-27B", max_tokens: int = 4000,
     Retries absorb server warm-up / transient 5xx with short backoff.
     No cross-channel fallback: a dead local server returns None and the
     batch runner stops-and-resumes (arm purity)."""
+    if not _provider_allowed("local"):
+        _gate_block("local", model)
+        return None
     base = (ENV.get("LOCAL_BASE_URL")
             or os.environ.get("LOCAL_BASE_URL", "http://127.0.0.1:8000/v1")).rstrip("/")
     key = ENV.get("LOCAL_API_KEY") or os.environ.get("LOCAL_API_KEY", "local")

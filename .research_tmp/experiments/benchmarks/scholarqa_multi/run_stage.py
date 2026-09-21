@@ -31,6 +31,16 @@ CHANNELS = ["intern:qwen3.8-27b", "local:Qwen3.8-27B"]
 INTERN_SOFT_CAP = int(os.environ.get("INTERN_SOFT_CAP", str(85_000_000)))
 
 
+def check_purity(log_path):
+    """Post-stage D8 assertion: every ok call in the build ledger must be one
+    of the two Qwen3.8-27B channels (intern qwen3.8-27b / local Qwen3.8-27B).
+    Judge runs use a SEPARATE ledger by protocol, so they never land here."""
+    sys.path.insert(0, r"C:/Users/D0n9/Desktop/CompileScholar/src")
+    from kb_infra.llm import check_arm_purity
+    return check_arm_purity(log_path, allowed_pairs=[
+        ("intern", "qwen3.8-27b"), ("local", "Qwen3.8-27B")])
+
+
 def ledger_tokens(log_path):
     per = {}
     if not os.path.exists(log_path):
@@ -84,7 +94,13 @@ def main():
                     "PYTHONIOENCODING": "utf-8",
                     "LLM_CALL_LOG": args.ledger,
                     "LLM_RUN_ID": f"multi-{args.name}",
-                    "LLM_SOCK_TIMEOUT": "300", "LLM_WALL_TIMEOUT": "600"})
+                    "LLM_SOCK_TIMEOUT": "600", "LLM_WALL_TIMEOUT": "900",
+                    # comparability hard gate (user directive 09-21): build
+                    # stages may ONLY touch the two Qwen3.8-27B channels —
+                    # a forgotten --model defaulting to DeepSeek/Kimi/Max
+                    # gets blocked at the llm.py choke point and aborts
+                    # loudly instead of silently mixing models
+                    "LLM_PROVIDER_ALLOWLIST": "intern,local"})
         if model.startswith("local"):
             env.setdefault("LOCAL_MAX_CONCURRENT", "16")
         else:
@@ -98,8 +114,10 @@ def main():
               + ", ".join(f"{k}={v/1e6:.2f}M" for k, v in sorted(tok.items())),
               flush=True)
         if p.returncode == 0:
-            print(f"[{args.name}] STAGE DONE on {model}", flush=True)
-            return 0
+            purity = check_purity(args.ledger)
+            print(f"[{args.name}] STAGE DONE on {model} | arm purity: {purity}",
+                  flush=True)
+            return 0 if purity.get("pure") else 4
         # ChannelDeadError surfaces as a traceback + rc=1; any nonzero rc on
         # intern gets one local retry (conservative: local rerun is cheap and
         # deterministic). Nonzero on LOCAL = real failure -> stop.
