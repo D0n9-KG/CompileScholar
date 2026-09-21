@@ -729,27 +729,43 @@ def merge_entities_blocked(mentions: dict, cards: dict, model: str,
     return entities, qc
 
 
+def _assignments_to_groups(asg: list) -> list:
+    """Invert per-item assignment shape [{"i":0,"canonical":3},...] into
+    group shape (431-run setup batch: models sometimes answer a grouping
+    prompt with item->canonical assignments instead of groups)."""
+    by_can: dict = {}
+    for a in asg:
+        if not isinstance(a, dict) or not isinstance(a.get("i"), int):
+            continue
+        c = a.get("canonical")
+        if not isinstance(c, int):
+            c = a["i"]
+        by_can.setdefault(c, []).append(a["i"])
+    return [{"canonical": c, "members": sorted(set(m))}
+            for c, m in sorted(by_can.items())]
+
+
 def _vocab_extract(obj: dict, dim: str, ctx: str) -> list:
-    """Key-tolerant group extraction (431-run: models cross 'families' and
-    'groups' keys); loud abort when neither is present."""
-    if dim == "subject":
-        raw = obj.get("families")
-        if raw is None:
-            raw = obj.get("groups")
-        if raw is None:
-            raise ChannelDeadError(
-                f"{ctx}: response has neither 'families' nor 'groups' — "
-                f"aborting instead of silent all-singleton fallback")
-        return [{"canonical": None, "members": g.get("members") or [],
-                 "family": g.get("family")} for g in raw if isinstance(g, dict)]
-    groups = obj.get("groups")
-    if groups is None:
-        groups = obj.get("families")
-    if groups is None:
+    """Key-tolerant extraction (431-run forensics: models cross
+    'families'/'groups' keys, or answer with 'assignments'); loud abort
+    with the actual key list when nothing is usable."""
+    raw = obj.get("families") if dim == "subject" else obj.get("groups")
+    if raw is None:
+        raw = obj.get("groups") if dim == "subject" else obj.get("families")
+    if raw is None:
+        asg = obj.get("assignments")
+        if isinstance(asg, list) and asg:
+            raw = None
+            groups = _assignments_to_groups(asg)
+            if dim == "subject":
+                return [{"canonical": None, "members": g["members"],
+                         "family": None} for g in groups]
+            return groups
         raise ChannelDeadError(
-            f"{ctx}: response has neither 'groups' nor 'families' — "
-            f"aborting instead of silent all-singleton fallback")
-    return [g for g in groups if isinstance(g, dict)]
+            f"{ctx}: response keys {sorted(obj.keys())[:8]} contain neither "
+            f"groups/families/assignments — aborting instead of silent "
+            f"all-singleton fallback")
+    return [g for g in raw if isinstance(g, dict)]
 
 
 def _vocab_one_call(dim: str, items: list, model: str, tag: str,

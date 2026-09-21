@@ -299,6 +299,27 @@ def test_short_token_split_keeps_long_anchor():
     assert len(out) == 1 and len(out[0]["members"]) == 3
 
 
+def test_vocab_extract_shape_tolerances():
+    import pytest
+    E = registry._vocab_extract
+    # families key for subject
+    g = E({"families": [{"family": "F", "members": [0, 1]}]}, "subject", "x")
+    assert g[0]["family"] == "F"
+    # crossed keys tolerated
+    g = E({"groups": [{"canonical": 0, "members": [0]}]}, "subject", "x")
+    assert g[0]["members"] == [0]
+    # assignments shape inverted into groups
+    g = E({"assignments": [{"i": 0, "canonical": 5}, {"i": 1, "canonical": 5},
+                           {"i": 2, "canonical": 2}]}, "setup", "x")
+    assert sorted(x["canonical"] for x in g) == [2, 5]
+    five = next(x for x in g if x["canonical"] == 5)
+    assert five["members"] == [0, 1]
+    # unusable shape -> loud abort WITH the actual keys in the message
+    with pytest.raises(registry.ChannelDeadError) as ei:
+        E({"results": []}, "setup", "x")
+    assert "results" in str(ei.value)
+
+
 def test_vocab_compliance_retry(monkeypatch):
     """Lazy first response (covers 2/10) -> completion retry for the missing
     8 -> merged groups cover all 10 (no singleton flood)."""
