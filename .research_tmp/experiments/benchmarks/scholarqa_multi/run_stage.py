@@ -27,7 +27,10 @@ import sys
 BASE = os.path.dirname(os.path.abspath(__file__))
 KB = os.path.join(BASE, "kb")
 
-CHANNELS = ["intern:qwen3.8-27b", "local:Qwen3.8-27B"]
+# User decision 09-21: LOCAL-ONLY default — single channel = cleanest arm
+# purity + zero quota risk (Intern ~100M tokens kept as emergency fallback
+# for local hardware failure only, opt-in via --channels).
+CHANNELS = ["local:Qwen3.8-27B"]
 INTERN_SOFT_CAP = int(os.environ.get("INTERN_SOFT_CAP", str(85_000_000)))
 
 
@@ -64,6 +67,9 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--name", required=True)
     ap.add_argument("--ledger", default=os.path.join(KB, "ledger_build.jsonl"))
+    ap.add_argument("--channels", default=",".join(CHANNELS),
+                    help="ordered channel list, e.g. 'local:Qwen3.8-27B' or "
+                         "'intern:qwen3.8-27b,local:Qwen3.8-27B' (emergency)")
     ap.add_argument("cmd", nargs=argparse.REMAINDER)
     args = ap.parse_args()
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -80,14 +86,15 @@ def main():
           + ", ".join(f"{k}={v/1e6:.2f}M" for k, v in sorted(tok.items()))
           + f" | intern soft cap {INTERN_SOFT_CAP/1e6:.0f}M", flush=True)
 
+    channels = [c.strip() for c in args.channels.split(",") if c.strip()]
     start = 0
-    if intern_used >= INTERN_SOFT_CAP:
+    if channels[0].startswith("intern") and intern_used >= INTERN_SOFT_CAP:
         print(f"[{args.name}] intern budget exhausted ({intern_used/1e6:.1f}M "
               f">= cap) — starting on local", flush=True)
         start = 1
 
-    for ci in range(start, len(CHANNELS)):
-        model = CHANNELS[ci]
+    for ci in range(start, len(channels)):
+        model = channels[ci]
         real = [c.replace("{MODEL}", model) for c in cmd]
         env = os.environ.copy()
         env.update({"PYTHONPATH": r"C:/Users/D0n9/Desktop/CompileScholar/src",
@@ -100,7 +107,8 @@ def main():
                     # a forgotten --model defaulting to DeepSeek/Kimi/Max
                     # gets blocked at the llm.py choke point and aborts
                     # loudly instead of silently mixing models
-                    "LLM_PROVIDER_ALLOWLIST": "intern,local"})
+                    "LLM_PROVIDER_ALLOWLIST": ",".join(
+                        c.split(":")[0] for c in channels)})
         if model.startswith("local"):
             env.setdefault("LOCAL_MAX_CONCURRENT", "16")
         else:

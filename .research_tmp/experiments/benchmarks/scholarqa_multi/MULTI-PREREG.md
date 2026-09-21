@@ -101,7 +101,7 @@
 追加披露（09-21 建库协议更新，用户批准）：
 5. **slot 深抽上限 110k→500k 字符**：旧上限系 API 计费时代成本旋钮，实测截伤 47/430 篇（GPT-3 覆盖 33%/Llama-3 Herd 27%）；免费渠道下成本理由消失，提到 500k 后 46/47 篇全覆盖。卡片层与 absence 全文 pass 维持 110k（单次调用物理预算，非成本旋钮）；长文 absence pass 只见前部一事如实披露。
 6. **LSST Science Book（300 页/1.93M 字符）**：slot 覆盖前 500k（26%），genre 与论文式 schema 错配，记录质量以建库 QC 实测为准；败题归因指向该书材料时再专项处理（章节化卡片为后手）。
-7. **建库模型渠道**：Intern 免费额度优先+本地 GPU 兜底（用户指令），两渠道同为 Qwen3.8-27B；ledger 逐调用记录 provider+model，臂纯度检查带双 pair 白名单。
+7. **建库/答题模型渠道（09-21 用户终裁：本地单渠道）**：全部 Qwen3.8-27B 走本地自部署（GPUStack）；Intern 免费通道（同为 Qwen3.8-27B）降为本地硬件故障时的应急备份，启用需显式 --channels 且 ledger 可查。机器闸：LLM_PROVIDER_ALLOWLIST 在 llm.py 六咽喉点（4 chat + 2 embed 通道）硬拦非白名单调用（漏传 --model 的默认 DeepSeek/Kimi/Max 会立即中止而非静默混模）；每 stage 结束跑 check_arm_purity 断言。判分 GLM-5.3 走独立 ledger（协议规定判分与建库分账，非混模）。
 
 ## 10. 决策记录（已裁事项沿承）
 
