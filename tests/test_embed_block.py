@@ -299,6 +299,32 @@ def test_short_token_split_keeps_long_anchor():
     assert len(out) == 1 and len(out[0]["members"]) == 3
 
 
+def test_vocab_compliance_retry(monkeypatch):
+    """Lazy first response (covers 2/10) -> completion retry for the missing
+    8 -> merged groups cover all 10 (no singleton flood)."""
+    calls = {"n": 0}
+
+    def fake_call_json(prompt, model, max_tokens=8000, retries=3, **kw):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            return {"families": [{"family": "A", "members": [0, 1]}]}
+        # completion call: parse the re-indexed lines count from the prompt
+        import re as _re
+        idxs = [int(m) for m in _re.findall(r"^\[(\d+)\]", prompt, _re.M)]
+        return {"families": [{"family": f"filler{i}", "members": [i]}
+                             for i in idxs]}
+
+    monkeypatch.setattr(registry, "call_json", fake_call_json)
+    items = [(f"k{i}", {"surface": f"surface {i}", "papers": {"p"}})
+             for i in range(10)]
+    groups = registry._vocab_one_call("subject", items, "fake", "test")
+    covered = sorted(i for g in groups for i in g["members"])
+    assert covered == list(range(10))
+    assert calls["n"] == 2
+    fam_a = next(g for g in groups if g.get("family") == "A")
+    assert fam_a["members"] == [0, 1]
+
+
 def test_shape_coercion():
     import pytest
     MJ = registry._must_json
