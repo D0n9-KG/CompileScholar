@@ -108,11 +108,27 @@ def main():
     TEXTS.mkdir(parents=True, exist_ok=True)
     report = json.loads(REPORT.read_text(encoding="utf-8"))
     # build worklist: paper_id -> (pdf_path, fmt)
-    work = []
+    # NOTE: fetch_report paths may be stale (pre-rename LogicKG dir, or a
+    # broken relative join). All source files live in corpus/pdfs/, so
+    # resolve by basename there. Dedupe: two paper_ids can share one file.
+    pdfs_dir = BASE / "corpus" / "pdfs"
+    work, seen = [], set()
+    unresolved = []
     for v in report.values():
         if v.get("ok") and v.get("path") and v.get("format"):
-            pid = v.get("paper_id") or Path(v["path"]).stem
-            work.append((pid, Path(v["path"]), v["format"]))
+            src = pdfs_dir / Path(v["path"].replace("\\", "/")).name
+            if not src.exists():
+                unresolved.append(v["path"])
+                continue
+            pid = v.get("paper_id") or src.stem
+            if pid in seen:
+                continue
+            seen.add(pid)
+            work.append((pid, src, v["format"]))
+    if unresolved:
+        print(f"WARNING: {len(unresolved)} ok-entries with no file in pdfs/:", flush=True)
+        for p in unresolved:
+            print(f"  {p}", flush=True)
     print(f"mineru: {len(work)} papers to parse "
           f"({sum(1 for _, _, f in work if f == 'md')} sciverse .md, "
           f"{sum(1 for _, _, f in work if f == 'pdf')} pdf)", flush=True)

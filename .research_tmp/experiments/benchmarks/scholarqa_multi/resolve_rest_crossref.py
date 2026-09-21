@@ -69,10 +69,31 @@ def main():
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     cmap = json.loads(CMAP.read_text(encoding="utf-8"))
     cr = CrossrefClient()
-    # unresolved = titles without doi AND without arxiv
+    # two populations: (a) titles already in the map lacking doi+arxiv
+    # (b) titles never entered the map (the OpenAlex run died at 205/439
+    #     mid-checkpoint) — build fresh entries for them
+    import hashlib
+    items = json.load(open(BASE / "data" / "scholarqa_multi.json", encoding="utf-8"))
+    seen = {}
+    for x in items:
+        for c in x.get("ctxs") or []:
+            t = (c.get("title") or "").strip()
+            if t and t not in seen:
+                seen[t] = {"year": c.get("year"),
+                           "authors": [a.get("name") for a in (c.get("authors") or [])][:3],
+                           "subject": x.get("subject")}
+    for t, meta in seen.items():
+        if t not in cmap:
+            cmap[t] = {"paper_id": "m" + hashlib.sha1(
+                re.sub(r"\s+", " ", re.sub(r"[^a-z0-9 ]", " ", t.lower())).strip()
+                .encode()).hexdigest()[:10], "title": t, **meta,
+                "openalex_id": None, "doi": None, "arxiv_id": None,
+                "oa_pdf_url": None, "resolution": None, "score": None,
+                "review": False}
     todo = [(t, e) for t, e in cmap.items()
             if not e.get("doi") and not e.get("arxiv_id")]
-    print(f"crossref+arxiv resolve: {len(todo)} of {len(cmap)}", flush=True)
+    print(f"crossref+arxiv resolve: {len(todo)} of {len(cmap)} "
+          f"({len(seen) - 205} newly entered)", flush=True)
     for i, (title, e) in enumerate(todo):
         got_doi = got_ax = None
         # --- arXiv first (gives both arxiv_id and often DOI) ---
