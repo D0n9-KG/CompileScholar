@@ -195,6 +195,43 @@ def _split_plus_variants(groups: list, keys: list, mentions: dict) -> list:
     return out
 
 
+def _split_short_token_groups(groups: list, keys: list, mentions: dict) -> list:
+    """Class-(a) guard extended to round-1 blocks (gate-3 A/B round 2:
+    'pcp'+'ppt' merged IN-BLOCK — ultra-short surfaces are unjudgeable in
+    ANY context, and small blocks give the LLM LESS disambiguating context
+    than the single call did). Class (b) affix-extension stays secondary-
+    channel-only: round-1 keeps full LLM authority over inclusion-fed
+    descriptive pairs ('gptq' + 'post-training quantization gptq')."""
+    out = []
+    for g in groups:
+        mem = list(g["members"])
+        if len(mem) < 2:
+            out.append(g)
+            continue
+        short = {i for i in mem
+                 if len(_norm(mentions[keys[i]]["surface"]).replace(" ", "")) <= 4}
+        if len(short) < 2:
+            out.append(g)
+            continue
+        # each short member separates from every OTHER short member;
+        # long members stay with the LLM's group (choose first short as anchor)
+        longs = [i for i in mem if i not in short]
+        shorts = sorted(short, key=lambda i: keys[i])
+        anchor_s = shorts[0]
+        if longs:
+            out.append({"canonical": g["canonical"] if g["canonical"] in longs
+                        else anchor_s,
+                        "members": longs + [anchor_s],
+                        "entity_type": g.get("entity_type")})
+        else:
+            out.append({"canonical": anchor_s, "members": [anchor_s],
+                        "entity_type": g.get("entity_type")})
+        for i in shorts[1:]:
+            out.append({"canonical": i, "members": [i],
+                        "entity_type": g.get("entity_type")})
+    return out
+
+
 def _covered_groups(groups: list, n_items: int, label: str) -> list:
     """Machine coverage check: every index in exactly one group; missing ->
     singleton fallback (truncation cannot silently drop items)."""
@@ -549,7 +586,8 @@ def merge_entities_blocked(mentions: dict, cards: dict, model: str,
         glob = [{"canonical": order[g["canonical"]],
                  "members": [order[m] for m in g["members"]],
                  "entity_type": g.get("entity_type")} for g in local]
-        return bi, _split_plus_variants(glob, keys, mentions)
+        return bi, _split_short_token_groups(
+            _split_plus_variants(glob, keys, mentions), keys, mentions)
 
     for bi, gs in par_map(_run_block, call_items):
         results[bi] = gs

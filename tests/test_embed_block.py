@@ -269,6 +269,30 @@ def test_merge_guard_classes():
     # secondary-channel rejection = fragmentation, the safe direction)
 
 
+def test_short_token_split_in_blocks():
+    surfaces = ["pc", "pcp", "ppt", "qlora", "quantized lora"]
+    mentions = _mentions_from(surfaces)
+    keys = [registry._norm(x) for x in surfaces]
+    groups = [{"canonical": 0, "members": [0, 1, 2], "entity_type": "method"},
+              {"canonical": 3, "members": [3, 4], "entity_type": "method"}]
+    out = registry._split_short_token_groups(groups, keys, mentions)
+    # short-token triangle fully split; long pair untouched
+    sizes = sorted(len(g["members"]) for g in out)
+    assert sizes == [1, 1, 1, 2]
+    merged = next(g for g in out if len(g["members"]) == 2)
+    assert set(merged["members"]) == {3, 4}
+
+
+def test_short_token_split_keeps_long_anchor():
+    surfaces = ["ar", "groove", "algorithmic regret"]
+    mentions = _mentions_from(surfaces)
+    keys = [registry._norm(x) for x in surfaces]
+    groups = [{"canonical": 1, "members": [0, 1, 2], "entity_type": "method"}]
+    out = registry._split_short_token_groups(groups, keys, mentions)
+    # only ONE short member ('ar') -> no split (class (a) needs two shorts)
+    assert len(out) == 1 and len(out[0]["members"]) == 3
+
+
 if __name__ == "__main__":
     import pytest
     raise SystemExit(pytest.main([__file__, "-v"]))
