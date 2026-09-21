@@ -22,7 +22,8 @@ from concurrent.futures import ThreadPoolExecutor
 
 from .common import (MAX_PAPER_CHARS, call_json, load_corpus, load_json,
                      load_manifest, route_model, save_json)
-from kb_infra.llm import call_paratera, call_cst, parse_json_response
+from kb_infra.llm import (call_paratera, call_cst, call_local, call_intern,
+                          parse_json_response)
 
 SKELETON_REPAIRED = [0]   # observability: cards saved by the escape-repair tier
 
@@ -118,7 +119,12 @@ def build_card(pid: str, text: str, title: str, model: str):
         # cannot recover — repair the raw output instead. Card-level only;
         # the shared records parser is untouched (frozen PS protocol).
         prov, mname = route_model(model)
-        fn = call_cst if prov == "cst" else call_paratera
+        # provider dispatch must cover ALL routed channels: the old
+        # cst-or-paratera ternary silently sent local:/intern: repair calls
+        # to paratera (arm-purity violation; caught 2026-09-21 while wiring
+        # the intern provider)
+        fn = {"cst": call_cst, "local": call_local,
+              "intern": call_intern}.get(prov, call_paratera)
         raw = fn(prompt, model=mname, max_tokens=8000,
                  temperature=0.0, enable_thinking=False) or ""
         fixed, nfix = _repair_json_escapes(raw)

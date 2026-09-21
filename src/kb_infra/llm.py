@@ -570,16 +570,31 @@ def call_cst(prompt: str, model: str = "qwen3.5", max_tokens: int = 4000,
 _LOCAL_SEM = threading.Semaphore(int(os.environ.get("LOCAL_MAX_CONCURRENT", "4")))
 
 
+_INTERN_SEM = threading.Semaphore(int(os.environ.get("INTERN_MAX_CONCURRENT", "8")))
+_INTERN_RETRY_STATUS = {408, 425, 429, 500, 502, 503, 504}
+
+
 def call_intern(prompt: str, model: str = "qwen3.8-27b", max_tokens: int = 4000,
-                temperature: float = 0.0, seed: int | None = None) -> str | None:
+                temperature: float = 0.0, seed: int | None = None,
+                enable_thinking: bool | None = None) -> str | None:
     """Call the INTERN free channel (discovery-api.intern-ai.org.cn; Qwen3.8-27B
     and other domestic models; free with quota).
 
-    Thinking-disable is INTERN-SPECIFIC (measured 2026-09-18): ONLY
-    {"thinking": {"type": "disabled"}} works — chat_template_kwargs and the
-    enable_thinking param are both ignored. Same wall-clock watchdog + ledger
-    discipline as the other providers. Use for: arbitration initial rulings,
-    smoke tests, low-stakes batch work; formal runs stay on billed channels.
+    Thinking-disable is INTERN-SPECIFIC (measured 2026-09-18, re-probed
+    2026-09-21): ONLY {"thinking": {"type": "disabled"}} works —
+    chat_template_kwargs and the top-level enable_thinking param are both
+    IGNORED (reasoning tokens stay billed). The enable_thinking kwarg is
+    accepted for call-interface parity and changes nothing.
+
+    Promoted to formal batch workhorse (user directive 2026-09-21: free
+    quota first, switch back to local when exhausted; the build ledger
+    records provider+model per call, and check_arm_purity takes the
+    (intern, local) allowed-pair list for mixed-provider builds).
+    Hardened for batch use: INTERN_MAX_CONCURRENT semaphore (default 8),
+    5 attempts with exponential backoff + jitter + Retry-After (reuses the
+    CST backoff), fresh Request per attempt. No cross-channel fallback
+    (arm purity): a dead channel returns None and the batch runner
+    stops-and-resumes.
     """
     key = ENV.get("INTERN_API_KEY")
     base = ENV.get("INTERN_BASE_URL", "").rstrip("/")
@@ -597,33 +612,49 @@ def call_intern(prompt: str, model: str = "qwen3.8-27b", max_tokens: int = 4000,
     if seed is not None:
         payload["seed"] = seed
     body = json.dumps(payload).encode()
+    attempts = int(os.environ.get("INTERN_MAX_ATTEMPTS", "5"))
     _WALL = float(os.environ.get("LLM_WALL_TIMEOUT", "240"))
-    req = urllib.request.Request(
-        base + "/chat/completions", data=body,
-        headers={"Authorization": f"Bearer {key}",
-                 "Content-Type": "application/json"})
     _sock_to = float(os.environ.get("LLM_SOCK_TIMEOUT", "60"))
-    for attempt in range(2):
+    for attempt in range(attempts):
         t0 = time.time()
+        retry_after = None
         try:
-            r = _walled_open(req, sock_timeout=_sock_to)
-            chunks = []
-            while True:
-                if time.time() - t0 > _WALL:
-                    raise TimeoutError(f"wall-clock {_WALL}s exceeded (slow-drip server)")
-                b = r.read(65536)
-                if not b:
-                    break
-                chunks.append(b)
+            req = urllib.request.Request(
+                base + "/chat/completions", data=body,
+                headers={"Authorization": f"Bearer {key}",
+                         "Content-Type": "application/json"})
+            with _INTERN_SEM:
+                r = _walled_open(req, sock_timeout=_sock_to)
+                chunks = []
+                while True:
+                    if time.time() - t0 > _WALL:
+                        raise TimeoutError(f"wall-clock {_WALL}s exceeded (slow-drip server)")
+                    b = r.read(65536)
+                    if not b:
+                        break
+                    chunks.append(b)
             resp = json.loads(b"".join(chunks))
             _log_call("intern", model, True, (time.time() - t0) * 1000,
                       resp.get("usage") or {}, attempt)
             return resp["choices"][0]["message"]["content"]
+        except urllib.error.HTTPError as e:
+            try:
+                retry_after = e.headers.get("Retry-After") if e.headers else None
+            except Exception:
+                retry_after = None
+            _log_call("intern", model, False, (time.time() - t0) * 1000,
+                      None, attempt)
+            if e.code in _INTERN_RETRY_STATUS and attempt < attempts - 1:
+                _cst_backoff_sleep(attempt, retry_after)
+                continue
+            return None
         except Exception:
             _log_call("intern", model, False, (time.time() - t0) * 1000,
                       None, attempt)
-            if attempt == 1:
-                return None
+            if attempt < attempts - 1:
+                _cst_backoff_sleep(attempt)
+                continue
+            return None
     return None
 
 

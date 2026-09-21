@@ -2,7 +2,9 @@
 """Pipeline common: corpus loading, model routing, JSON call wrapper, caching.
 
 Model routing convention: "provider:model" — provider ∈ {paratera, cst,
-local}; bare model name defaults to paratera. "local" = self-hosted vLLM
+local, intern}; bare model name defaults to paratera. "intern" = INTERN
+free channel (intern:qwen3.8-27b; its thinking-disabled form is provider-
+specific and handled inside call_intern). "local" = self-hosted vLLM
 (LOCAL_BASE_URL, e.g. local:qwen3.8-27b-local). enable_thinking=False is
 ALWAYS sent on paratera (kb_infra.llm dispatches the correct param form
 per model family).
@@ -17,7 +19,8 @@ _REPO_SRC = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fi
 if _REPO_SRC not in sys.path:
     sys.path.insert(0, _REPO_SRC)
 
-from kb_infra.llm import call_paratera, call_cst, call_local, parse_json_response  # noqa: E402
+from kb_infra.llm import (call_paratera, call_cst, call_local,  # noqa: E402
+                          call_intern, parse_json_response)
 
 MAX_PAPER_CHARS = 110_000  # stage-A proven cap for single-call full-text passes
 
@@ -80,7 +83,8 @@ def call_json(prompt: str, model_spec: str, max_tokens: int = 8000,
     empty/unparseable. salvage=True adds the truncation-salvage tier.
     Never raises."""
     prov, model = route_model(model_spec)
-    fn = {"cst": call_cst, "local": call_local}.get(prov, call_paratera)
+    fn = {"cst": call_cst, "local": call_local,
+          "intern": call_intern}.get(prov, call_paratera)
     for _ in range(retries):
         raw = fn(prompt, model=model, max_tokens=max_tokens,
                  temperature=0.0, enable_thinking=False)
