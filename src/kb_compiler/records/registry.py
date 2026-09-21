@@ -378,7 +378,13 @@ def _merge_guard_reject(a: str, b: str):
     if na == nb:
         return None
     ca, cb = na.replace(" ", ""), nb.replace(" ", "")
-    if len(ca) <= 4 and len(cb) <= 4:
+    # class (a') tightened after gate-3 A/B round 3: hub-spoke leak —
+    # 'pc'+'prompt-based continued pre-training' (short+long, no rule hit)
+    # merged in recovery, then pcp/ppt rode the hub through cross rounds.
+    # ANY surface <= 3 norm chars is unjudgeable on secondary channels;
+    # true acronyms (ued, colei) are round-1's job (acronym channel +
+    # paper-context lines). Both<=4 kept from the original class (a).
+    if min(len(ca), len(cb)) <= 3 or (len(ca) <= 4 and len(cb) <= 4):
         return "short_token"
     wa, wb = _words(a), _words(b)
     if wa and wb and wa != wb:

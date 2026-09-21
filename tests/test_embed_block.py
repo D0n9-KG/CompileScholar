@@ -256,11 +256,17 @@ def test_merge_guard_classes():
     assert G("PC", "pcp") == "short_token"
     # (b) whole-word affix extension (variant-vs-base)
     assert G("meta-upomdp", "upomdp") == "affix_extension"
-    assert G("information-directed sampling (ids-c51)", "C51") == "affix_extension"
+    assert G("information-directed sampling (ids-c51)", "C51") == "short_token"
     assert G("decision diffuser", "diffuser") == "affix_extension"
     assert G("iterated doremi", "doremi") == "affix_extension"
+    # class (a'): ANY side <= 3 chars -> reject on secondary channels
+    assert G("c51", "information-directed sampling (ids-c51)") == "short_token"
+    assert G("ued", "unsupervised environment design") == "short_token"
+    # ^ deliberate: true acronyms are round-1's job (acronym channel feeds
+    # them into blocks WITH paper context); secondary channels never touch
+    # ultra-short surfaces (hub-spoke leak, gate-3 A/B round 3)
     # negatives: legitimate merges must pass
-    assert G("qlora", "quantized lora") is None          # acronym, not affix
+    assert G("qlora", "quantized lora") is None          # 5 chars, not affix
     assert G("colei", "column excitation-inhibition") is None
     assert G("QLoRA", "qlora") is None                   # case variants
     assert G("gptq", "post-training quantization gptq") == "affix_extension"
