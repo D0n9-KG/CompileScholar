@@ -254,10 +254,17 @@ def _groups_to_entities(groups: list[dict], keys: list[str], mentions: dict,
             etype = votes.most_common(1)[0][0] if votes else "method"
         # own-paper type wins (deterministic override of LLM label)
         own = next((mentions[mk]["own"] for mk in members if mentions[mk]["own"]), None)
+        canon_key = keys[g["canonical"]]
         if own:
             mi = (cards.get(own) or {}).get("method_identity") or {}
             etype = mi.get("entity_type") or etype
             canonical = (mi.get("canonical_name") or "").strip() or canonical
+            # canonical override may change case/spacing vs the first-registered
+            # surface (gate-3 StopIteration, 09-21): resolve the member key by
+            # norm match, keep the LLM choice as fallback
+            cn = _norm(canonical)
+            canon_key = next((mk for mk in members
+                              if _norm(mentions[mk]["surface"]) == cn), canon_key)
         # origin_year_cited: deterministic majority of mention-level votes
         years = [y for mk in members for y in mentions[mk]["cited_years"]]
         oyc = None
@@ -274,6 +281,7 @@ def _groups_to_entities(groups: list[dict], keys: list[str], mentions: dict,
             "origin_year_cited": oyc, "mention_papers": papers,
             "mention_count": len(papers),
             "_member_keys": members,
+            "_canonical_key": canon_key,
         })
     return entities
 
@@ -396,14 +404,12 @@ def _recover_singletons(entities, keys, mentions, cards, embs, model, log,
         if ei in consumed and ei not in by_target:
             continue
         if ei in by_target:
-            canon_key = next(mk for mk in e["_member_keys"]
-                             if mentions[mk]["surface"] == e["canonical"])
             member_idx = [key_to_idx[mk] for mk in e["_member_keys"]]
             for src in sorted(by_target[ei]):
                 member_idx.extend(key_to_idx[mk]
                                   for mk in entities[src]["_member_keys"])
-            uni = {"canonical": key_to_idx[canon_key], "members": member_idx,
-                   "entity_type": e["entity_type"]}
+            uni = {"canonical": key_to_idx[e["_canonical_key"]],
+                   "members": member_idx, "entity_type": e["entity_type"]}
             new_entities.extend(_groups_to_entities([uni], keys, mentions, cards))
         else:
             new_entities.append(e)
@@ -551,9 +557,7 @@ def merge_entities_blocked(mentions: dict, cards: dict, model: str,
                     member_idx.extend(key_to_idx[mk]
                                       for mk in entities[ei]["_member_keys"])
                 canon_e = entities[cb[g["canonical"]]]
-                canon_mk = next(mk for mk in canon_e["_member_keys"]
-                                if mentions[mk]["surface"] == canon_e["canonical"])
-                uni = {"canonical": key_to_idx[canon_mk],
+                uni = {"canonical": key_to_idx[canon_e["_canonical_key"]],
                        "members": member_idx,
                        "entity_type": g.get("entity_type")}
                 new_entities.extend(_groups_to_entities([uni], keys, mentions, cards))
@@ -894,6 +898,22 @@ def main():
     for e in entities:
         for a in e["aliases"]:
             surface_index[_norm(a)] = e["entity_id"]
+    # collapse QC (gate-3 finding, 09-21): distinct LLM groups whose canonical
+    # got overridden to the SAME own-paper canonical_name share one entity_id
+    # — the surfaces are then silently conflated in surface_index despite the
+    # LLM keeping them apart. Card-alias quality amplifier: junk in a card's
+    # method_identity.aliases becomes an alias of the paper's method entity.
+    # Instrumented, NOT auto-fixed (own-paper authority is design intent).
+    from collections import defaultdict as _dd
+    by_eid = _dd(list)
+    for e in entities:
+        by_eid[e["entity_id"]].append(e["canonical"])
+    collapses = {eid: cans for eid, cans in by_eid.items() if len(cans) > 1}
+    qc["entity_id_collapses"] = len(collapses)
+    qc["collapse_examples"] = [cans[:4] for cans in list(collapses.values())[:10]]
+    if collapses:
+        print(f"WARNING: {len(collapses)} entity_ids shared by multiple groups "
+              f"(own-paper canonical collapse; review card aliases)", flush=True)
     registry = {"version": 1, "model": args.model,
                 "entities": [{k: v for k, v in e.items() if not k.startswith("_")}
                              for e in entities],
