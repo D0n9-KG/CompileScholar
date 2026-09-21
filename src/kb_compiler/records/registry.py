@@ -24,11 +24,13 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import sys
 from collections import Counter
 
-from .common import call_json, load_json, load_manifest, save_json
+from .common import (call_json, load_json, load_manifest, par_map,
+                     save_json)
 
 MAX_SURFACES_ONE_CALL = 600  # beyond this, single-call truncation risk grows
 
@@ -353,8 +355,9 @@ def _recover_singletons(entities, keys, mentions, cards, embs, model, log,
         return entities, qc
     merges: dict[int, int] = {}   # singleton entity idx -> target entity idx
     letters = "abcdef"
-    for b0 in range(0, len(tasks), batch_size):
-        chunk = tasks[b0:b0 + batch_size]
+    chunks = [tasks[b0:b0 + batch_size] for b0 in range(0, len(tasks), batch_size)]
+
+    def _run_chunk(chunk):
         lines = []
         for pos, (ei, cands) in enumerate(chunk):
             e = entities[ei]
@@ -372,10 +375,15 @@ def _recover_singletons(entities, keys, mentions, cards, embs, model, log,
         for a in (obj or {}).get("assignments", []):
             if isinstance(a, dict) and isinstance(a.get("i"), int):
                 got.setdefault(a["i"], a.get("match"))
+        out = {}
         for pos, (ei, cands) in enumerate(chunk):
             m = got.get(pos)
             if isinstance(m, str) and m in letters[:len(cands)]:
-                merges[ei] = cands[letters.index(m)]
+                out[ei] = cands[letters.index(m)]
+        return out
+
+    for chunk_merges in par_map(_run_chunk, chunks):
+        merges.update(chunk_merges)
     if not merges:
         return entities, qc
     # apply: fold singleton member keys into target entities, rebuild deterministically
@@ -445,14 +453,21 @@ def merge_entities_blocked(mentions: dict, cards: dict, model: str,
     blocks = block_indices(embs, keys, tau=tau1, max_block=MAX_SURFACES_ONE_CALL,
                            batch_log=log, extra_edges=ac_edges | inc_edges)
     qc["block_sizes"] = sorted(len(b) for b in blocks)
-    all_groups = []
+    # split singletons (no call) from LLM blocks; calls run in parallel,
+    # assembly is in block order (deterministic)
+    results: dict[int, list] = {}
+    call_items = []
     for bi, block in enumerate(blocks):
         # within-block order: most-mentioned first (same hint quality as legacy)
         order = sorted(block, key=lambda i: (-len(mentions[keys[i]]["papers"]), keys[i]))
         if len(order) == 1:
-            all_groups.append({"canonical": order[0], "members": list(order),
-                               "entity_type": None})
+            results[bi] = [{"canonical": order[0], "members": list(order),
+                            "entity_type": None}]
             continue
+        call_items.append((bi, order))
+
+    def _run_block(item):
+        bi, order = item
         n_papers = len(set().union(*(mentions[keys[i]]["papers"] for i in order)))
         prompt = MERGE_PROMPT.replace("{n_papers}", str(n_papers)).replace(
             "{lines}", _merge_lines(keys, mentions, order))
@@ -464,9 +479,13 @@ def merge_entities_blocked(mentions: dict, cards: dict, model: str,
         glob = [{"canonical": order[g["canonical"]],
                  "members": [order[m] for m in g["members"]],
                  "entity_type": g.get("entity_type")} for g in local]
-        all_groups.extend(_split_plus_variants(glob, keys, mentions))
-        if (bi + 1) % 10 == 0:
-            log(f"  blocked merge: {bi + 1}/{len(blocks)} blocks done")
+        return bi, _split_plus_variants(glob, keys, mentions)
+
+    for bi, gs in par_map(_run_block, call_items):
+        results[bi] = gs
+    log(f"  blocked merge: {len(call_items)} LLM blocks + "
+        f"{len(results) - len(call_items)} singletons done")
+    all_groups = [g for bi in sorted(results) for g in results[bi]]
     qc["block_merges"] = sum(len(g["members"]) - 1 for g in all_groups)
     entities = _groups_to_entities(all_groups, keys, mentions, cards)
     log(f"round1 blocked: {len(keys)} surfaces -> {len(entities)} entities "
@@ -492,11 +511,9 @@ def merge_entities_blocked(mentions: dict, cards: dict, model: str,
                                 extra_edges=acronym_edges(canon) | inclusion_edges(canon))
         merged_any = 0
         new_entities = []
-        consumed = set()
-        for cb in cblocks:
-            if len(cb) == 1:
-                new_entities.append(entities[cb[0]])
-                continue
+        call_cbs = [cb for cb in cblocks if len(cb) > 1]
+
+        def _run_cross(cb):
             lines = []
             for pos, ei in enumerate(cb):
                 e = entities[ei]
@@ -508,21 +525,35 @@ def merge_entities_blocked(mentions: dict, cards: dict, model: str,
                        if e["in_corpus_paper_id"] else ""))
             prompt = CROSS_MERGE_PROMPT.replace("{lines}", "\n".join(lines))
             obj = call_json(prompt, model, max_tokens=16000, retries=3)
-            local = _covered_groups((obj or {}).get("groups"), len(cb),
-                                    f"cross:r{rnd}")
+            return _covered_groups((obj or {}).get("groups"), len(cb),
+                                   f"cross:r{rnd}")
+
+        cross_results = dict(zip(range(len(call_cbs)),
+                                 par_map(_run_cross, call_cbs)))
+        ci = 0
+        for cb in cblocks:          # assembly in deterministic block order
+            if len(cb) == 1:
+                new_entities.append(entities[cb[0]])
+                continue
+            local = cross_results[ci]
+            ci += 1
             for g in local:
                 eis = [cb[m] for m in g["members"]]
-                consumed.update(eis)
                 if len(eis) == 1:
                     new_entities.append(entities[eis[0]])
                     continue
                 merged_any += len(eis) - 1
-                # union member keys, rebuild entity deterministically
+                # union member keys, rebuild entity deterministically.
+                # canonical must come from the LLM-chosen entity's own
+                # canonical key (g["canonical"] indexes cb, NOT member_idx)
                 member_idx = []
                 for ei in eis:
                     member_idx.extend(key_to_idx[mk]
                                       for mk in entities[ei]["_member_keys"])
-                uni = {"canonical": member_idx[g["canonical"]],
+                canon_e = entities[cb[g["canonical"]]]
+                canon_mk = next(mk for mk in canon_e["_member_keys"]
+                                if mentions[mk]["surface"] == canon_e["canonical"])
+                uni = {"canonical": key_to_idx[canon_mk],
                        "members": member_idx,
                        "entity_type": g.get("entity_type")}
                 new_entities.extend(_groups_to_entities([uni], keys, mentions, cards))
@@ -573,15 +604,23 @@ def _cross_merge_entries(entries: list[dict], name_of, model: str, prompt_tmpl: 
                                max_block=VOCAB_MAX_ONE_CALL // 2, batch_log=log)
     else:
         blocks = [list(range(n))]
-    out_groups, n_merges = [], 0
-    for b in blocks:
-        if len(b) == 1:
-            out_groups.append(list(b))
-            continue
+    call_blocks = [b for b in blocks if len(b) > 1]
+
+    def _run(b):
         lines = [entries[ei]["_line"](pos) for pos, ei in enumerate(b)]
         prompt = prompt_tmpl.replace("{lines}", "\n".join(lines))
         obj = call_json(prompt, model, max_tokens=12000, retries=3)
-        local = _covered_groups((obj or {}).get("groups"), len(b), tag)
+        return _covered_groups((obj or {}).get("groups"), len(b), tag)
+
+    results = dict(zip(range(len(call_blocks)), par_map(_run, call_blocks)))
+    out_groups, n_merges = [], 0
+    ci = 0
+    for b in blocks:          # assembly in deterministic block order
+        if len(b) == 1:
+            out_groups.append(list(b))
+            continue
+        local = results[ci]
+        ci += 1
         for g in local:
             gidx = [b[m] for m in g["members"]]
             n_merges += len(gidx) - 1
@@ -655,9 +694,12 @@ def build_vocab(cards: dict, model: str, pid_subject: dict | None = None,
 
         # --- per-batch calls -> raw entries ---
         raw = []   # subject: {family, members(idx)}; others: {canonical(idx), members(idx)}
-        for bi, batch in enumerate(batches):
-            sub = [items[i] for i in batch]
-            groups = _vocab_one_call(dim, sub, model, f"{batch_tag}{bi}")
+        batch_groups = par_map(
+            lambda bb: _vocab_one_call(dim, [items[i] for i in bb[1]], model,
+                                       f"{batch_tag}{bb[0]}"),
+            list(enumerate(batches)))
+        for bi, groups in enumerate(batch_groups):
+            batch = batches[bi]
             for g in groups:
                 gidx = [batch[m] for m in g["members"]]
                 if dim == "subject":

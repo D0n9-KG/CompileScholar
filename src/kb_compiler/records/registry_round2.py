@@ -148,21 +148,32 @@ def run_round2(registry: dict, queue: list[dict], model: str,
     # registry: per-chunk top-k candidate anchors — a true canonical missing
     # from the top-k lands in `new` and is caught by the consolidation pass
     # and the human arbitration queue, never silently dropped)
-    assigns = []
-    for bn, (ch, registry_lines) in enumerate(chunks):
+    from .common import par_map
+
+    def _run_chunk(item):
+        bn, (ch, registry_lines) = item
         batch = [queue[i] for i in ch]
         got = _map_batch(batch, registry_lines, model)
         by_i_batch = {}
         for a in got:
             if isinstance(a, dict) and isinstance(a.get("i"), int):
                 by_i_batch.setdefault(a["i"], a)
+        out = []
         for i in range(len(batch)):
             a = dict(by_i_batch.get(i) or {"action": "new", "canonical": batch[i]["surface"],
                                            "entity_type": "method", "note": "batch_unassigned"})
             a["_qidx"] = ch[i]
-            assigns.append(a)
-        print(f"  batch {bn + 1}/{len(chunks)}: {len(batch)} surfaces, "
-              f"{sum(1 for i in range(len(batch)) if i in by_i_batch)} assigned", flush=True)
+            out.append(a)
+        n_assigned = sum(1 for i in range(len(batch)) if i in by_i_batch)
+        return bn, len(batch), n_assigned, out
+
+    assigns = []
+    results = par_map(_run_chunk, list(enumerate(chunks)))
+    for bn, nb, n_assigned, out in results:
+        assigns.extend(out)
+        if (bn + 1) % 10 == 0 or bn == len(chunks) - 1:
+            print(f"  batch {bn + 1}/{len(chunks)}: {nb} surfaces, "
+                  f"{n_assigned} assigned", flush=True)
     # consolidation pass over proposed NEW entities (dedupe cross-batch twins)
     new_props = {}
     for a in assigns:

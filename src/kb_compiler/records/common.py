@@ -94,6 +94,21 @@ def call_json(prompt: str, model_spec: str, max_tokens: int = 8000,
     return None
 
 
+BLOCK_WORKERS = int(os.environ.get("REGISTRY_BLOCK_WORKERS", "6"))
+
+
+def par_map(fn, items: list, workers: int | None = None) -> list:
+    """Order-preserving parallel map over independent LLM block calls
+    (call_local is thread-safe; _LOCAL_SEM bounds server-side concurrency).
+    Deterministic: results always in item order regardless of timing."""
+    w = BLOCK_WORKERS if workers is None else workers
+    if w <= 1 or len(items) <= 1:
+        return [fn(it) for it in items]
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=min(w, len(items))) as ex:
+        return list(ex.map(fn, items))
+
+
 def load_corpus(texts_dir: str) -> list[tuple[str, str]]:
     """[(paper_id, text)] sorted; .md/.txt only (logs etc. excluded)."""
     out = []
