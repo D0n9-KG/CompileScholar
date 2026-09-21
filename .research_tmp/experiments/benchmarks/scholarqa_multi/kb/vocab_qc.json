@@ -1,0 +1,4048 @@
+{
+ "cleanup_flags": {
+  "setup_removed_budget_like": [
+   "128 samples per forward",
+   "14 days post-vacuum agroinfiltration",
+   "16 days of coincident observations",
+   "2000 hours of spoken English data",
+   "26 frames of 40 Mel-scaled filter-bank coefficients",
+   "7 days post infiltration",
+   "2048 samples",
+   "30k samples",
+   "50000 samples",
+   "9K samples",
+   "125k steps",
+   "1M steps",
+   "2.7 million steps",
+   "200k steps",
+   "250,000 steps",
+   "30,000 steps",
+   "400 thousand steps",
+   "1000 steps of linear warm-up",
+   "5,000 steps of warm-up",
+   "5 frames per B-scan",
+   "2 days",
+   "3 days",
+   "4 days",
+   "5 days incubation",
+   "7 days",
+   "7 days incubation",
+   "3514 days",
+   "16 GPUs"
+  ],
+  "setup_removed_repeats_like": []
+ },
+ "qc": {
+  "suspect_family_merge": [
+   {
+    "family": "ADCs",
+    "member": "ADC1"
+   },
+   {
+    "family": "ADCs",
+    "member": "ADC2"
+   },
+   {
+    "family": "AGIEval",
+    "member": "AGIE Gaokao Math"
+   },
+   {
+    "family": "AGIEval",
+    "member": "AGIE SAT Math"
+   },
+   {
+    "family": "AIME",
+    "member": "AIME25"
+   },
+   {
+    "family": "AMR",
+    "member": "AMR2.0"
+   },
+   {
+    "family": "Alerts",
+    "member": "Alert Events"
+   },
+   {
+    "family": "Atomic System",
+    "member": "$^{23}\\mathrm{Na}$"
+   },
+   {
+    "family": "Atomic System",
+    "member": "$^{41}\\mathrm{K}$"
+   },
+   {
+    "family": "Atomic System",
+    "member": "$^{7}\\mathrm{Li}$"
+   },
+   {
+    "family": "Atomic System",
+    "member": "$^{87}\\mathrm{Rb}$ single-domain spinor Bose-Einstein condensate"
+   },
+   {
+    "family": "Atomic System",
+    "member": "atoms"
+   },
+   {
+    "family": "Atomic System",
+    "member": "ions"
+   },
+   {
+    "family": "Atomic System",
+    "member": "laser-cooled alkali atoms"
+   },
+   {
+    "family": "Biological Sample",
+    "member": "10% horse serum"
+   },
+   {
+    "family": "Biological Sample",
+    "member": "Cytosol"
+   },
+   {
+    "family": "Biological Sample",
+    "member": "exosomes from human mesenchymal stem cells"
+   },
+   {
+    "family": "Biological Sample",
+    "member": "extracellular vesicles (EVs)"
+   },
+   {
+    "family": "Biological Sample",
+    "member": "healthy donors"
+   },
+   {
+    "family": "Biological Sample",
+    "member": "human plasma"
+   },
+   {
+    "family": "Biological Structure",
+    "member": "axoneme fragments"
+   },
+   {
+    "family": "Biological Structure",
+    "member": "commercial ELISA kits"
+   },
+   {
+    "family": "Biological Structure",
+    "member": "dental epithelial stem cells"
+   },
+   {
+    "family": "Biological Structure",
+    "member": "focal adhesions"
+   },
+   {
+    "family": "Biological Structure",
+    "member": "microtubules"
+   },
+   {
+    "family": "Biological Structure",
+    "member": "Myosin and kinesin"
+   },
+   {
+    "family": "COCO",
+    "member": "COCO2017-val"
+   },
+   {
+    "family": "Cancer Patient Cohort",
+    "member": "CRPC patients"
+   },
+   {
+    "family": "Cancer Patient Cohort",
+    "member": "noninfectious SIRS patients"
+   },
+   {
+    "family": "Cells",
+    "member": "A431"
+   },
+   {
+    "family": "Cells",
+    "member": "BMSCs"
+   },
+   {
+    "family": "Cells",
+    "member": "HeLa"
+   },
+   {
+    "family": "Cells",
+    "member": "MDA-MB-231-iRFP"
+   },
+   {
+    "family": "Device/Instrument",
+    "member": "Biotage/454 Life Sciences pyrosequencers"
+   },
+   {
+    "family": "Device/Instrument",
+    "member": "Cepheid GeneXpert®"
+   },
+   {
+    "family": "Device/Instrument",
+    "member": "CombiMatrix Corp."
+   },
+   {
+    "family": "Device/Instrument",
+    "member": "Directif Diagnostic Solutions"
+   },
+   {
+    "family": "Device/Instrument",
+    "member": "GeneOhm ePlex"
+   },
+   {
+    "family": "Device/Instrument",
+    "member": "Idaho Technology Inc. LightScanner"
+   },
+   {
+    "family": "Device/Instrument",
+    "member": "Integrated Nano-Technologies"
+   },
+   {
+    "family": "Device/Instrument",
+    "member": "Ionian Technologies Inc./HISSS"
+   },
+   {
+    "family": "Device/Instrument",
+    "member": "IQuum, Inc."
+   },
+   {
+    "family": "Device/Instrument",
+    "member": "Nanogen Inc.'s NanoChip® NC400"
+   },
+   {
+    "family": "Device/Instrument",
+    "member": "Nanomix Inc.'s Sensation technology"
+   },
+   {
+    "family": "Device/Instrument",
+    "member": "Nanosphere, Inc.: Verigene® System"
+   },
+   {
+    "family": "Electron/Neutron",
+    "member": "electrons"
+   },
+   {
+    "family": "Electron/Neutron",
+    "member": "neutrons"
+   },
+   {
+    "family": "FLORES-200",
+    "member": "Flwrs"
+   },
+   {
+    "family": "GRIT",
+    "member": "Aligning GRITLM"
+   },
+   {
+    "family": "INat",
+    "member": "INat18"
+   },
+   {
+    "family": "INat",
+    "member": "INat19"
+   },
+   {
+    "family": "LNP",
+    "member": "lipid nanoparticles"
+   },
+   {
+    "family": "LNP",
+    "member": "LNPs"
+   },
+   {
+    "family": "LNP",
+    "member": "mRNA-LNPs"
+   },
+   {
+    "family": "Language Modeling",
+    "member": "multilingual PLMs"
+   },
+   {
+    "family": "Language Modeling",
+    "member": "parametric LMs"
+   },
+   {
+    "family": "Linkers",
+    "member": "linker chemistry"
+   },
+   {
+    "family": "MATH-500",
+    "member": "MATH500"
+   },
+   {
+    "family": "MM-Vet",
+    "member": "MMVet"
+   },
+   {
+    "family": "Molecule/Chemical",
+    "member": "25-hydroxyvitamin D"
+   },
+   {
+    "family": "Molecule/Chemical",
+    "member": "[Ru(dpp)3]Cl2"
+   },
+   {
+    "family": "Molecule/Chemical",
+    "member": "acetamiprid"
+   },
+   {
+    "family": "Molecule/Chemical",
+    "member": "Acetylcholine (ACh)"
+   },
+   {
+    "family": "Molecule/Chemical",
+    "member": "adenosine"
+   },
+   {
+    "family": "Molecule/Chemical",
+    "member": "amine"
+   },
+   {
+    "family": "Molecule/Chemical",
+    "member": "Ascorbic acid (AA)"
+   },
+   {
+    "family": "Molecule/Chemical",
+    "member": "Biotin"
+   },
+   {
+    "family": "Molecule/Chemical",
+    "member": "Cholesterol"
+   },
+   {
+    "family": "Molecule/Chemical",
+    "member": "Cr(VI)"
+   },
+   {
+    "family": "Molecule/Chemical",
+    "member": "Creatine"
+   },
+   {
+    "family": "Molecule/Chemical",
+    "member": "Creatinine"
+   },
+   {
+    "family": "Molecule/Chemical",
+    "member": "CRP"
+   },
+   {
+    "family": "Molecule/Chemical",
+    "member": "cyclic peptide, ((RL)4)"
+   },
+   {
+    "family": "Molecule/Chemical",
+    "member": "Cysteine"
+   },
+   {
+    "family": "Molecule/Chemical",
+    "member": "Dopamine (DA)"
+   },
+   {
+    "family": "Molecule/Chemical",
+    "member": "Epinephrine (Ep)"
+   },
+   {
+    "family": "Molecule/Chemical",
+    "member": "FITC"
+   },
+   {
+    "family": "Molecule/Chemical",
+    "member": "Folic acid"
+   },
+   {
+    "family": "Molecule/Chemical",
+    "member": "Ganglioside GM1"
+   },
+   {
+    "family": "Molecule/Chemical",
+    "member": "Hydrogen Peroxide (HP)"
+   },
+   {
+    "family": "Molecule/Chemical",
+    "member": "Hypoxanthine"
+   },
+   {
+    "family": "Molecule/Chemical",
+    "member": "Ketone Bodies"
+   },
+   {
+    "family": "Molecule/Chemical",
+    "member": "KF"
+   },
+   {
+    "family": "Molecule/Chemical",
+    "member": "L-histidine"
+   },
+   {
+    "family": "Molecule/Chemical",
+    "member": "L-lysine"
+   },
+   {
+    "family": "Molecule/Chemical",
+    "member": "Lactate"
+   },
+   {
+    "family": "Molecule/Chemical",
+    "member": "Lactose"
+   },
+   {
+    "family": "Molecule/Chemical",
+    "member": "Nitric Oxide (NO)"
+   },
+   {
+    "family": "NLC",
+    "member": "nanostructured lipid carriers (NLCs)"
+   },
+   {
+    "family": "NLVR2",
+    "member": "NLVRv2"
+   },
+   {
+    "family": "Optical Component",
+    "member": "1D nanobeam OMC cavities"
+   },
+   {
+    "family": "Optical Component",
+    "member": "1D-periodic structure in air"
+   },
+   {
+    "family": "Optical Component",
+    "member": "AAO membrane"
+   },
+   {
+    "family": "Optical Component",
+    "member": "AlN-on-oxide silicon microchips"
+   },
+   {
+    "family": "Optical Component",
+    "member": "AuNS-array-on-waveguide hybrid structure"
+   },
+   {
+    "family": "Optical Component",
+    "member": "AuNS–PCGR hybrid"
+   },
+   {
+    "family": "Optical Component",
+    "member": "bilayer plasmonic structure"
+   },
+   {
+    "family": "Optical Component",
+    "member": "blazed grating"
+   },
+   {
+    "family": "Optical Component",
+    "member": "Capillary ring resonator"
+   },
+   {
+    "family": "Optical Component",
+    "member": "chromium-coated microdisk resonator"
+   },
+   {
+    "family": "Optical Component",
+    "member": "dielectric ring"
+   },
+   {
+    "family": "Optical Component",
+    "member": "dimpled tapered fiber"
+   },
+   {
+    "family": "Optical Component",
+    "member": "freestanding Si3N4 slab patterned with square-lattice air holes"
+   },
+   {
+    "family": "Optical Component",
+    "member": "gold bowtie nanoantenna"
+   },
+   {
+    "family": "Optical Component",
+    "member": "gold film"
+   },
+   {
+    "family": "Optical Component",
+    "member": "gram-scale mirrors"
+   },
+   {
+    "family": "Optical Component",
+    "member": "In0.53Ga0.47As-LiNbO3 acoustoelectric heterostructure"
+   },
+   {
+    "family": "Optical Component",
+    "member": "LNOI platform"
+   },
+   {
+    "family": "Optical Component",
+    "member": "microbottle modes"
+   },
+   {
+    "family": "Optical Component",
+    "member": "microcavity sensor"
+   },
+   {
+    "family": "Optical Component",
+    "member": "nanoscale patch antenna"
+   },
+   {
+    "family": "Organs/Tissues",
+    "member": "chick chorioallantoic membrane (CAM)"
+   },
+   {
+    "family": "Organs/Tissues",
+    "member": "frontal cortex"
+   },
+   {
+    "family": "Organs/Tissues",
+    "member": "GTKO pig kidney"
+   },
+   {
+    "family": "Organs/Tissues",
+    "member": "hippocampus"
+   },
+   {
+    "family": "Ovaries",
+    "member": "Ovary"
+   },
+   {
+    "family": "Particle/Colloid",
+    "member": "1 μm polystyrene colloids"
+   },
+   {
+    "family": "Populations",
+    "member": "cynomolgus monkey"
+   },
+   {
+    "family": "Populations",
+    "member": "Japanese aged 20 to 79"
+   },
+   {
+    "family": "Populations",
+    "member": "Japanese general public"
+   },
+   {
+    "family": "Populations",
+    "member": "Non-human Primates (NHPs)"
+   },
+   {
+    "family": "Prostate Specific Antigen",
+    "member": "PSA protein"
+   },
+   {
+    "family": "Purchase",
+    "member": "Purchases"
+   },
+   {
+    "family": "R6G Molecules",
+    "member": "rhodamine 6G (Rh6G)"
+   },
+   {
+    "family": "Receptors",
+    "member": "canine tyrosine-protein kinase receptor CD117 (c-Kit)"
+   },
+   {
+    "family": "Receptors",
+    "member": "CCR4"
+   },
+   {
+    "family": "Receptors",
+    "member": "CD146"
+   },
+   {
+    "family": "Receptors",
+    "member": "CD22"
+   },
+   {
+    "family": "Receptors",
+    "member": "CD36"
+   },
+   {
+    "family": "Receptors",
+    "member": "CD44"
+   },
+   {
+    "family": "Receptors",
+    "member": "CD9"
+   },
+   {
+    "family": "Receptors",
+    "member": "HER2"
+   },
+   {
+    "family": "Receptors",
+    "member": "HLA-DR"
+   },
+   {
+    "family": "Receptors",
+    "member": "human CD83"
+   },
+   {
+    "family": "Receptors",
+    "member": "IGF1R"
+   },
+   {
+    "family": "Receptors",
+    "member": "LARC"
+   },
+   {
+    "family": "Receptors",
+    "member": "LRRC"
+   },
+   {
+    "family": "Receptors",
+    "member": "mullerian inhibiting substance type II receptor (MISIIR)"
+   },
+   {
+    "family": "Receptors",
+    "member": "platelet integrin αIIbβ3"
+   },
+   {
+    "family": "Receptors",
+    "member": "receptor tyrosine kinases"
+   },
+   {
+    "family": "SEED-Bench",
+    "member": "SeedBench"
+   },
+   {
+    "family": "Stack Exchange",
+    "member": "StackExchange"
+   },
+   {
+    "family": "StoryCloze",
+    "member": "XStoryCloze"
+   },
+   {
+    "family": "Stylistic rewriting",
+    "member": "stylized"
+   },
+   {
+    "family": "Super-NaturalInstructions",
+    "member": "SUPERNI"
+   },
+   {
+    "family": "TyDi QA",
+    "member": "TYDIQA-GOLDP"
+   },
+   {
+    "family": "U87-MG Glioma Models",
+    "member": "U87MG glioblastoma tumor-bearing nude mice"
+   },
+   {
+    "family": "Vaccines",
+    "member": "mRNA mediated vaccination"
+   },
+   {
+    "family": "Antibodies",
+    "member": "anti-CD30 antibody"
+   },
+   {
+    "family": "Antibodies",
+    "member": "anti-EGFR antibody fragment (Fab')"
+   },
+   {
+    "family": "Antibodies",
+    "member": "Antibody 1"
+   },
+   {
+    "family": "Antibodies",
+    "member": "Antibody 2"
+   },
+   {
+    "family": "Antibodies",
+    "member": "antibody light chains"
+   },
+   {
+    "family": "Antibodies",
+    "member": "humanized IgG4"
+   },
+   {
+    "family": "Antibodies",
+    "member": "IgG1"
+   },
+   {
+    "family": "Antibodies",
+    "member": "anti-immunoglobulin G (IgG)"
+   },
+   {
+    "family": "Antibodies",
+    "member": "IgG"
+   },
+   {
+    "family": "Antibodies",
+    "member": "mouse immunoglobulin G"
+   },
+   {
+    "family": "Bacteria",
+    "member": "Bacillus megaterium"
+   },
+   {
+    "family": "Bacteria",
+    "member": "Chlamydophila psittaci (C. psittaci)"
+   },
+   {
+    "family": "Bacteria",
+    "member": "E. coli proteome"
+   },
+   {
+    "family": "Bacteria",
+    "member": "E. coli XL1-blue"
+   },
+   {
+    "family": "Bacteria",
+    "member": "Micrococcus luteus"
+   },
+   {
+    "family": "Cantilever",
+    "member": "cantilevers"
+   },
+   {
+    "family": "Coupler",
+    "member": "conventional couplers"
+   },
+   {
+    "family": "Diseases",
+    "member": "Alzheimer's disease"
+   },
+   {
+    "family": "Diseases",
+    "member": "Crohn’s disease"
+   },
+   {
+    "family": "Diseases",
+    "member": "ischemic stroke"
+   },
+   {
+    "family": "Diseases",
+    "member": "Parkinson's disease"
+   },
+   {
+    "family": "Diseases",
+    "member": "patients with T1D"
+   },
+   {
+    "family": "Quantum State",
+    "member": "dual-rail photonic qubits"
+   },
+   {
+    "family": "Quantum State",
+    "member": "multi-phonon Fock states"
+   },
+   {
+    "family": "Quantum State",
+    "member": "non-classical states of motion"
+   },
+   {
+    "family": "HellaSwag",
+    "member": "HSwag"
+   },
+   {
+    "family": "MS-COCO",
+    "member": "MSCOCO 30K"
+   },
+   {
+    "family": "Metasurface",
+    "member": "BIC-type dielectric metasurfaces"
+   },
+   {
+    "family": "Metasurface",
+    "member": "isolated-BIC design"
+   },
+   {
+    "family": "Metasurface",
+    "member": "Kerker-inspired disks"
+   },
+   {
+    "family": "Metasurface",
+    "member": "merging-BIC design"
+   },
+   {
+    "family": "Metasurface",
+    "member": "nanohole metasurfaces"
+   },
+   {
+    "family": "Metasurface",
+    "member": "pixelated metasurfaces"
+   },
+   {
+    "family": "Natural Questions",
+    "member": "NaturalQuestions-Open"
+   },
+   {
+    "family": "Natural Questions",
+    "member": "NQ"
+   },
+   {
+    "family": "Other",
+    "member": "1.14 ± 0.03 μm PS particles"
+   },
+   {
+    "family": "Other",
+    "member": "4A3-SC8-based LNPs"
+   },
+   {
+    "family": "Other",
+    "member": "AaET"
+   },
+   {
+    "family": "Other",
+    "member": "AaET-NL"
+   },
+   {
+    "family": "Other",
+    "member": "AaLT"
+   },
+   {
+    "family": "Other",
+    "member": "AaLT-NL"
+   },
+   {
+    "family": "Other",
+    "member": "AaSPVI"
+   },
+   {
+    "family": "Other",
+    "member": "AaSPVI-NL"
+   },
+   {
+    "family": "Other",
+    "member": "AaSPVII"
+   },
+   {
+    "family": "Other",
+    "member": "AaSPVII-NL"
+   },
+   {
+    "family": "Other",
+    "member": "AcBut-N-Ac-γ-calicheamicin"
+   },
+   {
+    "family": "Other",
+    "member": "ALCAM (CD166)"
+   },
+   {
+    "family": "Other",
+    "member": "anetumab ravtansine"
+   },
+   {
+    "family": "Other",
+    "member": "antigens"
+   },
+   {
+    "family": "Other",
+    "member": "APNA"
+   },
+   {
+    "family": "Other",
+    "member": "ApNGT"
+   },
+   {
+    "family": "Other",
+    "member": "artificial pancreas"
+   },
+   {
+    "family": "Other",
+    "member": "Atezolizumab"
+   },
+   {
+    "family": "Other",
+    "member": "Avelumab"
+   },
+   {
+    "family": "Other",
+    "member": "bat CD11b"
+   },
+   {
+    "family": "Other",
+    "member": "beta-cell replacement therapies"
+   },
+   {
+    "family": "Other",
+    "member": "biotechnology"
+   },
+   {
+    "family": "Other",
+    "member": "BPH-1"
+   },
+   {
+    "family": "Other",
+    "member": "BT-474 xenograft model"
+   },
+   {
+    "family": "Other",
+    "member": "C225"
+   },
+   {
+    "family": "Other",
+    "member": "cAC10"
+   },
+   {
+    "family": "Other",
+    "member": "Cas9"
+   },
+   {
+    "family": "Other",
+    "member": "cat"
+   },
+   {
+    "family": "Other",
+    "member": "CDR sequences"
+   },
+   {
+    "family": "Other",
+    "member": "Cell Line 1"
+   },
+   {
+    "family": "Other",
+    "member": "Cell Line 2"
+   },
+   {
+    "family": "Other",
+    "member": "Cell Line 3"
+   },
+   {
+    "family": "Other",
+    "member": "Cell Line 4"
+   },
+   {
+    "family": "Other",
+    "member": "cetuximab sarotalocan"
+   },
+   {
+    "family": "Other",
+    "member": "CFT073"
+   },
+   {
+    "family": "Other",
+    "member": "chimeric BR96"
+   },
+   {
+    "family": "Other",
+    "member": "CIONs-22"
+   },
+   {
+    "family": "Other",
+    "member": "CIONs-26"
+   },
+   {
+    "family": "Other",
+    "member": "CIONs-46"
+   },
+   {
+    "family": "Other",
+    "member": "CK 8"
+   },
+   {
+    "family": "Other",
+    "member": "colon C-26 and C-38 tumors"
+   },
+   {
+    "family": "Other",
+    "member": "conventional chemotherapeutics (CC)"
+   },
+   {
+    "family": "Other",
+    "member": "CR3009"
+   },
+   {
+    "family": "Other",
+    "member": "CR3018"
+   },
+   {
+    "family": "Other",
+    "member": "CR3022"
+   },
+   {
+    "family": "Other",
+    "member": "datopotamab deruxtecan"
+   },
+   {
+    "family": "Other",
+    "member": "deGFP"
+   },
+   {
+    "family": "Other",
+    "member": "dendrimers"
+   },
+   {
+    "family": "Other",
+    "member": "DMBA-induced rat breast cancer"
+   },
+   {
+    "family": "Other",
+    "member": "DOPC bilayers"
+   },
+   {
+    "family": "Other",
+    "member": "DVD1"
+   },
+   {
+    "family": "Other",
+    "member": "DVD2"
+   },
+   {
+    "family": "Other",
+    "member": "encapsulated islets"
+   },
+   {
+    "family": "Other",
+    "member": "EP01rec"
+   },
+   {
+    "family": "Other",
+    "member": "EP01recAG"
+   },
+   {
+    "family": "Other",
+    "member": "EP14rec"
+   },
+   {
+    "family": "Other",
+    "member": "EP14recAG"
+   },
+   {
+    "family": "Other",
+    "member": "epsilon toxoid"
+   },
+   {
+    "family": "Other",
+    "member": "Fab"
+   },
+   {
+    "family": "Other",
+    "member": "fam-trastuzumab deruxtecan"
+   },
+   {
+    "family": "Other",
+    "member": "ferritin"
+   },
+   {
+    "family": "Other",
+    "member": "gastric cancer"
+   },
+   {
+    "family": "Other",
+    "member": "genetic engineering"
+   },
+   {
+    "family": "Other",
+    "member": "glembatumumab vedotin"
+   },
+   {
+    "family": "Other",
+    "member": "GLPAPs"
+   },
+   {
+    "family": "Other",
+    "member": "granulocytes"
+   },
+   {
+    "family": "Other",
+    "member": "hCD46 pig islets"
+   },
+   {
+    "family": "Other",
+    "member": "hMN-14"
+   },
+   {
+    "family": "Other",
+    "member": "Hs27"
+   },
+   {
+    "family": "Other",
+    "member": "HSA"
+   },
+   {
+    "family": "Other",
+    "member": "IFN-α2b"
+   },
+   {
+    "family": "Other",
+    "member": "inclusion body"
+   },
+   {
+    "family": "Other",
+    "member": "indomethacin"
+   },
+   {
+    "family": "Other",
+    "member": "infliximab"
+   },
+   {
+    "family": "Other",
+    "member": "IOWA-iT"
+   },
+   {
+    "family": "Other",
+    "member": "ligand-gated ion channels"
+   },
+   {
+    "family": "Other",
+    "member": "lipid polymer hybrid nanoparticles (LPNs)"
+   },
+   {
+    "family": "Other",
+    "member": "liposomal amphotericin B (AmBisome®)"
+   },
+   {
+    "family": "Other",
+    "member": "LL-37"
+   },
+   {
+    "family": "Other",
+    "member": "lsr operon promoter"
+   },
+   {
+    "family": "Other",
+    "member": "lung cancer A549 cells"
+   },
+   {
+    "family": "Other",
+    "member": "M1 macrophages"
+   },
+   {
+    "family": "Other",
+    "member": "Macrophage-1 (Mac-1)"
+   },
+   {
+    "family": "Other",
+    "member": "mc-MMAF"
+   },
+   {
+    "family": "Other",
+    "member": "mc-va-PBD dimer"
+   },
+   {
+    "family": "Other",
+    "member": "mc-vc-PABC-MMAE"
+   },
+   {
+    "family": "Other",
+    "member": "MCC-DM1"
+   },
+   {
+    "family": "Other",
+    "member": "mcc-triazole spacer-PEG7-x-lysine-PABC-SN-38"
+   },
+   {
+    "family": "Other",
+    "member": "membrane proteins"
+   },
+   {
+    "family": "Other",
+    "member": "mesoporous silica (MS) particles"
+   },
+   {
+    "family": "Other",
+    "member": "MethA tumor"
+   },
+   {
+    "family": "Other",
+    "member": "Metuximab-I131"
+   },
+   {
+    "family": "Other",
+    "member": "MmmSC B237"
+   },
+   {
+    "family": "Other",
+    "member": "MmmSC PG1"
+   },
+   {
+    "family": "Other",
+    "member": "monocytes"
+   },
+   {
+    "family": "Other",
+    "member": "mRNA-ionizable lipid binary"
+   },
+   {
+    "family": "Other",
+    "member": "nanobody72"
+   },
+   {
+    "family": "Other",
+    "member": "naptumomab estafenatox"
+   },
+   {
+    "family": "Other",
+    "member": "Necitumumab"
+   },
+   {
+    "family": "Other",
+    "member": "nRBD:His"
+   },
+   {
+    "family": "Other",
+    "member": "oRibo-T"
+   },
+   {
+    "family": "Other",
+    "member": "orthogonal ribosome"
+   },
+   {
+    "family": "Other",
+    "member": "orthotopic pancreatic rabbit tumor model"
+   },
+   {
+    "family": "Other",
+    "member": "papillary thyroid carcinoma"
+   },
+   {
+    "family": "Other",
+    "member": "patient-derived tumor xenografts (PDX)"
+   },
+   {
+    "family": "Other",
+    "member": "pAzF"
+   },
+   {
+    "family": "Other",
+    "member": "PC-3"
+   },
+   {
+    "family": "Other",
+    "member": "peripheral blood RNA-sequencing"
+   },
+   {
+    "family": "Other",
+    "member": "peritoneal carcinomatosis"
+   },
+   {
+    "family": "Other",
+    "member": "pertuzumab"
+   },
+   {
+    "family": "Other",
+    "member": "Ph.D-7"
+   },
+   {
+    "family": "Other",
+    "member": "Ph.D-C7C"
+   },
+   {
+    "family": "Other",
+    "member": "phase change materials (PCMs)"
+   },
+   {
+    "family": "Other",
+    "member": "pHPFON-NO/O2"
+   },
+   {
+    "family": "Other",
+    "member": "polymer repeat units"
+   },
+   {
+    "family": "Other",
+    "member": "protein corona"
+   },
+   {
+    "family": "Other",
+    "member": "PyLPC/RMC"
+   },
+   {
+    "family": "Other",
+    "member": "QKO porcine islets"
+   },
+   {
+    "family": "Plasmonic BICs",
+    "member": "quasi-BIC"
+   },
+   {
+    "family": "SST-2",
+    "member": "SST2"
+   },
+   {
+    "family": "SciQ",
+    "member": "Sciqa"
+   },
+   {
+    "family": "Surface Plasmon Resonance Sensors",
+    "member": "SPR (grating coupled)"
+   },
+   {
+    "family": "Surface Plasmon Resonance Sensors",
+    "member": "SPR (prism coupled)"
+   },
+   {
+    "family": "WMT",
+    "member": "EnDe"
+   },
+   {
+    "family": "WMT",
+    "member": "EnFr"
+   },
+   {
+    "family": "WMT",
+    "member": "EnRo"
+   },
+   {
+    "family": "WMT",
+    "member": "WMT14 En-Fr"
+   },
+   {
+    "family": "WMT",
+    "member": "WMT16_ende"
+   },
+   {
+    "family": "WMT",
+    "member": "WMT16_enro"
+   },
+   {
+    "family": "WikiText-103",
+    "member": "Wikitext103"
+   },
+   {
+    "family": "Summarization",
+    "member": "WikiSum"
+   },
+   {
+    "family": "Summarization",
+    "member": "XLSum"
+   },
+   {
+    "family": "TripAdvisor",
+    "member": "tripadv"
+   },
+   {
+    "family": "xenotransplantation",
+    "member": "transgenic pig heart transplantation"
+   },
+   {
+    "family": "ARC",
+    "member": "ARCD"
+   },
+   {
+    "family": "Chorioretinal Diseases",
+    "member": "choroidal and retinal disorders"
+   },
+   {
+    "family": "Viruses/Pathogens",
+    "member": "P. falciparum-infected red blood cells"
+   },
+   {
+    "family": "Viruses/Pathogens",
+    "member": "P. yoelii 17XNL"
+   },
+   {
+    "family": "Viruses/Pathogens",
+    "member": "Hepatitis B virus"
+   },
+   {
+    "family": "Viruses/Pathogens",
+    "member": "HIV"
+   },
+   {
+    "family": "Viruses/Pathogens",
+    "member": "M. tuberculosis"
+   },
+   {
+    "family": "BNS mergers",
+    "member": "binary neutron stars"
+   },
+   {
+    "family": "TruthfulQA",
+    "member": "Truthful QA"
+   },
+   {
+    "family": "Proteins",
+    "member": "bRBD:His"
+   },
+   {
+    "family": "Proteins",
+    "member": "GFP"
+   },
+   {
+    "family": "Proteins",
+    "member": "GST-ACLyz"
+   },
+   {
+    "family": "Proteins",
+    "member": "His:bN"
+   },
+   {
+    "family": "Proteins",
+    "member": "LacZ"
+   },
+   {
+    "family": "Proteins",
+    "member": "MBP-FumI fusion protein"
+   },
+   {
+    "family": "Proteins",
+    "member": "native PfHRP2"
+   },
+   {
+    "family": "Proteins",
+    "member": "recombinant ACLyz"
+   },
+   {
+    "family": "Proteins",
+    "member": "recombinant protein"
+   },
+   {
+    "family": "Proteins",
+    "member": "AQP4"
+   },
+   {
+    "family": "Proteins",
+    "member": "CFTR"
+   },
+   {
+    "family": "Proteins",
+    "member": "hTR protein"
+   },
+   {
+    "family": "Proteins",
+    "member": "IBB domain of snurportin-1"
+   },
+   {
+    "family": "Wikipedia",
+    "member": "WIKI"
+   },
+   {
+    "family": "Wikipedia",
+    "member": "WIKI-100M"
+   },
+   {
+    "family": "Wikipedia",
+    "member": "WIKI-3B"
+   },
+   {
+    "family": "microRNA",
+    "member": "miR"
+   },
+   {
+    "family": "microRNA",
+    "member": "miRNA"
+   },
+   {
+    "family": "CNN/DailyMail",
+    "member": "CNNDM"
+   },
+   {
+    "family": "Nucleic Acid",
+    "member": "DNA-XPA system"
+   },
+   {
+    "family": "Nucleic Acid",
+    "member": "FITC-labeled dsDNA"
+   },
+   {
+    "family": "Nucleic Acid",
+    "member": "GFP-labeled dsDNA"
+   },
+   {
+    "family": "Nucleic Acid",
+    "member": "isomiRs"
+   },
+   {
+    "family": "Nucleic Acid",
+    "member": "mature miR"
+   },
+   {
+    "family": "Nucleic Acid",
+    "member": "miR-375"
+   },
+   {
+    "family": "Nucleic Acid",
+    "member": "miR-7"
+   },
+   {
+    "family": "Nucleic Acid",
+    "member": "miR21"
+   },
+   {
+    "family": "Nucleic Acid",
+    "member": "MS2"
+   },
+   {
+    "family": "Oligonucleotide",
+    "member": "22-mer oligonucleotides"
+   },
+   {
+    "family": "Oligonucleotide",
+    "member": "8-mer oligonucleotides"
+   },
+   {
+    "family": "MEF",
+    "member": "mouse embryo fibroblasts"
+   },
+   {
+    "family": "MEF",
+    "member": "mouse embryonic fibroblast"
+   },
+   {
+    "family": "MEF",
+    "member": "mouse embryonic fibroblasts (MEFs)"
+   },
+   {
+    "family": "MNLI",
+    "member": "MultiNLI"
+   },
+   {
+    "family": "colorectal cancer",
+    "member": "CRC"
+   },
+   {
+    "family": "colorectal cancer",
+    "member": "non-metastatic CRC patients"
+   },
+   {
+    "family": "glioma",
+    "member": "14 WHO grade IV astrocytoma cases"
+   },
+   {
+    "family": "lung cancer",
+    "member": "bronchioloalveolar carcinomas"
+   },
+   {
+    "family": "SCLC",
+    "member": "small-cell lung cancer"
+   },
+   {
+    "family": "Dentin",
+    "member": "dentine"
+   },
+   {
+    "family": "Arithmetic",
+    "member": "addition synthetic"
+   },
+   {
+    "family": "CIFAR-100",
+    "member": "Cifar100"
+   },
+   {
+    "family": "CIFAR-10",
+    "member": "Cifar10"
+   },
+   {
+    "family": "STL-10",
+    "member": "STL10-U"
+   },
+   {
+    "family": "Mice",
+    "member": "Panc02 tumor-bearing mouse model"
+   },
+   {
+    "family": "MDA-MB-231",
+    "member": "MDAMB231"
+   },
+   {
+    "family": "MCF-7",
+    "member": "MCF7"
+   },
+   {
+    "family": "SK-BR-3 breast cancer cells",
+    "member": "SkBr3"
+   },
+   {
+    "family": "MDA-MB-157",
+    "member": "MDAMB157"
+   },
+   {
+    "family": "Cell Line",
+    "member": "4T1 mouse breast cancer cells"
+   },
+   {
+    "family": "Cell Line",
+    "member": "A549 cells"
+   },
+   {
+    "family": "Cell Line",
+    "member": "HepG2a"
+   },
+   {
+    "family": "Cell Line",
+    "member": "live biological cells (CT26)"
+   },
+   {
+    "family": "MMLU",
+    "member": "College biology"
+   },
+   {
+    "family": "MMLU",
+    "member": "College chemistry"
+   },
+   {
+    "family": "MMLU",
+    "member": "College Math"
+   },
+   {
+    "family": "VQAv2",
+    "member": "VQA-v2"
+   },
+   {
+    "family": "OpenBookQA",
+    "member": "OBQA"
+   },
+   {
+    "family": "SQuAD",
+    "member": "SQuADv2"
+   },
+   {
+    "family": "CommonsenseQA",
+    "member": "CSQA"
+   },
+   {
+    "family": "CommonsenseQA",
+    "member": "Commonsense QA"
+   },
+   {
+    "family": "VizWiz",
+    "member": "VisWiz"
+   },
+   {
+    "family": "NExT-QA",
+    "member": "NextQA"
+   },
+   {
+    "family": "Socialqa",
+    "member": "SociQA"
+   },
+   {
+    "family": "WebQuestions",
+    "member": "web_questions"
+   },
+   {
+    "family": "WebQuestions",
+    "member": "WebQS"
+   },
+   {
+    "family": "The Pile",
+    "member": "Gutenberg PG-19"
+   },
+   {
+    "family": "Claude",
+    "member": "Anthropic Claude2"
+   },
+   {
+    "family": "Winogrande",
+    "member": "Winograd"
+   },
+   {
+    "family": "GPT-4",
+    "member": "DaVinci003"
+   },
+   {
+    "family": "Llama 2",
+    "member": "LLaMA2-7B-WhoIsHarryPotter"
+   },
+   {
+    "family": "10M Model",
+    "member": "180M"
+   },
+   {
+    "family": "30B Model",
+    "member": "30 billion parameter sparse attention models"
+   },
+   {
+    "family": "7B Model",
+    "member": "7 billion parameter sparse attention models"
+   },
+   {
+    "family": "PaLM 2",
+    "member": "PaLM2-S"
+   },
+   {
+    "family": "PaLM 2",
+    "member": "PaLM2-XS"
+   },
+   {
+    "family": "PaLM 2",
+    "member": "PaLM2-XXS"
+   },
+   {
+    "family": "Qwen",
+    "member": "Qwen3-8B"
+   },
+   {
+    "family": "RedPajama",
+    "member": "RedPajama2"
+   },
+   {
+    "family": "silica nanoparticles",
+    "member": "SiO2 nanoparticle"
+   },
+   {
+    "family": "mRNA-LNP",
+    "member": "MC3-based LNPs"
+   },
+   {
+    "family": "Nanoparticles",
+    "member": "drug nanocarriers"
+   },
+   {
+    "family": "Nanoparticles",
+    "member": "magnetic NPs"
+   },
+   {
+    "family": "Nanoparticles",
+    "member": "nanoemulsions"
+   },
+   {
+    "family": "Nanoparticles",
+    "member": "nanomedicines"
+   },
+   {
+    "family": "Nanoparticles",
+    "member": "PDLLA NPs"
+   },
+   {
+    "family": "Nanoparticles",
+    "member": "Pdots"
+   },
+   {
+    "family": "Nanoparticles",
+    "member": "PLGA-NP"
+   },
+   {
+    "family": "Nanoparticles",
+    "member": "poly(2-methacryloyloxyethyl phosphorylcholine) (PMPC) particles"
+   },
+   {
+    "family": "Nanoparticles",
+    "member": "polymer vesicles"
+   },
+   {
+    "family": "Nanoparticles",
+    "member": "polystyrene nanoparticle"
+   },
+   {
+    "family": "Nanoparticles",
+    "member": "precious metals NPs"
+   },
+   {
+    "family": "Nanoparticles",
+    "member": "silica nanoparticle"
+   },
+   {
+    "family": "Nanoparticles",
+    "member": "Au NPs"
+   },
+   {
+    "family": "Nanoparticles",
+    "member": "levitated nanoparticle"
+   },
+   {
+    "family": "Nanoparticles",
+    "member": "100 nm particles"
+   },
+   {
+    "family": "Nanoparticles",
+    "member": "100nm Au-NP"
+   },
+   {
+    "family": "Nanoparticles",
+    "member": "Ag NPs"
+   },
+   {
+    "family": "Nanoparticles",
+    "member": "ellipsoidal nanoparticle"
+   },
+   {
+    "family": "Nanoparticles",
+    "member": "gold nanorod"
+   },
+   {
+    "family": "Nanoparticles",
+    "member": "levitated dielectric nanoparticle"
+   },
+   {
+    "family": "Nanoparticles",
+    "member": "levitated nanodiamond"
+   },
+   {
+    "family": "Nanoparticles",
+    "member": "nanosphere"
+   },
+   {
+    "family": "mechanical resonator",
+    "member": "hBAR"
+   },
+   {
+    "family": "mechanical resonator",
+    "member": "nanomechanical resonators"
+   },
+   {
+    "family": "mechanical resonator",
+    "member": "micromechanical oscillators"
+   },
+   {
+    "family": "mechanical resonator",
+    "member": "nanomechanical beam"
+   },
+   {
+    "family": "mechanical resonator",
+    "member": "nanomechanical spring"
+   },
+   {
+    "family": "grating coupler",
+    "member": "dual-layer polarization-diversity GC"
+   },
+   {
+    "family": "microdisk",
+    "member": "microdisks"
+   },
+   {
+    "family": "nanodumbbell",
+    "member": "silica nanodumbbells"
+   },
+   {
+    "family": "Colloidal Quantum Dots",
+    "member": "QDs (CdSe/ZnS core-shell type)"
+   },
+   {
+    "family": "Silica Microsphere/Bead",
+    "member": "SiO2 microspheres"
+   },
+   {
+    "family": "Silica Microsphere/Bead",
+    "member": "microspheres"
+   },
+   {
+    "family": "Microtoroid Resonator",
+    "member": "silica microtoroidal cavity"
+   },
+   {
+    "family": "Photonic Crystal (PC)",
+    "member": "inverse opal PCs"
+   },
+   {
+    "family": "Photonic Crystal (PC)",
+    "member": "PhC samples"
+   },
+   {
+    "family": "Photonic Crystal (PC)",
+    "member": "PhC slab"
+   },
+   {
+    "family": "Superconducting Qubit",
+    "member": "Josephson phase qubits"
+   },
+   {
+    "family": "Nanomechanical Membrane",
+    "member": "nanomembranes"
+   },
+   {
+    "family": "Nanomechanical Membrane",
+    "member": "mechanical nano-membranes"
+   },
+   {
+    "family": "Optomechanical System",
+    "member": "Cavity Optomechanics: Nano- and Micromechanical Resonators Interacting with Light"
+   },
+   {
+    "family": "Optomechanical System",
+    "member": "cavity optomechanics"
+   },
+   {
+    "family": "Acoustic Waveguide/Modulator",
+    "member": "nonreciprocal SAW devices"
+   },
+   {
+    "family": "Acoustic Waveguide/Modulator",
+    "member": "PT-symmetric SAW system"
+   },
+   {
+    "family": "Silicon Nanowires",
+    "member": "Si nanowire"
+   },
+   {
+    "family": "Silicon Nitride Waveguides",
+    "member": "SiN waveguide"
+   }
+  ],
+  "suspect_entity_type": [
+   {
+    "entity": "AraBERT",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "BEIR Benchmark",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "BIG-Bench",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "Bard",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "CAT",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "COM2SENSE",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "COMMONSENSE NORM BANK",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "CoFiPruning",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "DaVinci003",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "Delphi",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "DomainNet",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "Dziribert",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "HONEST",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "LLM-Pruner",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "MarVL",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "NF-κB",
+    "type": "mechanism",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "Natural Questions",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "OPT",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "Playground v2.5",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "PyLPC/RMC",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "SlimPajama",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "THIOMAB",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "TyDi",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "Wanda",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "WikiArt",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "XQA",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "gold nanostars",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "transmon qubit",
+    "type": "mechanism",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "AlpacaEval",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "VideoFusion",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "COPA",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "XCOPA",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "MT-bench",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "MasakhaNER",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "Unnatural Instructions",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "Super-Natural Instructions",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "protein corona",
+    "type": "mechanism",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "SEOBNRv4HM",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "Word2Vec",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "grating couplers",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "optomechanical crystal (OMC)",
+    "type": "mechanism",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "Claude",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "Claude-1",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "MidJourney",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "XLM-R",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "DDPM",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "mBERT",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "RoBERTa",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "SDXL",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "Stable Diffusion",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "DeepFloyd IF",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "PixArt-α",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "GPT-4",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "GPT-2",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "LLaMa",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "Llama-2",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "Mistral-7B",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "GPT-3.5",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "GPT-3.5-Turbo",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "Mixtral",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "GPT",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "LAION",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "LLaMA-7B",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "Phi-1.5",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "RedPajama",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   },
+   {
+    "entity": "Vicuna-13B",
+    "type": "method",
+    "reason": "appears in subject vocab (likely benchmark/dataset)"
+   }
+  ]
+ },
+ "scale": {
+  "subject": {
+   "candidates": 2251,
+   "batching": "domain",
+   "batches": 14,
+   "cross_merges": 117
+  },
+  "setup": {
+   "candidates": 3786,
+   "batching": "domain",
+   "batches": 20,
+   "cross_merges": 186
+  },
+  "variant": {
+   "candidates": 3504,
+   "batching": "domain",
+   "batches": 18,
+   "cross_merges": 49
+  },
+  "hyperparam_item": {
+   "candidates": 1346,
+   "batching": "domain",
+   "batches": 12,
+   "cross_merges": 64
+  },
+  "compliance_events": [
+   {
+    "tag": "cross:family_subject",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "setup:domain3",
+    "attempt": 0,
+    "event": "empty_response",
+    "keys": []
+   },
+   {
+    "tag": "setup:domain4",
+    "attempt": 1,
+    "event": "empty_response",
+    "keys": []
+   },
+   {
+    "tag": "setup:domain4",
+    "attempt": 2,
+    "event": "empty_response",
+    "keys": []
+   },
+   {
+    "tag": "setup:domain4",
+    "attempt": 3,
+    "event": "final_shortfall",
+    "missing": 26,
+    "n": 26
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_setup",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_setup: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_variant",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_variant: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_hyperparam_item",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_hyperparam_item",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_hyperparam_item",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_hyperparam_item",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_hyperparam_item",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_hyperparam_item",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_hyperparam_item",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_hyperparam_item",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_hyperparam_item",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_hyperparam_item",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_hyperparam_item",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_hyperparam_item",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_hyperparam_item",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_hyperparam_item",
+    "event": "unusable_groups_shape"
+   },
+   {
+    "tag": "cross:dedup_hyperparam_item",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_hyperparam_item: bare list with unrecognized element shape — aborting"
+   },
+   {
+    "tag": "cross:dedup_hyperparam_item",
+    "event": "shape_abort_downgraded",
+    "err": "vocab cross-merge:dedup_hyperparam_item: bare list with unrecognized element shape — aborting"
+   }
+  ]
+ }
+}
