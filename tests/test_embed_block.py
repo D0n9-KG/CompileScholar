@@ -249,6 +249,26 @@ def test_channel_death_aborts_not_singletons(monkeypatch):
         registry.merge_entities(mentions, {}, "dead-channel")
 
 
+def test_merge_guard_classes():
+    G = registry._merge_guard_reject
+    # (a) ultra-short token ambiguity
+    assert G("pc", "ppt") == "short_token"
+    assert G("PC", "pcp") == "short_token"
+    # (b) whole-word affix extension (variant-vs-base)
+    assert G("meta-upomdp", "upomdp") == "affix_extension"
+    assert G("information-directed sampling (ids-c51)", "C51") == "affix_extension"
+    assert G("decision diffuser", "diffuser") == "affix_extension"
+    assert G("iterated doremi", "doremi") == "affix_extension"
+    # negatives: legitimate merges must pass
+    assert G("qlora", "quantized lora") is None          # acronym, not affix
+    assert G("colei", "column excitation-inhibition") is None
+    assert G("QLoRA", "qlora") is None                   # case variants
+    assert G("gptq", "post-training quantization gptq") == "affix_extension"
+    # ^ deliberate: affix guard also blocks this TRUE alias pair on secondary
+    # channels — accepted trade (acronym channel covers it in round-1 blocks;
+    # secondary-channel rejection = fragmentation, the safe direction)
+
+
 if __name__ == "__main__":
     import pytest
     raise SystemExit(pytest.main([__file__, "-v"]))

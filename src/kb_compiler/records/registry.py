@@ -317,6 +317,41 @@ def merge_entities(mentions: dict, cards: dict, model: str) -> list[dict]:
     return _groups_to_entities(groups, keys, mentions, cards)
 
 
+def _words(s: str) -> list:
+    return re.findall(r"[a-z0-9]+", (s or "").lower())
+
+
+def _merge_guard_reject(a: str, b: str):
+    """Deterministic ambiguity guard for SECONDARY merge channels (singleton
+    recovery / cross-round). Gate-3 A/B evidence (09-21): the 12 blocked-extra
+    merges vs the single call all rode these channels, in two mechanical
+    classes:
+    (a) ultra-short token ambiguity: both norms <= 4 chars, unequal
+        ('pc'+'ppt', 'pc'+'pcp') — 2-3 char acronyms are unjudgeable without
+        context; conflation poisons entity linking, fragmentation is safe.
+    (b) whole-word affix extension: one surface's word list is a strict
+        leading/trailing sublist of the other's ('meta-upomdp'/'upomdp',
+        '(ids-c51)'/'c51', 'decision diffuser'/'diffuser') — variant-vs-base
+        conflation; the F34 '+'-guard family generalized to word affixes.
+    Correct acronym<->expansion merges are UNAFFECTED: they ride the acronym
+    channel into round-1 blocks where the LLM keeps full authority with
+    paper context. Rejection = fragmentation (safe), never conflation
+    (poison). Returns reason string or None."""
+    na, nb = _norm(a), _norm(b)
+    if na == nb:
+        return None
+    ca, cb = na.replace(" ", ""), nb.replace(" ", "")
+    if len(ca) <= 4 and len(cb) <= 4:
+        return "short_token"
+    wa, wb = _words(a), _words(b)
+    if wa and wb and wa != wb:
+        short, lng = (wa, wb) if len(wa) < len(wb) else (wb, wa)
+        k = len(short)
+        if lng[:k] == short or lng[-k:] == short:
+            return "affix_extension"
+    return None
+
+
 SINGLETON_RECOVERY_PROMPT = """下面是合并后仍孤立的实体表面名（每行一个），以及它出处论文内语义最近的候选实体。判定每个孤立名是否只是某候选实体的另一种说法（描述性称呼/缩写/全称/变体），还是确实是独立实体。
 
 行格式：[编号] 孤立表面名 | 提及篇数 | 候选: [a] 规范名(别名: ...) [b] 规范名(别名: ...)
@@ -375,7 +410,7 @@ def _recover_singletons(entities, keys, mentions, cards, embs, model, log,
         if cands:
             tasks.append((ei, cands))
     qc = {"singletons": sum(1 for e in entities if len(e["_member_keys"]) == 1),
-          "with_candidates": len(tasks), "recovered": 0}
+          "with_candidates": len(tasks), "recovered": 0, "guard_rejected": {}}
     if not tasks:
         return entities, qc
     merges: dict[int, int] = {}   # singleton entity idx -> target entity idx
@@ -401,15 +436,24 @@ def _recover_singletons(entities, keys, mentions, cards, embs, model, log,
         for a in (obj or {}).get("assignments", []):
             if isinstance(a, dict) and isinstance(a.get("i"), int):
                 got.setdefault(a["i"], a.get("match"))
-        out = {}
+        out, gh = {}, {}
         for pos, (ei, cands) in enumerate(chunk):
             m = got.get(pos)
             if isinstance(m, str) and m in letters[:len(cands)]:
-                out[ei] = cands[letters.index(m)]
-        return out
+                tgt = cands[letters.index(m)]
+                reason = _merge_guard_reject(entities[ei]["canonical"],
+                                             entities[tgt]["canonical"])
+                if reason:
+                    gh[reason] = gh.get(reason, 0) + 1
+                    continue
+                out[ei] = tgt
+        return out, gh
 
-    for chunk_merges in par_map(_run_chunk, chunks):
+    guard_hits: dict = {}
+    for chunk_merges, chunk_guard in par_map(_run_chunk, chunks):
         merges.update(chunk_merges)
+        for k, v in chunk_guard.items():
+            guard_hits[k] = guard_hits.get(k, 0) + v
     if not merges:
         return entities, qc
     # apply: fold singleton member keys into target entities, rebuild deterministically
@@ -432,6 +476,7 @@ def _recover_singletons(entities, keys, mentions, cards, embs, model, log,
         else:
             new_entities.append(e)
     qc["recovered"] = len(merges)
+    qc["guard_rejected"] = guard_hits
     log("singleton recovery: {} with candidates -> {} merged ({} -> {} entities)".format(
         qc["with_candidates"], qc["recovered"], len(entities), len(new_entities)))
     return new_entities, qc
@@ -522,6 +567,7 @@ def merge_entities_blocked(mentions: dict, cards: dict, model: str,
     qc["singleton_recovery"] = rec_qc
 
     # --- cross-block canonical re-merge rounds ---
+    cross_guard = [0]
     for rnd in range(1, max_rounds + 1):
         if len(entities) <= 1:
             break
@@ -564,26 +610,57 @@ def merge_entities_blocked(mentions: dict, cards: dict, model: str,
             local = cross_results[ci]
             ci += 1
             for g in local:
-                eis = [cb[m] for m in g["members"]]
-                if len(eis) == 1:
-                    new_entities.append(entities[eis[0]])
+                eis_all = [cb[m] for m in g["members"]]
+                if len(eis_all) == 1:
+                    new_entities.append(entities[eis_all[0]])
                     continue
-                merged_any += len(eis) - 1
-                # union member keys, rebuild entity deterministically.
-                # canonical must come from the LLM-chosen entity's own
-                # canonical key (g["canonical"] indexes cb, NOT member_idx)
-                member_idx = []
-                for ei in eis:
-                    member_idx.extend(key_to_idx[mk]
-                                      for mk in entities[ei]["_member_keys"])
-                canon_e = entities[cb[g["canonical"]]]
-                uni = {"canonical": key_to_idx[canon_e["_canonical_key"]],
-                       "members": member_idx,
-                       "entity_type": g.get("entity_type")}
-                new_entities.extend(_groups_to_entities([uni], keys, mentions, cards))
+                # secondary-channel guard: split the proposed group into
+                # components of pairwise-allowed merges
+                parent = {ei: ei for ei in eis_all}
+
+                def _find(x, parent=parent):
+                    while parent[x] != x:
+                        parent[x] = parent[parent[x]]
+                        x = parent[x]
+                    return x
+
+                for ii in range(len(eis_all)):
+                    for jj in range(ii + 1, len(eis_all)):
+                        reason = _merge_guard_reject(
+                            entities[eis_all[ii]]["canonical"],
+                            entities[eis_all[jj]]["canonical"])
+                        if reason:
+                            cross_guard[0] += 1
+                            continue
+                        ri, rj = _find(eis_all[ii]), _find(eis_all[jj])
+                        if ri != rj:
+                            parent[max(ri, rj)] = min(ri, rj)
+                comps = {}
+                for ei in eis_all:
+                    comps.setdefault(_find(ei), []).append(ei)
+                llm_canon = cb[g["canonical"]]
+                for sub in comps.values():
+                    if len(sub) == 1:
+                        new_entities.append(entities[sub[0]])
+                        continue
+                    merged_any += len(sub) - 1
+                    # union member keys, rebuild entity deterministically;
+                    # canonical = LLM choice if it survived into this
+                    # component, else the component lead
+                    canon_e = entities[llm_canon if llm_canon in sub else sub[0]]
+                    member_idx = []
+                    for ei in sub:
+                        member_idx.extend(key_to_idx[mk]
+                                          for mk in entities[ei]["_member_keys"])
+                    uni = {"canonical": key_to_idx[canon_e["_canonical_key"]],
+                           "members": member_idx,
+                           "entity_type": g.get("entity_type")}
+                    new_entities.extend(
+                        _groups_to_entities([uni], keys, mentions, cards))
         entities = new_entities
         qc["cross_rounds"].append({"round": rnd, "merges": merged_any,
-                                   "entities_after": len(entities)})
+                                   "entities_after": len(entities),
+                                   "guard_rejected_pairs": cross_guard[0]})
         log(f"cross round {rnd}: {merged_any} merges -> {len(entities)} entities")
         if merged_any == 0:
             break
