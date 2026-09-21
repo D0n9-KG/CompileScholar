@@ -353,6 +353,9 @@ def test_shape_coercion():
     assert MJ([{"members": [0], "canonical": 0}], "x") == {"groups": [{"members": [0], "canonical": 0}]}
     # bare list of assignments -> wrapped
     assert MJ([{"i": 0, "match": None}], "x") == {"assignments": [{"i": 0, "match": None}]}
+    # species 5: bare nested int arrays -> groups with canonical=first
+    assert MJ([[2, 0, 1], [3]], "x") == {"groups": [
+        {"canonical": 2, "members": [2, 0, 1]}, {"canonical": 3, "members": [3]}]}
     # dict passthrough
     assert MJ({"groups": []}, "x") == {"groups": []}
     # None / junk -> loud abort

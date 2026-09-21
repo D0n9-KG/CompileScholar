@@ -66,6 +66,11 @@ def _must_json(obj, ctx: str):
                 return {"assignments": obj}
             if any("family" in x for x in obj):
                 return {"families": obj}
+        # species 5 (431-run, 184 degraded dedup blocks): bare nested int
+        # arrays [[0,1],[2]] = groups as member-index lists, canonical=first
+        if obj and all(isinstance(x, list) and x
+                       and all(isinstance(i, int) for i in x) for x in obj):
+            return {"groups": [{"canonical": x[0], "members": x} for x in obj]}
         raise ChannelDeadError(
             f"{ctx}: bare list with unrecognized element shape — aborting")
     if not isinstance(obj, dict):
