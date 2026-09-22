@@ -24,7 +24,7 @@ slot:
 registry:
   tau1: 0.84                         # 门①校准（遗产 973 表面名真值：阻塞召回 0.896）
   tau2: 0.80                         # 跨轮合并阈值
-  block_workers: 6                   # par_map 线程数
+  block_workers: 12                  # par_map 线程数（09-22 深夜：registry_growth 长调用 3min/块，6 路在 96 路容量下严重吃不满；混合负载下取 12 留长调用余量）
 
 paths:
   # 相对仓库根；实际路径由 config.load() 解析为绝对路径
