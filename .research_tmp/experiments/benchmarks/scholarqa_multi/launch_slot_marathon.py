@@ -40,21 +40,21 @@ def main():
 
     cmd = [sys.executable, os.path.join(BASE, "run_stage.py"), "--name", "slot",
            "--",
-           sys.executable, "-m", "kb_compiler.records.slot",
+           sys.executable, "-m", "kb_compiler.records.deep_extract",
            "--texts", os.path.join(BASE, "corpus", "texts"),
            "--manifest", os.path.join(BASE, "corpus", "manifest.json"),
            "--cards", os.path.join(KB, "cards.json"),
            "--registry", os.path.join(KB, "registry.json"),
            "--vocab", os.path.join(KB, "dim_vocab_v1.json"),
            "--out", OUT,
-           "--model", "local:Qwen3.8-27B",
+           "--model", "{MODEL}",
            # concurrency fix (09-22 02:00 diagnosis): per-paper chunk calls
            # were SERIAL (chunk-threads=1 default) -- smoke measured 32k
            # tok/min vs the probed 384k peak @32 in-flight. 11 papers x 3
            # chunk threads = 33 ~= the 32-call semaphore ceiling; single-paper
            # wall clock shrinks ~3x. The 110k absence pass is a single call
            # (physical budget, not parallelizable) and is unaffected.
-           "--workers", "11", "--chunk-threads", "3"]
+           "--pool", "24"]
     print("[marathon] launching:", " ".join(cmd[-8:]), flush=True)
     rc = subprocess.run(cmd, cwd=BASE).returncode
     print(f"[marathon] run_stage rc={rc}", flush=True)

@@ -486,7 +486,15 @@ class KBTools:
                             return
                 except Exception:
                     pass  # fall through to rebuild
-        embs, provider = embed_texts_robust(texts)
+        # KB_EMBED_PROVIDER=local (2026-09-23 Multi-108): local-only arm purity
+        # — embed the record cache with the GPUStack qwen3-embedding-8b instead
+        # of the paratera/cst tiers. Same-model-same-dim discipline holds: this
+        # branch tags "local-qwen3" and search() embeds queries the same way.
+        if os.environ.get("KB_EMBED_PROVIDER", "") == "local":
+            from kb_infra.embedding import embed_local
+            embs, provider = embed_local(texts), "local-qwen3"
+        else:
+            embs, provider = embed_texts_robust(texts)
         if embs is None:
             raise RuntimeError("embedding providers both failed (honest degrade: search unavailable)")
         self._emb_cache, self._emb_texts, self._emb_provider = embs, metas, provider
@@ -549,11 +557,13 @@ class KBTools:
         self._ensure_embeddings()
         import sys, os
         sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-        from kb_infra.embedding import embed_texts_robust, embed_cst
+        from kb_infra.embedding import embed_texts_robust, embed_cst, embed_local
         from kb_infra.llm import cosine_sim
         # query MUST use the same provider as the cache (dim discipline)
         if self._emb_provider == "cst-qwen3":
             qe = embed_cst([query])[0]
+        elif self._emb_provider == "local-qwen3":
+            qe = embed_local([query])[0]
         else:
             embs, prov = embed_texts_robust([query])
             if prov != self._emb_provider:

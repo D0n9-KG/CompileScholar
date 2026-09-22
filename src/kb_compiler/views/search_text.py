@@ -106,11 +106,15 @@ class TextSearchIndex:
     def _vector_rank(self, query: str, depth: int = 50) -> list[tuple[int, float]]:
         sys.path.insert(0, os.path.dirname(os.path.dirname(
             os.path.dirname(os.path.abspath(__file__)))))
-        from kb_infra.embedding import embed_cst
+        from kb_infra.embedding import embed_cst, embed_local
         from kb_infra.llm import cosine_sim
-        if self.meta.get("provider") != "cst-qwen3":
-            raise RuntimeError(f"provider mismatch: index={self.meta.get('provider')}")
-        qe = embed_cst([query[:300]])[0]
+        # KB_EMBED_PROVIDER=local (2026-09-23 Multi-108): local-only arm purity;
+        # provider tag in index meta decides the query embedder (dim discipline)
+        prov = self.meta.get("provider")
+        if prov not in ("cst-qwen3", "local-qwen3"):
+            raise RuntimeError(f"provider mismatch: index={prov}")
+        qe = (embed_local([query[:300]])[0] if prov == "local-qwen3"
+              else embed_cst([query[:300]])[0])
         sims = sorted(((cosine_sim(qe, e), i) for i, e in enumerate(self.embs)),
                       key=lambda x: -x[0])[:depth]
         return [(i, s) for s, i in sims]
@@ -162,10 +166,15 @@ class TextSearchIndex:
                     break
         sys.path.insert(0, os.path.dirname(os.path.dirname(
             os.path.dirname(os.path.abspath(__file__)))))
-        from kb_infra.embedding import embed_cst
+        from kb_infra.embedding import embed_cst, embed_local
         print(f"[search_text] embedding {len(chunks)} chunks "
               f"({len(os.listdir(texts_dir))} papers)...", flush=True)
-        embs = embed_cst([c["text"][:3000] for c in chunks])
+        if os.environ.get("KB_EMBED_PROVIDER", "") == "local":
+            embs = embed_local([c["text"][:3000] for c in chunks])
+            provider = "local-qwen3"
+        else:
+            embs = embed_cst([c["text"][:3000] for c in chunks])
+            provider = "cst-qwen3"
         with open(os.path.join(index_dir, "chunks.jsonl"), "w",
                   encoding="utf-8") as f:
             for c in chunks:
@@ -173,7 +182,7 @@ class TextSearchIndex:
         with open(os.path.join(index_dir, "emb.bin"), "wb") as f:
             array("f", (x for e in embs for x in e)).tofile(f)
         json.dump({"n_chunks": len(chunks), "dim": len(embs[0]),
-                   "provider": "cst-qwen3", "chunk_chars": chunk_chars,
+                   "provider": provider, "chunk_chars": chunk_chars,
                    "overlap": overlap},
                   open(os.path.join(index_dir, "meta.json"), "w",
                        encoding="utf-8"))

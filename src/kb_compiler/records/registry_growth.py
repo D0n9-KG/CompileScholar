@@ -79,13 +79,21 @@ def _map_batch(batch: list[dict], registry_lines: str, model: str) -> list:
         f"[{i}] {s['surface']} | papers={','.join(s['papers'][:3])} | "
         f"ctx={','.join(s['contexts'][:2])}" for i, s in enumerate(batch))
     # IL-P1 (pilot): salvage tier ON — batch-1 of PS16 run lost 120 surfaces to
-    # output truncation (3x parse fail, unassigned fallback flood); salvage_json_records
-    # recovers truncated arrays, exactly its design purpose.
+    # output truncation (3x parse fail, unassigned fallback flood); salvage
+    # recovers the complete prefix. 2026-09-23 run5 forensics: salvage was
+    # silently empty for assignment-shaped output (only matched "kind") —
+    # now key/wrapper-generalized. fail_dump captures the FULL raw of every
+    # unparseable response (even when salvage recovers) — the previous debug
+    # capture capped at 2000 chars showed a clean head and hid the tail.
     from .registry import _must_json
-    obj = _must_json(call_json(MAP_PROMPT.replace("{registry_lines}", registry_lines)
-                               .replace("{queue_lines}", queue_lines),
-                               model, max_tokens=12000, retries=3, salvage=True),
-                     "round2 mapping batch")
+    obj = _must_json(call_json(
+        MAP_PROMPT.replace("{registry_lines}", registry_lines)
+        .replace("{queue_lines}", queue_lines),
+        model, max_tokens=12000, retries=3, salvage=True,
+        salvage_key="i", salvage_wrapper="assignments",
+        fail_dump="C:/Users/D0n9/Desktop/CompileScholar/.research_tmp/"
+                  "experiments/benchmarks/scholarqa_multi/kb/forensic_map_fail.txt"),
+        "round2 mapping batch")
     return obj.get("assignments") or []
 
 
@@ -136,7 +144,8 @@ def _build_chunks(queue, canon_list, embed_cache_dir=None,
 
 
 def run_round2(registry: dict, queue: list[dict], model: str,
-               embed_cache_dir: str | None = None):
+               embed_cache_dir: str | None = None,
+               checkpoint_dir: str | None = None):
     canon_list = sorted({e["canonical"] for e in registry["entities"]})
     ent_by_canon: dict[str, dict] = {}
     for e in registry["entities"]:
@@ -152,8 +161,46 @@ def run_round2(registry: dict, queue: list[dict], model: str,
     # and the human arbitration queue, never silently dropped)
     from .common import par_map
 
+    # chunk WAL (2026-09-23): this stage died 5x overnight; each death lost
+    # ALL mapping calls (~4800 completion tokens x surviving chunks). Chunks
+    # are deterministic from (registry, records) inputs — validated against
+    # first surface + size before reuse, stale rows ignored.
+    wal_path = None
+    wal_done: dict[int, list] = {}
+    _wal_append = None
+    if checkpoint_dir:
+        import threading
+        os.makedirs(checkpoint_dir, exist_ok=True)
+        wal_path = os.path.join(checkpoint_dir, "registry_growth_round2.wal.jsonl")
+        _wal_lock = threading.Lock()
+
+        def _wal_append(bn: int, n: int, first: str, out: list):
+            with _wal_lock:
+                with open(wal_path, "a", encoding="utf-8") as f:
+                    f.write(json.dumps({"bn": bn, "n": n, "first": first,
+                                        "out": out}, ensure_ascii=False) + "\n")
+
+        if os.path.exists(wal_path):
+            with open(wal_path, encoding="utf-8") as f:
+                for line in f:
+                    try:
+                        rec = json.loads(line)
+                    except Exception:
+                        continue
+                    bn = rec.get("bn")
+                    if (isinstance(bn, int) and 0 <= bn < len(chunks)
+                            and rec.get("n") == len(chunks[bn][0])
+                            and rec.get("first") == queue[chunks[bn][0][0]]["surface"]):
+                        wal_done[bn] = rec["out"]
+            if wal_done:
+                print(f"round2 WAL: resuming, {len(wal_done)}/{len(chunks)} "
+                      f"chunks already mapped", flush=True)
+
     def _run_chunk(item):
         bn, (ch, registry_lines) = item
+        if bn in wal_done:
+            out = wal_done[bn]
+            return bn, len(out), -1, out
         batch = [queue[i] for i in ch]
         got = _map_batch(batch, registry_lines, model)
         by_i_batch = {}
@@ -167,6 +214,8 @@ def run_round2(registry: dict, queue: list[dict], model: str,
             a["_qidx"] = ch[i]
             out.append(a)
         n_assigned = sum(1 for i in range(len(batch)) if i in by_i_batch)
+        if _wal_append:
+            _wal_append(bn, len(batch), batch[0]["surface"], out)
         return bn, len(batch), n_assigned, out
 
     assigns = []
@@ -207,9 +256,14 @@ def run_round2(registry: dict, queue: list[dict], model: str,
             prop_lines = "\n".join(f"[{pos}] {prop_keys[gi]}"
                                    for pos, gi in enumerate(pb))
             from .registry import _must_json
-            cobj = _must_json(call_json(_CONSOL_PROMPT + prop_lines, model,
-                                        max_tokens=8000, retries=2),
-                              "round2 proposal consolidation")
+            cobj = _must_json(call_json(
+                _CONSOL_PROMPT + prop_lines, model,
+                max_tokens=8000, retries=2, salvage=True,
+                salvage_key="members", salvage_wrapper="groups",
+                fail_dump="C:/Users/D0n9/Desktop/CompileScholar/.research_tmp/"
+                          "experiments/benchmarks/scholarqa_multi/kb/"
+                          "forensic_consol_fail.txt"),
+                "round2 proposal consolidation")
             return [(g, pb) for g in (cobj.get("groups") or [])]
 
         with ThreadPoolExecutor(max_workers=12) as cex:
@@ -311,10 +365,14 @@ def main():
     cache = args.embed_cache or os.path.join(args.out_dir, "embed_cache")
     os.makedirs(cache, exist_ok=True)
     registry2, report = run_round2(registry, queue, args.model,
-                                   embed_cache_dir=cache)
+                                   embed_cache_dir=cache,
+                                   checkpoint_dir=args.out_dir)
     v = registry2["version"]
     save_json(registry2, f"{args.out_dir}/registry_v{v}.json")
     save_json(report, f"{args.out_dir}/registry_growth_report_v{v}.json")
+    wal = os.path.join(args.out_dir, "registry_growth_round2.wal.jsonl")
+    if os.path.exists(wal):
+        os.remove(wal)
     print(f"registry v{v}: matched={len(report['matched'])} "
           f"new={len(report['new'])} fallback={len(report['unassigned_fallback'])} "
           f"| total entities={len(registry2['entities'])}", flush=True)

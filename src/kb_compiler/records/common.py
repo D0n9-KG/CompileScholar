@@ -42,11 +42,17 @@ def route_model(spec: str):
     return "paratera", spec
 
 
-def salvage_json_records(raw: str):
+def salvage_json_records(raw: str, item_key: str = "kind",
+                         wrapper_key: str = "records"):
     """Truncation salvage (deterministic): extract complete brace-balanced
-    objects containing "kind" from an unparseable/truncated response.
+    objects containing item_key from an unparseable/truncated response.
     Measured need 2026-09-05: DSF memory-blurt on a famous paper produced
-    37k chars, truncated mid-JSON, whole chunk lost without salvage."""
+    37k chars, truncated mid-JSON, whole chunk lost without salvage.
+    item_key/wrapper_key generalize the original records-shape ("kind" ->
+    "records") to other contracts, e.g. round2 mapping assignments
+    ("i" -> "assignments") — 2026-09-23 run5 forensics: salvage silently
+    returned nothing for assignment-shaped output because it only matched
+    "kind"."""
     if not raw:
         return None
     objs, depth, in_str, esc = [], 0, False, False
@@ -75,33 +81,57 @@ def salvage_json_records(raw: str):
                 if open_depth > 1:
                     continue
                 blob = raw[start:i + 1]
-                if '"kind"' not in blob:
+                if f'"{item_key}"' not in blob:
                     continue
                 try:
                     o = json.loads(blob)
                 except Exception:
                     continue
-                if isinstance(o, dict) and o.get("kind"):
+                if isinstance(o, dict) and o.get(item_key) is not None:
                     objs.append(o)
-    return {"records": objs} if objs else None
+    return {wrapper_key: objs} if objs else None
+
+
+def _dump_raw(path: str, attempt: int, raw: str | None, cap: int = 60000):
+    """Forensic capture (append-only): full raw output of a response that
+    failed direct parse — for post-hoc contract analysis. 2026-09-23 lesson:
+    the run5 debug capture truncated at 2000 chars and the visible head looked
+    like clean JSON, hiding the real tail defect. Per-dump cap bounds growth;
+    hard file cap 5MB stops unbounded append on salvage-recovered runs."""
+    try:
+        if os.path.exists(path) and os.path.getsize(path) > 5 * 1024 * 1024:
+            return
+        import time as _time
+        with open(path, "a", encoding="utf-8") as f:
+            f.write(f"=== attempt {attempt} ts={_time.strftime('%m-%d %H:%M:%S')} "
+                    f"len={len(raw or '')} ===\n")
+            f.write((raw or "")[:cap] + "\n")
+    except OSError:
+        pass
 
 
 def call_json(prompt: str, model_spec: str, max_tokens: int = 8000,
-              retries: int = 3, salvage: bool = False):
+              retries: int = 3, salvage: bool = False,
+              salvage_key: str = "kind", salvage_wrapper: str = "records",
+              fail_dump: str | None = None):
     """LLM call -> parsed JSON (balanced-extract parser) or None. Retries on
-    empty/unparseable. salvage=True adds the truncation-salvage tier.
-    Never raises."""
+    empty/unparseable. salvage=True adds the truncation-salvage tier
+    (item_key/wrapper_key select the contract shape). fail_dump path gets
+    every raw that failed direct parse (full capture, even when salvage
+    recovers — diagnosis without blocking progress). Never raises."""
     prov, model = route_model(model_spec)
     fn = {"cst": call_cst, "local": call_local,
           "intern": call_intern}.get(prov, call_paratera)
-    for _ in range(retries):
+    for _att in range(retries):
         raw = fn(prompt, model=model, max_tokens=max_tokens,
                  temperature=0.0, enable_thinking=False)
         obj = parse_json_response(raw)
         if obj is not None:
             return obj
+        if fail_dump:
+            _dump_raw(fail_dump, _att, raw)
         if salvage:
-            obj = salvage_json_records(raw)
+            obj = salvage_json_records(raw, salvage_key, salvage_wrapper)
             if obj:
                 return obj
     return None

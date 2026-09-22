@@ -1,0 +1,124 @@
+{
+ "git": {
+  "sha": "741c4641874390bfec8e08a3d9ed2cca7bddceb4",
+  "dirty_files": [
+   "M .research_tmp/experiments/benchmarks/scholarqa_multi/launch_slot_marathon.py",
+   " M build.py",
+   "?? .research_tmp/experiments/benchmarks/scholarqa_multi/baselines/",
+   "?? .research_tmp/experiments/benchmarks/scholarqa_multi/kb/cards_smoke.json",
+   "?? .research_tmp/experiments/benchmarks/scholarqa_multi/kb/gate3_ab_report_guard1.json",
+   "?? .research_tmp/experiments/benchmarks/scholarqa_multi/kb/gate3_ab_report_guard2.json",
+   "?? .research_tmp/experiments/benchmarks/scholarqa_multi/kb/gate3_ab_report_pre_guard.json",
+   "?? .research_tmp/experiments/benchmarks/scholarqa_multi/kb/gate3_regression_report.json",
+   "?? .research_tmp/experiments/benchmarks/scholarqa_multi/kb/gate3_singlecall_diag.json",
+   "?? .research_tmp/experiments/benchmarks/scholarqa_multi/kb/notation.json",
+   "?? .research_tmp/experiments/benchmarks/scholarqa_multi/kb/notation_rejected.json",
+   "?? .research_tmp/experiments/benchmarks/scholarqa_multi/kb/postcheck/",
+   "?? .research_tmp/experiments/benchmarks/scholarqa_multi/kb/records_tables.json",
+   "?? .research_tmp/experiments/benchmarks/scholarqa_multi/kb/records_tables_by_paper.json",
+   "?? .research_tmp/experiments/benchmarks/scholarqa_multi/kb/table_semantic/",
+   "?? build_manifest.json",
+   "?? runs/"
+  ]
+ },
+ "config": {
+  "llm": {
+   "model": "local:Qwen3.8-27B",
+   "provider_allowlist": "local",
+   "local_max_concurrent": 96,
+   "local_sock_timeout": 900,
+   "local_max_attempts": 4,
+   "wall_timeout": 900,
+   "sock_timeout": 600,
+   "intern_soft_cap": 85000000
+  },
+  "slot": {
+   "max_chars": 500000,
+   "pool_size": 64
+  },
+  "registry": {
+   "tau1": 0.84,
+   "tau2": 0.8,
+   "block_workers": 6
+  },
+  "paths": {
+   "texts": "C:\\Users\\D0n9\\Desktop\\CompileScholar\\.research_tmp\\experiments\\benchmarks\\scholarqa_multi\\corpus\\texts",
+   "manifest": "C:\\Users\\D0n9\\Desktop\\CompileScholar\\.research_tmp\\experiments\\benchmarks\\scholarqa_multi\\corpus\\manifest.json",
+   "kb_dir": "C:\\Users\\D0n9\\Desktop\\CompileScholar\\.research_tmp\\experiments\\benchmarks\\scholarqa_multi\\kb"
+  }
+ },
+ "stages": {
+  "cards": {
+   "ts": "2026-09-22T13:30:06",
+   "note": "seeded from pre-build.py artifacts (produced by this pipeline, verified by purity gates: marathon 6710869e, repair 64.16M PURE)",
+   "output_hashes": [
+    "0ce49da94b2f8f42"
+   ]
+  },
+  "registry_vocab": {
+   "ts": "2026-09-22T13:30:06",
+   "note": "seeded from pre-build.py artifacts (produced by this pipeline, verified by purity gates: marathon 6710869e, repair 64.16M PURE)",
+   "output_hashes": [
+    "b3528867940a6726",
+    "e85a3e26e33cbabb"
+   ]
+  },
+  "deep_extract": {
+   "ts": "2026-09-22T13:30:06",
+   "note": "seeded from pre-build.py artifacts (produced by this pipeline, verified by purity gates: marathon 6710869e, repair 64.16M PURE)",
+   "output_hashes": [
+    "f1ffb20b0f73ec0a"
+   ]
+  },
+  "postcheck": {
+   "ts": "2026-09-22T17:59:04",
+   "param_fp": "e534f9ef9c6bb367",
+   "code_fp": "5e44d616a776b889",
+   "output_hashes": [
+    "08bcd41ccb689a37"
+   ],
+   "elapsed_s": 8591.4,
+   "check": {
+    "ok": true,
+    "msg": "no check declared"
+   }
+  },
+  "table_extract": {
+   "ts": "2026-09-22T19:07:54",
+   "param_fp": "ec73dbcfe737b97c",
+   "code_fp": "58cb7105ed93ce12",
+   "output_hashes": [
+    "613e78fd7dbb7539"
+   ],
+   "elapsed_s": 33.8,
+   "check": {
+    "ok": true,
+    "msg": "no check declared"
+   }
+  },
+  "notation": {
+   "ts": "2026-09-22T21:49:51",
+   "param_fp": "ebafa7cf9e73e80e",
+   "code_fp": "909eb282497485e4",
+   "output_hashes": [
+    "f4c739bd2eaf125c"
+   ],
+   "elapsed_s": 2057.7,
+   "check": {
+    "ok": true,
+    "msg": "no check declared"
+   }
+  }
+ },
+ "ran": [],
+ "skipped": [
+  "cards",
+  "registry_vocab",
+  "deep_extract",
+  "postcheck",
+  "table_extract",
+  "notation",
+  "registry_growth",
+  "views"
+ ]
+}

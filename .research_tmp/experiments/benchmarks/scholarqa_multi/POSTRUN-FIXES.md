@@ -95,3 +95,25 @@
     外层空转 2h。教训：调容量参数要查全通道约束（LLM/嵌入/写入各有
     自己的超时线），只看单通道吞吐会自伤。已回退保守参数+watchdog
     常驻（用户裁定：自动定时查进程健康，不许再"快跑完才发现早死了"）。
+
+## 09-23 凌晨自治时段新增
+
+24. **registry_growth run5 死因翻案（截断非换行）**：ChannelDead 第四案
+    ——账本 ok=True/~4.8k completion tokens（远未到 12k 上限）但解析全灭；
+    取证捕获只存 2000 字符看到的是干净头部，掩盖了尾部缺陷。真因待
+    fail_dump 全量取证（call_json 新增 fail_dump 参数，60k/次）。已修：
+    salvage_json_records 泛化（原只认 "kind"，assignment 形状永远空手
+    →"i"/"assignments" 键参数化）+ chunk WAL 断点（本阶段一晚死 5 次，
+    每次全丢 ~50 chunks 的映射调用）。**教训：取证截断上限必须远大于
+    疑似病灶位置；取证预循环还让每批白烧双倍调用（已删）。**
+25. **LightRAG WinError-5 管线团灭（01:36 事件）**：lightrag
+    file_atomic.atomic_write 的 os.replace 无重试——Windows 上 Defender/
+    索引器瞬态句柄撞上 rename → IndexFlushError → 整个 ingestion 管线
+    abort，199 篇一瞬标 failed（空 error 字符串）。修复=harness 内
+    monkeypatch 带退避重试的 atomic_write（7 个绑定点全换）。与 PaperQA
+    的 WinError-5 同类=**Windows rename-vs-open-handle 是系统性风险**
+    （见 #20 迁移 Linux 的又一论据）。199 篇已重置 pending 重放（LLM
+    extract 缓存保住，重放只花嵌入+合并）。
+26. **看门狗 build-chain 探针 run_id 脆弱**：探针按 run_id 过滤账本行，
+    换 run_id 重启后读 0 → 必然误报 WEDGED。已改为 run_id 无关的全
+    ok 行计数。

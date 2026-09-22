@@ -32,7 +32,23 @@ from concurrent.futures import ThreadPoolExecutor
 sys.path.insert(0, "C:/Users/D0n9/Desktop/CompileScholar/src")
 sys.path.insert(0, "C:/Users/D0n9/Desktop/CompileScholar/.research_tmp/experiments/stageB")
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-from kb_infra.llm import call_paratera, parse_json_response
+from kb_infra.llm import call_paratera, call_local, parse_json_response
+
+
+def _chat(prompt, model=MODEL, max_tokens=8000, temperature=0.0,
+          enable_thinking=False):
+    """Provider-aware chat for the answer stack (2026-09-23 Multi-108): MODEL
+    may be "local:Qwen3.8-27B" — baselines answer on the same local model, so
+    our arm routes local: specs to call_local (ledger + concurrency gate apply
+    automatically). Bare model names keep the historic paratera path, so PS53
+    reproducibility is untouched."""
+    if isinstance(model, str) and model.startswith("local:"):
+        return call_local(prompt, model=model.split(":", 1)[1],
+                          max_tokens=max_tokens, temperature=temperature,
+                          enable_thinking=enable_thinking)
+    return call_paratera(prompt, model=model, max_tokens=max_tokens,
+                         temperature=temperature,
+                         enable_thinking=enable_thinking)
 from evidence_b2_tools import (build_tools, build_grounding, compact, degenerate,
                                load_questions, gate_entity_args, _cleanq,
                                TOOL_WHITELIST, TOOL_SIGS, REC_INDEX)
@@ -1369,7 +1385,7 @@ def run_question(q, arm, kb, tkb, grounding, glog):
         if book(f"{arm}_step", len(p)):
             traj.append({"budget_abort": True, "at_step": steps})
             break  # prereg total token ceiling hit — honest stop
-        raw = call_paratera(p, model=MODEL, max_tokens=10000,
+        raw = _chat(p, model=MODEL, max_tokens=10000,
                             temperature=0.0, enable_thinking=False) or ""
         if degenerate(raw):
             obs = "(previous step output was corrupted; re-emit the required format)"
@@ -1863,7 +1879,7 @@ def run_question(q, arm, kb, tkb, grounding, glog):
             "Question: " + q["question"] + "\n\nNotes:\n" + (notes_full() or "(empty)")
             + "\n\nOpen gaps:\n" + (gaps or "-"))
         book(f"{arm}_step", len(comp_p))
-        compiled = call_paratera(comp_p, model=MODEL, max_tokens=4000,
+        compiled = _chat(comp_p, model=MODEL, max_tokens=4000,
                                  temperature=0.0, enable_thinking=False) or ""
         gate_info["forced_notes_submit"] = True   # provenance marker kept either way
         if compiled.strip() and not degenerate(compiled):
@@ -1875,7 +1891,7 @@ def run_question(q, arm, kb, tkb, grounding, glog):
             if absence_claimed(answer) and not absence_grounded(traj) \
                     and not gate_info.get("absence_recompile"):
                 gate_info["absence_recompile"] = True
-                recomp = call_paratera(
+                recomp = _chat(
                     comp_p + "\n\nSTRICT CORRECTION PASS: the previous draft (below) asserted "
                     "that the literature/papers do not report or detail certain items. The "
                     "absence channels were never queried, so those assertions are ungrounded. "
@@ -1900,7 +1916,7 @@ def run_question(q, arm, kb, tkb, grounding, glog):
             if miss_c or uns_c:
                 gate_info["compiled_numeric_fail"] = {
                     "missing_nums": miss_c[:10], "unsourced": len(uns_c)}
-                recomp_n = call_paratera(
+                recomp_n = _chat(
                     comp_p + "\n\nSTRICT NUMERIC CORRECTION PASS: the previous "
                     "draft (below) contains numbers that do not appear in the "
                     "note anchors, and/or numeric claim sentences without a "

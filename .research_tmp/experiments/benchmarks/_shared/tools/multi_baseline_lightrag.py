@@ -55,6 +55,51 @@ MODEL = "Qwen3.8-27B"
 CITE_RE = re.compile(r"\[(\d+(?:,\s*\d+)*)\]")
 
 
+def _patch_atomic_write_retry():
+    """WinError-5 class fix (2026-09-23 01:36 incident): lightrag's
+    atomic_write does a bare os.replace(tmp, target) with NO retry. On
+    Windows, a transient handle on the target (Defender real-time scan of the
+    freshly-grown vdb file, indexer, backup) makes the rename fail with
+    access denied -> IndexFlushError -> the WHOLE ingestion pipeline aborts
+    (199 docs failed in one event, all with empty error strings). Retry with
+    backoff absorbs the transient handle window. Patched at every binding
+    site because lightrag modules use from-import (patching the defining
+    module alone rebinds nothing)."""
+    import importlib
+    import lightrag.file_atomic as fa
+    orig = fa.atomic_write
+
+    def retrying(file_name, write_fn, workspace="_"):
+        last = None
+        for att in range(6):
+            try:
+                return orig(file_name, write_fn, workspace)
+            except PermissionError as e:
+                last = e
+                time.sleep(0.5 * (att + 1))
+        raise last
+
+    mods = [fa]
+    # every lightrag module that binds atomic_write via from-import; some
+    # (faiss) carry heavy optional deps — bind what exists, skip what doesn't
+    for sub in ("kg.nano_vector_db_impl", "kg.json_kv_impl",
+                "kg.json_doc_status_impl", "kg.networkx_impl",
+                "kg.faiss_impl", "utils"):
+        try:
+            mods.append(importlib.import_module(f"lightrag.{sub}"))
+        except Exception:
+            pass
+    n = 0
+    for mod in mods:
+        if getattr(mod, "atomic_write", None) is orig:
+            mod.atomic_write = retrying
+            n += 1
+    print(f"[lrag] atomic_write retry patch bound at {n} sites", flush=True)
+
+
+_patch_atomic_write_retry()
+
+
 def _env_local_concurreny():
     # LightRAG's internal concurrency is modest; the call_local semaphore
     # (LOCAL_MAX_CONCURRENT, runner sets 32) is the real guard.

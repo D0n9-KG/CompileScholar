@@ -26,8 +26,10 @@ STALL_LIMIT = 2400  # 40 min without progress = WEDGED
 
 LINES = {
     "build-chain": {
-        "probe": lambda: _ledger_rows(f"{KB}/kb/ledger_build.jsonl",
-                                       run_id="multi-registry_growth"),
+        # probe: any ok-row advance in the shared build ledger (run_id-agnostic
+        # — run ids change per relaunch, a filtered probe reads 0 and false-
+        # alarms WEDGED on every fresh run)
+        "probe": lambda: _ledger_rows(f"{KB}/kb/ledger_build.jsonl"),
         "done": lambda: os.path.exists(f"{KB}/kb/views.json"),
         "match": "registry|build.py|notation|table",
     },

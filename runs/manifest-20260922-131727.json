@@ -1,0 +1,51 @@
+{
+ "git": {
+  "sha": "d1c4db5d37721de3158587c9de939f638729972b",
+  "dirty_files": [
+   "M .research_tmp/experiments/benchmarks/scholarqa_multi/kb/records_slot.json",
+   " M .research_tmp/experiments/benchmarks/scholarqa_multi/launch_slot_marathon.py",
+   "?? .research_tmp/experiments/benchmarks/scholarqa_multi/baselines/",
+   "?? .research_tmp/experiments/benchmarks/scholarqa_multi/kb/cards_smoke.json",
+   "?? .research_tmp/experiments/benchmarks/scholarqa_multi/kb/gate3_ab_report_guard1.json",
+   "?? .research_tmp/experiments/benchmarks/scholarqa_multi/kb/gate3_ab_report_guard2.json",
+   "?? .research_tmp/experiments/benchmarks/scholarqa_multi/kb/gate3_ab_report_pre_guard.json",
+   "?? .research_tmp/experiments/benchmarks/scholarqa_multi/kb/gate3_regression_report.json",
+   "?? .research_tmp/experiments/benchmarks/scholarqa_multi/kb/gate3_singlecall_diag.json",
+   "?? .research_tmp/experiments/benchmarks/scholarqa_multi/kb/repair_pids.txt",
+   "?? build.py",
+   "?? qdump.txt"
+  ]
+ },
+ "config": {
+  "llm": {
+   "model": "local:Qwen3.8-27B",
+   "provider_allowlist": "local",
+   "local_max_concurrent": 32,
+   "local_sock_timeout": 900,
+   "local_max_attempts": 4,
+   "wall_timeout": 900,
+   "sock_timeout": 600,
+   "intern_soft_cap": 85000000
+  },
+  "slot": {
+   "max_chars": 500000,
+   "pool_size": 30
+  },
+  "registry": {
+   "tau1": 0.84,
+   "tau2": 0.8,
+   "block_workers": 6
+  },
+  "paths": {
+   "texts": "C:\\Users\\D0n9\\Desktop\\CompileScholar\\.research_tmp\\experiments\\benchmarks\\scholarqa_multi\\corpus\\texts",
+   "manifest": "C:\\Users\\D0n9\\Desktop\\CompileScholar\\.research_tmp\\experiments\\benchmarks\\scholarqa_multi\\corpus\\manifest.json",
+   "kb_dir": "C:\\Users\\D0n9\\Desktop\\CompileScholar\\.research_tmp\\experiments\\benchmarks\\scholarqa_multi\\kb"
+  }
+ },
+ "stages": {},
+ "ran": [],
+ "skipped": [
+  "deep_extract",
+  "views"
+ ]
+}
