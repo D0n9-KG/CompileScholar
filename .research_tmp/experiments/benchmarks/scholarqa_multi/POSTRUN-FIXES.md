@@ -63,3 +63,8 @@
 18. **纯视觉图表推理**："图3曲线哪个先达峰"类只有 caption 兜。
     修法方向：figure_channel（识图通道）已有模块未集成，VLM 建库
     预算 ~22M 待批。
+19. **postcheck 通道不对称**（用户发现）：五门只检深抽取产物；F24/F35/
+    notation 各带通道内轻闸但无统一终检。修法：postcheck 移到所有通道
+    汇流后（views 前），per-kind 校验表驱动（notation=LaTeX 折叠锚定、
+    表格=单元格锚定——check_record 本就按 kind 分派，架构现成）。
+    顺带把 F24 对 checked 的 dedup 基底依赖改为显式合并语义。
