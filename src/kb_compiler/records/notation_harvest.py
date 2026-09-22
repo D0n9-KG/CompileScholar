@@ -223,10 +223,21 @@ def main():
         title = (title.get("_title") if isinstance(title, dict) else None) or pid
         pid_harvest = []
         pid_symbols = set(existing.get(pid, set()))
-        for bstart in range(0, len(formulas), BATCH_SIZE):
-            batch = formulas[bstart:bstart + BATCH_SIZE]
-            prompt = build_prompt(title, batch)
-            props = llm_harvest(prompt, args.model, args.provider)
+        # batch pool (2026-09-22, same pattern as deep_extract/postcheck):
+        # batch calls are independent, gate is batch-local -> fly all of a
+        # paper's batches concurrently, settle in ORIGINAL order (byte-
+        # comparable to the serial path; the sequential loop measured
+        # ~1 call/min = ~6644/6/60 ≈ 18h extrapolated)
+        all_batches = [(bstart, formulas[bstart:bstart + BATCH_SIZE])
+                       for bstart in range(0, len(formulas), BATCH_SIZE)]
+        from concurrent.futures import ThreadPoolExecutor
+        workers = int(os.environ.get("NOTATION_POOL", "16"))
+        with ThreadPoolExecutor(max_workers=workers) as nex:
+            props_list = list(nex.map(
+                lambda b: llm_harvest(build_prompt(title, b[1]),
+                                      args.model, args.provider),
+                all_batches))
+        for (bstart, batch), props in zip(all_batches, props_list):
             if props is None:
                 rejected.append({"pid": pid, "batch": bstart, "reason": "llm_unparseable"})
                 continue
