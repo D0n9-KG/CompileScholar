@@ -58,17 +58,19 @@ LOCAL_BASE = os.environ.get("LOCAL_BASE_URL", "").rstrip("/")
 
 
 def _env_from_dotenv():
-    """Read .env values litellm needs (LOCAL_BASE_URL/API_KEY) if not set."""
-    if LOCAL_BASE:
-        return
+    """Load .env into os.environ for the keys this harness needs. PaperQA's
+    litellm path reads os.environ directly (kb_infra's ENV dict does NOT
+    propagate to it — smoke-3 fix: EMBEDDING_MODEL was None -> model
+    'openai/None' -> 404)."""
     env_path = os.path.join(_SRC, "..", ".env")
+    wanted = ("LOCAL_BASE_URL", "LOCAL_API_KEY", "EMBEDDING_MODEL")
     if os.path.exists(env_path):
         for line in open(env_path, encoding="utf-8"):
             line = line.strip()
             if "=" in line and not line.startswith("#"):
                 k, v = line.split("=", 1)
                 k, v = k.strip(), v.strip()
-                if k in ("LOCAL_BASE_URL", "LOCAL_API_KEY"):
+                if k in wanted:
                     os.environ.setdefault(k, v)
 
 
@@ -86,9 +88,26 @@ def dockey_stem_map(docs_dir: str = DOCS) -> dict:
 def install_litellm_ledger_hooks():
     """Log every litellm chat/embedding call into the arm ledger in the
     kb_infra _log_call format (ts/provider/model/ok/usage). Purity check
-    then sees exactly the pairs we whitelist."""
+    then sees exactly the pairs we whitelist.
+
+    Also registers our custom model names in litellm.model_cost (smoke-6):
+    lmi's embedding._truncate_if_large reads
+    model_cost[name]["max_input_tokens"]; an unknown model name returns
+    None from the dict-writer (None * 3 -> TypeError inside the embedding
+    TaskGroup), which surfaced as 'unhandled errors in a TaskGroup' and a
+    truncated index. Registering a max_input_tokens entry fixes the crash
+    AND enables correct truncation for our 4096-dim embedder."""
     import litellm
     from kb_infra.llm import _log_call
+
+    for _n in ("openai/qwen3-embedding-8b-local", "qwen3-embedding-8b-local"):
+        # full entry incl. max_input_tokens (smoke-6b: the first fix omitted
+        # it -> lmi read model_cost[name]["max_input_tokens"] -> KeyError
+        # 'max_input_tokens' — same TaskGroup, third face of the same bug)
+        litellm.model_cost[_n] = {
+            "max_tokens": 8192, "max_input_tokens": 8192,
+            "input_cost_per_token": 0.0, "output_cost_per_token": 0.0,
+            "litellm_provider": "openai", "mode": "embedding"}
 
     def _cb(kwargs, completion_response=None, start_time=None, end_time=None):
         try:
@@ -123,28 +142,36 @@ def install_litellm_ledger_hooks():
 
 def build_settings():
     from paperqa import Settings
+    # smoke-5 fix: read endpoints at CALL time, not import time. The old
+    # module-level LOCAL_BASE was '' when .env wasn't in os.environ at import
+    # -> litellm treated api_base='' as unset -> hit api.openai.com with the
+    # GPUStack key -> AuthenticationError -> every index citation-peek died
+    # -> truncated files.zip (misdiagnosed twice as an index/zlib bug).
+    base = os.environ.get("LOCAL_BASE_URL", LOCAL_BASE).rstrip("/")
+    if not base:
+        raise RuntimeError("LOCAL_BASE_URL unresolved — call _env_from_dotenv() first")
     key = os.environ.get("LOCAL_API_KEY", "local")
-    qwen_params = {"model": f"openai/{MODEL}", "api_base": LOCAL_BASE,
+    qwen_params = {"model": f"openai/{MODEL}", "api_base": base,
                    "api_key": key, "temperature": 0.0, "max_tokens": 6000,
                    "timeout": 300,
                    "extra_body": {"chat_template_kwargs":
                                   {"enable_thinking": False}}}
-    emb_params = {"model": f"openai/{EMBED_MODEL}", "api_base": LOCAL_BASE,
-                  "api_key": key, "timeout": 120,
-                  "dimensions": None}
-    emb_params.pop("dimensions")
+    emb_model = os.environ.get("EMBEDDING_MODEL", EMBED_MODEL)
+    emb_params = {"model": f"openai/{emb_model}", "api_base": base,
+                  "api_key": key, "timeout": 120}
+    emb_params.pop("dimensions", None) if "dimensions" in emb_params else None
     llm_cfg = {"model_list": [
         {"model_name": f"openai/{MODEL}", "litellm_params": qwen_params},
         {"model_name": MODEL, "litellm_params": qwen_params}]}
     emb_cfg = {"model_list": [
-        {"model_name": f"openai/{EMBED_MODEL}", "litellm_params": emb_params},
-        {"model_name": EMBED_MODEL, "litellm_params": emb_params}]}
+        {"model_name": f"openai/{emb_model}", "litellm_params": emb_params},
+        {"model_name": emb_model, "litellm_params": emb_params}]}
     settings = Settings(
         llm=f"openai/{MODEL}", llm_config=llm_cfg,
         summary_llm=f"openai/{MODEL}", summary_llm_config=llm_cfg,
         agent={"agent_llm": f"openai/{MODEL}",
                "agent_llm_config": llm_cfg},
-        embedding=f"openai/{EMBED_MODEL}", embedding_config=emb_cfg,
+        embedding=f"openai/{emb_model}", embedding_config=emb_cfg,
         verbosity=0, parsing={"use_doc_details": False})
     # home-proven index config (PS-era smoke v1 bug lesson)
     settings.agent.index.paper_directory = DOCS
@@ -152,6 +179,11 @@ def build_settings():
     settings.agent.index.use_absolute_paper_directory = True
     settings.agent.index.sync_with_paper_directory = True
     settings.agent.index.recurse_subdirectories = False
+    # smoke-4 fix: indexing 430 files with the default concurrency=5 +
+    # batch_size=1 can leave files.zip half-written if the process dies
+    # mid-index (measured: 9KB truncated zip -> 107 questions instant-died on
+    # 'Error -5 decompressing'). Batch commits make the index durable sooner.
+    settings.agent.index.batch_size = 10
     return settings
 
 
