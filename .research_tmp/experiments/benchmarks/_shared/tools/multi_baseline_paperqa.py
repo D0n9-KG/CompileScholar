@@ -232,8 +232,19 @@ def build_settings():
     # home-proven index config (PS-era smoke v1 bug lesson)
     settings.agent.index.paper_directory = DOCS
     settings.agent.index.index_directory = INDEX_DIR
-    settings.agent.index.use_absolute_paper_directory = True
-    settings.agent.index.sync_with_paper_directory = True
+    # 2026-09-23 03:25 root fix: use_absolute_paper_directory=True stores
+    # ABSOLUTE file_location keys in files.zip while the sync comparison set
+    # is ALWAYS relative filenames — structurally every indexed file reads
+    # as "extra" and each process restart attempted remove-all (index eroded
+    # 430->360 across tonight's restarts, with WinError-5 races on the zip
+    # rewrites). Relative keys make the comparison coherent.
+    settings.agent.index.use_absolute_paper_directory = False
+    # sync=False (default): index is complete and frozen; no add/remove
+    # churn. PQA_SYNC=1 (env) enables a one-shot heal pass: re-adds missing
+    # files (relative-vs-relative comparison now matches, so nothing is
+    # removed). Answering runs must NOT set it.
+    settings.agent.index.sync_with_paper_directory = \
+        os.environ.get("PQA_SYNC", "0") == "1"
     settings.agent.index.recurse_subdirectories = False
     # smoke-4 fix: indexing 430 files with the default concurrency=5 +
     # batch_size=1 can leave files.zip half-written if the process dies
