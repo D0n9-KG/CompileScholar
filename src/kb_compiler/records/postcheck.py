@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 import unicodedata
@@ -443,6 +444,7 @@ def check_paper(pid, payload, text, vocab_sets, model, dry=False, triage=None,
     normc, normf = nc, nf
     stats = Counter()
     dropped, warnings = [], []
+    repair_jobs = []
     if True:
         out_recs = []
         for rec in payload.get("records", []):
@@ -466,25 +468,48 @@ def check_paper(pid, payload, text, vocab_sets, model, dry=False, triage=None,
                                 "triage": "skipped_repair"})
                 continue
             v_orig = list(v)  # FG-archive fix (2026-09-10): dropped entries used to
-            fixed = repair_record(rec, v, text, model)  # pair the ORIGINAL record with
-            if fixed:  # the POST-REPAIR violations — misattribution found in FG1
-                v2, w2, loc2 = check_record(fixed, normc, idx_c, normf, idx_f, vocab_sets,
-                                             lenient_nf=lenient_nf)  # diagnosis (5/25 'passes_now' were this artifact).
-                if not v2:
-                    fixed["repair_history"] = {"violations": v}
-                    if loc2:
-                        fixed["loc"] = loc2
-                    stats["repaired"] += 1
-                    out_recs.append(fixed)
+            # (collected for the parallel repair pass below — same repair
+            # semantics, but all LLM calls for the paper fly concurrently;
+            # the sequential one-at-a-time loop measured 1.8 min/paper and
+            # extrapolated to ~13h over the 430-paper corpus)
+            repair_jobs.append((rec, v, v_orig, text))
+            continue
+
+        if repair_jobs and not dry:
+            from concurrent.futures import ThreadPoolExecutor
+            workers = int(os.environ.get("POSTCHECK_REPAIR_WORKERS", "12"))
+            with ThreadPoolExecutor(max_workers=workers) as rex:
+                fixed_list = list(rex.map(
+                    lambda job: repair_record(job[0], job[1], job[3], model),
+                    repair_jobs))
+            # re-check in ORIGINAL record order (output byte-comparable to
+            # the sequential path; FG1 misattribution guard preserved)
+            fixed_by_id = {id(job[0]): fx for job, fx in zip(repair_jobs, fixed_list)}
+            for rec, v, v_orig, text in repair_jobs:
+                fixed = fixed_by_id[id(rec)]
+                if fixed:
+                    v2, w2, loc2 = check_record(fixed, normc, idx_c, normf, idx_f,
+                                                 vocab_sets, lenient_nf=lenient_nf)
+                    if not v2:
+                        fixed["repair_history"] = {"violations": v}
+                        if loc2:
+                            fixed["loc"] = loc2
+                        stats["repaired"] += 1
+                        out_recs.append(fixed)
+                        continue
+                    stats["dropped"] += 1
+                    dropped.append({"paper_id": pid, "record": rec,
+                                    "violations": v_orig,
+                                    "violations_after_repair": v2,
+                                    "record_after_repair": fixed})
                     continue
                 stats["dropped"] += 1
+                dropped.append({"paper_id": pid, "record": rec, "violations": v_orig})
+        elif repair_jobs and dry:
+            for rec, v, v_orig, _t in repair_jobs:
+                stats["would_repair"] += 1
                 dropped.append({"paper_id": pid, "record": rec,
-                                "violations": v_orig,
-                                "violations_after_repair": v2,
-                                "record_after_repair": fixed})
-                continue
-            stats["dropped"] += 1
-            dropped.append({"paper_id": pid, "record": rec, "violations": v_orig})
+                                "violations": v, "dry": True})
         for ov in payload.get("overflow", []):
             stats["overflow"] += 1
         checked_payload = {"records": out_recs,
@@ -497,13 +522,26 @@ def check_paper(pid, payload, text, vocab_sets, model, dry=False, triage=None,
 
 
 def run_postcheck(records_by_paper, texts, vocab, model, dry=False, triage=None,
-                  lenient_quote_channels=False, skip_pids=None):
+                  lenient_quote_channels=False, skip_pids=None,
+                  incremental_out_dir=None):
     """Batch driver = check_paper over every paper. skip_pids (set): papers
     already checked by the inline path — the stage run then only processes
-    the remainder (paper-level resume; inline+stage coexistence)."""
+    the remainder (paper-level resume; inline+stage coexistence).
+    incremental_out_dir: when given, records_checked.json/dropped.json are
+    saved after EVERY paper (crash-safe resume via skip_pids on relaunch —
+    the 430-paper stage used to lose everything on restart)."""
     vocab_sets = build_vocab_sets(vocab)
     stats = Counter()
     checked, dropped, warnings = {}, [], []
+    if incremental_out_dir:
+        prior = load_json(f"{incremental_out_dir}/records_checked.json", default={}) or {}
+        prior_dropped = load_json(f"{incremental_out_dir}/dropped.json", default=[]) or []
+        checked.update(prior)
+        dropped.extend(prior_dropped)
+        skip_pids = (skip_pids or set()) | {p for p in prior if p in records_by_paper}
+        if skip_pids:
+            print(f"postcheck: resuming, {len(skip_pids)} papers already checked",
+                  flush=True)
     for pid, payload in records_by_paper.items():
         if skip_pids and pid in skip_pids:
             continue
@@ -517,6 +555,9 @@ def run_postcheck(records_by_paper, texts, vocab, model, dry=False, triage=None,
             lenient_nf=lenient_nf)
         checked[pid] = checked_payload
         dropped.extend(drops)
+        if incremental_out_dir and not dry:
+            save_json(checked, f"{incremental_out_dir}/records_checked.json")
+            save_json(dropped, f"{incremental_out_dir}/dropped.json")
         warnings.extend(warns)
         stats.update(delta)
     return checked, dropped, warnings, dict(stats)
@@ -546,8 +587,9 @@ def main():
         print(f"postcheck: {len(skip_pids)} papers already checked inline — "
               f"skipping (paper-level resume)", flush=True)
     checked, dropped, warnings, stats = run_postcheck(
-        records, texts, vocab, args.model, dry=args.dry, skip_pids=skip_pids)
-    checked.update({p: prior[p] for p in skip_pids})
+        records, texts, vocab, args.model, dry=args.dry, skip_pids=skip_pids,
+        incremental_out_dir=None if args.dry else args.out_dir)
+    checked.update({p: prior[p] for p in skip_pids if p in prior})
     dropped = prior_dropped + dropped
     tag = "_dry" if args.dry else ""
     save_json(checked, f"{args.out_dir}/records_checked{tag}.json")
