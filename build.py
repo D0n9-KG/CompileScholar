@@ -276,16 +276,14 @@ def build(targets: list[str], force: set[str], dry: bool, exp: str | None):
             sys.exit(2)
 
     ran, skipped = [], []
-    for st in stages:
-        if st.name in force:
-            fresh = False
-        else:
-            fresh = stage_fresh(st, cfg, manifest)
-        status = "skip(fresh)" if fresh else ("FORCE" if st.name in force else "run")
-        print(f"[{st.name:16s}] {status:12s} {st.desc}")
-        if dry or fresh:
-            skipped.append(st.name)
-            continue
+
+    import threading as _th
+
+    _manifest_lock = _th.Lock()
+
+    def _run_stage(st) -> bool:
+        """Execute one stage (subprocess); returns True on success.
+        Thread-safe: manifest writes under a lock (parallel groups)."""
         cmd = _format_cmd(st, cfg)
         env = project_env(cfg)
         env["PYTHONIOENCODING"] = "utf-8"
@@ -299,19 +297,80 @@ def build(targets: list[str], force: set[str], dry: bool, exp: str | None):
         if p.returncode != 0:
             print(f"[{st.name}] FAILED rc={p.returncode} — STOP "
                   f"(resume-safe; fix then rerun build.py)", file=sys.stderr)
-            sys.exit(p.returncode)
+            return False
         ok, msg = run_check(st)
-        manifest["stages"][st.name] = {
-            "ts": time.strftime("%Y-%m-%dT%H:%M:%S"),
-            "param_fp": _param_fingerprint(st, cfg),
-            "code_fp": _code_fingerprint(st),
-            "output_hashes": [sha256_file(o) if o.exists() else None for o in outs],
-            "elapsed_s": round(dt, 1), "check": {"ok": ok, "msg": msg},
-        }
-        manifest_path.write_text(json.dumps(manifest, indent=1, ensure_ascii=False),
-                                 encoding="utf-8")
+        with _manifest_lock:
+            manifest["stages"][st.name] = {
+                "ts": time.strftime("%Y-%m-%dT%H:%M:%S"),
+                "param_fp": _param_fingerprint(st, cfg),
+                "code_fp": _code_fingerprint(st),
+                "output_hashes": [sha256_file(o) if o.exists() else None for o in outs],
+                "elapsed_s": round(dt, 1), "check": {"ok": ok, "msg": msg},
+            }
+            manifest_path.write_text(json.dumps(manifest, indent=1, ensure_ascii=False),
+                                     encoding="utf-8")
         ran.append(st.name)
         print(f"[{st.name:16s}] done {dt:.0f}s | check {'PASS' if ok else 'FAIL: ' + msg}")
+        return True
+
+    def _stage_fresh(st) -> bool:
+        return st.name not in force and stage_fresh(st, cfg, manifest)
+
+    # ---- scheduling: dependency groups fly in PARALLEL; group boundaries
+    # and ungrouped stages run sequentially in list order ----
+    from concurrent.futures import ThreadPoolExecutor
+    group_names = {n: [s for s in STAGES if s.name in names
+                       and (not targets or s.name in targets)]
+                   for n, names in PARALLEL_GROUPS.items()}
+    in_a_group = {name for names in PARALLEL_GROUPS.values() for name in names}
+
+    i = 0
+    order = [s.name for s in stages]
+    while i < len(order):
+        name = order[i]
+        st = next(s for s in stages if s.name == name)
+        # freshness pre-check for display
+        if name in in_a_group and name in group_names and st not in []:
+            grp = group_names[name]
+            if st is grp[0]:
+                # entering a group: evaluate freshness for all members, fly
+                # the non-fresh ones together
+                todo = [g for g in grp if not _stage_fresh(g)]
+                fresh = [g.name for g in grp if _stage_fresh(g)]
+                for f in fresh:
+                    print(f"[{f:16s}] skip(fresh)  (group member)")
+                    skipped.append(f)
+                if todo:
+                    print(f"~~ parallel group '{name}': "
+                          + ", ".join(g.name for g in todo) + " ~~", flush=True)
+                    if dry:
+                        for g in todo:
+                            print(f"[{g.name:16s}] [dry]")
+                            skipped.append(g.name)
+                    else:
+                        with ThreadPoolExecutor(max_workers=len(todo)) as gex:
+                            results = dict(zip([g.name for g in todo],
+                                               gex.map(_run_stage, todo)))
+                        if not all(results.values()):
+                            sys.exit(1)
+                i += len(grp)
+                continue
+            else:
+                i += 1
+                continue  # non-first member handled by the group dispatch above
+        if _stage_fresh(st):
+            print(f"[{st.name:16s}] skip(fresh)  {st.desc}")
+            skipped.append(st.name)
+            i += 1
+            continue
+        print(f"[{st.name:16s}] run          {st.desc}")
+        if dry:
+            skipped.append(st.name)
+            i += 1
+            continue
+        if not _run_stage(st):
+            sys.exit(1)
+        i += 1
 
     run_dir = REPO / "runs"
     run_dir.mkdir(exist_ok=True)
