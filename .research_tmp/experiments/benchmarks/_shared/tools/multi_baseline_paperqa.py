@@ -284,19 +284,40 @@ async def run(smoke: bool = False, q_limit: int | None = None):
     # returns a lazy handle; ask() triggers building but does not wait.
     from paperqa.agents.search import get_directory_index
     idx = await get_directory_index(settings=settings, build=True)
+    # smoke-11 fix: "index complete" must be a DISK-STABLE verdict, not a
+    # volatile in-memory count. The earlier len(files)>=427 check fired on a
+    # mid-write read (files.zip hit 430 transiently), released the answer
+    # pool against a still-writing index, and every reader collided with the
+    # writer (WinError 5) or read half-written zips (zlib -5).
+    _IDX_DIR = os.path.join(INDEX_DIR, os.listdir(INDEX_DIR)[0])
+    _FZIP = os.path.join(_IDX_DIR, "files.zip")
     t0 = time.time()
+    stable_rounds = 0
+    last_count = -1
     while True:
         files = await idx.index_files
-        if len(files) >= len(key2stem):
-            print(f"[pqa] index complete: {len(files)} files "
-                  f"({time.time()-t0:.0f}s wait)", flush=True)
-            break
-        if time.time() - t0 > 3600:
-            print(f"[pqa] index wait TIMEOUT at {len(files)} files — "
+        try:
+            mtime = os.path.getmtime(_FZIP)
+            import zlib as _z, pickle as _pk
+            n_disk = len(_pk.loads(_z.decompress(open(_FZIP, "rb").read())))
+        except Exception:
+            n_disk, mtime = -1, -1
+        if n_disk == last_count and n_disk >= len(key2stem):
+            stable_rounds += 1
+            if stable_rounds >= 3:  # 3 consecutive reads identical & full
+                print(f"[pqa] index STABLE-COMPLETE: {n_disk} files on disk "
+                      f"({time.time()-t0:.0f}s wait)", flush=True)
+                break
+        else:
+            stable_rounds = 0
+        last_count = n_disk
+        if time.time() - t0 > 5400:
+            print(f"[pqa] index wait TIMEOUT at {n_disk} stable files — "
                   f"answering anyway (partial index)", flush=True)
             break
-        await asyncio.sleep(30)
-        print(f"[pqa] index building: {len(files)}/{len(key2stem)}", flush=True)
+        await asyncio.sleep(60)
+        print(f"[pqa] index building: disk={n_disk}/{len(key2stem)} "
+              f"mem={len(files)} stable={stable_rounds}", flush=True)
     # question pool (2026-09-22): independent questions, N in flight.
     # Each ask() is internally concurrent (agent loop), so fan-out stays modest.
     todo_qs = [q for q in questions
