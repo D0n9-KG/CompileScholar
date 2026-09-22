@@ -1,0 +1,33 @@
+# conf/base.yaml — 编译管线默认参数（单一事实源）
+#
+# 分层：base < local < experiments/<name> < env(secrets/一次性覆盖) < CLI
+# merge 规则：dict 深合并，标量覆盖。secrets（API key/端点）不放这里——
+# 走 .env（gitignore）。本文件进 git。
+#
+# 向下投影：build.py/run_stage 把 llm 段投影成 kb_infra 的 env vars
+# （kb_infra 内部读取逻辑保持 env-var 接口不动——它已在生产验证）。
+
+llm:
+  model: "local:Qwen3.8-27B"        # 建库/答题统一模型（可比性硬闸的默认值）
+  provider_allowlist: "local"        # D8 纯度闸：允许的 provider（逗号分隔）
+  local_max_concurrent: 32           # 探针实测峰值 384k tok/min @32
+  local_sock_timeout: 900            # smoke-1 教训：默认 300 撞墙烧重试；大输出调用物理需 ~600s
+  local_max_attempts: 4
+  wall_timeout: 900
+  sock_timeout: 600                  # 通用（非 local 通道）
+  intern_soft_cap: 85000000          # Intern ~100M 额度，预留余量（应急通道）
+
+slot:
+  max_chars: 500000                  # 深抽上限（用户批 09-21；卡片/absence 层维持 110k 硬编码物理预算）
+  pool_size: 30                      # 全局 chunk 并发（A2：固定池，不再 workers×chunk_threads 浮动）
+
+registry:
+  tau1: 0.84                         # 门①校准（遗产 973 表面名真值：阻塞召回 0.896）
+  tau2: 0.80                         # 跨轮合并阈值
+  block_workers: 6                   # par_map 线程数
+
+paths:
+  # 相对仓库根；实际路径由 config.load() 解析为绝对路径
+  texts: ".research_tmp/experiments/benchmarks/scholarqa_multi/corpus/texts"
+  manifest: ".research_tmp/experiments/benchmarks/scholarqa_multi/corpus/manifest.json"
+  kb_dir: ".research_tmp/experiments/benchmarks/scholarqa_multi/kb"

@@ -146,7 +146,11 @@ async def run(smoke: bool = False, ingest_only: bool = False,
             if os.path.exists(fp):
                 continue
             t0 = time.time()
-            await rag.ainsert(text, ids=[stem])
+            # smoke-2 fix: ids= only sets the doc key; file_paths= sets the
+            # file_path field the query-time reference list is built from
+            # (ids-only leaves file_path=unknown_source -> references=[] ->
+            # citation bridge dead). Pass BOTH.
+            await rag.ainsert(text, ids=[stem], file_paths=[stem])
             open(fp, "w").write("1")
             n += 1
             print(f"[ingest] {stem[:60]} ({n}/{len(corpus)}) "
@@ -164,6 +168,7 @@ async def run(smoke: bool = False, ingest_only: bool = False,
 
 
 async def run_queries(rag, smoke: bool = False, q_limit: int | None = None):
+    from lightrag import QueryParam  # smoke-1 fix: was only imported in run()
     questions = load_questions()
     id_mapping = load_id_mapping()
     if smoke:

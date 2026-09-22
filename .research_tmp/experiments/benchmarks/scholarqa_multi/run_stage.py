@@ -101,7 +101,13 @@ def main():
                     "PYTHONIOENCODING": "utf-8",
                     "LLM_CALL_LOG": args.ledger,
                     "LLM_RUN_ID": f"multi-{args.name}",
-                    "LLM_SOCK_TIMEOUT": "600", "LLM_WALL_TIMEOUT": "900",
+                    # 09-22 fix: was LLM_SOCK_TIMEOUT (a name call_local never
+                    # read — it reads LOCAL_SOCK_TIMEOUT), so the 600 never
+                    # took effect and big-output calls died at the 300s default.
+                    # Both names now set; the source of truth is conf/base.yaml
+                    # projected via kb_compiler.config.project_env.
+                    "LLM_SOCK_TIMEOUT": "900",
+                    "LOCAL_SOCK_TIMEOUT": "900", "LLM_WALL_TIMEOUT": "900",
                     # comparability hard gate (user directive 09-21): build
                     # stages may ONLY touch the two Qwen3.8-27B channels —
                     # a forgotten --model defaulting to DeepSeek/Kimi/Max

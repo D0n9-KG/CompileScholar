@@ -26,6 +26,11 @@ THIRD_PARTY_WHITELIST = {
     # network, already the env's numerical base (2.5.1). Commit message
     # carries the full justification per gate protocol.
     "numpy",
+    # 2026-09-22 arbitration: pyyaml for config.py (conf/base.yaml layered
+    # loader — the env-name-mismatch marathon bug's structural fix). stdlib
+    # has no yaml parser; hand-rolling one is strictly worse than the env's
+    # long-established yaml 6.0.3. Pure parsing, no network, no model calls.
+    "yaml",
 }
 BANNED_ROOTS = {"granular_agent"}
 

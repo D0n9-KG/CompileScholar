@@ -730,7 +730,10 @@ def call_local(prompt: str, model: str = "Qwen3.8-27B", max_tokens: int = 4000,
         payload["chat_template_kwargs"] = {"enable_thinking": False}
     body = json.dumps(payload).encode()
     attempts = int(os.environ.get("LOCAL_MAX_ATTEMPTS", "4"))
-    sock_to = float(os.environ.get("LOCAL_SOCK_TIMEOUT", "300"))
+    # 900 default (config.py projects conf/base.yaml here; the old 300 default
+    # systematically killed big-output chunk calls in the 09-22 marathon tail —
+    # 12 retries × 300s burned per stuck chunk, 62 chunks lost to it)
+    sock_to = float(os.environ.get("LOCAL_SOCK_TIMEOUT", "900"))
     for attempt in range(attempts):
         t0 = time.time()
         try:
