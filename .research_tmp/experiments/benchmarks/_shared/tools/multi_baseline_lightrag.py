@@ -140,21 +140,58 @@ async def run(smoke: bool = False, ingest_only: bool = False,
     if smoke:
         corpus = corpus[:3]
     if not query_only:
+        # Ingestion with COMPLETION-verified markers (2026-09-22):
+        # the first parallel version wrote markers when ainsert() RETURNED —
+        # but LightRAG 1.5.7's ainsert only enqueues ("Request queued"); the
+        # user caught 406 false "done" markers while doc_status showed 25
+        # processed / 285 pending. Markers are now written only after
+        # status polling confirms 'processed' for that doc id.
+        # Fanout=1: LightRAG's own pipeline is the concurrency source; the
+        # outer fan-out only flooded the queue and lied about completion.
         n = 0
-        for stem, text in corpus:
-            fp = os.path.join(WORKDIR, f"_marker_{stem}.done")
-            if os.path.exists(fp):
-                continue
+        done_count = sum(1 for s, _ in corpus
+                         if os.path.exists(os.path.join(WORKDIR, f"_marker_{s}.done")))
+        todo = [(s, t) for s, t in corpus
+                if not os.path.exists(os.path.join(WORKDIR, f"_marker_{s}.done"))]
+        print(f"ingest: {done_count} done (verified markers), {len(todo)} to go",
+              flush=True)
+
+        async def _wait_processed(rag, stem, timeout_s=1800):
+            """Poll doc_status until this doc id reports processed (or
+            failed/timeout -> no marker, retried on next resume)."""
+            import asyncio as _aio
+            t0 = time.time()
+            while time.time() - t0 < timeout_s:
+                try:
+                    st = await rag.doc_status.get_docs(ids=[stem], include_content=False)
+                    row = st.get(stem) if isinstance(st, dict) else None
+                    status = (getattr(row, "status", None) or
+                              (row.get("status") if isinstance(row, dict) else None))
+                    sstr = str(status).lower() if status else ""
+                    if "processed" in sstr or "failed" in sstr:
+                        return "processed" in sstr
+                except Exception:
+                    pass
+                await _aio.sleep(5)
+            return False
+
+        for stem, text in todo:
             t0 = time.time()
             # smoke-2 fix: ids= only sets the doc key; file_paths= sets the
             # file_path field the query-time reference list is built from
             # (ids-only leaves file_path=unknown_source -> references=[] ->
             # citation bridge dead). Pass BOTH.
             await rag.ainsert(text, ids=[stem], file_paths=[stem])
-            open(fp, "w").write("1")
-            n += 1
-            print(f"[ingest] {stem[:60]} ({n}/{len(corpus)}) "
-                  f"{time.time()-t0:.0f}s", flush=True)
+            ok = await _wait_processed(rag, stem)
+            if ok:
+                open(os.path.join(WORKDIR, f"_marker_{stem}.done"), "w").write("1")
+                n += 1
+                print(f"[ingest] {stem[:60]} ({n}/{len(todo)}) "
+                      f"{time.time()-t0:.0f}s PROCESSED", flush=True)
+            else:
+                print(f"[ingest] {stem[:60]} NOT PROCESSED in time "
+                      f"({time.time()-t0:.0f}s) — no marker, will retry",
+                      flush=True)
         print(f"ingest done (new={n})", flush=True)
 
     if ingest_only or smoke:
@@ -181,17 +218,26 @@ async def run_queries(rag, smoke: bool = False, q_limit: int | None = None):
         done = {r["qid"]: r for r in json.load(open(ANSWERS, encoding="utf-8"))}
 
     stats = {"mapped": 0, "dropped": 0}
-    for q in questions:
+    # question pool (2026-09-22): questions are independent; fly N at once.
+    # Each aquery_llm is itself multi-call internally (keywords+answer), so a
+    # modest fan-out (4) keeps total in-flight near the GPU sweet spot.
+    todo_qs = [q for q in questions
+               if not (q["id"] in done and (done[q["id"]].get("answer_official_all")
+                                            or done[q["id"]].get("err")))]
+    fanout = int(os.environ.get("LRAG_QUERY_FANOUT", "4"))
+    print(f"questions: {len(todo_qs)} to answer, fanout={fanout}", flush=True)
+    sem = asyncio.Semaphore(fanout)
+    _save_lock = asyncio.Lock()
+
+    async def _answer_one(q):
         qid, text = q["id"], q["input"]
-        if qid in done and (done[qid].get("answer_official_all")
-                            or done[qid].get("err")):
-            continue
         t0 = time.time()
         row = {"qid": qid, "subject": q.get("subject"), "question": text}
         try:
-            result = await asyncio.wait_for(
-                rag.aquery_llm(text, QueryParam(mode="hybrid")),
-                timeout=1200)
+            async with sem:
+                result = await asyncio.wait_for(
+                    rag.aquery_llm(text, QueryParam(mode="hybrid")),
+                    timeout=1200)
             answer = (result.get("llm_response") or {}).get("content") or ""
             refs = ((result.get("data") or {}).get("references")) or []
             row["raw_answer"] = answer
@@ -210,16 +256,18 @@ async def run_queries(rag, smoke: bool = False, q_limit: int | None = None):
         except Exception as e:
             row["err"] = str(e)[:200]
         row["wall_s"] = round(time.time() - t0, 1)
-        done[qid] = row
-        os.makedirs(os.path.dirname(ANSWERS), exist_ok=True)
-        json.dump(list(done.values()),
-                  open(ANSWERS, "w", encoding="utf-8"),
-                  ensure_ascii=False, indent=1)
+        async with _save_lock:
+            done[qid] = row
+            os.makedirs(os.path.dirname(ANSWERS), exist_ok=True)
+            json.dump(list(done.values()),
+                      open(ANSWERS, "w", encoding="utf-8"),
+                      ensure_ascii=False, indent=1)
         print(f"[q] {qid} {len(row.get('raw_answer') or '')}ch "
               f"cite_map={row.get('citation_mapped')} "
               f"drop={row.get('citation_dropped')} "
               f"{row['wall_s']}s {row.get('err') or ''}", flush=True)
 
+    await asyncio.gather(*(_answer_one(q) for q in todo_qs))
     print(f"[lrag] answers saved: {ANSWERS}", flush=True)
     print(f"[lrag] citation translation: mapped={stats['mapped']} "
           f"dropped={stats['dropped']}", flush=True)

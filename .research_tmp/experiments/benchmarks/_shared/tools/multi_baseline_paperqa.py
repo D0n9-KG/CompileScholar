@@ -36,8 +36,12 @@ import sys
 import time
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
-_MULTI = os.path.join(_HERE, "..", "..", "scholarqa_multi")
-_SRC = os.path.join(_MULTI, "..", "..", "..", "..", "src")
+# smoke-10: normalize ALL path constants. The raw joined forms carried
+# '..\' segments which leaked into the tantivy index KEYS; paperqa's sync
+# then compared them against canonical absolute paths, found 'missing'
+# files, and DELETED the whole index (5093 removal lines) on every restart.
+_MULTI = os.path.normpath(os.path.join(_HERE, "..", "..", "scholarqa_multi"))
+_SRC = os.path.normpath(os.path.join(_MULTI, "..", "..", "..", "..", "src"))
 BASE_DIR = os.path.join(_MULTI, "baselines", "paperqa")
 DOCS = os.path.join(_MULTI, "corpus", "texts")
 INDEX_DIR = os.path.join(BASE_DIR, "index")
@@ -83,6 +87,50 @@ def dockey_stem_map(docs_dir: str = DOCS) -> dict:
                 open(os.path.join(docs_dir, fn), "rb").read()).hexdigest()
             out[h] = fn.rsplit(".", 1)[0]
     return out
+
+
+def install_lmi_router_shim():
+    """smoke-7 fix: paperqa 2026.8.12's make_aviary_tool_selector calls
+    get_agent_llm().get_router().acompletion — but fhlmi 1.0.7's LiteLLMModel
+    has NO get_router (never had it: verified in 1.0.6/0.48.0 wheels too;
+    upstream mismatch). Shim a router whose acompletion routes to the
+    module-level litellm.acompletion — the same channel our ledger hooks
+    instrument, so purity accounting covers it. Signature per aviary's
+    ToolSelector: acompletion(messages=..., tools=..., **kwargs) ->
+    ModelResponse with .choices[0].message (content + tool_calls)."""
+    from lmi import LiteLLMModel
+
+    if hasattr(LiteLLMModel, "get_router"):
+        return  # upstream fixed it — nothing to do
+
+    class _Router:
+        async def acompletion(self, messages, tools=None, **kwargs):
+            import litellm
+            from litellm.types.utils import ModelResponse, Choices, Message
+            model = kwargs.pop("model", f"openai/{MODEL}")
+            body = {"model": model, "messages": messages,
+                    "temperature": kwargs.pop("temperature", 0.0)}
+            if tools:
+                body["tools"] = tools
+                if kwargs.get("tool_choice"):
+                    body["tool_choice"] = kwargs["tool_choice"]
+            resp = await litellm.acompletion(**body, **{
+                k: v for k, v in kwargs.items()
+                if k in ("max_tokens", "timeout", "api_base", "api_key")})
+            ch = resp["choices"][0] if isinstance(resp, dict) else resp.choices[0]
+            msg = ch.get("message", {}) if isinstance(ch, dict) else ch.message
+            m = Message(role=msg.get("role", "assistant"),
+                        content=msg.get("content"),
+                        tool_calls=msg.get("tool_calls"))
+            return ModelResponse(
+                id=resp.get("id", "x") if isinstance(resp, dict) else resp.id,
+                created=0, model=model,
+                choices=[Choices(index=0,
+                                 finish_reason=ch.get("finish_reason", "stop")
+                                 if isinstance(ch, dict) else ch.finish_reason,
+                                 message=m)])
+
+    LiteLLMModel.get_router = lambda self: _Router()
 
 
 def install_litellm_ledger_hooks():
@@ -211,6 +259,7 @@ async def run(smoke: bool = False, q_limit: int | None = None):
     from paperqa import ask
     _env_from_dotenv()
     install_litellm_ledger_hooks()
+    install_lmi_router_shim()
     settings = build_settings()
 
     key2stem = dockey_stem_map()
@@ -228,16 +277,44 @@ async def run(smoke: bool = False, q_limit: int | None = None):
         done = {r["qid"]: r for r in json.load(open(ANSWERS, encoding="utf-8"))}
 
     stats = {"mapped": 0, "dropped": 0, "unmapped_groups": 0}
-    for q in questions:
+    # smoke-8 fix: WAIT for the full index before answering. The first
+    # question ran against a half-built index (agent found 41/427 docs and
+    # honestly answered 'I cannot answer this question due to having no
+    # papers' — correct behavior, wrong precondition). get_directory_index
+    # returns a lazy handle; ask() triggers building but does not wait.
+    from paperqa.agents.search import get_directory_index
+    idx = await get_directory_index(settings=settings, build=True)
+    t0 = time.time()
+    while True:
+        files = await idx.index_files
+        if len(files) >= len(key2stem):
+            print(f"[pqa] index complete: {len(files)} files "
+                  f"({time.time()-t0:.0f}s wait)", flush=True)
+            break
+        if time.time() - t0 > 3600:
+            print(f"[pqa] index wait TIMEOUT at {len(files)} files — "
+                  f"answering anyway (partial index)", flush=True)
+            break
+        await asyncio.sleep(30)
+        print(f"[pqa] index building: {len(files)}/{len(key2stem)}", flush=True)
+    # question pool (2026-09-22): independent questions, N in flight.
+    # Each ask() is internally concurrent (agent loop), so fan-out stays modest.
+    todo_qs = [q for q in questions
+               if not (q["id"] in done and (done[q["id"]].get("answer_official_all")
+                                            or done[q["id"]].get("err")))]
+    fanout = int(os.environ.get("PQA_QUERY_FANOUT", "3"))
+    print(f"[pqa] questions: {len(todo_qs)} to answer, fanout={fanout}", flush=True)
+    sem = asyncio.Semaphore(fanout)
+    save_lock = asyncio.Lock()
+
+    async def _answer_one(q):
         qid, text = q["id"], q["input"]
-        if qid in done and (done[qid].get("answer_official_all")
-                            or done[qid].get("err")):
-            continue
         t0 = time.time()
         row = {"qid": qid, "subject": q.get("subject"), "question": text}
         try:
-            ans = await asyncio.wait_for(
-                ask(text, settings=settings), timeout=1800)
+            async with sem:
+                ans = await asyncio.wait_for(
+                    ask(text, settings=settings), timeout=1800)
             sess = ans.session
             raw = sess.raw_answer or ""
             row["raw_answer"] = raw
@@ -265,16 +342,18 @@ async def run(smoke: bool = False, q_limit: int | None = None):
         except Exception as e:
             row["err"] = str(e)[:200]
         row["wall_s"] = round(time.time() - t0, 1)
-        done[qid] = row
-        os.makedirs(BASE_DIR, exist_ok=True)
-        json.dump(list(done.values()),
-                  open(ANSWERS, "w", encoding="utf-8"),
-                  ensure_ascii=False, indent=1)
+        async with save_lock:
+            done[qid] = row
+            os.makedirs(BASE_DIR, exist_ok=True)
+            json.dump(list(done.values()),
+                      open(ANSWERS, "w", encoding="utf-8"),
+                      ensure_ascii=False, indent=1)
         print(f"[pqa] {qid} {len(row.get('raw_answer') or '')}ch "
               f"cite_map={row.get('citation_mapped')} "
               f"drop={row.get('citation_dropped')} "
               f"{row['wall_s']}s {row.get('err') or ''}", flush=True)
 
+    await asyncio.gather(*(_answer_one(q) for q in todo_qs))
     print(f"[pqa] answers saved: {ANSWERS}", flush=True)
     print(f"[pqa] citation translation: mapped={stats['mapped']} "
           f"dropped={stats['dropped']} "
