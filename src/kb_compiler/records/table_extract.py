@@ -62,13 +62,40 @@ def _shim_tc(ns):
         _sys.argv = old_argv
 
 
+def _normalize_to_by_paper(out_path: str) -> str:
+    """table_channel writes a stats wrapper {records: [flat, paper_id-keyed],
+    residue, per_paper, stats}; every downstream consumer (table_semantic,
+    notation, views) expects pid -> {records: [...]}. Normalize IN PLACE
+    (write a sibling file <stem>_by_paper.json) on first run — the wire-format
+    fix for the 2026-09-22 chain crash (notation got the wrapper and did
+    pv["records"] on the string 'records' key)."""
+    import json
+    import os
+    sibling = out_path.replace(".json", "_by_paper.json")
+    if os.path.exists(sibling):
+        return sibling
+    wrapper = json.load(open(out_path, encoding="utf-8"))
+    by_paper = {}
+    for r in wrapper.get("records", []):
+        pid = r.get("paper_id")
+        if pid:
+            by_paper.setdefault(pid, {"records": []})["records"].append(r)
+    for pid, counts in (wrapper.get("per_paper") or {}).items():
+        by_paper.setdefault(pid, {"records": []})
+    json.dump(by_paper, open(sibling, "w", encoding="utf-8"),
+              ensure_ascii=False, indent=1)
+    print(f"[table_extract] normalized wrapper -> by-paper form "
+          f"({len(by_paper)} papers) -> {sibling}", flush=True)
+    return sibling
+
+
 def run_semantic(args) -> str:
     """Phase 2 — delegate to table_semantic (LLM, canary-gated)."""
     import sys as _sys
     old_argv = _sys.argv
     try:
         argv = ["table_semantic",
-                "--records", args.out,
+                "--records", _normalize_to_by_paper(args.out),
                 "--texts", args.texts,
                 "--registry", args.registry,
                 "--out-dir", args.semantic_dir,

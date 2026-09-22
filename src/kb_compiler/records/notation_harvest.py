@@ -115,6 +115,10 @@ def build_prompt(title: str, batch: list[dict]) -> str:
 
 
 def llm_harvest(prompt: str, model: str, provider: str) -> list[dict] | None:
+    # strip "provider:" prefix (same chain-of-commands bug as table_semantic:
+    # full spec local:Qwen3.8-27B reached the server as a literal model name)
+    if ":" in model:
+        model = model.split(":", 1)[1]
     if provider == "local":
         # enable_thinking=False is load-bearing (F35 canary lesson: visible
         # reasoning eats the token budget before the JSON).

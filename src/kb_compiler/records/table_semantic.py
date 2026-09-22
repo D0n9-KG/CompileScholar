@@ -203,6 +203,12 @@ def build_prompt(repr_, caption, context, registry_names):
 
 
 def llm_propose(prompt, model, provider="paratera"):
+    # strip "provider:" prefix if a full spec is passed (chain-of-commands
+    # lesson 2026-09-22: build.py injects local:Qwen3.8-27B; the raw name
+    # made the server-side model field literal "local:..." -> every call
+    # failed -> canary llm_unparseable -> G5 hard stop, correctly)
+    if ":" in model:
+        model = model.split(":", 1)[1]
     if provider == "local":
         # enable_thinking=False is load-bearing: without it the 400-token
         # budget is eaten by visible reasoning (canary live-run lesson

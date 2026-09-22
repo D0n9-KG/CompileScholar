@@ -124,7 +124,7 @@ STAGES = [
         name="notation",
         desc="formula/notation symbol harvest",
         cmd=["python", "-m", "kb_compiler.records.notation_harvest",
-             "--texts", "{texts}", "--records", str(KB / "records_tables.json"),
+             "--texts", "{texts}", "--records", str(KB / "records_tables_by_paper.json"),
              "--out", str(KB / "notation.json"),
              "--provider", "local", "--model", "{model}"],
         outputs=("conf/../.research_tmp/experiments/benchmarks/scholarqa_multi/kb/notation.json",),
