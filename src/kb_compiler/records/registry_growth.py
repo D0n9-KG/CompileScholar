@@ -197,23 +197,35 @@ def run_round2(registry: dict, queue: list[dict], model: str,
         else:
             pblocks = [list(range(len(prop_keys)))]
         groups = []
-        for pb in pblocks:
+        # consolidation block pool (2026-09-22): blocks are independent LLM
+        # calls; the serial loop is the last sequential stage in this module
+        from concurrent.futures import ThreadPoolExecutor
+
+        def _consol_one(pb):
             if len(pb) == 1:
-                continue
+                return []
             prop_lines = "\n".join(f"[{pos}] {prop_keys[gi]}"
                                    for pos, gi in enumerate(pb))
             from .registry import _must_json
             cobj = _must_json(call_json(_CONSOL_PROMPT + prop_lines, model,
                                         max_tokens=8000, retries=2),
                               "round2 proposal consolidation")
-            for g in (cobj.get("groups") or []):
-                mem = [pb[m] for m in (g.get("members") or [])
-                       if isinstance(m, int) and 0 <= m < len(pb)]
-                if not mem:
-                    continue
-                can = pb[g["canonical"]] if isinstance(g.get("canonical"), int) \
-                    and g["canonical"] in range(len(pb)) else mem[0]
-                groups.append({"canonical": can, "members": mem})
+            return [(g, pb) for g in (cobj.get("groups") or [])]
+
+        with ThreadPoolExecutor(max_workers=12) as cex:
+            for gs in cex.map(_consol_one, pblocks):
+                for g, pb in gs:
+                    groups.append((g, pb))
+        # flatten pooled results (original block order preserved by cex.map)
+        flat = []
+        for g, pb in groups:
+            mem = [pb[m] for m in (g.get("members") or [])
+                   if isinstance(m, int) and 0 <= m < len(pb)]
+            if not mem:
+                continue
+            can = pb[g["canonical"]] if isinstance(g.get("canonical"), int)                 and g["canonical"] in range(len(pb)) else mem[0]
+            flat.append({"canonical": can, "members": mem})
+        groups = flat
         seen_idx = set()
         rename = {}
         for g in groups:
