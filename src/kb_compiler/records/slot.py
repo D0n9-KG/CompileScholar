@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import sys
 import threading
@@ -332,18 +333,14 @@ def _fingerprint(rec):
     return re.sub(r"\s+", " ", f"{m}|{v}").strip().lower()
 
 
-def extract_paper(pid, text, card, registry, vocab, model, title, chunk_threads=1):
+def build_paper_tasks(pid, text, card, registry, vocab, title):
+    """Pure per-paper context: injection, chunks, per-chunk prompts, absence
+    prompt. Split out of extract_paper (A2 2026-09-22) so the global pool can
+    build ALL tasks up front and execute in any order — prompts are pure
+    functions of the chunk (B2 2026-09-18 invariant), execution order does
+    not affect output."""
     inj = build_injection(pid, card, registry, vocab)
     chunks = chunk_text(pid, text, section_labels=card.get("sections"))
-    records, overflow, entity_queue = [], [], []
-    chunk_fails = 0  # FG2 (2026-09-10): silent chunk-loss counter — gate1 C arm
-    # lost ~35% of yield to exhausted-retry chunks with NO count anywhere
-    # (discovered only via cross-arm comparison). Counted + surfaced in stats.
-    # B2 chunk-level parallelism (2026-09-18 batch 1): prompts are pure
-    # functions of the chunk; execution is optionally threaded and results
-    # are post-processed in ORIGINAL chunk order, so output is byte-comparable
-    # to the serial path (record order, entity_queue order and the
-    # order-independent dedup merge are all preserved).
     chunk_prompts = []
     for ch in chunks:
         schemas = "\n".join(KIND_SLICES[k] for k in ch["kinds"] if k in KIND_SLICES)
@@ -358,16 +355,33 @@ def extract_paper(pid, text, card, registry, vocab, model, title, chunk_threads=
                               .replace("{rules}", QUOTE_FIRST_RULES)
                               .replace("{section}", ch["section"])
                               .replace("{chunk}", ch["text"])))
-    if chunk_threads > 1 and len(chunk_prompts) > 1:
-        with ThreadPoolExecutor(max_workers=chunk_threads) as cex:
-            objs = list(cex.map(
-                lambda p: call_json(p, model, max_tokens=9000,
-                                    retries=3, salvage=True),
-                [p for _, p in chunk_prompts]))
-    else:
-        objs = [call_json(p, model, max_tokens=9000, retries=3, salvage=True)
-                for _, p in chunk_prompts]
-    for (ch, _), obj in zip(chunk_prompts, objs):
+    matrix = json.dumps(card.get("experimental_matrix") or [], ensure_ascii=False)[:3000]
+    aprompt = (ABSENCE_PROMPT.replace("{title}", title or pid)
+               .replace("{identity}", inj["identity"]).replace("{matrix}", matrix)
+               .replace("{schema}", KIND_SLICES["absence"])
+               .replace("{rules}", QUOTE_FIRST_RULES)
+               .replace("{text}", text[:MAX_PAPER_CHARS]))
+    return {"inj": inj, "chunks": chunks, "chunk_prompts": chunk_prompts,
+            "absence_prompt": aprompt}
+
+
+def _call_chunk(prompt, model):
+    """One chunk LLM call (thin pure wrapper — stable monkeypatch surface)."""
+    return call_json(prompt, model, max_tokens=9000, retries=3, salvage=True)
+
+
+def _call_absence(prompt, model):
+    return call_json(prompt, model, max_tokens=6000, retries=3)
+
+
+def finalize_paper(pid, ctx, chunk_objs, absence_obj, registry, card, title):
+    """Deterministic post-processing. chunk_objs: {chunk_id: obj|None} —
+    iterated in ORIGINAL chunk order (B2 byte-comparable invariant).
+    Behavior identical to the old extract_paper tail."""
+    records, overflow, entity_queue = [], [], []
+    chunk_fails = 0  # FG2: silent chunk-loss counter (gate1 C arm lesson)
+    for ch, _p in ctx["chunk_prompts"]:
+        obj = chunk_objs.get(ch["chunk_id"])
         if isinstance(obj, list):  # bare-array output normalization
             obj = {"records": obj}
         if not isinstance(obj, dict):
@@ -387,17 +401,10 @@ def extract_paper(pid, text, card, registry, vocab, model, title, chunk_threads=
                 ov.update({"kind": "overflow", "paper_id": pid,
                            "chunk_id": ch["chunk_id"], "section": ch["section"]})
                 overflow.append(ov)
-    # absence whole-text pass
-    matrix = json.dumps(card.get("experimental_matrix") or [], ensure_ascii=False)[:3000]
-    aprompt = (ABSENCE_PROMPT.replace("{title}", title or pid)
-               .replace("{identity}", inj["identity"]).replace("{matrix}", matrix)
-               .replace("{schema}", KIND_SLICES["absence"])
-               .replace("{rules}", QUOTE_FIRST_RULES)
-               .replace("{text}", text[:MAX_PAPER_CHARS]))
-    aobj = call_json(aprompt, model, max_tokens=6000, retries=3)
-    absence_fail = 0 if isinstance(aobj, dict) else 1  # FG2: absence pass loss counted
-    if isinstance(aobj, dict):
-        for rec in aobj.get("records") or []:
+    # absence whole-text pass (obj fetched by the pool)
+    absence_fail = 0 if isinstance(absence_obj, dict) else 1  # FG2 loss counted
+    if isinstance(absence_obj, dict):
+        for rec in absence_obj.get("records") or []:
             if isinstance(rec, dict) and rec.get("kind") == "absence":
                 rec.update({"paper_id": pid, "chunk_id": f"{pid}#absence",
                             "section": "(whole-text)", "chunk_char_start": 0})
@@ -459,14 +466,181 @@ def extract_paper(pid, text, card, registry, vocab, model, title, chunk_threads=
             rec.pop(field, None)  # surface preserved inside *_ref
     out = {"records": list(merged.values()), "overflow": overflow,
            "entity_queue": entity_queue, "schema_version": SCHEMA_VERSION,
-           "stats": {"chunks": len(chunks), "records": len(merged),
+           "stats": {"chunks": len(ctx["chunks"]), "records": len(merged),
                      "overflow": len(overflow), "queue": len(entity_queue),
                      "chunk_fails": chunk_fails, "absence_fail": absence_fail}}
     with _print_lock:
         print(f"[{pid}] records={len(merged)} overflow={len(overflow)} "
-              f"queue={len(entity_queue)} chunks={len(chunks)} "
+              f"queue={len(entity_queue)} chunks={len(ctx['chunks'])} "
               f"chunk_fails={chunk_fails} absence_fail={absence_fail}", flush=True)
     return pid, out
+
+
+def extract_paper(pid, text, card, registry, vocab, model, title, chunk_threads=1):
+    """Single-paper extraction (wrapper kept for tests & single callers).
+    Production path is run_pool (global chunk pool); this preserves the old
+    signature/semantics: build tasks, fetch serially or chunk_threads-inner,
+    finalize in original chunk order."""
+    ctx = build_paper_tasks(pid, text, card, registry, vocab, title)
+    prompts = [p for _, p in ctx["chunk_prompts"]]
+    if chunk_threads > 1 and len(prompts) > 1:
+        with ThreadPoolExecutor(max_workers=chunk_threads) as cex:
+            objs = list(cex.map(lambda p: _call_chunk(p, model), prompts))
+    else:
+        objs = [_call_chunk(p, model) for p in prompts]
+    chunk_objs = {ch["chunk_id"]: obj
+                  for (ch, _), obj in zip(ctx["chunk_prompts"], objs)}
+    absence_obj = _call_absence(ctx["absence_prompt"], model)
+    return finalize_paper(pid, ctx, chunk_objs, absence_obj, registry, card, title)
+
+
+# ---------------------------------------------------------------------------
+# Progress WAL: chunk-level checkpoint ({out}.progress.jsonl)
+# ---------------------------------------------------------------------------
+
+def _wal_load(path):
+    """Replay WAL -> {(pid, cid): obj}. ok=false lines are NOT done marks
+    (failed chunks retry on resume); torn tail lines are skipped."""
+    done = {}
+    if not os.path.exists(path):
+        return done
+    with open(path, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                rec = json.loads(line)
+            except Exception:
+                continue  # torn tail line from a crash mid-append
+            if rec.get("ok"):
+                done[(rec["pid"], rec["cid"])] = rec.get("obj")
+    return done
+
+
+class _WalWriter:
+    def __init__(self, path):
+        self._f = open(path, "a", encoding="utf-8")
+        self._lock = threading.Lock()
+
+    def add(self, pid, cid, ok, obj):
+        line = json.dumps({"pid": pid, "cid": cid, "ok": ok, "obj": obj},
+                          ensure_ascii=False)
+        with self._lock:
+            self._f.write(line + "\n")
+            self._f.flush()
+
+    def close(self):
+        self._f.close()
+
+
+def _seed_wal_from_results(paper_payloads, wal):
+    """--repair seeding: reconstruct per-chunk objs from existing paper
+    outputs so ONLY hole chunks (no records under a chunk_id) get re-called.
+    Returns the NEWLY-seeded {(pid,cid): obj} (caller persists those only)."""
+    seeded = {}
+    for pid, payload in paper_payloads.items():
+        if pid == "canary":
+            continue
+        by_chunk = {}
+        for rec in payload.get("records") or []:
+            cid = rec.get("chunk_id")
+            if cid and cid != f"{pid}#absence":
+                by_chunk.setdefault(cid, {"records": []})["records"].append(rec)
+        for ov in payload.get("overflow") or []:
+            cid = ov.get("chunk_id")
+            if cid:
+                ent = by_chunk.setdefault(cid, {"records": []})
+                ent.setdefault("overflow", []).append(ov)
+        for cid, obj in by_chunk.items():
+            if (pid, cid) not in wal:
+                wal[(pid, cid)] = obj
+                seeded[(pid, cid)] = obj
+        # absence seeded iff absence records exist (absence_fail papers re-call)
+        abs_recs = [r for r in payload.get("records") or []
+                    if r.get("chunk_id") == f"{pid}#absence"]
+        if abs_recs and (pid, "absence") not in wal:
+            wal[(pid, "absence")] = {"records": abs_recs}
+            seeded[(pid, "absence")] = {"records": abs_recs}
+    return seeded
+
+
+# ---------------------------------------------------------------------------
+# Global chunk pool (A2 2026-09-22: one fixed pool; the workers x
+# chunk-threads composition floated 9-33 in-flight and starved the tail —
+# last 4 papers ran at ~4 calls/min vs the 33-concurrent mid-run)
+# ---------------------------------------------------------------------------
+
+def run_pool(todo, cards, registry, vocab, model, manifest, pool_size, out_path):
+    """todo: [(pid, text)]. One global executor over every paper's chunk +
+    absence tasks; per-paper finalize fires as soon as all its tasks land;
+    incremental save preserves paper-level atomicity."""
+    results = load_json(out_path, default={}) or {}
+    wal_path = out_path + ".progress.jsonl"
+    wal = _wal_load(wal_path)
+    writer = _WalWriter(wal_path)
+
+    def _finalize_and_save(pid):
+        ctx = ctxs[pid]
+        chunk_objs = {ch["chunk_id"]: wal.get((pid, ch["chunk_id"]))
+                      for ch, _ in ctx["chunk_prompts"]}
+        absence_obj = wal.get((pid, "absence"))
+        _, out = finalize_paper(pid, ctx, chunk_objs, absence_obj,
+                                registry, cards[pid],
+                                (manifest.get(pid) or {}).get("title"))
+        results[pid] = out
+        save_json(results, out_path)  # incremental crash-safe
+
+    ctxs, futures = {}, {}
+    n_skip = 0
+    with ThreadPoolExecutor(max_workers=pool_size) as ex:
+        for pid, text in todo:
+            ctx = build_paper_tasks(pid, text, cards[pid], registry, vocab,
+                                    (manifest.get(pid) or {}).get("title"))
+            ctxs[pid] = ctx
+            for ch, prompt in ctx["chunk_prompts"]:
+                if (pid, ch["chunk_id"]) in wal:
+                    n_skip += 1
+                    continue
+                futures[ex.submit(_call_chunk, prompt, model)] = (pid, ch["chunk_id"])
+            if (pid, "absence") not in wal:
+                futures[ex.submit(_call_absence, ctx["absence_prompt"], model)] = (pid, "absence")
+        print(f"pool: {len(ctxs)} papers | {len(futures)} tasks to call "
+              f"| {n_skip} chunks resumed from WAL | pool={pool_size}", flush=True)
+
+        remaining = {pid: 0 for pid in ctxs}
+        for _f, (pid, _cid) in futures.items():
+            remaining[pid] += 1
+        # papers whose tasks are ALL WAL hits (crash between last chunk and
+        # finalize): finalize immediately, never strand them
+        for pid in list(ctxs):
+            if remaining[pid] == 0:
+                _finalize_and_save(pid)
+
+        from concurrent.futures import as_completed
+        for fut in as_completed(futures):
+            pid, cid = futures[fut]
+            try:
+                obj = fut.result()
+            except Exception:
+                obj = None
+            ok = isinstance(obj, (dict, list))
+            writer.add(pid, cid, ok, obj if ok else None)
+            wal[(pid, cid)] = obj if ok else None
+            remaining[pid] -= 1
+            if remaining[pid] == 0:
+                _finalize_and_save(pid)
+    writer.close()
+    tot = {"records": 0, "overflow": 0, "queue": 0, "chunk_fails": 0}
+    for o in results.values():
+        for k in tot:
+            tot[k] += o["stats"][k if k != "queue" else "queue"]
+    print(f"\nsaved {len(results)} papers -> {out_path} | totals {tot}", flush=True)
+    # section-routing odometer (task #12)
+    print(f"route stats: card={ROUTE_STATS['card']} regex={ROUTE_STATS['regex']} "
+          f"fallback={ROUTE_STATS['fallback']} card_vs_regex_mismatch={ROUTE_STATS['mismatch']}",
+          flush=True)
+    return results
 
 
 def main():
@@ -478,12 +652,17 @@ def main():
     ap.add_argument("--vocab", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--model", default="DeepSeek-V4-Flash")
-    ap.add_argument("--workers", type=int, default=3)
-    ap.add_argument("--chunk-threads", type=int, default=1,
-                    help="threads per paper for chunk calls (workers x this "
-                         "<= ~16-20 for Paratera; results order-preserving)")
+    ap.add_argument("--pool", type=int, default=30,
+                    help="global chunk concurrency (A2: one fixed pool; old "
+                         "workers x chunk-threads floated 9-33 and starved the tail)")
+    ap.add_argument("--workers", type=int, default=None,
+                    help="deprecated alias for --pool (old callers keep working)")
     ap.add_argument("--only", default="")
+    ap.add_argument("--repair", default="",
+                    help="comma-separated pids to re-extract; seeds the WAL from "
+                         "existing results so ONLY hole chunks get re-called")
     args = ap.parse_args()
+    pool = args.pool if args.workers is None else args.workers
 
     corpus = load_corpus(args.texts)
     manifest = load_manifest(args.manifest)
@@ -495,30 +674,33 @@ def main():
         corpus = [c for c in corpus if c[0] in keep]
 
     existing = load_json(args.out, default={}) or {}
+    repair = [p for p in args.repair.split(",") if p]
+    if repair:
+        # pull repair pids out of the output, seed the WAL from their current
+        # records (so only holes are re-called), persist the seeded entries
+        wal_path = args.out + ".progress.jsonl"
+        wal = _wal_load(wal_path)
+        seeded = _seed_wal_from_results({pid: existing[pid] for pid in repair
+                                         if pid in existing}, wal)
+        with open(wal_path, "a", encoding="utf-8") as f:
+            for (pid, cid), obj in seeded.items():
+                f.write(json.dumps({"pid": pid, "cid": cid, "ok": True, "obj": obj},
+                                   ensure_ascii=False) + "\n")
+        for pid in repair:
+            existing.pop(pid, None)
+        save_json(existing, args.out)
+        print(f"repair: {len(repair)} papers | {len(seeded)} chunks seeded from "
+              f"existing results | holes will be re-called", flush=True)
+
     results = dict(existing)
     todo = [(pid, t) for pid, t in corpus
             if pid not in results and pid in cards]
     print(f"slot: {len(todo)} papers to run, model={args.model}", flush=True)
-    with ThreadPoolExecutor(max_workers=args.workers) as ex:
-        futs = [ex.submit(extract_paper, pid, text, cards[pid], registry, vocab,
-                          args.model, (manifest.get(pid) or {}).get("title"),
-                          args.chunk_threads)
-                for pid, text in todo]
-        for f in futs:
-            pid, out = f.result()
-            results[pid] = out
-            save_json(results, args.out)  # incremental crash-safe
-    tot = {"records": 0, "overflow": 0, "queue": 0}
-    for o in results.values():
-        for k in tot:
-            tot[k] += o["stats"][k if k != "queue" else "queue"]
-    print(f"\nsaved {len(results)} papers -> {args.out} | totals {tot}", flush=True)
-    # section-routing odometer (task #12): instrumentation window for the
-    # card-label vs regex swap — a rising fallback share means the card map is
-    # missing titles; heavy mismatch means one of the two routers is wrong.
-    print(f"route stats: card={ROUTE_STATS['card']} regex={ROUTE_STATS['regex']} "
-          f"fallback={ROUTE_STATS['fallback']} card_vs_regex_mismatch={ROUTE_STATS['mismatch']}",
-          flush=True)
+    if todo:
+        run_pool(todo, cards, registry, vocab, args.model, manifest,
+                 pool, args.out)
+    else:
+        print("nothing to do (all papers in output)", flush=True)
 
 
 if __name__ == "__main__":
