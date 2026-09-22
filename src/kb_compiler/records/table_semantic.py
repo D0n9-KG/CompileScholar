@@ -462,9 +462,27 @@ def main():
     os.makedirs(args.out_dir, exist_ok=True)
     corrected = {}      # (pid,th) -> [records]
     rejected = []
-    items = list(trig.items())
+    # table-level checkpoint (2026-09-22 stop-anytime directive): key-level
+    # resume — corrected/rejected already on disk are final (each table's
+    # proposal is an independent LLM call); a crash loses only in-flight work
+    _c_path = os.path.join(args.out_dir, "f35_corrected.json")
+    _r_path = os.path.join(args.out_dir, "f35_rejected.json")
+    if os.path.exists(_c_path):
+        try:
+            corrected = {tuple(k.split("||", 1)): v for k, v in
+                         json.load(open(_c_path, encoding="utf-8")).items()}
+        except Exception:
+            corrected = {}
+    if os.path.exists(_r_path):
+        try:
+            rejected = json.load(open(_r_path, encoding="utf-8"))
+        except Exception:
+            rejected = []
+    items = [(k, t) for k, t in trig.items() if k not in corrected]
     if args.limit:
         items = items[:args.limit]
+    print(f"tables to process: {len(items)} "
+          f"(resumed corrected={len(corrected)} rejected={len(rejected)})", flush=True)
     n_acc = n_deg = n_rej = n_corr = 0
     for i, (key, t) in enumerate(items):
         pid, th = key
@@ -489,6 +507,11 @@ def main():
         if nc:
             corrected[key] = new_recs
             n_corr += nc
+        # incremental crash-safe save (table-level checkpoint)
+        json.dump({f"{k[0]}||{k[1]}": v for k, v in corrected.items()},
+                  open(_c_path, "w", encoding="utf-8"), ensure_ascii=False)
+        json.dump(rejected, open(_r_path, "w", encoding="utf-8"),
+                  ensure_ascii=False)
         if (i + 1) % 10 == 0:
             print(f"  [{i+1}/{len(items)}] acc={n_acc} deg={n_deg} rej={n_rej} corrected_recs={n_corr}", flush=True)
 

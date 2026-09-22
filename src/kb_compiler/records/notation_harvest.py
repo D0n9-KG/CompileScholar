@@ -191,8 +191,27 @@ def main():
 
     harvested = {}   # pid -> [notation records]
     rejected = []
+    # paper-level checkpoint (2026-09-22 user directive: stop-anytime-resume):
+    # out.json is rewritten after every paper; papers already present on
+    # relaunch are skipped (their harvested records are final — notation
+    # dedup key is (paper, symbol), so per-paper results are independent)
+    if os.path.exists(args.out):
+        try:
+            harvested = json.load(open(args.out, encoding="utf-8"))
+            print(f"resume: {len(harvested)} papers already harvested -> skip",
+                  flush=True)
+        except Exception:
+            harvested = {}
+    rej_path = args.out.replace(".json", "_rejected.json")
+    if os.path.exists(rej_path):
+        try:
+            rejected = json.load(open(rej_path, encoding="utf-8"))
+        except Exception:
+            rejected = []
     n_forms = 0
     for pid, text in texts.items():
+        if pid in harvested:
+            continue
         formulas = scan_formulas(text)
         if args.limit:
             formulas = formulas[:args.limit]
@@ -235,6 +254,12 @@ def main():
                       f"rejected={len(rejected)}", flush=True)
         if pid_harvest:
             harvested[pid] = pid_harvest
+        # incremental crash-safe save (paper-level checkpoint)
+        os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
+        json.dump(harvested, open(args.out, "w", encoding="utf-8"),
+                  ensure_ascii=False, indent=1)
+        json.dump(rejected, open(rej_path, "w", encoding="utf-8"),
+                  ensure_ascii=False, indent=1)
 
     os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
     json.dump(harvested, open(args.out, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
