@@ -73,3 +73,8 @@
     （192.168.199.73）若有 CPU 余量，QASA/LitSearch 前把基线 harness
     迁过去——本地调用变同机调用+消灭 Windows 文件语义。Docker Desktop
     不推荐（bind mount 仍过 NTFS，收益打折）。
+21. **混合负载下的 GPU 调度**：registry_growth 大调用（280s 级）在四线
+    并跑时撞墙（wall timeout 耗尽重试 → ChannelDead 正确中止）。96 路
+    容量是短调用探针测的，长调用混入时排队模型不同。修法方向：容量
+    计划加调用形态维度（长调用站错峰或预留独占份额）；或 kb_infra
+    信号量分级（大 max_tokens 调用走独立低并发闸）。
