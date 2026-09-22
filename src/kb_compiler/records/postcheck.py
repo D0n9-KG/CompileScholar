@@ -422,26 +422,28 @@ def _triage_skip(violations: list, triage: dict) -> bool:
     return bool(classes) and all(c in skip_all for c in classes)
 
 
-def run_postcheck(records_by_paper, texts, vocab, model, dry=False, triage=None,
-                  lenient_quote_channels=False):
-    """lenient_quote_channels (AirQA IL-5, opt-in): add the tag-stripped +
-    de-hyphenated lookup channel for quote/table_header containment. Default
-    False = frozen PS protocol, byte-identical behavior."""
-    vocab_sets = build_vocab_sets(vocab)
+def check_paper(pid, payload, text, vocab_sets, model, dry=False, triage=None,
+                lenient_nf=None):
+    """Per-paper quality gates (paper-level pipeline entry, 2026-09-22).
+
+    Extracted verbatim from the old run_postcheck loop body so
+    deep_extract can inline the quality gate right after each paper's
+    finalize (check-as-you-extract instead of check-after-everything).
+    Returns (checked_payload, dropped_entries, warnings, stats_delta).
+
+    Precomputed per-paper text artifacts (fold/idx maps, lenient channel)
+    are passed IN so the batch driver computes them once per paper —
+    identical work, identical results, byte-for-byte.
+    """
+    folded, fmap = _fold_latex(text)
+    nc, ic = _norm_text(folded)
+    idx_c = [fmap[j] for j in ic]
+    nf, iff = _norm_text(folded, drop_ws=True)
+    idx_f = [fmap[j] for j in iff]
+    normc, normf = nc, nf
     stats = Counter()
-    checked, dropped, warnings = {}, [], []
-    for pid, payload in records_by_paper.items():
-        text = texts.get(pid, "")
-        folded, fmap = _fold_latex(text)
-        nc, ic = _norm_text(folded)
-        idx_c = [fmap[j] for j in ic]
-        nf, iff = _norm_text(folded, drop_ws=True)
-        idx_f = [fmap[j] for j in iff]
-        normc, normf = nc, nf
-        lenient_nf = None
-        if lenient_quote_channels:
-            lenient_nf = _norm_text(
-                _fold_latex(lenient_text_transform(text))[0], drop_ws=True)[0]
+    dropped, warnings = [], []
+    if True:
         out_recs = []
         for rec in payload.get("records", []):
             v, w, loc = check_record(rec, normc, idx_c, normf, idx_f, vocab_sets,
@@ -485,11 +487,38 @@ def run_postcheck(records_by_paper, texts, vocab, model, dry=False, triage=None,
             dropped.append({"paper_id": pid, "record": rec, "violations": v_orig})
         for ov in payload.get("overflow", []):
             stats["overflow"] += 1
-        checked[pid] = {"records": out_recs, "overflow": payload.get("overflow", []),
-                        "entity_queue": payload.get("entity_queue", [])}
+        checked_payload = {"records": out_recs,
+                           "overflow": payload.get("overflow", []),
+                           "entity_queue": payload.get("entity_queue", [])}
         stats["total"] += len(payload.get("records", []))
         print(f"[{pid}] in={len(payload.get('records', []))} pass={len(out_recs)} "
               f"(dry={dry})", flush=True)
+    return checked_payload, dropped, warnings, dict(stats)
+
+
+def run_postcheck(records_by_paper, texts, vocab, model, dry=False, triage=None,
+                  lenient_quote_channels=False, skip_pids=None):
+    """Batch driver = check_paper over every paper. skip_pids (set): papers
+    already checked by the inline path — the stage run then only processes
+    the remainder (paper-level resume; inline+stage coexistence)."""
+    vocab_sets = build_vocab_sets(vocab)
+    stats = Counter()
+    checked, dropped, warnings = {}, [], []
+    for pid, payload in records_by_paper.items():
+        if skip_pids and pid in skip_pids:
+            continue
+        text = texts.get(pid, "")
+        lenient_nf = None
+        if lenient_quote_channels:
+            lenient_nf = _norm_text(
+                _fold_latex(lenient_text_transform(text))[0], drop_ws=True)[0]
+        checked_payload, drops, warns, delta = check_paper(
+            pid, payload, text, vocab_sets, model, dry=dry, triage=triage,
+            lenient_nf=lenient_nf)
+        checked[pid] = checked_payload
+        dropped.extend(drops)
+        warnings.extend(warns)
+        stats.update(delta)
     return checked, dropped, warnings, dict(stats)
 
 
@@ -506,8 +535,20 @@ def main():
     records = load_json(args.records, {})
     texts = dict(load_corpus(args.texts))
     vocab = load_json(args.vocab, {})
+    # paper-level pipeline coexistence (2026-09-22): papers already checked
+    # by deep_extract --inline-postcheck land in records_checked.json — carry
+    # them forward, only check the remainder
+    prior_path = f"{args.out_dir}/records_checked.json"
+    prior = load_json(prior_path, default={}) or {}
+    prior_dropped = load_json(f"{args.out_dir}/dropped.json", default=[]) or []
+    skip_pids = {p for p in prior if p in records}
+    if skip_pids:
+        print(f"postcheck: {len(skip_pids)} papers already checked inline — "
+              f"skipping (paper-level resume)", flush=True)
     checked, dropped, warnings, stats = run_postcheck(
-        records, texts, vocab, args.model, dry=args.dry)
+        records, texts, vocab, args.model, dry=args.dry, skip_pids=skip_pids)
+    checked.update({p: prior[p] for p in skip_pids})
+    dropped = prior_dropped + dropped
     tag = "_dry" if args.dry else ""
     save_json(checked, f"{args.out_dir}/records_checked{tag}.json")
     save_json(dropped, f"{args.out_dir}/dropped{tag}.json")

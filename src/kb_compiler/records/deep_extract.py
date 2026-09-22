@@ -571,14 +571,37 @@ def _seed_wal_from_results(paper_payloads, wal):
 # last 4 papers ran at ~4 calls/min vs the 33-concurrent mid-run)
 # ---------------------------------------------------------------------------
 
-def run_pool(todo, cards, registry, vocab, model, manifest, pool_size, out_path):
+def run_pool(todo, cards, registry, vocab, model, manifest, pool_size, out_path,
+             inline_postcheck=None):
     """todo: [(pid, text)]. One global executor over every paper's chunk +
     absence tasks; per-paper finalize fires as soon as all its tasks land;
-    incremental save preserves paper-level atomicity."""
+    incremental save preserves paper-level atomicity.
+
+    inline_postcheck (paper-level pipeline, user directive 2026-09-22): dict
+    {vocab, out_dir} — when given, each paper runs the five quality gates
+    RIGHT AFTER finalize (check-as-you-extract) and lands in
+    <out_dir>/records_checked.json incrementally. The postcheck stage run
+    afterwards skips already-checked papers (skip_pids), so inline+stage
+    coexist and are byte-equivalent to the batch path."""
     results = load_json(out_path, default={}) or {}
     wal_path = out_path + ".progress.jsonl"
     wal = _wal_load(wal_path)
     writer = _WalWriter(wal_path)
+
+    inline_state = None
+    if inline_postcheck:
+        from .postcheck import build_vocab_sets, check_paper
+        from .common import save_json as _save
+        inline_state = {
+            "vocab_sets": build_vocab_sets(inline_postcheck["vocab"]),
+            "checked": load_json(inline_postcheck["out_dir"] + "/records_checked.json",
+                                 default={}) or {},
+            "dropped": load_json(inline_postcheck["out_dir"] + "/dropped.json",
+                                 default=[]) or [],
+            "out_dir": inline_postcheck["out_dir"],
+            "model": inline_postcheck.get("model", model),
+            "texts": inline_postcheck.get("texts") or {},
+        }
 
     def _finalize_and_save(pid):
         ctx = ctxs[pid]
@@ -590,6 +613,19 @@ def run_pool(todo, cards, registry, vocab, model, manifest, pool_size, out_path)
                                 (manifest.get(pid) or {}).get("title"))
         results[pid] = out
         save_json(results, out_path)  # incremental crash-safe
+        if inline_state and pid != "canary":
+            try:
+                checked_payload, drops, _w, _s = check_paper(
+                    pid, out, inline_state["texts"].get(pid, ""),
+                    inline_state["vocab_sets"], inline_state["model"])
+                inline_state["checked"][pid] = checked_payload
+                inline_state["dropped"].extend(drops)
+                _save(inline_state["checked"],
+                      inline_state["out_dir"] + "/records_checked.json")
+                _save(inline_state["dropped"],
+                      inline_state["out_dir"] + "/dropped.json")
+            except Exception as e:  # never let QC kill extraction
+                print(f"  [inline-postcheck:{pid}] ERROR {e}", flush=True)
 
     ctxs, futures = {}, {}
     n_skip = 0
@@ -658,6 +694,10 @@ def main():
     ap.add_argument("--workers", type=int, default=None,
                     help="deprecated alias for --pool (old callers keep working)")
     ap.add_argument("--only", default="")
+    ap.add_argument("--inline-postcheck", default="",
+                    help="out-dir: run the five quality gates per paper right "
+                         "after finalize (paper-level pipeline). The postcheck "
+                         "stage skips these pids via its skip_pids resume.")
     ap.add_argument("--repair", default="",
                     help="comma-separated pids to re-extract; seeds the WAL from "
                          "existing results so ONLY hole chunks get re-called")
@@ -696,9 +736,18 @@ def main():
     todo = [(pid, t) for pid, t in corpus
             if pid not in results and pid in cards]
     print(f"slot: {len(todo)} papers to run, model={args.model}", flush=True)
+    inline = None
+    if args.inline_postcheck:
+        out_dir = args.inline_postcheck
+        os.makedirs(out_dir, exist_ok=True)
+        inline = {"vocab": vocab, "out_dir": out_dir, "model": args.model,
+                  "texts": dict(corpus)}
+        print(f"inline postcheck ON -> {out_dir}/records_checked.json "
+              f"(paper-level pipeline; postcheck stage will skip these pids)",
+              flush=True)
     if todo:
         run_pool(todo, cards, registry, vocab, args.model, manifest,
-                 pool, args.out)
+                 pool, args.out, inline_postcheck=inline)
     else:
         print("nothing to do (all papers in output)", flush=True)
 
