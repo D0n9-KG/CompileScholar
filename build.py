@@ -155,6 +155,23 @@ STAGES = [
 ]
 
 
+# Dependency-based parallel groups (2026-09-22 user directive): stages whose
+# inputs don't depend on each other run CONCURRENTLY. The linear list order
+# remains the topological fallback for sequential runs.
+#   group 1 (build KB inputs): cards -> registry_vocab (strictly serial pair)
+#   group 2 (extraction fan-out): deep_extract, table_extract — independent
+#   group 3 (needs slot records): postcheck, notation — independent of each
+#           other (notation dedup is soft vs table records)
+#   group 4 (needs everything): registry_growth, views — growth needs slot
+#           records; views needs all products -> serial tail
+PARALLEL_GROUPS = {
+    "extract": ["deep_extract", "table_extract"],
+    "check": ["postcheck", "notation"],
+}
+# NOTE: table_extract phase 1 (deterministic) is independent even of
+# registry_vocab's LLM output — only phase 2 wants the registry. Fine-grained
+# interleaving is left to the stage internals (checkpointed, resumable).
+
 # ---------------------------------------------------------------------------
 # make layer: freshness, execution, checks
 # ---------------------------------------------------------------------------

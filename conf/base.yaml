@@ -10,7 +10,7 @@
 llm:
   model: "local:Qwen3.8-27B"        # 建库/答题统一模型（可比性硬闸的默认值）
   provider_allowlist: "local"        # D8 纯度闸：允许的 provider（逗号分隔）
-  local_max_concurrent: 32           # 探针实测峰值 384k tok/min @32
+  local_max_concurrent: 48           # 09-22 晚复测（3 副本）：64 路 568k / 96 路 671k tok/min 零失败；取 48 留排队余量（p50 延迟 10s 内）
   local_sock_timeout: 900            # smoke-1 教训：默认 300 撞墙烧重试；大输出调用物理需 ~600s
   local_max_attempts: 4
   wall_timeout: 900
