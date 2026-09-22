@@ -104,16 +104,127 @@ def install_lmi_router_shim():
         return  # upstream fixed it — nothing to do
 
     class _Router:
-        async def acompletion(self, messages, tools=None, **kwargs):
+        @staticmethod
+        def _parse_tool_calls(text: str) -> list[dict]:
+            """Extract {"tool_calls": [...]} JSON from model text (tolerant:
+            fences, prose around the JSON, bare call arrays)."""
+            import re as _re
+            if not text:
+                return []
+            # Hermes-style XML fallback FIRST (pure-XML text carries no
+            # braces, so the JSON branch below would early-return []):
+            # <function>NAME<parameter>k>v</parameter>...</function>
+            fx = _re.search(
+                r"<function>\s*(\w+)([\s\S]*?)</function>", text)
+            if fx:
+                args = {}
+                for pm in _re.finditer(
+                        r"<parameter>\s*(\w+)\s*>\s*([\s\S]*?)\s*</parameter>",
+                        fx.group(2)):
+                    v = pm.group(2)
+                    try:
+                        v = json.loads(v)
+                    except Exception:
+                        pass
+                    args[pm.group(1)] = v
+                return [{"name": fx.group(1), "arguments": args}]
+            m = _re.search(r"\{[\s\S]*\}", text)  # outermost braces span
+            if not m:
+                return []
+            try:
+                obj = json.loads(m.group(0))
+            except Exception:
+                return []
+            if isinstance(obj, dict):
+                calls = obj.get("tool_calls")
+            elif isinstance(obj, list):
+                calls = obj
+            else:
+                return []
+            out = []
+            for c in calls or []:
+                if isinstance(c, dict) and c.get("name"):
+                    out.append({"name": c["name"],
+                                "arguments": c.get("arguments") or {}})
+            return out
+
+        # aviary binds the model name POSITIONALLY (partial(acompletion,
+        # model_name)) then passes messages/tools as kwargs — the old
+        # (self, messages, tools=None) signature collided ("got multiple
+        # values for argument 'messages'") and every agent tool-selection
+        # call died -> every question fell to the "no papers" canned refusal
+        # (2026-09-23 root cause, 52 questions wasted before it was caught).
+        async def acompletion(self, *args, **kwargs):
             import litellm
             from litellm.types.utils import ModelResponse, Choices, Message
-            model = kwargs.pop("model", f"openai/{MODEL}")
+            # positional args come from the partial: (model_name,) — though
+            # a bare (messages,) form is tolerated too
+            model = kwargs.pop("model", None) or (
+                args[0] if args and isinstance(args[0], str) else f"openai/{MODEL}")
+            messages = kwargs.pop("messages", None)
+            if messages is None and args and not isinstance(args[0], str):
+                messages = args[0]
             body = {"model": model, "messages": messages,
-                    "temperature": kwargs.pop("temperature", 0.0)}
+                    "temperature": kwargs.pop("temperature", 0.0),
+                    # module-level litellm.acompletion bypasses the router
+                    # llm_config — inject the local endpoint unless the
+                    # caller supplied one (missing creds -> api.openai.com)
+                    "api_base": kwargs.pop("api_base", None) or
+                                os.environ.get("LOCAL_BASE_URL", "").rstrip("/"),
+                    "api_key": kwargs.pop("api_key", None) or
+                               os.environ.get("LOCAL_API_KEY", "local")}
+            tools = kwargs.pop("tools", None)
+            tool_choice = kwargs.pop("tool_choice", None)
             if tools:
-                body["tools"] = tools
-                if kwargs.get("tool_choice"):
-                    body["tool_choice"] = kwargs["tool_choice"]
+                # The GPUStack vLLM server has no --tool-call-parser: ANY
+                # native tool-calling is rejected ("tool_choice='required'
+                # requires --tool-call-parser"). Emulate tool calling in the
+                # prompt: render the schemas, ask for ONE JSON tool call,
+                # parse it back into a native tool_calls response. Agent
+                # adaptivity (the PaperQA2 method) is fully preserved.
+                tool_desc = json.dumps(tools, ensure_ascii=False)
+                instr = (
+                    "\n\n[TOOL CALLING PROTOCOL] The runtime cannot emit native "
+                    "tool_calls. You MUST still select exactly one function, but "
+                    "express it as your ENTIRE reply, a single JSON object of "
+                    'the form {"tool_calls": [{"name": "<function name>", '
+                    '"arguments": {<argument values>}}]} — no prose, no '
+                    "markdown fence.\n\nAvailable functions:\n" + tool_desc)
+                msgs = [dict(x) if isinstance(x, dict) else dict(x)
+                        for x in (messages or [])]
+                if msgs and msgs[0].get("role") == "system":
+                    msgs[0] = {**msgs[0],
+                               "content": str(msgs[0].get("content") or "") + instr}
+                else:
+                    msgs = [{"role": "system", "content": instr.strip()}] + msgs
+                body["messages"] = msgs
+                resp = await litellm.acompletion(**body)
+                ch = resp["choices"][0] if isinstance(resp, dict) else resp.choices[0]
+                msg = ch.get("message", {}) if isinstance(ch, dict) else ch.message
+                text = msg.get("content") if isinstance(msg, dict) else msg.content
+                calls = self._parse_tool_calls(text or "")
+                if calls:
+                    from litellm.types.utils import (ChatCompletionMessageToolCall,
+                                                     Function)
+                    tcs = [ChatCompletionMessageToolCall(
+                        id=f"call_{i}", type="function",
+                        function=Function(name=c["name"],
+                                          arguments=json.dumps(
+                                              c.get("arguments") or {},
+                                              ensure_ascii=False)))
+                        for i, c in enumerate(calls)]
+                    m = Message(role="assistant", content=None, tool_calls=tcs)
+                    return ModelResponse(
+                        id=resp.get("id", "x") if isinstance(resp, dict) else resp.id,
+                        created=0, model=model,
+                        choices=[Choices(index=0, finish_reason="tool_calls",
+                                         message=m)])
+                # no valid tool call parsed -> treat as a plain stop answer
+                m = Message(role="assistant", content=text, tool_calls=None)
+                return ModelResponse(
+                    id=resp.get("id", "x") if isinstance(resp, dict) else resp.id,
+                    created=0, model=model,
+                    choices=[Choices(index=0, finish_reason="stop", message=m)])
             resp = await litellm.acompletion(**body, **{
                 k: v for k, v in kwargs.items()
                 if k in ("max_tokens", "timeout", "api_base", "api_key")})
@@ -308,7 +419,11 @@ async def run(smoke: bool = False, q_limit: int | None = None):
     # mid-write read (files.zip hit 430 transiently), released the answer
     # pool against a still-writing index, and every reader collided with the
     # writer (WinError 5) or read half-written zips (zlib -5).
-    _IDX_DIR = os.path.join(INDEX_DIR, os.listdir(INDEX_DIR)[0])
+    # 2026-09-23 04:20 fix: the probe used os.listdir(INDEX_DIR)[0] — with
+    # sibling dirs (an 'answers' dir, a second pqa_index_* from a settings
+    # change) it probed the WRONG index. Resolve the actual runtime index
+    # directory from the SearchIndex object itself.
+    _IDX_DIR = str((await idx.docs_index_directory).parent)
     _FZIP = os.path.join(_IDX_DIR, "files.zip")
     t0 = time.time()
     stable_rounds = 0
