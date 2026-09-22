@@ -133,3 +133,15 @@
     +随机文档=必 0 分）被 resume 跳过逻辑保留②我方冒烟行清了 pilot
     文件漏清 answers_ours.json→judge 判出假 0 分。教训：**冒烟产物与
     正式产物必须物理隔离（不同 TAG/目录），或冒烟后全链清残**。
+30. **PaperQA agent 三层死因链（整夜罐头拒绝）**：①shim 签名与 aviary
+    partial(model) 调用约定冲突→工具选择全程 TypeError②vLLM 服务器无
+    --tool-call-parser→原生工具调用被拒③messages 自带 system 与注入
+    system 冲突。修=shim 重写（位置参数归一+凭证注入+提示词模拟工具调用
+    +JSON/XML 双格式解析）。**教训：shim/适配层的调用约定必须用真实调用
+    端到端冒烟，不是"能 import"就算接好——这个 shim 从未在真实 agent
+    路径上跑通过一次。**（晨间：GPUStack 加 --tool-call-parser 后可撤
+    模拟层）
+31. **PaperQA 索引侵蚀（430→360）**：use_absolute_paper_directory=True
+    （PS 时代配置债）与 sync 比较集结构性失配→每次重启删索引→边删边
+    崩。修=开关翻转+键重写+治愈跑。教训：**跨项目携带的配置项要重新
+    验证其在当前组合下的语义**（绝对/相对路径这类约定随版本变义）。
