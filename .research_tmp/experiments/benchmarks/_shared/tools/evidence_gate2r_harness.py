@@ -35,13 +35,15 @@ sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 from kb_infra.llm import call_paratera, call_local, parse_json_response
 
 
-def _chat(prompt, model=MODEL, max_tokens=8000, temperature=0.0,
+def _chat(prompt, model=None, max_tokens=8000, temperature=0.0,
           enable_thinking=False):
     """Provider-aware chat for the answer stack (2026-09-23 Multi-108): MODEL
     may be "local:Qwen3.8-27B" — baselines answer on the same local model, so
     our arm routes local: specs to call_local (ledger + concurrency gate apply
     automatically). Bare model names keep the historic paratera path, so PS53
     reproducibility is untouched."""
+    if model is None:
+        model = MODEL  # resolved at call time — MODEL may be set by a runner
     if isinstance(model, str) and model.startswith("local:"):
         return call_local(prompt, model=model.split(":", 1)[1],
                           max_tokens=max_tokens, temperature=temperature,

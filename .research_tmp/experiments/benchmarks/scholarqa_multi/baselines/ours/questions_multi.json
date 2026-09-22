@@ -1,0 +1,652 @@
+{
+ "questions": [
+  {
+   "qid": "norman_bio_1",
+   "prompt_type": "aggregation",
+   "question": "What are the key mechanisms for lipid nanoparticles (LNPs) to form biomolecular corona with various serum proteins and blood components?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "norman_bio_2",
+   "prompt_type": "aggregation",
+   "question": "What experimental strategies can be introduced to prevent LNPs to be exclusively accumulated in the liver?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "norman_bio_3",
+   "prompt_type": "aggregation",
+   "question": "How have advancements in synthetic biology and genetic engineering techniques contributed to the development of more efficient recombinant protein expression systems?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "norman_bio_4",
+   "prompt_type": "aggregation",
+   "question": "What are the most common applications of phage display-derived antibodies in biomedicine and diagnostics?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "norman_bio_5",
+   "prompt_type": "aggregation",
+   "question": "How have advancements in next-generation sequencing impacted the development and optimization of phage display libraries?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "norman_bio_6",
+   "prompt_type": "aggregation",
+   "question": "What are the critical factors affecting the library design and diversity in phage display for effective antibody discovery?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "norman_bio_7",
+   "prompt_type": "aggregation",
+   "question": "What are the production challenges and solutions associated with the large-scale manufacturing of recombinant antibodies?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "norman_bio_8",
+   "prompt_type": "aggregation",
+   "question": "How has the integration of recombinant antibody technology impacted the field of vaccine development and immune therapy?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "norman_bio_9",
+   "prompt_type": "aggregation",
+   "question": "What are the advantages of using Escherichia coli as a host organism for recombinant protein expression?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "norman_bio_10",
+   "prompt_type": "aggregation",
+   "question": "What challenges are commonly encountered in the production of recombinant proteins in E. coli?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "benjamin_bio_1",
+   "prompt_type": "aggregation",
+   "question": "What are the benefits of LNP-based drug delivery compared to other nanoparticle-based applications?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "benjamin_bio_2",
+   "prompt_type": "aggregation",
+   "question": "What are the biochemical analytical tools to assess the integrity and stability of LNPs?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "benjamin_bio_3",
+   "prompt_type": "aggregation",
+   "question": "What cancer type and cancer stage are most ideal for using image-guided surgery as a treatment option?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "benjamin_bio_4",
+   "prompt_type": "aggregation",
+   "question": "What are the benefits of semiconducting polymers over other commercially available biomaterials in terms of efficacy and effectiveness in tumor detection?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "benjamin_bio_5",
+   "prompt_type": "aggregation",
+   "question": "How linker stability is related to the potency and toxicity of ADCs upon intravenous administration?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "benjamin_bio_6",
+   "prompt_type": "aggregation",
+   "question": "What are different chemical methodologies to form ADC linkers?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "benjamin_bio_7",
+   "prompt_type": "aggregation",
+   "question": "What are potential candidates other than porcine model for xenotransplantation as a means to treat type-1 diabetes?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "benjamin_bio_8",
+   "prompt_type": "aggregation",
+   "question": "What are some ways to overcome ethical challenges in xenotransplantation?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "benjamin_bio_9",
+   "prompt_type": "aggregation",
+   "question": "Is it possible for microcapsules to cross the blood brain barrier?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "benjamin_bio_10",
+   "prompt_type": "aggregation",
+   "question": "What is the correlation between the efficacy of the EPR effect and the progression of tumor (benign, solid tumor, metastasis, etc.)?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "akari_cs_1",
+   "prompt_type": "aggregation",
+   "question": "Are there any papers showing the effectiveness of quality filtering of LLM pre-training data using more advanced models such as BERT? I found many prior studies only use fasttext but it could make the filtering models pretty weak...",
+   "gold_answer": ""
+  },
+  {
+   "qid": "akari_cs_2",
+   "prompt_type": "aggregation",
+   "question": "Hi everyone, I want to use LLM to evaluate the quality of my synthetically generated data using GPT-4. I was wondering if I should use GPT-4 as the evaluator LLM or should I use a different LLM so that it does not bias its own generation. Can someone kindly explain the best practice right now for this? thanks!",
+   "gold_answer": ""
+  },
+  {
+   "qid": "akari_cs_3",
+   "prompt_type": "aggregation",
+   "question": "Hi everyone! I was wondering if anyone knows about work on how LLM fine-tuning (perhaps when done poorly) causes the model to become worse at some things? For example, I’ve heard lots of anecdotes that fine-tuning LLMs for specific tasks “hurts their generation ability”, but I’m looking for papers with more systematic exploration.",
+   "gold_answer": ""
+  },
+  {
+   "qid": "akari_cs_4",
+   "prompt_type": "aggregation",
+   "question": "Many papers study optimal scaling laws for training compute. Has anyone analyzed optimality for inference-time compute? For instance, self-consistency samples many outputs to find the right answers. While this is effective, can't we just sample once if we have a stronger model?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "akari_cs_5",
+   "prompt_type": "aggregation",
+   "question": "Any papers/articles recommendations on RAG and GenAI viz-a-viz fine tuning?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "akari_cs_6",
+   "prompt_type": "aggregation",
+   "question": "Has anyone tried fine tuning with RAG— or have seen work on this?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "akari_cs_7",
+   "prompt_type": "aggregation",
+   "question": "do we know how true the “superficial alignment hypothesis” is?\nA model’s knowledge and capabilities are learnt almost entirely during pretraining, while alignment teaches it which subdistribution of formats should be used when interacting with users\nIs it true for all domains/aspects or is it only true for more perceivable aspects like helpfulness?\nDoes SFT on a huge instruction dataset teach models new knowledge? Pointers to related papers would be appreciated.",
+   "gold_answer": ""
+  },
+  {
+   "qid": "akari_cs_8",
+   "prompt_type": "aggregation",
+   "question": "Have anyone tried training with 4-bit quantization? Did you observe some performance difference with higher precision?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "akari_cs_9",
+   "prompt_type": "aggregation",
+   "question": "would appreciate it if anyone can share papers on synthetic data generation, especially those that generate hard reasoning problems ",
+   "gold_answer": ""
+  },
+  {
+   "qid": "akari_cs_10",
+   "prompt_type": "aggregation",
+   "question": "What are some of the key advantages and challenges of building multilingual evaluation datasets by translating existing English datasets into other target languages? Or more specifically, how do these translated datasets impact the quality and reliability of cross-lingual evaluations, and what potential pitfalls should be considered when using translations as a primary method for creating non-English benchmarks? ",
+   "gold_answer": ""
+  },
+  {
+   "qid": "rulin_cs_1",
+   "prompt_type": "aggregation",
+   "question": "What are the latest works on finetuning an auto-regressive LM for dense passage retrieval? How are their performance compared with bi-directional encoders?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "rulin_cs_2",
+   "prompt_type": "aggregation",
+   "question": "How do people train a long-context Transformer model over 32K context length using sequence parallelism techniques? How are these methods compared with each other?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "rulin_cs_3",
+   "prompt_type": "aggregation",
+   "question": "Could you explain the LLaVA series or variants? How they envolve over time?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "weijia_cs_1",
+   "prompt_type": "aggregation",
+   "question": "If we have a lot of specialized language models, how can we combine them to build a general system that combine the abilities of different models? Can this unified model be as good as the single large LM? ",
+   "gold_answer": ""
+  },
+  {
+   "qid": "weijia_cs_2",
+   "prompt_type": "aggregation",
+   "question": "What are papers that train multilmodal language models that can input and output both text and images?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "weijia_cs_3",
+   "prompt_type": "aggregation",
+   "question": "How do machine unlearning methods perform? Can they be used to remove knowledge from language models? ",
+   "gold_answer": ""
+  },
+  {
+   "qid": "weijia_cs_4",
+   "prompt_type": "aggregation",
+   "question": "How to evaluate copyright infringement of image generation models? ",
+   "gold_answer": ""
+  },
+  {
+   "qid": "weijia_cs_5",
+   "prompt_type": "aggregation",
+   "question": "How to detect or extract pretraining data from language models? Are there related works on this topic? ",
+   "gold_answer": ""
+  },
+  {
+   "qid": "weijia_cs_6",
+   "prompt_type": "aggregation",
+   "question": "What are the common model architectures for retrieval-augmented language models?\n",
+   "gold_answer": ""
+  },
+  {
+   "qid": "weijia_cs_7",
+   "prompt_type": "aggregation",
+   "question": "What is membership inference attack? ",
+   "gold_answer": ""
+  },
+  {
+   "qid": "weijia_cs_8",
+   "prompt_type": "aggregation",
+   "question": "Can you explain to me what is Visual programming?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "weijia_cs_9",
+   "prompt_type": "aggregation",
+   "question": "How should we analyze the training dynamics of language models?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "weijia_cs_10",
+   "prompt_type": "aggregation",
+   "question": "Could you please provide some references to work on multi-document summarization?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "jacqueline_cs_1",
+   "prompt_type": "aggregation",
+   "question": "What exactly is the \"dark knowledge\" that gets distilled in the standard formulation of knowledge distillation, wherein information is transferred from a teacher network to a student network? ",
+   "gold_answer": ""
+  },
+  {
+   "qid": "jacqueline_cs_2",
+   "prompt_type": "aggregation",
+   "question": "Can classifier-free guidance be extended beyond conditional diffusion models in image generation to NLP tasks?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "jacqueline_cs_3",
+   "prompt_type": "aggregation",
+   "question": "In knowledge distillation, the teacher model is typically a larger (more powerful) network than the student model. Has there been work showing that the teacher model is size-matched or smaller (but perhaps more targeted in knowledge) than the student model, and for knowledge transfer to still be effective? ",
+   "gold_answer": ""
+  },
+  {
+   "qid": "jacqueline_cs_4",
+   "prompt_type": "aggregation",
+   "question": "Data selection has emerged as an important problem for training good language models (i.e., which datapoints to include). Has there been any research on the ordering of datapoints for LMs (i.e., easy to hard curriculum sequence of data points), such that a LM may be trained in a more sample-efficient manner? ",
+   "gold_answer": ""
+  },
+  {
+   "qid": "jacqueline_cs_5",
+   "prompt_type": "aggregation",
+   "question": "One desirable property for LMs is that they should be well-calibrated, in that the LM can generate a confidence score that is well-calibrated to how likely its decision is actually correct. What are some recent works that seek to properly calibrate LM confidence judgments?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "jacqueline_cs_6",
+   "prompt_type": "aggregation",
+   "question": "Social bias in large language models is an endemic problem, as models often inherit and amplify stereotypical judgments due to naturally occurring, yet undesirable statistical associations from training corpora. What are some recent techniques on post-trained, aligned LMs that mitigate social bias?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "jacqueline_cs_7",
+   "prompt_type": "aggregation",
+   "question": "What are the differences between encoder-decoder and causal/non-causal decoder-only LMs?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "jacqueline_cs_8",
+   "prompt_type": "aggregation",
+   "question": "Pruning is a means of model compression that can improve model efficiency in NLP. What are some recent general, task-agnostic pruning methods for large language methods that have worked well?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "jacqueline_cs_9",
+   "prompt_type": "aggregation",
+   "question": "Has there been any direct head-to-head comparison of techniques that involve learning from human feedback, e.g., DPO vs PPO vs SimPO (preferably under a fixed compute budget)?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "jacqueline_cs_10",
+   "prompt_type": "aggregation",
+   "question": "Contrastive learning is an effective technique for learning good discriminative embedding representations, and was a popular training strategy for encoder-only LMs. With the recent popularity of causal, decoder-only LMs, have there been any works which show that contrastive learning can also help improve generative performance for this architecture?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "pan_biophysics_1",
+   "prompt_type": "aggregation",
+   "question": "Find some papers that discuss the methods to suppress multiple light scattering effect on light scattering imaging",
+   "gold_answer": ""
+  },
+  {
+   "qid": "pan_biophysics_2",
+   "prompt_type": "aggregation",
+   "question": "Find papers discussing phantom fabrication for bio tissues for imaging",
+   "gold_answer": ""
+  },
+  {
+   "qid": "pan_biophysics_3",
+   "prompt_type": "aggregation",
+   "question": "What orgnelle level reaction may contribute to the hetergeniety in dynamic imaging of cell ?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "pan_biophysics_4",
+   "prompt_type": "aggregation",
+   "question": "How to recognzie and suppress OCT autocorrelation artifact.",
+   "gold_answer": ""
+  },
+  {
+   "qid": "pan_biophysics_5",
+   "prompt_type": "aggregation",
+   "question": "How to compensate the dispersion in OCT by hardware or computational method",
+   "gold_answer": ""
+  },
+  {
+   "qid": "pan_biophysics_6",
+   "prompt_type": "aggregation",
+   "question": "how cancer cell response to anti-caner drugs",
+   "gold_answer": ""
+  },
+  {
+   "qid": "pan_biophysics_7",
+   "prompt_type": "aggregation",
+   "question": "What are major new advanced findings(novelty ) from polarization-sensitive Optical coherence tomography from traditional OCT",
+   "gold_answer": ""
+  },
+  {
+   "qid": "pan_biophysics_8",
+   "prompt_type": "aggregation",
+   "question": "How dynamic signal can be detected from OCT speckle",
+   "gold_answer": ""
+  },
+  {
+   "qid": "pan_biophysics_9",
+   "prompt_type": "aggregation",
+   "question": "What are reprensentative SNR improvement digital method in OCT imaging",
+   "gold_answer": ""
+  },
+  {
+   "qid": "shengyan_photonics_1",
+   "prompt_type": "aggregation",
+   "question": "What are ways to cool the center-of-mass (CoM) motion of levitated nanoparticles?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "shengyan_photonics_2",
+   "prompt_type": "aggregation",
+   "question": "What recent experiments have verified the existence of the Casimir force at the micro- and nanoscale?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "shengyan_photonics_3",
+   "prompt_type": "aggregation",
+   "question": "What are the large systems in which quantum effects have been successfully demonstrated?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "shengyan_photonics_4",
+   "prompt_type": "aggregation",
+   "question": "What progress has been made in trapping and controlling multiple nanoparticles?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "shengyan_photonics_5",
+   "prompt_type": "aggregation",
+   "question": "Which integrated phononic devices have been realized?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "shengyan_photonics_6",
+   "prompt_type": "aggregation",
+   "question": "Which experiments have demonstrated quantum effects in microwave-optics transducers?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "shengyan_photonics_7",
+   "prompt_type": "aggregation",
+   "question": "Which motion degrees of freedom of levitated nanospheres have been experimentally studied?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "shengyan_photonics_8",
+   "prompt_type": "aggregation",
+   "question": "What physical quantities can be precisely measured using a levitated nanosphere?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "shengyan_photonics_9",
+   "prompt_type": "aggregation",
+   "question": "What experiments can be conducted to verify or further study the non-Hermitian skin effect?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "shengyan_photonics_10",
+   "prompt_type": "aggregation",
+   "question": "What are some ways to overcome the heating issue due to residual optical absorption in the a levitated nanoparticle?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "minyang_physics_1",
+   "prompt_type": "aggregation",
+   "question": "What methods can be used to simulate Binary Black Holes in numerical relativity?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "minyang_physics_2",
+   "prompt_type": "aggregation",
+   "question": "What messager are combined in multi-messenger astrophysics approach?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "minyang_physics_3",
+   "prompt_type": "aggregation",
+   "question": "What astrophysical phenomena and physics theories can be found by the multi-messenger astrophysics (MMA) approach?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "minyang_physics_4",
+   "prompt_type": "aggregation",
+   "question": "What challenges does the multi-messager astrophysics (MMA) approach currently meet for detecting astrophysical phenomena?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "minyang_physics_5",
+   "prompt_type": "aggregation",
+   "question": "How to realize Topology Optimization of Cavity-Based Second Harmonic Generation?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "minyang_physics_6",
+   "prompt_type": "aggregation",
+   "question": "What are the ways to perform optomechincal cooling ",
+   "gold_answer": ""
+  },
+  {
+   "qid": "hao_photonics_1",
+   "prompt_type": "aggregation",
+   "question": "What are some ways to overcome the heating issue due to residual optical absorption in the integrated optomechanical devices?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "hao_photonics_2",
+   "prompt_type": "aggregation",
+   "question": "What types of mechanical resonators have been used to couple with superconducting qubits?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "hao_photonics_3",
+   "prompt_type": "aggregation",
+   "question": "What aspects can be studied using a coupled system of qubits and mechanical resonators?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "hao_photonics_4",
+   "prompt_type": "aggregation",
+   "question": "What methods have been explored to couple light from a fiber onto a chip under cryogenic temperature?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "hao_photonics_5",
+   "prompt_type": "aggregation",
+   "question": "What are ways to improve the behavior of the grating couplers?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "hao_photonics_6",
+   "prompt_type": "aggregation",
+   "question": "What are ways to modulate the gigahertz surface acoustic waves?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "hao_photonics_7",
+   "prompt_type": "aggregation",
+   "question": "What other systems, besides photonic crystals, have demonstrated bound states in the continuum?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "hao_photonics_8",
+   "prompt_type": "aggregation",
+   "question": "What discoveries have been made regarding the topological charge corresponding to bound states in the continuum?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "hao_photonics_9",
+   "prompt_type": "aggregation",
+   "question": "What physical platforms can be used to study the quantum properties of phonons?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "hao_photonics_10",
+   "prompt_type": "aggregation",
+   "question": "Which quantum states of phonons have been successfully prepared?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "yanyu_photonics_1",
+   "prompt_type": "aggregation",
+   "question": "How do high-Q dielectric optical microcavities, specifically whispering gallery mode (WGM) resonators, function as biosensors for detecting nanomaterials and biomolecules?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "yanyu_photonics_2",
+   "prompt_type": "aggregation",
+   "question": "How do hybrid plasmonic–photonic enhance the sensitivity of whispering gallery mode (WGM) or photonic crystal (PC) nanobeam cavity sensors for single-molecule detection? ",
+   "gold_answer": ""
+  },
+  {
+   "qid": "yanyu_photonics_3",
+   "prompt_type": "aggregation",
+   "question": "How does particle binding to a high-Q optical microcavity induce a resonance shift, and what are the limitations and enhancements required for sensitive single-protein detection using cavity optomechanics?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "yanyu_photonics_4",
+   "prompt_type": "aggregation",
+   "question": "How do exceptional points (EPs) in optical resonators enhance the sensitivity of sensors compared to traditional diabolic points (DPs) for detecting nanoparticles and biomolecules?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "yanyu_photonics_5",
+   "prompt_type": "aggregation",
+   "question": "What are the current state of the art in which photonic metamaterial surfaces are utilized to enhance Label-Free Imaging in Phase Contrast Microscopy and Refractometric Microscopy?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "yanyu_photonics_6",
+   "prompt_type": "aggregation",
+   "question": "How can all-dielectri photonics crystal enhance fluorescence? ",
+   "gold_answer": ""
+  },
+  {
+   "qid": "yanyu_photonics_7",
+   "prompt_type": "aggregation",
+   "question": "Can you explain the significance of ultra-sensitive detection in life science research?\n",
+   "gold_answer": ""
+  },
+  {
+   "qid": "yanyu_photonics_8",
+   "prompt_type": "aggregation",
+   "question": "What are the limitations of usinhg quantitative reverse transcriptase PCR to detect miRNA at a very low concentration?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "yanyu_photonics_9",
+   "prompt_type": "aggregation",
+   "question": "What are the recent research advancements in enhancing fluorescence for imaging?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "yanyu_photonics_10",
+   "prompt_type": "aggregation",
+   "question": "What are the recent research advancements in enhancing fluorescence for biosensing using photonic crystal?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "bohao_cs_1",
+   "prompt_type": "aggregation",
+   "question": "How can natural language processing and machine learning techniques be leveraged to improve the understanding of medical jargon and research papers for non-experts?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "bohao_cs_2",
+   "prompt_type": "aggregation",
+   "question": "How can we develop effective personalized systems to improve understanding of scientific concepts and jargon across different domains and expertise levels?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "bohao_cs_3",
+   "prompt_type": "aggregation",
+   "question": "How can user modeling techniques be improved to capture and leverage individual preferences more effectively in personalized recommendation systems?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "bohao_cs_4",
+   "prompt_type": "aggregation",
+   "question": "How can complex word identification (CWI) models be personalized to improve their performance for individual users with different language backgrounds and proficiency levels?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "bohao_cs_5",
+   "prompt_type": "aggregation",
+   "question": "In the domain of HCI or social science, there are many cases that researchers need to conduct studies with surveys and participants. How can large language models (LLMs) be used to simulate or represent diverse human populations in such social science applications?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "bohao_cs_6",
+   "prompt_type": "aggregation",
+   "question": "In survey-based research, generating questions with different granularity is usually a heavy work. Are there any question-generation models that are controllable over the specificity of the questions?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "bohao_cs_7",
+   "prompt_type": "aggregation",
+   "question": "In real research reading, scholar will search for relavent work or follow-up papers in order to get a more comprehensive understanding. Is there any work done to automate or assist in this process?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "bohao_cs_8",
+   "prompt_type": "aggregation",
+   "question": "Interdisciplinary research usually takes extra efforts to conduct. Are there any systems or approaches to facilitate interdisciplinary research and cross-domain discovery in scientific fields?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "bohao_cs_9",
+   "prompt_type": "aggregation",
+   "question": "Citation graph is a good tool to find relevant work and to help understand the evolution of the domain. What recent research has been done to analyze scientific discourse and generate citation content using citation networks and related textual information?",
+   "gold_answer": ""
+  },
+  {
+   "qid": "bohao_cs_10",
+   "prompt_type": "aggregation",
+   "question": "For research paper reading, how can we improve the automatic generation of related work sections for scientific papers with the help of language models?",
+   "gold_answer": ""
+  }
+ ]
+}
