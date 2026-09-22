@@ -10,7 +10,7 @@
 llm:
   model: "local:Qwen3.8-27B"        # 建库/答题统一模型（可比性硬闸的默认值）
   provider_allowlist: "local"        # D8 纯度闸：允许的 provider（逗号分隔）
-  local_max_concurrent: 48           # 09-22 晚复测（3 副本）：64 路 568k / 96 路 671k tok/min 零失败；取 48 留排队余量（p50 延迟 10s 内）
+  local_max_concurrent: 96           # 09-22 晚复测（3 副本）：64路/568k、96路/671k、128路/684k 全零失败；甜点 64-96（128 时 p50 延迟翻倍 21s）
   local_sock_timeout: 900            # smoke-1 教训：默认 300 撞墙烧重试；大输出调用物理需 ~600s
   local_max_attempts: 4
   wall_timeout: 900
@@ -19,7 +19,7 @@ llm:
 
 slot:
   max_chars: 500000                  # 深抽上限（用户批 09-21；卡片/absence 层维持 110k 硬编码物理预算）
-  pool_size: 30                      # 全局 chunk 并发（A2：固定池，不再 workers×chunk_threads 浮动）
+  pool_size: 64                      # 全局 chunk 并发（容量复测 09-22：甜点 64-96；原 30 是旧探针时代保守值）
 
 registry:
   tau1: 0.84                         # 门①校准（遗产 973 表面名真值：阻塞召回 0.896）

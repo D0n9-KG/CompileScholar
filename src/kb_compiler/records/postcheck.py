@@ -574,7 +574,7 @@ def run_postcheck(records_by_paper, texts, vocab, model, dry=False, triage=None,
     fixed_map = {}
     if all_jobs and not dry:
         from concurrent.futures import ThreadPoolExecutor
-        workers = int(os.environ.get("POSTCHECK_REPAIR_WORKERS", "16"))
+        workers = int(os.environ.get("POSTCHECK_REPAIR_WORKERS", "48"))
         texts_by_pid = {pid: text for pid, _cp, text in papers}
 
         def _repair_one(job):

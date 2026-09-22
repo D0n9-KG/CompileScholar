@@ -236,7 +236,7 @@ def main():
         all_batches = [(bstart, formulas[bstart:bstart + BATCH_SIZE])
                        for bstart in range(0, len(formulas), BATCH_SIZE)]
         from concurrent.futures import ThreadPoolExecutor
-        workers = int(os.environ.get("NOTATION_POOL", "16"))
+        workers = int(os.environ.get("NOTATION_POOL", "32"))
         with ThreadPoolExecutor(max_workers=workers) as nex:
             props_list = list(nex.map(
                 lambda b: llm_harvest(build_prompt(title, b[1]),
@@ -270,7 +270,7 @@ def main():
         return pid, pid_harvest, rej_items
 
     from concurrent.futures import ThreadPoolExecutor
-    _w = int(os.environ.get("NOTATION_PAPER_POOL", "4"))
+    _w = int(os.environ.get("NOTATION_PAPER_POOL", "6"))
     with ThreadPoolExecutor(max_workers=_w) as ppex:
         # NOTE: each _harvest_paper internally runs its own batch pool
         # (NOTATION_POOL wide); paper-pool x batch-pool approximates the GPU

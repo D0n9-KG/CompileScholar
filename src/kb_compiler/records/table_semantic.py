@@ -505,7 +505,7 @@ def main():
         prompt = build_prompt(repr_, caption, context, reg_names)
         return key, t, llm_propose(prompt, args.model, provider=args.provider)
 
-    with ThreadPoolExecutor(max_workers=int(os.environ.get("F35_POOL", "12"))) as pex:
+    with ThreadPoolExecutor(max_workers=int(os.environ.get("F35_POOL", "32"))) as pex:
         settled = list(pex.map(_propose_one, items))
     for i, (key, t, prop) in enumerate(settled):
         pid, th = key
