@@ -814,6 +814,38 @@ def check_arm_purity(log_path: str | None = None,
     }
 
 
+def _repair_control_chars_in_strings(obj_text: str) -> str:
+    """Escape literal newlines/tabs inside JSON string values (2026-09-22
+    registry_growth forensics: Qwen3.8-27B occasionally emits raw newlines
+    inside string values — invalid JSON that json.loads rejects. Three
+    consecutive ChannelDead aborts traced to exactly this; the outputs were
+    balanced and complete, just carrying control chars in strings)."""
+    out = []
+    in_str = False
+    esc = False
+    for c in obj_text:
+        if esc:
+            out.append(c)
+            esc = False
+            continue
+        if c == chr(92):  # backslash
+            out.append(c)
+            esc = True
+            continue
+        if c == '"':
+            in_str = not in_str
+            out.append(c)
+            continue
+        if in_str and c == chr(10):
+            out.append(chr(92) + "n")
+            continue
+        if in_str and c == chr(9):
+            out.append(chr(92) + "t")
+            continue
+        out.append(c)
+    return "".join(out)
+
+
 def parse_json_response(text: str | None) -> Any:
     r"""Parse JSON from LLM response, handling markdown fences and extra text.
 
@@ -831,6 +863,12 @@ def parse_json_response(text: str | None) -> Any:
     if obj is not None:
         try:
             return json.loads(obj)
+        except Exception:
+            pass
+        # repair tier: raw newlines/tabs inside string values (LLM-emitted
+        # invalid JSON — balanced but with control chars)
+        try:
+            return json.loads(_repair_control_chars_in_strings(obj))
         except Exception:
             pass
     # fallback: old greedy regex (last resort, may fail on long prose)
