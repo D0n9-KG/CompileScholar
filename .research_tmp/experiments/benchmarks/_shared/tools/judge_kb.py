@@ -30,7 +30,7 @@ from kb_infra.llm import call_paratera  # noqa: E402
 IDX_DIR = os.path.join(HERE, "rec_index")
 OUT = os.path.join(HERE, "kb_cov.jsonl")
 MODEL = "GLM-5.3"
-WORKERS = 8
+WORKERS = 16
 
 
 def patch_numpy_rank():

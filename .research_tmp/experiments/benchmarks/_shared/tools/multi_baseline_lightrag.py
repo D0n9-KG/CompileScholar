@@ -224,7 +224,7 @@ async def run_queries(rag, smoke: bool = False, q_limit: int | None = None):
     todo_qs = [q for q in questions
                if not (q["id"] in done and (done[q["id"]].get("answer_official_all")
                                             or done[q["id"]].get("err")))]
-    fanout = int(os.environ.get("LRAG_QUERY_FANOUT", "4"))
+    fanout = int(os.environ.get("LRAG_QUERY_FANOUT", "6"))
     print(f"questions: {len(todo_qs)} to answer, fanout={fanout}", flush=True)
     sem = asyncio.Semaphore(fanout)
     _save_lock = asyncio.Lock()

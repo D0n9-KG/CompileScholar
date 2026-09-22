@@ -23,7 +23,7 @@ ANSWERS = os.environ.get("GOLDCOV_ANSWERS") or os.path.join(
     D2, "term_stage", "term_53arm", "answers_pilot_term_ours53.json")
 OUT = os.environ.get("GOLDCOV_ANS_OUT") or os.path.join(HERE, "ans_cov.jsonl")
 MODEL = "GLM-5.3"
-WORKERS = 8
+WORKERS = 16
 
 PROMPT = """You are auditing whether ONE atomic key point from a reference answer also appears in a model's answer to the same question.
 

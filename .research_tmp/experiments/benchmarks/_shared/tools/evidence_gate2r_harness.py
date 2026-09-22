@@ -1939,7 +1939,7 @@ def stage_answer(arm, qs, outp, kb, tkb, grounding, glog):
     def one(q):
         return run_question(q, arm, kb, tkb, grounding, glog)
 
-    with ThreadPoolExecutor(max_workers=3) as ex:
+    with ThreadPoolExecutor(max_workers=int(os.environ.get('OURS_QUERY_FANOUT', '4'))) as ex:
         for r in ex.map(one, todo):
             results.append(r)
             g = r["gate"]
@@ -2011,7 +2011,7 @@ def stage_judge(arm, outp, ans_path=None):
         return out
 
     rows = []
-    with ThreadPoolExecutor(max_workers=3) as ex:
+    with ThreadPoolExecutor(max_workers=int(os.environ.get('OURS_QUERY_FANOUT', '4'))) as ex:
         for r in ex.map(one, answers):
             rows.append(r)
             print(f"  [judge|{r['id']}] score={r.get('score')}"
