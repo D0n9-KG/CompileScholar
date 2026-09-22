@@ -213,15 +213,20 @@ def main():
         except Exception:
             rejected = []
     n_forms = 0
-    for pid, text in texts.items():
-        if pid in harvested:
-            continue
+    # paper-level pool (2026-09-22 user directive: keep the local GPU full):
+    # per-paper harvests are independent; the old paper-serial loop left the
+    # batch pool idle between papers. Settle + incremental save stay ordered.
+    todo_papers = [(pid, text) for pid, text in texts.items() if pid not in harvested]
+    print(f"papers to harvest: {len(todo_papers)}", flush=True)
+
+    def _harvest_paper(pid, text):
         formulas = scan_formulas(text)
         if args.limit:
             formulas = formulas[:args.limit]
         title = (recs_by_paper.get(pid) or {})
         title = (title.get("_title") if isinstance(title, dict) else None) or pid
         pid_harvest = []
+        rej_items = []
         pid_symbols = set(existing.get(pid, set()))
         # batch pool (2026-09-22, same pattern as deep_extract/postcheck):
         # batch calls are independent, gate is batch-local -> fly all of a
@@ -261,20 +266,30 @@ def main():
                     pid_harvest.append(rec)
                     pid_symbols.add(_math_strip(rec["symbol"]).lower())
                 else:
-                    rejected.append({"pid": pid, "symbol": p.get("symbol"), "reason": reason})
-            n_forms += len(batch)
-            if n_forms % 30 < BATCH_SIZE:
-                print(f"  [{n_forms}/{total_f if not args.limit else args.limit*len(texts)}] "
-                      f"harvested={sum(len(v) for v in harvested.values())} "
-                      f"rejected={len(rejected)}", flush=True)
-        if pid_harvest:
-            harvested[pid] = pid_harvest
-        # incremental crash-safe save (paper-level checkpoint)
-        os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
-        json.dump(harvested, open(args.out, "w", encoding="utf-8"),
-                  ensure_ascii=False, indent=1)
-        json.dump(rejected, open(rej_path, "w", encoding="utf-8"),
-                  ensure_ascii=False, indent=1)
+                    rej_items.append({"pid": pid, "symbol": p.get("symbol"), "reason": reason})
+        return pid, pid_harvest, rej_items
+
+    from concurrent.futures import ThreadPoolExecutor
+    _w = int(os.environ.get("NOTATION_PAPER_POOL", "4"))
+    with ThreadPoolExecutor(max_workers=_w) as ppex:
+        # NOTE: each _harvest_paper internally runs its own batch pool
+        # (NOTATION_POOL wide); paper-pool x batch-pool approximates the GPU
+        # gate — the LOCAL_MAX_CONCURRENT semaphore in kb_infra is the true
+        # global cap, so nesting here cannot oversubscribe the server.
+        for pid, pid_harvest, rej_items in ppex.map(
+                lambda pt: _harvest_paper(*pt), todo_papers):
+            if pid_harvest:
+                harvested[pid] = pid_harvest
+            rejected.extend(rej_items)
+            n_forms += 1
+            # incremental crash-safe save (paper-level checkpoint)
+            os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
+            json.dump(harvested, open(args.out, "w", encoding="utf-8"),
+                      ensure_ascii=False, indent=1)
+            json.dump(rejected, open(rej_path, "w", encoding="utf-8"),
+                      ensure_ascii=False, indent=1)
+            print(f"  paper done: {pid[:50]} harvested={sum(len(v) for v in harvested.values())} "
+                  f"rejected={len(rejected)}", flush=True)
 
     os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
     json.dump(harvested, open(args.out, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
