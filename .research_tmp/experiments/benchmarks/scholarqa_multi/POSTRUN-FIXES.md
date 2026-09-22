@@ -51,3 +51,15 @@
 - LightRAG failed=8：8 篇入库失败待归因（跑完查 doc_status 失败原因）。
 - notation 拒率 ~58%：大部分是行内非定义公式，符合预期；跑完抽样核实。
 - LightRAG 索引库 graphml 6.6MB/5328 节点：430 篇全入库后重查规模。
+
+## E. 能力边界（用户裁定：能修的跑完要修）
+
+16. **跨篇符号消歧**：notation 记录篇内局部，同符号跨论文不同义
+    （C=电容/cooperativity/置信度）。修法方向：registry_growth 给
+    notation 建 symbol-namespace 实体（篇内符号→全局消歧键）。
+17. **多步公式推理**：平铺定义无推导链，"由式3和式5推出"类答不了。
+    修法方向：notation 记录加 references 字段（本公式引用了哪些先行
+    符号），形成符号依赖图。
+18. **纯视觉图表推理**："图3曲线哪个先达峰"类只有 caption 兜。
+    修法方向：figure_channel（识图通道）已有模块未集成，VLM 建库
+    预算 ~22M 待批。
