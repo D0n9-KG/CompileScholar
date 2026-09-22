@@ -25,6 +25,7 @@ a queue for the arbitration channel (spec governance).
 from __future__ import annotations
 
 import json
+import os
 import re
 import sys
 from collections import defaultdict
@@ -200,7 +201,8 @@ def run_all(records_by_paper, registry, vocab):
 
 
 if __name__ == "__main__":
-    sys.path.insert(0, "C:/Users/D0n9/Desktop/CompileScholar/src")
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(
+        os.path.dirname(os.path.abspath(__file__))))))  # repo/src
     import argparse
     from kb_compiler.records.common import load_json, save_json
     ap = argparse.ArgumentParser()

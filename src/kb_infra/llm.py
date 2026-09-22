@@ -33,10 +33,20 @@ _CTX.check_hostname = False
 _CTX.verify_mode = ssl.CERT_NONE
 
 
-def load_env(path: str = "C:/Users/D0n9/Desktop/CompileScholar/.env") -> dict:
-    # Missing file -> empty env (providers fall back to os.environ). This is
-    # load-bearing during the LogicKG->CompileScholar folder rename window and
-    # for any fresh clone without a .env; a hard crash here killed imports.
+def load_env(path: str = "") -> dict:
+    # Default: repo-root .env resolved relative to this file (portable since
+    # B6 2026-09-22; was a hardcoded absolute path). Missing file -> empty env
+    # (providers fall back to os.environ). A hard crash here once killed
+    # imports on fresh clones, so stay silent on missing files.
+    if not path:
+        path = os.path.join(os.path.dirname(os.path.dirname(
+            os.path.dirname(os.path.abspath(__file__)))), ".env")
+    if not os.path.exists(path):
+        return {}
+    env = {}
+    with open(path, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
     if not os.path.exists(path):
         return {}
     env = {}

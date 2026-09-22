@@ -27,7 +27,24 @@ archive/             历史形态归档（gitignored，磁盘保留可逆；见 
 ## 运行
 
 ```bash
-python -m pytest tests/ -q          # 需 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 若本地 logfire 插件损坏
+python -m pip install -e . --no-deps   # 一次性：让 kb_compiler/kb_infra 全局可导入
+python build.py --list                 # 管线站表 + 新鲜度
+python build.py                        # 跑全管线（产物在即跳过；LLM 站重跑须 --force）
+python build.py postcheck --force      # 单站强制重跑
+python -m pytest tests/ -q             # 需 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 若本地 logfire 插件损坏
 ```
 
-LLM 凭据在 `.env`（PARATERA/CST/LOCAL provider）；建库与答题入口见 ASSET-STATE.md §2-§3。
+- **配置**：`conf/base.yaml`（参数单一事实源，git 追踪）+ `conf/local.yaml`（本机覆盖，gitignored）；LLM 凭据在 `.env`
+- **每次完整跑**落盘 `runs/manifest-*.json`（git sha + config + 每站 hash + check 结果）
+
+### 历史代号 → 现名（2026-09-22 起，代码表面已退役）
+
+| 旧代号 | 现名（模块=stage=产物） |
+|---|---|
+| slot / 深抽 | `deep_extract` |
+| skeleton / 建卡 | `cards` |
+| F24 表格通道 | `table_extract` phase 1（确定性解析） |
+| F35 表格语义 | `table_extract` phase 2（LLM 语义化） |
+| round2 | `registry_growth` |
+
+旧文档/判决档中的代号按此表阅读。
