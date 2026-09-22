@@ -490,13 +490,28 @@ def main():
     print(f"tables to process: {len(items)} "
           f"(resumed corrected={len(corrected)} rejected={len(rejected)})", flush=True)
     n_acc = n_deg = n_rej = n_corr = 0
-    for i, (key, t) in enumerate(items):
+    # proposal pool (2026-09-22, completes the full-chain scan): table
+    # proposals are independent LLM calls; gate+apply are local per table.
+    # Canary runs BEFORE this loop and is unaffected (hard-stop semantics
+    # preserved — the canary verdict gates whether we enter here at all).
+    from concurrent.futures import ThreadPoolExecutor
+
+    def _propose_one(item):
+        key, t = item
         pid, th = key
         repr_ = table_repr(t["records"])
         cs = t["records"][0].get("chunk_char_start") or 0
         caption, context = caption_and_context(texts.get(pid, ""), cs)
         prompt = build_prompt(repr_, caption, context, reg_names)
-        prop = llm_propose(prompt, args.model, provider=args.provider)
+        return key, t, llm_propose(prompt, args.model, provider=args.provider)
+
+    with ThreadPoolExecutor(max_workers=int(os.environ.get("F35_POOL", "12"))) as pex:
+        settled = list(pex.map(_propose_one, items))
+    for i, (key, t, prop) in enumerate(settled):
+        pid, th = key
+        repr_ = table_repr(t["records"])
+        cs = t["records"][0].get("chunk_char_start") or 0
+        caption, context = caption_and_context(texts.get(pid, ""), cs)
         if prop is None:
             rejected.append({"pid": pid, "th": th[:80], "reason": "llm_unparseable"}); n_rej += 1
             continue
