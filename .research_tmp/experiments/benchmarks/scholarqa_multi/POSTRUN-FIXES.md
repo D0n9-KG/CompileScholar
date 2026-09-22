@@ -68,3 +68,8 @@
     汇流后（views 前），per-kind 校验表驱动（notation=LaTeX 折叠锚定、
     表格=单元格锚定——check_record 本就按 kind 分派，架构现成）。
     顺带把 F24 对 checked 的 dedup 基底依赖改为显式合并语义。
+20. **基线 harness 迁 Linux 服务器**（用户提议）：PaperQA2 的 11 bug 中 5
+    个是 Windows 专属（文件锁/路径/编码/半写读）。GPUStack 宿主机
+    （192.168.199.73）若有 CPU 余量，QASA/LitSearch 前把基线 harness
+    迁过去——本地调用变同机调用+消灭 Windows 文件语义。Docker Desktop
+    不推荐（bind mount 仍过 NTFS，收益打折）。
