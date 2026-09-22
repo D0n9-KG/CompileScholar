@@ -186,6 +186,14 @@ def install_litellm_ledger_hooks():
 
     litellm.success_callback = [_cb]
     litellm.failure_callback = [_cb]
+    # lmi drives litellm through the ASYNC path (acompletion/aembedding), and
+    # litellm's async handlers read ONLY the _async_* callback lists — a sync
+    # callback registered on success_callback alone never fires (measured:
+    # zero ledger rows despite thousands of calls). Sync callables in the
+    # async list are invoked via customLogger.async_log_event, so the same
+    # _cb works on both paths.
+    litellm._async_success_callback = [_cb]
+    litellm._async_failure_callback = [_cb]
 
 
 def build_settings():

@@ -117,3 +117,19 @@
 26. **看门狗 build-chain 探针 run_id 脆弱**：探针按 run_id 过滤账本行，
     换 run_id 重启后读 0 → 必然误报 WEDGED。已改为 run_id 无关的全
     ok 行计数。
+27. **PaperQA 账本全损（异步回调盲区）**：litellm 的 async 路径只读
+    `_async_success_callback` 列表，harness 只挂了 sync `success_callback`
+    → 数千次调用零入账（纯度断言盲区+成本不可审计）。修复=双列表同挂
+    （sync callable 在 async 列表会被 customLogger.async_log_event 包装调
+    用，实测入账）。教训：**回调挂账必须端到端验证一条真调用入账**，
+    不能只看注册不报错。
+28. **编译路径引用形态断裂（Multi 冒烟首案）**：notes 回引=[record_id]
+    (hex)，编译 prompt 要求"[paper_id]"，模型两头对不上自造 [Wan#10800]
+    →官方桥翻译 0 引用=Citation F1 必 0。修复=①编译/直答 prompt 明确
+    "逐字拷贝 note 行首的括号 id"②官方桥支持 record_id→paper_id 解析
+    （records_checked 建倒排）。**教训：引用形态必须在冒烟时端到端验
+    译一次，不能假定 prompt 词汇=输出形态。**
+29. **冒烟残留污染正式数据两案**：①lightrag 昨日冒烟 2 行（残缺索引
+    +随机文档=必 0 分）被 resume 跳过逻辑保留②我方冒烟行清了 pilot
+    文件漏清 answers_ours.json→judge 判出假 0 分。教训：**冒烟产物与
+    正式产物必须物理隔离（不同 TAG/目录），或冒烟后全链清残**。

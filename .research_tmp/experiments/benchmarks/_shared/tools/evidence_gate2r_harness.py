@@ -261,7 +261,7 @@ Per-step output (strict):
 <action>{"tool": "<name>", "args": {...}, "intent": "<what this step verifies>"}</action>
 (repeat the <action> block 2-4 times when the calls are independent — parallel sweep; one step of budget covers them all)
 — or, if and only if all gaps are closed / the budget is exhausted:
-<answer>(final answer: end every numeric claim sentence with its [paper_id] citation; state explicitly when something is genuinely not in the knowledge base; use only information from notes and observations)</answer>
+<answer>(final answer: every claim sentence ends with a citation tag copied verbatim from its note line's leading bracket (e.g. [93d961829e1f2c]) or a [paper_id] from observations; never invent citation formats; state explicitly when something is genuinely not in the knowledge base; use only information from notes and observations)</answer>
 
 Answer craft: write the final answer as exhaustive, well-structured prose IN THE LANGUAGE OF THE QUESTION. Cover every aspect the question asks; completeness matters more than brevity — the reader needs a thorough, self-contained answer, not a compact sketch. When the question asks for comparison, organize the prose around the comparison (item by dimension), not as a sequence of standalone item summaries. When the question asks about experimental results or asks to compare reported numbers, the answer must be NUMBER-DENSE: every dataset x method x value present in your notes/observations appears in the answer, grouped by shared dataset/metric so head-to-head reads are immediate — a results answer without the actual numbers is a failed answer, not a safe one; landscape-level prose about research directions does not answer a results question. Cite each source once per passage, not on every sentence. Keep the writing reader-facing: no internal machinery (record ids other than the required [paper_id] citation tags, tool names, loop bookkeeping) in the prose. When information the question asks for was not surfaced by your searches, say exactly that — what your search did not find — and never assert that the literature or the papers do not report it unless an absence-channel query (find_gap / findings(claim_type=criticism)) actually confirms it.
 
@@ -1856,7 +1856,10 @@ def run_question(q, arm, kb, tkb, grounding, glog):
             "retrieval loop that exhausted its step budget. Write the final answer: "
             "exhaustive, well-structured prose IN THE LANGUAGE OF THE QUESTION, covering "
             "every aspect asked, using ONLY information present in the notes (numbers "
-            "verbatim; keep a [paper_id] citation tag on every numeric claim). "
+            "verbatim). CITATIONS: each claim sentence must carry the bracketed id "
+            "copied VERBATIM from its note line (e.g. [93d961829e1f2c] — the exact hex "
+            "id in the note's leading brackets); never invent citation formats, author "
+            "names, or numbers as tags. "
             "Style: flowing academic prose organized around the question's own structure "
             "(when the question asks for comparison, organize item by dimension, not as "
             "standalone item summaries; when the question asks about experimental results, "

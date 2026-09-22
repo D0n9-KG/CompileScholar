@@ -225,32 +225,56 @@ def wrap_f21(kb):
 
 _PID_MARK = re.compile(r"\[([A-Za-z0-9_\-]{6,80})\]")
 
+# record_id -> paper stem (notes carry [record_id] backrefs; the answer
+# copies them — the bridge resolves record ids to their paper before the
+# official ctx translation)
+_REC2PID: dict[str, str] = {}
+
+
+def _load_rec2pid():
+    if _REC2PID:
+        return
+    recs = json.load(open(os.path.join(KB, "postcheck", "records_checked.json"),
+                          encoding="utf-8"))
+    for pid, payload in recs.items():
+        if not isinstance(payload, dict):
+            continue
+        for r in payload.get("records") or []:
+            if r.get("id"):
+                _REC2PID[str(r["id"])] = pid
+
 
 def to_official_row(r: dict, id_mapping: dict) -> dict:
     """Native result row -> baseline-compatible official answer row.
-    [paper_id] markers translate 1:1 to stems (paper_id == corpus text stem)."""
+    Citation markers in the answer may be [paper_id] stems (direct path) or
+    [record_id] hex ids (notes backrefs / compiled path) — both resolve to
+    stems, then translate to official [ctx_idx]. Invented markers (e.g.
+    [Wan#10800]) resolve to nothing and drop per official semantics."""
     from multi_baseline_common import CitationTranslator
+    _load_rec2pid()
     qid = r["id"]
     raw = r.get("answer") or ""
     tr = CitationTranslator(qid, id_mapping)
     pairs, seen = [], set()
     for m in _PID_MARK.finditer(raw):
-        pid = m.group(1)
-        if pid in seen:
+        rid = m.group(1)
+        if rid in seen:
             continue
-        seen.add(pid)
-        pairs.append((m.group(0), pid))
-    off_all, cites = tr.translate(raw, pairs, policy="all")
-    off_first, _ = tr.translate(raw, pairs, policy="first")
+        seen.add(rid)
+        pairs.append((m.group(0), rid))
+    # record_id -> stem resolution pass
+    resolved = [(mk, (_REC2PID.get(rid) or rid)) for mk, rid in pairs]
+    off_all, cites = tr.translate(raw, resolved, policy="all")
+    off_first, _ = tr.translate(raw, resolved, policy="first")
+    qmap = id_mapping.get(qid) or {}
     return {"qid": qid, "question": r.get("question"),
             "raw_answer": raw, "references": [],
             "answer_official_all": off_all, "citations_all": cites,
             "answer_official_first": off_first,
             "citation_mapped": tr.mapped, "citation_dropped": tr.dropped,
-            "unresolved_markers": sum(1 for _, s in pairs
-                                      if not (id_mapping.get(qid) or {}).get(s)),
+            "unresolved_markers": sum(1 for _, s in resolved if s not in qmap),
             "steps": r.get("steps"), "gate": r.get("gate"),
-            "cited_pids": sorted(seen)}
+            "cited_pids": sorted({s for _, s in resolved if s in qmap})}
 
 
 def main():
