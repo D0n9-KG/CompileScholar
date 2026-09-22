@@ -12,7 +12,7 @@ sys.path.insert(0, r"C:\Users\D0n9\Desktop\CompileScholar\src")
 
 import numpy as np  # noqa: E402
 
-from kb_compiler.records import embed_block, registry, registry_round2  # noqa: E402
+from kb_compiler.records import embed_block, registry, registry_growth  # noqa: E402
 
 
 # ---------- fake embeddings ----------
@@ -167,7 +167,7 @@ def test_single_call_path_unchanged(monkeypatch):
 def test_round2_small_registry_full_anchor():
     reg_canons = [f"ent{i}" for i in range(50)]
     queue = [{"surface": f"q{i}", "papers": ["p"], "contexts": []} for i in range(10)]
-    chunks, mode = registry_round2._build_chunks(queue, reg_canons)
+    chunks, mode = registry_growth._build_chunks(queue, reg_canons)
     assert mode == "full-anchor"
     assert all("- ent0" in lines for _, lines in chunks)
     assert sorted(i for ch, _ in chunks for i in ch) == list(range(10))
@@ -186,13 +186,13 @@ def test_round2_large_registry_topk_anchor(monkeypatch, tmp_path=None):
             rows.append(_basis_vec(idx % 97))
         return embed_block._l2(np.asarray(rows, dtype=np.float32))
     monkeypatch.setattr(embed_block, "embed_items", _fake_embed)
-    chunks, mode = registry_round2._build_chunks(
+    chunks, mode = registry_growth._build_chunks(
         queue, reg_canons, embed_cache_dir="unused")
     assert mode == "topk-anchor"
     assert sorted(i for ch, _ in chunks for i in ch) == list(range(30))
     for _, lines in chunks:
         n_lines = len(lines.splitlines())
-        assert n_lines <= registry_round2.UNION_CAP
+        assert n_lines <= registry_growth.UNION_CAP
 
 
 # ---------- deterministic alias channels ----------

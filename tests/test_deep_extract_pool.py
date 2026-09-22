@@ -15,7 +15,7 @@ import time
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "src"))
 
-import kb_compiler.records.slot as slot  # noqa: E402
+import kb_compiler.records.deep_extract as deep_extract  # noqa: E402
 
 TEXT = "\n\n".join(
     "## Section %d\n\n" % i + ("Sentence about method %d with number. " % i) * 40
@@ -51,30 +51,30 @@ def fake_call_json_factory(delay=0.0, scramble=False):
 
 @contextlib.contextmanager
 def _with_fake(fake):
-    orig = slot.call_json
-    slot.call_json = fake
+    orig = deep_extract.call_json
+    deep_extract.call_json = fake
     try:
         yield
     finally:
-        slot.call_json = orig
+        deep_extract.call_json = orig
 
 
 def test_pool_matches_serial_output():
     """Pool path (global executor) must equal extract_paper byte-for-byte."""
     fake1, _ = fake_call_json_factory()
     with _with_fake(fake1):
-        _, out_serial = slot.extract_paper("pX", TEXT, CARD, REGISTRY, VOCAB,
+        _, out_serial = deep_extract.extract_paper("pX", TEXT, CARD, REGISTRY, VOCAB,
                                            "m", "T", 1)
     # fresh fake with the same per-call mapping (content depends on call order
     # per phase, so each phase gets its own counter starting at 0 — the fake's
     # N maps 1:1 to chunk order because both paths process chunks in order)
     fake2, _ = fake_call_json_factory(delay=0.05, scramble=True)
     with _with_fake(fake2):
-        ctx = slot.build_paper_tasks("pX", TEXT, CARD, REGISTRY, VOCAB, "T")
-        objs = {ch["chunk_id"]: slot._call_chunk(p, "m")
+        ctx = deep_extract.build_paper_tasks("pX", TEXT, CARD, REGISTRY, VOCAB, "T")
+        objs = {ch["chunk_id"]: deep_extract._call_chunk(p, "m")
                 for ch, p in ctx["chunk_prompts"]}
-        abs_obj = slot._call_absence(ctx["absence_prompt"], "m")
-        _, out_pool = slot.finalize_paper("pX", ctx, objs, abs_obj,
+        abs_obj = deep_extract._call_absence(ctx["absence_prompt"], "m")
+        _, out_pool = deep_extract.finalize_paper("pX", ctx, objs, abs_obj,
                                           REGISTRY, CARD, "T")
     # stats identical; records identical (id/order/content)
     assert out_serial["stats"] == out_pool["stats"]
@@ -90,7 +90,7 @@ def test_wal_roundtrip_and_resume():
     fake, state = fake_call_json_factory()
     manifest = {"pX": {"title": "T"}}
     with _with_fake(fake):
-        slot.run_pool([("pX", TEXT)], {"pX": CARD}, REGISTRY, VOCAB, "m",
+        deep_extract.run_pool([("pX", TEXT)], {"pX": CARD}, REGISTRY, VOCAB, "m",
                       manifest, 4, out_path)
     n_first = state["n"]
     assert n_first >= 7  # 6 chunks + absence
@@ -98,7 +98,7 @@ def test_wal_roundtrip_and_resume():
     # everything done -> replay WAL, no new calls
     fake2, state2 = fake_call_json_factory()
     with _with_fake(fake2):
-        slot.run_pool([("pX", TEXT)], {"pX": CARD}, REGISTRY, VOCAB, "m",
+        deep_extract.run_pool([("pX", TEXT)], {"pX": CARD}, REGISTRY, VOCAB, "m",
                       manifest, 4, out_path)
     # finalize re-runs (paper already in results -> not re-todo'd by run_pool?
     # run_pool re-finalizes from WAL: acceptable; the invariant = ZERO new
@@ -118,7 +118,7 @@ def test_partial_wal_only_calls_holes():
     fake, state = fake_call_json_factory()
     manifest = {"pX": {"title": "T"}}
     with _with_fake(fake):
-        slot.run_pool([("pX", TEXT)], {"pX": CARD}, REGISTRY, VOCAB, "m",
+        deep_extract.run_pool([("pX", TEXT)], {"pX": CARD}, REGISTRY, VOCAB, "m",
                       manifest, 4, out_path)
     # 6 chunks total, 3 seeded -> 3 chunk calls + 1 absence = 4
     assert state["n"] == 4, f"expected 4 calls (3 holes + absence), got {state['n']}"
@@ -130,14 +130,14 @@ def test_repair_seeding_only_calls_holes():
     # build a full result for pX, then knock out records of chunks 4,5
     fake, _ = fake_call_json_factory()
     with _with_fake(fake):
-        _, out = slot.extract_paper("pX", TEXT, CARD, REGISTRY, VOCAB, "m", "T", 1)
+        _, out = deep_extract.extract_paper("pX", TEXT, CARD, REGISTRY, VOCAB, "m", "T", 1)
     out["records"] = [r for r in out["records"]
                       if r["chunk_id"] not in ("pX#c4", "pX#c5")]
     tmp = tempfile.mkdtemp()
     out_path = os.path.join(tmp, "rec.json")
     json.dump({"pX": out}, open(out_path, "w", encoding="utf-8"))
-    wal = slot._wal_load(out_path + ".progress.jsonl")
-    seeded = slot._seed_wal_from_results({"pX": out}, wal)
+    wal = deep_extract._wal_load(out_path + ".progress.jsonl")
+    seeded = deep_extract._seed_wal_from_results({"pX": out}, wal)
     # chunks 0-3 seeded (4 chunks with records); absence seeded (records exist
     # only if absence produced any — fake returns empty, so NOT seeded)
     seeded_cids = sorted(cid for pid, cid in seeded if cid != "absence")
@@ -151,7 +151,7 @@ def test_repair_seeding_only_calls_holes():
                                 "obj": obj}) + "\n")
     manifest = {"pX": {"title": "T"}}
     with _with_fake(fake2):
-        slot.run_pool([("pX", TEXT)], {"pX": CARD}, REGISTRY, VOCAB, "m",
+        deep_extract.run_pool([("pX", TEXT)], {"pX": CARD}, REGISTRY, VOCAB, "m",
                       manifest, 4, out_path)
     assert state2["n"] == 3, f"expected 3 calls (2 holes + absence), got {state2['n']}"
 
@@ -165,18 +165,18 @@ def test_fully_wald_paper_finalizes_without_calls():
     fake, _ = fake_call_json_factory()
     manifest = {"pX": {"title": "T"}}
     with _with_fake(fake):
-        ctx = slot.build_paper_tasks("pX", TEXT, CARD, REGISTRY, VOCAB, "T")
+        ctx = deep_extract.build_paper_tasks("pX", TEXT, CARD, REGISTRY, VOCAB, "T")
         with open(wal_path, "w", encoding="utf-8") as f:
             for ch, p in ctx["chunk_prompts"]:
-                obj = slot._call_chunk(p, "m")
+                obj = deep_extract._call_chunk(p, "m")
                 f.write(json.dumps({"pid": "pX", "cid": ch["chunk_id"],
                                     "ok": True, "obj": obj}) + "\n")
-            aobj = slot._call_absence(ctx["absence_prompt"], "m")
+            aobj = deep_extract._call_absence(ctx["absence_prompt"], "m")
             f.write(json.dumps({"pid": "pX", "cid": "absence", "ok": True,
                                 "obj": aobj}) + "\n")
     fake2, state2 = fake_call_json_factory()
     with _with_fake(fake2):
-        slot.run_pool([("pX", TEXT)], {"pX": CARD}, REGISTRY, VOCAB, "m",
+        deep_extract.run_pool([("pX", TEXT)], {"pX": CARD}, REGISTRY, VOCAB, "m",
                       manifest, 4, out_path)
     assert state2["n"] == 0
     res = json.load(open(out_path, encoding="utf-8"))

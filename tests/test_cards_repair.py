@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-"""Unit tests for skeleton._repair_json_escapes (AirQA HuCurl case:
+"""Unit tests for cards._repair_json_escapes (AirQA HuCurl case:
 LaTeX-in-caption invalid \\escape killed a whole card at temp 0)."""
 import json
 import sys
 
 sys.path.insert(0, r"C:\Users\D0n9\Desktop\CompileScholar\src")
-from kb_compiler.records.skeleton import _repair_json_escapes  # noqa: E402
+from kb_compiler.records.cards import _repair_json_escapes  # noqa: E402
 
 
 def test_invalid_latex_escape_repaired():

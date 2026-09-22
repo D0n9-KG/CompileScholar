@@ -24,8 +24,8 @@ from . import registry as reg
 from .canary_granular import CANARY_PID, CANARY_TEXT, score as canary_score
 from .common import load_corpus, load_json, load_manifest, save_json
 from .postcheck import run_postcheck
-from .skeleton import build_card
-from .slot import extract_paper
+from .cards import build_card
+from .deep_extract import extract_paper
 
 _lock = threading.Lock()
 

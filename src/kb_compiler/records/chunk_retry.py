@@ -6,7 +6,7 @@ with 3 retries + salvage (measured RL40 first pass 47/916, rerun 41/~500 —
 different chunks each round = transient infrastructure, not content).
 Whole-paper reruns have diminishing returns; this tool re-extracts ONLY the
 failed chunks and merges into the records file (dedup by id, longest quote
-wins — same merge semantics as slot.extract_paper, whose attach/resolve logic
+wins — same merge semantics as deep_extract.extract_paper, whose attach/resolve logic
 is mirrored here).
 
 Also audits the silent-loss point: the whole-text absence pass failing leaves
@@ -28,7 +28,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from .common import call_json, load_corpus, load_json, load_manifest, save_json
 from .schema import SCHEMA_VERSION
-from .slot import (ABSENCE_PROMPT, CHUNK_PROMPT, KIND_SLICES, QUOTE_FIRST_RULES,
+from .deep_extract import (ABSENCE_PROMPT, CHUNK_PROMPT, KIND_SLICES, QUOTE_FIRST_RULES,
                    _fingerprint, _rid, build_injection, chunk_text)
 
 _lock = threading.Lock()
@@ -45,7 +45,7 @@ def parse_failed(log_path: str) -> dict:
 
 
 def _attach(rec, pid, ch, registry):
-    """mirror of slot.extract_paper record attach + canonical resolution."""
+    """mirror of deep_extract.extract_paper record attach + canonical resolution."""
     rec["paper_id"] = pid
     rec["chunk_id"] = ch["chunk_id"]
     rec["section"] = ch["section"]

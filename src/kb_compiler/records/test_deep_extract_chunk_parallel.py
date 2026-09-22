@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""B2 chunk-parallelism tests for slot.extract_paper (no LLM cost).
+"""B2 chunk-parallelism tests for deep_extract.extract_paper (no LLM cost).
 
 Verifies the 2026-09-18 refactor:
   1. serial path (chunk_threads=1) is behavior-identical to a reference
@@ -21,7 +21,7 @@ import time
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", ".."))
 
-import kb_compiler.records.slot as slot  # noqa: E402
+import kb_compiler.records.deep_extract as deep_extract  # noqa: E402
 
 
 TEXT = "\n\n".join(
@@ -64,15 +64,15 @@ def fake_call_json_factory(per_call_delay=0.0, scramble=False):
 
 def run_extract(threads, scramble=False, delay=0.0):
     fake, state = fake_call_json_factory(delay, scramble)
-    orig = slot.call_json
-    slot.call_json = fake
+    orig = deep_extract.call_json
+    deep_extract.call_json = fake
     try:
         t0 = time.time()
-        pid, out = slot.extract_paper("pX", TEXT, CARD, REGISTRY, VOCAB,
+        pid, out = deep_extract.extract_paper("pX", TEXT, CARD, REGISTRY, VOCAB,
                                       "fake-model", "Test Paper", threads)
         dt = time.time() - t0
     finally:
-        slot.call_json = orig
+        deep_extract.call_json = orig
     return out, dt, state
 
 

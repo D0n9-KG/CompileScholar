@@ -6,7 +6,7 @@ Run:
 """
 import os, sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
-from kb_compiler.records import slot
+from kb_compiler.records import deep_extract
 
 
 def _text():
@@ -15,57 +15,57 @@ def _text():
 
 
 def _reset():
-    slot.ROUTE_STATS.update({"card": 0, "regex": 0, "fallback": 0, "mismatch": 0})
+    deep_extract.ROUTE_STATS.update({"card": 0, "regex": 0, "fallback": 0, "mismatch": 0})
 
 
 def test_card_label_is_primary_route():
     _reset()
-    chunks = slot.chunk_text("t", _text(), section_labels=[
+    chunks = deep_extract.chunk_text("t", _text(), section_labels=[
         {"title": "3.3 Evaluation", "label": "method"}])
     ev = next(c for c in chunks if "Evaluation" in c["section"])
     # method kinds: finding/config/lineage/notation (+finding base)
     assert "notation" in ev["kinds"]
     assert "result" not in ev["kinds"]  # NOT the regex experiment route
-    assert slot.ROUTE_STATS["card"] >= 1
+    assert deep_extract.ROUTE_STATS["card"] >= 1
 
 
 def test_regex_fallback_when_card_misses_title():
     _reset()
-    chunks = slot.chunk_text("t", _text(), section_labels=[
+    chunks = deep_extract.chunk_text("t", _text(), section_labels=[
         {"title": "A Section That Does Not Exist", "label": "method"}])
     ev = next(c for c in chunks if "Evaluation" in c["section"])
     assert "result" in ev["kinds"]  # regex experiment route fired
-    assert slot.ROUTE_STATS["regex"] >= 1
+    assert deep_extract.ROUTE_STATS["regex"] >= 1
 
 
 def test_no_card_map_preserves_legacy_regex_behavior():
     _reset()
-    chunks = slot.chunk_text("t", _text())
+    chunks = deep_extract.chunk_text("t", _text())
     ev = next(c for c in chunks if "Evaluation" in c["section"])
     assert "result" in ev["kinds"]
-    assert slot.ROUTE_STATS["card"] == 0
+    assert deep_extract.ROUTE_STATS["card"] == 0
 
 
 def test_card_regex_mismatch_counted_card_wins():
     _reset()
-    chunks = slot.chunk_text("t", _text(), section_labels=[
+    chunks = deep_extract.chunk_text("t", _text(), section_labels=[
         {"title": "3.3 Evaluation", "label": "related_work"}])
     ev = next(c for c in chunks if "Evaluation" in c["section"])
     assert "result" not in ev["kinds"]          # card label won
-    assert slot.ROUTE_STATS["mismatch"] == 1     # odometer saw the conflict
+    assert deep_extract.ROUTE_STATS["mismatch"] == 1     # odometer saw the conflict
 
 
 def test_invalid_card_label_dropped_to_regex():
     _reset()
-    chunks = slot.chunk_text("t", _text(), section_labels=[
+    chunks = deep_extract.chunk_text("t", _text(), section_labels=[
         {"title": "3.3 Evaluation", "label": "experimental_tactics"}])  # not in enum
     ev = next(c for c in chunks if "Evaluation" in c["section"])
     assert "result" in ev["kinds"]  # enum gate rejected the label -> regex
-    assert slot.ROUTE_STATS["card"] == 0
+    assert deep_extract.ROUTE_STATS["card"] == 0
 
 
 def test_label_map_normalizes_titles():
-    m = slot._norm_label_map([
+    m = deep_extract._norm_label_map([
         {"title": "  Related   Work ", "label": "related_work"},
         {"title": "x", "label": "bogus"},
         "not-a-dict",

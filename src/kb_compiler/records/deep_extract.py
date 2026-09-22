@@ -12,7 +12,7 @@ Same for explicit dimension values: not in vocab -> dims_new field (arbitration
 queue), never invented into dims.
 
 Usage:
-  python -m kb_compiler.records.slot --texts DIR --manifest M.json \
+  python -m kb_compiler.records.deep_extract --texts DIR --manifest M.json \
       --cards C.json --registry R.json --vocab V.json \
       --out records_TAG.json --model DeepSeek-V4-Flash [--only p1,p2]
 """

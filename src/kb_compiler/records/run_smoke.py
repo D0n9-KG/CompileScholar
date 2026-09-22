@@ -28,8 +28,8 @@ from concurrent.futures import ThreadPoolExecutor
 from .canary import CANARY_PID, CANARY_TEXT, score as canary_score
 from .common import load_corpus, load_json, load_manifest, save_json
 from .postcheck import run_postcheck
-from .skeleton import build_card
-from .slot import extract_paper
+from .cards import build_card
+from .deep_extract import extract_paper
 
 SMOKE_PAPERS = ["repro", "qr_dqn", "r2d2", "icm", "seed_PER"]
 ARMS = {"dsf": "DeepSeek-V4-Flash", "qwen": "Qwen3.8-Max"}
