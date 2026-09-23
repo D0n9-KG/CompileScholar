@@ -1,0 +1,2433 @@
+{
+ "summary": {
+  "n_questions": 108,
+  "recall_at_10": 0.0618,
+  "pool_recall": 0.0812,
+  "gate": "FAIL",
+  "by_subject": {
+   "bio": 0.103,
+   "biophysics": 0.075,
+   "cs_hci": 0.0,
+   "cs_nlp": 0.0,
+   "photonics": 0.081,
+   "physics": 0.247
+  },
+  "mean_latency_s": 11.3
+ },
+ "rows": [
+  {
+   "qid": "norman_bio_1",
+   "subject": "bio",
+   "n_gold": 3,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 26,
+   "latency_s": 13.7,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 5673.8,
+    "discovery_ms": 7487.4,
+    "rerank_ms": 574.1
+   },
+   "subqueries": [
+    "lipid nanoparticle biomolecular corona formation mechanism",
+    "LNP serum protein adsorption kinetics binding affinity",
+    "lipid nanoparticle blood components interaction plasma proteins"
+   ]
+  },
+  {
+   "qid": "norman_bio_2",
+   "subject": "bio",
+   "n_gold": 4,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 40,
+   "latency_s": 14.9,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 6875.4,
+    "discovery_ms": 7186.7,
+    "rerank_ms": 823.1
+   },
+   "subqueries": [
+    "lipid nanoparticle liver accumulation avoidance strategies",
+    "ionizable lipid modification extrahepatic targeting",
+    "LNP surface modification PEGylation tumor targeting",
+    "receptor-mediated uptake non-liver tissue delivery"
+   ]
+  },
+  {
+   "qid": "norman_bio_3",
+   "subject": "bio",
+   "n_gold": 4,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 40,
+   "latency_s": 14.7,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 7072.1,
+    "discovery_ms": 6889.2,
+    "rerank_ms": 714.7
+   },
+   "subqueries": [
+    "synthetic biology genetic engineering recombinant protein expression efficiency",
+    "CRISPR gene editing metabolic pathway optimization protein yield",
+    "mammalian cell line engineering CHO protein production bioprocess",
+    "bacterial host engineering E coli protein folding secretion"
+   ]
+  },
+  {
+   "qid": "norman_bio_4",
+   "subject": "bio",
+   "n_gold": 4,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 23,
+   "latency_s": 10.1,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 4701.7,
+    "discovery_ms": 4993.5,
+    "rerank_ms": 441.4
+   },
+   "subqueries": [
+    "phage display antibody applications biomedicine",
+    "phage display derived antibodies diagnostics clinical",
+    "phage display technology therapeutic antibody discovery"
+   ]
+  },
+  {
+   "qid": "norman_bio_5",
+   "subject": "bio",
+   "n_gold": 3,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 30,
+   "latency_s": 11.3,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 4953.1,
+    "discovery_ms": 5723.3,
+    "rerank_ms": 649.2
+   },
+   "subqueries": [
+    "next-generation sequencing phage display library construction",
+    "NGS phage display library optimization diversity analysis",
+    "high-throughput sequencing phage display antibody discovery"
+   ]
+  },
+  {
+   "qid": "norman_bio_6",
+   "subject": "bio",
+   "n_gold": 4,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 27,
+   "latency_s": 11.0,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 5236.9,
+    "discovery_ms": 5159.3,
+    "rerank_ms": 583.1
+   },
+   "subqueries": [
+    "phage display library design diversity optimization",
+    "antibody discovery phage display critical factors",
+    "phage display library complexity representation bias"
+   ]
+  },
+  {
+   "qid": "norman_bio_7",
+   "subject": "bio",
+   "n_gold": 5,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 38,
+   "latency_s": 17.5,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 6972.6,
+    "discovery_ms": 9002.8,
+    "rerank_ms": 1475.0
+   },
+   "subqueries": [
+    "recombinant antibody large-scale manufacturing production challenges",
+    "bioprocess scale-up cell culture productivity yield optimization",
+    "antibody purification downstream processing viral inactivation",
+    "protein aggregation stability formulation bioburden control"
+   ]
+  },
+  {
+   "qid": "norman_bio_8",
+   "subject": "bio",
+   "n_gold": 3,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 29,
+   "latency_s": 12.7,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 5360.2,
+    "discovery_ms": 6567.0,
+    "rerank_ms": 800.3
+   },
+   "subqueries": [
+    "recombinant antibody technology vaccine development",
+    "monoclonal antibody immune therapy clinical application",
+    "phage display antibody engineering immunotherapy"
+   ]
+  },
+  {
+   "qid": "norman_bio_9",
+   "subject": "bio",
+   "n_gold": 2,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 30,
+   "latency_s": 11.6,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 5552.1,
+    "discovery_ms": 5241.7,
+    "rerank_ms": 782.4
+   },
+   "subqueries": [
+    "Escherichia coli recombinant protein expression advantages",
+    "E. coli host system protein production efficiency cost",
+    "bacterial expression system recombinant protein purification yield"
+   ]
+  },
+  {
+   "qid": "norman_bio_10",
+   "subject": "bio",
+   "n_gold": 3,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 29,
+   "latency_s": 12.1,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 4874.5,
+    "discovery_ms": 6398.9,
+    "rerank_ms": 817.5
+   },
+   "subqueries": [
+    "recombinant protein expression E. coli challenges",
+    "protein misfolding aggregation inclusion bodies E. coli",
+    "soluble expression yield optimization E. coli"
+   ]
+  },
+  {
+   "qid": "benjamin_bio_1",
+   "subject": "bio",
+   "n_gold": 4,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 23,
+   "latency_s": 21.0,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 14662.4,
+    "discovery_ms": 5687.5,
+    "rerank_ms": 602.4
+   },
+   "subqueries": [
+    "lipid nanoparticle drug delivery advantages",
+    "LNP versus polymeric nanoparticle comparison",
+    "lipid nanoparticle biocompatibility efficacy"
+   ]
+  },
+  {
+   "qid": "benjamin_bio_2",
+   "subject": "bio",
+   "n_gold": 3,
+   "n_hit": 1,
+   "recall": 0.333,
+   "pool_recall": 0.333,
+   "pool_size": 36,
+   "latency_s": 15.3,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 6176.7,
+    "discovery_ms": 8096.2,
+    "rerank_ms": 1048.5
+   },
+   "subqueries": [
+    "lipid nanoparticle integrity stability analytical methods",
+    "LNP physicochemical characterization size PDI zeta potential",
+    "lipid nanoparticle encapsulation efficiency drug loading assay",
+    "LNP structural stability aggregation degradation kinetics"
+   ]
+  },
+  {
+   "qid": "benjamin_bio_3",
+   "subject": "bio",
+   "n_gold": 3,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 24,
+   "latency_s": 11.8,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 4849.8,
+    "discovery_ms": 6002.7,
+    "rerank_ms": 959.0
+   },
+   "subqueries": [
+    "image-guided surgery cancer type stage optimal",
+    "intraoperative imaging oncology indication tumor stage",
+    "image-guided resection efficacy early stage cancer"
+   ]
+  },
+  {
+   "qid": "benjamin_bio_4",
+   "subject": "bio",
+   "n_gold": 6,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 30,
+   "latency_s": 12.1,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 4818.8,
+    "discovery_ms": 6157.2,
+    "rerank_ms": 1134.1
+   },
+   "subqueries": [
+    "semiconducting polymers tumor detection efficacy",
+    "conjugated polymers biosensor tumor marker sensitivity",
+    "biomaterial comparison tumor imaging effectiveness"
+   ]
+  },
+  {
+   "qid": "benjamin_bio_5",
+   "subject": "bio",
+   "n_gold": 5,
+   "n_hit": 2,
+   "recall": 0.4,
+   "pool_recall": 0.4,
+   "pool_size": 22,
+   "latency_s": 13.1,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 5563.7,
+    "discovery_ms": 6656.5,
+    "rerank_ms": 865.9
+   },
+   "subqueries": [
+    "antibody drug conjugate linker stability potency toxicity",
+    "ADC intravenous administration pharmacokinetics linker cleavage",
+    "peptide linker stability drug antibody ratio therapeutic index"
+   ]
+  },
+  {
+   "qid": "benjamin_bio_6",
+   "subject": "bio",
+   "n_gold": 3,
+   "n_hit": 1,
+   "recall": 0.333,
+   "pool_recall": 0.333,
+   "pool_size": 26,
+   "latency_s": 11.0,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 4826.9,
+    "discovery_ms": 5389.2,
+    "rerank_ms": 804.5
+   },
+   "subqueries": [
+    "antibody drug conjugate linker synthesis methodology",
+    "cleavable non-cleavable linker chemistry ADC",
+    "site-specific conjugation linker formation"
+   ]
+  },
+  {
+   "qid": "benjamin_bio_7",
+   "subject": "bio",
+   "n_gold": 4,
+   "n_hit": 3,
+   "recall": 0.75,
+   "pool_recall": 0.75,
+   "pool_size": 40,
+   "latency_s": 17.8,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 8032.8,
+    "discovery_ms": 8222.9,
+    "rerank_ms": 1566.9
+   },
+   "subqueries": [
+    "xenotransplantation type 1 diabetes non-porcine species",
+    "primate islet cell transplantation diabetes",
+    "chimpanzee baboon organ transplant diabetes",
+    "alternative xenograft sources type 1 diabetes treatment"
+   ]
+  },
+  {
+   "qid": "benjamin_bio_8",
+   "subject": "bio",
+   "n_gold": 3,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 1.0,
+   "pool_size": 40,
+   "latency_s": 16.5,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 7162.7,
+    "discovery_ms": 7890.5,
+    "rerank_ms": 1494.1
+   },
+   "subqueries": [
+    "xenotransplantation ethical challenges regulatory frameworks",
+    "public opinion bioethics organ transplantation consent",
+    "zoonotic risk assessment gene-edited pig organs",
+    "equity access allocation policy xenotransplantation"
+   ]
+  },
+  {
+   "qid": "benjamin_bio_9",
+   "subject": "bio",
+   "n_gold": 4,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 27,
+   "latency_s": 10.6,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 5453.8,
+    "discovery_ms": 4223.6,
+    "rerank_ms": 959.7
+   },
+   "subqueries": [
+    "microcapsules blood brain barrier permeability",
+    "polymeric microcapsules BBB transport mechanism",
+    "drug delivery microcapsules neuroinflammation BBB"
+   ]
+  },
+  {
+   "qid": "benjamin_bio_10",
+   "subject": "bio",
+   "n_gold": 4,
+   "n_hit": 1,
+   "recall": 0.25,
+   "pool_recall": 0.25,
+   "pool_size": 27,
+   "latency_s": 13.0,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 5757.6,
+    "discovery_ms": 6147.3,
+    "rerank_ms": 1073.9
+   },
+   "subqueries": [
+    "EPR effect efficacy tumor progression correlation",
+    "enhanced permeability retention solid tumor metastasis benign",
+    "nanoparticle delivery tumor microenvironment heterogeneity"
+   ]
+  },
+  {
+   "qid": "akari_cs_1",
+   "subject": "cs_nlp",
+   "n_gold": 8,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 10,
+   "latency_s": 69.0,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 5775.9,
+    "discovery_ms": 62688.4,
+    "rerank_ms": 553.8
+   },
+   "subqueries": [
+    "LLM pre-training data quality filtering BERT",
+    "large language model training data curation transformer classifier",
+    "fasttext vs BERT text classification data filtering effectiveness"
+   ]
+  },
+  {
+   "qid": "akari_cs_2",
+   "subject": "cs_nlp",
+   "n_gold": 10,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 10,
+   "latency_s": 34.2,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 4980.5,
+    "discovery_ms": 28698.7,
+    "rerank_ms": 520.9
+   },
+   "subqueries": [
+    "LLM-as-a-judge evaluation bias self-preference",
+    "synthetic data quality assessment GPT-4 evaluator",
+    "LLM self-evaluation bias mitigation best practices"
+   ]
+  },
+  {
+   "qid": "akari_cs_3",
+   "subject": "cs_nlp",
+   "n_gold": 7,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 18.0,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 5952.1,
+    "discovery_ms": 12012.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "LLM fine-tuning catastrophic forgetting",
+    "instruction tuning degradation general capabilities",
+    "negative transfer large language models task-specific training",
+    "fine-tuning impact generation quality systematic evaluation"
+   ]
+  },
+  {
+   "qid": "akari_cs_4",
+   "subject": "cs_nlp",
+   "n_gold": 4,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 6.0,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 6045.0,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "inference compute scaling laws optimality",
+    "self-consistency sampling efficiency large language models",
+    "test-time compute scaling versus model size tradeoff",
+    "optimal inference budget allocation LLM reasoning"
+   ]
+  },
+  {
+   "qid": "akari_cs_5",
+   "subject": "cs_nlp",
+   "n_gold": 6,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 14.8,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 14844.4,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "retrieval augmented generation fine tuning comparison",
+    "RAG vs parameter efficient fine tuning LLM",
+    "hybrid RAG fine tuning generative AI"
+   ]
+  },
+  {
+   "qid": "akari_cs_6",
+   "subject": "cs_nlp",
+   "n_gold": 6,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 5.5,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 5498.5,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "fine-tuning retrieval augmented generation",
+    "RAG fine-tuning LLM",
+    "retrieval augmented generation optimization"
+   ]
+  },
+  {
+   "qid": "akari_cs_7",
+   "subject": "cs_nlp",
+   "n_gold": 7,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 6.3,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 6310.1,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "superficial alignment hypothesis LLM pretraining alignment",
+    "supervised fine-tuning new knowledge acquisition instruction tuning",
+    "alignment tax capability degradation helpfulness safety trade-off",
+    "pretraining vs fine-tuning knowledge representation domain generalization"
+   ]
+  },
+  {
+   "qid": "akari_cs_8",
+   "subject": "cs_nlp",
+   "n_gold": 7,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 5.6,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 5575.3,
+    "discovery_ms": 0.2,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "4-bit quantization training large language models",
+    "low-bit precision training performance degradation",
+    "quantization-aware training accuracy comparison higher precision"
+   ]
+  },
+  {
+   "qid": "akari_cs_9",
+   "subject": "cs_nlp",
+   "n_gold": 9,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 4.7,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 4748.7,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "synthetic data generation hard reasoning problems",
+    "LLM synthetic data generation logical reasoning benchmarks",
+    "automated generation complex reasoning tasks dataset"
+   ]
+  },
+  {
+   "qid": "akari_cs_10",
+   "subject": "cs_nlp",
+   "n_gold": 8,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 5.4,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 5363.6,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "multilingual evaluation dataset translation English target languages",
+    "cross-lingual benchmark quality reliability translation pitfalls",
+    "NLP dataset localization challenges bias introduction"
+   ]
+  },
+  {
+   "qid": "rulin_cs_1",
+   "subject": "cs_nlp",
+   "n_gold": 9,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 5.2,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 5238.6,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "auto-regressive language model finetuning dense passage retrieval",
+    "decoder-only LLM dense retrieval benchmark comparison",
+    "bi-directional encoder dense retrieval performance evaluation"
+   ]
+  },
+  {
+   "qid": "rulin_cs_2",
+   "subject": "cs_nlp",
+   "n_gold": 5,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 4.7,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 4746.1,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "long-context Transformer training sequence parallelism",
+    "32K context length model parallelism techniques",
+    "sequence parallelism comparison long sequence training"
+   ]
+  },
+  {
+   "qid": "rulin_cs_3",
+   "subject": "cs_nlp",
+   "n_gold": 7,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 7.1,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 7078.9,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "LLaVA large language and vision assistant",
+    "LLaVA-1.5 improved visual instruction tuning",
+    "LLaVA-NeXT high-resolution multimodal large language model",
+    "LLaVA-OneVision unified visual representation"
+   ]
+  },
+  {
+   "qid": "weijia_cs_1",
+   "subject": "cs_nlp",
+   "n_gold": 6,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 5.4,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 5433.4,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "model merging specialized language models generalization",
+    "ensemble specialized LLMs unified system performance comparison",
+    "weight averaging fine-tuned models single large language model"
+   ]
+  },
+  {
+   "qid": "weijia_cs_2",
+   "subject": "cs_nlp",
+   "n_gold": 3,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 5.2,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 5187.0,
+    "discovery_ms": 0.2,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "multimodal large language model text image input output",
+    "vision language model image generation text understanding",
+    "joint text image generation multimodal transformer"
+   ]
+  },
+  {
+   "qid": "weijia_cs_3",
+   "subject": "cs_nlp",
+   "n_gold": 2,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 4.9,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 4909.6,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "machine unlearning performance evaluation",
+    "knowledge removal language models",
+    "unlearning methods LLMs effectiveness"
+   ]
+  },
+  {
+   "qid": "weijia_cs_4",
+   "subject": "cs_nlp",
+   "n_gold": 4,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 20,
+   "latency_s": 9.6,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 5969.7,
+    "discovery_ms": 3033.5,
+    "rerank_ms": 569.7
+   },
+   "subqueries": [
+    "copyright infringement evaluation image generation models",
+    "generative AI intellectual property legal framework",
+    "training data provenance detection diffusion models",
+    "similarity metric copyright risk assessment synthetic images"
+   ]
+  },
+  {
+   "qid": "weijia_cs_5",
+   "subject": "cs_nlp",
+   "n_gold": 4,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 4.7,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 4731.3,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "pretraining data extraction language models",
+    "training data detection membership inference large language models",
+    "memorization evaluation pretraining corpus LLM"
+   ]
+  },
+  {
+   "qid": "weijia_cs_6",
+   "subject": "cs_nlp",
+   "n_gold": 7,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 4.6,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 4617.9,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "retrieval augmented generation architecture",
+    "dense retrieval encoder language model integration",
+    "RAG framework survey model design"
+   ]
+  },
+  {
+   "qid": "weijia_cs_7",
+   "subject": "cs_nlp",
+   "n_gold": 6,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 5.2,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 5186.1,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "membership inference attack definition",
+    "machine learning privacy leakage membership inference",
+    "training data exposure model membership inference"
+   ]
+  },
+  {
+   "qid": "weijia_cs_8",
+   "subject": "cs_nlp",
+   "n_gold": 3,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 4.4,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 4393.8,
+    "discovery_ms": 0.2,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "visual programming languages survey",
+    "graphical programming environments",
+    "node-based visual scripting"
+   ]
+  },
+  {
+   "qid": "weijia_cs_9",
+   "subject": "cs_nlp",
+   "n_gold": 5,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 6.4,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 6356.7,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "language model training dynamics analysis",
+    "loss landscape optimization trajectory large language models",
+    "emergent abilities scaling laws training phase transitions",
+    "gradient flow activation statistics neural network training"
+   ]
+  },
+  {
+   "qid": "weijia_cs_10",
+   "subject": "cs_nlp",
+   "n_gold": 5,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 12.9,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 12885.2,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "multi-document summarization",
+    "abstractive multi-document summarization neural network",
+    "extractive multi-document summarization benchmark"
+   ]
+  },
+  {
+   "qid": "jacqueline_cs_1",
+   "subject": "cs_nlp",
+   "n_gold": 7,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 4.7,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 4659.4,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "knowledge distillation dark knowledge definition",
+    "soft labels probability distribution teacher student network",
+    "inter-class similarity information distillation"
+   ]
+  },
+  {
+   "qid": "jacqueline_cs_2",
+   "subject": "cs_nlp",
+   "n_gold": 8,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 4.6,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 4638.0,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "classifier-free guidance NLP text generation",
+    "diffusion language models guidance scaling",
+    "conditional diffusion models natural language processing"
+   ]
+  },
+  {
+   "qid": "jacqueline_cs_3",
+   "subject": "cs_nlp",
+   "n_gold": 7,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 6.0,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 5996.4,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "knowledge distillation smaller teacher model",
+    "size-matched teacher student network distillation",
+    "reverse knowledge distillation compact teacher",
+    "targeted knowledge transfer small teacher large student"
+   ]
+  },
+  {
+   "qid": "jacqueline_cs_4",
+   "subject": "cs_nlp",
+   "n_gold": 6,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 5.5,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 5547.2,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "curriculum learning data ordering language model training",
+    "sample efficient pretraining data selection sequence",
+    "easy to hard curriculum large language models"
+   ]
+  },
+  {
+   "qid": "jacqueline_cs_5",
+   "subject": "cs_nlp",
+   "n_gold": 9,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 5.4,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 5436.9,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "large language model confidence calibration",
+    "LLM probability calibration uncertainty estimation",
+    "token-level confidence score calibration language models"
+   ]
+  },
+  {
+   "qid": "jacqueline_cs_6",
+   "subject": "cs_nlp",
+   "n_gold": 6,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 4.8,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 4774.8,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "large language model social bias mitigation post-training",
+    "aligned LLM stereotype reduction fine-tuning",
+    "debiasing techniques post-trained language models"
+   ]
+  },
+  {
+   "qid": "jacqueline_cs_7",
+   "subject": "cs_nlp",
+   "n_gold": 7,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 5.8,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 5806.2,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "encoder-decoder transformer architecture",
+    "causal decoder-only language model",
+    "autoregressive vs seq2seq generation comparison",
+    "non-causal attention mask decoder"
+   ]
+  },
+  {
+   "qid": "jacqueline_cs_8",
+   "subject": "cs_nlp",
+   "n_gold": 7,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 4.6,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 4595.7,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "task-agnostic pruning large language models",
+    "general model compression LLM efficiency",
+    "structured unstructured pruning transformer networks"
+   ]
+  },
+  {
+   "qid": "jacqueline_cs_9",
+   "subject": "cs_nlp",
+   "n_gold": 10,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 4.8,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 4782.5,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "DPO PPO SimPO head-to-head comparison",
+    "direct preference optimization policy gradient comparison fixed compute",
+    "RLHF alignment techniques benchmark evaluation"
+   ]
+  },
+  {
+   "qid": "jacqueline_cs_10",
+   "subject": "cs_nlp",
+   "n_gold": 4,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 5.7,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 5665.4,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "contrastive learning decoder-only language models generative performance",
+    "contrastive pretraining causal language models embedding representation",
+    "contrastive objective autoregressive generation improvement"
+   ]
+  },
+  {
+   "qid": "pan_biophysics_1",
+   "subject": "biophysics",
+   "n_gold": 5,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 20,
+   "latency_s": 9.8,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 5201.9,
+    "discovery_ms": 3761.2,
+    "rerank_ms": 795.5
+   },
+   "subqueries": [
+    "suppress multiple light scattering imaging",
+    "multiple scattering suppression optical imaging methods",
+    "diffuse optical imaging multiple scattering mitigation"
+   ]
+  },
+  {
+   "qid": "pan_biophysics_2",
+   "subject": "biophysics",
+   "n_gold": 7,
+   "n_hit": 1,
+   "recall": 0.143,
+   "pool_recall": 0.143,
+   "pool_size": 29,
+   "latency_s": 11.3,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 4675.5,
+    "discovery_ms": 5379.4,
+    "rerank_ms": 1233.7
+   },
+   "subqueries": [
+    "phantom fabrication bio tissue imaging",
+    "tissue-mimicking phantom optical properties",
+    "biological tissue phantom construction methodology"
+   ]
+  },
+  {
+   "qid": "pan_biophysics_3",
+   "subject": "biophysics",
+   "n_gold": 6,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 28,
+   "latency_s": 10.1,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 4910.5,
+    "discovery_ms": 4407.2,
+    "rerank_ms": 733.2
+   },
+   "subqueries": [
+    "organelle level reaction dynamic imaging cell heterogeneity",
+    "subcellular heterogeneity live cell imaging reaction kinetics",
+    "organelle specific fluorescence dynamics cell variability"
+   ]
+  },
+  {
+   "qid": "pan_biophysics_4",
+   "subject": "biophysics",
+   "n_gold": 6,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 29,
+   "latency_s": 11.6,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 4792.9,
+    "discovery_ms": 5714.2,
+    "rerank_ms": 1083.3
+   },
+   "subqueries": [
+    "OCT autocorrelation artifact suppression",
+    "optical coherence tomography speckle reduction algorithm",
+    "OCT signal processing coherent artifact removal"
+   ]
+  },
+  {
+   "qid": "pan_biophysics_5",
+   "subject": "biophysics",
+   "n_gold": 6,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 30,
+   "latency_s": 11.8,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 4817.2,
+    "discovery_ms": 5776.6,
+    "rerank_ms": 1157.8
+   },
+   "subqueries": [
+    "optical coherence tomography dispersion compensation hardware",
+    "OCT computational dispersion correction algorithm",
+    "broadband optical coherence tomography chromatic dispersion mitigation"
+   ]
+  },
+  {
+   "qid": "pan_biophysics_6",
+   "subject": "biophysics",
+   "n_gold": 6,
+   "n_hit": 1,
+   "recall": 0.167,
+   "pool_recall": 0.167,
+   "pool_size": 38,
+   "latency_s": 14.9,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 5821.3,
+    "discovery_ms": 7986.8,
+    "rerank_ms": 1121.5
+   },
+   "subqueries": [
+    "cancer cell response anticancer drugs",
+    "drug resistance mechanisms cancer cells",
+    "apoptosis signaling pathways chemotherapy",
+    "high-throughput screening cancer drug sensitivity"
+   ]
+  },
+  {
+   "qid": "pan_biophysics_7",
+   "subject": "biophysics",
+   "n_gold": 5,
+   "n_hit": 1,
+   "recall": 0.2,
+   "pool_recall": 0.2,
+   "pool_size": 30,
+   "latency_s": 12.8,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 4817.4,
+    "discovery_ms": 7098.0,
+    "rerank_ms": 924.9
+   },
+   "subqueries": [
+    "polarization sensitive optical coherence tomography novel findings",
+    "PS-OCT advanced imaging techniques novelty",
+    "polarization sensitive OCT vs traditional OCT comparison"
+   ]
+  },
+  {
+   "qid": "pan_biophysics_8",
+   "subject": "biophysics",
+   "n_gold": 6,
+   "n_hit": 1,
+   "recall": 0.167,
+   "pool_recall": 0.5,
+   "pool_size": 29,
+   "latency_s": 17.9,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 11696.0,
+    "discovery_ms": 5316.5,
+    "rerank_ms": 848.2
+   },
+   "subqueries": [
+    "OCT speckle dynamic signal detection",
+    "dynamic optical coherence tomography speckle analysis",
+    "speckle decorrelation OCT motion detection"
+   ]
+  },
+  {
+   "qid": "pan_biophysics_9",
+   "subject": "biophysics",
+   "n_gold": 5,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 30,
+   "latency_s": 10.6,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 5087.3,
+    "discovery_ms": 4719.2,
+    "rerank_ms": 770.7
+   },
+   "subqueries": [
+    "optical coherence tomography signal-to-noise ratio improvement digital methods",
+    "OCT image denoising deep learning convolutional neural network",
+    "spectral domain OCT noise reduction algorithm SNR enhancement"
+   ]
+  },
+  {
+   "qid": "shengyan_photonics_1",
+   "subject": "photonics",
+   "n_gold": 8,
+   "n_hit": 4,
+   "recall": 0.5,
+   "pool_recall": 0.5,
+   "pool_size": 20,
+   "latency_s": 11.2,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 7128.7,
+    "discovery_ms": 3290.8,
+    "rerank_ms": 742.0
+   },
+   "subqueries": [
+    "levitated nanoparticle center-of-mass cooling",
+    "optical feedback cooling levitated dielectric particle",
+    "cavity cooling levitated nanosphere motion",
+    "sympathetic cooling levitated nanoparticle gas"
+   ]
+  },
+  {
+   "qid": "shengyan_photonics_2",
+   "subject": "photonics",
+   "n_gold": 6,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 35,
+   "latency_s": 14.2,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 6057.9,
+    "discovery_ms": 6937.4,
+    "rerank_ms": 1187.2
+   },
+   "subqueries": [
+    "Casimir force measurement microscale nanoscale",
+    "atomic force microscopy Casimir interaction experiment",
+    "microcantilever Casimir force verification",
+    "nanoscale Casimir effect experimental evidence"
+   ]
+  },
+  {
+   "qid": "shengyan_photonics_3",
+   "subject": "photonics",
+   "n_gold": 7,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.143,
+   "pool_size": 39,
+   "latency_s": 15.3,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 6032.6,
+    "discovery_ms": 8123.3,
+    "rerank_ms": 1121.7
+   },
+   "subqueries": [
+    "macroscopic quantum systems superconductivity",
+    "quantum coherence large molecules matter-wave interference",
+    "superfluid helium quantum effects macroscopic",
+    "quantum optomechanics macroscopic resonators"
+   ]
+  },
+  {
+   "qid": "shengyan_photonics_4",
+   "subject": "photonics",
+   "n_gold": 8,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 30,
+   "latency_s": 12.9,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 5916.7,
+    "discovery_ms": 5864.0,
+    "rerank_ms": 1106.3
+   },
+   "subqueries": [
+    "multiple nanoparticle trapping optical tweezers",
+    "nanoparticle manipulation control feedback loop",
+    "acoustic levitation nanoparticle array",
+    "magnetic nanoparticle swarm control"
+   ]
+  },
+  {
+   "qid": "shengyan_photonics_5",
+   "subject": "photonics",
+   "n_gold": 7,
+   "n_hit": 1,
+   "recall": 0.143,
+   "pool_recall": 0.143,
+   "pool_size": 20,
+   "latency_s": 14.8,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 10698.9,
+    "discovery_ms": 3331.6,
+    "rerank_ms": 774.6
+   },
+   "subqueries": [
+    "integrated phononic devices realization",
+    "phononic crystal waveguide resonator chip",
+    "surface acoustic wave integrated circuit",
+    "photonic phononic co-integrated platform"
+   ]
+  },
+  {
+   "qid": "shengyan_photonics_6",
+   "subject": "photonics",
+   "n_gold": 6,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 18,
+   "latency_s": 10.6,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 6056.4,
+    "discovery_ms": 3931.5,
+    "rerank_ms": 627.2
+   },
+   "subqueries": [
+    "microwave-optical transducer quantum effects",
+    "microwave photon conversion quantum regime",
+    "electro-optic modulator quantum microwave optics",
+    "microwave-to-optical transduction quantum noise"
+   ]
+  },
+  {
+   "qid": "shengyan_photonics_7",
+   "subject": "photonics",
+   "n_gold": 10,
+   "n_hit": 4,
+   "recall": 0.4,
+   "pool_recall": 0.4,
+   "pool_size": 28,
+   "latency_s": 11.5,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 6141.9,
+    "discovery_ms": 4585.6,
+    "rerank_ms": 778.6
+   },
+   "subqueries": [
+    "levitated nanosphere motion degrees of freedom",
+    "optical levitation nanoparticle rotational dynamics",
+    "levitated optomechanics center-of-mass motion",
+    "nanoparticle levitation experimental measurement angular momentum"
+   ]
+  },
+  {
+   "qid": "shengyan_photonics_8",
+   "subject": "photonics",
+   "n_gold": 5,
+   "n_hit": 2,
+   "recall": 0.4,
+   "pool_recall": 0.4,
+   "pool_size": 19,
+   "latency_s": 8.7,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 4872.9,
+    "discovery_ms": 3354.3,
+    "rerank_ms": 509.8
+   },
+   "subqueries": [
+    "levitated nanosphere precision measurement physical quantities",
+    "optical levitation nanosphere force sensing displacement",
+    "levitated optomechanics mass sensing temperature measurement"
+   ]
+  },
+  {
+   "qid": "shengyan_photonics_9",
+   "subject": "photonics",
+   "n_gold": 7,
+   "n_hit": 2,
+   "recall": 0.286,
+   "pool_recall": 0.286,
+   "pool_size": 17,
+   "latency_s": 10.7,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 6456.4,
+    "discovery_ms": 3500.7,
+    "rerank_ms": 708.0
+   },
+   "subqueries": [
+    "non-Hermitian skin effect experimental verification",
+    "synthetic photonic lattice non-Hermitian skin effect",
+    "electrical circuit non-Hermitian skin effect measurement",
+    "acoustic waveguide non-Hermitian skin effect"
+   ]
+  },
+  {
+   "qid": "shengyan_photonics_10",
+   "subject": "photonics",
+   "n_gold": 4,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 20,
+   "latency_s": 17.8,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 14362.1,
+    "discovery_ms": 2752.2,
+    "rerank_ms": 734.4
+   },
+   "subqueries": [
+    "levitated nanoparticle residual optical absorption heating mitigation",
+    "optical levitation thermal noise reduction absorption cooling",
+    "nanoparticle material selection low absorption optical trapping"
+   ]
+  },
+  {
+   "qid": "minyang_physics_1",
+   "subject": "physics",
+   "n_gold": 5,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 19,
+   "latency_s": 11.0,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 5341.0,
+    "discovery_ms": 4807.7,
+    "rerank_ms": 863.7
+   },
+   "subqueries": [
+    "binary black hole numerical relativity simulation methods",
+    "spacetime evolution finite difference spectral methods",
+    "black hole excision boundary conditions constraint damping"
+   ]
+  },
+  {
+   "qid": "minyang_physics_2",
+   "subject": "physics",
+   "n_gold": 3,
+   "n_hit": 1,
+   "recall": 0.333,
+   "pool_recall": 0.667,
+   "pool_size": 29,
+   "latency_s": 12.7,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 4745.5,
+    "discovery_ms": 6970.8,
+    "rerank_ms": 995.3
+   },
+   "subqueries": [
+    "multi-messenger astrophysics messengers",
+    "gravitational waves electromagnetic neutrinos cosmic rays",
+    "multi-messenger astronomy detection channels"
+   ]
+  },
+  {
+   "qid": "minyang_physics_3",
+   "subject": "physics",
+   "n_gold": 4,
+   "n_hit": 1,
+   "recall": 0.25,
+   "pool_recall": 0.25,
+   "pool_size": 30,
+   "latency_s": 14.0,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 6170.2,
+    "discovery_ms": 6952.3,
+    "rerank_ms": 871.9
+   },
+   "subqueries": [
+    "multi-messenger astrophysics detection methods",
+    "gravitational wave electromagnetic neutrino cosmic ray joint analysis",
+    "neutron star merger black hole binary physics phenomena",
+    "high energy astrophysics source identification multi-messenger"
+   ]
+  },
+  {
+   "qid": "minyang_physics_4",
+   "subject": "physics",
+   "n_gold": 6,
+   "n_hit": 1,
+   "recall": 0.167,
+   "pool_recall": 0.167,
+   "pool_size": 16,
+   "latency_s": 12.0,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 5352.1,
+    "discovery_ms": 6187.6,
+    "rerank_ms": 448.9
+   },
+   "subqueries": [
+    "multi-messenger astrophysics detection challenges",
+    "gravitational wave electromagnetic neutrino coincidence detection limitations",
+    "multi-messenger astronomy data analysis sensitivity constraints"
+   ]
+  },
+  {
+   "qid": "minyang_physics_5",
+   "subject": "physics",
+   "n_gold": 3,
+   "n_hit": 1,
+   "recall": 0.333,
+   "pool_recall": 0.333,
+   "pool_size": 19,
+   "latency_s": 9.1,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 4760.4,
+    "discovery_ms": 3692.8,
+    "rerank_ms": 647.9
+   },
+   "subqueries": [
+    "topology optimization cavity second harmonic generation",
+    "nonlinear photonic crystal cavity SHG optimization",
+    "inverse design nonlinear optical cavity frequency doubling"
+   ]
+  },
+  {
+   "qid": "minyang_physics_6",
+   "subject": "physics",
+   "n_gold": 5,
+   "n_hit": 2,
+   "recall": 0.4,
+   "pool_recall": 0.4,
+   "pool_size": 17,
+   "latency_s": 10.6,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 5971.6,
+    "discovery_ms": 4217.4,
+    "rerank_ms": 419.6
+   },
+   "subqueries": [
+    "optomechanical cooling techniques",
+    "cavity optomechanics sideband cooling",
+    "laser cooling mechanical resonator ground state",
+    "feedback cooling optomechanical systems"
+   ]
+  },
+  {
+   "qid": "hao_photonics_1",
+   "subject": "photonics",
+   "n_gold": 7,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 30,
+   "latency_s": 13.9,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 6320.6,
+    "discovery_ms": 6650.9,
+    "rerank_ms": 937.4
+   },
+   "subqueries": [
+    "integrated optomechanical devices residual optical absorption heating mitigation",
+    "optomechanical thermal noise absorption loss compensation",
+    "photonic crystal cavity thermal management optical absorption",
+    "silicon nitride optomechanics thermal stability absorption reduction"
+   ]
+  },
+  {
+   "qid": "hao_photonics_2",
+   "subject": "photonics",
+   "n_gold": 7,
+   "n_hit": 3,
+   "recall": 0.429,
+   "pool_recall": 0.714,
+   "pool_size": 19,
+   "latency_s": 10.9,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 6241.9,
+    "discovery_ms": 4072.4,
+    "rerank_ms": 570.6
+   },
+   "subqueries": [
+    "mechanical resonator superconducting qubit coupling",
+    "micromechanical oscillator transducer superconducting circuit",
+    "piezoelectric mechanical mode qubit interaction",
+    "nanomechanical resonator hybrid quantum system"
+   ]
+  },
+  {
+   "qid": "hao_photonics_3",
+   "subject": "photonics",
+   "n_gold": 7,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 16,
+   "latency_s": 11.8,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 6202.5,
+    "discovery_ms": 5109.8,
+    "rerank_ms": 458.2
+   },
+   "subqueries": [
+    "coupled qubits mechanical resonators hybrid quantum systems",
+    "quantum transduction microwave optical phonon interface",
+    "mechanical resonator qubit entanglement generation",
+    "optomechanical qubit coupling force sensing"
+   ]
+  },
+  {
+   "qid": "hao_photonics_4",
+   "subject": "photonics",
+   "n_gold": 7,
+   "n_hit": 2,
+   "recall": 0.286,
+   "pool_recall": 0.286,
+   "pool_size": 29,
+   "latency_s": 16.8,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 5987.9,
+    "discovery_ms": 9770.0,
+    "rerank_ms": 1089.8
+   },
+   "subqueries": [
+    "fiber chip coupling cryogenic temperature",
+    "optical fiber integration photonic chip low temperature",
+    "cryogenic optical coupling superconducting qubit",
+    "thermal contraction fiber chip alignment cryostat"
+   ]
+  },
+  {
+   "qid": "hao_photonics_5",
+   "subject": "photonics",
+   "n_gold": 8,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 10,
+   "latency_s": 42.9,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 4828.2,
+    "discovery_ms": 37768.9,
+    "rerank_ms": 277.6
+   },
+   "subqueries": [
+    "grating coupler efficiency optimization design",
+    "silicon photonics grating coupler fabrication tolerance",
+    "grating coupler insertion loss back reflection reduction"
+   ]
+  },
+  {
+   "qid": "hao_photonics_6",
+   "subject": "photonics",
+   "n_gold": 8,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 10,
+   "latency_s": 69.4,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 7092.1,
+    "discovery_ms": 62072.2,
+    "rerank_ms": 279.2
+   },
+   "subqueries": [
+    "gigahertz surface acoustic wave modulation techniques",
+    "piezoelectric resonator frequency tuning SAW",
+    "liquid acoustic impedance SAW sensor modulation",
+    "nonlinear acoustic wave interaction high frequency SAW"
+   ]
+  },
+  {
+   "qid": "hao_photonics_7",
+   "subject": "photonics",
+   "n_gold": 8,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 6.9,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 6869.6,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "bound states in the continuum acoustic metamaterials",
+    "BIC elastic waveguides phononic crystals",
+    "bound states in the continuum plasmonic nanostructures",
+    "BIC microwave cavities electromagnetic resonators"
+   ]
+  },
+  {
+   "qid": "hao_photonics_8",
+   "subject": "photonics",
+   "n_gold": 9,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 10,
+   "latency_s": 18.4,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 4767.4,
+    "discovery_ms": 13421.9,
+    "rerank_ms": 252.7
+   },
+   "subqueries": [
+    "bound states in the continuum topological charge",
+    "BIC topological invariant discovery",
+    "topological bound states continuum photonic systems"
+   ]
+  },
+  {
+   "qid": "hao_photonics_9",
+   "subject": "photonics",
+   "n_gold": 7,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 10,
+   "latency_s": 7.6,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 5998.0,
+    "discovery_ms": 1306.7,
+    "rerank_ms": 289.8
+   },
+   "subqueries": [
+    "phonon quantum properties physical platforms",
+    "optomechanical systems phonon quantum state",
+    "superconducting qubit phonon coupling",
+    "piezoelectric phonon quantum device"
+   ]
+  },
+  {
+   "qid": "hao_photonics_10",
+   "subject": "photonics",
+   "n_gold": 8,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 6.0,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 5976.8,
+    "discovery_ms": 0.2,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "phonon quantum state preparation",
+    "single phonon Fock state generation",
+    "phonon squeezed state optomechanics",
+    "phonon entangled state superconducting qubit"
+   ]
+  },
+  {
+   "qid": "yanyu_photonics_1",
+   "subject": "photonics",
+   "n_gold": 10,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 5.1,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 5145.9,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "whispering gallery mode resonator biosensor nanomaterial detection",
+    "high-Q dielectric microcavity biomolecule sensing mechanism",
+    "WGM resonator refractive index sensitivity nanoscale analyte"
+   ]
+  },
+  {
+   "qid": "yanyu_photonics_2",
+   "subject": "photonics",
+   "n_gold": 10,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 5.8,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 5833.9,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "hybrid plasmonic photonic whispering gallery mode sensor single molecule detection",
+    "photonic crystal nanobeam cavity plasmonic enhancement sensitivity",
+    "plasmonic photonic hybrid cavity Q factor enhancement single molecule sensing"
+   ]
+  },
+  {
+   "qid": "yanyu_photonics_3",
+   "subject": "photonics",
+   "n_gold": 7,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 10,
+   "latency_s": 6.9,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 4973.3,
+    "discovery_ms": 1640.3,
+    "rerank_ms": 275.4
+   },
+   "subqueries": [
+    "high-Q optical microcavity resonance shift particle binding",
+    "cavity optomechanics single-protein detection sensitivity",
+    "optical microcavity biosensor limitations noise enhancement"
+   ]
+  },
+  {
+   "qid": "yanyu_photonics_4",
+   "subject": "photonics",
+   "n_gold": 5,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 10,
+   "latency_s": 7.5,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 5525.4,
+    "discovery_ms": 1575.6,
+    "rerank_ms": 406.6
+   },
+   "subqueries": [
+    "exceptional points optical resonators sensor sensitivity enhancement",
+    "diabolic points exceptional points comparison nanoparticle detection",
+    "PT-symmetric optical sensors biomolecule detection exceptional point"
+   ]
+  },
+  {
+   "qid": "yanyu_photonics_5",
+   "subject": "photonics",
+   "n_gold": 10,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 4.8,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 4810.6,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "photonic metamaterial surfaces phase contrast microscopy enhancement",
+    "metasurface refractometric microscopy label-free imaging",
+    "metamaterial enhanced optical microscopy sensitivity"
+   ]
+  },
+  {
+   "qid": "yanyu_photonics_6",
+   "subject": "photonics",
+   "n_gold": 4,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 10,
+   "latency_s": 11.8,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 10007.1,
+    "discovery_ms": 1533.4,
+    "rerank_ms": 272.3
+   },
+   "subqueries": [
+    "all-dielectric photonic crystal fluorescence enhancement",
+    "dielectric photonic crystal Purcell effect fluorescence",
+    "photonic crystal slab fluorescence lifetime modification"
+   ]
+  },
+  {
+   "qid": "yanyu_photonics_7",
+   "subject": "photonics",
+   "n_gold": 8,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 40,
+   "latency_s": 13.3,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 6588.6,
+    "discovery_ms": 5819.9,
+    "rerank_ms": 864.0
+   },
+   "subqueries": [
+    "ultra-sensitive detection life science research significance",
+    "single molecule detection sensitivity biological assays",
+    "high sensitivity biosensor applications diagnostics",
+    "limit of detection improvement life science tools"
+   ]
+  },
+  {
+   "qid": "yanyu_photonics_8",
+   "subject": "photonics",
+   "n_gold": 7,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 20,
+   "latency_s": 9.1,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 4975.2,
+    "discovery_ms": 3548.5,
+    "rerank_ms": 542.2
+   },
+   "subqueries": [
+    "quantitative reverse transcriptase PCR miRNA detection limit",
+    "low concentration miRNA qRT-PCR sensitivity limitations",
+    "miRNA quantification assay noise floor low abundance"
+   ]
+  },
+  {
+   "qid": "yanyu_photonics_9",
+   "subject": "photonics",
+   "n_gold": 5,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 40,
+   "latency_s": 13.3,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 5945.3,
+    "discovery_ms": 6596.7,
+    "rerank_ms": 792.7
+   },
+   "subqueries": [
+    "fluorescence enhancement imaging techniques",
+    "quantum dots upconversion nanoparticles fluorescence",
+    "super-resolution microscopy fluorescence signal amplification",
+    "fluorophore brightness photostability improvement"
+   ]
+  },
+  {
+   "qid": "yanyu_photonics_10",
+   "subject": "photonics",
+   "n_gold": 5,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 4.8,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 4802.9,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "photonic crystal fluorescence enhancement biosensing",
+    "photonic crystal surface enhanced fluorescence detection",
+    "nanophotonic biosensor fluorescence signal amplification"
+   ]
+  },
+  {
+   "qid": "bohao_cs_1",
+   "subject": "cs_hci",
+   "n_gold": 10,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 10,
+   "latency_s": 6.4,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 4772.1,
+    "discovery_ms": 1351.9,
+    "rerank_ms": 270.4
+   },
+   "subqueries": [
+    "natural language processing medical jargon simplification",
+    "machine learning biomedical text summarization non-experts",
+    "clinical NLP readability assessment research papers"
+   ]
+  },
+  {
+   "qid": "bohao_cs_2",
+   "subject": "cs_hci",
+   "n_gold": 10,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 5.8,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 5800.7,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "personalized adaptive learning scientific concepts",
+    "domain-specific jargon explanation natural language processing",
+    "expertise level adaptation educational technology",
+    "cross-domain knowledge representation semantic understanding"
+   ]
+  },
+  {
+   "qid": "bohao_cs_3",
+   "subject": "cs_hci",
+   "n_gold": 7,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 5.9,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 5867.3,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "user modeling techniques personalized recommendation systems",
+    "individual preference capture adaptive recommendation algorithms",
+    "dynamic user profile learning preference drift detection",
+    "context-aware user modeling implicit feedback utilization"
+   ]
+  },
+  {
+   "qid": "bohao_cs_4",
+   "subject": "cs_hci",
+   "n_gold": 5,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 4.7,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 4696.0,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "complex word identification personalization user-specific",
+    "CWI model adaptation language proficiency background",
+    "personalized text difficulty estimation individual learner"
+   ]
+  },
+  {
+   "qid": "bohao_cs_5",
+   "subject": "cs_hci",
+   "n_gold": 10,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 5.9,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 5859.2,
+    "discovery_ms": 0.3,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "large language models synthetic participants simulation",
+    "LLM agent social science survey methodology",
+    "human population representation generative AI HCI",
+    "simulated respondents LLM bias diversity"
+   ]
+  },
+  {
+   "qid": "bohao_cs_6",
+   "subject": "cs_hci",
+   "n_gold": 4,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 4.7,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 4669.0,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "controllable question generation specificity granularity",
+    "survey question generation model fine-grained control",
+    "automatic survey construction question granularity adjustment"
+   ]
+  },
+  {
+   "qid": "bohao_cs_7",
+   "subject": "cs_hci",
+   "n_gold": 8,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 4.7,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 4739.0,
+    "discovery_ms": 0.2,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "automated literature review survey generation",
+    "research paper recommendation system related work discovery",
+    "citation context extraction follow-up paper identification"
+   ]
+  },
+  {
+   "qid": "bohao_cs_8",
+   "subject": "cs_hci",
+   "n_gold": 7,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 20,
+   "latency_s": 8.2,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 4505.4,
+    "discovery_ms": 3177.6,
+    "rerank_ms": 504.5
+   },
+   "subqueries": [
+    "interdisciplinary research facilitation systems",
+    "cross-domain discovery knowledge graph",
+    "scientific literature mining interdisciplinary collaboration"
+   ]
+  },
+  {
+   "qid": "bohao_cs_9",
+   "subject": "cs_hci",
+   "n_gold": 5,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 4.5,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 4490.7,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "citation network analysis scientific discourse",
+    "citation content generation textual information",
+    "citation graph evolution domain understanding"
+   ]
+  },
+  {
+   "qid": "bohao_cs_10",
+   "subject": "cs_hci",
+   "n_gold": 5,
+   "n_hit": 0,
+   "recall": 0.0,
+   "pool_recall": 0.0,
+   "pool_size": 0,
+   "latency_s": 5.1,
+   "mode_used": "full",
+   "reranked": false,
+   "latency_breakdown": {
+    "understand_ms": 5136.9,
+    "discovery_ms": 0.1,
+    "rerank_ms": 0.0
+   },
+   "subqueries": [
+    "automatic related work generation large language models",
+    "scientific paper writing assistance LLM related work section",
+    "citation recommendation related work synthesis language models"
+   ]
+  }
+ ]
+}
