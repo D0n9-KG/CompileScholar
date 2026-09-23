@@ -6,7 +6,7 @@ projections + F31V2 notes spec + R-A no-global-cap + scalable/dynamic step
 caps. Deltas for Multi-108 (2026-09-23):
 
   - KB products from scholarqa_multi/kb: postcheck records_checked.json,
-    views.json, registry_v2.json (grown), dim_vocab_v1.json, cards.json;
+    views.json, registry_v3.json (grown+deduped), dim_vocab_v1.json, cards.json;
     manifest from corpus/manifest.json
   - qfile = data/scholarqa_multi.json converted GOLD-BLIND (gold_hint="",
     type=aggregation: Multi questions are multi-doc by construction, so the
@@ -94,7 +94,7 @@ def build_tools_multi():
     records = json.load(open(os.path.join(KB, "postcheck", "records_checked.json"),
                              encoding="utf-8"))
     views = json.load(open(os.path.join(KB, "views.json"), encoding="utf-8"))
-    registry = json.load(open(os.path.join(KB, "registry_v2.json"),
+    registry = json.load(open(os.path.join(KB, "registry_v3.json"),
                               encoding="utf-8"))
     vocab = json.load(open(os.path.join(KB, "dim_vocab_v1.json"),
                            encoding="utf-8"))

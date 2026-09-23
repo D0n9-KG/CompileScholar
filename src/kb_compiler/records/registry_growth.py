@@ -45,6 +45,11 @@ MAP_PROMPT = """下面是抽取管线产出的未解析实体表面名（编号|
 {queue_lines}"""
 
 
+def _norm(s: str) -> str:
+    # keep in sync with registry._norm (entity ids are md5 of this)
+    return re.sub(r"\s+", " ", (s or "").strip().lower())
+
+
 def collect_queue(record_files: list[str]) -> list[dict]:
     q, seen = [], {}
     for path in record_files:
@@ -303,6 +308,14 @@ def run_round2(registry: dict, queue: list[dict], model: str,
     # coverage: unassigned surfaces -> new entity with surface as canonical
     report = {"matched": [], "new": [], "unassigned_fallback": []}
     canon_set = set(canon_list)
+    # G3 dup guard (2026-09-24): action=new with a canonical that already
+    # exists (case/space variant) used to md5-collide with the existing
+    # entity_id and append a duplicate row — v2 carried 1,450 such rows that
+    # views/cards silently overwrote. Fold those into the existing entity.
+    ent_by_norm: dict[str, dict] = {}
+    for e in registry["entities"]:
+        ent_by_norm.setdefault(_norm(e["canonical"]), e)
+    new_by_norm: dict[str, dict] = {}
     new_entities = []
     index_additions = {}
     for i, s in enumerate(queue):
@@ -322,13 +335,24 @@ def run_round2(registry: dict, queue: list[dict], model: str,
                 "method", "mechanism", "practice", "out_of_corpus") else "method"
             import hashlib
             canonical = (a.get("canonical") or s["surface"]).strip()
-            ent = {"entity_id": hashlib.md5(canonical.lower().encode()).hexdigest()[:12],
+            target = ent_by_norm.get(_norm(canonical)) or new_by_norm.get(_norm(canonical))
+            if target is not None:
+                # LLM proposed a canonical variant of an already-registered
+                # entity — fold as alias, never append a duplicate row
+                report.setdefault("dup_guard_folds", []).append(
+                    {"surface": s["surface"], "canonical": target["canonical"]})
+                if s["surface"] not in target["aliases"]:
+                    target["aliases"].append(s["surface"])
+                index_additions[re.sub(r"\s+", " ", s["surface"].strip().lower())] = target["entity_id"]
+                continue
+            ent = {"entity_id": hashlib.md5(_norm(canonical).encode()).hexdigest()[:12],
                    "canonical": canonical, "aliases": sorted({canonical, s["surface"]}),
                    "entity_type": etype, "in_corpus_paper_id": None,
                    "origin_year_cited": None, "mention_papers": s["papers"],
                    "mention_count": len(s["papers"]),
                    "provenance": "round2_growth"}
             new_entities.append(ent)
+            new_by_norm[_norm(canonical)] = ent
             report["new"].append({"surface": s["surface"], "canonical": canonical,
                                   "entity_type": etype, "note": a.get("note", "")})
             index_additions[re.sub(r"\s+", " ", s["surface"].strip().lower())] = ent["entity_id"]
