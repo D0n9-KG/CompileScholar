@@ -1961,7 +1961,15 @@ def stage_answer(arm, qs, outp, kb, tkb, grounding, glog):
         return run_question(q, arm, kb, tkb, grounding, glog)
 
     with ThreadPoolExecutor(max_workers=int(os.environ.get('OURS_QUERY_FANOUT', '4'))) as ex:
-        for r in ex.map(one, todo):
+        # 2026-09-23 fix: ex.map yields in SUBMISSION order — one slow/looping
+        # head question head-of-line-blocks the write path while the pool
+        # keeps completing later questions into invisible buffers (measured:
+        # 3h, 572 calls, zero flushed answers). as_completed writes each
+        # answer the moment it lands.
+        from concurrent.futures import as_completed
+        futs = [ex.submit(one, q) for q in todo]
+        for fut in as_completed(futs):
+            r = fut.result()
             results.append(r)
             g = r["gate"]
             print(f"  [{r['id']}] steps={r['steps']}/{r['cap']} notes={len(r['notes_final'])}ch "
