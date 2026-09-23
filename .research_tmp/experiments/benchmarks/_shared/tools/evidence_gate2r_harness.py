@@ -798,7 +798,11 @@ def _clean_answer_artifacts(answer):
     Replaces <something>-chunk-<label> patterns inside [] with the bare
     citation; also strips stray "-chunk-" suffixed tokens. Mechanism-level,
     zero question awareness."""
-    a = re.sub(r"\[([^\]]*?)-chunk-[a-z]+\]", r"[]", answer or "")
+    # N6 (carpet-audit 2026-09-23): the replacement string contained a RAW
+    # 0x01 control byte instead of the ZQZ backreference - on trigger it would
+    # destroy the citation AND inject an invisible control character into the
+    # answer text (worse than the artifact it cleans). Correct backreference:
+    a = re.sub(r"\[([^\]]*?)-chunk-[a-z]+\]", lambda m: "[" + m.group(1) + "]", answer or "")
     a = re.sub(r"-chunk-(?:config|finding|table|absence|card|search|result)", "", a)
     return a
 
@@ -1310,6 +1314,7 @@ def run_question(q, arm, kb, tkb, grounding, glog):
     redundant = 0
     none_streak = 0
     prev_notes = None
+    last_progress_notes = None   # N13: last notes that actually CHANGED (rollback target)
     forced_answer = False
     cov_audit_done = False   # F22: one-shot mid-budget breadth audit
     prev_obs_nums = set()    # F25: numbers carried by the latest observation
@@ -1434,6 +1439,7 @@ def run_question(q, arm, kb, tkb, grounding, glog):
             traj.append({"f28_hard_stop": True, "at_step": steps,
                          "f28_autos": f28_autos})
             break
+        prev_obs_nums = set()   # N10: F25 tracking is STEP-scoped (reset here)
         notes_step_start = notes   # F28d: productivity baseline for this step
         if not cov_audit_done and steps_left == 8:   # F22 injection point
             cov_audit_done = True
@@ -1591,6 +1597,7 @@ def run_question(q, arm, kb, tkb, grounding, glog):
                     redundant += 1
                 else:
                     redundant = 0
+                    last_progress_notes = kept   # N13: snapshot real progress
                 prev_notes = kept
                 notes = kept
         if st["gaps"]:
@@ -1729,7 +1736,7 @@ def run_question(q, arm, kb, tkb, grounding, glog):
             steps += 1
             continue
         obs_parts = []
-        step_evidence = step_error = step_kill = False
+        step_evidence = step_error = False
         for act in acts[:6]:          # hard cap 6 actions/step (safety)
             tool, args = str(act.get("tool")), dict(act.get("args") or {})
             sig = tool + "|" + json.dumps(args, sort_keys=True, ensure_ascii=False)[:200]
@@ -1814,7 +1821,23 @@ def run_question(q, arm, kb, tkb, grounding, glog):
                 else:
                     res = {"error": "unknown tool", "valid": sorted(TOOL_SIGS)}
             except Exception as e:
-                res = {"tool": tool, "error": f"bad args: {str(e)[:80]}",
+                # N12 (carpet-audit 2026-09-23): the sig was appended to
+                # `queried` BEFORE the try — a transient failure (embedding
+                # service down, network retry exhausted) permanently blocked
+                # retrying the SAME query for the rest of the question, and
+                # mislabeled every failure as "bad args" (teaching the model
+                # its arguments were wrong during infra outages). Pop the sig
+                # on transient failures; keep it for stable TypeError-class
+                # failures (retry is pointless, step cap bounds the loop).
+                _transient = not isinstance(e, (TypeError, KeyError, AttributeError))
+                if _transient:
+                    try:
+                        queried.remove(sig)
+                    except ValueError:
+                        pass
+                _label = "tool/infra error (retryable)" if _transient \
+                    else "bad args"
+                res = {"tool": tool, "error": f"{_label}: {str(e)[:80]}",
                        "valid_signature": TOOL_SIGS.get(tool, "(query,k<=12)")}
             res = shrink_obs(res)
             # A7 timing: streak over typed-tool zero-hits (compare/findings/
@@ -1844,11 +1867,23 @@ def run_question(q, arm, kb, tkb, grounding, glog):
                 (res.get("tool") if isinstance(res, dict) else None), OBS_CAP) + 300
             obs_text = (json.dumps(res, ensure_ascii=False)[:_slice]
                         if isinstance(res, dict) else str(res)[:OBS_CAP])
-            fp = hashlib.sha1((sig + obs_text[:400]).encode()).hexdigest()[:12]
-            fingerprints[fp] += 1
-            step_kill = step_kill or fingerprints[fp] > 3
+            # N9 (carpet-audit 2026-09-23): the fingerprint-kill was dead
+            # machinery — fp hashed the sig, and the `queried` dedup above
+            # already guarantees each sig runs at most once per question, so
+            # fingerprints[fp] could never exceed 1 and `> 3` never fired.
+            # The real anti-loop lines are the sig dedup + the F28 ladder.
+            # Removed rather than "fixed": enabling a tool+obs fingerprint
+            # would misfire on legitimate repeated zero-hit exploration.
             obs_parts.append(obs_text)
-            prev_obs_nums |= _obs_numset(obs_text)   # F25: union across the step's actions
+            # N10 (carpet-audit 2026-09-23): the check consumes prev_obs_nums
+            # at step END, so the union must be STEP-SCOPED. The old
+            # question-scoped accumulation (never reset except on nudge/F28)
+            # let any OLD number present in notes permanently mask the check —
+            # exactly the F25 target scenario (new observation fully dropped)
+            # went undetected while stale numbers satisfied `any(...)`.
+            _step_obs_nums = _obs_numset(obs_text)
+            prev_obs_nums = _step_obs_nums if not prev_obs_nums \
+                else (prev_obs_nums | _step_obs_nums)
             if isinstance(res, dict) and res.get("error"):
                 step_error = True
             else:
@@ -1899,8 +1934,11 @@ def run_question(q, arm, kb, tkb, grounding, glog):
                         "retrieval over the corpus papers.")
         else:
             obs = _f28_step(obs, notes_step_start)   # all-repeats step = no-evidence step
-        if redundant >= 2:  # local rollback (H5)
-            notes = prev_notes or notes
+        if redundant >= 2:  # local rollback (H5, N13-fixed: real restore)
+            if last_progress_notes is not None and notes.strip() != last_progress_notes.strip():
+                notes = last_progress_notes   # discard the circling rewrites
+            else:
+                notes = prev_notes or notes
             obs += "\n[SYSTEM] Two consecutive steps with zero note delta = circling signal: change angle (different tool/entity/keywords), or answer directly if the gaps are closed."
             redundant = 0
         if none_streak >= 3:
@@ -1911,9 +1949,6 @@ def run_question(q, arm, kb, tkb, grounding, glog):
             obs += ("\n[SYSTEM] All gaps closed: if the notes already contain the key points, "
                     "output <answer> directly next step; further retrieval wastes budget.")
         steps += 1
-        if step_kill:
-            obs += "\n[SYSTEM] Same query fingerprint repeated >3 times; loop terminated: no more retrieval; output <answer> from your notes."
-            forced_answer = True
         if steps >= cap and not forced_answer:
             forced_answer = True
             obs += ("\n[SYSTEM] Step budget exhausted (The maximum search limit is exceeded. "

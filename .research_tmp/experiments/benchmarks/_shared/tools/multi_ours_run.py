@@ -311,9 +311,20 @@ def main():
     try:
         D.main()   # runs stage_answer -> answers_{tag}.json in RB
     finally:
-        json.dump(F18_LOG, open(os.path.join(ARM, f"f18_events_{TAG}.json"), "w",
-                                encoding="utf-8"), ensure_ascii=False, indent=1)
-        print(f"[F21] {len(F18_LOG)} resolver events", flush=True)
+        # N5: merge-mode write — the old "w" mode erased the audit trail on
+        # every resume (108 questions ran 4 times; only the last run's
+        # events survived)
+        _f18p = os.path.join(ARM, f"f18_events_{TAG}.json")
+        _prev = []
+        if os.path.exists(_f18p):
+            try:
+                _prev = json.load(open(_f18p, encoding="utf-8"))
+            except Exception:
+                pass
+        json.dump(_prev + F18_LOG, open(_f18p, "w", encoding="utf-8"),
+                  ensure_ascii=False, indent=1)
+        print(f"[F21] {len(_prev) + len(F18_LOG)} resolver events "
+              f"(+{len(F18_LOG)} this run)", flush=True)
 
     # post-pass: native results -> official-format answer rows
     native = os.path.join(RB, f"answers_pilot_{TAG}.json")
