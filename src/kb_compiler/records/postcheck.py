@@ -543,6 +543,15 @@ def run_postcheck(records_by_paper, texts, vocab, model, dry=False, triage=None,
     if incremental_out_dir:
         prior = load_json(f"{incremental_out_dir}/records_checked.json", default={}) or {}
         prior_dropped = load_json(f"{incremental_out_dir}/dropped.json", default=[]) or []
+        # P1-6: shard-based resume — per-paper shards are the crash-granular
+        # checkpoint; the monolith may lag behind if a crash hit mid-merge
+        _shard_dir = f"{incremental_out_dir}/shards"
+        if os.path.isdir(_shard_dir):
+            for fn in os.listdir(_shard_dir):
+                if fn.endswith(".checked.json"):
+                    _pid = fn[:-len(".checked.json")]
+                    if _pid not in prior:
+                        prior[_pid] = load_json(f"{_shard_dir}/{fn}", default={})
         checked.update(prior)
         dropped.extend(prior_dropped)
         skip_pids = (skip_pids or set()) | {p for p in prior if p in records_by_paper}
@@ -588,13 +597,25 @@ def run_postcheck(records_by_paper, texts, vocab, model, dry=False, triage=None,
               f"{workers}-wide global pool", flush=True)
 
     # ---- phase C: settle each paper in original order + incremental save ----
+    # P1-6 (efficiency): the per-paper save rewrote the FULL 500MB+ json every
+    # iteration — 430 papers x 500MB = ~215GB of write amplification. Now:
+    # per-paper shard files (crash-resume granularity kept) + one merge at
+    # the end. The monolithic files remain the final deliverable format.
     for pid, checked_payload, _t in papers:
         drops = settle_repairs(pid, checked_payload, fixed_map, vocab_sets,
                                stats, dry=dry)
         dropped.extend(drops)
         if incremental_out_dir and not dry:
-            save_json(checked, f"{incremental_out_dir}/records_checked.json")
-            save_json(dropped, f"{incremental_out_dir}/dropped.json")
+            _shard_dir = f"{incremental_out_dir}/shards"
+            os.makedirs(_shard_dir, exist_ok=True)
+            save_json(checked_payload,
+                      f"{_shard_dir}/{pid}.checked.json")
+            if drops:
+                save_json(drops, f"{_shard_dir}/{pid}.dropped.json")
+    if incremental_out_dir and not dry and papers:
+        # merge shards -> monolithic deliverables (single write each)
+        save_json(checked, f"{incremental_out_dir}/records_checked.json")
+        save_json(dropped, f"{incremental_out_dir}/dropped.json")
     return checked, dropped, warnings, dict(stats)
 
 
