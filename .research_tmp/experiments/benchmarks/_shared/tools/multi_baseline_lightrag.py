@@ -316,7 +316,7 @@ async def run_queries(rag, smoke: bool = False, q_limit: int | None = None):
     print(f"[lrag] answers saved: {ANSWERS}", flush=True)
     print(f"[lrag] citation translation: mapped={stats['mapped']} "
           f"dropped={stats['dropped']}", flush=True)
-    purity = arm_purity(LEDGER)
+    purity = arm_purity(LEDGER, min_calls=len(todo_qs))
     print(f"[lrag] arm purity: {purity}", flush=True)
 
 

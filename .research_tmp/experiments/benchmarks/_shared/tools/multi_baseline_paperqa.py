@@ -520,7 +520,7 @@ async def run(smoke: bool = False, q_limit: int | None = None):
     print(f"[pqa] citation translation: mapped={stats['mapped']} "
           f"dropped={stats['dropped']} "
           f"unmapped_groups={stats['unmapped_groups']}", flush=True)
-    purity = arm_purity(LEDGER)
+    purity = arm_purity(LEDGER, min_calls=len(todo_qs))
     print(f"[pqa] arm purity: {purity}", flush=True)
 
 

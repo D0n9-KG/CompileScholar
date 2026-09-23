@@ -131,11 +131,14 @@ def load_corpus_texts(texts_dir: str | None = None) -> list[tuple[str, str]]:
     return out
 
 
-def arm_purity(ledger_path: str) -> dict:
-    """Local-only purity assertion over the arm ledger (kb_infra format)."""
+def arm_purity(ledger_path: str, min_calls: int = 0) -> dict:
+    """Local-only purity assertion over the arm ledger (kb_infra format).
+    min_calls: expected floor (~1/question) — kills the empty-ledger
+    false-PURE blind spot (PaperQA index-death case, audit #11)."""
     import sys
     sys.path.insert(0, os.path.join(os.path.dirname(_MULTI), "..", "..",
                                     "..", "..", "src"))
     from kb_infra.llm import check_arm_purity
     return check_arm_purity(log_path=ledger_path,
-                            allowed_pairs=[("local", "Qwen3.8-27B")])
+                            allowed_pairs=[("local", "Qwen3.8-27B")],
+                            min_calls=min_calls)

@@ -812,14 +812,20 @@ def call_local(prompt: str, model: str = "Qwen3.8-27B", max_tokens: int = 4000,
 
 
 def check_arm_purity(log_path: str | None = None,
-                     allowed_pairs: list[tuple[str, str]] | None = None) -> dict:
+                     allowed_pairs: list[tuple[str, str]] | None = None,
+                     min_calls: int = 0) -> dict:
     """D8 arm-purity assertion. Reads a JSONL call log (default: env
     LLM_CALL_LOG) and reports the distinct (provider, model) pairs with
     ok=True. Purity rule: if allowed_pairs is given, any ok pair outside it
     is a violation; otherwise the log must contain exactly ONE distinct pair.
     Runner calls this at batch end; violations => arm void (discipline D8).
     Judge/scoring calls must go to a SEPARATE log file, else pass them in
-    allowed_pairs explicitly."""
+    allowed_pairs explicitly.
+
+    min_calls (P2-12, audit #11): an empty or near-empty ledger passes the
+    pair check trivially — the PaperQA case (index dead, 0 calls, PURE).
+    When min_calls > 0 and total ok calls fall below it, pure=False with
+    reason insufficient_calls. Callers pass ~1 per expected question."""
     path = log_path or os.environ.get("LLM_CALL_LOG")
     if not path or not os.path.exists(path):
         return {"error": f"log not found: {path}", "pure": False}
@@ -841,10 +847,15 @@ def check_arm_purity(log_path: str | None = None,
         violations = sorted(k for k in counts if k not in allowed)
     else:
         violations = sorted(counts, key=lambda k: -counts[k])[1:]
+    total_ok = sum(counts.values())
+    insufficient = min_calls > 0 and total_ok < min_calls
     return {
         "pairs": {f"{p}/{m}": c for (p, m), c in sorted(counts.items())},
-        "violations": [f"{p}/{m}" for p, m in violations],
-        "pure": not violations,
+        "violations": [f"{p}/{m}" for p, m in violations]
+                      + (["<insufficient_calls: "
+                          f"{total_ok}<{min_calls}>"] if insufficient else []),
+        "total_ok": total_ok,
+        "pure": not violations and not insufficient,
     }
 
 
