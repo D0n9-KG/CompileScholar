@@ -142,3 +142,44 @@ def arm_purity(ledger_path: str, min_calls: int = 0) -> dict:
     return check_arm_purity(log_path=ledger_path,
                             allowed_pairs=[("local", "Qwen3.8-27B")],
                             min_calls=min_calls)
+
+
+def write_run_manifest(out_path: str, files: list[str], extra: dict | None = None,
+                       repo_dir: str | None = None) -> str:
+    """P2-10: per-run MANIFEST — file -> sha256/size plus git state and the
+    caller's extra (model, tag, command). Build stages already emit
+    runs/manifest-*.json; this brings the answering/judging runs to parity."""
+    import hashlib
+    import subprocess
+    from datetime import datetime, timezone
+    repo = repo_dir or os.path.join(_MULTI, "..", "..", "..")
+    entries = {}
+    for p in files:
+        if not os.path.exists(p):
+            entries[os.path.basename(p)] = {"missing": True}
+            continue
+        h = hashlib.sha256()
+        with open(p, "rb") as f:
+            for b in iter(lambda: f.read(65536), b""):
+                h.update(b)
+        entries[os.path.basename(p)] = {
+            "sha256": h.hexdigest()[:16],
+            "bytes": os.path.getsize(p),
+        }
+    try:
+        sha = subprocess.run(["git", "rev-parse", "HEAD"], cwd=repo,
+                             capture_output=True, text=True,
+                             timeout=10).stdout.strip()
+        dirty = bool(subprocess.run(["git", "status", "--porcelain"], cwd=repo,
+                                    capture_output=True, text=True,
+                                    timeout=10).stdout.strip())
+    except Exception:
+        sha, dirty = "unknown", None
+    mani = {"written_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            "git_sha": sha, "git_dirty": dirty, "files": entries}
+    if extra:
+        mani.update(extra)
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    with open(out_path, "w", encoding="utf-8") as f:
+        json.dump(mani, f, ensure_ascii=False, indent=1)
+    return out_path

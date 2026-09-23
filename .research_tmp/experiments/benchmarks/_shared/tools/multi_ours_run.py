@@ -345,6 +345,20 @@ def main():
                   ensure_ascii=False, indent=1)
         print(f"[ours] official rows: {len(done)} -> {ANSWERS}", flush=True)
 
+    # P2-10: run manifest — answers + ledger + native trajectory, hashed
+    try:
+        from multi_baseline_common import write_run_manifest
+        _ledger = os.path.join(ARM, f"ledger_ours_{TAG}.jsonl")
+        mani = write_run_manifest(
+            os.path.join(ARM, f"MANIFEST-{TAG}.json"),
+            [ANSWERS, native, _ledger,
+             os.path.join(ARM, f"f18_events_{TAG}.json")],
+            extra={"tag": TAG, "model": MODEL,
+                   "qids": os.environ.get("OURS_QIDS", "all")})
+        print(f"[ours] run manifest: {mani}", flush=True)
+    except Exception as e:
+        print(f"[ours] manifest write failed (non-fatal): {e}", flush=True)
+
 
 if __name__ == "__main__":
     import sys as _s
