@@ -37,7 +37,8 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent
 sys.path.insert(0, str(REPO / "src"))
 
-from kb_compiler.config import load_conf, project_env  # noqa: E402
+from kb_compiler.config import load_conf, project_env
+from kb_compiler import runlog  # noqa: E402
 
 MULTI = REPO / ".research_tmp/experiments/benchmarks/scholarqa_multi"
 KB = MULTI / "kb"
@@ -291,7 +292,10 @@ def build(targets: list[str], force: set[str], dry: bool, exp: str | None):
         env["LLM_CALL_LOG"] = str(KB / "ledger_build.jsonl")
         env["LLM_RUN_ID"] = f"multi-{st.name}"
         t0 = time.time()
-        p = subprocess.run(cmd, cwd=str(REPO / "src"), env=env)
+        with runlog.run(st.name) as _rlog:
+            _rlog.event("cmd", cmd=[str(c) for c in cmd])
+            p = subprocess.run(cmd, cwd=str(REPO / "src"), env=env)
+            _rlog.event("subprocess_exit", rc=p.returncode)
         dt = time.time() - t0
         outs = _outputs_abs(st)
         if p.returncode != 0:
