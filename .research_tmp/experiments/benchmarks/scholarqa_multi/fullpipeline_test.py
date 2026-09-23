@@ -69,6 +69,11 @@ def run_stage(name: str, cmd: list[str]) -> bool:
         "LLM_CALL_LOG": os.path.join(TEST_KB, "ledger_pipeline_test.jsonl"),
         "LLM_RUN_ID": f"pipelinetest-{name}",
         "LOCAL_MAX_CONCURRENT": "16",
+        # marathon-env parity: chunk calls with 9k-token outputs need the
+        # 900s wall (default 240s killed 81% of attempts when the server
+        # runs at ~10 tok/s/stream — measured 2026-09-24)
+        "LOCAL_SOCK_TIMEOUT": "900",
+        "LLM_WALL_TIMEOUT": "1200",
         "LLM_PROVIDER_ALLOWLIST": "local",
         "KB_EMBED_PROVIDER": "local",
     })
@@ -123,7 +128,7 @@ def main():
                           "--registry", f"{K}/registry.json",
                           "--vocab", f"{K}/dim_vocab_v1.json",
                           "--out", f"{K}/records_slot.json",
-                          "--model", MODEL, "--pool", "16"]),
+                          "--model", MODEL, "--pool", "8"]),
         ("postcheck", ["python", "-m", "kb_compiler.records.postcheck",
                        "--records", f"{K}/records_slot.json",
                        "--texts", TEST_TEXTS, "--vocab", f"{K}/dim_vocab_v1.json",
