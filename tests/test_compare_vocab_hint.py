@@ -37,8 +37,9 @@ def _kb():
 
 def test_compare_miss_returns_nearby_keys():
     kb = _kb()
-    # partial token overlap ("brain") but no full fuzzy match -> empty + hints
-    r = kb.compare(metric="brain uptake efficiency")
+    # partial token overlap ("brain") but below the majority-token fuzzy
+    # gate (1 of 5 long tokens) -> empty + hints
+    r = kb.compare(metric="brain uptake efficiency imaging protocols")
     assert r["n"] == 0
     keys = r["vocab_hint"]["nearby_keys"]
     assert any(k["subject"] == "icr mice" and
