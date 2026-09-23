@@ -354,10 +354,31 @@ class KBTools:
             return {"tool": "card", "n": 0,
                     "error": f"no compiled dossier for '{entity}' "
                              "(dossiers exist for in-corpus entities; "
-                             "use findings/compare for out-of-corpus ones)"}
+                             "use findings/compare for out-of-corpus ones)",
+                    "nearest_in_corpus": self._nearest_in_corpus(entity)}
         c = dict(cards[key])
         c["tool"] = "card"
         return c
+
+    def _nearest_in_corpus(self, name: str, k: int = 3) -> list:
+        """G1-B2 redirect (2026-09-24): token-overlap nearest in-corpus card
+        names on a card() miss. Measured: 146/153 empty card observations hit
+        out-of-corpus entities — a bare error turned each into a dead step;
+        named alternatives let the model re-target in one step. Deterministic
+        scan over the 335 compiled cards, no API."""
+        toks = set(_norm(name).split())
+        if not toks:
+            return []
+        scored = []
+        for c in self.views.get("cards", {}).get("cards", {}).values():
+            ctoks = set(_norm(str(c.get("canonical") or "")).split())
+            ctoks |= {t for a in c.get("aliases", []) for t in _norm(a).split()}
+            ov = len(toks & ctoks)
+            if ov:
+                # overlap first, then the more specific (shorter) name
+                scored.append((ov, len(ctoks), c["canonical"]))
+        scored.sort(key=lambda x: (-x[0], x[1], x[2]))
+        return [c for _, _, c in scored[:k]]
 
     # ---------- typed tool 5: as_of ----------
 
