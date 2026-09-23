@@ -115,9 +115,62 @@ class KBTools:
                     rows.append({"subject": subj, "metric": met, "entity": ent, **c})
         out = {"tool": "compare", "n": len(rows), "rows": rows,
                "derived_ranking": self._rank(rows)}
+        if not rows:
+            # G1-B1 (2026-09-24): 15/27 compare calls on Multi-108 returned
+            # empty because planner free-text args ("average performance")
+            # collide with the compiled matrix vocabulary ("psf contrast").
+            # A bare n=0 taught the model nothing; nearby keys let it
+            # re-target in one step.
+            out["vocab_hint"] = self._compare_vocab_hint(subject, metric, entities)
         if band_note:
             out["note"] = band_note
         return out
+
+    def _compare_vocab_hint(self, subject, metric, entities, k: int = 10) -> dict:
+        """Deterministic 'did you mean' over the compiled matrix keys."""
+        qtoks = {t for t in _norm(
+            f"{subject or ''} {metric or ''}").split() if len(t) > 2}
+        scored = []
+        for key, ents in self.views["matrix"]["tables"].items():
+            subj, met = key.split("||")
+            ktoks = {t for t in _norm(f"{subj} {met}").split() if len(t) > 2}
+            ov = len(qtoks & ktoks)
+            if ov:
+                scored.append((ov, len(ents), subj, met))
+        scored.sort(key=lambda x: (-x[0], -x[1], x[2], x[3]))
+        hints = [{"subject": s, "metric": m, "n_entities": n}
+                 for _, n, s, m in scored[:k]]
+        all_ents = {ent for tbl in
+                    self.views["matrix"]["tables"].values() for ent in tbl}
+        # axis confusion: a registry entity passed as subject/metric (the
+        # measured QLoRA/NV-Embed shape — the matrix subject axis is datasets/
+        # setups, methods live on the entity axis)
+        axis_note = None
+        for arg in (subject, metric):
+            if not arg:
+                continue
+            als = self._alias_set(arg)
+            if any(_norm(x) in als for x in all_ents):
+                axis_note = (f"'{arg}' is a matrix ENTITY, not a subject/metric "
+                             f"— retry as compare(entities=['{arg}']) without "
+                             f"the subject/metric filters")
+                break
+        ent_diag = None
+        if entities:
+            if isinstance(entities, str):
+                entities = [entities]
+            present, absent = [], []
+            for e in entities:
+                als = self._alias_set(e)
+                (present if any(_norm(x) in als for x in all_ents)
+                 else absent).append(e)
+            ent_diag = {"in_matrix": present, "not_in_matrix": absent}
+            if present and not absent and subject is None and metric is None:
+                ent_diag["note"] = ("all requested entities exist in the matrix "
+                                    "but no rows matched — the filters were too "
+                                    "narrow")
+        return {"nearby_keys": hints, "entities": ent_diag,
+                "axis_note": axis_note}
 
     def _rank(self, rows):
         """within-band numeric ranking (derived), direction-aware."""
