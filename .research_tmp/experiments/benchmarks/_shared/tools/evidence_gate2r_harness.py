@@ -1599,6 +1599,34 @@ def run_question(q, arm, kb, tkb, grounding, glog):
                     redundant = 0
                     last_progress_notes = kept   # N13: snapshot real progress
                 prev_notes = kept
+                # P1-2 (efficiency): MECHANICAL length enforcement. The
+                # protocol asks for <=5k chars but 83/108 answers ran 7.2k-
+                # 18k (median 7.2k) — every extra char rides along in EVERY
+                # subsequent step's prompt. Deterministic trim: keep N (id
+                # lines) and X (overturned) rows, drop bare-plan/[unsourced]
+                # prose rows first, then oldest rows, until under budget.
+                if len(kept) > 5500:
+                    _rows = [l for l in kept.split("\n") if l.strip()]
+                    _prio = []
+                    for l in _rows:
+                        if re.match(r"^N\d+\.\s*\[plan\]", l.strip()):
+                            _prio.append((2, l))      # plan rows: drop first
+                        elif l.strip().startswith("[unsourced]"):
+                            _prio.append((1, l))      # downgraded: drop next
+                        else:
+                            _prio.append((0, l))      # evidence: keep
+                    # stable sort keeps order within tiers
+                    _prio.sort(key=lambda t: t[0])
+                    _out, _sz = [], 0
+                    for _t, l in _prio:
+                        if _sz + len(l) + 1 > 5000 and _out:
+                            break
+                        _out.append(l)
+                        _sz += len(l) + 1
+                    if _sz < len(kept):
+                        gate_info["notes_truncated"] = \
+                            gate_info.get("notes_truncated", 0) + (len(kept) - _sz)
+                        kept = "\n".join(_out)
                 notes = kept
         if st["gaps"]:
             gaps = "" if st["gaps"].upper().startswith("NONE") else st["gaps"]
