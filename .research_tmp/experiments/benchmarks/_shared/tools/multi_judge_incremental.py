@@ -274,16 +274,33 @@ def judge_arm(arm: str, path: str, gold: dict, backfill: bool = False) -> list[s
     out_path = path.rsplit(".", 1)[0] + ".scores.jsonl"
     if not os.path.exists(path):
         return []
+    # P0-4 (carpet-audit 2026-09-23): SCORE-DATA VERSION LOCK. The old
+    # append-only scoring trusted a mutable input file forever — a resident
+    # postpass rewrote answers mid-judging and scores silently diverged from
+    # data (the voided 0.5165). Now: every score row records the input file's
+    # sha256; a changed hash invalidates ALL prior rows of that arm (they are
+    # quarantined to .stale and scoring restarts from the current data).
+    import hashlib as _hl
+    _data_hash = _hl.sha256(open(path, "rb").read()).hexdigest()[:16]
     scored: dict[str, dict] = {}
+    stale = False
     if os.path.exists(out_path):
         for l in open(out_path, encoding="utf-8"):
             l = l.strip()
             if l:
                 try:
                     r = json.loads(l)
-                    scored[r["qid"]] = r   # last row per qid wins
                 except Exception:
-                    pass
+                    continue
+                if r.get("data_hash") and r["data_hash"] != _data_hash:
+                    stale = True
+                    break
+                scored[r["qid"]] = r   # last row per qid wins
+        if stale:
+            os.replace(out_path, out_path + f".stale.{int(time.time())}")
+            print(f"[judge] {arm}: input data changed ({_data_hash}) — prior "
+                  f"scores quarantined, rescoring from current data", flush=True)
+            scored = {}
     rows = json.load(open(path, encoding="utf-8"))
     newly = []
     for r in rows:
@@ -299,7 +316,7 @@ def judge_arm(arm: str, path: str, gold: dict, backfill: bool = False) -> list[s
         g = gold.get(qid)
         if g is None:
             continue
-        row = _score_row(arm, r, qid, ans, g)
+        row = _score_row(arm, r, qid, ans, g, data_hash=_data_hash)
         newly.append(row)
     if backfill:
         # rows scored before Track 2 existed: recompute with AutoAIS
@@ -314,7 +331,7 @@ def judge_arm(arm: str, path: str, gold: dict, backfill: bool = False) -> list[s
                    or match.get("answer_official_first") or "")
             if not ans.strip():
                 continue
-            newly.append(_score_row(arm, match, qid, ans, g))
+            newly.append(_score_row(arm, match, qid, ans, g, data_hash=_data_hash))
     if newly:
         with open(out_path, "a", encoding="utf-8") as f:
             for row in newly:
@@ -322,10 +339,10 @@ def judge_arm(arm: str, path: str, gold: dict, backfill: bool = False) -> list[s
     return [r["qid"] for r in newly]
 
 
-def _score_row(arm, r, qid, ans, g) -> dict:
+def _score_row(arm, r, qid, ans, g, data_hash: str = "") -> dict:
     s = citation_f1(ans, g.get("output") or "")
     ais = autoais_scores(ans, g.get("ctxs") or []) or {}
-    return {"qid": qid, "arm": arm, "policy": "all",
+    return {"qid": qid, "arm": arm, "policy": "all", "data_hash": data_hash,
             "n_cited_pids": len(r.get("cited_pids") or []),
             "citation_dropped": r.get("citation_dropped"),
             "citation_mapped": r.get("citation_mapped"),

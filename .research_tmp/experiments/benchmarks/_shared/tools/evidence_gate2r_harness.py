@@ -23,6 +23,7 @@ import argparse
 import hashlib
 import json
 import os
+import time
 import re
 import sys
 import threading
@@ -81,6 +82,24 @@ def _text_search(query, k):
         from kb_compiler.views.search_text import TextSearchIndex
         _TSI = TextSearchIndex(_TEXT_INDEX_DIR)
     return _TSI.search(str(query)[:300], k=min(int(k or 8), 12))
+
+
+def _atomic_write_json(obj, path):
+    """N11 (carpet-audit 2026-09-23): crash-safe answer writes — tmp file +
+    os.replace. The old direct open(w) rewrite left a truncated file on any
+    crash mid-dump, destroying the ONLY checkpoint (resume reads the same
+    file and would die on JSONDecodeError)."""
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(obj, f, ensure_ascii=False, indent=1)
+    for _att in range(5):
+        try:
+            os.replace(tmp, path)
+            return
+        except PermissionError:
+            time.sleep(0.3 * (_att + 1))  # WinError-5 transient handle (see #25)
+    os.replace(tmp, path)  # last attempt; raise if still locked
+
 
 OBS_CAP = 3200            # H4 compact form; 2500 zeroed fat compare rows (IL-C2)
 STEP_CAP = {"broad": 20, "precise": 6}   # H1; F5-rev (user directive 09-09): r1 cap-hit 23/30 at 10 -> 20
@@ -792,9 +811,25 @@ def answer_gates(answer, notes, titles=None):
     skip (LaTeX formulas), sentence split no longer breaks decimals on '.'."""
     # R-E(a) (PS53 repair): [plan] lines are non-evidence (like [unsourced]) —
     # numbers written in planning prose must not satisfy the numeric gate.
-    anchors = "\n".join(l for l in (notes or "").split("\n")
-                        if not (l.strip().startswith("[unsourced]")
-                                or re.search(r"^N\d+\.?\s*\[plan\]", l.strip())))
+    # N2 (carpet-audit 2026-09-23): the note gate passes through lines that
+    # carry NO prefix at all (not N/X/[unsourced]/A) and bare '[plan]' lines
+    # (no N-prefix); both flowed into this anchor blob unchecked. The anchor
+    # set must mirror the note gate's ACCEPTED set: only lines with a valid
+    # backref id, [unsourced] merges, X lines, or the system A-rows.
+    _valid_anchors = []
+    for l in (notes or "").split("\n"):
+        ls = l.strip()
+        if not ls:
+            continue
+        if ls.startswith("[unsourced]") or re.search(r"\[plan\]", ls[:40]):
+            continue  # non-evidence (plan prose / downgraded lines)
+        if re.match(r"^X\d+", ls) or re.match(r"^A\d+\.", ls):
+            _valid_anchors.append(l)  # overturned / system rows are evidence
+            continue
+        # lines with no backref bracket at all are NOT evidence anchors
+        if BRACKET.search(l):
+            _valid_anchors.append(l)
+    anchors = "\n".join(_valid_anchors)
     ans_nums = set()
     for mt in NUM_BOUND.finditer(answer or ""):
         n = mt.group(0)
@@ -807,8 +842,18 @@ def answer_gates(answer, notes, titles=None):
         if MATHY.search(ctx):
             continue
         ans_nums.add(n)
-    missing_nums = sorted(n for n in ans_nums
-                          if n not in anchors and n.replace(",", "") not in anchors)
+    # N7 (carpet-audit): boundary-guarded membership — the old plain substring
+    # let '95' pass via '[3072d10a795359]' (hex record ids embedded in the
+    # anchor blob). Strip bracketed hex ids from the blob first, then require
+    # digit-boundary matches.
+    _anchors_clean = re.sub(r"\[[0-9a-f]{10,16}\]", "", anchors)
+    def _n_in_anchors(n):
+        if re.search(r"(?<![\d.])" + re.escape(n) + r"(?![\d])", _anchors_clean):
+            return True
+        nc = n.replace(",", "")
+        return bool(re.search(r"(?<![\d.])" + re.escape(nc) + r"(?![\d])",
+                              _anchors_clean))
+    missing_nums = sorted(n for n in ans_nums if not _n_in_anchors(n))
     unsourced = []
     for sent in re.split(r"[。；;]|\n+", answer or ""):
         s = sent.strip()
@@ -2009,8 +2054,8 @@ def stage_answer(arm, qs, outp, kb, tkb, grounding, glog):
             print(f"  [{r['id']}] steps={r['steps']}/{r['cap']} notes={len(r['notes_final'])}ch "
                   f"gate_pass={g.get('gate_passed')} rejects={g.get('note_rejects')} "
                   f"ans={len(r['answer'] or '')}ch", flush=True)
-            json.dump(results, open(outp, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
-    json.dump(results, open(outp, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+            _atomic_write_json(results, outp)
+    _atomic_write_json(results, outp)
 
 
 def stage_judge(arm, outp, ans_path=None):

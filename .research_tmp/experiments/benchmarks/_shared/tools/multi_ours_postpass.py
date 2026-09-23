@@ -35,8 +35,10 @@ def one_pass() -> int:
     for r in rows:
         if r.get("answer"):
             done[r["id"]] = M.to_official_row(r, idm)
-    json.dump(list(done.values()), open(OFFICIAL, "w", encoding="utf-8"),
-              ensure_ascii=False, indent=1)
+    _tmp = OFFICIAL + ".tmp"
+    with open(_tmp, "w", encoding="utf-8") as _f:
+        json.dump(list(done.values()), _f, ensure_ascii=False, indent=1)
+    os.replace(_tmp, OFFICIAL)  # N11 atomic write
     return len(done)
 
 
