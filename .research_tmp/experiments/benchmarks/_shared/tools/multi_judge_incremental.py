@@ -386,8 +386,29 @@ def main():
     ap.add_argument("--interval", type=int, default=120)
     ap.add_argument("--backfill", action="store_true",
                     help="also compute AutoAIS for rows scored before Track 2")
+    ap.add_argument("--snapshot",
+                    help="judge from a frozen input snapshot made by "
+                         "multi_judge_freeze.py (P2-9) instead of the live "
+                         "answers files")
     args = ap.parse_args()
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    global QFILE
+    if args.snapshot:
+        mani_p = os.path.join(args.snapshot, "MANIFEST.json")
+        mani = json.load(open(mani_p, encoding="utf-8"))
+        for arm in list(ARMS):
+            entry = mani["files"].get(arm)
+            if not entry:
+                print(f"[judge] snapshot missing arm {arm} — skipping it",
+                      flush=True)
+                ARMS.pop(arm, None)
+                continue
+            ARMS[arm] = os.path.join(args.snapshot, entry["path"])
+        qe = mani["files"].get("questions")
+        if qe:
+            QFILE = os.path.join(args.snapshot, qe["path"])
+        print(f"[judge] frozen inputs: {args.snapshot} "
+              f"(arms={sorted(ARMS)})", flush=True)
 
     _load_cache()
     gold = load_gold()
