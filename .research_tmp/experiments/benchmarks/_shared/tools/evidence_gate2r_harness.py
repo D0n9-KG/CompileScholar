@@ -157,7 +157,13 @@ class TextKB:
 
 def ground_lists(kb, grounding, question):
     """H-budget: inject question-relevant entity subset (token overlap on
-    surface_index), full subject/paper lists, overlap-filtered metrics."""
+    surface_index), full subject/paper lists, overlap-filtered metrics.
+
+    GROUNDING_CONSERVATIVE=1 (G2 A/B arm): the entity list exposes ONLY
+    in-corpus (starred) entities — unreviewed out-of-corpus registry names
+    (74% of the registry) are hidden from the planner entirely. Compare vs
+    the default full-exposure arm on the same question set."""
+    conservative = os.environ.get("GROUNDING_CONSERVATIVE", "") == "1"
     qtoks = {t for t in re.findall(r"[a-z0-9][a-z0-9\-\.]{2,}", question.lower())}
     scored = []
     for surf, eid in kb.surface_index.items():
@@ -166,6 +172,8 @@ def ground_lists(kb, grounding, question):
         if ov:
             e = kb.byid.get(eid)
             if e:
+                if conservative and not e.get("in_corpus_paper_id"):
+                    continue
                 scored.append((ov, e.get("mention_count", 0), e["canonical"],
                                bool(e.get("in_corpus_paper_id"))))
     seen, ents = set(), []
