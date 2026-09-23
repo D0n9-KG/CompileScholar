@@ -102,3 +102,15 @@ ETA ~4-5h。**晨间建议：给 GPUStack 服务器加 --tool-call-parser hermes
 （然后可撤掉模拟层跑原生工具调用对比）。
 
  ours 20/108 | pqa 15/108 | lightrag 291/440 入库中。
+
+## 追记三（07:05）：PaperQA 108/108 完成终值
+
+**PaperQA2 完整跑完**：Citation F1 mean=0.4493（precision 0.782 / recall 0.339，
+21 题零引用）。我方臂过半时点的部分配对（24 题 bio 域偏样本）：
+ours 0.432 vs pqa 0.575（CI 跨零）。**弱轴已定位=引用召回**——我方答案只引
+1-3 篇 gold ctx 内论文（内容 5-8k 字符正常，是引用广度问题）。完整 108 题
++ LightRAG 臂出齐后跑 `multi_paired_stats.py` 看全量判决，按预注册失败分支
+做败题归因（不夜间盲目迭代）。
+
+**资源裁决（07:00）**：暂停 LightRAG 入库（309/440，断点+LLM缓存全保），
+GPU 全给我方臂（pqa 已完）；我方完成探针触发 lightrag 自动重启。

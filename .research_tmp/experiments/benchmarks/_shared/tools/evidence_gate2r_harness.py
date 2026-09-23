@@ -343,7 +343,9 @@ def parse_step(raw):
             "parse_ok": bool(notes and gaps and (ans or acts))}
 
 
-BRACKET = re.compile(r"\[([^\[\]]{1,80})\]")
+# P0-1b: 80-char cap truncated long paper stems ('Hybrid_Lipid_Polymer_...for_C')
+# making legitimate backrefs unmatchable — corpus stems run to ~100 chars
+BRACKET = re.compile(r"\[([^\[\]]{1,120})\]")
 # PSV3-IL-2: author-year is a legitimate citation form — measured 26/30 answers
 # cite (Author et al., year) and 0/30 use [bracket] ids in the answer layer
 # (deinternalized style); the unsourced check only accepted BRACKET, so numeric
@@ -356,8 +358,26 @@ def _has_valid_id(line, valid_ids):
     """IL-C2: permissive bracket parsing — model naturally writes
     [seed_PER|2015] / [pid, record_id] composites; split bracket content on
     separators and accept if ANY part is a known id (v1's strict whole-content
-    TAG match rejected these and fed the reject spiral)."""
+    TAG match rejected these and fed the reject spiral).
+
+    P0-1 (carpet-audit 2026-09-23): match order is whole-content FIRST, then
+    'entity: X' suffix, THEN word-split. The old split-first order shredded
+    multi-word entity names ('[entity: Photonic Crystal Enhanced Microscopy]'
+    -> words, none of which are ids) even when the name was a perfectly valid
+    registry canonical — 2,898 false rejects across 108 questions, 85/108
+    anti-loop hard stops, the entire forced-compile cascade. This matcher has
+    TWO call sites (note gate + first-reject merge, see N8) — both are healed
+    by this ordering."""
     for content in BRACKET.findall(line):
+        # 1) whole bracket content is an id (multi-word canonicals/aliases)
+        if content in valid_ids:
+            return True
+        # 2) '[entity: X]' / '[tool: X]' prefixed form — the payload is the id
+        if ":" in content:
+            payload = content.split(":", 1)[1].strip()
+            if payload and payload in valid_ids:
+                return True
+        # 3) composite separators (IL-C2 legacy behavior)
         for part in re.split(r"[|,;/\s]+", content):
             p = part.strip()
             if p and p in valid_ids:
@@ -1455,6 +1475,20 @@ def run_question(q, arm, kb, tkb, grounding, glog):
                     # query is productive work; execute it. Notes still merge
                     # with [unsourced] marks (discipline intact — plan prose
                     # and unanchored numbers must not be cited as evidence).
+                    # N8 (carpet-audit): distinguish TRUE downgrades (line
+                    # carries no valid id) from false ones — with the P0-1
+                    # matcher fix, legit multi-word ids must no longer land
+                    # here. This counter is the acceptance gate for P0-1: if
+                    # false downgrades persist, the fix is incomplete.
+                    _n_downgraded = sum(
+                        1 for s in st["notes"].split("\n")
+                        if s.strip() and not _has_valid_id(s, valid_ids))
+                    _n_lines = sum(1 for s in st["notes"].split("\n")
+                                   if s.strip())
+                    gate_info["merge_downgraded_lines"] = \
+                        gate_info.get("merge_downgraded_lines", 0) + _n_downgraded
+                    gate_info["merge_total_lines"] = \
+                        gate_info.get("merge_total_lines", 0) + _n_lines
                     notes = "\n".join(
                         (s.strip() if _has_valid_id(s, valid_ids)
                          else "[unsourced] " + s.strip())

@@ -1,4 +1,43 @@
 {
+ "git": {
+  "sha": "c75b45a601117a6834788addf063ea2a275187b0",
+  "dirty_files": [
+   "M .research_tmp/experiments/benchmarks/scholarqa_multi/baselines/lightrag/ledger_lightrag.jsonl",
+   " M .research_tmp/experiments/benchmarks/scholarqa_multi/baselines/lightrag/work/kv_store_doc_status.json",
+   " M .research_tmp/experiments/benchmarks/scholarqa_multi/baselines/lightrag/work/kv_store_full_entities.json",
+   " M .research_tmp/experiments/benchmarks/scholarqa_multi/baselines/lightrag/work/kv_store_full_relations.json",
+   " M build_manifest.json",
+   "?? .research_tmp/experiments/benchmarks/scholarqa_multi/kb/registry_growth_report_v2.json",
+   "?? .research_tmp/experiments/benchmarks/scholarqa_multi/kb/registry_v2.json",
+   "?? .research_tmp/experiments/benchmarks/scholarqa_multi/kb/views.json"
+  ]
+ },
+ "config": {
+  "llm": {
+   "model": "local:Qwen3.8-27B",
+   "provider_allowlist": "local",
+   "local_max_concurrent": 96,
+   "local_sock_timeout": 900,
+   "local_max_attempts": 4,
+   "wall_timeout": 900,
+   "sock_timeout": 600,
+   "intern_soft_cap": 85000000
+  },
+  "slot": {
+   "max_chars": 500000,
+   "pool_size": 64
+  },
+  "registry": {
+   "tau1": 0.84,
+   "tau2": 0.8,
+   "block_workers": 12
+  },
+  "paths": {
+   "texts": "C:\\Users\\D0n9\\Desktop\\CompileScholar\\.research_tmp\\experiments\\benchmarks\\scholarqa_multi\\corpus\\texts",
+   "manifest": "C:\\Users\\D0n9\\Desktop\\CompileScholar\\.research_tmp\\experiments\\benchmarks\\scholarqa_multi\\corpus\\manifest.json",
+   "kb_dir": "C:\\Users\\D0n9\\Desktop\\CompileScholar\\.research_tmp\\experiments\\benchmarks\\scholarqa_multi\\kb"
+  }
+ },
  "stages": {
   "cards": {
    "ts": "2026-09-22T13:30:06",
@@ -87,5 +126,17 @@
     "msg": "no check declared"
    }
   }
- }
+ },
+ "ran": [
+  "registry_growth",
+  "views"
+ ],
+ "skipped": [
+  "cards",
+  "registry_vocab",
+  "deep_extract",
+  "postcheck",
+  "table_extract",
+  "notation"
+ ]
 }

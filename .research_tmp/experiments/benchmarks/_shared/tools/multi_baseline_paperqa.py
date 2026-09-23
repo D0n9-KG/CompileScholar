@@ -45,7 +45,7 @@ _SRC = os.path.normpath(os.path.join(_MULTI, "..", "..", "..", "..", "src"))
 BASE_DIR = os.path.join(_MULTI, "baselines", "paperqa")
 DOCS = os.path.join(_MULTI, "corpus", "texts")
 INDEX_DIR = os.path.join(BASE_DIR, "index")
-ANSWERS = os.path.join(BASE_DIR, "answers_paperqa.json")
+ANSWERS = os.environ.get("PQA_ANSWERS_FILE") or os.path.join(BASE_DIR, "answers_paperqa.json")
 LEDGER = os.path.join(BASE_DIR, "ledger_paperqa.jsonl")
 
 sys.path.insert(0, _SRC)
@@ -175,7 +175,14 @@ def install_lmi_router_shim():
                                os.environ.get("LOCAL_API_KEY", "local")}
             tools = kwargs.pop("tools", None)
             tool_choice = kwargs.pop("tool_choice", None)
-            if tools:
+            if tools and os.environ.get("PQA_NATIVE_TOOLS", "0") == "1":
+                # 2026-09-23: server now runs with --tool-call-parser (user
+                # enabled it) — pass tools through natively. Controlled by
+                # PQA_NATIVE_TOOLS so the emulated path stays reproducible.
+                body["tools"] = tools
+                if tool_choice:
+                    body["tool_choice"] = tool_choice
+            elif tools:
                 # The GPUStack vLLM server has no --tool-call-parser: ANY
                 # native tool-calling is rejected ("tool_choice='required'
                 # requires --tool-call-parser"). Emulate tool calling in the

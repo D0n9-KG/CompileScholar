@@ -34,7 +34,11 @@ LINES = {
         "match": "registry|build.py|notation|table",
     },
     "lightrag": {
-        "probe": lambda: _processed_docs(),
+        # 2026-09-23 (2nd false alarm): state-count probes read FLAT when docs
+        # flow between states at equal rates (3 enter parsing while 3 leave).
+        # Monotonic probe instead: ok rows in the arm ledger — every completed
+        # LLM call appends, never decreases, cannot cancel out.
+        "probe": lambda: _ledger_rows(f"{KB}/baselines/lightrag/ledger_lightrag.jsonl"),
         "done": lambda: _processed_docs() >= 430,
         "match": "lightrag",
     },
@@ -42,6 +46,22 @@ LINES = {
         "probe": lambda: _pqa_index_count() * 10 + _pqa_answer_rows(),
         "done": lambda: _pqa_answer_rows() >= 108,
         "match": "paperqa",
+    },
+    # 2026-09-23: the answering-phase lines. ours probe = answer rows x 100 +
+    # ledger ok rows (answers only flush per question; ledger calls flow
+    # continuously — combining both catches both stalls: no calls AND no
+    # completions)
+    "ours-answers": {
+        "probe": lambda: _ours_answer_rows() * 100
+                       + _ledger_rows(f"{KB}/baselines/ours/ledger_ours_multi.jsonl"),
+        "done": lambda: _ours_answer_rows() >= 108,
+        "match": "multi_ours_run",
+    },
+    # judge loop: GLM-5.3 verdicts (Paratera, independent of GPUStack)
+    "judge": {
+        "probe": lambda: _ledger_rows(f"{KB}/judge/ledger_judge.jsonl"),
+        "done": lambda: False,  # never "done" — it idles between arms by design
+        "match": "multi_judge_incremental",
     },
 }
 
@@ -73,7 +93,22 @@ def _doc_status():
 
 
 def _processed_docs():
-    return sum(1 for v in _doc_status().values() if v.get("status") == "processed")
+    # 2026-09-23: count pipeline-progress states, not just terminal 'processed'
+    # — a doc in parsing/processing/analyzing is FORWARD progress, but the
+    # processed-only probe read flat across a 40-min window and false-alarmed
+    # WEDGED while extraction calls were actively flowing
+    return sum(1 for v in _doc_status().values()
+               if v.get("status") in ("processed", "parsing", "processing",
+                                      "analyzing"))
+
+
+def _ours_answer_rows():
+    try:
+        d = json.load(open(f"{KB}/baselines/ours/answers_pilot_multi.json",
+                           encoding="utf-8"))
+        return sum(1 for r in d if r.get("answer"))
+    except Exception:
+        return 0
 
 
 def _failed_docs():

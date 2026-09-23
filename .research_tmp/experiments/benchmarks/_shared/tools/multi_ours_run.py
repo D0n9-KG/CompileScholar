@@ -223,7 +223,7 @@ def wrap_f21(kb):
 
 # ---------------- official-format answer rows ----------------
 
-_PID_MARK = re.compile(r"\[([A-Za-z0-9_\-]{6,80})\]")
+_PID_MARK = re.compile(r"\[([A-Za-z0-9_\-]{6,120})\]")  # P0-1b: stem length cap
 
 # record_id -> paper stem (notes carry [record_id] backrefs; the answer
 # copies them — the bridge resolves record ids to their paper before the
@@ -253,7 +253,12 @@ def to_official_row(r: dict, id_mapping: dict) -> dict:
     from multi_baseline_common import CitationTranslator
     _load_rec2pid()
     qid = r["id"]
-    raw = r.get("answer") or ""
+    # N1 (carpet-audit 2026-09-23): the shared driver's F3 post-pass rewrites
+    # every [pid] marker to "(Author et al., year)" into `answer`, preserving
+    # the original in `answer_raw`. The official bridge MUST read answer_raw —
+    # reading `answer` mapped 0 citations for all 108 questions. 91/108 raw
+    # answers carry [pid] markers (68/85 compile-path + 23/23 direct).
+    raw = r.get("answer_raw") or r.get("answer") or ""
     tr = CitationTranslator(qid, id_mapping)
     pairs, seen = [], set()
     for m in _PID_MARK.finditer(raw):
@@ -298,6 +303,11 @@ def main():
 
     F18_LOG = []
     D.build_tools_ps16 = build_tools_f21
+    # N1: the shared driver's deinternalize post-pass rewrites [pid] markers
+    # to (Author, year) — for Multi the official bridge needs the raw markers.
+    # The bridge now reads answer_raw (belt), and this flag stops the rewrite
+    # entirely (braces) so `answer` == `answer_raw` in future runs.
+    D.SKIP_DEINTERNALIZE = True
     try:
         D.main()   # runs stage_answer -> answers_{tag}.json in RB
     finally:
