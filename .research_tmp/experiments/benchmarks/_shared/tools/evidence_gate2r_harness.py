@@ -256,7 +256,7 @@ Tool catalog (local, deterministic, zero-cost, call as often as needed):
 
 Channel semantics: numeric experimental results live in compare (matrix rows) and card (main_results) — findings carries claim-type records only and will never return numbers; an empty findings result is not a signal to keep appending keywords to contains.
 
-Eight-move playbook (typed semantics of this knowledge base; execute item by item):
+Nine-move playbook (typed semantics of this knowledge base; execute item by item):
 (1) Provenance chase: a number with epistemic=cited is a restatement; trace the source paper via card/findings(paper_id=source).
 (2) Band discipline: before comparing two numbers verify they share the same band (setup/budget); never compare across bands directly.
 (3) Absence trichotomy: empirical absence from find_gap = cited knowledge (a paper states it did NOT do X); derived absence = corpus state (would change with another corpus); never conflate the two wordings.
@@ -265,6 +265,7 @@ Eight-move playbook (typed semantics of this knowledge base; execute item by ite
 (6) Category expansion: for method-family or technique-category phrases, FIRST pick member names yourself from the entity list below (entries marked * have records grounded in the corpus); entities(contains=name-fragment) is only corroboration — a category phrase is not an entity name and hits zero directly.
 (7) Empty-result trichotomy: empty result -> check nearest_candidates (wrong argument: rename and retry) / check find_gap (true absence: record it) / change angle (not found yet).
 (8) Information-need alignment: before querying, identify WHICH KIND of information the question asks for — mechanism, numeric comparison, configuration, lineage, or limitation/weakness/what-is-missing — and query the record type that houses that kind. Limitation asks go to findings(claim_type=criticism) + find_gap FIRST; keyword-guessing via contains is the last resort, not the first (record wording rarely echoes the question's words).
+(9) Compare-first for comparisons: when the question asks to compare methods/models/systems (head-to-head, vs., better/worse, benchmark tables), call compare(entities=[all compared names]) FIRST — the matrix carries the numeric rows and derived rankings in one call. Findings/card add explanations AFTER the numbers are on the notes; do not assemble comparisons by reading papers one by one. If compare returns empty, follow its vocab_hint to the compiled keys before falling back to findings.
 
 {notes_spec}
 
