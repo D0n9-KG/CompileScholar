@@ -35,7 +35,7 @@ def embed_cst(texts: list[str], batch_size: int = CST_EMBED_BATCH,
               workers: int = 4) -> list[list[float]]:
     """CST qwen3-embedding:8b, true batched (dim 4096). Raises RuntimeError
     if any batch still fails after retries — caller decides degradation."""
-    from .llm import _provider_allowed, _gate_block
+    from .llm import _provider_allowed, _gate_block, _log_call
     if not _provider_allowed("cst"):
         _gate_block("cst-embed", CST_EMBED_MODEL)
         raise RuntimeError("CST embedding blocked by LLM_PROVIDER_ALLOWLIST")
@@ -50,6 +50,7 @@ def embed_cst(texts: list[str], batch_size: int = CST_EMBED_BATCH,
 
     def _one(batch: list[str]) -> list[list[float]]:
         body = json.dumps({"model": CST_EMBED_MODEL, "input": batch}).encode()
+        _t0 = time.time()  # P2-4: batch latency from request start
         last_err = None
         for attempt in range(4):
             try:
@@ -73,11 +74,19 @@ def embed_cst(texts: list[str], batch_size: int = CST_EMBED_BATCH,
                 data.sort(key=lambda x: x.get("index", 0))
                 out = [d["embedding"] for d in data]
                 if len(out) == len(batch):
+                    _log_call("cst-embed", CST_EMBED_MODEL, True,
+                              (time.time() - _t0) * 1000, None, attempt,
+                              payload={"model": CST_EMBED_MODEL, "input": batch},
+                              extra={"n_items": len(batch)})
                     return out
                 last_err = RuntimeError(f"count mismatch {len(out)}/{len(batch)}")
             except Exception as e:
                 last_err = e
                 time.sleep(6 * (attempt + 1))
+        _log_call("cst-embed", CST_EMBED_MODEL, False,
+                  (time.time() - _t0) * 1000, None, 3,
+                  payload={"model": CST_EMBED_MODEL, "input": batch},
+                  extra={"n_items": len(batch)})
         raise RuntimeError(f"CST embed batch failed: {last_err}")
 
     if workers <= 1 or len(batches) == 1:
@@ -111,7 +120,9 @@ def embed_local(texts: list[str], batch_size: int = 64,
     wall = float(os.environ.get("LLM_WALL_TIMEOUT", "240"))
 
     def _one(batch: list[str]) -> list[list[float]]:
+        from .llm import _log_call
         body = json.dumps({"model": model, "input": batch}).encode()
+        _t0 = time.time()  # P2-4: batch latency from request start
         last_err = None
         for attempt in range(4):
             try:
@@ -133,11 +144,19 @@ def embed_local(texts: list[str], batch_size: int = 64,
                 data.sort(key=lambda x: x.get("index", 0))
                 out = [d["embedding"] for d in data]
                 if len(out) == len(batch):
+                    _log_call("local-embed", model, True,
+                              (time.time() - _t0) * 1000, None, attempt,
+                              payload={"model": model, "input": batch},
+                              extra={"n_items": len(batch)})
                     return out
                 last_err = RuntimeError(f"count mismatch {len(out)}/{len(batch)}")
             except Exception as e:
                 last_err = e
                 time.sleep(3 * (attempt + 1))
+        _log_call("local-embed", model, False,
+                  (time.time() - _t0) * 1000, None, 3,
+                  payload={"model": model, "input": batch},
+                  extra={"n_items": len(batch)})
         raise RuntimeError(f"local embed batch failed: {last_err}")
 
     if workers <= 1 or len(batches) == 1:

@@ -67,7 +67,10 @@ D.TOKEN_CAP_R3 = int(os.environ.get("G2_CAP", "999999999999"))  # R-A: no global
 D.H.MODEL = MODEL
 
 QFILE_OUT = os.path.join(ARM, "questions_multi.json")
-ANSWERS = os.path.join(ARM, "answers_ours.json")
+# OURS_ANSWERS override: resample/A-B runs must never merge rows into the
+# frozen Multi-108 artifact (answers_ours.json backs the reported scores)
+ANSWERS = os.environ.get("OURS_ANSWERS",
+                         os.path.join(ARM, "answers_ours.json"))
 
 
 # ---------------- qfile conversion (gold-blind) ----------------

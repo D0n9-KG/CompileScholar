@@ -78,12 +78,27 @@ def _env_seed() -> int | None:
         return None
 
 
+def _phash(payload) -> str:
+    """P2-4: stable short hash of the request payload — retry-storm and
+    duplicate-prompt diagnosis without logging prompt content."""
+    if not payload:
+        return ""
+    try:
+        blob = json.dumps(payload, ensure_ascii=False, sort_keys=True)
+        import hashlib
+        return hashlib.sha256(blob.encode("utf-8")).hexdigest()[:12]
+    except Exception:
+        return ""
+
+
 def _log_call(provider: str, model: str, ok: bool, latency_ms: float,
               usage: dict | None = None, attempt: int = 0,
-              fallback_for: str = "") -> None:
+              fallback_for: str = "", payload=None, extra: dict | None = None,
+              caller: str = "") -> None:
     rec = {
         "ts": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "run_id": RUN_ID,
+        "caller": caller or os.environ.get("LLM_CALLER", ""),
         "provider": provider,
         "model": model,
         "ok": ok,
@@ -93,6 +108,10 @@ def _log_call(provider: str, model: str, ok: bool, latency_ms: float,
         "attempt": attempt,
         "fallback_for": fallback_for,
     }
+    if payload is not None:
+        rec["prompt_hash"] = _phash(payload)
+    if extra:
+        rec.update(extra)
     CALL_LOG.append(rec)
     path = os.environ.get("LLM_CALL_LOG")
     if path:
@@ -212,12 +231,13 @@ def call_llm(prompt: str, model: str = "deepseek-chat", max_tokens: int = 4000,
         t0 = time.time()
         try:
             content, usage = _chat_once(url, key, body, timeout=120)
-            _log_call("deepseek", model, True, (time.time() - t0) * 1000, usage, attempt)
+            _log_call("deepseek", model, True, (time.time() - t0) * 1000, usage, attempt,
+                     payload=payload)
             return content
         except Exception as e:
             last_err = e
             _log_call("deepseek", model, False, (time.time() - t0) * 1000,
-                      None, attempt)
+                      None, attempt, payload=payload)
             if attempt < 2:
                 time.sleep(2 * (attempt + 1))
     # fallback: Paratera GLM-5-Turbo (same prompt, one shot) — logged + switchable
@@ -334,11 +354,12 @@ def call_paratera(prompt: str, model: str = "Kimi-K2.6", max_tokens: int = 4000,
             raw = b"".join(chunks)
             resp = json.loads(raw)
             _log_call("paratera", model, True, (time.time() - t0) * 1000,
-                      resp.get("usage") or {}, attempt, fallback_for)
+                      resp.get("usage") or {}, attempt, fallback_for,
+                      payload=payload)
             return resp["choices"][0]["message"]["content"]
         except Exception:
             _log_call("paratera", model, False, (time.time() - t0) * 1000,
-                      None, attempt, fallback_for)
+                      None, attempt, fallback_for, payload=payload)
             if attempt == 1:
                 return None
     return None
@@ -398,11 +419,11 @@ def call_paratera_vision(prompt: str, image_path: str,
             raw = b"".join(chunks)
             resp = json.loads(raw)
             _log_call("paratera-vision", model, True, (time.time() - t0) * 1000,
-                      resp.get("usage") or {}, attempt)
+                      resp.get("usage") or {}, attempt, payload=payload)
             return resp["choices"][0]["message"]["content"]
         except Exception:
             _log_call("paratera-vision", model, False, (time.time() - t0) * 1000,
-                      None, attempt)
+                      None, attempt, payload=payload)
             if attempt == 1:
                 return None
     return None
@@ -582,7 +603,7 @@ def call_cst(prompt: str, model: str = "qwen3.5", max_tokens: int = 4000,
                 raw = _walled_read(_r3, t0)
             resp = json.loads(raw)
             _log_call("cst", model, True, (time.time() - t0) * 1000,
-                      resp.get("usage") or {}, attempt)
+                      resp.get("usage") or {}, attempt, payload=payload)
             return resp["choices"][0]["message"]["content"]
         except urllib.error.HTTPError as e:
             try:
@@ -590,14 +611,14 @@ def call_cst(prompt: str, model: str = "qwen3.5", max_tokens: int = 4000,
             except Exception:
                 retry_after = None
             _log_call("cst", model, False, (time.time() - t0) * 1000,
-                      None, attempt)
+                      None, attempt, payload=payload)
             if e.code in _CST_RETRY_STATUS and attempt < attempts - 1:
                 _cst_backoff_sleep(attempt, retry_after)
                 continue
             return None
         except Exception:
             _log_call("cst", model, False, (time.time() - t0) * 1000,
-                      None, attempt)
+                      None, attempt, payload=payload)
             if attempt < attempts - 1:
                 _cst_backoff_sleep(attempt)
                 continue
@@ -678,7 +699,7 @@ def call_intern(prompt: str, model: str = "qwen3.8-27b", max_tokens: int = 4000,
                     chunks.append(b)
             resp = json.loads(b"".join(chunks))
             _log_call("intern", model, True, (time.time() - t0) * 1000,
-                      resp.get("usage") or {}, attempt)
+                      resp.get("usage") or {}, attempt, payload=payload)
             return resp["choices"][0]["message"]["content"]
         except urllib.error.HTTPError as e:
             try:
@@ -686,14 +707,14 @@ def call_intern(prompt: str, model: str = "qwen3.8-27b", max_tokens: int = 4000,
             except Exception:
                 retry_after = None
             _log_call("intern", model, False, (time.time() - t0) * 1000,
-                      None, attempt)
+                      None, attempt, payload=payload)
             if e.code in _INTERN_RETRY_STATUS and attempt < attempts - 1:
                 _cst_backoff_sleep(attempt, retry_after)
                 continue
             return None
         except Exception:
             _log_call("intern", model, False, (time.time() - t0) * 1000,
-                      None, attempt)
+                      None, attempt, payload=payload)
             if attempt < attempts - 1:
                 _cst_backoff_sleep(attempt)
                 continue
@@ -771,18 +792,18 @@ def call_local(prompt: str, model: str = "Qwen3.8-27B", max_tokens: int = 4000,
                 raw = _walled_read(_rl, t0)
             resp = json.loads(raw)
             _log_call("local", model, True, (time.time() - t0) * 1000,
-                      resp.get("usage") or {}, attempt)
+                      resp.get("usage") or {}, attempt, payload=payload)
             return resp["choices"][0]["message"]["content"]
         except urllib.error.HTTPError as e:
             _log_call("local", model, False, (time.time() - t0) * 1000,
-                      None, attempt)
+                      None, attempt, payload=payload)
             if e.code in (429, 500, 502, 503, 504) and attempt < attempts - 1:
                 time.sleep(2 * (attempt + 1))
                 continue
             return None
         except Exception:
             _log_call("local", model, False, (time.time() - t0) * 1000,
-                      None, attempt)
+                      None, attempt, payload=payload)
             if attempt < attempts - 1:
                 time.sleep(2 * (attempt + 1))
                 continue
