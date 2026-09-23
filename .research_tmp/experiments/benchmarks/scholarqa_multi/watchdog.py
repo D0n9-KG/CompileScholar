@@ -54,12 +54,16 @@ LINES = {
     "ours-answers": {
         "probe": lambda: _ours_answer_rows() * 100
                        + _ledger_rows(f"{KB}/baselines/ours/ledger_ours_multi.jsonl"),
+        "fail_streak": lambda: _ledger_fail_streak(
+            f"{KB}/baselines/ours/ledger_ours_multi.jsonl"),
         "done": lambda: _ours_answer_rows() >= 108,
         "match": "multi_ours_run",
     },
     # judge loop: GLM-5.3 verdicts (Paratera, independent of GPUStack)
     "judge": {
         "probe": lambda: _ledger_rows(f"{KB}/judge/ledger_judge.jsonl"),
+        "fail_streak": lambda: _ledger_fail_streak(
+            f"{KB}/judge/ledger_judge.jsonl"),
         "done": lambda: False,  # never "done" — it idles between arms by design
         "match": "multi_judge_incremental",
     },
@@ -100,6 +104,33 @@ def _processed_docs():
     return sum(1 for v in _doc_status().values()
                if v.get("status") in ("processed", "parsing", "processing",
                                       "analyzing"))
+
+
+def _ledger_fail_streak(path):
+    """Consecutive ok=False at the ledger TAIL (2026-09-23 outage lesson:
+    the GPUStack model vanished post-restart; every process was alive but
+    ALL calls 404'd for 40 minutes — row-count probes saw healthy flow).
+    Returns the trailing consecutive-failure count."""
+    try:
+        tail = []
+        for l in open(path, encoding="utf-4" if False else "utf-8"):
+            l = l.strip()
+            if l:
+                tail.append(l)
+                if len(tail) > 30:
+                    tail.pop(0)
+        n = 0
+        for l in reversed(tail):
+            try:
+                if not json.loads(l).get("ok"):
+                    n += 1
+                else:
+                    break
+            except Exception:
+                break
+        return n
+    except Exception:
+        return 0
 
 
 def _ours_answer_rows():
@@ -168,11 +199,14 @@ def main():
                     state = "ALIVE"
                     last_change[name] = time.time()
                 last_probe[name] = p
+            _fs = spec.get("fail_streak")
+            if _fs and _fs() >= 8 and state in ("ALIVE", "ALIVE(no-progress)"):
+                state = "FAILING"
             if state != last_change.get(name + ":state"):
                 last_change[name + ":state"] = state
                 print(f"[watchdog {time.strftime('%H:%M')}] {name}: {state} "
                       f"(probe={last_probe.get(name, '?')})", flush=True)
-                if state in ("WEDGED", "DEAD"):
+                if state in ("WEDGED", "DEAD", "FAILING"):
                     print(f"[watchdog] !!! {name} {state} — 需要人工介入 "
                           f"(重启/取证)", flush=True)
         time.sleep(INTERVAL)
