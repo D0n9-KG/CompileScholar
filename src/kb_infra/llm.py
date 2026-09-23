@@ -753,7 +753,20 @@ def call_local(prompt: str, model: str = "Qwen3.8-27B", max_tokens: int = 4000,
                 headers={"Authorization": f"Bearer {key}",
                          "Content-Type": "application/json"},
             )
-            with _LOCAL_SEM:
+            # P1-9 (carpet-audit #21): tiered semaphore — one large-output
+            # call (registry_growth's 280s generations) hogging a slot in the
+            # SHARED pool starved short calls behind it during mixed workloads
+            # (ChannelDead wall-timeout cascades). Large calls (max_tokens
+            # >= 8000) get their own low-concurrency lane so a fleet of them
+            # cannot monopolize the short-call capacity.
+            _sem = _LOCAL_SEM
+            if max_tokens >= 8000:
+                global _LOCAL_SEM_LARGE
+                if "_LOCAL_SEM_LARGE" not in globals():
+                    _LOCAL_SEM_LARGE = threading.Semaphore(max(
+                        2, int(os.environ.get("LOCAL_MAX_CONCURRENT", "4")) // 8))
+                _sem = _LOCAL_SEM_LARGE
+            with _sem:
                 _rl = _walled_open(req, sock_timeout=sock_to)
                 raw = _walled_read(_rl, t0)
             resp = json.loads(raw)
