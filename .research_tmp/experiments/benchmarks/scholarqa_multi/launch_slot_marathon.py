@@ -17,7 +17,7 @@ import sys
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 KB = os.path.join(BASE, "kb")
-SMOKE = os.path.join(KB, "records_smoke.json")
+SMOKE = os.path.join(KB, "smoke", "records_smoke.json")
 OUT = os.path.join(KB, "records_slot.json")
 
 
