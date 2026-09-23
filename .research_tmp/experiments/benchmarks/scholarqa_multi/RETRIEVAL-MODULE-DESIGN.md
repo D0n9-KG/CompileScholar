@@ -88,3 +88,42 @@
   A6 初步验证=对 Multi 语料 108 题做"闭卷模拟开放检索"（把 430 篇语料
      从 KB 里藏起来，用检索模块从零召回，量 Recall@K——不依赖 SQA2）
 - SQA2 排在 P4-A 全部完成+验证之后（用户裁定，已修正推进顺序）
+
+## 五、落地记录（2026-09-24 深夜，A1-A5+G4 全部建成）
+
+全部在 sci-evo-extract 仓库（commits: A1+A2 / A3+A4 / A5+deadlock 修复 /
+G4 / 单测 7 例），每个模块都有现场验证：
+
+- **A1 熔断+递进降级**（circuit.py + discover_tiered）：SourceCircuit
+  滑动窗口（3 失败/120s→OPEN 600s→HALF_OPEN 单探针）；discover_tiered
+  按 tier 顺序查，circuit-open 跳过、错误/超时（默认 20s，防 S2 匿名池
+  Retry-After 分钟级挂死）降级+计数、诚实空结果降级不熔断、DOI 归一去
+  重、达标早停。现场验证：arXiv 406 限流→超时降级→S2 429→超时降级→
+  OpenAlex 1.3s 接住且目标论文第一。
+- **A2 arXiv 搜索客户端**（sources.py ArxivClient）：Atom 解析、
+  1req/3s 跨实例礼貌间隔、退避重试。两个实测坑：search_query 里
+  `:` 必须字面（%3A→HTTP 406）；406 也是 arXiv 的限流信号（同一 URL
+  200 后连发数分钟内变 406）→长退避重试。现场：0.3s 命中目标论文。
+- **A3 查询理解层**（query_understanding.py）：一次小 LLM 调用→
+  intent+domain+2-4 关键词式子查询+源偏好；可注入 chat callable
+  （CompileScholar 侧接 kb_infra 入账）；LLM 失败确定性回退原查询。
+  现场（GPU 满载）：LNP 题→bio/openalex+3 子查询（含 DLS/NMR/HPLC
+  特征化词表）；CFG 题→cs/arxiv+s2。
+- **A4 嵌入重排+两级缓存**（rerank.py）：candidate_text 重建（OpenAlex
+  倒排索引摘要/arXiv summary/S2 abstract）+余弦重排；QueryResultCache
+  （进程内 LRU+TTL）+DoiMetaCache（文件 JSONL 原子写）。现场：目标论文
+  第 4→第 1（0.886），异域 diffusion 沉底，0.4s/批。
+- **A5 延迟分级**（search_service.py）：fast（缓存命中/单层 5s 帽，无
+  LLM 无重排）/full（A3→分层发现→去重→A4）/auto（fast 薄结果升级）；
+  每结果带分级延迟明细。现场：fast 1.7s、缓存 0ms、full 14.6s（GPU
+  满载；idle 时 understand ~2s）。**修复两枚真 bug**：SourceCircuit
+  .snapshot() 持非重入锁自死锁；executor shutdown 阻塞调用方退出。
+- **G4 引用图服务**（citation_graph.py）：设计勘误——manifest 无 refs
+  字段（430 条实测零），库内引用结构=genealogy（已有 lineage 工具）；
+  缺的是外部游走。S2 双向（OpenAlex 只出向，作出向兜底）+DOI 键磁盘
+  缓存（7 天 TTL）+语料回指标注。现场：CFG 论文 52 边 2.0s，ADM 论文
+  正确标 in_corpus。
+- **A6 闭卷验证**在跑（multi_closedbook_recall.py，108 题全量，
+  Recall@10 ≥0.7 过门）。初判风险：gold 是特定论文选择（同一主题下
+  检索返回的 top-10 全切题但可能不含 gold 本尊）——若 FAIL，改进方向
+  =子查询多样性/每子查询单独配额/S2 key（匿名池 429 是当前主要降级源）。
