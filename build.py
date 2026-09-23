@@ -28,6 +28,7 @@ import argparse
 import hashlib
 import importlib
 import json
+import os
 import subprocess
 import sys
 import time
@@ -305,7 +306,18 @@ def build(targets: list[str], force: set[str], dry: bool, exp: str | None):
         t0 = time.time()
         with runlog.run(st.name) as _rlog:
             _rlog.event("cmd", cmd=[str(c) for c in cmd])
-            p = subprocess.run(cmd, cwd=str(REPO / "src"), env=env)
+            # P2-3: stage stdout/stderr captured into the run dir — the
+            # inner prints (per-paper progress, warnings, stage summaries)
+            # previously evaporated with the console. One run dir now holds
+            # the full story: events.jsonl + stdout.log + summary.json.
+            _out_fh = open(os.path.join(_rlog["dir"], "stdout.log"), "w",
+                           encoding="utf-8", errors="replace")
+            try:
+                p = subprocess.run(cmd, cwd=str(REPO / "src"), env=env,
+                                   stdout=_out_fh,
+                                   stderr=subprocess.STDOUT)
+            finally:
+                _out_fh.close()
             _rlog.event("subprocess_exit", rc=p.returncode)
         dt = time.time() - t0
         outs = _outputs_abs(st)
