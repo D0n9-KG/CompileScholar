@@ -1972,8 +1972,13 @@ def run_question(q, arm, kb, tkb, grounding, glog):
             "every aspect asked, using ONLY information present in the notes (numbers "
             "verbatim). CITATIONS: each claim sentence must carry the bracketed id "
             "copied VERBATIM from its note line (e.g. [93d961829e1f2c] — the exact hex "
-            "id in the note's leading brackets); never invent citation formats, author "
-            "names, or numbers as tags. "
+            "id in the note's leading brackets). "
+            "VALID citation forms (copy the note's bracket EXACTLY): "
+            "[93d961829e1f2c]  |  [Scaling_LLM_Test_Time_Compute_Optimally]. "
+            "INVALID forms that the system will DELETE: [1] [13] (sequential "
+            "renumbering), [Wan#5400] (author#number), [13,14] (number groups), "
+            "(Author et al., 2024). Do not renumber, do not reformat, do not "
+            "invent ids — copy the note brackets character for character. "
             "Style: flowing academic prose organized around the question's own structure "
             "(when the question asks for comparison, organize item by dimension, not as "
             "standalone item summaries; when the question asks about experimental results, "
@@ -2003,6 +2008,29 @@ def run_question(q, arm, kb, tkb, grounding, glog):
         gate_info["forced_notes_submit"] = True   # provenance marker kept either way
         if compiled.strip() and not degenerate(compiled):
             answer = compiled.strip()
+            # P1-D (borrowed from PaperQA's hallucinated-citation strip,
+            # types.py:511): the compile step is a FREE TRANSCRIPTION of note
+            # backrefs — measured failure forms: sequential renumbering
+            # [1][2][3] (untranslatable), fabricated hex ids, out-of-range
+            # indices. Deterministic post-filter: markers must be ids the
+            # question's OWN notes carry; anything else is stripped at the
+            # source so it never reaches the official bridge or the judge.
+            _note_ids = set(re.findall(r"\[([0-9a-f]{14})\]", notes_full() or "")) | \
+                        set(re.findall(r"\[([A-Za-z][A-Za-z0-9_\-]{15,110})\]",
+                                       notes_full() or ""))
+            _stripped = 0
+            for _m in re.finditer(r"\[([^\[\]]{1,110})\]", answer):
+                _tok = _m.group(1)
+                if _tok in _note_ids:
+                    continue
+                # composite [a|b] / [a,b] parts (any part valid = keep)
+                if any(p.strip() in _note_ids
+                       for p in re.split(r"[|,;/\s]+", _tok) if p.strip()):
+                    continue
+                answer = answer.replace(_m.group(0), "", 1)
+                _stripped += 1
+            if _stripped:
+                gate_info["compile_citation_stripped"] = _stripped
             gate_info["fallback_compiled"] = True
             # F9-compile: the loop never gets a repair turn on this path — if the
             # compiled draft carries ungrounded literature-absence claims, one
