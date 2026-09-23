@@ -253,8 +253,11 @@ P0-1 → P0-2/3 → P0-4（重判分出真实成绩）→ P1-1（复测定效率
   out_of_corpus 是潜在噪声源
 - 修法：仲裁队列处理（抽检+批量规则），或答题端 grounding 只暴露
   仲裁通过的子集（保守模式 A/B 测试）
-- **09-24：GROUNDING_CONSERVATIVE=1 开关已落地（星标-only 实体列表），
-  resample20 跑完即以同题集跑 B 臂。**
+- **09-24 A/B 判决：保守模式不采纳**（同 20 题/同代码/同 fanout=20）：
+  F1 A(全暴露)=0.5446 > B(星标-only)=0.4729（5W 9L 6T），步数/答案长度
+  持平（A med 10/p90 21，B med 11.5/p90 25，双方零烧尽）。结论：
+  out_of_corpus 实体名作检索跳板有真值——G1-B2 的"全暴露+miss 重定向"
+  即终态形态。A 臂退化题 benjamin_bio_2 在 B 臂 +1.0 恢复=27B 方差实锤。
 
 ### G3 views 的 cards 投影损耗 —— **已结案（09-24，非 views bug）**
 - 95 张缺口全分解：**87 = 综述/practice 论文**（method_identity.
