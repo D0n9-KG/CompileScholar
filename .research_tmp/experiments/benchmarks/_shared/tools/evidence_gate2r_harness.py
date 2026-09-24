@@ -2114,7 +2114,9 @@ def run_question(q, arm, kb, tkb, grounding, glog):
             # source so it never reaches the official bridge or the judge.
             _note_ids = set(re.findall(r"\[([0-9a-f]{14})\]", notes_full() or "")) | \
                         set(re.findall(r"\[([A-Za-z][A-Za-z0-9_\-]{15,110})\]",
-                                       notes_full() or ""))
+                                       notes_full() or "")) | \
+                        set(re.findall(r"\[(10\.\d{4,5}/[^\]\s]{3,100})\]",
+                                       notes_full() or ""))  # external DOIs
             _stripped = 0
             for _m in re.finditer(r"\[([^\[\]]{1,110})\]", answer):
                 _tok = _m.group(1)

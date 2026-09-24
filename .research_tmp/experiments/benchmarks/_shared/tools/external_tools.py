@@ -236,10 +236,16 @@ class ExternalTools:
             r = extract_coarse(title, abstract, None, self._model)
             recs = [{"kind": x["kind"], "subject": x["subject"],
                      "claim": x["claim"], "quote": x["quote"][:200],
-                     "mentions": x["mentions"]}
+                     "mentions": x["mentions"],
+                     # citation handle per record so note lines can backref
+                     # the paper (behavior probe: the model invented
+                     # [extract_paper] tool-name citations when records
+                     # carried no citable id — 4 consecutive reject steps)
+                     "title": title}
                     for x in r["records"]]
             return {"tool": "extract_paper", "n": len(recs), "records": recs,
-                    "note": "coarse records from abstract only; quote=supporting abstract sentence"}
+                    "title": title,
+                    "note": "coarse records from abstract only; cite this paper in notes as [title]"}
         except Exception as e:
             return {"tool": "extract_paper", "n": 0,
                     "error": f"coarse extraction failed: {str(e)[:120]}"}
