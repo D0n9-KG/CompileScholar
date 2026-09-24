@@ -206,9 +206,25 @@ dossier 的题）。修法方向：F31 转写上限/超量行丢弃策略——�
 ```
 第 1 批  ✅ 已完成（今晚）：P16 转写自旋修复 + P14 agent 档检索
          （实测语义层填满配额时单次 5.1s）
-第 2 批  粗抽 mentions 回流机制（半天）——外部论文×库内谱系挂边，
-         库生长飞轮最小闭环
-第 3 批  Tier 1→2 升级触发 + 入库 + 存储状态接 SQLite（一天）
+第 2 批  ✅ 已完成（09-26 凌晨）：粗抽 mentions 回流机制
+         — backflow.py 两级确定性匹配（精确+连续 token 包含，
+         blocklist 501 防跨域同形，歧义即弃）→ external_mention 弱边
+         （provenance=coarse，升级留 Tier 2）→ JSONL 持久化+重放
+         — 活体验证（真 LLM+真库）：Mamba 摘要 12.9s 粗抽 → 2 边挂
+         Transformer 实体 → lineage_walk 29.9ms 零检索成本召回该论文
+         （飞轮收益直接可见）；库内 KBTools.lineage 也免费看到弱边
+         — 测试 8+1，双仓提交
+第 3 批  ✅ 基本完成（09-26）：Tier 1→2 升级触发 + SQLite 状态
+         — sci-evo TierStore（papers+extraction_runs COARSE_/DEEP_ 前缀
+         +paper_tags，零 schema 改动）：粗级注册→重抽拒绝→升级候选
+         （确定性规则：limitation 记录或≥2 谱系锚）→深级终态
+         — extract_paper 双写：回流边+SQLite 账+候选标记进观测
+         — promote_to_deep.py：tier 查→获取链（arXiv 身份验证）→
+         mineru→篇级 kb 链（growth 目录，冻结语料不动）→深级入账
+         — 活体：Mamba arXiv 获取+mineru 159KB 干净解析+cards 208s；
+         deep_extract 57 chunks 在跑
+         — postcheck 门适配（P8）：provenance=coarse 跳过 quote 锚定，
+         结构门不动
 第 4 批  开集 Multi 三臂实测（半天，含闭集 108 题全量重跑回归基线
          + gold 剔除版知识模型防循环论证）→ SQA2（裁点 2-5 先裁）
 ```

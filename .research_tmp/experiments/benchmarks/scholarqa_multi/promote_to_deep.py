@@ -118,7 +118,7 @@ def parse_pdf(pdf_path: str, out_md: str) -> None:
 
 # ---------------- 4. per-paper kb chain (growth dir) ----------------
 
-def run_kb_chain(paper_id: str, pid: str) -> dict:
+def run_kb_chain(paper_pid: str, _unused: str = None) -> dict:
     """cards -> deep_extract -> postcheck on the growth dir. The frozen
     Multi corpus/kb is never touched; growth records accumulate in
     records_growth.json for the views merge."""
@@ -127,7 +127,7 @@ def run_kb_chain(paper_id: str, pid: str) -> dict:
     env.update({
         "PYTHONIOENCODING": "utf-8", "PYTHONUNBUFFERED": "1",
         "LLM_CALL_LOG": os.path.join(GROWTH, "ledger_growth.jsonl"),
-        "LLM_RUN_ID": f"growth-{paper_id}",
+        "LLM_RUN_ID": f"growth-{paper_pid}",
         "LOCAL_MAX_CONCURRENT": "8",
         "LOCAL_SOCK_TIMEOUT": "900", "LLM_WALL_TIMEOUT": "1200",
         "LLM_PROVIDER_ALLOWLIST": "local", "KB_EMBED_PROVIDER": "local",
@@ -142,11 +142,14 @@ def run_kb_chain(paper_id: str, pid: str) -> dict:
                           "--texts", GROWTH_TEXTS,
                           "--manifest", os.path.join(GROWTH, "manifest_growth.json"),
                           "--cards", os.path.join(GROWTH, "cards_growth.json"),
+                          "--registry", os.path.join(KB, "registry_v3.json"),
+                          "--vocab", os.path.join(KB, "dim_vocab_v1.json"),
                           "--out", os.path.join(GROWTH, "records_growth.json"),
                           "--model", MODEL, "--pool", "4"]),
         ("postcheck", ["python", "-m", "kb_compiler.records.postcheck",
                        "--records", os.path.join(GROWTH, "records_growth.json"),
                        "--texts", GROWTH_TEXTS,
+                       "--vocab", os.path.join(KB, "dim_vocab_v1.json"),
                        "--out-dir", os.path.join(GROWTH, "postcheck"),
                        "--model", MODEL]),
     ]
@@ -163,9 +166,21 @@ def run_kb_chain(paper_id: str, pid: str) -> dict:
             raise RuntimeError(f"stage {name} failed — see growth logs")
     checked = os.path.join(GROWTH, "postcheck", "records_checked.json")
     n = len(json.load(open(checked, encoding="utf-8")))
-    return {"records_checked": n, "artifacts": {
-        "records": checked,
-        "cards": os.path.join(GROWTH, "cards_growth.json")}}
+    # the tier store's registry requires artifacts inside its library root
+    # (growth_library/) — copy the deep products there for durable keeping
+    import shutil
+    lib_root = os.path.join(KB, "growth_library")
+    deep_dir = os.path.join(lib_root, "papers", paper_pid, "deep")
+    os.makedirs(deep_dir, exist_ok=True)
+    arts = {}
+    for name, src_path in (("records_checked", checked),
+                           ("cards", os.path.join(GROWTH, "cards_growth.json")),
+                           ("fulltext_md", os.path.join(GROWTH_TEXTS, paper_pid + ".md"))):
+        if os.path.exists(src_path):
+            dst = os.path.join(deep_dir, os.path.basename(src_path))
+            shutil.copyfile(src_path, dst)
+            arts[name] = dst
+    return {"records_checked": n, "artifacts": arts}
 
 
 # ---------------- main ----------------
@@ -222,26 +237,31 @@ def main():
     json.dump(gm, open(gm_path, "w", encoding="utf-8"),
               ensure_ascii=False, indent=1)
 
-    # 2-3. acquire + parse
-    pdf_dir = os.path.join(GROWTH, "pdfs")
-    path = acquire(row, pdf_dir)
-    print(f"[acquire] {path}", flush=True)
+    # 2-3. acquire + parse (skipped when the growth text already exists —
+    # re-entry after a stage failure must not re-pay acquisition)
     md_path = os.path.join(GROWTH_TEXTS, row["paper_id"] + ".md")
     os.makedirs(GROWTH_TEXTS, exist_ok=True)
-    if path.lower().endswith(".md"):
-        import shutil
-        shutil.copyfile(path, md_path)
-        print("[parse] copied (already markdown)", flush=True)
+    if os.path.exists(md_path) and os.path.getsize(md_path) > 5000:
+        print(f"[acquire] re-entry: {os.path.basename(md_path)} already "
+              f"parsed, skipping acquisition", flush=True)
     else:
-        parse_pdf(path, md_path)
-        print(f"[parse] mineru -> {os.path.basename(md_path)} "
-              f"({os.path.getsize(md_path)} bytes)", flush=True)
+        pdf_dir = os.path.join(GROWTH, "pdfs")
+        path = acquire(row, pdf_dir)
+        print(f"[acquire] {path}", flush=True)
+        if path.lower().endswith(".md"):
+            import shutil
+            shutil.copyfile(path, md_path)
+            print("[parse] copied (already markdown)", flush=True)
+        else:
+            parse_pdf(path, md_path)
+            print(f"[parse] mineru -> {os.path.basename(md_path)} "
+                  f"({os.path.getsize(md_path)} bytes)", flush=True)
     if args.acquire_only:
         print("[done] acquire-only mode stops here")
         return
 
     # 4. per-paper kb chain
-    res = run_kb_chain(row["paper_id"], pid)
+    res = run_kb_chain(row["paper_id"])
     print(f"[kb-chain] {res['records_checked']} checked records", flush=True)
 
     # 5. register deep
