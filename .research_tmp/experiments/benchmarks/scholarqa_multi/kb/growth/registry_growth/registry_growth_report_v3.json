@@ -1,0 +1,575 @@
+{
+ "matched": [
+  {
+   "surface": "FlashAttention-2",
+   "canonical": "FlashAttention v2"
+  },
+  {
+   "surface": "rotary positional encodings",
+   "canonical": "RoPE"
+  }
+ ],
+ "new": [
+  {
+   "surface": "Discretization",
+   "canonical": "discretization",
+   "entity_type": "method",
+   "note": ""
+  },
+  {
+   "surface": "GAN and diffusion-based models",
+   "canonical": "gan and diffusion-based models",
+   "entity_type": "out_of_corpus",
+   "note": "Composite category of model types"
+  },
+  {
+   "surface": "GLU Activation",
+   "canonical": "glu activation",
+   "entity_type": "method",
+   "note": ""
+  },
+  {
+   "surface": "GSS",
+   "canonical": "gss",
+   "entity_type": "method",
+   "note": "Likely Generalized State Space or similar, distinct from existing GSPMD/GELU"
+  },
+  {
+   "surface": "Gu, Johnson, Goel, et al. (2021, Lemma 3.1)",
+   "canonical": "gu, johnson, goel, et al. (2021, lemma 3.1)",
+   "entity_type": "out_of_corpus",
+   "note": "Specific citation reference"
+  },
+  {
+   "surface": "H3",
+   "canonical": "h3",
+   "entity_type": "method",
+   "note": "Hierarchical State Space model"
+  },
+  {
+   "surface": "HIPPO theory",
+   "canonical": "hippo theory",
+   "entity_type": "method",
+   "note": ""
+  },
+  {
+   "surface": "Hyena",
+   "canonical": "attention and hyena models",
+   "entity_type": "method",
+   "note": ""
+  },
+  {
+   "surface": "Induction Heads task",
+   "canonical": "induction heads experiment",
+   "entity_type": "practice",
+   "note": "Specific evaluation task"
+  },
+  {
+   "surface": "LTI SSMs",
+   "canonical": "classical state space models",
+   "entity_type": "method",
+   "note": "Linear Time-Invariant State Space Models"
+  },
+  {
+   "surface": "Linear Attention (LA)",
+   "canonical": "linear attention",
+   "entity_type": "method",
+   "note": ""
+  },
+  {
+   "surface": "Liquid S4",
+   "canonical": "liquid s4",
+   "entity_type": "method",
+   "note": ""
+  },
+  {
+   "surface": "LongNet",
+   "canonical": "longnet",
+   "entity_type": "method",
+   "note": ""
+  },
+  {
+   "surface": "Lu et al. (2023)",
+   "canonical": "lu et al. (2023)",
+   "entity_type": "out_of_corpus",
+   "note": "Citation reference"
+  },
+  {
+   "surface": "MHA-Abs, MHA-RoPE, MHA-xPos",
+   "canonical": "mha-abs, mha-rope, mha-xpos",
+   "entity_type": "out_of_corpus",
+   "note": "Composite list of variants"
+  },
+  {
+   "surface": "MLP",
+   "canonical": "mlp",
+   "entity_type": "mechanism",
+   "note": "Multi-Layer Perceptron"
+  },
+  {
+   "surface": "Mamba",
+   "canonical": "mamba",
+   "entity_type": "method",
+   "note": ""
+  },
+  {
+   "surface": "Mega",
+   "canonical": "mega",
+   "entity_type": "method",
+   "note": ""
+  },
+  {
+   "surface": "Poli et al. (2023)",
+   "canonical": "poli et al. (2023)",
+   "entity_type": "out_of_corpus",
+   "note": "Citation reference"
+  },
+  {
+   "surface": "Pythia-3B, Pythia-7B",
+   "canonical": "pythia-3b, pythia-7b",
+   "entity_type": "out_of_corpus",
+   "note": "Composite list of models"
+  },
+  {
+   "surface": "RFA",
+   "canonical": "random feature attention (rfa)",
+   "entity_type": "method",
+   "note": "Random Feature Attention"
+  },
+  {
+   "surface": "RNNs",
+   "canonical": "older rnns",
+   "entity_type": "method",
+   "note": "Recurrent Neural Networks"
+  },
+  {
+   "surface": "RWKV",
+   "canonical": "rwkv",
+   "entity_type": "method",
+   "note": ""
+  },
+  {
+   "surface": "RWKV, RetNet",
+   "canonical": "retnet",
+   "entity_type": "out_of_corpus",
+   "note": "Composite list of models"
+  },
+  {
+   "surface": "Recurrent Memory Transformer",
+   "canonical": "recurrent memory transformer",
+   "entity_type": "method",
+   "note": ""
+  },
+  {
+   "surface": "S4",
+   "canonical": "s4",
+   "entity_type": "method",
+   "note": ""
+  },
+  {
+   "surface": "SLW",
+   "canonical": "slw",
+   "entity_type": "method",
+   "note": "Likely Selective Linear Weighting or similar"
+  },
+  {
+   "surface": "SSM scan",
+   "canonical": "scan (ours)",
+   "entity_type": "mechanism",
+   "note": "Computational operation"
+  },
+  {
+   "surface": "SSMs with Attention",
+   "canonical": "ssms with attention",
+   "entity_type": "method",
+   "note": "Hybrid architecture class"
+  },
+  {
+   "surface": "Selective Copying task",
+   "canonical": "selective copying task",
+   "entity_type": "practice",
+   "note": "Specific evaluation task"
+  },
+  {
+   "surface": "Selective S4",
+   "canonical": "selective models",
+   "entity_type": "method",
+   "note": ""
+  },
+  {
+   "surface": "TransNormer",
+   "canonical": "transnormer",
+   "entity_type": "method",
+   "note": ""
+  },
+  {
+   "surface": "Transformer 1.3B",
+   "canonical": "transformer 1.3b",
+   "entity_type": "method",
+   "note": "Specific model size"
+  },
+  {
+   "surface": "architectural gating, hypernetworks, data-dependence",
+   "canonical": "architectural gating, hypernetworks, data-dependence",
+   "entity_type": "mechanism",
+   "note": "List of mechanisms/concepts, not a single entity"
+  },
+  {
+   "surface": "attention-free Transformer",
+   "canonical": "attention-free transformer",
+   "entity_type": "method",
+   "note": "Specific architectural variant"
+  },
+  {
+   "surface": "bits per byte (BPB)",
+   "canonical": "bits per byte (bpb)",
+   "entity_type": "out_of_corpus",
+   "note": "Metric, not a method/mechanism/practice"
+  },
+  {
+   "surface": "convolution mode",
+   "canonical": "convolution mode",
+   "entity_type": "mechanism",
+   "note": "Operational mode"
+  },
+  {
+   "surface": "cosFormer",
+   "canonical": "cosformer",
+   "entity_type": "method",
+   "note": "Specific model name not in registry"
+  },
+  {
+   "surface": "efficient variants of attention",
+   "canonical": "efficient variants of attention",
+   "entity_type": "method",
+   "note": "Category of methods"
+  },
+  {
+   "surface": "fast weights",
+   "canonical": "fast weights",
+   "entity_type": "mechanism",
+   "note": "Specific mechanism"
+  },
+  {
+   "surface": "gated attention unit (GAU)",
+   "canonical": "gated attention unit (gau)",
+   "entity_type": "method",
+   "note": "Specific architectural component"
+  },
+  {
+   "surface": "multiplicative gating",
+   "canonical": "multiplicative gating",
+   "entity_type": "mechanism",
+   "note": "Specific gating type"
+  },
+  {
+   "surface": "optimized transformer implementation with FlashAttention",
+   "canonical": "optimized transformer implementation with flashattention",
+   "entity_type": "method",
+   "note": "Specific implementation variant"
+  },
+  {
+   "surface": "orthogonal RNNs",
+   "canonical": "orthogonal rnns",
+   "entity_type": "method",
+   "note": "Specific RNN variant"
+  },
+  {
+   "surface": "recurrent mode",
+   "canonical": "recurrent mode",
+   "entity_type": "mechanism",
+   "note": "Operational mode"
+  },
+  {
+   "surface": "selection",
+   "canonical": "selection",
+   "entity_type": "mechanism",
+   "note": "General concept, likely refers to selective mechanisms in context"
+  },
+  {
+   "surface": "sequence models",
+   "canonical": "sequence models",
+   "entity_type": "method",
+   "note": "Category of models"
+  },
+  {
+   "surface": "subquadratic-time architectures",
+   "canonical": "subquadratic-time architectures",
+   "entity_type": "method",
+   "note": "Category of architectures"
+  },
+  {
+   "surface": "vanilla positional encodings",
+   "canonical": "vanilla positional encodings",
+   "entity_type": "mechanism",
+   "note": "Specific encoding type"
+  }
+ ],
+ "unassigned_fallback": [],
+ "dup_guard_folds": [
+  {
+   "surface": "H3 block",
+   "canonical": "h3"
+  },
+  {
+   "surface": "H3++",
+   "canonical": "h3"
+  },
+  {
+   "surface": "H3, Mamba",
+   "canonical": "h3"
+  },
+  {
+   "surface": "Hyena and HyenaDNA",
+   "canonical": "attention and hyena models"
+  },
+  {
+   "surface": "HyenaDNA",
+   "canonical": "attention and hyena models"
+  },
+  {
+   "surface": "HyenaDNA 1.4M",
+   "canonical": "attention and hyena models"
+  },
+  {
+   "surface": "HyenaDNA, Transformer++",
+   "canonical": "attention and hyena models"
+  },
+  {
+   "surface": "Induction heads experiment",
+   "canonical": "induction heads experiment"
+  },
+  {
+   "surface": "LTI models",
+   "canonical": "classical state space models"
+  },
+  {
+   "surface": "LTI state space models",
+   "canonical": "classical state space models"
+  },
+  {
+   "surface": "LTI structured SSMs",
+   "canonical": "classical state space models"
+  },
+  {
+   "surface": "Linear Randomized Attention",
+   "canonical": "linear attention"
+  },
+  {
+   "surface": "Linear attention",
+   "canonical": "linear attention"
+  },
+  {
+   "surface": "MHA-Absolute",
+   "canonical": "mha-abs, mha-rope, mha-xpos"
+  },
+  {
+   "surface": "MHA-RoPE",
+   "canonical": "mha-abs, mha-rope, mha-xpos"
+  },
+  {
+   "surface": "MHA-xPos",
+   "canonical": "mha-abs, mha-rope, mha-xpos"
+  },
+  {
+   "surface": "Mamba (S6)",
+   "canonical": "mamba"
+  },
+  {
+   "surface": "Mamba 1.4B",
+   "canonical": "mamba"
+  },
+  {
+   "surface": "Mamba 1.4M",
+   "canonical": "mamba"
+  },
+  {
+   "surface": "Mamba 6.9B",
+   "canonical": "mamba"
+  },
+  {
+   "surface": "Mamba 7M",
+   "canonical": "mamba"
+  },
+  {
+   "surface": "Mamba-130M",
+   "canonical": "mamba"
+  },
+  {
+   "surface": "Mamba-370M",
+   "canonical": "mamba"
+  },
+  {
+   "surface": "Mamba-3B",
+   "canonical": "mamba"
+  },
+  {
+   "surface": "Mamba-6.9B",
+   "canonical": "mamba"
+  },
+  {
+   "surface": "Mamba-790M",
+   "canonical": "mamba"
+  },
+  {
+   "surface": "Mamba-MHA",
+   "canonical": "mamba"
+  },
+  {
+   "surface": "Mamba-MLP",
+   "canonical": "mamba"
+  },
+  {
+   "surface": "Random Feature Attention (RFA)",
+   "canonical": "random feature attention (rfa)"
+  },
+  {
+   "surface": "RetNet",
+   "canonical": "retnet"
+  },
+  {
+   "surface": "S4+FFN",
+   "canonical": "s4"
+  },
+  {
+   "surface": "S4+MLP",
+   "canonical": "s4"
+  },
+  {
+   "surface": "S4+MLP, MHA+MLP",
+   "canonical": "s4"
+  },
+  {
+   "surface": "S4D-Lin",
+   "canonical": "s4"
+  },
+  {
+   "surface": "S4D-Real",
+   "canonical": "s4"
+  },
+  {
+   "surface": "S5",
+   "canonical": "s4"
+  },
+  {
+   "surface": "S6",
+   "canonical": "mamba"
+  },
+  {
+   "surface": "SGConv, Hyena, LongConv, MultiresConv, Toeplitz Neural Network",
+   "canonical": "attention and hyena models"
+  },
+  {
+   "surface": "SSM (S4)",
+   "canonical": "s4"
+  },
+  {
+   "surface": "SSM + Selection (S6)",
+   "canonical": "mamba"
+  },
+  {
+   "surface": "SSMs",
+   "canonical": "classical state space models"
+  },
+  {
+   "surface": "SaShiMi (S4+MLP)",
+   "canonical": "s4"
+  },
+  {
+   "surface": "SaShiMi, Hyena, Transformers",
+   "canonical": "attention and hyena models"
+  },
+  {
+   "surface": "Sashimi",
+   "canonical": "s4"
+  },
+  {
+   "surface": "Scan (ours)",
+   "canonical": "scan (ours)"
+  },
+  {
+   "surface": "Selective SSMs",
+   "canonical": "selective models"
+  },
+  {
+   "surface": "Transformer 6.7B",
+   "canonical": "transformer 1.3b"
+  },
+  {
+   "surface": "Transformer++",
+   "canonical": "attention and hyena models"
+  },
+  {
+   "surface": "Transformer++, HyenaDNA",
+   "canonical": "attention and hyena models"
+  },
+  {
+   "surface": "Transformer-1.3B",
+   "canonical": "transformer 1.3b"
+  },
+  {
+   "surface": "architecture gating",
+   "canonical": "architectural gating, hypernetworks, data-dependence"
+  },
+  {
+   "surface": "attention and Hyena models",
+   "canonical": "attention and hyena models"
+  },
+  {
+   "surface": "classical state space models",
+   "canonical": "classical state space models"
+  },
+  {
+   "surface": "convolutional computation",
+   "canonical": "convolution mode"
+  },
+  {
+   "surface": "global convolutions",
+   "canonical": "convolution mode"
+  },
+  {
+   "surface": "heuristic gating mechanisms",
+   "canonical": "architectural gating, hypernetworks, data-dependence"
+  },
+  {
+   "surface": "modern structured SSMs",
+   "canonical": "classical state space models"
+  },
+  {
+   "surface": "older RNNs",
+   "canonical": "older rnns"
+  },
+  {
+   "surface": "orthogonal/unitary RNNs",
+   "canonical": "orthogonal rnns"
+  },
+  {
+   "surface": "random Fourier feature approximation of Gaussian kernels",
+   "canonical": "random feature attention (rfa)"
+  },
+  {
+   "surface": "recurrent models",
+   "canonical": "older rnns"
+  },
+  {
+   "surface": "selective SSM",
+   "canonical": "selective models"
+  },
+  {
+   "surface": "selective models",
+   "canonical": "selective models"
+  },
+  {
+   "surface": "standard scan implementation in PyTorch",
+   "canonical": "scan (ours)"
+  },
+  {
+   "surface": "structured SSMs",
+   "canonical": "classical state space models"
+  },
+  {
+   "surface": "structured state space sequence models (SSMs)",
+   "canonical": "classical state space models"
+  }
+ ]
+}
