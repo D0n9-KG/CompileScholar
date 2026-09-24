@@ -36,6 +36,20 @@ os.environ.setdefault(
     "***REMOVED-LOCAL_API_KEY***")
 os.environ.setdefault("LOCAL_MODEL", "Qwen3.8-27B")
 os.environ.setdefault("LOCAL_EMBED_MODEL", "qwen3-embedding-8b-local")
+# Sciverse semantic channel (2026-09-25: it was ABSENT from the first
+# A6 run - the token env was never set, so the sciverse tier silently
+# blocked; 0.062 was measured WITHOUT the semantic channel)
+if not os.environ.get("SCIVERSE_API_TOKEN"):
+    _env = os.path.join(
+        "C:" + os.sep + os.path.join(*["Users", "D0n9", "Desktop", "CompileScholar"]),
+        ".env")
+    try:
+        for line in open(_env, encoding="utf-8"):
+            if line.strip().startswith("SCIVERSE_API_TOKEN"):
+                k, _, v = line.strip().partition("=")
+                os.environ["SCIVERSE_API_TOKEN"] = v.strip()
+    except Exception:
+        pass
 os.environ.setdefault("LLM_CALL_LOG", os.path.join(
     _HERE, "..", "judge", "ledger_closedbook.jsonl"))
 os.environ.setdefault("LLM_RUN_ID", "multi-closedbook")
