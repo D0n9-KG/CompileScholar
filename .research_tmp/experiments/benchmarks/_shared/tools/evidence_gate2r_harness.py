@@ -262,11 +262,7 @@ Tool catalog (local, deterministic, zero-cost, call as often as needed):
 10. fetch_chunk(record_id, window?) R-C: original text window around a record's chunk — use when a note/row needs surrounding context (table rows, neighboring sentences) beyond the <=40-word quote; returns the verbatim source passage
 11. describe_kb() B6: one-call inventory of this knowledge base (record counts by kind, matrix/lineage/coverage/card view sizes, registry size) — call it FIRST when unsure which view or entity scale you are facing; zero cost
 12. search_text(query, k<=12) A7: hybrid lexical+semantic search over the FULL RAW TEXTS of all corpus papers (BM25+vector fused). The escape hatch when a question targets content the compiled records may not cover (novel phrasings, appendix details, prose context around a known number). Returns verbatim source passages with chunk anchors ([paper_id#char_start]) usable as note backrefs
-13. search_papers(query, k?) EXTERNAL literature search over the whole world's papers (not just this corpus) — semantic channel leads, returns title+year+doi+abstract. Use when the corpus lacks coverage for the question's topic. Cite external papers in notes as [title]
-14. gap_search(query) knowledge-model-driven: matches the question against the KB's recorded ABSENCES (what corpus methods cannot do, what has no results), then searches externally for papers FILLING that gap with vocabulary the question does not contain. Prefer this over search_papers when the question hints at a limitation/unsolved aspect
-15. lineage_walk_ext(entity, direction?) typed method-genealogy walk: follows extends/improves/replaces edges in-corpus to the frontier, then continues externally for successors. Use for 'latest advances in X / what replaced X' questions
-16. citation_graph(doi?, title?, direction?) external citation neighbors of a paper (who it cites / who cites it), with in-corpus annotation
-17. extract_paper(title, abstract) Tier-1 coarse extraction: digest ONE external paper's abstract into structured records (method/finding/limitation). Run on the 1-3 external papers that look core to the question, then use their records as evidence
+{ext_catalog}
 
 Channel semantics: numeric experimental results live in compare (matrix rows) and card (main_results) — findings carries claim-type records only and will never return numbers; an empty findings result is not a signal to keep appending keywords to contains.
 
@@ -300,6 +296,20 @@ Per-step output (strict):
 Answer craft: write the final answer as exhaustive, well-structured prose IN THE LANGUAGE OF THE QUESTION. Cover every aspect the question asks; completeness matters more than brevity — the reader needs a thorough, self-contained answer, not a compact sketch. When the question asks for comparison, organize the prose around the comparison (item by dimension), not as a sequence of standalone item summaries. When the question asks about experimental results or asks to compare reported numbers, the answer must be NUMBER-DENSE: every dataset x method x value present in your notes/observations appears in the answer, grouped by shared dataset/metric so head-to-head reads are immediate — a results answer without the actual numbers is a failed answer, not a safe one; landscape-level prose about research directions does not answer a results question. Cite each source once per passage, not on every sentence. Keep the writing reader-facing: no internal machinery (record ids other than the required [paper_id] citation tags, tool names, loop bookkeeping) in the prose. When information the question asks for was not surfaced by your searches, say exactly that — what your search did not find — and never assert that the literature or the papers do not report it unless an absence-channel query (find_gap / findings(claim_type=criticism)) actually confirms it.
 
 Argument discipline: pick entity arguments from the entity list (* = records grounded in the corpus — only these have card() dossiers); unmarked entries are out-of-corpus context names with NO records behind them, so card() on them is always empty — do not spend steps on them. Never pass category phrases as entity. Remaining steps are shown at the end of each observation; plan accordingly."""
+
+# KB_OPEN_SET gate (2026-09-26): external retrieval tools exist only in
+# open-set mode. Closed-set runs (regression comparability with the
+# frozen F1 0.6503 baseline) must not advertise tools that are not
+# attached — the model would be steered into calling missing tools.
+EXT_CATALOG = """
+13. search_papers(query, k?) EXTERNAL literature search over the whole world's papers (not just this corpus) — semantic channel leads, returns title+year+doi+abstract. Use when the corpus lacks coverage for the question's topic. Cite external papers in notes as [title]
+14. gap_search(query) knowledge-model-driven: matches the question against the KB's recorded ABSENCES (what corpus methods cannot do, what has no results), then searches externally for papers FILLING that gap with vocabulary the question does not contain. Prefer this over search_papers when the question hints at a limitation/unsolved aspect
+15. lineage_walk_ext(entity, direction?) typed method-genealogy walk: follows extends/improves/replaces edges in-corpus to the frontier, then continues externally for successors. Use for 'latest advances in X / what replaced X' questions
+16. citation_graph(doi?, title?, direction?) external citation neighbors of a paper (who it cites / who cites it), with in-corpus annotation
+17. extract_paper(title, abstract) Tier-1 coarse extraction: digest ONE external paper's abstract into structured records (method/finding/limitation). Run on the 1-3 external papers that look core to the question, then use their records as evidence"""
+_OPEN_SET = os.environ.get("KB_OPEN_SET", "0") == "1"
+MAIN_SYSTEM = MAIN_SYSTEM.replace("{ext_catalog}",
+                                   EXT_CATALOG if _OPEN_SET else "")
 
 # F10 (PROMPT-AUDIT-R2 #11): translated + genericized ({kb_stats} slot injected by the
 # driver, same as MAIN_SYSTEM). The Chinese home version hardcoded a 40-paper DRL

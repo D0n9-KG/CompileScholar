@@ -47,6 +47,17 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 MODEL = os.environ.get("OURS_MODEL", "local:Qwen3.8-27B")
 TAG = os.environ.get("OURS_TAG", "multi")
+# Closed-set vs open-set retrieval mode (2026-09-26 user directive):
+#   KB_OPEN_SET=0 (default)  closed-set — the answering loop may only use
+#                            the provided corpus KB (13 typed tools, no
+#                            external retrieval); this is the exact
+#                            configuration of the frozen F1 0.6503 run,
+#                            kept as the regression baseline shape
+#   KB_OPEN_SET=1            open-set   — the five external retrieval tools
+#                            are injected (search_papers / gap_search /
+#                            lineage_walk_ext / citation_graph /
+#                            extract_paper with backflow + tier store)
+OPEN_SET = os.environ.get("KB_OPEN_SET", "0") == "1"
 os.environ.setdefault("LLM_CALL_LOG", os.path.join(ARM, f"ledger_ours_{TAG}.jsonl"))
 os.environ.setdefault("LLM_RUN_ID", f"ours-{TAG}")
 os.environ.setdefault("LLM_SOCK_TIMEOUT", "900")
@@ -127,14 +138,22 @@ def build_tools_multi():
     # mentions backflow (batch-2): coarse records' mentions attach the
     # external paper to the corpus genealogy; growth persists in
     # kb/backflow_edges.jsonl and replays on startup
-    from external_tools import attach_external_tools
-    _bl_path = os.path.join(KB, "blocklist_keep.json")
-    _blocklist = (json.load(open(_bl_path, encoding="utf-8"))
-                  if os.path.exists(_bl_path) else None)
-    attach_external_tools(kb, views, manifest, model=MODEL,
-                          registry=registry, blocklist=_blocklist,
-                          backflow_path=os.path.join(KB, "backflow_edges.jsonl"),
-                          tier_db=os.path.join(KB, "growth_library.db"))
+    # Gated by KB_OPEN_SET (2026-09-26): closed-set runs keep the exact
+    # frozen-baseline tool surface (regression comparability with the
+    # F1 0.6503 run); open-set runs add the five external tools.
+    if OPEN_SET:
+        from external_tools import attach_external_tools
+        _bl_path = os.path.join(KB, "blocklist_keep.json")
+        _blocklist = (json.load(open(_bl_path, encoding="utf-8"))
+                      if os.path.exists(_bl_path) else None)
+        attach_external_tools(kb, views, manifest, model=MODEL,
+                              registry=registry, blocklist=_blocklist,
+                              backflow_path=os.path.join(KB, "backflow_edges.jsonl"),
+                              tier_db=os.path.join(KB, "growth_library.db"))
+        print("[mode] OPEN-SET: external retrieval tools injected", flush=True)
+    else:
+        print("[mode] CLOSED-SET: corpus KB only (no external tools)",
+              flush=True)
     return kb, records, views, manifest
 
 
