@@ -1,0 +1,830 @@
+[
+ {
+  "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+  "record": {
+   "kind": "finding",
+   "claim": "Language can make concrete the categorization and differentiation of social groups, giving voice to generic or derogatory labels, and linking categories of people to stereotypical, unrepresentative, or overly general characteristics.",
+   "target_ref": "",
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "Language can make concrete the categorization and differentiation of social groups, giving voice to generic or derogatory labels, and linking categories of people to stereotypical, unrepresentative, or overly general characteristics",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c12",
+   "section": "Definition 7 (SOCIAL BIAS)",
+   "chunk_char_start": 22359,
+   "id": "900adbbceded77",
+   "scope_ref_ref": {
+    "surface": "Language",
+    "canonical": null,
+    "entity_id": null
+   }
+  },
+  "violations": [
+   "quote_not_in_text"
+  ],
+  "violations_after_repair": [
+   "quote_not_in_text"
+  ],
+  "record_after_repair": {
+   "kind": "finding",
+   "claim": "Language can make concrete the categorization and differentiation of social groups, giving voice to generic or derogatory labels, and linking categories of people to stereotypical, unrepresentative, or overly general characteristics.",
+   "target_ref": "",
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "Language can make concrete the categorization and differentiation of social groups, giving voice to generic or derogatory labels, and linking categories of people to stereotypical, unrepresentative, or overly general characteristics",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c12",
+   "section": "Definition 7 (SOCIAL BIAS)",
+   "chunk_char_start": 22359,
+   "id": "900adbbceded77",
+   "scope_ref_ref": {
+    "surface": "Language",
+    "canonical": null,
+    "entity_id": null
+   }
+  }
+ },
+ {
+  "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+  "record": {
+   "kind": "finding",
+   "claim": "Embedding-based metrics typically compute distances in the vector space between neutral words and identity-related words.",
+   "target_ref": "",
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "definition",
+   "quote": "Embedding-based metrics typically compute distances in the vector space between neutral words, such as professions, and identity-related words, such as gender pronouns.",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c24",
+   "section": "3.3 Embedding-Based Metrics",
+   "chunk_char_start": 49325,
+   "id": "cdd2765112bb89",
+   "scope_ref_ref": {
+    "surface": "Embedding-based metrics",
+    "canonical": null,
+    "entity_id": null
+   }
+  },
+  "violations": [
+   "quote_not_in_text"
+  ],
+  "violations_after_repair": [
+   "quote_not_in_text"
+  ],
+  "record_after_repair": {
+   "kind": "finding",
+   "claim": "Embedding-based metrics typically compute distances in the vector space between neutral words and identity-related words.",
+   "target_ref": "",
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "definition",
+   "quote": "Embedding-based metrics typically compute distances in the vector space between neutral words, such as professions, and identity-related words, such as gender pronouns.",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c24",
+   "section": "3.3 Embedding-Based Metrics",
+   "chunk_char_start": 49325,
+   "id": "cdd2765112bb89",
+   "scope_ref_ref": {
+    "surface": "Embedding-based metrics",
+    "canonical": null,
+    "entity_id": null
+   }
+  }
+ },
+ {
+  "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+  "record": {
+   "kind": "lineage",
+   "relation": "extends",
+   "scope": {},
+   "evidence_basis": "explicit_claim",
+   "quote": "WEAT* (Dev et al. 2021) presents an alternative, where $W_{1}$ and $W_{2}$ are instead definitionally masculine and feminine words",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c26",
+   "section": "Table 3",
+   "chunk_char_start": 61078,
+   "id": "ffafb9a7d1bdea",
+   "from_method_ref": {
+    "surface": "WEAT*",
+    "canonical": null,
+    "entity_id": null
+   },
+   "to_method_ref": {
+    "surface": "WEAT",
+    "canonical": "WEAT",
+    "entity_id": "5390a2ba1892"
+   }
+  },
+  "violations": [
+   "quote_not_in_text"
+  ],
+  "violations_after_repair": [
+   "quote_not_in_text"
+  ],
+  "record_after_repair": {
+   "kind": "lineage",
+   "relation": "extends",
+   "scope": {},
+   "evidence_basis": "explicit_claim",
+   "quote": "WEAT* (Dev et al. 2021) presents an alternative, where $W_{1}$ and $W_{2}$ are instead definitionally masculine and feminine words",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c26",
+   "section": "Table 3",
+   "chunk_char_start": 61078,
+   "id": "ffafb9a7d1bdea",
+   "from_method_ref": {
+    "surface": "WEAT*",
+    "canonical": null,
+    "entity_id": null
+   },
+   "to_method_ref": {
+    "surface": "WEAT",
+    "canonical": "WEAT",
+    "entity_id": "5390a2ba1892"
+   }
+  }
+ },
+ {
+  "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+  "record": {
+   "kind": "finding",
+   "claim": "Discovery of Correlations (DisCo) compares the completion of template sentences by averaging the count of differing predictions between social groups across all templates.",
+   "target_ref": "",
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "cited",
+   "claim_type": "definition",
+   "quote": "Discovery of Correlations (DisCo) (Webster et al. 2020), for instance, compares the completion of template sentences. ... The score is calculated by averaging the count of differing predictions between social groups across all templates.",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c27",
+   "section": "3.4 Probability-Based Metrics",
+   "chunk_char_start": 68311,
+   "id": "edcee8cc72dab4",
+   "scope_ref_ref": {
+    "surface": "DisCo",
+    "canonical": "DisCo",
+    "entity_id": "d78acd9cad41"
+   }
+  },
+  "violations": [
+   "quote_not_in_text"
+  ],
+  "violations_after_repair": [
+   "quote_not_in_text"
+  ],
+  "record_after_repair": {
+   "kind": "finding",
+   "claim": "Discovery of Correlations (DisCo) compares the completion of template sentences, and the score is calculated by averaging the count of differing predictions between social groups across all templates.",
+   "target_ref": "",
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "cited",
+   "claim_type": "definition",
+   "quote": "Discovery of Correlations (DisCo) (Webster et al. 2020), for instance, compares the completion of template sentences. ... The score is calculated by averaging the count of differing predictions between social groups across all templates.",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c27",
+   "section": "3.4 Probability-Based Metrics",
+   "chunk_char_start": 68311,
+   "id": "edcee8cc72dab4",
+   "scope_ref_ref": {
+    "surface": "DisCo",
+    "canonical": "DisCo",
+    "entity_id": "d78acd9cad41"
+   }
+  }
+ },
+ {
+  "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+  "record": {
+   "kind": "finding",
+   "claim": "Log-Probability Bias Score (LPBS) uses a template-based approach to measure bias in neutral attribute words by normalizing a token's predicted probability with the model's prior probability.",
+   "target_ref": "",
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "cited",
+   "claim_type": "definition",
+   "quote": "Log-Probability Bias Score (LPBS) (Kurita et al. 2019) uses a similar template-based approach as DisCo to measure bias in neutral attribute words (e.g., occupations), but normalizes a token's predicted probability $p_a$ ... with the model's prior probability $p_{prior}$",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c27",
+   "section": "3.4 Probability-Based Metrics",
+   "chunk_char_start": 68311,
+   "id": "eb0840c731c848",
+   "scope_ref_ref": {
+    "surface": "LPBS",
+    "canonical": "LPBS",
+    "entity_id": "01f6cf7d5b75"
+   }
+  },
+  "violations": [
+   "quote_not_in_text"
+  ],
+  "violations_after_repair": [
+   "quote_not_in_text"
+  ],
+  "record_after_repair": {
+   "kind": "finding",
+   "claim": "Log-Probability Bias Score (LPBS) uses a template-based approach to measure bias in neutral attribute words by normalizing a token's predicted probability with the model's prior probability.",
+   "target_ref": "",
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "cited",
+   "claim_type": "definition",
+   "quote": "Log-Probability Bias Score (LPBS) (Kurita et al. 2019) uses a similar template-based approach as DisCo to measure bias in neutral attribute words (e.g., occupations), but normalizes a token's predicted probability $p_a$ ... with the model's prior probability $p_{prior}$",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c27",
+   "section": "3.4 Probability-Based Metrics",
+   "chunk_char_start": 68311,
+   "id": "eb0840c731c848",
+   "scope_ref_ref": {
+    "surface": "LPBS",
+    "canonical": "LPBS",
+    "entity_id": "01f6cf7d5b75"
+   }
+  }
+ },
+ {
+  "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+  "record": {
+   "kind": "finding",
+   "claim": "BEC-Pro measures gender biases with respect to occupations, with 5,400 sentences constructed from templates containing a person word and one of 60 profession terms.",
+   "target_ref": "",
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "definition",
+   "quote": "BEC-Pro (Bartl, Nissim, and Gatt 2020) measures gender biases with respect to occupations, with 5,400 sentences constructed from templates containing a person word and one of 60 profession terms.",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c35",
+   "section": "Table 4",
+   "chunk_char_start": 103460,
+   "id": "ac561ff274ab8a",
+   "scope_ref_ref": {
+    "surface": "BEC-Pro",
+    "canonical": null,
+    "entity_id": null
+   }
+  },
+  "violations": [
+   "quote_not_in_text"
+  ],
+  "violations_after_repair": [
+   "quote_not_in_text"
+  ],
+  "record_after_repair": {
+   "kind": "finding",
+   "claim": "BEC-Pro measures gender biases with respect to occupations, with 5,400 sentences constructed from templates containing a person word and one of 60 profession terms.",
+   "target_ref": "",
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "definition",
+   "quote": "BEC-Pro (Bartl, Nissim, and Gatt 2020) measures gender biases with respect to occupations, with 5,400 sentences constructed from templates containing a person word and one of 60 profession terms.",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c35",
+   "section": "Table 4",
+   "chunk_char_start": 103460,
+   "id": "ac561ff274ab8a",
+   "scope_ref_ref": {
+    "surface": "BEC-Pro",
+    "canonical": null,
+    "entity_id": null
+   }
+  }
+ },
+ {
+  "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+  "record": {
+   "kind": "finding",
+   "claim": "Grep-BiasIR provides 118 gender-neutral search queries for document retrieval to assess gender representation bias.",
+   "target_ref": "",
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "definition",
+   "quote": "Grep-BiasIR (Krieg et al. 2023) provides 118 gender-neutral search queries for document retrieval to assess gender representation bias.",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c37",
+   "section": "4.2 Prompts",
+   "chunk_char_start": 114743,
+   "id": "e8a386209369f9",
+   "scope_ref_ref": {
+    "surface": "Grep-BiasIR",
+    "canonical": null,
+    "entity_id": null
+   }
+  },
+  "violations": [
+   "quote_not_in_text"
+  ],
+  "violations_after_repair": [
+   "quote_not_in_text"
+  ],
+  "record_after_repair": {
+   "kind": "finding",
+   "claim": "Grep-BiasIR provides 118 gender-neutral search queries for document retrieval to assess gender representation bias.",
+   "target_ref": "",
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "definition",
+   "quote": "Grep-BiasIR (Krieg et al. 2023) provides 118 gender-neutral search queries for document retrieval to assess gender representation bias.",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c37",
+   "section": "4.2 Prompts",
+   "chunk_char_start": 114743,
+   "id": "e8a386209369f9",
+   "scope_ref_ref": {
+    "surface": "Grep-BiasIR",
+    "canonical": null,
+    "entity_id": null
+   }
+  }
+ },
+ {
+  "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+  "record": {
+   "kind": "finding",
+   "claim": "Lu et al. (2020) create matched pairs by flipping gendered words while preserving grammatical and semantic correctness, under the definition that an unbiased model should consider each sentence in a pair equally",
+   "target_ref": "",
+   "condition": {
+    "setup": [
+     "counterfactual inputs"
+    ]
+   },
+   "strength": "stated",
+   "epistemic": "cited",
+   "claim_type": "mechanism",
+   "quote": "creating matched pairs by flipping gendered (e.g., \"he\" and \"she\") or definitionally-gendered (e.g., \"king\" and \"queen\") words, while preserving grammatical and semantic correctness, under the definition that an unbiased model should consider each sentence in a pair equally.",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c41",
+   "section": "5.1.1 Data Augmentation. Data augmentation techniques seek to neutralize bias by adding new examples to the training data that extend the distribution for under- or misrepresented social groups, which can then be used for training.",
+   "chunk_char_start": 125601,
+   "id": "ed9e7953b1aafe",
+   "scope_ref_ref": {
+    "surface": "Lu et al. (2020)",
+    "canonical": null,
+    "entity_id": null
+   }
+  },
+  "violations": [
+   "quote_not_in_text"
+  ],
+  "violations_after_repair": [
+   "quote_not_in_text"
+  ],
+  "record_after_repair": {
+   "kind": "finding",
+   "claim": "Lu et al. (2020) create matched pairs by flipping gendered or definitionally-gendered words while preserving grammatical and semantic correctness, under the definition that an unbiased model should consider each sentence in a pair equally",
+   "target_ref": "",
+   "condition": {
+    "setup": [
+     "counterfactual inputs"
+    ]
+   },
+   "strength": "stated",
+   "epistemic": "cited",
+   "claim_type": "mechanism",
+   "quote": "creating matched pairs by flipping gendered (e.g., \"he\" and \"she\") or definitionally-gendered (e.g., \"king\" and \"queen\") words, while preserving grammatical and semantic correctness, under the definition that an unbiased model should consider each sentence in a pair equally.",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c41",
+   "section": "5.1.1 Data Augmentation. Data augmentation techniques seek to neutralize bias by adding new examples to the training data that extend the distribution for under- or misrepresented social groups, which can then be used for training.",
+   "chunk_char_start": 125601,
+   "id": "ed9e7953b1aafe",
+   "scope_ref_ref": {
+    "surface": "Lu et al. (2020)",
+    "canonical": null,
+    "entity_id": null
+   }
+  }
+ },
+ {
+  "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+  "record": {
+   "kind": "finding",
+   "claim": "Ngo et al. (2021) append a phrase representative of an undesirable harm to each document and remove those with high conditional log-likelihoods.",
+   "target_ref": "",
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "cited",
+   "claim_type": "mechanism",
+   "quote": "Ngo et al. (2021) append to each document a phrase representative of an undesirable harm... Documents with high log-likelihoods are removed from the training set.",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c42",
+   "section": "5.1.1 Data Augmentation. Data augmentation techniques seek to neutralize bias by adding new examples to the training data that extend the distribution for under- or misrepresented social groups, which can then be used for training.",
+   "chunk_char_start": 132793,
+   "id": "754afba3e2c66a",
+   "scope_ref_ref": {
+    "surface": "Ngo et al. (2021)",
+    "canonical": null,
+    "entity_id": null
+   }
+  },
+  "violations": [
+   "quote_not_in_text"
+  ],
+  "violations_after_repair": [
+   "quote_not_in_text"
+  ],
+  "record_after_repair": {
+   "kind": "finding",
+   "claim": "Ngo et al. (2021) append a phrase representative of an undesirable harm to each document and remove those with high conditional log-likelihoods.",
+   "target_ref": "",
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "cited",
+   "claim_type": "mechanism",
+   "quote": "Ngo et al. (2021) append to each document a phrase representative of an undesirable harm... Documents with high log-likelihoods are removed from the training set.",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c42",
+   "section": "5.1.1 Data Augmentation. Data augmentation techniques seek to neutralize bias by adding new examples to the training data that extend the distribution for under- or misrepresented social groups, which can then be used for training.",
+   "chunk_char_start": 132793,
+   "id": "754afba3e2c66a",
+   "scope_ref_ref": {
+    "surface": "Ngo et al. (2021)",
+    "canonical": null,
+    "entity_id": null
+   }
+  }
+ },
+ {
+  "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+  "record": {
+   "kind": "config",
+   "item": "regularization term",
+   "value": "$\\mathcal{R} = \\lambda \\sum_{(a_i, a_j) \\in A} \\|E(a_i) - E(a_j)\\|_2$",
+   "applicability": {},
+   "role": "used_in_experiment",
+   "epistemic": "cited",
+   "quote": "Liu et al. (2020) add a regularization term to minimize distance between embeddings $E(\\cdot)$ of a protected attribute $a_{i}$ and its counterfactual $a_{j}$ in a list of gender or race words A, given by Equation 30.",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c46",
+   "section": "5.2 In-Training Mitigation",
+   "chunk_char_start": 155500,
+   "id": "66b06ae4a25e32",
+   "method_ref": {
+    "surface": "Liu et al. (2020)",
+    "canonical": null,
+    "entity_id": null
+   },
+   "loc": {
+    "char_start": 158669,
+    "char_end": 158886,
+    "match": "normalized"
+   }
+  },
+  "violations": [
+   "formula_not_in_quote:$\\mathcal{R} = \\lambda \\sum_{("
+  ],
+  "violations_after_repair": [
+   "formula_not_in_quote:$\\mathcal{R} = \\lambda \\sum_{("
+  ],
+  "record_after_repair": {
+   "kind": "config",
+   "item": "regularization term",
+   "value": "$\\mathcal{R} = \\lambda \\sum_{(a_i, a_j) \\in A} \\|E(a_i) - E(a_j)\\|_2$",
+   "applicability": {},
+   "role": "used_in_experiment",
+   "epistemic": "cited",
+   "quote": "Liu et al. (2020) add a regularization term to minimize distance between embeddings $E(\\cdot)$ of a protected attribute $a_{i}$ and its counterfactual $a_{j}$ in a list of gender or race words A, given by Equation 30.",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c46",
+   "section": "5.2 In-Training Mitigation",
+   "chunk_char_start": 155500,
+   "id": "66b06ae4a25e32",
+   "method_ref": {
+    "surface": "Liu et al. (2020)",
+    "canonical": null,
+    "entity_id": null
+   },
+   "loc": {
+    "char_start": 158669,
+    "char_end": 158886,
+    "match": "normalized"
+   }
+  }
+ },
+ {
+  "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+  "record": {
+   "kind": "config",
+   "item": "regularization term",
+   "value": "$\\mathcal{R} = \\lambda \\left\\| E (W) V _ {\\text { gender }} \\right\\| _ {F} ^ {2}$",
+   "applicability": {},
+   "role": "used_in_experiment",
+   "epistemic": "cited",
+   "quote": "Bordia and Bowman (2019) alternatively obtain the gender subspace B from the singular value decomposition of a stack of vectors representing gender-opposing words (e.g., \"man\" and \"woman\"), and minimize the squared Frobenius norm of the projection of neutral embeddings, denoted $E(W)$ , onto that subspace with the regularization term given by Equation 35.",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c46",
+   "section": "5.2 In-Training Mitigation",
+   "chunk_char_start": 155500,
+   "id": "3fb6fbc631c09b",
+   "method_ref": {
+    "surface": "Bordia and Bowman (2019)",
+    "canonical": null,
+    "entity_id": null
+   },
+   "loc": {
+    "char_start": 161712,
+    "char_end": 162070,
+    "match": "normalized"
+   }
+  },
+  "violations": [
+   "formula_not_in_quote:$\\mathcal{R} = \\lambda \\left\\|"
+  ],
+  "violations_after_repair": [
+   "formula_not_in_quote:$\\mathcal{R} = \\lambda \\left\\|"
+  ],
+  "record_after_repair": {
+   "kind": "config",
+   "item": "regularization term",
+   "value": "$\\mathcal{R} = \\lambda \\left\\| E (W) V _ {\\text { gender }} \\right\\| _ {F} ^ {2}$",
+   "applicability": {},
+   "role": "used_in_experiment",
+   "epistemic": "cited",
+   "quote": "Bordia and Bowman (2019) alternatively obtain the gender subspace B from the singular value decomposition of a stack of vectors representing gender-opposing words (e.g., \"man\" and \"woman\"), and minimize the squared Frobenius norm of the projection of neutral embeddings, denoted $E(W)$ , onto that subspace with the regularization term given by Equation 35.",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c46",
+   "section": "5.2 In-Training Mitigation",
+   "chunk_char_start": 155500,
+   "id": "3fb6fbc631c09b",
+   "method_ref": {
+    "surface": "Bordia and Bowman (2019)",
+    "canonical": null,
+    "entity_id": null
+   },
+   "loc": {
+    "char_start": 161712,
+    "char_end": 162070,
+    "match": "normalized"
+   }
+  }
+ },
+ {
+  "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+  "record": {
+   "kind": "config",
+   "item": "regularization term",
+   "value": "$\\mathcal{R} = \\sum_ {w \\in W} \\sum_ {S \\in \\mathbb {S}} \\sum_ {a \\in A} \\left(\\bar {\\mathbf {a}} _ {i} ^ {\\top} E _ {i} (w, S)\\right) ^ {2}$",
+   "applicability": {},
+   "role": "used_in_experiment",
+   "epistemic": "cited",
+   "quote": "Kaneko and Bollegala (2021) similarly encourages hidden representations to be orthogonal to some protected attribute, with a regularization term (Equation 36) summing over the inner products between the embeddings of neutral token $w \\in W$ in an input sentence $S \\in S$ and the average embedding $\\bar{a}_{i}$ of all encoded sentences containing protected attribute $a \\in A$ for an embedding E at layer i.",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c46",
+   "section": "5.2 In-Training Mitigation",
+   "chunk_char_start": 155500,
+   "id": "3dff32b2d4e363",
+   "method_ref": {
+    "surface": "Kaneko and Bollegala (2021)",
+    "canonical": null,
+    "entity_id": null
+   },
+   "loc": {
+    "char_start": 162170,
+    "char_end": 162578,
+    "match": "normalized"
+   }
+  },
+  "violations": [
+   "formula_not_in_quote:$\\mathcal{R} = \\sum_ {w \\in W}"
+  ],
+  "violations_after_repair": [
+   "formula_not_in_quote:$\\mathcal{R} = \\sum_ {w \\in W}"
+  ],
+  "record_after_repair": {
+   "kind": "config",
+   "item": "regularization term",
+   "value": "$\\mathcal{R} = \\sum_ {w \\in W} \\sum_ {S \\in \\mathbb {S}} \\sum_ {a \\in A} \\left(\\bar {\\mathbf {a}} _ {i} ^ {\\top} E _ {i} (w, S)\\right) ^ {2}$",
+   "applicability": {},
+   "role": "used_in_experiment",
+   "epistemic": "cited",
+   "quote": "Kaneko and Bollegala (2021) similarly encourages hidden representations to be orthogonal to some protected attribute, with a regularization term (Equation 36) summing over the inner products between the embeddings of neutral token $w \\in W$ in an input sentence $S \\in S$ and the average embedding $\\bar{a}_{i}$ of all encoded sentences containing protected attribute $a \\in A$ for an embedding E at layer i.",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c46",
+   "section": "5.2 In-Training Mitigation",
+   "chunk_char_start": 155500,
+   "id": "3dff32b2d4e363",
+   "method_ref": {
+    "surface": "Kaneko and Bollegala (2021)",
+    "canonical": null,
+    "entity_id": null
+   },
+   "loc": {
+    "char_start": 162170,
+    "char_end": 162578,
+    "match": "normalized"
+   }
+  }
+ },
+ {
+  "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+  "record": {
+   "kind": "config",
+   "item": "regularization term",
+   "value": "$\\mathcal{R} = \\lambda I (E (X); A)$",
+   "applicability": {},
+   "role": "used_in_experiment",
+   "epistemic": "cited",
+   "quote": "Similarly, Colombo, Piantanida, and Clavel (2021) introduce a regularization term (Equation 37) to minimize mutual information I between a random variable A representing a protected attribute and the encoding of an input X with hidden representation E.",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c46",
+   "section": "5.2 In-Training Mitigation",
+   "chunk_char_start": 155500,
+   "id": "0bd8bf1b9b64bb",
+   "method_ref": {
+    "surface": "Colombo, Piantanida, and Clavel (2021)",
+    "canonical": null,
+    "entity_id": null
+   },
+   "loc": {
+    "char_start": 163076,
+    "char_end": 163328,
+    "match": "normalized"
+   }
+  },
+  "violations": [
+   "formula_not_in_quote:$\\mathcal{R} = \\lambda I (E (X"
+  ],
+  "violations_after_repair": [
+   "formula_not_in_quote:$\\mathcal{R} = \\lambda I (E (X"
+  ],
+  "record_after_repair": {
+   "kind": "config",
+   "item": "regularization term",
+   "value": "$\\mathcal{R} = \\lambda I (E (X); A)$",
+   "applicability": {},
+   "role": "used_in_experiment",
+   "epistemic": "cited",
+   "quote": "Similarly, Colombo, Piantanida, and Clavel (2021) introduce a regularization term (Equation 37) to minimize mutual information I between a random variable A representing a protected attribute and the encoding of an input X with hidden representation E.",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c46",
+   "section": "5.2 In-Training Mitigation",
+   "chunk_char_start": 155500,
+   "id": "0bd8bf1b9b64bb",
+   "method_ref": {
+    "surface": "Colombo, Piantanida, and Clavel (2021)",
+    "canonical": null,
+    "entity_id": null
+   },
+   "loc": {
+    "char_start": 163076,
+    "char_end": 163328,
+    "match": "normalized"
+   }
+  }
+ },
+ {
+  "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+  "record": {
+   "kind": "finding",
+   "claim": "Liang et al. (2021) apply a nullspace projection to remove bias by finding a projection matrix P that removes any linear dependence between the tokens' embeddings and gender or religion.",
+   "target_ref": "",
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "cited",
+   "claim_type": "mechanism",
+   "quote": "Liang et al. (2021) apply a nullspace projection to remove bias. ... They then use a variation of INLP (Ravfogel et al. 2020) to find a projection matrix P that removes any linear dependence between the tokens' embeddings and gender or religion",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c51",
+   "section": "5.3 Intra-Processing Mitigation",
+   "chunk_char_start": 189428,
+   "id": "06baa2d77e2d1a",
+   "scope_ref_ref": {
+    "surface": "Liang et al. (2021)",
+    "canonical": null,
+    "entity_id": null
+   }
+  },
+  "violations": [
+   "quote_not_in_text"
+  ],
+  "violations_after_repair": [
+   "quote_not_in_text"
+  ],
+  "record_after_repair": {
+   "kind": "finding",
+   "claim": "Liang et al. (2021) apply a nullspace projection to remove bias by finding a projection matrix P that removes any linear dependence between the tokens' embeddings and gender or religion.",
+   "target_ref": "",
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "cited",
+   "claim_type": "mechanism",
+   "quote": "Liang et al. (2021) apply a nullspace projection to remove bias. ... They then use a variation of INLP (Ravfogel et al. 2020) to find a projection matrix P that removes any linear dependence between the tokens' embeddings and gender or religion",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c51",
+   "section": "5.3 Intra-Processing Mitigation",
+   "chunk_char_start": 189428,
+   "id": "06baa2d77e2d1a",
+   "scope_ref_ref": {
+    "surface": "Liang et al. (2021)",
+    "canonical": null,
+    "entity_id": null
+   }
+  }
+ },
+ {
+  "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+  "record": {
+   "kind": "finding",
+   "claim": "Hauzenberger et al. (2023) train several subnetworks that can be applied modularly at inference time to remove a specific set of biases, storing changes to the pre-trained model's parameters in sparse subnetworks.",
+   "target_ref": "",
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "cited",
+   "claim_type": "mechanism",
+   "quote": "Hauzenberger et al. (2023) propose a technique that trains several subnetworks that can be applied modularly at inference time to remove a specific set of biases. ... storing changes to the pre-trained model's parameters in sparse subnetworks.",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c51",
+   "section": "5.3 Intra-Processing Mitigation",
+   "chunk_char_start": 189428,
+   "id": "baf093de346bc3",
+   "scope_ref_ref": {
+    "surface": "Hauzenberger et al. (2023)",
+    "canonical": null,
+    "entity_id": null
+   }
+  },
+  "violations": [
+   "quote_not_in_text"
+  ],
+  "violations_after_repair": [
+   "quote_not_in_text"
+  ],
+  "record_after_repair": {
+   "kind": "finding",
+   "claim": "Hauzenberger et al. (2023) train several subnetworks that can be applied modularly at inference time to remove a specific set of biases, storing changes to the pre-trained model's parameters in sparse subnetworks.",
+   "target_ref": "",
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "cited",
+   "claim_type": "mechanism",
+   "quote": "Hauzenberger et al. (2023) propose a technique that trains several subnetworks that can be applied modularly at inference time to remove a specific set of biases. ... storing changes to the pre-trained model's parameters in sparse subnetworks.",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c51",
+   "section": "5.3 Intra-Processing Mitigation",
+   "chunk_char_start": 189428,
+   "id": "baf093de346bc3",
+   "scope_ref_ref": {
+    "surface": "Hauzenberger et al. (2023)",
+    "canonical": null,
+    "entity_id": null
+   }
+  }
+ },
+ {
+  "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+  "record": {
+   "kind": "finding",
+   "claim": "Decoding algorithms may be manipulated to generate biased language by increasing, rather than decreasing, the generation of toxic or hateful text.",
+   "target_ref": "",
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "cited",
+   "claim_type": "criticism",
+   "quote": "Kumar et al. (2023b) also warn that decoding algorithms may be manipulated to generate biased language by increasing, rather than decreasing, the generation of toxic or hateful text.",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c51",
+   "section": "5.3 Intra-Processing Mitigation",
+   "chunk_char_start": 189428,
+   "id": "6b442eb14aadd4",
+   "scope_ref_ref": {
+    "surface": "Kumar et al. (2023b)",
+    "canonical": null,
+    "entity_id": null
+   }
+  },
+  "violations": [
+   "quote_not_in_text"
+  ],
+  "violations_after_repair": [
+   "quote_not_in_text"
+  ],
+  "record_after_repair": {
+   "kind": "finding",
+   "claim": "Decoding algorithms may be manipulated to generate biased language by increasing, rather than decreasing, the generation of toxic or hateful text.",
+   "target_ref": "",
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "cited",
+   "claim_type": "criticism",
+   "quote": "Kumar et al. (2023b) also warn that decoding algorithms may be manipulated to generate biased language by increasing, rather than decreasing, the generation of toxic or hateful text.",
+   "paper_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey",
+   "chunk_id": "Bias_and_Fairness_in_Large_Language_Models_A_Survey#c51",
+   "section": "5.3 Intra-Processing Mitigation",
+   "chunk_char_start": 189428,
+   "id": "6b442eb14aadd4",
+   "scope_ref_ref": {
+    "surface": "Kumar et al. (2023b)",
+    "canonical": null,
+    "entity_id": null
+   }
+  }
+ }
+]

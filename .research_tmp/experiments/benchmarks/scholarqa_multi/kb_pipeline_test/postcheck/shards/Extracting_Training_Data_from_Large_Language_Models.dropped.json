@@ -1,0 +1,170 @@
+[
+ {
+  "paper_id": "Extracting_Training_Data_from_Large_Language_Models",
+  "record": {
+   "kind": "result",
+   "measure": {
+    "metric": "high entropy examples",
+    "value": "1",
+    "unit": "examples",
+    "direction": "higher_better",
+    "aggregation": "count"
+   },
+   "role": "baseline_comparison",
+   "delta": "",
+   "dims": {
+    "subject": "GPT-2",
+    "variant": "zlib"
+   },
+   "epistemic": "demonstrated",
+   "quote": "compared to just one with zlib",
+   "paper_id": "Extracting_Training_Data_from_Large_Language_Models",
+   "chunk_id": "Extracting_Training_Data_from_Large_Language_Models#c23",
+   "section": "6.2 Results",
+   "chunk_char_start": 40393,
+   "id": "74cb1f93e5690d",
+   "method_ref": {
+    "surface": "Training Data Extraction Attack",
+    "canonical": "Training Data Extraction Attack",
+    "entity_id": "c1e25a62fc59"
+   },
+   "loc": {
+    "char_start": 45459,
+    "char_end": 45489,
+    "match": "normalized"
+   }
+  },
+  "violations": [
+   "number_not_in_quote:1"
+  ],
+  "violations_after_repair": [
+   "number_not_in_quote:1"
+  ],
+  "record_after_repair": {
+   "kind": "result",
+   "measure": {
+    "metric": "high entropy examples",
+    "value": "1",
+    "unit": "examples",
+    "direction": "higher_better",
+    "aggregation": "count"
+   },
+   "role": "baseline_comparison",
+   "delta": "",
+   "dims": {
+    "subject": "GPT-2",
+    "variant": "zlib"
+   },
+   "epistemic": "demonstrated",
+   "quote": "There are 13 and 10 high entropy examples found by using the Small and Medium GPT-2 variants, respectively (compared to just one with zlib).",
+   "paper_id": "Extracting_Training_Data_from_Large_Language_Models",
+   "chunk_id": "Extracting_Training_Data_from_Large_Language_Models#c23",
+   "section": "6.2 Results",
+   "chunk_char_start": 40393,
+   "id": "74cb1f93e5690d",
+   "method_ref": {
+    "surface": "Training Data Extraction Attack",
+    "canonical": "Training Data Extraction Attack",
+    "entity_id": "c1e25a62fc59"
+   },
+   "loc": {
+    "char_start": 45459,
+    "char_end": 45489,
+    "match": "normalized"
+   }
+  }
+ },
+ {
+  "paper_id": "Extracting_Training_Data_from_Large_Language_Models",
+  "record": {
+   "kind": "result",
+   "measure": {
+    "metric": "memorization",
+    "value": "four more URLs",
+    "unit": "count",
+    "direction": "higher_better",
+    "aggregation": "sum",
+    "timepoint": null
+   },
+   "role": "ablation",
+   "delta": "+4",
+   "dims": {
+    "subject": "GPT-2 Medium",
+    "setup": [
+     "black-box access"
+    ],
+    "variant": "Medium",
+    "hyperparam": {
+     "item": "n",
+     "value": "33",
+     "unit": "insertions"
+    }
+   },
+   "epistemic": "demonstrated",
+   "quote": "When given the additional context and using beam search, the medium model can emit four more URLs",
+   "paper_id": "Extracting_Training_Data_from_Large_Language_Models",
+   "chunk_id": "Extracting_Training_Data_from_Large_Language_Models#c27",
+   "section": "7 Correlating Memorization with Model Size & Insertion Frequency",
+   "chunk_char_start": 54440,
+   "id": "f9403956bfac16",
+   "method_ref": {
+    "surface": "Training Data Extraction Attack",
+    "canonical": "Training Data Extraction Attack",
+    "entity_id": "c1e25a62fc59"
+   },
+   "loc": {
+    "char_start": 59056,
+    "char_end": 59153,
+    "match": "normalized"
+   }
+  },
+  "violations": [
+   "formula_not_in_quote:+4"
+  ],
+  "violations_after_repair": [
+   "number_not_in_quote:4"
+  ],
+  "record_after_repair": {
+   "kind": "result",
+   "measure": {
+    "metric": "memorization",
+    "value": "4",
+    "unit": "count",
+    "direction": "higher_better",
+    "aggregation": "sum",
+    "timepoint": null
+   },
+   "role": "ablation",
+   "delta": null,
+   "dims": {
+    "subject": "GPT-2 Medium",
+    "setup": [
+     "black-box access"
+    ],
+    "variant": "Medium",
+    "hyperparam": {
+     "item": "n",
+     "value": "33",
+     "unit": "insertions"
+    }
+   },
+   "epistemic": "demonstrated",
+   "quote": "When given the additional context and using beam search, the medium model can emit four more URLs",
+   "paper_id": "Extracting_Training_Data_from_Large_Language_Models",
+   "chunk_id": "Extracting_Training_Data_from_Large_Language_Models#c27",
+   "section": "7 Correlating Memorization with Model Size & Insertion Frequency",
+   "chunk_char_start": 54440,
+   "id": "f9403956bfac16",
+   "method_ref": {
+    "surface": "Training Data Extraction Attack",
+    "canonical": "Training Data Extraction Attack",
+    "entity_id": "c1e25a62fc59"
+   },
+   "loc": {
+    "char_start": 59056,
+    "char_end": 59153,
+    "match": "normalized"
+   }
+  }
+ }
+]

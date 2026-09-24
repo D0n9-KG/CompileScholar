@@ -1,0 +1,3269 @@
+{
+ "records": [
+  {
+   "kind": "finding",
+   "claim": "Word embeddings are vulnerable to black-box membership inference attacks under realistic assumptions.",
+   "target_ref": "",
+   "condition": {
+    "setup": [
+     "black-box access"
+    ]
+   },
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "In this work, we show that word embeddings are vulnerable to black-box membership inference attacks under realistic assumptions.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c0",
+   "section": "MEMBERSHIP INFERENCE ON WORD EMBEDDING AND BEYOND",
+   "chunk_char_start": 0,
+   "id": "eb725bbe9905d3",
+   "scope_ref_ref": {
+    "surface": "Word embeddings",
+    "canonical": null,
+    "entity_id": null
+   },
+   "loc": {
+    "char_start": 1044,
+    "char_end": 1172,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "Membership inference leakage persists through classification and text-generation applications even when the embedding layer is not exposed to the attacker.",
+   "target_ref": "",
+   "condition": {
+    "setup": [
+     "label-only access"
+    ]
+   },
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "Furthermore, we show that this leakage persists through two other major NLP applications: classification and text-generation, even when the embedding layer is not exposed to the attacker.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c0",
+   "section": "MEMBERSHIP INFERENCE ON WORD EMBEDDING AND BEYOND",
+   "chunk_char_start": 0,
+   "id": "b928d065beef35",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 1173,
+    "char_end": 1360,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The MI attack achieves high attack accuracy against a classifier model and an LSTM-based language model.",
+   "target_ref": "",
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "observation",
+   "quote": "We show that our MI attack achieves high attack accuracy against a classifier model and an LSTM-based language model.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c0",
+   "section": "MEMBERSHIP INFERENCE ON WORD EMBEDDING AND BEYOND",
+   "chunk_char_start": 0,
+   "id": "ec2e601b67c88c",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 1361,
+    "char_end": 1478,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The MI attack is a cheaper membership inference attack on text-generative models that does not require knowledge of the target model or expensive training of text-generative models as shadow models.",
+   "target_ref": "",
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "Indeed, our attack is a cheaper membership inference attack on text-generative models, which does not require the knowledge of the target model or any expensive training of text-generative models as shadow models.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c0",
+   "section": "MEMBERSHIP INFERENCE ON WORD EMBEDDING AND BEYOND",
+   "chunk_char_start": 0,
+   "id": "2902f20f5d3aeb",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 1479,
+    "char_end": 1692,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "Membership Inference (MI) attack is a natural attack metric used to understand the extent of information leakage from a ML model.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "definition",
+   "quote": "A natural attack metric that is commonly used to understand the extent of information leakage from a ML model is Membership Inference (MI) attack.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c2",
+   "section": "1 Introduction",
+   "chunk_char_start": 1694,
+   "id": "2ec00766c4911e",
+   "scope_ref_ref": {
+    "surface": "Membership Inference",
+    "canonical": null,
+    "entity_id": null
+   },
+   "loc": {
+    "char_start": 2048,
+    "char_end": 2194,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "In MI attacks, an attacker is given black/white/grey box access to a ML model and aims to find out if a particular set of data was used in training the ML model.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "definition",
+   "quote": "In MI attacks, an attacker is given black/white/grey box access to a ML model and aims to find out if a particular set of data was used in training the ML model.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c2",
+   "section": "1 Introduction",
+   "chunk_char_start": 1694,
+   "id": "0cdfba5ead5105",
+   "scope_ref_ref": {
+    "surface": "Membership Inference",
+    "canonical": null,
+    "entity_id": null
+   },
+   "loc": {
+    "char_start": 2195,
+    "char_end": 2356,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "Membership inference attacks in the context of embeddings and its effect in other natural language processing (NLP) tasks that use embeddings are relatively unexplored.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "observation",
+   "quote": "Membership inference attacks in this setting, i.e., in the context of embeddings and its effect in other natural language processing (NLP) tasks that use embeddings, are relatively unexplored",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c2",
+   "section": "1 Introduction",
+   "chunk_char_start": 1694,
+   "id": "5ace2b8787f689",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 3266,
+    "char_end": 3457,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "Grey-box attack model is strictly less general than black-box attack model since score-based attacks cannot be applied when the model only exposes the predicted label.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "Grey-box attack model is strictly less general than black-box attack model since score-based attacks cannot be applied when the model only exposes the predicted label",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c2",
+   "section": "1 Introduction",
+   "chunk_char_start": 1694,
+   "id": "31b8fe65cd65bf",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 4076,
+    "char_end": 4242,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The attack achieves success rates of above 90% in doing membership inference attack against word embeddings.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "demonstrated",
+   "epistemic": "demonstrated",
+   "claim_type": "observation",
+   "quote": "Our attack is can achieve success rates of above 90% in doing membership inference attack against word embeddings.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c2",
+   "section": "1 Introduction",
+   "chunk_char_start": 1694,
+   "id": "66ed6cf6bf4ea3",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 6529,
+    "char_end": 6643,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The leakage from word embedding is transferable to the classification and text-generation NLP tasks.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "demonstrated",
+   "epistemic": "demonstrated",
+   "claim_type": "mechanism",
+   "quote": "Surprisingly, we show that this leakage from word embedding is transferable to the classification and text-generation NLP tasks.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c2",
+   "section": "1 Introduction",
+   "chunk_char_start": 1694,
+   "id": "1129929de49993",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 6644,
+    "char_end": 6772,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The MI attack on text-generative language models does not require the knowledge of the target model or any expensive shadow model training.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "our MI attack on text-generative language models does not require the knowledge of the target model or any expensive shadow model training (as opposed to previous work).",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c2",
+   "section": "1 Introduction",
+   "chunk_char_start": 1694,
+   "id": "2fce4a1bd962de",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 6845,
+    "char_end": 7014,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The attack is expected to generalize to MI attacks on other large transformer-based models for which shadow model training would be highly costly.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "recommendation",
+   "quote": "a by-product of our attack is a cheap MI attack on language models, which we expect, would generalize to MI attacks on other large transformer-based models (Vaswani et al., 2017) for which shadow model training would be highly costly.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c2",
+   "section": "1 Introduction",
+   "chunk_char_start": 1694,
+   "id": "c81d1df2c35694",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 7115,
+    "char_end": 7349,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "lineage",
+   "relation": "motivated_by",
+   "scope": {
+    "setup": [
+     "black-box access"
+    ]
+   },
+   "evidence_basis": "explicit_claim",
+   "quote": "In this paper, we focus on black-box membership inference attacks, introduced in Shokri et al. (2017), in which an attacker can query a model with the goal of determining whether a particular dataset was included in the training data.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c4",
+   "section": "2 Security Model",
+   "chunk_char_start": 10132,
+   "id": "0bf15a293d8cfb",
+   "from_method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "to_method_ref": {
+    "surface": "Shokri et al. (2017)",
+    "canonical": "Shokri et al. (2017)",
+    "entity_id": "562cff41479e"
+   },
+   "loc": {
+    "char_start": 10152,
+    "char_end": 10386,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "result",
+   "measure": {
+    "metric": "MI accuracy",
+    "value": "around $90\\%$",
+    "unit": "%",
+    "direction": "higher_better"
+   },
+   "role": "main_result",
+   "dims": {
+    "subject": "Word2Vec"
+   },
+   "epistemic": "stated",
+   "quote": "We show the success of our attack against Word2Vec which is one of the most commonly used word embedding algorithms. Our attack can achieve MI accuracy around $90\\%$ .",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c3",
+   "section": "Contributions",
+   "chunk_char_start": 7351,
+   "id": "9b4d045d4addfe",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 7635,
+    "char_end": 7802,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The attack works in a setting where the attacker does not have knowledge of or sample access to the exact training data distribution, unlike Song and Raghunathan (2020).",
+   "condition": {
+    "setup": [
+     "label-only access"
+    ]
+   },
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "criticism",
+   "quote": "Note that, in contrast to previous work Song and Raghunathan (2020), our attack works in a very realistic setting where the attacker does not have knowledge of or sample access to the exact training data distribution.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c3",
+   "section": "Contributions",
+   "chunk_char_start": 7351,
+   "id": "87cd5f618e302e",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "target_ref_ref": {
+    "surface": "Song and Raghunathan (2020)",
+    "canonical": "Song and Raghunathan (2020)",
+    "entity_id": "7e61e9f32824"
+   },
+   "loc": {
+    "char_start": 7821,
+    "char_end": 8038,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "result",
+   "measure": {
+    "metric": "attack accuracy",
+    "value": "65 - 90%",
+    "unit": "%",
+    "direction": "higher_better"
+   },
+   "role": "main_result",
+   "dims": {
+    "subject": "spam classifier",
+    "setup": [
+     "black-box access"
+    ]
+   },
+   "epistemic": "stated",
+   "quote": "We show that our MI attack achieves 65 - 90% attack accuracy against the classifier model (Section 4) and 70% attack accuracy against LSTM-based language model (Section 5).",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c3",
+   "section": "Contributions",
+   "chunk_char_start": 7351,
+   "id": "eaf4bee7e14edf",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 9021,
+    "char_end": 9193,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "result",
+   "measure": {
+    "metric": "attack accuracy",
+    "value": "70%",
+    "unit": "%",
+    "direction": "higher_better"
+   },
+   "role": "main_result",
+   "dims": {
+    "subject": "LSTM-based language model",
+    "setup": [
+     "black-box access"
+    ]
+   },
+   "epistemic": "stated",
+   "quote": "We show that our MI attack achieves 65 - 90% attack accuracy against the classifier model (Section 4) and 70% attack accuracy against LSTM-based language model (Section 5).",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c3",
+   "section": "Contributions",
+   "chunk_char_start": 7351,
+   "id": "0984825c7daeea",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 9021,
+    "char_end": 9193,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The MI attack on text-generative language models does not require knowledge of the target model or expensive shadow model training, unlike previous work.",
+   "condition": {
+    "setup": [
+     "black-box access"
+    ]
+   },
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "Our MI attack on text-generative language models for instance does not require the knowledge of the target model or any expensive shadow model training as opposed to previous work, while still providing successful attack performance.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c3",
+   "section": "Contributions",
+   "chunk_char_start": 7351,
+   "id": "af7181389f21d6",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 9289,
+    "char_end": 9522,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The MI attack transfers through LSTM-based language models where the trained embedding layer is not based on Word2Vec.",
+   "condition": {
+    "subject": "LSTM-based language model"
+   },
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "observation",
+   "quote": "We further note that our attack transfers through LSTM-based language model where the trained embedding layer is not based on Word2Vec.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c3",
+   "section": "Contributions",
+   "chunk_char_start": 7351,
+   "id": "99dd5127e99c9c",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 9523,
+    "char_end": 9658,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The MI attack is expected to generalize to other large transformer-based models for which shadow model training would be highly costly.",
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "recommendation",
+   "quote": "Therefore, we expect our MI attack to generalize to other large transformer-based models for which shadow model training would be highly costly.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c3",
+   "section": "Contributions",
+   "chunk_char_start": 7351,
+   "id": "978e0403de7a07",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 9659,
+    "char_end": 9803,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "config",
+   "item": "n",
+   "value": "even",
+   "applicability": {
+    "variant": [
+     "Number of shadow models"
+    ]
+   },
+   "role": "protocol",
+   "epistemic": "stated",
+   "quote": "Pick $n$ distributions $\\mathcal{D}_i$ for $i = 1, \\ldots, n$ where $n$ is even.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c4",
+   "section": "2 Security Model",
+   "chunk_char_start": 10132,
+   "id": "a609b4ce9e9f54",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 11764,
+    "char_end": 11844,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "config",
+   "item": "aux",
+   "value": "sample access to the distributions $\\mathcal{D}_1, \\ldots, \\mathcal{D}_n$ or include sample access to distributions similar to $\\mathcal{D}_1, \\ldots, \\mathcal{D}_n$",
+   "applicability": {
+    "subject": [
+     "Enron email distribution"
+    ]
+   },
+   "role": "protocol",
+   "epistemic": "stated",
+   "quote": "aux could include sample access to the distributions $\\mathcal{D}_1, \\ldots, \\mathcal{D}_n$ or include sample access to distributions similar to $\\mathcal{D}_1, \\ldots, \\mathcal{D}_n$, but not those.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c4",
+   "section": "2 Security Model",
+   "chunk_char_start": 10132,
+   "id": "7f16f372938df9",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 13909,
+    "char_end": 14109,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The security experiment allows for implementation by varying the parameters of the experiment.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "definition",
+   "quote": "The security experiments are generic and allows for implementation by varying the parameters of the experiment.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c4",
+   "section": "2 Security Model",
+   "chunk_char_start": 10132,
+   "id": "98032ff330935c",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 13742,
+    "char_end": 13853,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "Training on a random subset of each user's data makes the attacker's task somewhat more difficult because the attacker does not know which subset will be used.",
+   "target_ref": null,
+   "condition": {
+    "variant": [
+     "proxy distribution"
+    ]
+   },
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "This makes the attacker's task somewhat more difficult because, while the attacker knows the dataset of the user/tenant in question, it does not know which subset of that user/tenant's data will be used.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c4",
+   "section": "2 Security Model",
+   "chunk_char_start": 10132,
+   "id": "4e761ea23a1ef4",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 14925,
+    "char_end": 15128,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "config",
+   "item": "representation dimension",
+   "value": "T - 1",
+   "applicability": {
+    "variant": []
+   },
+   "role": "used_in_experiment",
+   "epistemic": "stated",
+   "quote": "we actually just consider the consecutive pairs of words which reduces the dimension to T - 1",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c5",
+   "section": "3 Word Embedding Attack",
+   "chunk_char_start": 15211,
+   "id": "706b6c7be4a490",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "dims_new": {
+    "applicability.variant": [
+     "consecutive pairs"
+    ]
+   },
+   "loc": {
+    "char_start": 19988,
+    "char_end": 20081,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "config",
+   "item": "distance metric",
+   "value": "l_{2} distance",
+   "applicability": {},
+   "role": "used_in_experiment",
+   "epistemic": "stated",
+   "quote": "we propose an attack that uses $l_{2}$ distance between the representation of words in the users email data",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c5",
+   "section": "3 Word Embedding Attack",
+   "chunk_char_start": 15211,
+   "id": "04415a24087c6d",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 19163,
+    "char_end": 19270,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The dimension of the model representation is very large for machine learning models to handle because the size of the dictionary is huge and multiplied by the dimension of the embedding model.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "criticism",
+   "quote": "One major problem with the approach proposed above is that the dimension of the model representation is very large for machine learning models to handle.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c5",
+   "section": "3 Word Embedding Attack",
+   "chunk_char_start": 15211,
+   "id": "5d333a6b298642",
+   "scope_ref_ref": {
+    "surface": "naive approach",
+    "canonical": null,
+    "entity_id": null
+   },
+   "loc": {
+    "char_start": 17484,
+    "char_end": 17637,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "There is high entropy in the representation of words due to transformations that preserve distance, which makes it harder for the adversary to identify a statistical pattern.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "In that sense there is a high entropy in the representation of words which makes the job of adversary harder in identifying a statistical pattern.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c5",
+   "section": "3 Word Embedding Attack",
+   "chunk_char_start": 15211,
+   "id": "c4e5a2314d3904",
+   "scope_ref_ref": {
+    "surface": "word embedding",
+    "canonical": null,
+    "entity_id": null
+   },
+   "loc": {
+    "char_start": 18955,
+    "char_end": 19101,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "Using relative distances between words resolves the issue of randomness in the embedding space because the randomness is expected not to change relative distances.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "This way we resolve the second issue as we look at the relative distance between words and we expect the randomness of the word embedding not to change the relative distances between pairs of words.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c5",
+   "section": "3 Word Embedding Attack",
+   "chunk_char_start": 15211,
+   "id": "047c7defb6c506",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 19272,
+    "char_end": 19470,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "Considering only consecutive pairs of words reduces the dimension to T - 1 because the presence of target data is expected to have a more significant effect on closer word pairs.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "The reason behind this is that we expect the presence of the target data in the training set should have a more significant effect on pairs of words that are closer to each other.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c5",
+   "section": "3 Word Embedding Attack",
+   "chunk_char_start": 15211,
+   "id": "fc94e84ea32b0b",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 20083,
+    "char_end": 20262,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "config",
+   "item": "shadow distribution",
+   "value": "Enron email distribution",
+   "applicability": {
+    "setup": []
+   },
+   "role": "used_in_experiment",
+   "epistemic": "stated",
+   "quote": "In our experiments all these distributions are Enron email distribution.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c6",
+   "section": "3.1 Attack as per the Security Experiments",
+   "chunk_char_start": 20306,
+   "id": "2977357758d0db",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "dims_new": {
+    "applicability.setup": [
+     "Enron email distribution"
+    ]
+   },
+   "loc": {
+    "char_start": 20548,
+    "char_end": 20620,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "config",
+   "item": "target model",
+   "value": "Word2vec embedding",
+   "applicability": {},
+   "role": "used_in_experiment",
+   "epistemic": "stated",
+   "quote": "Train a Word2vec embedding $M \\leftarrow L(D_1, D_2, \\ldots, D_n)$ .",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c6",
+   "section": "3.1 Attack as per the Security Experiments",
+   "chunk_char_start": 20306,
+   "id": "f7bf956690388f",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 21180,
+    "char_end": 21248,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "config",
+   "item": "attack model",
+   "value": "sparse linear attack",
+   "applicability": {},
+   "role": "used_in_experiment",
+   "epistemic": "stated",
+   "quote": "Algorithm 1 Training a sparse linear attack using shadow model training.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c6",
+   "section": "3.1 Attack as per the Security Experiments",
+   "chunk_char_start": 20306,
+   "id": "ce8616b98c6878",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 21579,
+    "char_end": 21651,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "config",
+   "item": "optimization problem",
+   "value": "$$\\min _ {l \\in L _ {D ^ {*}}} \\sum_ {i = 1} ^ {k} \\left(1 - l (\\sigma (m _ {i}))\\right) ^ {2} + \\left(1 + l (\\sigma (m _ {i} ^ {\\prime}))\\right) ^ {2} + \\lambda | l | _ {1}.$$ ",
+   "applicability": {},
+   "role": "protocol",
+   "epistemic": "stated",
+   "quote": "by solving the following LASSO optimization problem: $$\\min _ {l \\in L _ {D ^ {*}}} \\sum_ {i = 1} ^ {k} \\left(1 - l (\\sigma (m _ {i}))\\right) ^ {2} + \\left(1 + l (\\sigma (m _ {i} ^ {\\prime}))\\right) ^ {2} + \\lambda | l | _ {1}.$$ ",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c6",
+   "section": "3.1 Attack as per the Security Experiments",
+   "chunk_char_start": 20306,
+   "id": "0c49a1516305e8",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 22849,
+    "char_end": 23078,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The attack has two phases: a preparation phase without interaction with the target model and an interactive query phase.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "Our attacks have two phases: the first phase is the preparation phase where the adversary prepares some queries for the target model (word embedding in this case) without any interaction with the target model. The second phase is the query phase which is interactive.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c6",
+   "section": "3.1 Attack as per the Security Experiments",
+   "chunk_char_start": 20306,
+   "id": "3e759f53702feb",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 23781,
+    "char_end": 24048,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The attack identifies pairs of words whose distance significantly changes upon including the target dataset.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "Our attack tries to identify such pairs of words whose distance will significantly change upon including the target dataset.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c6",
+   "section": "3.1 Attack as per the Security Experiments",
+   "chunk_char_start": 20306,
+   "id": "089e4224ec1fc4",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 24623,
+    "char_end": 24747,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "Due to unique properties of LASSO regression, the final linear model is sparse, meaning the attacker only needs to query a few words.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "Because of unique properties of LASSO regression, we know that the final linear model is going to be sparse. This means that in the query phase the attacker will only need to query a few words and not all the words in the target dataset.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c6",
+   "section": "3.1 Attack as per the Security Experiments",
+   "chunk_char_start": 20306,
+   "id": "510fa4a24a11a8",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 24918,
+    "char_end": 25155,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "Controlling the parameter $\\lambda$ changes the number of pairs of words that have non-zero weight in the linear combination.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "By controlling the $\\lambda$ parameter we can change the number of pairs of words that have non-zero weight in the linear combination.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c6",
+   "section": "3.1 Attack as per the Security Experiments",
+   "chunk_char_start": 20306,
+   "id": "d6883a8332eb45",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 25156,
+    "char_end": 25290,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "Changing $\\lambda$ can also change the generalization of the attack to unseen models.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "Changing $\\lambda$ can also change the generalization of attack to unseen models.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c6",
+   "section": "3.1 Attack as per the Security Experiments",
+   "chunk_char_start": 20306,
+   "id": "dab9cc91b2e2e0",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 25291,
+    "char_end": 25372,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "config",
+   "item": "window size",
+   "value": "5",
+   "applicability": {
+    "subject": "Word2Vec"
+   },
+   "role": "used_in_experiment",
+   "epistemic": "stated",
+   "quote": "We use Word2Vec (Rong, 2014) with window size 5.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c7",
+   "section": "3.2 Attack results",
+   "chunk_char_start": 25441,
+   "id": "5ca1770336c5e1",
+   "method_ref": {
+    "surface": "Word2Vec",
+    "canonical": "Word2Vec",
+    "entity_id": "619637785a09"
+   },
+   "loc": {
+    "char_start": 27093,
+    "char_end": 27141,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "config",
+   "item": "dimension",
+   "value": "80",
+   "applicability": {
+    "subject": "Word2Vec"
+   },
+   "role": "used_in_experiment",
+   "epistemic": "stated",
+   "quote": "We use dimension 80 for the vector representation",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c7",
+   "section": "3.2 Attack results",
+   "chunk_char_start": 25441,
+   "id": "91eec39cdbfa9a",
+   "method_ref": {
+    "surface": "Word2Vec",
+    "canonical": "Word2Vec",
+    "entity_id": "619637785a09"
+   },
+   "loc": {
+    "char_start": 27142,
+    "char_end": 27191,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "config",
+   "item": "frequency threshold",
+   "value": "20",
+   "applicability": {
+    "subject": "Word2Vec"
+   },
+   "role": "used_in_experiment",
+   "epistemic": "stated",
+   "quote": "ignore all words that happen with frequency less than 20 in the training data",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c7",
+   "section": "3.2 Attack results",
+   "chunk_char_start": 25441,
+   "id": "5d7fddb4e2a84e",
+   "method_ref": {
+    "surface": "Word2Vec",
+    "canonical": "Word2Vec",
+    "entity_id": "619637785a09"
+   },
+   "loc": {
+    "char_start": 27414,
+    "char_end": 27491,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "config",
+   "item": "Lasso parameter",
+   "value": "$\\lambda = 1/\\sqrt{k}$",
+   "applicability": {},
+   "role": "used_in_experiment",
+   "epistemic": "stated",
+   "quote": "Our attack uses a Lasso parameter of $\\lambda = 1/\\sqrt{k}$ to ensure that the number of selected word pairs does not exceed 50.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c7",
+   "section": "3.2 Attack results",
+   "chunk_char_start": 25441,
+   "id": "d7f3f3d62467bc",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "dims_new": {
+    "applicability.subject": [
+     "Membership Inference on Word Embedding"
+    ]
+   },
+   "loc": {
+    "char_start": 27512,
+    "char_end": 27640,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "config",
+   "item": "number of selected word pairs",
+   "value": "50",
+   "applicability": {},
+   "role": "used_in_experiment",
+   "epistemic": "stated",
+   "quote": "ensure that the number of selected word pairs does not exceed 50",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c7",
+   "section": "3.2 Attack results",
+   "chunk_char_start": 25441,
+   "id": "65d331111fc0ee",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "dims_new": {
+    "applicability.subject": [
+     "Membership Inference on Word Embedding"
+    ]
+   },
+   "loc": {
+    "char_start": 27575,
+    "char_end": 27639,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The attack works better with larger target datasets.",
+   "target_ref": "",
+   "condition": {
+    "subject": "Word2Vec"
+   },
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "observation",
+   "quote": "As expected, the attack works better with larger target datasets.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c7",
+   "section": "3.2 Attack results",
+   "chunk_char_start": 25441,
+   "id": "8069aa0991820b",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 25829,
+    "char_end": 25894,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The attack becomes more successful as the number of shadow models increases, reaching a plateau after 200 shadow models.",
+   "target_ref": "",
+   "condition": {},
+   "strength": "demonstrated",
+   "epistemic": "stated",
+   "claim_type": "observation",
+   "quote": "As numbers of shadow models increase, the attack becomes more successful in performing membership inference. In all setting, the attack seem to reach a plateau after 200 shadow models.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c8",
+   "section": "3.3 Other variants of the attack",
+   "chunk_char_start": 27970,
+   "id": "5b1c0b65fcaf89",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 30064,
+    "char_end": 30248,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The attack can succeed even when there is a single email in the target email set.",
+   "target_ref": "",
+   "condition": {},
+   "strength": "demonstrated",
+   "epistemic": "stated",
+   "claim_type": "observation",
+   "quote": "Interestingly, the attack can success even when there is a single email in the target email set.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c8",
+   "section": "3.3 Other variants of the attack",
+   "chunk_char_start": 27970,
+   "id": "c32948b52e062c",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 30249,
+    "char_end": 30345,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "Knowledge of the exact training distribution is not crucial to the attack if enough number of shadow models are trained.",
+   "target_ref": "",
+   "condition": {
+    "setup": []
+   },
+   "strength": "demonstrated",
+   "epistemic": "stated",
+   "claim_type": "observation",
+   "quote": "Interestingly, the knowledge of the exact distribution is not crucial to the attack if enough number of shadow models are trained.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c8",
+   "section": "3.3 Other variants of the attack",
+   "chunk_char_start": 27970,
+   "id": "9a5e20642daf6a",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "dims_new": {
+    "condition.setup": [
+     "proxy distribution"
+    ]
+   },
+   "loc": {
+    "char_start": 31360,
+    "char_end": 31490,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "config",
+   "item": "training distribution for shadow embeddings",
+   "value": "Avocado dataset",
+   "applicability": {},
+   "role": "used_in_experiment",
+   "epistemic": "stated",
+   "quote": "In this set of experiments, the adversary uses the Avocado dataset to train shadow embeddings while the actual target model is trained on Enron dataset.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c8",
+   "section": "3.3 Other variants of the attack",
+   "chunk_char_start": 27970,
+   "id": "1d1f2f91c64385",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 31539,
+    "char_end": 31691,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "config",
+   "item": "training distribution for target model",
+   "value": "Enron dataset",
+   "applicability": {},
+   "role": "used_in_experiment",
+   "epistemic": "stated",
+   "quote": "In this set of experiments, the adversary uses the Avocado dataset to train shadow embeddings while the actual target model is trained on Enron dataset.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c8",
+   "section": "3.3 Other variants of the attack",
+   "chunk_char_start": 27970,
+   "id": "7b0015fe9cdbab",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 31539,
+    "char_end": 31691,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "Sub-sampling of data by the model trainer can potentially hurt the attack as identified word pairs might not appear in the training set.",
+   "target_ref": "",
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "This can potentially hurt the attack as the identified pair of words might not appear in the training set of the model at all.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c8",
+   "section": "3.3 Other variants of the attack",
+   "chunk_char_start": 27970,
+   "id": "be111626eb772b",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 32168,
+    "char_end": 32294,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "In the adaptive attack against sub-sampling, the adversary must select a more diverse set of word pairs to ensure inference success if some pairs are missing from the actual training set.",
+   "target_ref": "",
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "When this adaptive attack is used, the attack is has to select a more diverse set of word pairs so that if some of them did not appear in the actual training set, then other pairs can still help to perform the inference.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c8",
+   "section": "3.3 Other variants of the attack",
+   "chunk_char_start": 27970,
+   "id": "0f4f26966d5b9d",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 33928,
+    "char_end": 34148,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "config",
+   "item": "access model",
+   "value": "black-box access to the embedding",
+   "applicability": {
+    "setup": [
+     "black-box access"
+    ]
+   },
+   "role": "protocol",
+   "epistemic": "stated",
+   "quote": "Our embedding attack in Section 3 works when the adversary has black-box access to the embedding.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c9",
+   "section": "4 Embedding Attack on a Text-Classification Model",
+   "chunk_char_start": 34208,
+   "id": "b7e5c3f647654a",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 34261,
+    "char_end": 34358,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "config",
+   "item": "access model",
+   "value": "access to a classifier that is trained on a public dataset which uses the embedding in its training process",
+   "applicability": {
+    "setup": [
+     "label-only access"
+    ]
+   },
+   "role": "protocol",
+   "epistemic": "stated",
+   "quote": "adversary might only have access to a classifier that is trained on a public dataset which uses the embedding in its training process.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c9",
+   "section": "4 Embedding Attack on a Text-Classification Model",
+   "chunk_char_start": 34208,
+   "id": "e6358dad1465e0",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 34443,
+    "char_end": 34577,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "config",
+   "item": "training data distribution",
+   "value": "email data set of a user of Avocado dataset",
+   "applicability": {
+    "subject": [
+     "Avocado dataset"
+    ]
+   },
+   "role": "used_in_experiment",
+   "epistemic": "stated",
+   "quote": "$D^{*}$ is the email data set of a user of Avocado dataset.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c9",
+   "section": "4 Embedding Attack on a Text-Classification Model",
+   "chunk_char_start": 34208,
+   "id": "c66800a310092f",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 34959,
+    "char_end": 35017,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "config",
+   "item": "query distribution",
+   "value": "distribution of emails from Avocado dataset",
+   "applicability": {
+    "subject": [
+     "Avocado dataset"
+    ]
+   },
+   "role": "used_in_experiment",
+   "epistemic": "stated",
+   "quote": "In Step 3, the $\\mathcal{D}_i$ distributions are distribution of emails from Avocado dataset (instead of Enron).",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c9",
+   "section": "4 Embedding Attack on a Text-Classification Model",
+   "chunk_char_start": 34208,
+   "id": "9dd6b9fc37fb16",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 35023,
+    "char_end": 35135,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "config",
+   "item": "classifier training procedure",
+   "value": "a dataset $D_c \\leftarrow \\mathcal{D}_c$ is sampled and then mapped to embedding space using $M$ to get $M(D_c)$ . Then a spam classifier is trained on $M(D_c)$ to get a linear classifier $C$ .",
+   "applicability": {
+    "subject": [
+     "Word2Vec"
+    ]
+   },
+   "role": "protocol",
+   "epistemic": "stated",
+   "quote": "In Step 7, after training Word2vec model $M$ , a dataset $D_c \\leftarrow \\mathcal{D}_c$ is sampled and then mapped to embedding space using $M$ to get $M(D_c)$ . Then a spam classifier is trained on $M(D_c)$ to get a linear classifier $C$ .",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c9",
+   "section": "4 Embedding Attack on a Text-Classification Model",
+   "chunk_char_start": 34208,
+   "id": "1413ef0cabe8fc",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 35141,
+    "char_end": 35381,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "config",
+   "item": "query target",
+   "value": "classifier $C$",
+   "applicability": {},
+   "role": "protocol",
+   "epistemic": "stated",
+   "quote": "In Step 8, the attacker adaptively queries the classifier $C$ (instead of the Embedding model) and prepares a set of query documents (instead of query words) using Algorithm 3.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c9",
+   "section": "4 Embedding Attack on a Text-Classification Model",
+   "chunk_char_start": 34208,
+   "id": "6d949cf925f074",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 35387,
+    "char_end": 35563,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The main goal of the design of the classification attack is to extract the information from the embedding attack described in Section 3.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "The main goal of the design of our classification attack is to extract the information from the embedding attack described in Section 3.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c9",
+   "section": "4 Embedding Attack on a Text-Classification Model",
+   "chunk_char_start": 34208,
+   "id": "eca66216a83f64",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 35713,
+    "char_end": 35849,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "If word $w_{i}$ and $w_{j}$ are close together in the embedding space, they are expected to have similar behavior in changing the prediction of the classifier.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "Specifically, if word $w_{i}$ and $w_{j}$ are close together in the embedding space, we expect them to have similar behavior in changing the prediction of the classifier.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c9",
+   "section": "4 Embedding Attack on a Text-Classification Model",
+   "chunk_char_start": 34208,
+   "id": "7cde170cdbe2cb",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 36213,
+    "char_end": 36383,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The measure based on threshold comparison has enough information to make the attack succeed with proper shadow model training, although it is different from the distance of the words in the embedding space.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "Although this measure is different from the distance of the words in the embedding space, it still has enough information to make the attack succeed with proper shadow model training.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c9",
+   "section": "4 Embedding Attack on a Text-Classification Model",
+   "chunk_char_start": 34208,
+   "id": "55baaa063fc9b4",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 36384,
+    "char_end": 36567,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "config",
+   "item": "repetitions of word w",
+   "value": "0 \\leq j \\leq 5",
+   "applicability": {},
+   "role": "protocol",
+   "epistemic": "stated",
+   "quote": "For $q_{i}$ , each word $w$ in the set of word pairs $W$ and each $0 \\leq j \\leq 5$ , create a query point $q_{(w,i,j)}$ which is same as $q_{i}$ with the difference that it is appended with $i$ repetitions of word $w$ .",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c11",
+   "section": "Input: A target data $D^{*}$",
+   "chunk_char_start": 36633,
+   "id": "be5d0086106007",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 37472,
+    "char_end": 37692,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "config",
+   "item": "attack classifier",
+   "value": "Random forest classifier",
+   "applicability": {},
+   "role": "protocol",
+   "epistemic": "stated",
+   "quote": "Create a dataset $\\{(T_1, 1), \\ldots, (T_k, 1), (T_1', 0), (T_k', 0)\\}$ and train an attack classifier $l$ on this dataset using a Random forest classifier.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c11",
+   "section": "Input: A target data $D^{*}$",
+   "chunk_char_start": 36633,
+   "id": "c7f6816cb38490",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 37844,
+    "char_end": 38000,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "config",
+   "item": "embedding dimension and LSTM hidden-representation size",
+   "value": "500",
+   "applicability": {
+    "subject": [],
+    "variant": [
+     "2-LAYER LSTM"
+    ]
+   },
+   "role": "used_in_experiment",
+   "epistemic": "stated",
+   "quote": "We set both the embedding dimension and LSTM hidden-representation size to 500 (gives around 50 million parameters).",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c15",
+   "section": "5.1 Attack as per the Security Experiment",
+   "chunk_char_start": 42022,
+   "id": "b4da743c4d2c11",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "dims_new": {
+    "applicability.subject": [
+     "LSTM"
+    ]
+   },
+   "loc": {
+    "char_start": 43191,
+    "char_end": 43307,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "config",
+   "item": "lasso parameter",
+   "value": "0.1",
+   "applicability": {},
+   "role": "used_in_experiment",
+   "epistemic": "stated",
+   "quote": "uses lasso parameter 0.1 to come up with the set of words",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c12",
+   "section": "Algorithm 4 Membership inference on the target classification model.",
+   "chunk_char_start": 38070,
+   "id": "5976b353a56827",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 39069,
+    "char_end": 39126,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The variant of the attack where the same data is used for classification and embedding is expected to be more successful due to less entropy.",
+   "target_ref": null,
+   "condition": {
+    "setup": []
+   },
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "This variant of the attack has less entropy and the attack is expected to be more successful.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c12",
+   "section": "Algorithm 4 Membership inference on the target classification model.",
+   "chunk_char_start": 38070,
+   "id": "c5a1c79c89ae50",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "dims_new": {
+    "condition.setup": [
+     "same data for classification and embedding"
+    ]
+   },
+   "loc": {
+    "char_start": 39977,
+    "char_end": 40070,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "result",
+   "measure": {
+    "metric": "ATTACK ACCURACY",
+    "value": "0.65±8.15",
+    "unit": null,
+    "direction": "higher_better",
+    "aggregation": "mean",
+    "timepoint": null
+   },
+   "role": "main_result",
+   "delta": null,
+   "dims": {
+    "subject": "Avocado dataset",
+    "setup": [
+     "label-only access"
+    ],
+    "budget": "10",
+    "variant": "BASELINE 1"
+   },
+   "epistemic": "demonstrated",
+   "quote": "<tr><td>10</td><td>0.65±8.15</td></tr>",
+   "table_header": "<tr><td>TARGET DATASET SIZE</td><td>ATTACK ACCURACY</td></tr>",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c12",
+   "section": "Algorithm 4 Membership inference on the target classification model.",
+   "chunk_char_start": 38070,
+   "id": "ee4766d190a564",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 40193,
+    "char_end": 40231,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "result",
+   "measure": {
+    "metric": "ATTACK ACCURACY",
+    "value": "0.69±5.08",
+    "unit": null,
+    "direction": "higher_better",
+    "aggregation": "mean",
+    "timepoint": null
+   },
+   "role": "main_result",
+   "delta": null,
+   "dims": {
+    "subject": "Avocado dataset",
+    "setup": [
+     "label-only access"
+    ],
+    "budget": "100",
+    "variant": "BASELINE 1"
+   },
+   "epistemic": "demonstrated",
+   "quote": "<tr><td>100</td><td>0.69±5.08</td></tr>",
+   "table_header": "<tr><td>TARGET DATASET SIZE</td><td>ATTACK ACCURACY</td></tr>",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c12",
+   "section": "Algorithm 4 Membership inference on the target classification model.",
+   "chunk_char_start": 38070,
+   "id": "1a5cb7294ffde6",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 40231,
+    "char_end": 40270,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "result",
+   "measure": {
+    "metric": "ATTACK ACCURACY",
+    "value": "0.79±3.75",
+    "unit": null,
+    "direction": "higher_better",
+    "aggregation": "mean",
+    "timepoint": null
+   },
+   "role": "main_result",
+   "delta": null,
+   "dims": {
+    "subject": "Avocado dataset",
+    "setup": [
+     "label-only access"
+    ],
+    "budget": "1000",
+    "variant": "BASELINE 1"
+   },
+   "epistemic": "demonstrated",
+   "quote": "<tr><td>1000</td><td>0.79±3.75</td></tr>",
+   "table_header": "<tr><td>TARGET DATASET SIZE</td><td>ATTACK ACCURACY</td></tr>",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c12",
+   "section": "Algorithm 4 Membership inference on the target classification model.",
+   "chunk_char_start": 38070,
+   "id": "6addb2e9dafee7",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 40270,
+    "char_end": 40310,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "result",
+   "measure": {
+    "metric": "ATTACK ACCURACY",
+    "value": "0.77±5.12",
+    "unit": null,
+    "direction": "higher_better",
+    "aggregation": "mean",
+    "timepoint": null
+   },
+   "role": "main_result",
+   "delta": null,
+   "dims": {
+    "subject": "Avocado dataset",
+    "setup": [
+     "label-only access"
+    ],
+    "budget": "10",
+    "variant": "BASELINE 2"
+   },
+   "epistemic": "demonstrated",
+   "quote": "<tr><td>10</td><td>0.77±5.12</td></tr>",
+   "table_header": "<tr><td>TARGET DATASET SIZE</td><td>ATTACK ACCURACY</td></tr>",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c12",
+   "section": "Algorithm 4 Membership inference on the target classification model.",
+   "chunk_char_start": 38070,
+   "id": "9f8a53bb7f7181",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 40587,
+    "char_end": 40625,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "result",
+   "measure": {
+    "metric": "ATTACK ACCURACY",
+    "value": "0.84±2.35",
+    "unit": null,
+    "direction": "higher_better",
+    "aggregation": "mean",
+    "timepoint": null
+   },
+   "role": "main_result",
+   "delta": null,
+   "dims": {
+    "subject": "Avocado dataset",
+    "setup": [
+     "label-only access"
+    ],
+    "budget": "100",
+    "variant": "BASELINE 2"
+   },
+   "epistemic": "demonstrated",
+   "quote": "<tr><td>100</td><td>0.84±2.35</td></tr>",
+   "table_header": "<tr><td>TARGET DATASET SIZE</td><td>ATTACK ACCURACY</td></tr>",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c12",
+   "section": "Algorithm 4 Membership inference on the target classification model.",
+   "chunk_char_start": 38070,
+   "id": "db4ef24d8ad63e",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 40625,
+    "char_end": 40664,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "result",
+   "measure": {
+    "metric": "ATTACK ACCURACY",
+    "value": "0.91±1.78",
+    "unit": null,
+    "direction": "higher_better",
+    "aggregation": "mean",
+    "timepoint": null
+   },
+   "role": "main_result",
+   "delta": null,
+   "dims": {
+    "subject": "Avocado dataset",
+    "setup": [
+     "label-only access"
+    ],
+    "budget": "1000",
+    "variant": "BASELINE 2"
+   },
+   "epistemic": "demonstrated",
+   "quote": "<tr><td>1000</td><td>0.91±1.78</td></tr>",
+   "table_header": "<tr><td>TARGET DATASET SIZE</td><td>ATTACK ACCURACY</td></tr>",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c12",
+   "section": "Algorithm 4 Membership inference on the target classification model.",
+   "chunk_char_start": 38070,
+   "id": "30bfbdd251b216",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 40664,
+    "char_end": 40704,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "result",
+   "measure": {
+    "metric": "CLASSIFICATIONACCURACY (TRAIN)",
+    "value": "95.18 \\pm 2.12",
+    "unit": "%",
+    "direction": "higher_better",
+    "aggregation": "mean",
+    "timepoint": null
+   },
+   "role": "baseline_comparison",
+   "delta": null,
+   "dims": {
+    "subject": "Enron email distribution",
+    "variant": "SVM"
+   },
+   "epistemic": "demonstrated",
+   "quote": "<tr><td>SVM</td><td>ENRON</td><td> $95.18 \\pm 2.12$ </td><td> $94.27 \\pm 1.05$ </td></tr>",
+   "table_header": "<tr><td>MODEL</td><td>EMBEDDING DATASET</td><td>CLASSIFICATIONACCURACY (TRAIN)</td><td>CLASSIFICATIONACCURACY (TEST)</td></tr>",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c12",
+   "section": "Algorithm 4 Membership inference on the target classification model.",
+   "chunk_char_start": 38070,
+   "id": "8d76697e051151",
+   "method_ref": {
+    "surface": "SVM",
+    "canonical": null,
+    "entity_id": null
+   },
+   "loc": {
+    "char_start": 41035,
+    "char_end": 41124,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "result",
+   "measure": {
+    "metric": "CLASSIFICATIONACCURACY (TEST)",
+    "value": "94.27 \\pm 1.05",
+    "unit": "%",
+    "direction": "higher_better",
+    "aggregation": "mean",
+    "timepoint": null
+   },
+   "role": "baseline_comparison",
+   "delta": null,
+   "dims": {
+    "subject": "Enron email distribution",
+    "variant": "SVM"
+   },
+   "epistemic": "demonstrated",
+   "quote": "<tr><td>SVM</td><td>ENRON</td><td> $95.18 \\pm 2.12$ </td><td> $94.27 \\pm 1.05$ </td></tr>",
+   "table_header": "<tr><td>MODEL</td><td>EMBEDDING DATASET</td><td>CLASSIFICATIONACCURACY (TRAIN)</td><td>CLASSIFICATIONACCURACY (TEST)</td></tr>",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c12",
+   "section": "Algorithm 4 Membership inference on the target classification model.",
+   "chunk_char_start": 38070,
+   "id": "335784e19b9b20",
+   "method_ref": {
+    "surface": "SVM",
+    "canonical": null,
+    "entity_id": null
+   },
+   "loc": {
+    "char_start": 41035,
+    "char_end": 41124,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "result",
+   "measure": {
+    "metric": "CLASSIFICATIONACCURACY (TRAIN)",
+    "value": "93.98 \\pm 1.95",
+    "unit": "%",
+    "direction": "higher_better",
+    "aggregation": "mean",
+    "timepoint": null
+   },
+   "role": "baseline_comparison",
+   "delta": null,
+   "dims": {
+    "subject": "Avocado dataset",
+    "variant": "SVM"
+   },
+   "epistemic": "demonstrated",
+   "quote": "<tr><td>SVM</td><td>AVOCADO</td><td> $93.98 \\pm 1.95$ </td><td> $93.34 \\pm 1.08$ </td></tr>",
+   "table_header": "<tr><td>MODEL</td><td>EMBEDDING DATASET</td><td>CLASSIFICATIONACCURACY (TRAIN)</td><td>CLASSIFICATIONACCURACY (TEST)</td></tr>",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c12",
+   "section": "Algorithm 4 Membership inference on the target classification model.",
+   "chunk_char_start": 38070,
+   "id": "f2e8a3d806c68a",
+   "method_ref": {
+    "surface": "SVM",
+    "canonical": null,
+    "entity_id": null
+   },
+   "loc": {
+    "char_start": 41124,
+    "char_end": 41215,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "result",
+   "measure": {
+    "metric": "CLASSIFICATIONACCURACY (TEST)",
+    "value": "93.34 \\pm 1.08",
+    "unit": "%",
+    "direction": "higher_better",
+    "aggregation": "mean",
+    "timepoint": null
+   },
+   "role": "baseline_comparison",
+   "delta": null,
+   "dims": {
+    "subject": "Avocado dataset",
+    "variant": "SVM"
+   },
+   "epistemic": "demonstrated",
+   "quote": "<tr><td>SVM</td><td>AVOCADO</td><td> $93.98 \\pm 1.95$ </td><td> $93.34 \\pm 1.08$ </td></tr>",
+   "table_header": "<tr><td>MODEL</td><td>EMBEDDING DATASET</td><td>CLASSIFICATIONACCURACY (TRAIN)</td><td>CLASSIFICATIONACCURACY (TEST)</td></tr>",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c12",
+   "section": "Algorithm 4 Membership inference on the target classification model.",
+   "chunk_char_start": 38070,
+   "id": "bf42dfeed87061",
+   "method_ref": {
+    "surface": "SVM",
+    "canonical": null,
+    "entity_id": null
+   },
+   "loc": {
+    "char_start": 41124,
+    "char_end": 41215,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "config",
+   "item": "learning rate",
+   "value": "1e-3",
+   "applicability": {
+    "subject": [],
+    "variant": [
+     "2-LAYER LSTM"
+    ]
+   },
+   "role": "used_in_experiment",
+   "epistemic": "stated",
+   "quote": "We use the Adam optimizer with the learning rate set to 1e-3 and batch size to 64.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c15",
+   "section": "5.1 Attack as per the Security Experiment",
+   "chunk_char_start": 42022,
+   "id": "f71ff28f73030a",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "dims_new": {
+    "applicability.subject": [
+     "LSTM"
+    ]
+   },
+   "loc": {
+    "char_start": 43393,
+    "char_end": 43475,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "config",
+   "item": "batch size",
+   "value": "64",
+   "applicability": {
+    "subject": [],
+    "variant": [
+     "2-LAYER LSTM"
+    ]
+   },
+   "role": "used_in_experiment",
+   "epistemic": "stated",
+   "quote": "We use the Adam optimizer with the learning rate set to 1e-3 and batch size to 64.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c15",
+   "section": "5.1 Attack as per the Security Experiment",
+   "chunk_char_start": 42022,
+   "id": "ec3f2813cbc428",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "dims_new": {
+    "applicability.subject": [
+     "LSTM"
+    ]
+   },
+   "loc": {
+    "char_start": 43393,
+    "char_end": 43475,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "config",
+   "item": "number of runs",
+   "value": "five",
+   "applicability": {
+    "subject": [],
+    "variant": [
+     "2-LAYER LSTM"
+    ]
+   },
+   "role": "used_in_experiment",
+   "epistemic": "stated",
+   "quote": "We repeat our experiments over five random runs.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c15",
+   "section": "5.1 Attack as per the Security Experiment",
+   "chunk_char_start": 42022,
+   "id": "d8ca8c1604899e",
+   "method_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "dims_new": {
+    "applicability.subject": [
+     "LSTM"
+    ]
+   },
+   "loc": {
+    "char_start": 43476,
+    "char_end": 43524,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The attack is label-only, using only the top-1 predictions of the model.",
+   "target_ref": null,
+   "condition": {
+    "setup": [
+     "label-only access"
+    ]
+   },
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "definition",
+   "quote": "our method only uses the top-1 predictions of the model, i.e. our attack is label-only",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c15",
+   "section": "5.1 Attack as per the Security Experiment",
+   "chunk_char_start": 42022,
+   "id": "3b7023db8c1d42",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 43885,
+    "char_end": 43971,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The attack does not require any shadow training.",
+   "condition": null,
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "Another advantage of our attack is that it does not require any shadow training as opposed to Song and Shmatikov (2019)",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c15",
+   "section": "5.1 Attack as per the Security Experiment",
+   "chunk_char_start": 42022,
+   "id": "e804a830a99693",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "target_ref_ref": {
+    "surface": "Song and Shmatikov (2019)",
+    "canonical": "Song and Shmatikov (2019)",
+    "entity_id": "6c83ccfafceb"
+   },
+   "loc": {
+    "char_start": 44403,
+    "char_end": 44522,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "Membership Inference on Word Embedding attack is query-efficient because it uses a curated list of word pairs, substantially reducing the number of queries to the model compared to Song and Shmatikov (2019).",
+   "condition": {
+    "setup": [
+     "label-only access"
+    ]
+   },
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "We point out another advantage of our method that it is query-efficient in the sense that it uses a curated list of word pairs, therefore, this substantially reduces the number of queries to the model compared to Song and Shmatikov (2019).",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c16",
+   "section": "5.2 Attack results",
+   "chunk_char_start": 48665,
+   "id": "fa8d37406401e3",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "target_ref_ref": {
+    "surface": "Song and Shmatikov (2019)",
+    "canonical": "Song and Shmatikov (2019)",
+    "entity_id": "6c83ccfafceb"
+   },
+   "loc": {
+    "char_start": 50048,
+    "char_end": 50287,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The attack in Song and Shmatikov (2019) under label-only access without shadow model training results in all-member prediction because it uses all word pairs in a user's data.",
+   "target_ref": null,
+   "condition": {
+    "setup": [
+     "label-only access"
+    ]
+   },
+   "strength": "stated",
+   "epistemic": "cited",
+   "claim_type": "mechanism",
+   "quote": "Without the latter step, the attack would naturally result in all-member prediction since the attack essentially uses all word pairs in a user's data and each user has at least one word pair satisfying the required condition.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c16",
+   "section": "5.2 Attack results",
+   "chunk_char_start": 48665,
+   "id": "f6827b4b1ba170",
+   "scope_ref_ref": {
+    "surface": "Song and Shmatikov (2019)",
+    "canonical": "Song and Shmatikov (2019)",
+    "entity_id": "6c83ccfafceb"
+   },
+   "loc": {
+    "char_start": 49687,
+    "char_end": 49912,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "Excluding common word pairs using the GloVe public dictionary improves attack performance but still substantially falls short of the proposed attack.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "demonstrated",
+   "epistemic": "demonstrated",
+   "claim_type": "qualitative_ablation",
+   "quote": "Although this improved the attack performance as expected, it still substantially falls short of our attack.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c16",
+   "section": "5.2 Attack results",
+   "chunk_char_start": 48665,
+   "id": "2c7cf0e727006b",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 50724,
+    "char_end": 50832,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The attack based on Word2Vec embedding transfers through the LSTM-based language model, which trains its own embeddings different from Word2Vec.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "We finally highlight the fact that our attack, which is based on Word2Vec embedding, transfers through the LSTM-based language model, which trains its own embeddings different from Word2Vec.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c16",
+   "section": "5.2 Attack results",
+   "chunk_char_start": 48665,
+   "id": "c2ed0b20b67690",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 50982,
+    "char_end": 51172,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "Successful prediction of rare words provides strong signal for membership inference.",
+   "scope_ref": null,
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "cited",
+   "claim_type": "mechanism",
+   "quote": "As noted in Song and Shmatikov (2019) successful prediction of rare words provide strong signal for membership inference.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c16",
+   "section": "5.2 Attack results",
+   "chunk_char_start": 48665,
+   "id": "9ed559846fed85",
+   "loc": {
+    "char_start": 50602,
+    "char_end": 50723,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "Deep learning models can achieve perfect accuracy even on randomly labeled data.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "cited",
+   "claim_type": "observation",
+   "quote": "In general, it is known that deep learning models can achieve perfect accuracy even on randomly labeled data (Zhang et al., 2017).",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c17",
+   "section": "6 Related work",
+   "chunk_char_start": 51390,
+   "id": "722638b0a6ca8a",
+   "scope_ref_ref": {
+    "surface": "deep learning models",
+    "canonical": null,
+    "entity_id": null
+   },
+   "loc": {
+    "char_start": 52814,
+    "char_end": 52944,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "Strong memorization ability may be required to achieve near-optimal accuracy on test data when the data distribution is long-tailed.",
+   "target_ref": null,
+   "condition": {
+    "setup": []
+   },
+   "strength": "stated",
+   "epistemic": "cited",
+   "claim_type": "mechanism",
+   "quote": "Strong memorization ability may actually be required to achieve near-optimal accuracy on test data when the data distribution is long-tailed as recently shown by Feldman (2020); Brown et al. (2020).",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c17",
+   "section": "6 Related work",
+   "chunk_char_start": 51390,
+   "id": "9851cfd67d2bdc",
+   "scope_ref_ref": {
+    "surface": "machine learning models",
+    "canonical": null,
+    "entity_id": null
+   },
+   "dims_new": {
+    "condition.setup": [
+     "long-tailed data distribution"
+    ]
+   },
+   "loc": {
+    "char_start": 52945,
+    "char_end": 53143,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "Individual training examples from the GPT-2 language model can be recovered verbatim.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "cited",
+   "claim_type": "observation",
+   "quote": "Carlini et al. (2020) demonstrated that individual training examples from the GPT-2 language model (Radford et al., 2019) can be recovered verbatim.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c17",
+   "section": "6 Related work",
+   "chunk_char_start": 51390,
+   "id": "b12e20acc878c8",
+   "scope_ref_ref": {
+    "surface": "GPT-2",
+    "canonical": "GPT-2",
+    "entity_id": "236d36773735"
+   },
+   "loc": {
+    "char_start": 53251,
+    "char_end": 53399,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "By having simultaneous black box access to the pre-trained and fine-tuned language models, rare sequences from the fine-tuning dataset can be extracted successfully.",
+   "target_ref": null,
+   "condition": {
+    "setup": [
+     "black-box access"
+    ]
+   },
+   "strength": "stated",
+   "epistemic": "cited",
+   "claim_type": "observation",
+   "quote": "In a transfer learning setup, Zanella-Béguelin et al. (2020) have shown that by having simultaneous black box access to the pre-trained and fine-tuned language models, rare sequences from the typically more sensitive fine-tuning dataset can be extracted successfully.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c17",
+   "section": "6 Related work",
+   "chunk_char_start": 51390,
+   "id": "4748159c58edb6",
+   "scope_ref_ref": {
+    "surface": "language models",
+    "canonical": null,
+    "entity_id": null
+   },
+   "loc": {
+    "char_start": 53400,
+    "char_end": 53667,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "In a membership inference attack, the goal is to determine if a particular data point or a targeted user belongs to the training set of the model.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "definition",
+   "quote": "In a membership inference attack, the goal is to determine if a particular data point or a targeted user belongs to the training set of the model.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c17",
+   "section": "6 Related work",
+   "chunk_char_start": 51390,
+   "id": "0d17a4c855721c",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 54147,
+    "char_end": 54293,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "Song and Raghunathan (2020) considers three types of attacks: embedding inversion, sensitive attribute inference, and membership inference (MI).",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "cited",
+   "claim_type": "definition",
+   "quote": "In Song and Raghunathan (2020), the authors consider three types of attacks: 1) embedding inversion 2) sensitive attribute inference and 3) membership inference (MI).",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c18",
+   "section": "6.1 Comparison with Song and Raghunathan (2020)",
+   "chunk_char_start": 55043,
+   "id": "c2429306832709",
+   "scope_ref_ref": {
+    "surface": "Song and Raghunathan (2020)",
+    "canonical": "Song and Raghunathan (2020)",
+    "entity_id": "7e61e9f32824"
+   },
+   "loc": {
+    "char_start": 55094,
+    "char_end": 55260,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "In Song and Raghunathan (2020), the adversary has access to some auxiliary data labeled with membership.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "cited",
+   "claim_type": "mechanism",
+   "quote": "In the MI attack in Song and Raghunathan (2020), the attacker has access to some auxiliary data labeled with membership.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c18",
+   "section": "6.1 Comparison with Song and Raghunathan (2020)",
+   "chunk_char_start": 55043,
+   "id": "c116623a3b745f",
+   "scope_ref_ref": {
+    "surface": "Song and Raghunathan (2020)",
+    "canonical": "Song and Raghunathan (2020)",
+    "entity_id": "7e61e9f32824"
+   },
+   "loc": {
+    "char_start": 57169,
+    "char_end": 57289,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "In Song and Raghunathan (2020), the adversary's advantage increases as the central word in the 5-window context becomes rarer.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "cited",
+   "claim_type": "mechanism",
+   "quote": "Moreover, in their attack, they show that their adversary's advantage increases as the central word in the 5-window context becomes rarer.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c18",
+   "section": "6.1 Comparison with Song and Raghunathan (2020)",
+   "chunk_char_start": 55043,
+   "id": "635280a8420cb5",
+   "scope_ref_ref": {
+    "surface": "Song and Raghunathan (2020)",
+    "canonical": "Song and Raghunathan (2020)",
+    "entity_id": "7e61e9f32824"
+   },
+   "loc": {
+    "char_start": 57290,
+    "char_end": 57428,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The success of the attack in Song and Raghunathan (2020) requires the adversary to pick a context whose central word is rare in the training distribution.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "cited",
+   "claim_type": "mechanism",
+   "quote": "Therefore, the success of the attack requires the adversary to pick a context whose central word is rare in the training distribution, which implicitly assumes that the adversary has enough knowledge of the training distribution to find these rare words.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c18",
+   "section": "6.1 Comparison with Song and Raghunathan (2020)",
+   "chunk_char_start": 55043,
+   "id": "d3b8778ddb45bd",
+   "scope_ref_ref": {
+    "surface": "Song and Raghunathan (2020)",
+    "canonical": "Song and Raghunathan (2020)",
+    "entity_id": "7e61e9f32824"
+   },
+   "loc": {
+    "char_start": 57429,
+    "char_end": 57683,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The attack in Song and Raghunathan (2020) is threshold based, measuring average cosine similarity of all word pairs in the context against a certain threshold.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "cited",
+   "claim_type": "mechanism",
+   "quote": "The attack defined in Song and Raghunathan (2020) is threshold based: they measure average cosine similarity of all word pairs in the context and sees if it is over a certain threshold.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c18",
+   "section": "6.1 Comparison with Song and Raghunathan (2020)",
+   "chunk_char_start": 55043,
+   "id": "cbe4fca77b577c",
+   "scope_ref_ref": {
+    "surface": "Song and Raghunathan (2020)",
+    "canonical": "Song and Raghunathan (2020)",
+    "entity_id": "7e61e9f32824"
+   },
+   "loc": {
+    "char_start": 58604,
+    "char_end": 58789,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "Song and Raghunathan (2020) does not discuss how the threshold is computed in their experiment.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "cited",
+   "claim_type": "criticism",
+   "quote": "However, in the experiment they do not discuss how they compute the threshold.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c18",
+   "section": "6.1 Comparison with Song and Raghunathan (2020)",
+   "chunk_char_start": 55043,
+   "id": "68eaa2cc116a3a",
+   "scope_ref_ref": {
+    "surface": "Song and Raghunathan (2020)",
+    "canonical": "Song and Raghunathan (2020)",
+    "entity_id": "7e61e9f32824"
+   },
+   "loc": {
+    "char_start": 58790,
+    "char_end": 58868,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The attack in Song and Raghunathan (2020) is fundamentally based on the insight that rarer words are memorized more.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "cited",
+   "claim_type": "mechanism",
+   "quote": "The attack in Song and Raghunathan (2020) is fundamentally based on the insight that rarer words are memorized more.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c18",
+   "section": "6.1 Comparison with Song and Raghunathan (2020)",
+   "chunk_char_start": 55043,
+   "id": "7c0230bfe2cd21",
+   "scope_ref_ref": {
+    "surface": "Song and Raghunathan (2020)",
+    "canonical": "Song and Raghunathan (2020)",
+    "entity_id": "7e61e9f32824"
+   },
+   "loc": {
+    "char_start": 59266,
+    "char_end": 59382,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The definition of MI in Song and Raghunathan (2020) is limited because the attack is very tied to the length of the input.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "cited",
+   "claim_type": "criticism",
+   "quote": "This definition, while interesting, is a little limited, in that the attack is very tied to the length of the input.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c18",
+   "section": "6.1 Comparison with Song and Raghunathan (2020)",
+   "chunk_char_start": 55043,
+   "id": "cfd53fabb0dbf2",
+   "scope_ref_ref": {
+    "surface": "Song and Raghunathan (2020)",
+    "canonical": "Song and Raghunathan (2020)",
+    "entity_id": "7e61e9f32824"
+   },
+   "loc": {
+    "char_start": 56606,
+    "char_end": 56722,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The attack in Membership Inference on Word Embedding does not require the adversary to have access to any auxiliary labeled data.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "This is in contrast to ours, where the adversary does not have access to any auxiliary labeled data.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c18",
+   "section": "6.1 Comparison with Song and Raghunathan (2020)",
+   "chunk_char_start": 55043,
+   "id": "3d89c0b3615c61",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 57783,
+    "char_end": 57883,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "In Membership Inference on Word Embedding, the adversary does not need sample access to the exact training distribution of the target model; access to a similar distribution can be sufficient.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "In fact, we show that, the adversary does not even need sample access to the exact training distribution of the target model; access to a similar distribution can be sufficient.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c18",
+   "section": "6.1 Comparison with Song and Raghunathan (2020)",
+   "chunk_char_start": 55043,
+   "id": "6e9f3467a0f443",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 57884,
+    "char_end": 58061,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The attack in Membership Inference on Word Embedding is successful for input data drawn from real datasets.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "observation",
+   "quote": "Our analysis, in contrast, shows that our attack is successful for input data drawn from real datasets.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c18",
+   "section": "6.1 Comparison with Song and Raghunathan (2020)",
+   "chunk_char_start": 55043,
+   "id": "99244b08f4ea86",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 58478,
+    "char_end": 58581,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "In Membership Inference on Word Embedding, the thresholds used in attacks are specified exactly how they would be computed.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "In contrast to this, in our attacks that use thresholds, we specify exactly how the thresholds would be computed, so this cost is already included in the analysis of our attack.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c18",
+   "section": "6.1 Comparison with Song and Raghunathan (2020)",
+   "chunk_char_start": 55043,
+   "id": "6c169e133208ae",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 58970,
+    "char_end": 59147,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The text-generative model attack in Membership Inference on Word Embedding does not require a threshold.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "Our text-generative model attack has the advantage that it doesn't require a threshold.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c18",
+   "section": "6.1 Comparison with Song and Raghunathan (2020)",
+   "chunk_char_start": 55043,
+   "id": "f25add9f197fa0",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 59148,
+    "char_end": 59235,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The attack in Membership Inference on Word Embedding exploits the property that a good embedding is expected to capture semantic relationships between words.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "We exploit the following property of embedding: a good embedding is expected to capture semantic relationships between words.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c18",
+   "section": "6.1 Comparison with Song and Raghunathan (2020)",
+   "chunk_char_start": 55043,
+   "id": "40a17d0feff9f5",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 59664,
+    "char_end": 59789,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "Word embeddings are vulnerable to black-box membership inference attack.",
+   "target_ref": null,
+   "condition": {
+    "setup": [
+     "black-box access"
+    ]
+   },
+   "strength": "demonstrated",
+   "epistemic": "demonstrated",
+   "claim_type": "observation",
+   "quote": "First we show that word embeddings are vulnerable to black-box membership inference attack.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c19",
+   "section": "7 Conclusion",
+   "chunk_char_start": 60074,
+   "id": "5f9ac7e0a3b514",
+   "scope_ref_ref": {
+    "surface": "word embedding",
+    "canonical": null,
+    "entity_id": null
+   },
+   "loc": {
+    "char_start": 60223,
+    "char_end": 60314,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The attacks exploit the property of word embeddings preserving semantic relationship of words.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "mechanism",
+   "quote": "Our attacks exploit a property of word embeddings (preserving semantic relationship of words), which is widely believed to be a property of a good embedding function.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c19",
+   "section": "7 Conclusion",
+   "chunk_char_start": 60074,
+   "id": "5957fcc03ea1c9",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 60495,
+    "char_end": 60661,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "The proposed attack provides a cheaper membership inference on text-generative models that does not require expensive training of shadow models.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "observation",
+   "quote": "A secondary contribution of our attack is a cheaper membership inference on text-generative models, which does not require any expensive training of text-generative models as shadow models.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c19",
+   "section": "7 Conclusion",
+   "chunk_char_start": 60074,
+   "id": "43be91d46840b5",
+   "scope_ref_ref": {
+    "surface": "Membership Inference on Word Embedding",
+    "canonical": "Membership Inference on Word Embedding",
+    "entity_id": "a2ca1f4ae23b"
+   },
+   "loc": {
+    "char_start": 60759,
+    "char_end": 60948,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "Applying differential privacy in training protects the model as a whole, including the embedding layer.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "stated",
+   "claim_type": "recommendation",
+   "quote": "Applying differential privacy (Dwork, 2011) in training (Abadi et al., 2016) will protect the model as a whole, hence including the embedding layer.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c19",
+   "section": "7 Conclusion",
+   "chunk_char_start": 60074,
+   "id": "36cc8e98a39fc1",
+   "scope_ref_ref": {
+    "surface": "differential privacy",
+    "canonical": null,
+    "entity_id": null
+   },
+   "loc": {
+    "char_start": 61222,
+    "char_end": 61370,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "finding",
+   "claim": "Differentially private model training is substantially slower and may negatively affect model utility.",
+   "target_ref": null,
+   "condition": {},
+   "strength": "stated",
+   "epistemic": "cited",
+   "claim_type": "criticism",
+   "quote": "but differentially private model training is substantially slower in comparison and may affect the utility of the model negatively (Bagdasaryan et al., 2019).",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c19",
+   "section": "7 Conclusion",
+   "chunk_char_start": 60074,
+   "id": "6f8ab176b7a7f3",
+   "scope_ref_ref": {
+    "surface": "differential privacy",
+    "canonical": null,
+    "entity_id": null
+   },
+   "loc": {
+    "char_start": 61430,
+    "char_end": 61588,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "absence",
+   "subject": "MI attack on text-generative models",
+   "missing": "Evaluation on transformer-based models",
+   "absence_type": "explicitly_stated",
+   "evidence": "Authors state they expect generalization but do not test it.",
+   "quote": "The second is to apply our attack to other models such as those based on transformers.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#absence",
+   "section": "(whole-text)",
+   "chunk_char_start": 0,
+   "id": "8c3525a1f6b933",
+   "loc": {
+    "char_start": 61965,
+    "char_end": 62051,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "absence",
+   "subject": "Defenses (differential privacy/heuristic)",
+   "missing": "Effectiveness measurement against the proposed attack",
+   "absence_type": "explicitly_stated",
+   "evidence": "Authors list this as future work, implying it was not done in this paper.",
+   "quote": "The first one is to measure the effectiveness of heuristic defenses or differential privacy with realistic privacy budget in defending against our attack.",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#absence",
+   "section": "(whole-text)",
+   "chunk_char_start": 0,
+   "id": "4d8387e4a1280d",
+   "loc": {
+    "char_start": 61810,
+    "char_end": 61964,
+    "match": "normalized"
+   }
+  },
+  {
+   "kind": "absence",
+   "subject": "Word2Vec attack (Section 3)",
+   "missing": "Comparison with Song and Raghunathan (2020) baseline",
+   "absence_type": "not_reported",
+   "evidence": "Section 3.2 and Figures 3-5 report only 'success of the attack' for the proposed method. No baseline columns or rows for Song and Raghunathan (2020) are present in the experimental results for the embedding attack.",
+   "quote": "",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#absence",
+   "section": "(whole-text)",
+   "chunk_char_start": 0,
+   "id": "fa720d213f049c"
+  },
+  {
+   "kind": "absence",
+   "subject": "Spam classifier attack (Section 4)",
+   "missing": "Comparison with Song and Raghunathan (2020) baseline",
+   "absence_type": "not_reported",
+   "evidence": "Tables 1, 2, and 3 report only 'ATTACK ACCURACY' for the proposed method and 'CLASSIFICATION ACCURACY' for the target model. No baseline attack results are reported.",
+   "quote": "",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#absence",
+   "section": "(whole-text)",
+   "chunk_char_start": 0,
+   "id": "283f978cf9a0db"
+  },
+  {
+   "kind": "absence",
+   "subject": "LSTM-based language model attack (Section 5)",
+   "missing": "Comparison with Song and Shmatikov (2019) baseline",
+   "absence_type": "not_reported",
+   "evidence": "Table 5 reports 'OUR ATTACK', 'BASELINE 1' (all word pairs), and 'BASELINE 2' (GloVe filtered). The specific attack from Song and Shmatikov (2019) is discussed in text as requiring shadow models which the authors avoid, but its specific performance metric is not reported in the table for direct comparison.",
+   "quote": "",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#absence",
+   "section": "(whole-text)",
+   "chunk_char_start": 0,
+   "id": "0de40127b32aab"
+  }
+ ],
+ "overflow": [
+  {
+   "reason": "Experimental setup detail regarding data sampling and repetition protocol does not fit into config (not a parameter value) or finding (not a research claim).",
+   "quote": "We first sample 10 different target email sets from Enron distribution and for each target email set, we repeat the experiments security experiment 5 times.",
+   "kind": "overflow",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c7",
+   "section": "3.2 Attack results"
+  },
+  {
+   "reason": "Data preprocessing protocol detail (dictionary replacement) is a procedural step, not a parameter or research finding.",
+   "quote": "We first preprocess the Enron and Avocado datasets by replacing all the words that are not in a public dictionary of words with a specific dummy word.",
+   "kind": "overflow",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c7",
+   "section": "3.2 Attack results"
+  },
+  {
+   "reason": "Table data (Table 4 and Table 5) contains specific performance metrics (PPL, Accuracy, Precision, Recall) which do not fit the allowed record types (config, finding, lineage, notation) as they are experimental results, not configurations, claims, relationships, or definitions.",
+   "quote": "<tr><td>2-LAYER LSTM</td><td>94.70±3.16</td><td>107.74±2.55</td></tr>",
+   "kind": "overflow",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c15",
+   "section": "5.1 Attack as per the Security Experiment"
+  },
+  {
+   "reason": "Table data (Table 5) contains specific attack performance metrics which do not fit the allowed record types.",
+   "quote": "<tr><td>OUR ATTACK</td><td>0.708±0.023</td><td>0.67±0.025</td><td>0.82±0.047</td></tr>",
+   "kind": "overflow",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c15",
+   "section": "5.1 Attack as per the Security Experiment"
+  },
+  {
+   "reason": "Table data (Table 5) contains specific baseline performance metrics which do not fit the allowed record types.",
+   "quote": "<tr><td>BASELINE 1</td><td>0.5±0.0</td><td>0.5±0.0</td><td>1.0±0.0</td></tr>",
+   "kind": "overflow",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c15",
+   "section": "5.1 Attack as per the Security Experiment"
+  },
+  {
+   "reason": "Table data (Table 5) contains specific baseline performance metrics which do not fit the allowed record types.",
+   "quote": "<tr><td>BASELINE 2</td><td>0.637±0.032</td><td>0.69±0.042</td><td>0.478±0.066</td></tr>",
+   "kind": "overflow",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c15",
+   "section": "5.1 Attack as per the Security Experiment"
+  },
+  {
+   "reason": "Dataset split details (number of users in D_target, D_shadow, D_in, D_out) are experimental setup details that do not fit the 'config' type (which is for model/protocol parameters) or 'finding' type (which is for claims/conclusions).",
+   "quote": "The dataset consists of 279 users. We split up the dataset in two parts: $D_{target}$ and $D_{shadow}$ where each part contains 100 users' data picked randomly from the dataset.",
+   "kind": "overflow",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "chunk_id": "Membership_Inference_on_Word_Embedding_and_Beyond#c15",
+   "section": "5.1 Attack as per the Security Experiment"
+  }
+ ],
+ "entity_queue": [
+  {
+   "surface": "Word embeddings",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "kind": "finding",
+   "field": "scope_ref"
+  },
+  {
+   "surface": "Membership Inference",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "kind": "finding",
+   "field": "scope_ref"
+  },
+  {
+   "surface": "Membership Inference",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "kind": "finding",
+   "field": "scope_ref"
+  },
+  {
+   "surface": "naive approach",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "kind": "finding",
+   "field": "scope_ref"
+  },
+  {
+   "surface": "word embedding",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "kind": "finding",
+   "field": "scope_ref"
+  },
+  {
+   "surface": "SVM",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "kind": "result",
+   "field": "method"
+  },
+  {
+   "surface": "SVM",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "kind": "result",
+   "field": "method"
+  },
+  {
+   "surface": "SVM",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "kind": "result",
+   "field": "method"
+  },
+  {
+   "surface": "SVM",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "kind": "result",
+   "field": "method"
+  },
+  {
+   "surface": "deep learning models",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "kind": "finding",
+   "field": "scope_ref"
+  },
+  {
+   "surface": "machine learning models",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "kind": "finding",
+   "field": "scope_ref"
+  },
+  {
+   "surface": "language models",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "kind": "finding",
+   "field": "scope_ref"
+  },
+  {
+   "surface": "word embedding",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "kind": "finding",
+   "field": "scope_ref"
+  },
+  {
+   "surface": "differential privacy",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "kind": "finding",
+   "field": "scope_ref"
+  },
+  {
+   "surface": "differential privacy",
+   "paper_id": "Membership_Inference_on_Word_Embedding_and_Beyond",
+   "kind": "finding",
+   "field": "scope_ref"
+  }
+ ]
+}
