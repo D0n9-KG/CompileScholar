@@ -1,0 +1,677 @@
+{
+ "PPR_D0538FA35432": {
+  "method_identity": {
+   "canonical_name": "Mamba",
+   "aliases": [
+    "Selective State Space Models",
+    "S6",
+    "Selective SSMs"
+   ],
+   "entity_type": "method"
+  },
+  "affiliations": [
+   "Machine Learning Department, Carnegie Mellon University",
+   "Department of Computer Science, Princeton University"
+  ],
+  "contributions": [
+   "Identify that a key weakness of such models is their inability to perform content-based reasoning",
+   "Letting the SSM parameters be functions of the input addresses their weakness with discrete modalities",
+   "Design a hardware-aware parallel algorithm in recurrent mode",
+   "Integrate these selective SSMs into a simplified end-to-end neural network architecture without attention or even MLP blocks (Mamba)",
+   "Mamba enjoys fast inference (5× higher throughput than Transformers) and linear scaling in sequence length",
+   "Mamba achieves state-of-the-art performance across several modalities such as language, audio, and genomics"
+  ],
+  "experimental_matrix": [
+   {
+    "subject": "Selective Copying",
+    "measures": [
+     "Acc."
+    ],
+    "variants": [
+     "S4",
+     "S6",
+     "H3",
+     "Hyena",
+     "Mamba"
+    ],
+    "where": "Table 1"
+   },
+   {
+    "subject": "Induction Heads",
+    "measures": [
+     "Accuracy"
+    ],
+    "variants": [
+     "MHA-Absolute",
+     "MHA-RoPE",
+     "MHA-xPos",
+     "H3",
+     "Hyena",
+     "Mamba",
+     "Random"
+    ],
+    "where": "Table 2"
+   },
+   {
+    "subject": "Language Modeling",
+    "measures": [
+     "Perplexity",
+     "FLOPs"
+    ],
+    "variants": [
+     "Hyena",
+     "RWKV",
+     "Transformer",
+     "RetNet",
+     "H3++",
+     "Transformer++",
+     "Mamba"
+    ],
+    "where": "Figure 4"
+   },
+   {
+    "subject": "Zero-shot Evaluations",
+    "measures": [
+     "Pile PPL",
+     "LAMBADA PPL",
+     "LAMBADA ACC",
+     "HELLASWAG ACC",
+     "PIQA ACC",
+     "ARC-E ACC",
+     "ARC-C ACC",
+     "WINOGRANDE ACC",
+     "AVERAGE ACC"
+    ],
+    "variants": [
+     "Hybrid H3",
+     "Pythia",
+     "Mamba",
+     "GPT-Neo",
+     "OPT",
+     "RWKV",
+     "GPT-J"
+    ],
+    "where": "Table 3"
+   },
+   {
+    "subject": "DNA Modeling",
+    "measures": [
+     "Perplexity"
+    ],
+    "variants": [
+     "HyenaDNA",
+     "Mamba",
+     "Transformer++"
+    ],
+    "where": "Figure 5"
+   },
+   {
+    "subject": "Great Apes DNA Classification",
+    "measures": [
+     "Accuracy"
+    ],
+    "variants": [
+     "HyenaDNA 1.4M",
+     "Mamba 1.4M",
+     "Mamba 7M",
+     "Random"
+    ],
+    "where": "Figure 6"
+   },
+   {
+    "subject": "Audio Pretraining",
+    "measures": [
+     "bits per byte (BPB)"
+    ],
+    "variants": [
+     "S4+FFN",
+     "Mamba"
+    ],
+    "where": "Figure 7"
+   },
+   {
+    "subject": "SC09",
+    "measures": [
+     "NLL",
+     "FID",
+     "IS",
+     "mIS",
+     "AM"
+    ],
+    "variants": [
+     "SampleRNN",
+     "WaveNet",
+     "SaShiMi",
+     "WaveGAN",
+     "DiffWave",
+     "Mamba"
+    ],
+    "where": "Table 4"
+   },
+   {
+    "subject": "SC09 Model Ablations",
+    "measures": [
+     "NLL",
+     "FID",
+     "IS",
+     "mIS",
+     "AM"
+    ],
+    "variants": [
+     "S4+MLP",
+     "MHA+MLP",
+     "Mamba"
+    ],
+    "where": "Table 5"
+   },
+   {
+    "subject": "Efficiency Benchmarks",
+    "measures": [
+     "Training speed",
+     "Inference throughput"
+    ],
+    "variants": [
+     "FlashAttention-2",
+     "Convolution",
+     "Scan (PyTorch)",
+     "Scan (ours)",
+     "Mamba",
+     "Transformer"
+    ],
+    "where": "Figure 8"
+   },
+   {
+    "subject": "Ablations: Architecture and SSM layer",
+    "measures": [
+     "Perplexity"
+    ],
+    "variants": [
+     "Hyena",
+     "H3",
+     "S4 (complex)",
+     "S4 (real)",
+     "S6",
+     "Mamba"
+    ],
+    "where": "Table 6"
+   },
+   {
+    "subject": "Ablations: Selective parameters",
+    "measures": [
+     "Perplexity"
+    ],
+    "variants": [
+     "Selective Δ",
+     "Selective B",
+     "Selective C"
+    ],
+    "where": "Table 7"
+   },
+   {
+    "subject": "Ablations: Parameterization of A",
+    "measures": [
+     "Perplexity"
+    ],
+    "variants": [
+     "S4D-Lin",
+     "S4D-Real",
+     "Random initialization"
+    ],
+    "where": "Table 8"
+   },
+   {
+    "subject": "Ablations: Expressivity of Δ",
+    "measures": [
+     "Perplexity",
+     "Params"
+    ],
+    "variants": [
+     "Size of Δ proj."
+    ],
+    "where": "Table 9"
+   },
+   {
+    "subject": "Ablations: SSM state dimension",
+    "measures": [
+     "Perplexity",
+     "Params"
+    ],
+    "variants": [
+     "Constant B and C",
+     "Selective B and C"
+    ],
+    "where": "Table 10"
+   }
+  ],
+  "figures_tables": [
+   {
+    "ref": "Figure 1",
+    "kind": "figure",
+    "caption": "(Overview.) Structured SSMs independently map each channel (e.g. D = 5) of an input x to output y through a higher dimensional latent state h (e.g. N = 4). Prior SSMs avoid materializing this large effective state (N times batch size B and sequence length L) through clever alternate computation paths requiring time-invariance: the (Δ, A, B, C) parameters are constant across time. Our selection mechanism adds back input-dependent dynamics, which also requires a careful hardware-aware algorithm to only materialize the expanded states in more efficient levels of the GPU memory hierarchy."
+   },
+   {
+    "ref": "Figure 2",
+    "kind": "figure",
+    "caption": "(Left) The standard version of the Copying task involves constant spacing between input and output elements and is easily solved by time-invariant models such as linear recurrences and global convolutions. (Right Top) The Selective Copying task has random spacing in between inputs and requires time-varying models that can selectively remember or ignore inputs depending on their content. (Right Bottom) The Induction Heads task is an example of associative recall that requires retrieving an answer based on context, a key ability for LLMs."
+   },
+   {
+    "ref": "Figure 3",
+    "kind": "figure",
+    "caption": "(Architecture.) Our simplified block design combines the H3 block, which is the basis of most SSM architectures, with the ubiquitous MLP block of modern neural networks. Instead of interleaving these two blocks, we simply repeat the Mamba block homogenously. Compared to the H3 block, Mamba replaces the first multiplicative gate with an activation function. Compared to the MLP block, Mamba adds an SSM to the main branch. For σ we use the SiLU / Swish activation (Hendrycks and Gimpel 2016; Ramachandran, Zoph, and Quoc V Le 2017)."
+   },
+   {
+    "ref": "Table 1",
+    "kind": "table",
+    "caption": "(Selective Copying.) Accuracy for combinations of architectures and inner sequence layers."
+   },
+   {
+    "ref": "Table 2",
+    "kind": "table",
+    "caption": "(Induction Heads.) Models are trained on sequence length 2^8 = 256, and tested on increasing sequence lengths of 2^6 = 64 up to 2^20 = 1048576. Full numbers in Table 11."
+   },
+   {
+    "ref": "Figure 4",
+    "kind": "figure",
+    "caption": "(Scaling Laws.) Models of size ≈ 125M to ≈ 1.3B parameters, trained on the Pile. Mamba scales better than all other attention-free models and is the first to match the performance of a very strong “Transformer++” recipe that has now become standard, particularly as the sequence length grows."
+   },
+   {
+    "ref": "Table 3",
+    "kind": "table",
+    "caption": "(Zero-shot Evaluations.) Best results for each size in bold. We compare against open source LMs with various tokenizers, trained for up to 300B tokens. Pile refers to the validation split, comparing only against models trained on the same dataset and tokenizer (GPT-NeoX-20B). For each model size, Mamba is best-in-class on every single evaluation result, and generally matches baselines at twice the model size."
+   },
+   {
+    "ref": "Figure 5",
+    "kind": "figure",
+    "caption": "(DNA Scaling Laws.) Pretraining on the HG38 (human genome) dataset. (Left) Fixing short context length 2^10 = 1024 and increasing size from ≈ 200K to ≈ 40M parameters, Mamba scales better than baselines. (Right) Fixing model size and increasing sequence lengths while keeping tokens/batch and total training tokens fixed. Unlike baselines, the selection mechanism of Mamba facilitates better performance with increasing context length."
+   },
+   {
+    "ref": "Figure 6",
+    "kind": "figure",
+    "caption": "(Great Apes DNA Classification.) Accuracy after finetuning on sequences of length 2^10 = 1024 up to 2^20 = 1048576 using pretrained models of the same context length. Numerical results in Table 13."
+   },
+   {
+    "ref": "Figure 7",
+    "kind": "figure",
+    "caption": "(Audio Pretraining.) Mamba improves performance over prior state-of-the-art (Sashimi) in autoregressive audio modeling, while improving up to minute-long context or million-length sequences (controlling for computation)."
+   },
+   {
+    "ref": "Table 4",
+    "kind": "table",
+    "caption": "(SC09) Automated metrics for unconditional generation on a challenging dataset of fixed-length speech clips. (Top to Bottom) Autoregressive baselines, non-autoregressive baselines, Mamba, and dataset metrics."
+   },
+   {
+    "ref": "Table 5",
+    "kind": "table",
+    "caption": "(SC09 Model Ablations) Models with 6M parameters. In SaShiMi’s U-Net backbone, there are 8 center blocks operating on sequence length 1000, sandwiched on each side by 8 outer blocks on sequence length 4000, sandwiched by 8 outer blocks on sequence length 16000 (40 blocks total). The architecture of the 8 center blocks are ablated independently of the rest. Note that Transformers (MHA+MLP) were not tested in the more important outer blocks because of efficiency constraints."
+   },
+   {
+    "ref": "Figure 8",
+    "kind": "figure",
+    "caption": "(Efficiency Benchmarks.) (Left) Training: our efficient scan is 40× faster than a standard implementation. (Right) Inference: as a recurrent model, Mamba can achieve 5× higher throughput than Transformers."
+   },
+   {
+    "ref": "Table 6",
+    "kind": "table",
+    "caption": "(Ablations: Architecture and SSM layer.) The Mamba block performs similarly to H3 while being simpler. In the inner layer, there is little difference among different parameterizations of LTI models, while selective SSMs (S6) provide a large improvement. More specifically, the S4 (real) variant is S4D-Real and the S4 (complex) variant is S4D-Lin."
+   },
+   {
+    "ref": "Table 7",
+    "kind": "table",
+    "caption": "(Ablations: Selective parameters.) Δ is the most important parameter (Theorem 1), but using multiple selective parameters together synergizes."
+   },
+   {
+    "ref": "Table 8",
+    "kind": "table",
+    "caption": "(Ablations: Parameterization of A.) The more standard initializations based on S4D-Lin (Gu, Gupta, et al. 2022) perform worse than S4D-Real or a random initialization, when the SSM is selective."
+   },
+   {
+    "ref": "Table 9",
+    "kind": "table",
+    "caption": "(Ablations: Expressivity of Δ.) The selection mechanism of Δ constructs it with a projection of the input. Projecting it even to dim. 1 provides a large increase in performance; increasing it further provides further improvements at the cost of a modest increase in parameters. State size fixed to N = 16."
+   },
+   {
+    "ref": "Table 10",
+    "kind": "table",
+    "caption": "(Ablations: SSM state dimension.) (Top) Constant B and C (Bottom) Selective B and C. Increasing the SSM state dimension N, which can be viewed as an expansion factor on the dimension of the recurrent state, can significantly improve performance for a negligible cost in parameters/FLOPs, but only when B and C are also selective. Size of Δ projection fixed to 64."
+   }
+  ],
+  "dimension_candidates": {
+   "subject": [
+    "Selective Copying",
+    "Induction Heads",
+    "Language Modeling",
+    "DNA Modeling",
+    "Great Apes DNA Classification",
+    "Audio Pretraining",
+    "SC09",
+    "Efficiency Benchmarks"
+   ],
+   "setup": [
+    "Chinchilla protocol",
+    "A100 GPUs",
+    "A100 80GB",
+    "prompt length 2048",
+    "sequence length 256",
+    "vocab size of 16",
+    "16000 Hz",
+    "1-second clips",
+    "state expansion N = 16"
+   ],
+   "variant": [
+    "S4",
+    "S6",
+    "H3",
+    "Hyena",
+    "Mamba",
+    "MHA",
+    "RWKV",
+    "RetNet",
+    "Transformer",
+    "Transformer++",
+    "H3++",
+    "SaShiMi",
+    "WaveNet",
+    "SampleRNN",
+    "WaveGAN",
+    "DiffWave",
+    "Pythia",
+    "GPT-Neo",
+    "OPT",
+    "GPT-J",
+    "HyenaDNA",
+    "FlashAttention-2",
+    "Scan (PyTorch)",
+    "Scan (ours)",
+    "Convolution",
+    "Selective Δ",
+    "Selective B",
+    "Selective C",
+    "S4D-Lin",
+    "S4D-Real",
+    "Real-valued",
+    "Complex-valued"
+   ],
+   "hyperparam_item": [
+    "model size",
+    "sequence length",
+    "context length",
+    "batch size",
+    "state dimension N",
+    "Size of Δ proj.",
+    "expansion factor E",
+    "number of heads"
+   ]
+  },
+  "related_methods": [
+   {
+    "name": "Transformer",
+    "entity_type": "method",
+    "relation_hint": "outperforms Transformers of the same size",
+    "cited_year": "2017"
+   },
+   {
+    "name": "S4",
+    "entity_type": "method",
+    "relation_hint": "improves on prior work",
+    "cited_year": "2022"
+   },
+   {
+    "name": "H3",
+    "entity_type": "method",
+    "relation_hint": "combining the design of prior SSM architectures (Dao, Fu, Saab, et al. 2023)",
+    "cited_year": "2023"
+   },
+   {
+    "name": "Hyena",
+    "entity_type": "method",
+    "relation_hint": "out-performs prior state-of-the-art models such as SaShiMi, Hyena",
+    "cited_year": "2023"
+   },
+   {
+    "name": "RetNet",
+    "entity_type": "method",
+    "relation_hint": "compares against other recent subquadratic architectures",
+    "cited_year": "2023"
+   },
+   {
+    "name": "RWKV",
+    "entity_type": "method",
+    "relation_hint": "compares against other recent subquadratic architectures",
+    "cited_year": "2023"
+   },
+   {
+    "name": "SaShiMi",
+    "entity_type": "method",
+    "relation_hint": "out-performs prior state-of-the-art models such as SaShiMi",
+    "cited_year": "2022"
+   },
+   {
+    "name": "Pythia",
+    "entity_type": "method",
+    "relation_hint": "matches Transformers twice its size (e.g. 4 points higher avg. on common sense reasoning compared to Pythia-3B)",
+    "cited_year": "2023"
+   },
+   {
+    "name": "LLaMa",
+    "entity_type": "method",
+    "relation_hint": "based on LLaMa (Touvron et al. 2023)",
+    "cited_year": "2023"
+   },
+   {
+    "name": "FlashAttention-2",
+    "entity_type": "method",
+    "relation_hint": "faster than the best attention implementation that we know of (FlashAttention-2 (Dao 2024))",
+    "cited_year": "2024"
+   },
+   {
+    "name": "WaveNet",
+    "entity_type": "method",
+    "relation_hint": "compared to a variety of baselines from Goel et al. (2022): WaveNet",
+    "cited_year": "2016"
+   },
+   {
+    "name": "SampleRNN",
+    "entity_type": "method",
+    "relation_hint": "compared to a variety of baselines from Goel et al. (2022): SampleRNN",
+    "cited_year": "2017"
+   },
+   {
+    "name": "WaveGAN",
+    "entity_type": "method",
+    "relation_hint": "compared to a variety of baselines from Goel et al. (2022): WaveGAN",
+    "cited_year": "2019"
+   },
+   {
+    "name": "DiffWave",
+    "entity_type": "method",
+    "relation_hint": "compared to a variety of baselines from Goel et al. (2022): DiffWave",
+    "cited_year": "2021"
+   },
+   {
+    "name": "HyenaDNA",
+    "entity_type": "method",
+    "relation_hint": "follow the setup of HyenaDNA (Nguyen, Poli, et al. 2023)",
+    "cited_year": "2023"
+   },
+   {
+    "name": "S5",
+    "entity_type": "method",
+    "relation_hint": "highlight in particular S5 (Smith, Warrington, and Linderman 2023)",
+    "cited_year": "2023"
+   },
+   {
+    "name": "QRNN",
+    "entity_type": "method",
+    "relation_hint": "highlight in particular ... QRNN (Bradbury et al. 2016)",
+    "cited_year": "2016"
+   },
+   {
+    "name": "SRU",
+    "entity_type": "method",
+    "relation_hint": "highlight in particular ... SRU (Lei et al. 2017)",
+    "cited_year": "2017"
+   }
+  ],
+  "sections": [
+   {
+    "title": "Abstract",
+    "label": "intro_discussion"
+   },
+   {
+    "title": "1 Introduction",
+    "label": "intro_discussion"
+   },
+   {
+    "title": "2 State Space Models",
+    "label": "method"
+   },
+   {
+    "title": "3 Selective State Space Models",
+    "label": "method"
+   },
+   {
+    "title": "3.1 Motivation: Selection as a Means of Compression",
+    "label": "method"
+   },
+   {
+    "title": "3.2 Improving SSMs with Selection",
+    "label": "method"
+   },
+   {
+    "title": "3.3 Efficient Implementation of Selective SSMs",
+    "label": "method"
+   },
+   {
+    "title": "3.3.1 Motivation of Prior Models",
+    "label": "method"
+   },
+   {
+    "title": "3.3.2 Overview of Selective Scan: Hardware-Aware State Expansion",
+    "label": "method"
+   },
+   {
+    "title": "3.4 A Simplified SSM Architecture",
+    "label": "method"
+   },
+   {
+    "title": "3.5 Properties of Selection Mechanisms",
+    "label": "method"
+   },
+   {
+    "title": "3.5.1 Connection to Gating Mechanisms",
+    "label": "method"
+   },
+   {
+    "title": "3.5.2 Interpretation of Selection Mechanisms",
+    "label": "method"
+   },
+   {
+    "title": "3.6 Additional Model Details",
+    "label": "method"
+   },
+   {
+    "title": "4 Empirical Evaluation",
+    "label": "experiment"
+   },
+   {
+    "title": "4.1 Synthetic Tasks",
+    "label": "experiment"
+   },
+   {
+    "title": "4.1.1 Selective Copying",
+    "label": "experiment"
+   },
+   {
+    "title": "4.1.2 Induction Heads",
+    "label": "experiment"
+   },
+   {
+    "title": "4.2 Language Modeling",
+    "label": "experiment"
+   },
+   {
+    "title": "4.2.1 Scaling Laws",
+    "label": "experiment"
+   },
+   {
+    "title": "4.2.2 Downstream Evaluations",
+    "label": "experiment"
+   },
+   {
+    "title": "4.3 DNA Modeling",
+    "label": "experiment"
+   },
+   {
+    "title": "4.3.1 Scaling: Model Size",
+    "label": "experiment"
+   },
+   {
+    "title": "4.3.2 Scaling: Context Length",
+    "label": "experiment"
+   },
+   {
+    "title": "4.3.3 Synthetic Species Classification",
+    "label": "experiment"
+   },
+   {
+    "title": "4.4 Audio Modeling and Generation",
+    "label": "experiment"
+   },
+   {
+    "title": "4.4.1 Long-Context Autoregressive Pretraining",
+    "label": "experiment"
+   },
+   {
+    "title": "4.4.2 Autoregressive Speech Generation",
+    "label": "experiment"
+   },
+   {
+    "title": "4.5 Speed and Memory Benchmarks",
+    "label": "experiment"
+   },
+   {
+    "title": "4.6 Model Ablations",
+    "label": "experiment"
+   },
+   {
+    "title": "4.6.1 Architecture",
+    "label": "experiment"
+   },
+   {
+    "title": "4.6.2 Selective SSM",
+    "label": "experiment"
+   },
+   {
+    "title": "5 Discussion",
+    "label": "intro_discussion"
+   },
+   {
+    "title": "6 Conclusion",
+    "label": "intro_discussion"
+   },
+   {
+    "title": "Acknowledgments",
+    "label": "other"
+   },
+   {
+    "title": "References",
+    "label": "other"
+   },
+   {
+    "title": "A Discussion: Selection Mechanism",
+    "label": "related_work"
+   },
+   {
+    "title": "B Related Work",
+    "label": "related_work"
+   },
+   {
+    "title": "B.1 S4 Variants and Derivatives",
+    "label": "related_work"
+   }
+  ],
+  "_paper_id": "PPR_D0538FA35432",
+  "_title_used": "Mamba: Linear-Time Sequence Modeling with Selective State Spaces",
+  "_model": "local:Qwen3.8-27B"
+ }
+}
