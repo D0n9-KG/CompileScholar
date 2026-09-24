@@ -107,7 +107,7 @@ class ExternalTools:
 
     def __init__(self, views: dict, kb_manifest: dict, model: str = "local:Qwen3.8-27B",
                  registry: dict = None, blocklist: list = None,
-                 backflow_path: str = None):
+                 backflow_path: str = None, tier_db: str = None):
         _ensure_env()
         self._model = model
         self._views = views
@@ -115,10 +115,29 @@ class ExternalTools:
         self._registry = registry
         self._blocklist = blocklist
         self._backflow_path = backflow_path
+        self._tier_db = tier_db
+        self._tiers = None
         self._svc = None
         self._gap_docs = None
         self._embed = None
         self._citgraph = None
+
+    def _tier_store(self):
+        """Lazy sci-evo SQLite tier store (batch-3): the system of record
+        for coarse/deep extraction state — re-extraction is refused across
+        sessions, promotion candidates queue for Tier 2."""
+        if self._tiers is None:
+            if not self._tier_db:
+                self._tiers = False
+                return None
+            try:
+                from sci_evo_extract.library.coarse_store import TierStore
+                root = os.path.dirname(self._tier_db)
+                self._tiers = TierStore(self._tier_db,
+                                        os.path.join(root, "growth_library"))
+            except Exception:
+                self._tiers = False
+        return self._tiers or None
 
     # ---- lazy singletons -------------------------------------------------
 
@@ -276,6 +295,27 @@ class ExternalTools:
                             + ", ".join(res["matched_entities"]))
             except Exception as e:
                 obs["backflow_error"] = str(e)[:120]
+            # batch-3: tier state in the sci-evo SQLite registry — the
+            # paper is recorded as coarse-extracted (re-extraction refused
+            # across sessions); the deterministic promotion rule (limitation
+            # signal / multi-lineage anchor) is surfaced to the loop
+            try:
+                ts = self._tier_store()
+                if ts is not None:
+                    matched = res["matched_entities"] if res.get("attached") or res.get("matched_entities") else []
+                    st = ts.register_coarse(
+                        title=title, year=None, abstract=abstract[:6000],
+                        records=r["records"], matched_entities=matched)
+                    if st.get("reused"):
+                        obs["tier_note"] = ("paper already registered "
+                                            f"(tier={st['tier']}) — no re-extraction")
+                    if st.get("promotion_candidate"):
+                        obs["promotion_candidate"] = True
+                        obs["promotion_note"] = (
+                            "limitation/multi-lineage signal — strong Tier-2 "
+                            "candidate (full-text extraction at library-growth time)")
+            except Exception as e:
+                obs["tier_error"] = str(e)[:120]
             return obs
         except Exception as e:
             return {"tool": "extract_paper", "n": 0,
@@ -285,13 +325,16 @@ class ExternalTools:
 def attach_external_tools(kb, views: dict, kb_manifest: dict,
                           model: str = "local:Qwen3.8-27B",
                           registry: dict = None, blocklist: list = None,
-                          backflow_path: str = None) -> ExternalTools:
+                          backflow_path: str = None,
+                          tier_db: str = None) -> ExternalTools:
     """Inject the five external tools onto a KBTools instance and extend the
     harness tool whitelist/catalog at runtime. `registry` enables mentions
     backflow (extract_paper -> genealogy attachment); `backflow_path`
-    persists + replays library growth across sessions."""
+    persists + replays library growth across sessions; `tier_db` puts
+    coarse/deep extraction state into the sci-evo SQLite registry."""
     ext = ExternalTools(views, kb_manifest, model, registry=registry,
-                        blocklist=blocklist, backflow_path=backflow_path)
+                        blocklist=blocklist, backflow_path=backflow_path,
+                        tier_db=tier_db)
     if backflow_path:
         try:
             from kb_compiler.records.backflow import load_backflow

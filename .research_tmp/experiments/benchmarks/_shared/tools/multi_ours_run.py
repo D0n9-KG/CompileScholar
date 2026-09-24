@@ -133,7 +133,8 @@ def build_tools_multi():
                   if os.path.exists(_bl_path) else None)
     attach_external_tools(kb, views, manifest, model=MODEL,
                           registry=registry, blocklist=_blocklist,
-                          backflow_path=os.path.join(KB, "backflow_edges.jsonl"))
+                          backflow_path=os.path.join(KB, "backflow_edges.jsonl"),
+                          tier_db=os.path.join(KB, "growth_library.db"))
     return kb, records, views, manifest
 
 
