@@ -164,3 +164,45 @@ G4 / 单测 7 例），每个模块都有现场验证：
    不值得为它多一条维护线；若未来 Sciverse 限流再评估
 4. **S2 key 申请继续挂着**：批下来只用于引用图（G4 的双向游走是 S2 独占
    能力），检索位已由 Sciverse 补齐
+
+## 七、知识模型驱动检索落地（2026-09-25 下午，用户方向纠偏后）
+
+> 用户裁决："光用外部检索工具和引用链别人都做过没创新性"——检索的差异性
+> 必须来自我们系统的独特知识（缺口/谱系/空格坐标）。引擎层（Sciverse 语义
+> 通道+熔断+重排）保留为执行底座，新增的是**知识模型驱动的检索原语**。
+
+### 三个新原语（全部 live 验证，sci-evo 仓库 commits）
+
+| 原语 | 机制（别人没有的部分） | live 验证 |
+|---|---|---|
+| **gap_search** | 题面嵌入匹配 3,953 条缺口坐标（absence+derived hole）→ 合成查询携带**题面没有的词汇**（缺口记录注入实体名+缺失内容词）→ 共享引擎执行 → fill 标注回配 | 签名场景：题面零 SAMMR → 缺口注入 SAMMR 局限原文 → 返回 OCT 色散补偿真补缺文献+fill 标注 |
+| **lineage_walk** | 库内**类型化**谱系 BFS（extends/improves/replaces 边，区别于无差别引用 BFS）→ 边界检测（终节点+深度截断有后继者）→ 外部续走合成后继查询 → 后继标注 | LLaVA-1.5→LLaVA→InstructBLIP 库内链→边界→外部返回 TG-LLaVA/LLaVA-CoT 真后继 |
+| **Tier 1 粗抽器** | 摘要→同 schema 子集轻记录（finding/method/limitation + mentions 谱系钩子），coarse: id 前缀防碰撞，provenance=coarse 区分 | CFG 摘要→4 记录；sweet-side 摘要→limitation 记录（缺口信号） |
+
+### 投资阶梯（用户定的粗/深分层设计）
+
+```
+Tier 0 元数据（免费）→ Tier 1 粗抽 11-16s/篇 → Tier 2 全流程 ~2min/篇
+选择权在答题循环的模型手里：初召回 Tier 0 → 核心论文 Tier 1（extract_paper
+工具）→ 答题必需的 1-3 篇 Tier 2。延迟结构=快路径粗证据初答+深抽异步升级。
+```
+
+### Broker 接线（external_tools.py，已 live 验证）
+
+五个外部工具注入答题循环（fork 侧，冻结模块不动）：search_papers /
+gap_search / lineage_walk_ext / citation_graph / extract_paper。观测=
+title+abstract（官方 asta 工具同构形态）；引用回指门放宽到 title/doi；
+prompt 目录第 13-17 条（何时用驱动式 vs 盲搜的引导）。
+
+### 检索=多步任务（用户定位："深入检索才是根本问题"）
+
+ReAct 循环的检索移动集：①词表精炼（实测有效）②引用跟随（业界主流）
+③**缺口定向**（我们独有）④**谱系外推**（我们独有）⑤实体枢纽。差异
+性=③④+①②⑤的移动选择受知识模型指导。两轮协议最小验证已通过（round-1
+池摘要见 "selective" → round-2 精炼 → gold 排第 3）。
+
+### 存储衔接（用户裁定）
+
+sci-evo 的 SQLite registry（papers 主键+processing_jobs+extraction_runs）
+直接用：粗/深两级状态挂 processing_jobs，抽取账目进 extraction_runs。
+两项目后续合并成一个完整项目（SQA2 之后）。
