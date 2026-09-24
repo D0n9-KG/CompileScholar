@@ -118,6 +118,32 @@ def parse_pdf(pdf_path: str, out_md: str) -> None:
 
 # ---------------- 4. per-paper kb chain (growth dir) ----------------
 
+def _build_views_overlay() -> None:
+    """Merge production records + growth records into one views rebuild
+    (kb/growth/views_growth.json). The runner overlays this at load time.
+    Skip silently when no growth registry exists (nothing promoted yet)."""
+    from kb_compiler.views.compiler import build_views
+    from kb_compiler.records.common import load_json
+    gr_path = os.path.join(GROWTH, "registry_growth", "registry_v3.json")
+    if not os.path.exists(gr_path):
+        return
+    prod_records = load_json(os.path.join(KB, "postcheck", "records_checked.json"), {})
+    growth_records = load_json(os.path.join(GROWTH, "postcheck", "records_checked.json"), {})
+    merged = {**prod_records, **growth_records}
+    prod_manifest = {r["paper_id"]: r for r in load_json(
+        os.path.join(os.path.dirname(BASE), "corpus", "manifest.json"), [])}
+    growth_manifest = {r["paper_id"]: r for r in json.load(
+        open(os.path.join(GROWTH, "manifest_growth.json"), encoding="utf-8"))}
+    views = build_views(merged, load_json(gr_path, {}),
+                        load_json(os.path.join(KB, "dim_vocab_v1.json"), {}),
+                        {**prod_manifest, **growth_manifest})
+    out = os.path.join(GROWTH, "views_growth.json")
+    json.dump(views, open(out, "w", encoding="utf-8"), ensure_ascii=False)
+    st = views.get("stats", {})
+    print(f"  [views-overlay] {st.get('n_records')} records, "
+          f"{st.get('genealogy_edges')} genealogy edges -> views_growth.json",
+          flush=True)
+
 def run_kb_chain(paper_pid: str, _unused: str = None) -> dict:
     """cards -> deep_extract -> postcheck on the growth dir. The frozen
     Multi corpus/kb is never touched; growth records accumulate in
@@ -142,7 +168,9 @@ def run_kb_chain(paper_pid: str, _unused: str = None) -> dict:
                           "--texts", GROWTH_TEXTS,
                           "--manifest", os.path.join(GROWTH, "manifest_growth.json"),
                           "--cards", os.path.join(GROWTH, "cards_growth.json"),
-                          "--registry", os.path.join(KB, "registry_v3.json"),
+                          "--registry", os.path.join(KB, "registry_growth", "registry_v3.json")
+                          if os.path.exists(os.path.join(GROWTH, "registry_growth", "registry_v3.json"))
+                          else os.path.join(KB, "registry_v3.json"),
                           "--vocab", os.path.join(KB, "dim_vocab_v1.json"),
                           "--out", os.path.join(GROWTH, "records_growth.json"),
                           "--model", MODEL, "--pool", "4"]),
@@ -152,6 +180,14 @@ def run_kb_chain(paper_pid: str, _unused: str = None) -> dict:
                        "--vocab", os.path.join(KB, "dim_vocab_v1.json"),
                        "--out-dir", os.path.join(GROWTH, "postcheck"),
                        "--model", MODEL]),
+        # last-mile join (batch-3 fix): unresolved surfaces (S4/H3/Hyena...)
+        # fold into a growth registry so lineage records get real
+        # entity_ids -> genealogy edges form in the views overlay
+        ("registry_growth", ["python", "-m", "kb_compiler.records.registry_growth",
+                             "--registry", os.path.join(KB, "registry_v3.json"),
+                             "--records", os.path.join(GROWTH, "records_growth.json"),
+                             "--out-dir", os.path.join(GROWTH, "registry_growth"),
+                             "--model", MODEL]),
     ]
     for name, cmd in stages:
         log = open(os.path.join(GROWTH, f"stage_{name}.log"), "a",
@@ -164,6 +200,11 @@ def run_kb_chain(paper_pid: str, _unused: str = None) -> dict:
               f"({time.time()-t0:.0f}s)", flush=True)
         if p.returncode != 0:
             raise RuntimeError(f"stage {name} failed — see growth logs")
+    # views overlay: production views + growth records re-compiled with the
+    # growth registry — the deep paper's genealogy edges become visible to
+    # lineage_walk / in-corpus lineage without touching the frozen views.json
+    _build_views_overlay()
+
     checked = os.path.join(GROWTH, "postcheck", "records_checked.json")
     n = len(json.load(open(checked, encoding="utf-8")))
     # the tier store's registry requires artifacts inside its library root

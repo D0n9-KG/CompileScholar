@@ -110,6 +110,25 @@ def build_tools_multi():
     views = json.load(open(os.path.join(KB, "views.json"), encoding="utf-8"))
     registry = json.load(open(os.path.join(KB, "registry_v3.json"),
                               encoding="utf-8"))
+    # growth overlay (batch-3 last-mile): when deep papers have been
+    # promoted (kb/growth/), their records + re-compiled views (with real
+    # genealogy edges via the growth registry join) merge into the KB the
+    # loop sees. Frozen production files are never modified.
+    gviews = os.path.join(KB, "growth", "views_growth.json")
+    gchecked = os.path.join(KB, "growth", "postcheck", "records_checked.json")
+    greg = os.path.join(KB, "growth", "registry_growth", "registry_v3.json")
+    gman = os.path.join(KB, "growth", "manifest_growth.json")
+    if os.path.exists(gviews) and os.path.exists(gchecked):
+        views = json.load(open(gviews, encoding="utf-8"))
+        records = {**records,
+                   **json.load(open(gchecked, encoding="utf-8"))}
+        if os.path.exists(greg):
+            registry = json.load(open(greg, encoding="utf-8"))
+        if os.path.exists(gman):
+            manifest = {**manifest, **{r["paper_id"]: r for r in
+                        json.load(open(gman, encoding="utf-8"))}}
+        print("[growth-overlay] deep papers merged into KB "
+              f"({len(records)} papers total)", flush=True)
     vocab = json.load(open(os.path.join(KB, "dim_vocab_v1.json"),
                            encoding="utf-8"))
     manifest = {r["paper_id"]: r for r in
