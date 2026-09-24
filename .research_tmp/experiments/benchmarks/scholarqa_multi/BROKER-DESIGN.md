@@ -33,15 +33,24 @@
 
 ## 三、裁点（需要用户定）
 
-1. **外扩证据的引用格式**：SQA2 官方判分怎么认外部文献？(a) 引用
-   DOI/URL 列表 (b) 引用文献 title——需要看 SQA2 官方评测器源码定
+1. ~~外扩证据的引用格式~~ **已从官方源码定死（2026-09-25 晨）**：
+   SQA2 判分=CitationEval 的 LLM 归因验证（claim+snippets→Attributable?），
+   引用 id 格式自由（须在文中逐字出现并与 snippets 配对）；**官方自家
+   检索工具就是 S2 API 且 `pd["text"] = pd["abstract"]`——abstract 即
+   证据文本**。故 broker 输出形态：外部引用 = 任意稳定 id（如 S2
+   corpusId），snippets = title+abstract，与官方工具同构。裁点剩余
+   部分仅"是否加 title 进 snippets 头部"（官方 bad_snippet 检查显示
+   他们容忍纯 title 的弱引用，但不加分）。
 2. **每题外扩预算**：默认 ≤6 次搜索 + ≤2 次 citation_graph？
 3. **延迟目标**：A5 实测 fast 1.7s/缓存 0ms/full 14.6s（GPU 满载）——
    答题循环里 full path 会拖慢单步，是否限制只用 fast 档+缓存？
-4. **S2 API key**：A6 词汇鸿沟的主杠杆（语义检索）。用户能否申请一个
-   （免费档就够 SQA2 规模）？
+4. **S2 API key**：A6 词汇鸿沟的主杠杆（语义检索）+ 官方工具同款源。
+   用户能否申请一个（免费档就够 SQA2 规模）？
 5. **语料边界披露**：SQA2 提交要不要声明"闭卷 430 篇 + 开放外扩"混合
    模式（对照 leaderboard 的纯开放 agents 公平性口径）
+6. （新）**ASTA_TOOL_KEY 替代路线**：官方 search.py 就是 S2 封装——
+   若拿不到 key，我们的 SearchService 已覆盖同能力（OpenAlex 关键词
+   +arXiv+重排），Custom 类别可直接用自家工具，功能等价
 
 ## 四、接线工作量估计
 
