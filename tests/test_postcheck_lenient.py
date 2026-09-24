@@ -76,3 +76,25 @@ if __name__ == "__main__":
             print(f"FAIL {fn.__name__}: {e}")
     print(f"{len(fns) - fails}/{len(fns)} passed")
     sys.exit(1 if fails else 0)
+
+
+def test_coarse_records_skip_quote_anchoring():
+    """P8/batch-3: coarse (Tier-1) records quote abstracts with no full
+    text — anchoring violations skip; structural gates still apply; the
+    gate stays intact for provenance=extracted records."""
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+    from kb_compiler.records.postcheck import check_record
+    rec = {"id": "coarse:xyz", "kind": "finding", "subject": "X",
+           "claim": "Mamba is faster.", "claim_type": "observation",
+           "quote": "this sentence appears in NO text anywhere",
+           "epistemic": "stated", "provenance": "coarse"}
+    v, _, _ = check_record(rec, "nc", [0], "nf", [0], {})
+    assert "quote_not_in_text" not in v
+    v2, _, _ = check_record(dict(rec, provenance="extracted"),
+                            "nc", [0], "nf", [0], {})
+    assert "quote_not_in_text" in v2
+    v3, _, _ = check_record(dict(rec, epistemic="bogus"),
+                            "nc", [0], "nf", [0], {})
+    assert any(x.startswith("enum:epistemic") for x in v3)

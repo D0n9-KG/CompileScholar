@@ -251,6 +251,12 @@ def check_record(rec: dict, normc: str, idx_c: list, normf: str, idx_f: list,
     # 3. quote -> loc (exact on whitespace-free norm, fuzzy on collapsed norm)
     loc = None
     qfold = _fold_latex(quote)[0] if quote else ""
+    # coarse records (Tier-1, abstract-only): quotes are abstract sentences
+    # with NO full text to anchor against — anchoring violations are skipped
+    # (P8); structural checks (enums, fields) still apply. Loc anchoring is
+    # still attempted opportunistically (bonus when text happens to contain
+    # the abstract), it just never fails the record.
+    _coarse = rec.get("provenance") == "coarse"
     if quote:
         nqf, _ = _norm_text(qfold, drop_ws=True)
         pos = normf.find(nqf)
@@ -284,14 +290,14 @@ def check_record(rec: dict, normc: str, idx_c: list, normf: str, idx_f: list,
                 if nql and nql in lenient_nf:
                     loc = {"char_start": None, "char_end": None,
                            "match": "lenient:tag_stripped+dehyphenated"}
-            if loc is None:
+            if loc is None and not _coarse:
                 v.append("quote_not_in_text")
     # 3b. table_header verbatim containment (v2 table protocol: quote = data
     # row verbatim, table_header = header row verbatim; both must be in text)
     th = (rec.get("table_header") or "").strip()
     if th:
         nth, _ = _norm_text(_fold_latex(th)[0], drop_ws=True)
-        if nth and nth not in normf:
+        if nth and nth not in normf and not _coarse:
             nth_l, _ = _norm_text(lenient_quote_transform(_fold_latex(th)[0]),
                                   drop_ws=True)
             if not (lenient_nf is not None and nth_l and nth_l in lenient_nf):
