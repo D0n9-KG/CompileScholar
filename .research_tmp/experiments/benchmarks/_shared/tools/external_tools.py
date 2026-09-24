@@ -156,7 +156,10 @@ class ExternalTools:
         (Sciverse semantic leads, keyword fallbacks). Returns title+abstract
         rows usable as evidence."""
         try:
-            r = self._service().search(query, mode="full", limit=k)
+            # agent mode (P14): the loop's query is already refined keyword
+            # vocabulary — skip the A3 decomposition, semantic-first single
+            # pass with keyword fallback
+            r = self._service().search(query, mode="agent", limit=k)
             rows = [_cand_row(c) for c in r.candidates[:k]]
             return {"tool": "search_papers", "n": len(rows), "papers": _truncate_obs(rows),
                     "latency_ms": {k2: v for k2, v in r.latency.items()},
@@ -173,7 +176,7 @@ class ExternalTools:
         try:
             from sci_evo_extract.library.gap_search import gap_search as gs
             r = gs(query, gap_docs=self._gap_index(),
-                   search_fn=lambda q, k: self._service().search(q, mode="full", limit=k),
+                   search_fn=lambda q, k: self._service().search(q, mode="agent", limit=k),
                    embed=self._embed_fn(), limit=8)
             gaps = [{"gap": h.gap_doc["doc"][:140], "score": h.score,
                      "kind": h.gap_doc.get("kind")}

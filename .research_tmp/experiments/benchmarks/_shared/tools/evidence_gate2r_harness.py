@@ -1532,6 +1532,20 @@ def run_question(q, arm, kb, tkb, grounding, glog):
                     gate_info["a_forged"] += len(_fg)
                     st["notes"] = "\n".join(
                         l for l in _fl if not re.match(r"\s*A\d+\.", l))
+                    # P16 (2026-09-25, behavior probe llava_succ): when the
+                    # model's ENTIRE notes rewrite was A-line copies, the
+                    # strip leaves empty notes; the model re-copies next step
+                    # and the loop spins (measured: 47 steps, 470 forged
+                    # lines, zero new tools). Break the spin: tell it once
+                    # what A-lines are and that re-copying them is wasted.
+                    if not st["notes"].strip() and len(auto_rows) > 3:
+                        obs += ("\n[SYSTEM] A-lines are system-managed "
+                                "evidence rows — they persist across steps "
+                                "WITHOUT you re-copying them. Your <notes> "
+                                "should contain only N-lines (your own "
+                                "transcriptions and plan). Re-copying "
+                                "A-lines wastes your step; continue with an "
+                                "<action> instead.")
             kept, bad = note_gate(st["notes"], valid_ids)
             if bad:
                 gate_info["note_rejects"] += len(bad)
