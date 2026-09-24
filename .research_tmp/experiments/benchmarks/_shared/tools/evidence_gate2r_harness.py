@@ -27,6 +27,7 @@ import time
 import re
 import sys
 import threading
+import types
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 
@@ -1442,6 +1443,8 @@ def run_question(q, arm, kb, tkb, grounding, glog):
 
     answer = None
     steps = 0
+    # degenerate-answer guard state (see the answer-branch guard below)
+    guard_state = types.SimpleNamespace(min_evidence_rejected=False)
     while steps < cap + 3:  # +3 slack for format retries/repair, hard stop
         steps_left = cap - steps
         if f28_terminate:   # F28c: hard stop -> break -> F2 compile from notes
@@ -1649,6 +1652,34 @@ def run_question(q, arm, kb, tkb, grounding, glog):
             none_streak = 0
         # answer branch
         if st["answer"]:
+            # Degenerate-answer guard (2026-09-25, user "发现新问题就修"):
+            # the measured case — model submits a 148-char nothing-found answer
+            # at step 3 with ZERO executed tool calls (27B stochastic give-up).
+            # F28 only polices the "loops forever" failure mode; nothing guards
+            # "surrenders instantly". Deterministic rule: a sub-MIN_EVIDENCE_ANS
+            # answer with no executed tools and no notes is rejected ONCE with
+            # an explicit retrieval order; a second submission is honored
+            # (honest nothing-found answers exist and must eventually pass).
+            _tools_executed = any(isinstance(t, dict) and t.get("tool")
+                                  for t in traj)
+            if (st["answer"] and len(st["answer"].strip()) < 400
+                    and not _tools_executed and not notes.strip()
+                    and not getattr(guard_state, "min_evidence_rejected", False)):
+                guard_state.min_evidence_rejected = True
+                gate_info["min_evidence_guard"] = True
+                traj.append({"step": steps + 1,
+                             "type": "min_evidence_guard",
+                             "answer_chars": len(st["answer"])})
+                obs = ("Your answer was rejected: it is very short, cites nothing, "
+                       "and you have not run a single tool — the knowledge base was "
+                       "never consulted, so 'not found' is not yet an honest verdict. "
+                       "Execute at least 2-3 retrieval actions first (findings/compare/"
+                       "search_text on the question's key entities), then answer; a "
+                       "second short submission will be accepted.")
+                st["answer"] = None
+                answer = None
+                steps += 1
+                continue
             answer = st["answer"]
             answer = _clean_answer_artifacts(answer)   # R-D
             miss, uns, btit = answer_gates(answer, notes_full(), q_titles)

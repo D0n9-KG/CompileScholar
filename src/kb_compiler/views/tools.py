@@ -404,11 +404,27 @@ class KBTools:
                     key = eid
                     break
         if key is None:
-            return {"tool": "card", "n": 0,
-                    "error": f"no compiled dossier for '{entity}' "
-                             "(dossiers exist for in-corpus entities; "
-                             "use findings/compare for out-of-corpus ones)",
-                    "nearest_in_corpus": self._nearest_in_corpus(entity)}
+            near = self._nearest_in_corpus(entity)
+            res = {"tool": "card", "n": 0,
+                   "error": f"no compiled dossier for '{entity}' "
+                            "(dossiers exist for in-corpus entities; "
+                            "use findings/compare for out-of-corpus ones)",
+                   "nearest_in_corpus": near}
+            # G1-B2 hardening (2026-09-25): the plain redirect list still left
+            # 12% dead-step card calls (model retried the same name). Make the
+            # next action literal: the top alternative is spelled out as a
+            # ready-to-copy call, and the out-of-corpus fallback names the
+            # exact substitute. Measure target: card empty-rate < 10%.
+            if near:
+                res["next_action"] = (
+                    f"retry as card(entity=\"{near[0]}\") — or one of: "
+                    + "; ".join(f'card(entity="{n}")' for n in near[1:]))
+            elif e is not None:
+                res["next_action"] = (
+                    f"'{entity}' is a registered out-of-corpus name (no records "
+                    f"behind it) — use findings(entity=\"{entity}\") for claims "
+                    f"that mention it, or compare(entities=[\"{entity}\"])")
+            return res
         c = dict(cards[key])
         c["tool"] = "card"
         return c
