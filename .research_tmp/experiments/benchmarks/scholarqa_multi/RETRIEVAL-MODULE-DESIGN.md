@@ -127,3 +127,40 @@ G4 / 单测 7 例），每个模块都有现场验证：
   Recall@10 ≥0.7 过门）。初判风险：gold 是特定论文选择（同一主题下
   检索返回的 top-10 全切题但可能不含 gold 本尊）——若 FAIL，改进方向
   =子查询多样性/每子查询单独配额/S2 key（匿名池 429 是当前主要降级源）。
+
+## 六、S2 替代源判决表（2026-09-25，用户指示：S2 key 申请未回，评估国内源）
+
+> 一手实测（每条都是真调用验证，非文档转述）。
+
+| 能力 | Sciverse（上海AI Lab，已有token） | AMiner（清华） | PubScholar（中科院） |
+|---|---|---|---|
+| 论文检索 | ✅ meta-search + **agentic-search（语义检索全文 chunk）** | ✅ 论文搜索 API（"限免"） | ✅ 检索 API 存在（`/hky/open/resources/api/v1/articles`） |
+| 摘要字段 | ✅ **922-1037 字符全文 abstract**（meta-search 返回） | ？（文档页需登录才见字段） | ✅ abstracts 全文 |
+| **词汇鸿沟能力**（A6 主诉求） | ✅ **实测 agentic-search 直接命中 gold**：glycosylation 查询 1.4s 拿到 "sweet side of protein corona" 正文 chunk——OpenAlex 关键词永远搜不到的那篇 | 未测（需 key） | 未测（需过签名墙） |
+| 引文数据 | ⚠️ meta-search 带 citation_count/influential_citation_count 字段，**无引用图 API**（引文游走仍靠 S2/OpenAlex） | ✅ 论文引用 API（0.1元/次，出向） | ❓ 未确认 |
+| 中文文献 | ✅ 实测中文查询返回中文结果（钙钛矿稳定性研究） | ✅（本土优势） | ✅（本土优势） |
+| 限流 | ✅ 8/8 连发零失败（0.5s 间隔） | 未测 | 有签名墙（x-xsrf-token+signature+nonce+timestamp 指纹校验） |
+| 接入成本 | **零**（客户端已在库里，只差进 tier 路由） | 需注册+充值（按次计费 0.01-1 元，论文搜索"限免"） | 高（WAF 反爬签名，浏览器才能过；无公开 API 文档） |
+| 数据规模 | ？ | 论文 3.0 亿+ | 期刊论文 1.08 亿 |
+
+### 判决
+
+1. **Sciverse 立即顶上 S2 的检索位**——这不再是妥协方案，是升级：
+   - agentic-search 是**语义检索**（检索全文 chunk），正好补 A6 诊断出的词汇
+     鸿沟（gold 靠特定发现连题、题面无 gold 词汇）——单发关键词检索的地板
+     直接被抬起来
+   - meta-search 已带全 abstract + 引文计数，SQA2 broker 的证据形态（裁点
+     1：abstract 即证据文本）完全满足
+   - 零接入成本：客户端已在 sci-evo 库里，缺的只是把它加进 discover_tiered
+     的 tier 路由 + agentic-search 包一个通道
+   - 唯一缺口：**引用图**（双向引文游走）Sciverse 没有 API——G4 的
+     CitationGraphService 保持 S2（匿名池凑合）+OpenAlex（出向）现状，
+     S2 key 批下来是锦上添花
+2. **PubScholar 出局**（当前形态）：接口藏在浏览器后面（x-xsrf-token +
+   signature + fingerprint 指纹校验），无公开 API 文档，程序化接入=持续
+   对抗其 WAF，脆弱且不适合论文系统；除非他们将来出正式开放 API
+3. **AMiner 观望**：论文搜索"限免"+按次计费（组合接口 0.2 元/次），
+   注册充值成本之外的增量能力（相对 Sciverse）只有出向引用 API——
+   不值得为它多一条维护线；若未来 Sciverse 限流再评估
+4. **S2 key 申请继续挂着**：批下来只用于引用图（G4 的双向游走是 S2 独占
+   能力），检索位已由 Sciverse 补齐
