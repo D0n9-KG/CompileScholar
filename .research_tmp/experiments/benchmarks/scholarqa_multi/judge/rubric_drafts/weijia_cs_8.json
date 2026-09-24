@@ -1,0 +1,98 @@
+{
+ "question": "Can you explain to me what is Visual programming?",
+ "case_id": "weijia_cs_8",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "Defines visual programming as a paradigm that decomposes complex visual tasks into simpler subtasks, each solved with an appropriate vision tool, making the overall problem tractable without end-to-end training.",
+   "weight": 0.15,
+   "examples": [
+    "A complex visual query is split into steps like detect, crop, classify",
+    "Breaking a hard visual question into detection then classification makes it tractable"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "Explains that a language model interprets the natural language query and, using in-context learning or code generation, produces a Python-like modular program determining which modules to call and in what order.",
+   "weight": 0.14,
+   "examples": [
+    "VisProg uses in-context learning to generate Python-like modular programs",
+    "ViperGPT leverages code-generation models to compose subroutines via a provided API"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "States that visual programming avoids task-specific training or finetuning, reusing off-the-shelf pretrained models composed at inference time.",
+   "weight": 0.11,
+   "examples": [
+    "No task-specific training is needed; the system composes existing models at inference time",
+    "ViperGPT requires no further training since it composes existing models via generated code"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "Describes that the generated program executes line by line, where each line invokes an off-the-shelf vision model, image-processing subroutine, or Python function (e.g., detectors, segmenters), with intermediate results feeding into subsequent steps.",
+   "weight": 0.13,
+   "examples": [
+    "An object detector's output boxes are passed to an attribute classifier downstream",
+    "Each program line may call an off-the-shelf vision model, with outputs consumed by later parts of the program"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "Cites at least two concrete frameworks from the passages (VisProg, ViperGPT, and/or Socratic Models) as instantiations of the visual programming paradigm.",
+   "weight": 0.11,
+   "examples": [
+    "VisProg demonstrated this on four diverse visual tasks",
+    "Socratic Models compose multiple pretrained models zero-shot in a modular framework"
+   ]
+  },
+  {
+   "name": "answer_critical_5",
+   "tier": "critical",
+   "criterion": "Notes that the approach yields both a solution and an interpretable rationale, because the explicit program separates perception from reasoning, unlike end-to-end models.",
+   "weight": 0.1,
+   "examples": [
+    "VisProg returns a solution plus a comprehensive, interpretable rationale",
+    "Unlike end-to-end models, the program makes the reasoning steps explicit"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "Elaborates that Socratic Models compose differently-trained pretrained models (e.g., VLMs on image captions, LLMs on large text corpora including code) via multimodal-informed prompting, exploiting their complementary knowledge zero-shot without finetuning.",
+   "weight": 0.09,
+   "examples": [
+    "VLMs excel at visual data from image captions while LLMs cover text domains like code and spreadsheets",
+    "SMs use multimodal-informed prompting so models exchange information zero-shot"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "Mentions demonstrated tasks such as compositional VQA, zero-shot reasoning on image pairs, factual knowledge object tagging, language-guided image editing, egocentric video QA, multimodal assistive dialogue, or robot perception.",
+   "weight": 0.09,
+   "examples": [
+    "VisProg was demonstrated on compositional VQA, zero-shot image-pair reasoning, and language-guided image editing",
+    "Socratic Models enable egocentric video QA, assistive dialogue, and robot perception"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "Conveys that neuro-symbolic, training-free composition expands AI systems to the long tail of complex tasks, and notes the structural characteristic that modules follow a pre-defined sequential plan laid out by the LM's generated program.",
+   "weight": 0.08,
+   "examples": [
+    "Neuro-symbolic approaches easily and effectively expand the scope of AI systems to long-tail tasks",
+    "Modules execute according to the plan the LM outlined in the code"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

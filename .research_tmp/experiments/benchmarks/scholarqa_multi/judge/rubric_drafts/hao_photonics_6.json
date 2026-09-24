@@ -1,0 +1,96 @@
+{
+ "question": "What are ways to modulate the gigahertz surface acoustic waves?",
+ "case_id": "hao_photonics_6",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "Answer enumerates at least two distinct methods to modulate GHz SAWs — thermal modulation and electrical (electro-acoustic) modulation — presenting each as a separate approach with its physical mechanism and platform rather than listing only one method or giving an unstructured answer.",
+   "weight": 0.14,
+   "examples": [
+    "Two main approaches: thermoacoustic modulators and electro-acoustic modulators",
+    "GHz SAWs can be modulated thermally or electrically on lithium niobate platforms",
+    "Each method is described with its underlying physics and implementation platform"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "Answer identifies thermal (thermoacoustic) modulation: microheaters placed near the acoustic waveguides tune temperature, exploiting the temperature dependence of LN elasticity to control SAW phase velocity, demonstrated on bulk LN and thin-film LN-on-sapphire (LNSa) substrates.",
+   "weight": 0.17,
+   "examples": [
+    "Microheaters placed close to the acoustic waveguides heat the substrate to tune the SAWs",
+    "Thermal modulation of GHz SAWs shown on both bulk LN and LNSa platforms",
+    "Temperature tuning of the waveguide material modulates the propagating SAW phase velocity"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "Answer states that bulk LN gives larger phase shift per unit heater power (lower LN thermal conductivity) while LNSa gives larger bandwidth (higher sapphire thermal conductivity), and that thermoacoustic modulators offer large tuning range and small voltages despite static power consumption.",
+   "weight": 0.1,
+   "examples": [
+    "Bulk LN modulators feature a larger phase shift per unit heater power than LNSa",
+    "LNSa modulators show a larger frequency bandwidth due to sapphire's high thermal conductivity",
+    "Thermoacoustic modulators show larger tuning range than electroacoustic ones and need smaller voltages"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "Answer identifies electrical modulation via the electro-acoustic effect (third-order piezoelectric effect): an applied electric field tunes the elasticity of the LN waveguide, changing the traveling acoustic wave's phase velocity at GHz carrier frequencies (e.g., ~2.5 GHz).",
+   "weight": 0.17,
+   "examples": [
+    "Applying an electric field uses the third-order piezoelectric effect to tune LN elasticity and SAW phase velocity",
+    "Electro-acoustic phase modulator operating at a ~2.5 GHz carrier frequency",
+    "Electric-field control of waveguide stiffness yields acoustic phase modulation"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "Answer describes concrete device capabilities: phase modulation, serrodyne frequency shifting via repeated linear voltage ramps (~92% efficiency), amplitude modulation using phase modulators in a Mach–Zehnder configuration, and non-reciprocal modulation (>40 dB) via quasi-travelling electric fields from multiple electrodes with phased drive signals.",
+   "weight": 0.15,
+   "examples": [
+    "A linear voltage ramp gives serrodyne frequency shifting with 92% efficiency",
+    "Phase modulators in a Mach–Zehnder configuration realize amplitude modulation",
+    "Multiple electrodes with phased signals create quasi-travelling fields yielding >40 dB non-reciprocal modulation"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "Answer notes that electro-acoustic modulation operates at cryogenic temperatures (e.g., 50 mK), coherently modulates single-phonon acoustic waves, and adds less than one noise phonon, making it suitable for quantum applications.",
+   "weight": 0.09,
+   "examples": [
+    "Coherent modulation of single-phonon acoustic waves demonstrated at 50 mK",
+    "The modulation adds less than one noise phonon, enabling quantum applications",
+    "Electro-acoustic modulation is compatible with cryogenic quantum experiments"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "Answer mentions envisioned applications and extensions: tunable acoustic filters with cavities or phononic crystals, compact phased arrays for beam formation via microheater temperature gradients, microwave signal-processing circuits, and suspended LN thin films for faster modulation response.",
+   "weight": 0.09,
+   "examples": [
+    "Microheaters integrated with acoustic cavities or phononic crystals could yield tunable acoustic filters",
+    "Temperature gradients from microheaters enable compact acoustic phased arrays for beam formation",
+    "Suspended LN thin films could improve modulation response"
+   ]
+  },
+  {
+   "name": "valuable_3",
+   "tier": "valuable",
+   "criterion": "Answer presents thermal and electro-acoustic methods as complementary alternatives with their respective trade-offs (thermal: large tuning range, low voltage, static power; electro-acoustic: fast, cryogenic-compatible), giving a coherent synthesis of modulation approaches.",
+   "weight": 0.09,
+   "examples": [
+    "Thermal modulators offer larger tuning range and lower voltage but consume static power",
+    "The two methods complement each other for on-chip microwave signal processing",
+    "Electro-acoustic modulation is fast and cryogenic-compatible, unlike thermal modulation"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

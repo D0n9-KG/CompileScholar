@@ -1,0 +1,98 @@
+{
+ "question": "What are the production challenges and solutions associated with the large-scale manufacturing of recombinant antibodies?",
+ "case_id": "norman_bio_7",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "Identifies glycosylation variability as a central challenge in recombinant antibody production, since glycan changes significantly impact antibody effector functions and are therefore a particular focus during drug development.",
+   "weight": 0.15,
+   "examples": [
+    "Heterogeneous glycosylation alters effector functions of rMAbs",
+    "Glycosylation is closely monitored during rMAb development"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "Describes acidic species charge variants in monoclonal antibodies, arising from covalent modifications and chemical degradation at specific peptide regions, as a major source of heterogeneity.",
+   "weight": 0.14,
+   "examples": [
+    "Acidic variants form via deamidation or other chemical degradation of peptide regions",
+    "Covalent modifications contribute to the wide range of acidic species in mAbs"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "States that charge variants can affect protein stability, activity, immunogenicity, and pharmacokinetics, and must be monitored during manufacturing to remain within proven acceptable ranges.",
+   "weight": 0.13,
+   "examples": [
+    "Charge variants may alter stability, immunogenicity, and PK",
+    "Manufacturers monitor variants to keep them within proven acceptable ranges"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "Explains that the vast heterogeneity of glycan structures across glycosylation sites hinders in-depth, site-specific analysis of glycan changes on individual proteins within complex mixtures.",
+   "weight": 0.11,
+   "examples": [
+    "Site-specific glycan analysis is difficult in complex protein mixtures",
+    "Structural heterogeneity across glycosylation sites complicates characterization"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "Explains that recombinant polyclonal antibodies (a new biologics class combining a defined number of target-specific antibodies, e.g., Sym001 with 25 anti-RhD antibodies) required new chemistry, manufacturing, and control technologies for development, manufacture, and release.",
+   "weight": 0.12,
+   "examples": [
+    "Sym001 contains 25 antibodies specific for Rhesus D antigen",
+    "Well-characterized polyclonal products needed new CMC approaches"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "Describes the Sympress single-batch manufacturing technology as enabling production of the full recombinant polyclonal antibody mixture in one batch.",
+   "weight": 0.08,
+   "examples": [
+    "Sympress technology manufactures the 25-antibody mixture in one batch",
+    "Single-batch production of a defined polyclonal mixture"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "Presents mass spectrometry methods (unique marker peptides and light chain LC-MS) as solutions for unambiguously identifying individual antibodies and quantifying their relative distribution in recombinant polyclonal products, with demonstrated linearity, specificity, precision, and accuracy for human-use QC release.",
+   "weight": 0.12,
+   "examples": [
+    "Marker peptide and light chain LC-MS methods identify each of the 25 antibodies",
+    "LC-MS method validated for precision and accuracy in QC release"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "Cites bioflavonoid supplementation of cell culture media as a targeted strategy to reduce acidic species charge variants during manufacturing of recombinant therapeutic proteins.",
+   "weight": 0.08,
+   "examples": [
+    "Adding bioflavonoids to culture media targets reduction of acidic variants",
+    "Culture media optimization modulates charge variant profiles"
+   ]
+  },
+  {
+   "name": "valuable_3",
+   "tier": "valuable",
+   "criterion": "Recognizes that such quantitative analytical methods are central to developing and controlling additional therapeutic recombinant polyclonal antibody products beyond Sym001.",
+   "weight": 0.07,
+   "examples": [
+    "Qualified QC methods enable the recombinant polyclonal class",
+    "Methods support development of future polyclonal products"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

@@ -1,0 +1,88 @@
+{
+ "question": "How to detect or extract pretraining data from language models? Are there related works on this topic? ",
+ "case_id": "weijia_cs_5",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "weight": 0.15,
+   "criterion": "Defines the core task: given a piece of text and black-box access to an LLM whose pretraining data is undisclosed, determine whether the model was trained on that text.",
+   "examples": [
+    "Given a text and an LLM whose training data is undisclosed, we ask: was this text seen during training?",
+    "The detection problem asks whether provided text appeared in the (undisclosed) pretraining data, with only black-box model access."
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "weight": 0.18,
+   "criterion": "Describes MIN-K% PROB and its hypothesis: unseen examples tend to contain a few outlier tokens with very low probability under the LLM, while seen (memorized) examples are less likely to have such low-probability words; the method scores text by its lowest-probability k% of tokens.",
+   "examples": [
+    "MIN-K% PROB identifies seen text by checking whether a small fraction of tokens have anomalously low likelihood under the model.",
+    "The method examines the lowest-probability k% of tokens to classify text as seen or unseen."
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "weight": 0.1,
+   "criterion": "Notes that MIN-K% PROB requires no knowledge of the pretraining corpus and no additional training, unlike prior methods that required training a reference model on data similar to the pretraining set.",
+   "examples": [
+    "Unlike earlier approaches that train a reference model on similar data, MIN-K% PROB needs neither corpus knowledge nor extra training.",
+    "Prior approaches needed a reference model trained on data similar to the pretraining set; MIN-K% PROB does not."
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "weight": 0.12,
+   "criterion": "Mentions the WIKIMIA dynamic benchmark, which uses data created before versus after model training (e.g., Wikipedia revisions around the training cutoff) to provide gold-truth labels for evaluating detection.",
+   "examples": [
+    "WIKIMIA uses Wikipedia revisions before and after the model's training cutoff as positive and negative examples.",
+    "They construct a dynamic benchmark with gold truth labels by using text that existed before versus after training."
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "weight": 0.1,
+   "criterion": "Explains why detection matters: pretraining corpora at trillion-token scale almost certainly contain copyrighted materials, personally identifiable information, and leaked benchmark test data, yet training data is rarely disclosed.",
+   "examples": [
+    "At trillions of tokens, pretraining data surely includes copyrighted text, PII, and leaked benchmark test sets, yet is rarely disclosed.",
+    "Since LLM training data is rarely disclosed, we need tools to know which problematic text is included."
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "weight": 0.12,
+   "criterion": "Identifies WIMBD (What's In My Big Data?) as related work: a platform with sixteen count/search-based analyses at scale revealing and comparing the contents of large corpora such as C4, The Pile, and RedPajama (35+ TB across ten corpora).",
+   "examples": [
+    "WIMBD uses count and search at scale to analyze over 35 terabytes and compare ten corpora like C4 and The Pile.",
+    "As related work, WIMBD reveals what is inside big training corpora through large-scale count and search."
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "weight": 0.12,
+   "criterion": "Identifies Data Portraits as related work: data-sketching-based artifacts that record training data (e.g., for The Pile and The Stack) with only ~3% size overhead, enabling fast, space-efficient queries about whether an example was encountered during training, such as for test set leakage and model plagiarism.",
+   "examples": [
+    "Data Portraits use data sketching with only 3% dataset-size overhead to record training data for downstream inspection.",
+    "Data Portraits document The Pile and The Stack, enabling queries about test set leakage and model plagiarism."
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "weight": 0.11,
+   "criterion": "Cites specific findings from corpus analysis, such as benchmark contamination of the Winograd Schema Challenge and parts of GLUE and SuperGLUE, and high prevalence of duplicates, synthetic, low-quality, PII, and toxic content (e.g., ~50% duplicates in RedPajama and LAION-2B-en).",
+   "examples": [
+    "WIMBD found contamination in benchmarks like the Winograd Schema Challenge and parts of GLUE/SuperGLUE.",
+    "About 50% of documents in RedPajama and LAION-2B-en are duplicates."
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

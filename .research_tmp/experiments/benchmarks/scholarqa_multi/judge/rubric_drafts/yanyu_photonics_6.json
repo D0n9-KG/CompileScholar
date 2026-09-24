@@ -1,0 +1,100 @@
+{
+ "question": "How can all-dielectri photonics crystal enhance fluorescence? ",
+ "case_id": "yanyu_photonics_6",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer states that coupling the pump/excitation light into a PC resonance mode enhances the local electromagnetic field and thus the absorption (excitation rate) of nearby fluorescent species compared with bulk/free-space or unpatterned-substrate absorption.",
+   "weight": 0.16,
+   "examples": [
+    "Coupling the excitation pump into a resonant mode produces an enhanced near-field that increases the absorption of fluorescent molecules on the PC surface.",
+    "The PC is designed to support a pump-mode at the laser wavelength, generating a stronger exciting field for surface-attached emitters.",
+    "QDs near the PC surface absorb substantially more pump energy than on glass."
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer states that emitted light couples to PC resonant (fluorescent) modes and is radiated/extracted into the far field at a higher rate than emission in free space.",
+   "weight": 0.13,
+   "examples": [
+    "QD emission couples with the PC fluorescent mode and radiates into the far field at a higher extraction rate.",
+    "Generated photons are extracted more efficiently from the PC than they would be from an emitter in free space."
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer states that the modified photonic environment of the dielectric PC enhances the spontaneous emission rate and radiative quantum efficiency via the Purcell effect (reduced spontaneous emission lifetime).",
+   "weight": 0.13,
+   "examples": [
+    "The dielectric PC enhances quantum efficiency through the Purcell effect, reducing spontaneous emission lifetime.",
+    "Modifying the emitter's photonic environment increases its radiative decay rate and thus quantum efficiency."
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer states that PC resonant modes impose a photonic dispersion that redirects emission into narrow preferred out-coupling angles, improving photon collection efficiency when the detection optics (e.g., objective NA) are matched to those angles.",
+   "weight": 0.1,
+   "examples": [
+    "The PC photonic dispersion dictates a directional angular distribution, so a properly chosen objective NA collects more photons.",
+    "Emitted light is redirected into preferred out-coupling directions, enhancing collection efficiency."
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "The answer explains the underlying mechanism: subwavelength periodicity phase-matches evanescent diffracted orders to spatially localized leaky modes with finite lifetimes, whose resonant energy density scales with the mode Q-factor and is tunable through device parameters.",
+   "weight": 0.11,
+   "examples": [
+    "Higher-order evanescent diffraction is phase-matched to leaky modes that are spatially localized during their finite lifetime.",
+    "The energy density at resonance is set by the mode lifetime/Q-factor, controlled by adjusting device parameters."
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer notes that leaky/Fano resonances arise from interference between resonant and direct scattering channels, e.g., backward re-radiated waves constructively interfering with the specular order while forward waves destructively interfere (π out of phase), yielding near-100% reflection at resonance.",
+   "weight": 0.1,
+   "examples": [
+    "Backward re-radiated waves interfere constructively with the zeroth backward-diffracted order while forward waves cancel, giving zero transmission at resonance.",
+    "Fano resonances of the PhC arise from interference between the resonance and direct scattering channels, with delocalized wave functions and long lifetimes."
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer notes that the dielectric (absorption-free) nature of the PC enables resonance phenomena such as near-total reflection and strong field enhancement without material loss, distinguishing it from plasmonic (metal-based) enhancement.",
+   "weight": 0.09,
+   "examples": [
+    "In a defect-free, lossless dielectric PC, leaky-mode excitation produces 100% reflection at the resonant wavelength.",
+    "Being all-dielectric, the PC avoids metal absorption losses."
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer indicates that the independent mechanisms (excitation, extraction, quantum efficiency, directionality) combine multiplicatively to yield very large total enhancements (e.g., ~3000x for single-QD biosensing), and that the PC environment can also suppress QD blinking, keeping emitters in the 'on' state longer.",
+   "weight": 0.1,
+   "examples": [
+    "The combination of several independent multiplicative effects yields an unprecedented 3000x fluorescence enhancement.",
+    "QDs on the PC remain in their on state a larger fraction of the time (blinking suppression), improving photon output."
+   ]
+  },
+  {
+   "name": "valuable_3",
+   "tier": "valuable",
+   "criterion": "The answer situates the mechanisms in applications such as biosensing with QDs or organic dyes, and acknowledges emitter assumptions: e.g., emitters must lie within the evanescent near field of the PC surface, and near-unity quantum yields may be assumed unchanged.",
+   "weight": 0.08,
+   "examples": [
+    "Enhanced single-QD emission enables digital-resolution biosensing.",
+    "Organic dye molecules on a PhC slab show enhanced emission and low-threshold lasing due to Fano resonances.",
+    "Because the quantum yield of many dyes is close to unity, it is assumed unchanged by the enhancement effects."
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

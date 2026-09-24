@@ -1,0 +1,88 @@
+{
+ "question": "Can classifier-free guidance be extended beyond conditional diffusion models in image generation to NLP tasks?",
+ "case_id": "jacqueline_cs_2",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer must define classifier-free guidance as performing guidance with a pure generative model, without training or using any separate classifier, as an alternative to classifier guidance.",
+   "weight": 0.16,
+   "examples": [
+    "CFG achieves guidance without an external classifier, unlike classifier guidance which requires training a classifier separately [0]",
+    "Guidance can be performed by the generative model itself, eliminating the need for an auxiliary classifier [0]"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer must state that CFG jointly trains a conditional and an unconditional diffusion model (often a single model trained with and without conditioning) and combines or interpolates between their score estimates at sampling time.",
+   "weight": 0.16,
+   "examples": [
+    "CFG jointly trains conditional and unconditional diffusion models and combines the two score estimates [0]",
+    "A single model is trained both with and without conditioning, and the resulting scores are mixed at sampling time"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer must frame CFG's purpose as trading off mode coverage/sample diversity (recall) against sample fidelity/quality (precision), matching what classifier guidance achieves and analogous to low-temperature sampling or truncation in other generative models.",
+   "weight": 0.14,
+   "examples": [
+    "CFG trades off mode coverage and sample fidelity post-training, like truncation in BigGAN or low-temperature Glow [0][2]",
+    "Varying guidance strength trades off precision and recall similar to the truncation parameter of BigGAN [2]"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer must contrast CFG with classifier guidance (Dhariwal & Nichol, 2021), which mixes the diffusion model's score estimate with the input gradient of the log probability of a separately trained classifier, typically trained on noisy images.",
+   "weight": 0.13,
+   "examples": [
+    "Classifier guidance combines the diffusion model's score estimate with the gradient of an image classifier trained on noisy images [0][2]",
+    "Dhariwal & Nichol's classifier guidance boosts sample quality using an extra trained classifier, which CFG avoids [2]"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "The answer must ground the discussion in the fact that CFG (and guidance generally) was developed for conditional diffusion models in image synthesis, where class labels and conditioning are crucial, so any extension discussion must start from this origin.",
+   "weight": 0.11,
+   "examples": [
+    "CFG was introduced for conditional diffusion models in image generation, where class information is crucial to success [0][1]",
+    "The passages establish CFG only for image diffusion; extending to NLP would require analogous conditional/unconditional language model scores"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer should discuss the transferability of the core idea — post-hoc combination of conditional and unconditional model outputs to steer sampling — beyond the image domain, distinguishing what the passages establish (image diffusion only) from what is speculative.",
+   "weight": 0.12,
+   "examples": [
+    "Since CFG needs only conditional and unconditional score estimates and no image-specific classifier, the principle could apply wherever conditional generative models exist",
+    "The passages establish CFG only for image diffusion; extending to NLP would require analogous conditional/unconditional language model scores"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer should note that guidance is a post-training intervention requiring no retraining, motivated by the failure of naive low-temperature attempts such as scaling score vectors or reducing sampling noise — a property relevant to portability across tasks.",
+   "weight": 0.09,
+   "examples": [
+    "Naive low-temperature attempts such as scaling model score vectors or decreasing Gaussian noise during sampling are ineffective [2]",
+    "Guidance operates post-training, requiring no retraining or extra classifier [0]"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer may enrich the discussion by noting other conditioning mechanisms — adaptive/conditional normalization layers, classifier-like discriminator heads, and synthetic labels in label-limited regimes — situating guidance among these approaches.",
+   "weight": 0.09,
+   "examples": [
+    "Class information can be incorporated via adaptive group normalization layers [1]",
+    "GAN discriminators with heads designed to behave like classifiers p(y|x), and synthetic labels for label-limited regimes [1]"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

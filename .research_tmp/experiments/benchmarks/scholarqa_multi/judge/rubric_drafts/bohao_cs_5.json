@@ -1,0 +1,83 @@
+{
+ "question": "In the domain of HCI or social science, there are many cases that researchers need to conduct studies with surveys and participants. How can large language models (LLMs) be used to simulate or represent diverse human populations in such social science applications?",
+ "case_id": "bohao_cs_5",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer must clearly state that all three reference passages concern microscopy/photonics (microtubule dynamics, dark-field microscopy, photonic chips) and contain no material on LLMs, HCI, social science surveys, or simulated participants, making the question unanswerable from the provided sources.",
+   "weight": 0.2,
+   "examples": [
+    "The three reference passages are about dark-field microscopy and photonic imaging and do not address LLM-simulated human populations.",
+    "Because the source material is unrelated to the question, no factually grounded synthesis can be produced from these passages alone.",
+    "No passage mentions large language models, surveys, or participant studies; the question cannot be answered from these sources."
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer justifies the mismatch by accurately summarizing at least two of the passages: [0] real-time dark-field video visualization of coexisting growing/shortening microtubule populations; [1] luminescent photonic substrates with tailored angular emission for compact dark-field imaging; [2] planar photonic chips enabling darkfield/TIR imaging on standard microscopes.",
+   "weight": 0.15,
+   "examples": [
+    "Passage [0] demonstrates via dark-field video microscopy that growing and shortening microtubule populations coexist at steady state.",
+    "Passage [1] embeds the dark-field illumination cone in a luminescent photonic substrate compatible with standard microscopes.",
+    "Passage [2] uses multilayer photonic band gaps to replace bulky condensers and special objectives."
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer must not attribute any LLM-population-simulation claims to the passages, invent studies they do not contain, or misattribute microtubule 'populations' and imaging 'samples'/'specimens' as if they were human study populations or survey participants.",
+   "weight": 0.2,
+   "examples": [
+    "The answer does not cite passages [0]-[2] as evidence for any LLM persona or synthetic respondent method.",
+    "Although passage [0] mentions 'two populations of microtubules,' these are biological polymers, not human demographic groups.",
+    "Blood cells, bacteria, and algae are the 'samples' in passages [1]-[2], not survey respondents."
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer explicitly notes that terms like 'populations,' 'samples,' and 'specimens' in the passages refer to microtubules and imaging subjects, not human study populations, thereby avoiding a misleading lexical-overlap synthesis.",
+   "weight": 0.1,
+   "examples": [
+    "'Two populations of microtubules' in passage [0] refers to growing vs. shortening microtubule subsets.",
+    "'Specimens' and 'samples' in the passages refer to imaging subjects, not survey respondents."
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "If the answer includes any general knowledge about LLM-based population simulation (persona conditioning, demographic sampling, synthetic survey respondents, survey pretesting), it must be clearly labeled as outside knowledge not derived from the passages.",
+   "weight": 0.1,
+   "examples": [
+    "Beyond the sources: LLMs can be conditioned on demographic personas to generate synthetic survey respondents.",
+    "Note: the following discussion draws on general knowledge, not the provided reference material.",
+    "LLM-simulated participants have been used to pilot-test survey instruments before human deployment."
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "Any LLM discussion should note key limitations such as alignment with real human population distributions, alignment and sampling bias, and the need for validation against real human response data.",
+   "weight": 0.08,
+   "examples": [
+    "LLM-simulated populations must be validated against real human response distributions before use in social science research.",
+    "Alignment and sampling biases in LLMs can distort simulated demographic representation."
+   ]
+  },
+  {
+   "name": "valuable_3",
+   "tier": "valuable",
+   "criterion": "The answer concludes by either declining to synthesize or constructively noting what sources would be required (LLM-simulation or computational social science literature on synthetic respondents), and is organized as coherent prose that clearly separates what is and is not supported by the sources.",
+   "weight": 0.17,
+   "examples": [
+    "Therefore, a faithful literature synthesis cannot be written from these sources; references on LLM-based synthetic respondents would be needed.",
+    "A valid answer would require sources from the LLM-simulation or computational social science literature.",
+    "Flowing paragraphs that first state the mismatch, justify it with passage content, and conclude on source-question compatibility."
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

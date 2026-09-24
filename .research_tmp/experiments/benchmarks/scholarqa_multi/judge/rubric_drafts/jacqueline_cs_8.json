@@ -1,0 +1,99 @@
+{
+ "question": "Pruning is a means of model compression that can improve model efficiency in NLP. What are some recent general, task-agnostic pruning methods for large language methods that have worked well?",
+ "case_id": "jacqueline_cs_8",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer situates pruning as a model compression technique for billion-scale LLMs, dropping a subset of weights or sub-networks to improve efficiency while preserving performance.",
+   "weight": 0.08,
+   "examples": [
+    "LLMs with billions of parameters are natural candidates for network pruning",
+    "Pruning drops weights while striving to preserve performance"
+   ]
+  },
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer frames the discussed methods as task-agnostic (pruned on pretraining data or general-purpose, without task-specific specialization) and describes at least two distinct recent methods (e.g., Sheared-LLaMA and Wanda) rather than a single one.",
+   "weight": 0.12,
+   "examples": [
+    "Task-agnostic pruning prunes a model on pretraining data",
+    "Sheared-LLaMA and Wanda are two recent effective task-agnostic pruning approaches"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer distinguishes structured pruning (removing layers, heads, intermediate/hidden dimensions) from unstructured or semi-structured pruning when positioning the methods.",
+   "weight": 0.08,
+   "examples": [
+    "Structured pruning removes larger blocks like layers or attention heads",
+    "Sheared-LLaMA performs structured pruning; Wanda induces sparsity without retraining"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer presents Sheared-LLaMA as a recent structured pruning approach that creates smaller LLMs from larger pretrained models via two key techniques: targeted structured pruning (removing layers, heads, and intermediate/hidden dimensions end-to-end to a target shape) and dynamic batch loading (adjusting batch composition based on varying domain losses) during continual pretraining.",
+   "weight": 0.18,
+   "examples": [
+    "Sheared-LLaMA prunes LLaMA2-7B down to 1.3B and 2.7B parameter models",
+    "Targeted structured pruning removes layers, heads, and intermediate and hidden dimensions to a specified target shape",
+    "Dynamic batch loading updates batch composition based on varying losses across domains"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer cites evidence that Sheared-LLaMA models outperform same-size open-source models (e.g., Pythia, INCITE, OpenLLaMA, TinyLlama) at only ~3% of the compute cost of training from scratch.",
+   "weight": 0.08,
+   "examples": [
+    "Sheared-LLaMA beats equivalent-size models at only 3% of pretraining compute",
+    "It outperforms models like Pythia and TinyLlama on downstream and instruction-tuning evaluations"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer identifies Wanda as a simple, effective pruning method that induces sparsity in pretrained LLMs with no retraining or weight updates; the pruned LLM can be used as is.",
+   "weight": 0.15,
+   "examples": [
+    "Wanda (Pruning by Weights and activations) prunes pretrained LLMs directly",
+    "No retraining or weight update is needed; the pruned model is used immediately after pruning"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer explains Wanda's mechanism: pruning weights with the smallest product of weight magnitude and corresponding input activation, on a per-output basis, motivated by emergent large-magnitude features in LLMs.",
+   "weight": 0.15,
+   "examples": [
+    "Wanda prunes weights with the smallest magnitude times input activation on a per-output basis",
+    "The approach is motivated by the observation of emergent large magnitude features in LLMs"
+   ]
+  },
+  {
+   "name": "valuable_3",
+   "tier": "valuable",
+   "criterion": "The answer notes that Wanda significantly outperforms magnitude pruning and is competitive with methods requiring intensive weight updates, evaluated on LLaMA and LLaMA-2 benchmarks.",
+   "weight": 0.08,
+   "examples": [
+    "Wanda significantly outperforms the magnitude pruning baseline on LLaMA benchmarks",
+    "It performs competitively against recent methods involving intensive weight updates"
+   ]
+  },
+  {
+   "name": "valuable_4",
+   "tier": "valuable",
+   "criterion": "The answer conveys the overall takeaway that pruning existing LLMs (versus training smaller models from scratch) is a cost-effective path to efficient, high-performing models.",
+   "weight": 0.08,
+   "examples": [
+    "Structured pruning of existing LLMs is far more cost-effective than training from scratch",
+    "Both methods demonstrate that compression of pretrained LLMs can match or beat same-size trained models"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

@@ -1,0 +1,99 @@
+{
+ "question": "What are the common model architectures for retrieval-augmented language models?\n",
+ "case_id": "weijia_cs_6",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer must define retrieval-augmented language models as LMs enhanced by incorporating external information/retrieved documents from external corpora during generation or inference.",
+   "weight": 0.13,
+   "examples": [
+    "RALMs condition generation on documents retrieved from an external corpus",
+    "A pre-trained LM augmented with external knowledge sources at inference time"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer must identify retrieval-in-context as an architecture family, citing REALM's mechanism of retrieving and attending to documents from a large corpus (e.g., Wikipedia) in the model's context during pre-training, and may note similar works (in-context RALM, REPLUG).",
+   "weight": 0.16,
+   "examples": [
+    "REALM attends to Wikipedia documents in the model's context during pre-training",
+    "In-context RALMs such as REPLUG append retrieved documents to the input context"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer must present kNN-LM as an architecture extending a pre-trained LM by linearly interpolating its output distribution with a k-nearest-neighbors distribution over a datastore, with neighbors computed by distance in the LM embedding space.",
+   "weight": 0.15,
+   "examples": [
+    "kNN-LM interpolates LM probabilities with kNN probabilities from a datastore",
+    "Neighbors retrieved via embedding-space distance and linearly combined with the LM distribution"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer must describe RETRO's architecture: chunked cross-attention to attend to retrieved document chunks, combined with a frozen Bert retriever and differentiable encoder, typically trained from scratch.",
+   "weight": 0.16,
+   "examples": [
+    "RETRO's chunked cross-attention lets the model attend over retrieved chunks",
+    "RETRO = frozen Bert retriever + differentiable encoder + chunked cross-attention"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "The answer should distinguish whether architectures are trained from scratch (RETRO, with retrofitting of pre-trained transformers as an option) versus augmenting pre-trained models (kNN-LM with no additional training, REALM-style pre-training).",
+   "weight": 0.1,
+   "examples": [
+    "RETRO is trained from scratch but can retrofit pretrained transformers",
+    "kNN-LM adds retrieval with no additional training"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer should specify how retrieval is performed, e.g., local similarity with preceding tokens (RETRO) or distance in the pre-trained LM embedding space (kNN-LM), including the retriever and encoder components of the pipeline.",
+   "weight": 0.07,
+   "examples": [
+    "RETRO chunks retrieved based on local similarity with preceding tokens",
+    "kNN computed by distance in the LM embedding space over a text datastore"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer should mention advanced architectures like Self-RAG that incorporate retrieval-on-demand, dynamically deciding when to access and integrate external knowledge during inference.",
+   "weight": 0.08,
+   "examples": [
+    "Self-RAG learns when to invoke the retriever during inference",
+    "On-demand retrieval integrated dynamically at generation time"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer should mention query rewriting as an advanced technique that reformulates input queries to better match and retrieve relevant documents from large corpora.",
+   "weight": 0.06,
+   "examples": [
+    "Rewritten queries improve matching to corpus documents",
+    "Query reformulation enhances retrieval effectiveness"
+   ]
+  },
+  {
+   "name": "valuable_3",
+   "tier": "valuable",
+   "criterion": "The answer should cite evidence of effectiveness, such as RETRO's GPT-3/Jurassic-1-comparable performance with 25x fewer parameters using a 2-trillion-token corpus, kNN-LM's SOTA perplexity and better handling of rare/factual patterns, or domain adaptation by swapping the datastore without retraining.",
+   "weight": 0.09,
+   "examples": [
+    "RETRO matches GPT-3 with 25x fewer parameters",
+    "kNN-LM achieves SOTA perplexity on Wikitext-103 with no extra training",
+    "Domain adaptation by varying the datastore"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

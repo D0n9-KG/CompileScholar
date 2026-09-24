@@ -1,0 +1,98 @@
+{
+ "question": "What are ways to cool the center-of-mass (CoM) motion of levitated nanoparticles?",
+ "case_id": "shengyan_photonics_1",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer identifies measurement-based feedback cooling as the (most common) way to cool the CoM motion of levitated nanoparticles.",
+   "weight": 0.15,
+   "examples": [
+    "Feedback cooling is currently the most commonly used method",
+    "Measurement-based feedback control can cool the CoM motion"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer describes the mechanism: measure real-time position, derive instantaneous velocity, and apply an opposing force, e.g., via scattering forces from laser beams.",
+   "weight": 0.16,
+   "examples": [
+    "Calculate the instantaneous velocity from the position signal and apply a force opposing the velocity",
+    "Feedback cooling by scattering forces from three orthogonal 532 nm laser beams"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer describes levitating a femtogram dielectric particle in cryogenic free space, where thermal decoherence is suppressed and measurement backaction dominates, enabling quantum control and CoM cooling via measurement-based feedback.",
+   "weight": 0.15,
+   "examples": [
+    "Levitating a femtogram dielectric particle in cryogenic free space suppresses thermal effects",
+    "With an efficient quantum measurement, we exert quantum control and cool the CoM motion by measurement-based feedback"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer quantifies cooling performance, e.g., millikelvin mode temperatures (1.5 mK at 5.2 mPa, from 297 K) or near-ground-state occupancies (about 0.65 motional quanta, state purity 0.43).",
+   "weight": 0.12,
+   "examples": [
+    "Cooling from room temperature to 1.5 mK at low pressure",
+    "An average occupancy of 0.65 motional quanta, corresponding to a state purity of 0.43"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "The answer explains that lowering gas pressure reduces the gas-collision heating rate while the feedback cooling rate stays roughly constant, so the final temperature drops (proportional to pressure at constant gain).",
+   "weight": 0.1,
+   "examples": [
+    "Reducing the pressure reduces the heating rate from air-molecule collisions while the cooling rate remains constant",
+    "At constant feedback gain, the mode temperature is proportional to pressure"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer gives hardware and implementation details: orthogonal 532 nm cooling beams (~1% of trapping-beam intensity), AOM-controlled power modulated proportionally to instantaneous velocity (plus an offset to shift the trap centre), or detector calibration via thermal spectra.",
+   "weight": 0.09,
+   "examples": [
+    "Three orthogonal 532 nm laser beams with intensities about 1% of the trapping beams, power controlled by acousto-optic modulators",
+    "Each beam is modulated with a signal proportional to the instantaneous velocity plus an offset"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer motivates CoM cooling: probing quantum mechanics with macroscopic objects, matter-wave/free-fall experiments, and fully controllable trapping potentials.",
+   "weight": 0.08,
+   "examples": [
+    "Cooled levitated particles allow tests of quantum mechanics on a macroscopic scale",
+    "The fully controllable trapping potential makes levitated nanoparticles promising for matter-wave experiments"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer notes that free-space levitated cooling avoids an optical resonator and its bandwidth limitations, and contrasts it with tethered micromechanical oscillators cooled by radiation-pressure coupling or cavity-enhanced feedback.",
+   "weight": 0.08,
+   "examples": [
+    "The absence of an optical resonator and its bandwidth limitations is advantageous",
+    "Cavity-enhanced detection schemes have been used to cool tethered oscillators to their quantum ground states"
+   ]
+  },
+  {
+   "name": "valuable_3",
+   "tier": "valuable",
+   "criterion": "The answer discusses decoherence: gas collisions as a heating source at finite pressure, and thermal effects suppressed in cryogenic environments so measurement backaction dominates.",
+   "weight": 0.07,
+   "examples": [
+    "Heating arises from collisions with air molecules at finite pressure",
+    "Cryogenic free space suppresses thermal effects so measurement backaction dominates decoherence"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

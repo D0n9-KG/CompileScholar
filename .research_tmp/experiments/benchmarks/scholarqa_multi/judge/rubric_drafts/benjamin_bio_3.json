@@ -1,0 +1,91 @@
+{
+ "question": "What cancer type and cancer stage are most ideal for using image-guided surgery as a treatment option?",
+ "case_id": "benjamin_bio_3",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer defines IGS (also fluorescence-guided surgery) as a surgical intervention using fluorescence/NIR imaging for real-time intraoperative identification of tumor margins, distinguishing malignant from healthy tissue.",
+   "weight": 0.15,
+   "examples": [
+    "IGS uses fluorescence imaging to identify tumor margins in real time during surgery",
+    "Fluorescence-guided surgery relies on NIR imaging agents to visualize malignant vs. healthy tissue intraoperatively"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer identifies breast cancer as the most ideal cancer type for IGS, specifically in the context of breast-conserving surgery (BCS/lumpectomy) at initial surgery.",
+   "weight": 0.16,
+   "examples": [
+    "Breast cancer, during breast-conserving surgery/lumpectomy",
+    "IGS was developed to meet an unmet need in the management of breast cancer at initial BCS"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer states that early-stage disease is the most ideal stage, with justification: early-stage breast cancer treated by BCS/lumpectomy, sentinel lymph node mapping in early-stage cervical/endometrial cancer, or early-stage solid tumors to reduce recurrence and metastasis risk.",
+   "weight": 0.16,
+   "examples": [
+    "Early stage, since early-stage breast cancer is treated with BCS/lumpectomy",
+    "Early-stage cervical and endometrial cancer for sentinel lymph node mapping",
+    "Early-stage solid tumors, to reduce the chance of recurrence and metastasis"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer explains the rationale: IGS addresses positive margins and the ~20% re-excision rate in BCS, with ~85% of re-excisions due to initial positive margins; surgeons relying on visual and tactile cues risk residual lesions.",
+   "weight": 0.13,
+   "examples": [
+    "Re-excision rate is ~20%, with ~85% due to positive initial margins",
+    "Surgeons relying on visual and tactile cues may leave residual lesions, motivating intraoperative imaging"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "The answer cites at least two additional cancer applications of IGS/fluorescence from the passages: advanced epithelial ovarian cancer, neuro-oncology, prostate, head and neck, liver, or rectal cancer.",
+   "weight": 0.12,
+   "examples": [
+    "Advanced epithelial ovarian cancer for detecting microscopic peritoneal metastases",
+    "Neuro-oncology resection to the functional limit with greater extent of resection",
+    "Head and neck cancer to better define resection borders"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer states that IGS improves the chance of complete resection with negative margins, citing the rectal cancer navigation study (R0 rates 93% vs 84% in LARC; 79% vs 49% in LRRC) and its demonstrated cost-effectiveness.",
+   "weight": 0.1,
+   "examples": [
+    "Navigated surgery achieved 79% R0 resections in LRRC vs 49% with standard surgery",
+    "Navigation in rectal cancer was shown to be early cost-effective"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer contrasts IGS with current practice, which relies on visual/tactile cues and preoperative imaging (MRI, mammography, ultrasound, CT) that cannot guide intraoperative decisions, leaving an unmet intraoperative need.",
+   "weight": 0.1,
+   "examples": [
+    "Surgeons rely primarily on visual and tactile cues, risking residual lesions",
+    "Traditional imaging modalities are used preoperatively but not intraoperatively"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer notes that outcomes depend on the specificity and half-life of the imaging agent, and/or that FDA-approved NIR devices and dyes exist (e.g., ICG, firefly camera in the da Vinci platform), reflecting the field's technical maturity.",
+   "weight": 0.08,
+   "examples": [
+    "Surgical outcome depends on the specificity and half-life of the imaging agent",
+    "ICG is an FDA-approved NIR dye commonly used",
+    "FDA-approved devices exist for NIR fluorescence navigation in laparoscopic and robotic surgery"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

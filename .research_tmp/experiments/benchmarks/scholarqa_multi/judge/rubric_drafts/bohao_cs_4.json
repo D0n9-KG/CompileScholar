@@ -1,0 +1,88 @@
+{
+ "question": "How can complex word identification (CWI) models be personalized to improve their performance for individual users with different language backgrounds and proficiency levels?",
+ "case_id": "bohao_cs_4",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer must explain that CW and CCW waves in a ring/WGM cavity resonate at the same frequency, and that an approaching particle couples to the evanescent field, scattering photons out or reversing their direction, thereby breaking symmetry and lifting the degeneracy to produce a measurable frequency splitting.",
+   "weight": 0.14,
+   "examples": [
+    "In a ring-shaped cavity, CW and CCW modes are degenerate; a nearby particle perturbs the evanescent field",
+    "Particle-induced backscattering converts CW to CCW photons, lifting eigenmode degeneracy"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer must define an exceptional point as a degeneracy of open (non-Hermitian) wave/quantum systems where both eigenvalues AND eigenvectors coalesce, and contrast it with a diabolic point, where only eigenvalues degenerate and frequency splitting is linear in perturbation strength.",
+   "weight": 0.16,
+   "examples": [
+    "At a DP, splitting is proportional to ε; at an EP, eigenvalues and eigenvectors coalesce and splitting scales as √ε",
+    "EPs are square-root singularities of eigenvalues as a function of a complex interaction parameter"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer must state that perturbing a system at an EP produces frequency splitting proportional to the square root of perturbation strength, which exceeds the linear (DP) splitting for sufficiently small perturbations, yielding enhanced sensitivity.",
+   "weight": 0.15,
+   "examples": [
+    "Splitting ∝ √ε at an EP vs ∝ ε at a DP",
+    "Square-root splitting exceeds linear DP splitting at low perturbations/concentrations (e.g., < 1 fM anti-IgG)"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer must apply EP sensing to microcavity/WGM single-particle detection and quantify the enhancement, e.g., more than threefold enhanced sensitivity in simulations or twice the sensitivity of a DP sensor in demonstrated nanoparticle detection.",
+   "weight": 0.13,
+   "examples": [
+    "Analytical theory and simulations prove >3x sensitivity enhancement for single-particle detection",
+    "An EP-based WGM sensor detected a polystyrene nanoparticle with twice the sensitivity of a DP sensor"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "The answer must note that EPs have been experimentally realized, e.g., microwave cavity experiments showing eigenvalue interchange with eigenvector sign changes upon encircling, and photonic crystal slabs exhibiting exceptional rings via angle-resolved reflection.",
+   "weight": 0.09,
+   "examples": [
+    "Microwave cavity experiments encircling EPs showed eigenvalues interchanged with field-pattern sign changes",
+    "An exceptional ring was demonstrated in a photonic crystal slab via angle-resolved reflection measurements"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer should describe mechanisms for tuning a system to an EP, such as nanotips inducing fully asymmetric internal backscattering (CW to CCW but not reverse) that yields no frequency splitting at the EP, or hybridization of detuned resonator arrays.",
+   "weight": 0.11,
+   "examples": [
+    "Two silica nanotips placed near a microtoroid scatter light one way only, preparing the EP",
+    "Two detuned plasmonic resonator arrays hybridize to form a plasmonic EP"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer should note that realizing the full EP sensitivity gain requires measuring both frequency splitting and linewidth splitting (with anticrossing accompanying width crossing as a signature), and that active optical microcavities may be needed to resolve individual linewidths.",
+   "weight": 0.11,
+   "examples": [
+    "Eigenvalue repulsion at an EP implies frequency anticrossing when width crossing is present",
+    "Active optical microcavities could enable resolution of individual linewidths"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer may situate EP sensing within broader non-Hermitian phenomena, e.g., non-Hermitian perturbations deforming a Dirac cone into an exceptional ring, PT-symmetry breaking, loss-induced transparency, unidirectional transmission, or single-mode lasing.",
+   "weight": 0.11,
+   "examples": [
+    "Dissimilar radiation losses deform a Dirac cone into a flat band enclosed by an exceptional ring",
+    "EPs underlie loss-induced transparency and unidirectional transmission"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

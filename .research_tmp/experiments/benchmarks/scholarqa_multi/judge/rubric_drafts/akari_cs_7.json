@@ -1,0 +1,98 @@
+{
+ "question": "do we know how true the “superficial alignment hypothesis” is?\nA model’s knowledge and capabilities are learnt almost entirely during pretraining, while alignment teaches it which subdistribution of formats should be used when interacting with users\nIs it true for all domains/aspects or is it only true for more perceivable aspects like helpfulness?\nDoes SFT on a huge instruction dataset teach models new knowledge? Pointers to related papers would be appreciated.",
+ "case_id": "akari_cs_7",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "States the Superficial Alignment Hypothesis accurately and attributes it to LIMA: knowledge/capabilities are learned almost entirely during pretraining, while alignment teaches which subdistribution of output formats to use with users — with the corollary that a small number of examples can suffice for tuning if alignment is largely stylistic.",
+   "weight": 0.13,
+   "examples": [
+    "Per LIMA [0], pretraining learns knowledge while alignment teaches format/style selection",
+    "The hypothesis implies ~1K curated examples should suffice for alignment"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "Cites LIMA's setup and results: 65B LLaMA fine-tuned on only 1,000 curated prompts/responses with no RLHF or preference modeling, achieving strong generalization to unseen tasks and competitive human preferences (preferred/equal in 43% of cases vs GPT-4, 58% vs Bard, 65% vs DaVinci003).",
+   "weight": 0.13,
+   "examples": [
+    "LIMA matched GPT-4 in 43% of human comparisons using just 1K examples and no RLHF",
+    "Format was learned from a handful of examples and generalized to unseen tasks"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "Presents the token-level analysis (The Unlocking Spell) showing base and aligned models decode nearly identically on most token positions, with distribution shifts concentrated in stylistic tokens — the strongest direct support for the hypothesis.",
+   "weight": 0.13,
+   "examples": [
+    "Base and aligned models differ mainly at stylistic tokens [2]",
+    "Distribution shift analysis directly supports superficiality of alignment"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "Mentions URIAL, a tuning-free alignment method using in-context learning with three constant stylistic examples plus a system prompt that matches or outperforms SFT/RLHF-aligned models, and optionally other training-free methods like RAIN, as further support.",
+   "weight": 0.12,
+   "examples": [
+    "URIAL aligns base LLMs with 3 ICL examples and a system prompt, matching tuned models",
+    "Training-free methods (URIAL, RAIN) succeeding implies alignment is largely superficial"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "Presents counter-evidence that small SFT datasets teach style mimicry rather than new capabilities such as factuality, and that human raters can be fooled into rating style-mimicking outputs positively — limiting the hypothesis' apparent scope.",
+   "weight": 0.12,
+   "examples": [
+    "1K examples cannot teach factuality, yet style mimicry earns positive human ratings",
+    "Learning style can mask absence of new knowledge"
+   ]
+  },
+  {
+   "name": "answer_critical_5",
+   "tier": "critical",
+   "criterion": "Cites evidence that scaling instruction-tuning data teaches new knowledge and skills: WebInstruct mines ~10M web examples, and the resulting Mammoth 2 outperforms LLaMA-3-Instruct by ~6 points on reasoning, showing SFT is not purely superficial.",
+   "weight": 0.13,
+   "examples": [
+    "Mammoth 2, trained on 10M web-mined instructions, beats LLaMA-3-Instruct by 6 points on reasoning",
+    "Scaling SFT to millions of examples yields genuine reasoning gains"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "Synthesizes a nuanced, aspect-specific conclusion: superficial alignment holds mainly for perceivable aspects like style, helpfulness, and instruction-following format, while knowledge and reasoning require substantial post-pretraining data — so post-pretraining training remains essential.",
+   "weight": 0.14,
+   "examples": [
+    "Superficiality holds for helpfulness/style but not for knowledge acquisition",
+    "Small data suffices for format; large-scale SFT is needed for reasoning gains"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "Frames the answer as partially supported and not definitively settled: direct evidence supports it for style-like aspects while other evidence contradicts it for knowledge/reasoning, so its overall validity remains an open research question.",
+   "weight": 0.06,
+   "examples": [
+    "The hypothesis is supported for some aspects and refuted for others; it remains open",
+    "We know it holds for style-like aspects but not universally across domains"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "Provides explicit pointers to the relevant papers by name, as requested: LIMA (Zhou et al., 2023), The Unlocking Spell on Base LLMs / URIAL, RAIN, and WebInstruct / Mammoth 2.",
+   "weight": 0.04,
+   "examples": [
+    "Related papers: LIMA, The Unlocking Spell (URIAL), RAIN, WebInstruct/Mammoth 2",
+    "See Zhou et al. 2023 and the Unlocking Spell paper for direct evidence"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

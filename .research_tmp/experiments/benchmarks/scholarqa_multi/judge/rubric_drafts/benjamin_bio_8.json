@@ -1,0 +1,88 @@
+{
+ "question": "What are some ways to overcome ethical challenges in xenotransplantation?",
+ "case_id": "benjamin_bio_8",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer identifies that xenotransplant recipients must be monitored for pathogens over extended periods, possibly their whole lives, due to risks to themselves and to public health.",
+   "weight": 0.15,
+   "examples": [
+    "Recipients need monitoring for pathogens dangerous to themselves and others, potentially for their whole lives",
+    "Ongoing pathogen surveillance of recipients is necessary as a public health measure"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer explains that safety monitoring severely limits the privacy of recipients and their family, friends, and work associates, creating an ethical tension between the individual's good and society's good.",
+   "weight": 0.14,
+   "examples": [
+    "Monitoring limits the privacy not only of the recipient but also of family, friends, and coworkers",
+    "There is a tension between the good of the recipient and the good of society"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer notes that recipients' identities are unlikely to remain confidential and that recipients may be stigmatized (e.g., seen as 'freaks' or taunted as 'pig heart', especially children), causing psychological damage.",
+   "weight": 0.13,
+   "examples": [
+    "It is extremely unlikely recipient identity can be kept confidential",
+    "A child recipient might be taunted with terms like 'pig heart', causing psychological harm"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer addresses the need for a fair system to ensure equitable distribution of xenotransplanted organs and a fair allocation of the risks and benefits involved.",
+   "weight": 0.13,
+   "examples": [
+    "There must be a fair way to assure equitable distribution of risks and benefits",
+    "Fair allocation criteria for xenotransplanted organs should be established before expansion"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "The answer calls for strong regulation, legal frameworks, and cautious governmental oversight of xenotransplantation research and clinical practice.",
+   "weight": 0.12,
+   "examples": [
+    "Governments have been extremely cautious and should restrict unrestricted research",
+    "Legal and ethical governance frameworks must be developed for clinical trials"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer recommends that medical professionals openly discuss and educate the public about xenotransplantation, citing AMA guidance.",
+   "weight": 0.11,
+   "examples": [
+    "The AMA encourages professionals to educate the public by openly discussing the procedures",
+    "Open debate on value-based decisions is needed because risks and benefits are not fully understood"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer acknowledges ethical concerns about animal rights and the treatment of animals (e.g., pigs) raised in unnatural, controlled conditions for organ procurement.",
+   "weight": 0.11,
+   "examples": [
+    "Regulations should not violate animal rights",
+    "Raising pigs in controlled, unnatural conditions raises ethical questions"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer frames xenotransplantation in the context of the severe human organ shortage and recent clinical milestones (e.g., the 2022 transgenic pig heart transplant) that motivate and ground the ethical discussion.",
+   "weight": 0.11,
+   "examples": [
+    "Xenotransplantation is considered to make up for the shortage of human organs; about 800 US patients died in 2021 waiting for a heart or lung",
+    "The first pig heart transplant recipient lived 8 weeks after the 2022 Maryland procedure"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

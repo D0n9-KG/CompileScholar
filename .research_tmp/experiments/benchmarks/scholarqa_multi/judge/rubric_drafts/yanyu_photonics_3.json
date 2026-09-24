@@ -1,0 +1,98 @@
+{
+ "question": "How does particle binding to a high-Q optical microcavity induce a resonance shift, and what are the limitations and enhancements required for sensitive single-protein detection using cavity optomechanics?",
+ "case_id": "yanyu_photonics_3",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer explains that a particle binding to a high-Q microcavity perturbs the cavity mode at resonance wavelength λ0 (e.g., via its polarizability in the evanescent field), producing a resonance shift δλ read out as a change in cavity transmission — the basis of microcavity sensing.",
+   "weight": 0.14,
+   "examples": [
+    "A bound particle polarizes in the optical field, perturbing the WGM resonance at λ0 by δλ, altering transmitted light",
+    "Individual nanobeads as small as 12.5 nm radius were resolved via their resonance shifts"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer states that sensing resolution depends critically on the optical quality factor Q: narrower linewidths of high-Q modes filter spectral noise within the resonance bandwidth and reduce the 3σ deviation of the measured resonance maximum.",
+   "weight": 0.12,
+   "examples": [
+    "Simulation across Q from 10^3 to 10^8 shows high Q lowers the 3σ deviation of the resonance maximum",
+    "Narrow-linewidth resonances more effectively reject noise samples identified as spectral extrema"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer distinguishes sensitivity (magnitude of the spectral shift) from sensor resolution (smallest accurately measurable shift, set by spectral resolution and noise), and defines the detection limit as combining the two (DL = noise or resolution / sensitivity), commonly expressed in RIU for RI-based sensors.",
+   "weight": 0.11,
+   "examples": [
+    "Detection limit DL = R/S where R is sensor resolution incorporating system noise",
+    "Sensitivity alone is insufficient; sensor resolution accounting for noise combines with S to give the detection limit"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer cites the state-of-the-art resolution δλ/λ0 = 3×10^−10 with Q ~ 10^8 in aqueous operation (achieved with a thermal-stabilized reference interferometer and ultrahigh-Q microtoroids), and notes this remains larger than the shift from a single protein binding event (~1 kDa).",
+   "weight": 0.13,
+   "examples": [
+    "Even a record resolution of 3×10^−10 at Q = 10^8 in water exceeds the shift induced by a single protein",
+    "Nanobead detection at 12.5 nm radius approaches but does not reach single-protein shifts"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "The answer explains cavity optomechanics: intracavity radiation pressure drives the mechanical mode, and a blue-detuned pump boosts the motion above threshold into coherent narrow-linewidth optomechanical oscillation (OMO) in the microwave range, whose frequency depends directly on laser–cavity detuning, so particle-induced optical resonance shifts are transduced into mechanical frequency shifts.",
+   "weight": 0.16,
+   "examples": [
+    "Blue-detuned pumping excites regenerative optomechanical oscillation; perturbations of the optical resonance transfer to the OMO frequency",
+    "OMO frequency depends directly on laser–cavity detuning, so resonance perturbations become microwave-range frequency shifts"
+   ]
+  },
+  {
+   "name": "answer_critical_5",
+   "tier": "critical",
+   "criterion": "The answer states that optomechanical sensing resolution scales with both the optical Q and the effective mechanical Q of the OMO, yielding up to six orders of magnitude enhancement — sufficient for single-molecule detection — while preserving the effective detection area, unlike plasmonic nanoantenna approaches.",
+   "weight": 0.15,
+   "examples": [
+    "Narrow mechanical linewidth of the OMO provides resolution beyond optical Q alone, improving sensitivity ~10^6-fold",
+    "Unlike nanoantenna enhancement, optomechanics does not compromise the effective detection area"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer describes the BSA experiment: discrete frequency steps in the oscillation spectrogram correspond to single BSA (66 kDa) binding/unbinding events in DPBS, with a signal-to-noise ratio of 16.8.",
+   "weight": 0.08,
+   "examples": [
+    "Lu et al. observed stepwise increases/decreases in OMO frequency corresponding to single BSA binding/unbinding",
+    "Single 66 kDa BSA molecules were detected with a signal-to-noise ratio of 16.8"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer mentions that a plasmonic nanoantenna on the microcavity can enhance the resonance shift enough for ~1 kDa protein detection, but at the cost of significantly reducing the effective detection area to a local hot spot.",
+   "weight": 0.05,
+   "examples": [
+    "Nanoantenna-enhanced microcavities reach single small-protein sensitivity but confine detection to a hot spot",
+    "Plasmonic enhancement trades detection area for local field intensity"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer addresses practical limitations and mitigations: residual thermal effects in high-Q devices even at ~10 µW coupled power, thermal-stabilized reference interferometry enabling record detection without laser feedback stabilization, SNR dependence of spectral resolution (e.g., 20–80 dB analysis), and SNR boosting via particle-induced backscatter combined with optical-path shifts (Influenza A SNR 3:1 → 38:1).",
+   "weight": 0.06,
+   "examples": [
+    "Even at 10 µW coupled power, thermal effects persisted in the highest-Q microtoroids (Q ~ 10^8)",
+    "A thermal-stabilized reference interferometer with an ultrahigh-Q microcavity enabled record nanoparticle detection without laser feedback stabilization"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

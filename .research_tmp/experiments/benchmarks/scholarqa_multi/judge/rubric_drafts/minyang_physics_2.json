@@ -1,0 +1,98 @@
+{
+ "question": "What messager are combined in multi-messenger astrophysics approach?",
+ "case_id": "minyang_physics_2",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer must identify the messengers combined in multi-messenger astrophysics: gravitational waves, electromagnetic radiation (photons), cosmic rays, and neutrinos.",
+   "weight": 0.16,
+   "examples": [
+    "MMA combines gravitational waves, electromagnetic radiation, cosmic rays, and neutrinos",
+    "The four messengers are photons, gravitational waves, cosmic rays, and neutrinos"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer must describe electromagnetic observations as a messenger, e.g., across radio, infrared, optical, UV, X-ray and gamma-ray wavelengths (up to multi-TeV), with facilities such as Swift, Fermi, MAGIC, HESS, VERITAS and HAWC.",
+   "weight": 0.13,
+   "examples": [
+    "Fermi covers 10 keV X-rays to TeV gamma-rays",
+    "Ground-based Cherenkov telescopes like MAGIC and HESS measure 100 GeV to multi-TeV gamma-rays"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer must describe gravitational waves as a messenger, produced by compact binary mergers (black hole and neutron star), detected by observatories such as LIGO/Virgo/KAGRA.",
+   "weight": 0.13,
+   "examples": [
+    "Gravitational waves from binary black hole and neutron star mergers are one messenger",
+    "GWs let us probe electromagnetically dark phenomena"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer must describe neutrinos as a messenger, citing detectors such as IceCube and its high-energy neutrino alert catalog (e.g., 275 track-event alerts from 2011-2020).",
+   "weight": 0.11,
+   "examples": [
+    "IceCube detects high-energy neutrinos and issues real-time alerts",
+    "Neutrinos probe dense interiors of compact objects"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "The answer must describe cosmic rays as a messenger, noting their violent astrophysical origins (supernovae, AGNs) and detection via air-shower experiments such as Pierre Auger and IceTop.",
+   "weight": 0.11,
+   "examples": [
+    "Pierre Auger records only ~20 cosmic ray showers per year, within ~100 Mpc",
+    "IceTop data was checked for cosmic-ray activity correlated with neutrino alerts"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer should explain what each messenger can and cannot probe (e.g., EM reveals temperature, composition, redshift but not dense interiors; neutrinos probe dense interiors; GWs only from massive systems) and why combining them yields insights no single messenger could.",
+   "weight": 0.12,
+   "examples": [
+    "EM cannot penetrate dense cores of BNS mergers, but neutrinos can",
+    "Combining GW and EM data gives a fuller picture of BNS mergers"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer should mention that absence of one messenger when another is detected can constrain models of source emission mechanisms.",
+   "weight": 0.08,
+   "examples": [
+    "Detecting photons but not neutrinos from a BNS merger constrains emission models",
+    "Non-detection of EM counterparts to BBH mergers informs source physics"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer should mention that diffuse backgrounds of cosmic rays, high-energy neutrinos, and gamma rays are expected to be interconnected and require MMA to identify their sources, and that BNS mergers emit GWs, photons and neutrinos together.",
+   "weight": 0.08,
+   "examples": [
+    "The cosmic ray, neutrino, and gamma-ray diffuse backgrounds are linked",
+    "Identifying sources of these backgrounds requires a multi-messenger approach"
+   ]
+  },
+  {
+   "name": "valuable_3",
+   "tier": "valuable",
+   "criterion": "The answer should connect MMA to fundamental physics domains such as particle physics, general relativity, nuclear physics, and dark matter studies (e.g., WIMPs, axions via GW observations).",
+   "weight": 0.08,
+   "examples": [
+    "MMA tests general relativity in extreme conditions",
+    "GW observations of mergers could provide insight into dark matter, e.g., WIMPs or axions"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

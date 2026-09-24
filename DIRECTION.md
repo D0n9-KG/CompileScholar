@@ -2,6 +2,8 @@
 
 > **本页历史**：09-16 版（三线框架）经 2026-09-17 代码一手核验判定作废；09-17 v2 重写后，09-20 又发生两件定案级事件——①基准切换（PaperScope 因 41% 脏 gold 弃用，换三考场组合）②项目定名 CompileScholar（编译 vs 检索的范式对话）。本页 v3 反映最新定案；与 IDEA-PLAN v4 冲突处以本页 09-20 节为准（v4 早于基准切换）。推导档案：`ccfa-workfiles/idea/logickg-idea-plan-2026-09-17/IDEA-PLAN.md`（v4）+ memory `session-handoff-2026-09-18` §六quindecies–novemdecies（基准判决全记录）。
 
+> **09-27 更新注**：本页 v3 的"基准三考场"（§2）已被任务驱动实验矩阵设计取代（四任务族：固定/开放检索+固定/开放跨论文 QA+单篇 QA+库生长分析节；ScholarStack 竞品定位+外部方法 PK 制；终版矩阵见 memory session-2026-09-21-scaling-and-corpus.md 09-27 节，待调研子代理返回后定稿）。方向主张（§0/§1）不变。
+
 ## 0. 大方向一句话
 
 做**内容可验证的类型化文献知识层**系统（构建管线+编译视图+typed tools），用同语料同后端的三家族 PK 矩阵（vs 通用 RAG / KG-RAG / 科学文献系统）证明它在科学 Agent 负载上的价值。〔用户 09-17 定调：主要工作=能与前沿系统 PK 的一套科学 Agent 文献系统〕

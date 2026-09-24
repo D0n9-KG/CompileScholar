@@ -1,0 +1,89 @@
+{
+ "question": "How do hybrid plasmonic–photonic enhance the sensitivity of whispering gallery mode (WGM) or photonic crystal (PC) nanobeam cavity sensors for single-molecule detection? ",
+ "case_id": "yanyu_photonics_2",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer describes coupling a plasmonic nanoparticle (e.g., gold nanorod/nanostar) on or inside a photonic cavity (WGM microsphere/microtoroid or PC nanobeam), hybridizing the LSPR with the cavity mode via spatial and spectral overlap to form a hybrid plasmonic-photonic resonance.",
+   "weight": 0.18,
+   "examples": [
+    "A metal nanoparticle bound to a microtoroid combines localized plasmon resonance with the WGM",
+    "A gold nanostar coupled to a photonic crystal guided resonance yields a sharp hybrid resonance",
+    "Trapping a gold NP inside a PC nanobeam cavity creates the hybrid resonator"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer identifies that the nanoparticle's localized surface plasmon concentrates the optical field into a nanoscale hotspot at the molecule binding site, so a single molecule perturbs the resonance far more strongly than in a bare cavity.",
+   "weight": 0.16,
+   "examples": [
+    "The resonantly excited nanorod produces field enhancements at its tips in excess of 10^3 relative to the incident intensity",
+    "The MNP offers a highly enhanced local field in the vicinity of an emitter/molecule"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer explains that the enhanced local field amplifies the resonance frequency shift induced by a bound analyte, enabling detection of single biomolecules (proteins, nucleic acids) with signal above noise, citing quantitative gains such as 870x single-BSA shift enhancement or MHz-scale shifts exceeding noise.",
+   "weight": 0.16,
+   "examples": [
+    "The frequency shift for a single BSA molecule increases by a factor of 870, with MHz-scale shifts an order of magnitude above thermal and frequency noise",
+    "Single proteins and single nucleic acids were detected with the hybrid resonator"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer notes that the hybrid combines low mode volume (plasmon) with long photon storage time (high-Q cavity), outperforming either a bare cavity or a lone nanoparticle, and that high Q can be maintained despite the lossy plasmonic element.",
+   "weight": 0.14,
+   "examples": [
+    "Surprisingly, the high-Q property of WGMs is maintained in the presence of the MNP",
+    "The hybrid PC nanobeam system achieves both deep subwavelength mode volume (3.5e-4 λ^3) and high Q (8.2e3 in buffer) simultaneously"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "The answer states that the hybrid mode enhances overall light-matter interaction, e.g., single-atom/molecule cooperativity enhanced by more than two orders of magnitude versus a bare WGM cavity.",
+   "weight": 0.1,
+   "examples": [
+    "The hybrid mode boosts single-atom cooperativity by over two orders of magnitude compared to a bare WGM microcavity",
+    "Strong interaction arises from combining low mode volume with long photon storage time"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer notes the approach extends to PC nanobeam cavities by trapping a gold nanoparticle inside the cavity, achieving deep subwavelength mode volume and high Q simultaneously for single-molecule observation of reaction dynamics.",
+   "weight": 0.09,
+   "examples": [
+    "Quan et al. trapped a gold NP in a PC nanobeam cavity, achieving V = 3.5e-4 λ^3 and Q = 8.2e3 in buffer",
+    "DNA-protein interaction dynamics were observed with single-molecule resolution in the hybrid PC cavity"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer discusses that coupling must be optimized — e.g., operating at critical coupling while avoiding destructive Fano interference/antenna transparency — and notes the ultrasharp hybrid resonance can be spectrally tuned (e.g., via incidence angle scanning).",
+   "weight": 0.09,
+   "examples": [
+    "Maximum power transfer to the antenna is attained under critical coupling",
+    "The ultrasharp Lorentzian-line-shaped hybrid resonance is continuously tunable by scanning the incidence angle"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer acknowledges costs of adding the plasmonic element, such as Q-factor degradation from absorption or WGM splitting into doublets from nanoparticle scattering.",
+   "weight": 0.08,
+   "examples": [
+    "Absorption from the nanorod reduces the Q factor of the resonator",
+    "Enhanced polarizability scatters light back into the microtoroid, splitting the WGM into a doublet"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

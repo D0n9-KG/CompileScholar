@@ -1,0 +1,95 @@
+{
+ "question": "How linker stability is related to the potency and toxicity of ADCs upon intravenous administration?",
+ "case_id": "benjamin_bio_5",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "Answer identifies the three ADC components—monoclonal antibody, cytotoxic payload, and chemical linker—and positions the linker as central to ADC potency, toxicity, and overall performance.",
+   "weight": 0.11,
+   "examples": [
+    "ADC = monoclonal antibody + linker + cytotoxic payload",
+    "ADCs deliver highly cytotoxic molecules selectively to cancer cells via mAb and linker",
+    "linker has a key role in ADC outcomes"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "Answer states that upon intravenous administration a stable linker keeps the payload attached until the ADC reaches the tumor, preventing premature release in circulation and the resulting off-target/systemic toxicity.",
+   "weight": 0.17,
+   "examples": [
+    "stable linkers result in minimum off-target effects by not releasing the drug before the target is reached",
+    "premature payload shedding in circulation increases systemic toxicity",
+    "unstable linkers release drug in the bloodstream, causing off-target effects"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "Answer connects linker stability to pharmacokinetic behavior after IV dosing, including maintaining antibody concentration in blood, ADC half-life, and biodistribution.",
+   "weight": 0.13,
+   "examples": [
+    "stable linkers maintain antibody concentration in blood circulation",
+    "linker stability determines PK profile, half-life, and biodistribution",
+    "linker characteristics substantially impact pharmacokinetics and therapeutic index"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "Answer explains that linker stability is a key determinant of the therapeutic index: it preserves selective payload delivery to cancer cells (potency/efficacy) while limiting off-target toxicity.",
+   "weight": 0.14,
+   "examples": [
+    "selective delivery to cancer cells increases the therapeutic index of the payload",
+    "stable linkers ensure payload is delivered intact, maximizing potency",
+    "linker stability determines both potency and tolerability of the ADC"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "Answer distinguishes cleavable linkers (hydrazone, disulfide, peptide) from non-cleavable linkers and describes their distinct payload-release mechanisms (acid degradation, protease cleavage, thiol-disulfide exchange, or complete lysosomal degradation of the antibody).",
+   "weight": 0.12,
+   "examples": [
+    "peptide linkers cleaved by lysosomal proteases such as cathepsin B",
+    "hydrazone linkers cleaved by acid degradation in lysosomes; disulfide linkers by thiol-disulfide exchange",
+    "non-cleavable linkers release payload only after complete lysosomal proteolytic degradation of the mAb"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "Answer notes that linkers are susceptible to degradation (e.g., hydrolysis, enzymatic cleavage in plasma), which motivates the need for stability in circulation while enabling controlled release at the target.",
+   "weight": 0.12,
+   "examples": [
+    "linkers are prone to degradation through hydrolysis in plasma",
+    "protease cleavage and thiol-disulfide exchange can degrade cleavable linkers prematurely"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "Answer mentions that unstable or hydrophobic linker chemistry can alter physicochemical properties and promote ADC aggregation, heterogeneity, and unfavorable biodistribution, whereas stable linkers prevent aggregation.",
+   "weight": 0.11,
+   "examples": [
+    "hydrophobic modifications increase risk of antibody aggregation",
+    "ideally stable linkers prevent ADC aggregation",
+    "unstable linker chemistry alters physicochemical properties and biodistribution heterogeneity"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "Answer explains why payload retention matters: cytotoxic warheads are highly toxic as free agents with narrow therapeutic windows, so premature release causes systemic toxicity and targeted delivery via a stable linker is essential.",
+   "weight": 0.1,
+   "examples": [
+    "free payloads show substantial toxicity and poor efficacy",
+    "unconjugated cytotoxic agents have a narrow therapeutic window",
+    "toxicity remains a key challenge despite growing numbers of approved and investigational ADCs"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

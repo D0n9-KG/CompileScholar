@@ -1,0 +1,89 @@
+{
+ "question": "What are some of the key advantages and challenges of building multilingual evaluation datasets by translating existing English datasets into other target languages? Or more specifically, how do these translated datasets impact the quality and reliability of cross-lingual evaluations, and what potential pitfalls should be considered when using translations as a primary method for creating non-English benchmarks? ",
+ "case_id": "akari_cs_10",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer explains that translation produces parallel data with maximally similar distributions across languages, enabling fair cross-lingual comparison on identical content and avoiding variance from different speakers' intuitions about filling prompts.",
+   "weight": 0.166667,
+   "examples": [
+    "Translating instead of generating new sentences ensures data distributions are maximally similar across languages [2]",
+    "Translating avoids the unwanted degree of freedom from speakers of different languages having different intuitions about filling prompts [2]"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer states that translation is motivated by the abundance of English datasets and the high cost of native annotation; it removes reliance on scarce language-proficient annotators and enables reuse of a trusted annotator pool without training new workers per language.",
+   "weight": 0.155556,
+   "examples": [
+    "Due to the abundance of English datasets and annotation costs, benchmarks are created by translating [0]",
+    "XNLI reuses the same trusted pool of workers without training new workers in each language [2]",
+    "Enables easy scaling up to many languages"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer identifies translation quality problems: artifacts, degradation on long sentences, and translationese (e.g., preserved source word order or constrained register), especially with automatic translation.",
+   "weight": 0.155556,
+   "examples": [
+    "Quality issues arise with automatic translation, including degradation for long sentences and translation artifacts [0]",
+    "Automatic translation was still used for 12 surveyed datasets despite these issues [0]",
+    "Translationese: translated text differs from native text, e.g., preserved source word order"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer notes that translated data may not reflect native speakers' interests or target-culture content, and may force source-culture concepts onto target languages, undermining ecological validity.",
+   "weight": 0.144444,
+   "examples": [
+    "Translation-based approaches can result in data that does not reflect native speakers' interests (Clark et al., 2020)",
+    "Ignoring target cultural complexity or forcing source-culture concepts on target cultures"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "The answer discusses that careful human/professional translation can mitigate quality issues and bias, but at increased cost, creating a cost-quality tradeoff.",
+   "weight": 0.111111,
+   "examples": [
+    "XQuAD was translated into ten languages by professional translators [1]",
+    "Careful human selection/translation of source text reduces bias but increases cost"
+   ]
+  },
+  {
+   "name": "answer_critical_5",
+   "tier": "critical",
+   "criterion": "The answer explicitly ties these factors to the reliability of cross-lingual evaluations, concluding that translated benchmarks must be interpreted with caution regarding true native-language performance.",
+   "weight": 0.088889,
+   "examples": [
+    "Translated datasets may inflate or misrepresent model performance on genuinely native text",
+    "Researchers should weigh scalability benefits against risks of misrepresenting native usage"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer supports its points with survey statistics on how common translation-based construction is and concrete examples such as XNLI and XQuAD.",
+   "weight": 0.1,
+   "examples": [
+    "33 datasets used translation vs. 123 that did not; automatic translation used for 12 datasets despite quality issues [0]",
+    "XNLI [2] and XQuAD (SQuAD v1.1 translated into 10 languages by professional translators) [1]"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer mentions that parallel translated data enables cross-lingual evaluation setups such as mixed-language premise-hypothesis pairs.",
+   "weight": 0.077778,
+   "examples": [
+    "XNLI allows evaluating whether an Arabic premise is entailed with a Bulgarian or French hypothesis, yielding 1.5M+ combinations [2]"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

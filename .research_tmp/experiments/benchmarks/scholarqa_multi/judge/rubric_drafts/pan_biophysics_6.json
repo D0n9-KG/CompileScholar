@@ -1,0 +1,80 @@
+{
+ "question": "how cancer cell response to anti-caner drugs",
+ "case_id": "pan_biophysics_6",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer identifies mechanisms by which cancer cells develop resistance to anti-cancer drugs, including genetic mutations that alter drug targets, enhanced drug efflux via overexpressed transporters, and activation of alternative survival signaling pathways.",
+   "weight": 0.18,
+   "examples": [
+    "Genetic mutations can alter drug targets and render therapy ineffective",
+    "Cancer cells overexpress efflux transporters that pump drugs out",
+    "Activation of alternative survival pathways allows cells to evade drug effects"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer distinguishes between universal gene expression changes and cell-type specific transcriptional responses to anti-cancer drugs, using high-throughput transcript profiling to characterize responses across cancer types.",
+   "weight": 0.14,
+   "examples": [
+    "Some drug-induced gene expression changes are shared across cancer cell types",
+    "Different cancer cell types show unique transcriptional responses to the same drug",
+    "High-throughput transcript profiling enables systematic comparison of drug responses"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer links gene expression response patterns to the molecular determinants of drug sensitivity and resistance.",
+   "weight": 0.1,
+   "examples": [
+    "Common transcriptional signatures may predict drug sensitivity",
+    "Cell-type specific expression programs underlie differential drug resistance"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer explains that the cell cycle and checkpoint control machinery are key targets of anticancer drugs.",
+   "weight": 0.13,
+   "examples": [
+    "Anticancer drugs target cell cycle regulators and checkpoint proteins",
+    "Checkpoint control is a major class of anticancer drug targets"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "The answer states that disrupting cell cycle and checkpoint processes inhibits cancer cell proliferation and induces programmed cell death (apoptosis).",
+   "weight": 0.1,
+   "examples": [
+    "Disrupting checkpoint control halts proliferation",
+    "Cell cycle disruption triggers apoptosis in cancer cells"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer frames drug resistance as a major challenge in cancer therapy requiring comprehensive understanding.",
+   "weight": 0.15,
+   "examples": [
+    "Drug resistance remains a central obstacle to effective cancer treatment",
+    "A comprehensive view of resistance mechanisms is needed"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer integrates resistance mechanisms, transcriptional response variation, and cell cycle targeting into a coherent account of how cancer cells respond to anti-cancer drugs.",
+   "weight": 0.2,
+   "examples": [
+    "Drug response involves both resistance mechanisms and cell-cycle-mediated death",
+    "Sensitivity varies by cell type while resistance can arise through mutations and efflux"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 1
+}

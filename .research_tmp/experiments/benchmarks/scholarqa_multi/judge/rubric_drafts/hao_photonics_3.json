@@ -1,0 +1,99 @@
+{
+ "question": "What aspects can be studied using a coupled system of qubits and mechanical resonators?",
+ "case_id": "hao_photonics_3",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer must identify transduction of superconducting qubit excitations to optical photons as a studyable aspect, with the mechanical mode acting as intermediary.",
+   "weight": 0.16,
+   "examples": [
+    "A mechanical mode mediates transduction between a qubit and an optical mode",
+    "The coupled system converts a superconducting qubit excitation into an optical photon"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer must describe the architecture of a qubit, mechanical resonator, and optical mode, with the qubit coupled to mechanics via a resonant piezoelectric interaction and mechanics to optics via a parametric optomechanical interaction.",
+   "weight": 0.14,
+   "examples": [
+    "Piezoelectric coupling (rate gpe) links the qubit and mechanical mode",
+    "The mechanical mode couples to an optical mode via a parametric optomechanical interaction"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer must identify quantum erasure using surface acoustic wave phonons as an application, exploiting a two-phonon entangled state where the herald phonon marks which-path information and slow phonon propagation delays detection until after the interferometric result.",
+   "weight": 0.16,
+   "examples": [
+    "A two-phonon entangled state with the second phonon marking which-path information",
+    "Slow SAW propagation allows which-path detection after the interferogram is recorded"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer must mention that improved transduction paves the way for system-level demonstrations of remote entanglement of superconducting qubits and acoustic quantum state transfer in quantum networks.",
+   "weight": 0.12,
+   "examples": [
+    "Improved transduction efficiency enables system-level remote entanglement demonstrations",
+    "High-fidelity acoustic quantum state transfer in a quantum network"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "The answer must mention that the quantum eraser builds on a previously demonstrated SAW-based interferometer whose interferogram is observed.",
+   "weight": 0.07,
+   "examples": [
+    "Building on a previously demonstrated SAW interferometer",
+    "Observation of the interferogram of the acoustic interferometric process"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer includes technical conditions of the optomechanical interaction: red-detuned drive (Δ = ωm) giving a beam-splitter form, resolved-sideband limit (ωm ≫ κo), and pump enhancement of the single-photon coupling by intra-cavity photon number.",
+   "weight": 0.09,
+   "examples": [
+    "The beam-splitter interaction requires red-detuned drive and resolved-sideband operation",
+    "Single-photon coupling gom is enhanced by intra-cavity photon number nc"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer cites concrete improvement routes: niobium electrodes, lithium niobate piezoelectric material, surface passivation, reduced filtering loss, better thermal contact, and target efficiencies (ηt ≈ 0.1, nadd ≲ 0.1).",
+   "weight": 0.1,
+   "examples": [
+    "Lithium niobate offers larger piezoelectric coupling and energy participation",
+    "Eliminating filter insertion loss increases external efficiency by nearly two orders of magnitude",
+    "Niobium electrodes shorten quasiparticle lifetimes, improving repetition rate"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer notes that current low photon flux prevents direct verification of quantum statistics (e.g., anti-bunching) of the emitted optical field, which improved devices would enable.",
+   "weight": 0.07,
+   "examples": [
+    "Low photon flux does not allow direct verification of quantum statistics in the emitted light",
+    "Improved flux would enable observation of anti-bunching from transduced photons"
+   ]
+  },
+  {
+   "name": "valuable_3",
+   "tier": "valuable",
+   "criterion": "The answer clearly identifies at least two distinct studyable aspects of the coupled system: quantum transduction and delayed-choice quantum erasure.",
+   "weight": 0.09,
+   "examples": [
+    "Two aspects: qubit-to-optical-photon transduction and quantum erasure with acoustic phonons",
+    "The hybrid system supports both transduction experiments and quantum eraser demonstrations"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

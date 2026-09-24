@@ -1,0 +1,88 @@
+{
+ "question": "Has anyone tried fine tuning with RAG— or have seen work on this?",
+ "case_id": "akari_cs_6",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer directly confirms that yes, fine-tuning with RAG has been tried in recent work, naming at least two specific approaches (e.g., SAIL and Self-RAG).",
+   "weight": 0.13,
+   "examples": [
+    "Yes — several works fine-tune LLMs with retrieved context, including SAIL and Self-RAG.",
+    "Yes, fine-tuning with RAG has been explored, e.g., Search-Augmented Instruction Learning and Self-RAG."
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer describes SAIL as augmenting instruction-tuning data with search results (forming instruction, grounding information, response triplets collected from different search APIs/domains) and fine-tuning LLaMA-7B on it, teaching the model to ground on trustworthy results and filter distractions.",
+   "weight": 0.14,
+   "examples": [
+    "SAIL collects search results for each instruction-tuning case and fine-tunes LLaMA-7B on (instruction, grounding information, response) triplets.",
+    "The model learns to ground on trustworthy search results and filter out distracting passages."
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer describes Self-RAG as training a single LM with special reflection tokens to adaptively retrieve passages on demand, generate, and critique both retrieved passages and its own generations, enabling controllable inference behavior.",
+   "weight": 0.15,
+   "examples": [
+    "Self-RAG trains an LM that adaptively retrieves passages and critiques them via reflection tokens.",
+    "Reflection tokens make the LM controllable during inference for diverse task requirements."
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer conveys the motivation: LLMs lack up-to-date knowledge and transparency and produce factual inaccuracies from parametric knowledge alone, while indiscriminate retrieval of a fixed number of passages regardless of relevance can be unhelpful and diminish versatility.",
+   "weight": 0.13,
+   "examples": [
+    "LLMs lack transparency and up-to-date knowledge, motivating search-grounded fine-tuning.",
+    "Retrieving a fixed number of passages regardless of relevance diminishes versatility."
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer explains how SAIL labels search-result trustworthiness: an entailment classification model labels each passage informative or distracting by comparing entailed and contradictory scores (without manual annotation), and a search-filtering sequence (e.g., 'search result (1) is informative...') is concatenated before each response.",
+   "weight": 0.11,
+   "examples": [
+    "A passage is labeled 'informative' if its entailed score exceeds its contradiction score.",
+    "A filtering sequence like 'search result (1) is informative and search result (2) is distracting...' is prepended to each annotated response."
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer reports empirical evidence: SAIL-7B shows strong instruction-following and significantly better performance on transparency-sensitive tasks (open-ended QA, fact checking), and Self-RAG (7B/13B) outperforms ChatGPT and retrieval-augmented Llama2-chat on open-domain QA, reasoning, and fact verification, with gains in factuality and citation accuracy.",
+   "weight": 0.13,
+   "examples": [
+    "SAIL-7B performs significantly better on open-ended QA and fact checking.",
+    "Self-RAG outperforms ChatGPT and retrieval-augmented Llama2-chat on open-domain QA, reasoning, and fact verification."
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer contrasts approaches: unlike standard RAG, which always incorporates a fixed number of passages, Self-RAG decides when to retrieve, avoiding unhelpful responses from irrelevant passages; it notes denoising requires explicit trustworthy-information selection since passages may be informative but not contain the answer.",
+   "weight": 0.09,
+   "examples": [
+    "Unlike RAG which always incorporates a fixed number of passages, Self-RAG decides when to retrieve.",
+    "Retrieved passages might be informative yet not contain the instruction-following answer."
+   ]
+  },
+  {
+   "name": "valuable_3",
+   "tier": "valuable",
+   "criterion": "The answer concludes that these works demonstrate further training of RAG models is more effective than combining off-the-shelf components, improving factuality and transparency.",
+   "weight": 0.12,
+   "examples": [
+    "These works illustrate that further training RAG models is effective versus off-the-shelf combinations.",
+    "Training rather than prompting improves factuality and transparency."
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

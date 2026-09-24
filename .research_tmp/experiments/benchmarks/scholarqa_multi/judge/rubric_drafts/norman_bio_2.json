@@ -1,0 +1,108 @@
+{
+ "question": "What experimental strategies can be introduced to prevent LNPs to be exclusively accumulated in the liver?",
+ "case_id": "norman_bio_2",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer identifies conjugating endothelial-targeting ligands (anti-PECAM or anti-PLVAP) to modmRNA-LNPs as an active targeting strategy to redirect accumulation from the liver to the lung.",
+   "weight": 0.2,
+   "examples": [
+    "Coupling anti-PECAM or anti-PLVAP antibodies to modmRNA-LNPs redirects them to the lung endothelium",
+    "PLVAP-targeted nanoparticles show substantial lung accumulation instead of hepatic localization"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer describes selective organ targeting (SORT) nanoparticles that incorporate a supplemental SORT molecule whose chemical structure determines tissue-specific delivery to non-liver tissues.",
+   "weight": 0.2,
+   "examples": [
+    "Adding a supplemental SORT lipid whose chemical identity confers tissue tropism",
+    "SORT nanoparticles enable mRNA and gene-editing delivery to non-liver tissues"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer states that altering the proportion/composition of LNP components can direct LNP-mRNA to specific organs such as lungs or spleen, providing a formulation-based redirection strategy.",
+   "weight": 0.18,
+   "examples": [
+    "Tuning the ratio of lipid components achieved accurate delivery to lung and spleen",
+    "Changing LNP formulation proportions redirects biodistribution away from the liver"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer acknowledges that conventional LNPs accumulate predominantly in the liver (with minor spleen/kidney/heart distribution), limiting therapeutic applications and motivating redirection strategies.",
+   "weight": 0.12,
+   "examples": [
+    "Majority of luciferase LNP expression was in the liver after IV injection",
+    "Liver accumulation limits clinical applications of LNP-based genetic medicines"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer explains that ligand-based targeting relies on binding to receptors overexpressed in the target tissue (e.g., PECAM/PLVAP on pulmonary endothelium).",
+   "weight": 0.06,
+   "examples": [
+    "Anti-PLVAP binding enables substantial lung accumulation",
+    "Ligands bind endothelial receptors to mediate active targeting"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer distinguishes active targeting (ligand/antibody-based) from formulation-based approaches (composition tuning, SORT molecules) as conceptually different redirection strategies.",
+   "weight": 0.05,
+   "examples": [
+    "Receptor-mediated targeting versus tuning lipid ratios",
+    "Antibody conjugation contrasts with adding supplemental SORT molecules"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer references experimental evidence such as IV injection of luciferase LNPs in mice with tissue-distribution/expression measurement over time, including inflammation models.",
+   "weight": 0.06,
+   "examples": [
+    "Luciferase LNP expression persisted 48 h and was measured per organ",
+    "Biodistribution studies in mouse inflammation models demonstrated successful lung targeting"
+   ]
+  },
+  {
+   "name": "valuable_3",
+   "tier": "valuable",
+   "criterion": "The answer names concrete non-liver tissues successfully targeted, most prominently lung, and also spleen, kidney, and heart.",
+   "weight": 0.05,
+   "examples": [
+    "Lung targeting via endothelial ligands",
+    "Spleen delivery achieved by adjusting LNP proportions"
+   ]
+  },
+  {
+   "name": "valuable_4",
+   "tier": "valuable",
+   "criterion": "The answer notes that these strategies apply to delivering mRNA and gene-editing systems, expanding therapeutic applications beyond hepatic delivery.",
+   "weight": 0.05,
+   "examples": [
+    "SORT nanoparticles deliver gene editing machinery to non-liver tissues",
+    "Redirection strategies expand genetic medicine applications"
+   ]
+  },
+  {
+   "name": "valuable_5",
+   "tier": "valuable",
+   "criterion": "The answer briefly explains why LNPs localize to the liver, such as lipid composition and liver physiology, as context for the redirection strategies.",
+   "weight": 0.03,
+   "examples": [
+    "LNPs localize to liver due to lipid composition and liver physiology",
+    "Physiological properties of the liver drive LNP uptake"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

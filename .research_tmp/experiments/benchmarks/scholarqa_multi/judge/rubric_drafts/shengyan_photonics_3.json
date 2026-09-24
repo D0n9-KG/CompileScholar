@@ -1,0 +1,108 @@
+{
+ "question": "What are the large systems in which quantum effects have been successfully demonstrated?",
+ "case_id": "shengyan_photonics_3",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer frames the demonstrations as examples of macroscopic quantum mechanics probing the quantum–classical boundary, organized into two main platforms: (a) matter-wave interference of massive particles/molecules and (b) quantum control of macroscopic mechanical resonators.",
+   "weight": 0.1,
+   "examples": [
+    "Quantum effects such as superposition have been pushed to ever larger systems to explore the boundary between quantum and classical realms",
+    "Two platforms: interfering large molecules and a quantum drum resonator"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer notes that de Broglie matter-wave superposition was first established for small particles such as electrons, atoms, dimers, small van der Waals clusters, and neutrons, as the historical baseline.",
+   "weight": 0.1,
+   "examples": [
+    "Superposition of matter waves has been observed for electrons, atoms, dimers, small van der Waals clusters, and neutrons",
+    "Before large-molecule experiments, neutrons and atomic clusters were among the most massive interfering particles"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer identifies the C60 fullerene interference experiment (1999, diffraction at a material absorption grating) as demonstrating wave behavior in the most massive and complex object at that time.",
+   "weight": 0.13,
+   "examples": [
+    "In 1999, interference of C60 molecules was observed by diffraction at a material absorption grating",
+    "C60 became the most massive and complex object with observed wave behavior"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer cites matter-wave interference of functionalized oligoporphyrins with masses beyond 25,000 Da and up to 2,000 atoms, observed in a new 2-m-long Talbot–Lau interferometer, as the heaviest objects to exhibit matter-wave interference.",
+   "weight": 0.13,
+   "examples": [
+    "Oligoporphyrins of mass >25 kDa with up to 2,000 atoms showed interference fringes in a 2-m Talbot–Lau interferometer",
+    "The interferometer accommodates particles with a large variety of internal states across a wide mass range"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "The answer identifies a macroscopic mechanical resonator (microwave-frequency 'quantum drum' oscillator) cooled to its quantum ground state using conventional cryogenic refrigeration and coupled to a qubit for quantum-limited readout.",
+   "weight": 0.13,
+   "examples": [
+    "A mechanical mode was cooled to its quantum ground state using a microwave-frequency mechanical oscillator coupled to a quantum bit",
+    "The 'quantum drum' resonator was cooled by conventional cryogenic refrigeration and measured via the coupled qubit"
+   ]
+  },
+  {
+   "name": "answer_critical_5",
+   "tier": "critical",
+   "criterion": "The answer states that single quantum excitations (phonons) were controllably created in the mechanical resonator, demonstrating first steps toward complete quantum control of a macroscopic mechanical system.",
+   "weight": 0.1,
+   "examples": [
+    "Researchers controllably created single phonons in the resonator",
+    "Single-phonon excitations demonstrated quantum-level manipulation of a macroscopic mechanical system"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer supports the interference claims with quantitative details: fringes reached over 90% of expected visibility in excellent agreement with quantum theory, and de Broglie wavelengths as short as 53 fm, five orders of magnitude below the molecules' diameter.",
+   "weight": 0.07,
+   "examples": [
+    "Interference fringes reached more than 90% of the expected visibility, in excellent agreement with quantum theory and not explainable classically",
+    "The molecules' de Broglie wavelengths were as short as 53 fm, five orders of magnitude below their diameter"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer explains that C60's many excited internal degrees of freedom and environmental couplings make it nearly a classical body, so interference experiments with such molecules enable detailed studies of decoherence.",
+   "weight": 0.08,
+   "examples": [
+    "C60 is almost a classical body due to its internal degrees of freedom, making interference experiments useful for studying decoherence",
+    "Couplings to the environment essential for decoherence can be probed with large-molecule interferometry"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer notes that increasing the mass and macroscopicity of superpositions places more stringent bounds on modifications of quantum mechanics such as objective collapse models.",
+   "weight": 0.08,
+   "examples": [
+    "The 25 kDa superposition, with macroscopicity value 14.1, places an order-of-magnitude improvement in bounds on objective collapse models",
+    "Heavier interfering particles constrain modified quantum theories"
+   ]
+  },
+  {
+   "name": "valuable_3",
+   "tier": "valuable",
+   "criterion": "The answer situates matter-wave interferometry within the broader development of atom interferometric techniques for fundamental physics, precision metrology, and lithography.",
+   "weight": 0.08,
+   "examples": [
+    "Atom interferometric techniques have been developed for fundamental quantum mechanics, metrology, and lithography",
+    "Matter-wave interferometry also underpins precision metrology applications"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

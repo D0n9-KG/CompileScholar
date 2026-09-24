@@ -1,0 +1,108 @@
+{
+ "question": "How do machine unlearning methods perform? Can they be used to remove knowledge from language models? ",
+ "case_id": "weijia_cs_3",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "Defines machine unlearning as transforming a trained model so it behaves as if it had never been trained on certain data.",
+   "weight": 0.111111,
+   "examples": [
+    "The goal is to make the model behave as though the forget data was never included in training.",
+    "Unlearning transforms an already-trained model into one indistinguishable from one retrained without the target data."
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "Describes TOFU as a benchmark for fictitious unlearning with 200 synthetic author profiles, 20 QA pairs each, a designated forget set, and holistic metrics plus baseline results.",
+   "weight": 0.111111,
+   "examples": [
+    "TOFU provides 200 synthetic author profiles, each with 20 QA pairs, and a forget set targeted for unlearning.",
+    "The TOFU benchmark includes holistic metrics and baseline results for unlearning efficacy."
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "Reports that none of the baseline algorithms evaluated in TOFU achieve effective unlearning, motivating further research.",
+   "weight": 0.111111,
+   "examples": [
+    "None of the baseline unlearning algorithms in TOFU showed effective unlearning.",
+    "No baseline behaves as if never trained on the forget data, motivating new approaches."
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "Identifies MUSE as a comprehensive benchmark evaluating unlearning across six properties: no verbatim memorization, no knowledge memorization, no privacy leakage, utility preservation, scalability, and sustainability.",
+   "weight": 0.111111,
+   "examples": [
+    "MUSE evaluates six properties: no verbatim memorization, no knowledge memorization, no privacy leakage, utility preservation, scalability, and sustainability over sequential requests.",
+    "MUSE is a six-way evaluation framework assessing unlearning from both deployer and data owner perspectives."
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "States that most of the eight benchmarked algorithms can prevent verbatim and knowledge memorization to varying degrees, showing partial success at knowledge removal.",
+   "weight": 0.111111,
+   "examples": [
+    "Most algorithms prevent verbatim and knowledge memorization to some degree.",
+    "Several of the eight algorithms partially succeed at removing memorized content."
+   ]
+  },
+  {
+   "name": "answer_critical_5",
+   "tier": "critical",
+   "criterion": "States that only one algorithm avoids severe privacy leakage, that existing algorithms degrade general utility, and that they cannot sustainably handle successive or large-scale unlearning requests.",
+   "weight": 0.111111,
+   "examples": [
+    "Only one algorithm does not lead to severe privacy leakage; most degrade utility and fail to scale.",
+    "Algorithms cannot handle successive removal requests or large removal requests."
+   ]
+  },
+  {
+   "name": "answer_critical_6",
+   "tier": "critical",
+   "criterion": "Concludes with a direct answer: current machine unlearning methods cannot effectively remove knowledge from language models without significantly compromising overall utility.",
+   "weight": 0.111111,
+   "examples": [
+    "Overall, current unlearning methods cannot remove knowledge without significantly compromising model utility.",
+    "The answer is largely no: effective, utility-preserving unlearning of LLMs remains unsolved."
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "Mentions that MUSE benchmarks eight popular unlearning algorithms on 7B-parameter language models using real-world corpora such as Harry Potter books and news articles, contrasting with TOFU's synthetic setting.",
+   "weight": 0.111111,
+   "examples": [
+    "MUSE tests eight algorithms on 7B-parameter LMs with Harry Potter books and news articles.",
+    "Unlike TOFU's synthetic profiles, MUSE benchmarks on real copyrighted text, giving complementary evidence."
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "Notes that prior evaluation of unlearning algorithms was narrow in scope, failing to quantify success and practicality from both model deployer and data owner perspectives, motivating these benchmarks.",
+   "weight": 0.055556,
+   "examples": [
+    "Prior evaluations were narrow, prompting MUSE's comprehensive six-way framework.",
+    "TOFU was created to deepen understanding of unlearning, an underexplored challenge."
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "Highlights the trade-off both benchmarks reveal between removing target knowledge and preserving utility on retained data.",
+   "weight": 0.055556,
+   "examples": [
+    "Both benchmarks reveal the trade-off between removing target knowledge and preserving retained utility.",
+    "TOFU and MUSE offer complementary perspectives on efficacy vs practicality of unlearning."
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

@@ -1,0 +1,95 @@
+{
+ "summary": {
+  "n_questions": 4,
+  "recall_at_10": 0.0,
+  "gate": "FAIL",
+  "by_subject": {
+   "bio": 0.0
+  },
+  "mean_latency_s": 15.9
+ },
+ "rows": [
+  {
+   "qid": "norman_bio_1",
+   "subject": "bio",
+   "n_gold": 3,
+   "n_hit": 0,
+   "recall": 0.0,
+   "latency_s": 11.6,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 4915.1,
+    "discovery_ms": 6106.2,
+    "rerank_ms": 590.7
+   },
+   "subqueries": [
+    "lipid nanoparticle protein corona formation mechanism",
+    "LNP serum protein adsorption kinetics binding affinity",
+    "lipid nanoparticle blood components interaction hemolysis complement"
+   ]
+  },
+  {
+   "qid": "norman_bio_2",
+   "subject": "bio",
+   "n_gold": 4,
+   "n_hit": 0,
+   "recall": 0.0,
+   "latency_s": 17.0,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 6145.3,
+    "discovery_ms": 9970.1,
+    "rerank_ms": 920.4
+   },
+   "subqueries": [
+    "lipid nanoparticle liver accumulation avoidance strategy",
+    "ionizable lipid modification extrahepatic targeting",
+    "ligand conjugation receptor-mediated uptake non-liver tissue",
+    "protein corona engineering LNP biodistribution"
+   ]
+  },
+  {
+   "qid": "norman_bio_3",
+   "subject": "bio",
+   "n_gold": 4,
+   "n_hit": 0,
+   "recall": 0.0,
+   "latency_s": 22.3,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 13174.8,
+    "discovery_ms": 8173.4,
+    "rerank_ms": 921.5
+   },
+   "subqueries": [
+    "synthetic biology genetic engineering recombinant protein expression efficiency",
+    "CRISPR gene editing metabolic pathway optimization protein yield",
+    "mammalian cell line engineering CHO protein production bioprocess",
+    "bacterial host engineering E coli protein folding secretion"
+   ]
+  },
+  {
+   "qid": "norman_bio_4",
+   "subject": "bio",
+   "n_gold": 4,
+   "n_hit": 0,
+   "recall": 0.0,
+   "latency_s": 12.7,
+   "mode_used": "full",
+   "reranked": true,
+   "latency_breakdown": {
+    "understand_ms": 4700.0,
+    "discovery_ms": 7426.0,
+    "rerank_ms": 563.9
+   },
+   "subqueries": [
+    "phage display antibody applications biomedicine",
+    "phage display derived antibodies diagnostics clinical",
+    "phage display technology therapeutic antibody discovery"
+   ]
+  }
+ ]
+}

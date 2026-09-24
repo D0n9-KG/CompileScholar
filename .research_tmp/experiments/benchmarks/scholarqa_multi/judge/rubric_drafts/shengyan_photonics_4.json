@@ -1,0 +1,98 @@
+{
+ "question": "What progress has been made in trapping and controlling multiple nanoparticles?",
+ "case_id": "shengyan_photonics_4",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer establishes that trapping and controlling multiple levitated nanoparticles is a key goal (arrays of trapped particles being a platform for complex nonequilibrium phenomena, with interparticle control analogous to atomic many-body systems) but is experimentally challenging.",
+   "weight": 0.133333,
+   "examples": [
+    "Manipulating and controlling multiple levitated nanoparticles is a key goal, enabling study of complex nonequilibrium phenomena, but is highly challenging experimentally.",
+    "As in atomic many-body systems, precise control of interparticle interactions is crucial."
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer cites optical binding experiments that simultaneously trapped up to six Au nanoparticles in optical potential wells, with each particle's position individually tracked (e.g., by single-particle tracking).",
+   "weight": 0.144444,
+   "examples": [
+    "Using optical binding, up to six Au nanoparticles were trapped simultaneously and the position of each tracked via SPT.",
+    "Trapped nanoparticles self-organize into distinct spatial distributions and configurations."
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer notes that optical binding provides simultaneous trapping but no individual control over each nanoparticle, and that increasing particle number reduces stability and complicates tracking (more configurations, more frequent rearrangements, lower SPT accuracy).",
+   "weight": 0.111111,
+   "examples": [
+    "The optical binding method traps many particles at once but lacks individual control of each nanoparticle.",
+    "With a sixth NP, configurations multiply and stability decreases, causing frequent rearrangements; SPT becomes less accurate when NPs exchange positions."
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer states that optical interactions studied previously provided only conservative optical binding forces of limited tunability, motivating the new work.",
+   "weight": 0.088889,
+   "examples": [
+    "Optical interactions studied thus far only provided conservative optical binding forces of limited tunability.",
+    "Earlier work could not tune or switch the interparticle interactions."
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "The answer describes coupling two levitated nanoparticles using two phase-coherent optical traps (each confining one particle) via a light-induced dipole-dipole interaction, controlled through the coherence, relative phase, and intensity of the driving fields.",
+   "weight": 0.144444,
+   "examples": [
+    "Two independent phase-coherent traps each confine one particle; the light-induced dipole-dipole interaction arises from interference between trapping and scattered fields.",
+    "Phase coherence between the optical fields driving the dipole-dipole interaction is exploited to couple two nanoparticles."
+   ]
+  },
+  {
+   "name": "answer_critical_5",
+   "tier": "critical",
+   "criterion": "The answer reports full control over both conservative and nonconservative coupling rates: normal mode splitting measured for separations of ~2.2–3.7 μm, maximum coupling at d0 ≈ 2.2 μm, coupling oscillating with distance (period λ) and decaying with separation, and dependence on the optical phase difference.",
+   "weight": 0.122222,
+   "examples": [
+    "Normal mode splitting was measured for separations of 2.2–3.7 μm; maximum coupling occurred at d0 ≈ 2.2 μm.",
+    "The coupling rate oscillates with particle distance with period λ and decays owing to the far-field nature of dipole radiation."
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer mentions that the optical interaction can be effectively switched off, revealing electrostatic coupling between the charged particles.",
+   "weight": 0.088889,
+   "examples": [
+    "They effectively switched off the optical interaction and observed electrostatic coupling between charged particles.",
+    "Turning off the light-induced interaction exposes electrostatic coupling."
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer describes the effects of the nonconservative interaction: constant energy pumping that increases particle motional amplitude by about an order of magnitude, dependence on the optical phase difference, and deviations from the linear interaction model at fixed separation.",
+   "weight": 0.088889,
+   "examples": [
+    "Nonconservative forces pump energy into the system, increasing the motional amplitude by an order of magnitude.",
+    "The linear interaction model failed to fully predict normal mode splitting at a fixed separation of ~3.2 μm."
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer frames these advances as a route to fully programmable many-body systems of interacting nanoparticles with tunable nonreciprocal interactions, relevant for entanglement and topological phases.",
+   "weight": 0.077778,
+   "examples": [
+    "These results provide a route to fully programmable many-body systems with tunable nonreciprocal interactions.",
+    "Such control is instrumental for exploring entanglement and topological phases in arrays of levitated nanoparticles."
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

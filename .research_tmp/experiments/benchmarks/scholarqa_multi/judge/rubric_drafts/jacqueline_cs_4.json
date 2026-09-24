@@ -1,0 +1,88 @@
+{
+ "question": "Data selection has emerged as an important problem for training good language models (i.e., which datapoints to include). Has there been any research on the ordering of datapoints for LMs (i.e., easy to hard curriculum sequence of data points), such that a LM may be trained in a more sample-efficient manner? ",
+ "case_id": "jacqueline_cs_4",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer directly affirms that research exists on datapoint ordering for LMs, identifying curriculum learning as the formalized area addressing easy-to-hard, meaningfully ordered (non-random) presentation of training examples, motivated by humans and animals learning better with gradually more complex concepts.",
+   "weight": 0.195652,
+   "examples": [
+    "Yes—curriculum learning formalizes training strategies where examples are organized in a meaningful order of gradually increasing complexity",
+    "Data is arranged easiest-to-hardest rather than randomly",
+    "Humans and animals learn much better when examples are not randomly presented"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer states that curriculum learning accelerates convergence and improves generalization, e.g., better local minima under non-convex criteria and lower generalization error for the same training error, acting as a regularizer analogous to unsupervised pre-training.",
+   "weight": 0.163043,
+   "examples": [
+    "Curriculum learning improves the speed of convergence and the quality of local minima under non-convex criteria",
+    "It acts as a regularizer, giving lower generalization error for the same training error, similar to unsupervised pre-training (Erhan et al., 2009)"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer explains curriculum learning via its connection to optimization: a continuation method for global optimization of non-convex functions, or its effect on local minima quality.",
+   "weight": 0.065217,
+   "examples": [
+    "Curriculum learning is a particular form of continuation method",
+    "In non-convex settings, curricula yield better local minima"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer cites Orca as evidence that data ordering matters in modern LM training, with the model progressively learning from increasingly complex teacher explanations (ChatGPT first, then longer, more complex GPT-4 traces ~1.5x longer).",
+   "weight": 0.152174,
+   "examples": [
+    "Orca progressively learns from increasing complexity of teacher explanations, e.g., GPT-4 responses are ~1.5x longer than ChatGPT's",
+    "Orca trains first on simpler ChatGPT-generated data, then longer, more complex GPT-4 explanations"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer describes Skill-It as an online data sampling algorithm that groups datapoints by skills and orders training by skill acquisition as a data-efficient training regime.",
+   "weight": 0.152174,
+   "examples": [
+    "Skill-It groups datapoints by skills and orders training based on skill acquisition",
+    "Skill-based ordering of data enables more efficient training"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer illustrates skill dependencies with a concrete example, such as Spanish question generation being learned more easily after the model has acquired English question generation and Spanish.",
+   "weight": 0.065217,
+   "examples": [
+    "Spanish question generation is easier after mastering English question generation and Spanish"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "The answer provides concrete sample-efficiency evidence: Skill-It applied to RedPajama enables a 3B model to achieve higher evaluation accuracy with 1B tokens than uniform sampling achieves with 3B tokens.",
+   "weight": 0.141304,
+   "examples": [
+    "A 3B model trained with Skill-It on 1B tokens beats uniform sampling on 3B tokens",
+    "A 3x reduction in training tokens while improving evaluation accuracy"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer notes limitations or unresolved issues, e.g., Krueger & Dayan (2009) found curricula can hurt with fixed neural resources, and the mechanisms behind generalization gains remain unclear.",
+   "weight": 0.065217,
+   "examples": [
+    "Krueger & Dayan found worse results with fixed neural resources, unlike later fixed-capacity results",
+    "Why curriculum improves generalization, like unsupervised pre-training, remains to be clarified"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

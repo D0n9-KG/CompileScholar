@@ -1,0 +1,82 @@
+{
+ "question": "What are the biochemical analytical tools to assess the integrity and stability of LNPs?",
+ "case_id": "benjamin_bio_2",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer identifies reversed phase–ion pair HPLC (RP-IP HPLC), capillary electrophoresis (CE), and/or agarose/polyacrylamide gel electrophoresis as accepted methods to assess the integrity of encapsulated mRNA/nucleic acids in LNPs.",
+   "weight": 0.22,
+   "examples": [
+    "RP-IP HPLC is a well-accepted method to assess mRNA integrity",
+    "Agarose or polyacrylamide gel or capillary electrophoresis (CE) can evaluate mRNA integrity",
+    "Nucleic acid integrity can be checked after extraction from LNPs using CE"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer names cryogenic transmission electron microscopy (cryo-TEM) as the tool to visualize LNP morphology and core structure, including electron-dense cores in mRNA-LNPs and empty versus nucleic-acid-loaded LNPs, optionally mentioning thionine contrast enhancement.",
+   "weight": 0.18,
+   "examples": [
+    "Cryo-TEM demonstrated the core structure of both unloaded and siRNA-containing LNPs",
+    "mRNA-LNPs show electron dense cores as revealed by cryo-TEM",
+    "Thionine was used for cryo-TEM contrast enhancement"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer identifies dynamic light scattering (DLS) as the method to measure z-average diameter and polydispersity index over storage conditions, interpreting changes as aggregation or loss of LNP integrity (e.g., no size change at −80°C/4°C indicating maintained integrity; size growth at elevated temperatures indicating instability).",
+   "weight": 0.18,
+   "examples": [
+    "DLS was used to characterize particle size and polydispersity",
+    "Frozen LNPs at −80°C showed no particle size change over time; lyophilized LNPs at 4°C maintained size integrity for at least 24 weeks",
+    "Particle-size increase reached a plateau after 4-week storage at 42°C while PDI remained <0.10"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer explains that RP-IP HPLC separates mRNA via hydrophobic interactions with the stationary phase, using alkylammonium ion-pair salts and high salt to neutralize the polar phosphodiester backbone, enabling high-resolution, size-based separation.",
+   "weight": 0.1,
+   "examples": [
+    "Alkylammonium salts increase hydrophobic interactions, driving selectivity based on sequence length",
+    "High salt concentrations neutralize the negative charge of the mRNA backbone",
+    "Separation is driven by hydrophobic interactions between analyte and stationary phase"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer notes that CE separation is driven by size and charge, whereas RP-IP HPLC additionally retains selectivity to variations in mRNA hydrophobicity arising from sequence or chemical modifications.",
+   "weight": 0.1,
+   "examples": [
+    "CE is driven by size and charge",
+    "Based on the ion pair system used, RP-IP retains selectivity to variations in mRNA hydrophobicity"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer uses the structural distinction of LNPs from liposomes (lipids and some water in the core) to justify why both particle and cargo integrity must be assessed, since encapsulated mRNA can be exposed to an aqueous environment.",
+   "weight": 0.1,
+   "examples": [
+    "A key aspect distinguishing LNPs from liposomes is the presence of lipids in the core",
+    "Data indicate water is present in the core, so mRNA could be exposed to an aqueous environment even when encapsulated"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer states that assessing LNP integrity matters because it heavily impacts the potency and efficacy of the encapsulated nucleic acid therapeutic.",
+   "weight": 0.12,
+   "examples": [
+    "LNP integrity heavily impacts the potency and efficacy of the encapsulated nucleic acids",
+    "LNPs are a promising platform for nucleic acid delivery to target tissues"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 2
+}

@@ -1,0 +1,88 @@
+{
+ "question": "One desirable property for LMs is that they should be well-calibrated, in that the LM can generate a confidence score that is well-calibrated to how likely its decision is actually correct. What are some recent works that seek to properly calibrate LM confidence judgments?",
+ "case_id": "jacqueline_cs_5",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "Defines confidence calibration as aligning the model's output confidence (probability) with the ground-truth likelihood that its decision is correct, enabling users to judge how much to trust its outputs.",
+   "weight": 0.14,
+   "examples": [
+    "calibration links output confidence to ground-truth correctness likelihood (Guo et al., 2017)",
+    "a well-calibrated LM's confidence score reflects how likely its prediction is correct, indicating how much to trust the output"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "Illustrates the definition with the example that if 100 predictions each receive 0.8 confidence, roughly 80 should be correct for a well-calibrated model.",
+   "weight": 0.07,
+   "examples": [
+    "100 predictions with 0.8 confidence each: expect 80 correct classifications",
+    "0.8 average confidence implies about 80% accuracy expected"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "Identifies Expected Calibration Error (ECE) as the standard calibration metric, computed by binning N predictions into M equal-sized confidence bins and measuring the L1 distance between per-bin confidence and accuracy.",
+   "weight": 0.12,
+   "examples": [
+    "ECE bins N predictions into M equal-sized bins by confidence and measures |confidence - accuracy| (Naeini et al., 2015)",
+    "ECE is the L1 gap between confidence and accuracy over equal-sized bins"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "Summarizes the systematic study of aligned LLMs: calibration improves with larger parameter scale and longer pretraining, but instruction tuning and ill-distributed synthetic data during alignment damage it (longer finetuning worsens the harm), with LoRA partially remediating it and RLHF having little impact.",
+   "weight": 0.15,
+   "examples": [
+    "calibration improves with parameter scale and training dynamics; instruction tuning and ill-distributed synthetic data degrade it; LoRA helps; RLHF has little effect",
+    "pretraining scale and duration improve calibration while alignment-stage training harms it"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "Cites the calibration study of BERT and RoBERTa showing temperature scaling effectively lowers in-domain ECE while label smoothing lowers out-of-domain ECE.",
+   "weight": 0.13,
+   "examples": [
+    "temperature scaling reduces in-domain ECE; label smoothing helps out-of-domain",
+    "calibration of BERT and RoBERTa can be improved with temperature scaling and label smoothing"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "Describes the finding that RLHF-finetuned LMs have degraded calibration of conditional probabilities, and that verbalized confidence scores emitted as output tokens serve as a better calibration signal.",
+   "weight": 0.13,
+   "examples": [
+    "after RLHF, conditional probabilities become miscalibrated; verbalized confidence tokens are better",
+    "asking the model to state its confidence in words outperforms probability-based confidence"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "Notes that LMs can appear well-calibrated on aggregate benchmarks yet be highly miscalibrated across sub-domains, e.g., LlaMa-65B showing low overall ECE on MMLU but high ECE within most of its domains.",
+   "weight": 0.09,
+   "examples": [
+    "low aggregate ECE on MMLU masks high per-domain ECE for LlaMa-65B",
+    "calibration measured over a whole benchmark can hide sub-domain miscalibration"
+   ]
+  },
+  {
+   "name": "answer_critical_5",
+   "tier": "critical",
+   "criterion": "Presents the few-shot recalibration approach, which trains a model on a few unlabeled examples to predict recalibrated confidence scores, addressing sub-domain miscalibration.",
+   "weight": 0.17,
+   "examples": [
+    "train a recalibration model on a handful of unlabeled examples to output corrected confidences",
+    "few-shot recalibration predicts adjusted confidence scores using unlabeled data"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

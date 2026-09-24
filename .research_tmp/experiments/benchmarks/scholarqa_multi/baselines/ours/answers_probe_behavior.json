@@ -1,0 +1,421 @@
+[
+ {
+  "qid": "probe_mamba",
+  "question": "What is the Mamba architecture and how does it compare to Transformers for language modeling?",
+  "raw_answer": "The Mamba architecture is a sequence modeling framework that integrates the computational efficiency of linear attention with the expressive power of state space models . At its core, the architecture utilizes selective state space layers that feature input-dependent transitions, residual connections, and RMS normalization . This design incorporates a selective mechanism that adaptively processes information based on the input, thereby avoiding the quadratic computational cost associated with self-attention . The implementation relies on a core parallel scan algorithm that enables efficient state computation for these selective state space models .\n\nIn the context of language modeling, Mamba is positioned as a computationally efficient alternative to Transformers, which are described as the most renowned and researched models but remain computationally heavy . The primary motivation for adopting Mamba stems from the quadratic computational and memory complexity of self-attention with respect to sequence length, a bottleneck that also leads to compounding prediction errors under autoregressive multi-step forecasting . By replacing the temporal Transformer backbone with a selective state space model, Mamba addresses these efficiency constraints . The paper states that Mamba achieves state-of-the-art performance on language modeling tasks, matching or exceeding Transformer-based models while being significantly faster at inference .\n\nWhen comparing Mamba to Transformers, the literature indicates that Mamba surpasses Transformers in certain aspects, particularly regarding efficiency . However, the records note that Transformers remain indispensable due to their complex computational capabilities and proven effectiveness . The evolution of this architecture is seen in Mamba-2, which introduces a data-dependent selective scan mechanism to adaptively isolate relevant features, specifically targeting the quadratic computational complexity of Transformers as a substantial bottleneck for real-time and edge applications . Furthermore, the field has moved toward hybrid approaches, with recent work focusing on understanding and enhancing Mamba-Transformer hybrids for memory recall and language modeling . A quantitative analysis of Mamba-2-based large language models has also been conducted to study state space duality .\n\nRegarding specific performance metrics, the consulted records did not surface specific language modeling benchmark numbers, such as perplexity, training FLOPs, or throughput values, for a direct comparison between Mamba and Transformers. Additionally, the records did not provide detailed architectural distinctions between Mamba's selective SSM mechanism and standard S4 or H3 models, nor did they detail the specific selective scan operation beyond its input-dependent nature.",
+  "references": [],
+  "answer_official_all": "The Mamba architecture is a sequence modeling framework that integrates the computational efficiency of linear attention with the expressive power of state space models . At its core, the architecture utilizes selective state space layers that feature input-dependent transitions, residual connections, and RMS normalization . This design incorporates a selective mechanism that adaptively processes information based on the input, thereby avoiding the quadratic computational cost associated with self-attention . The implementation relies on a core parallel scan algorithm that enables efficient state computation for these selective state space models . In the context of language modeling, Mamba is positioned as a computationally efficient alternative to Transformers, which are described as the most renowned and researched models but remain computationally heavy . The primary motivation for adopting Mamba stems from the quadratic computational and memory complexity of self-attention with respect to sequence length, a bottleneck that also leads to compounding prediction errors under autoregressive multi-step forecasting . By replacing the temporal Transformer backbone with a selective state space model, Mamba addresses these efficiency constraints . The paper states that Mamba achieves state-of-the-art performance on language modeling tasks, matching or exceeding Transformer-based models while being significantly faster at inference . When comparing Mamba to Transformers, the literature indicates that Mamba surpasses Transformers in certain aspects, particularly regarding efficiency . However, the records note that Transformers remain indispensable due to their complex computational capabilities and proven effectiveness . The evolution of this architecture is seen in Mamba-2, which introduces a data-dependent selective scan mechanism to adaptively isolate relevant features, specifically targeting the quadratic computational complexity of Transformers as a substantial bottleneck for real-time and edge applications . Furthermore, the field has moved toward hybrid approaches, with recent work focusing on understanding and enhancing Mamba-Transformer hybrids for memory recall and language modeling . A quantitative analysis of Mamba-2-based large language models has also been conducted to study state space duality . Regarding specific performance metrics, the consulted records did not surface specific language modeling benchmark numbers, such as perplexity, training FLOPs, or throughput values, for a direct comparison between Mamba and Transformers. Additionally, the records did not provide detailed architectural distinctions between Mamba's selective SSM mechanism and standard S4 or H3 models, nor did they detail the specific selective scan operation beyond its input-dependent nature.",
+  "citations_all": [],
+  "answer_official_first": "The Mamba architecture is a sequence modeling framework that integrates the computational efficiency of linear attention with the expressive power of state space models . At its core, the architecture utilizes selective state space layers that feature input-dependent transitions, residual connections, and RMS normalization . This design incorporates a selective mechanism that adaptively processes information based on the input, thereby avoiding the quadratic computational cost associated with self-attention . The implementation relies on a core parallel scan algorithm that enables efficient state computation for these selective state space models . In the context of language modeling, Mamba is positioned as a computationally efficient alternative to Transformers, which are described as the most renowned and researched models but remain computationally heavy . The primary motivation for adopting Mamba stems from the quadratic computational and memory complexity of self-attention with respect to sequence length, a bottleneck that also leads to compounding prediction errors under autoregressive multi-step forecasting . By replacing the temporal Transformer backbone with a selective state space model, Mamba addresses these efficiency constraints . The paper states that Mamba achieves state-of-the-art performance on language modeling tasks, matching or exceeding Transformer-based models while being significantly faster at inference . When comparing Mamba to Transformers, the literature indicates that Mamba surpasses Transformers in certain aspects, particularly regarding efficiency . However, the records note that Transformers remain indispensable due to their complex computational capabilities and proven effectiveness . The evolution of this architecture is seen in Mamba-2, which introduces a data-dependent selective scan mechanism to adaptively isolate relevant features, specifically targeting the quadratic computational complexity of Transformers as a substantial bottleneck for real-time and edge applications . Furthermore, the field has moved toward hybrid approaches, with recent work focusing on understanding and enhancing Mamba-Transformer hybrids for memory recall and language modeling . A quantitative analysis of Mamba-2-based large language models has also been conducted to study state space duality . Regarding specific performance metrics, the consulted records did not surface specific language modeling benchmark numbers, such as perplexity, training FLOPs, or throughput values, for a direct comparison between Mamba and Transformers. Additionally, the records did not provide detailed architectural distinctions between Mamba's selective SSM mechanism and standard S4 or H3 models, nor did they detail the specific selective scan operation beyond its input-dependent nature.",
+  "citation_mapped": 0,
+  "citation_dropped": 0,
+  "unresolved_markers": 0,
+  "steps": 12,
+  "gate": {
+   "note_rejects": 9,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "reject_reasons": {
+    "bad_backref": 9
+   },
+   "_consec_full_reject": 0,
+   "merge_downgraded_lines": 17,
+   "merge_total_lines": 49,
+   "relaxed_writes": 5,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 13,
+   "fallback_compiled": true
+  },
+  "cited_pids": []
+ },
+ {
+  "qid": "probe_dit",
+  "question": "Building on LLaVA's approach of connecting vision encoders to language models, what are the latest 2025 multimodal architectures that improved on it?",
+  "raw_answer": "The landscape of multimodal architectures in 2025 represents a significant evolution from the foundational LLaVA approach, which originally connected vision encoders to language models via a simple linear projection or MLP connector [LLaVA]. While the core corpus of retrieved records does not contain papers explicitly dated 2025, indicating that the primary indexed literature ends at 2024 with models such as Chameleon, LLaVA-OneVision, SHOW-O, and Transfusion [as_of 2025], external records and derivative works reveal several key architectural innovations and variants emerging in 2025 that build upon or diverge from the LLaVA lineage [external].\n\nA primary direction of 2025 development involves the optimization and specialization of the LLaVA family, focusing on efficiency and domain-specific applications. LLaVA-GM, published in *Frontiers of Computer Science* in 2025, addresses the computational redundancy of the Vicuna backbone used in earlier LLaVA iterations [external]. By identifying the backbone as \"too redundant,\" LLaVA-GM implements a lightweight variant that greatly reduces model parameters, enabling deployment on low-resource devices while maintaining performance on common Visual Question Answering (VQA) tasks [external]. Similarly, LLaVA-ST, presented at CVPR 2025, extends the architecture to handle spatial-temporal data, addressing the need for more complex temporal reasoning in multimodal contexts [external]. In the medical domain, LLaVA-NeXT-Med emerges as a specialized Multimodal Large Language Model (MLLM) tailored for clinical applications [external]. Furthermore, LLaVA-FL, presented at WACV 2025, adapts the LLaVA framework for federated learning, allowing for privacy-preserving training across distributed devices [external]. These variants collectively demonstrate a trend toward making the LLaVA architecture more efficient, specialized, and adaptable to constrained or distributed environments.\n\nBeyond the direct LLaVA derivatives, 2025 has seen the introduction of novel multimodal architectures that rethink the fusion and encoding mechanisms. DLLaVA, presented at IJCNN 2025, introduces a novel architecture characterized by an enhanced vision encoder and the integration of curriculum learning [external]. This approach suggests a move away from static feature extraction toward more dynamic and staged training processes for multimodal alignment [external]. Another significant 2025 architecture is MMU, which utilizes a unified transformer with single-stream attention [external]. MMU employs lightweight modality adapters and a hybrid objective that combines contrastive and generative learning, benchmarked on datasets including COCO, Flickr30k, VQAv2, and NLVR2 [external]. This design contrasts with the earlier LLaVA-1.5 approach, which relied on a fully-connected MLP cross-modal connector that was described as \"surprisingly powerful and data-efficient\" [Improved_Baselines_with_Visual_Instruction_Tuning]. The shift toward single-stream attention and hybrid objectives in MMU indicates a broader 2025 trend toward more integrated and efficient fusion strategies.\n\nAdditionally, 2025 architectures are exploring efficiency through connector optimization and specialized foundation models. OpenUni-Efficient focuses specifically on connector architecture optimization to improve the efficiency of multimodal AI systems [external]. In a more specialized domain, GlobeCore-ChipNet, a 2025 multimodal foundation model, is designed for cloud and chiplet co-design [external]. This model employs a graph-transformer hybrid encoder and a spatio-temporal tokenizer, and includes a differentiable co-simulator [external]. This represents a departure from general-purpose vision-language models toward domain-specific foundation models that integrate complex physical and computational simulations.\n\nIt is important to contextualize these 2025 developments against the 2024 state-of-the-art, which serves as the immediate predecessor to these innovations. The 2024 model Chameleon utilized an early-fusion mixed-modal approach, converting images into 1024 discrete tokens and processing them through a uniform transformer end-to-end [Chameleon_Mixed-Modal_Early-Fusion_Foundation_Models]. Chameleon demonstrated strong performance, matching or exceeding Gemini Pro and GPT-4V, with a task fulfillment rate of 55.2% and a win rate of 41.5% [Chameleon_Mixed-Modal_Early-Fusion_Foundation_Models]. However, it suffered from a weakness where its tokenizer failed on images containing large amounts of text [Chameleon_Mixed-Modal_Early-Fusion_Foundation_Models]. Other 2024 models like SHOW-O and Transfusion explored unifying understanding and generation in a single transformer or combining next-token prediction with image diffusion, respectively [SHOW-O_ONE_SINGLE_TRANSFORMER_TO_UNIFY_MULTIMODAL_UNDERSTANDING_AND_GENERATION] [Transfusion_Predict_the_Next_Token_and_Diffuse_Images_with_One_Multi-Modal_Mode]. LLaVA-OneVision also established strong transfer capabilities across modalities and scenarios in 2024 [LLaVA-OneVision_Easy_Visual_Task_Transfer]. The 2025 architectures discussed above, such as MMU and DLLaVA, appear to refine these early-fusion and unified transformer concepts with a greater emphasis on efficiency, specialized encoders, and hybrid training objectives.\n\nThe consulted records did not surface detailed quantitative benchmarks for the 2025 models like LLaVA-GM, MMU, or DLLaVA, nor did they provide specific architectural diagrams or parameter counts beyond the general descriptions of \"lightweight\" or \"enhanced\" components. The lineage walk from LLaVA within the primary corpus identified no in-corpus 2025 successors, confirming that the 2025 innovations are primarily found in external or derivative literature rather than the core indexed dataset [lineage_walk LLaVA].",
+  "references": [],
+  "answer_official_all": "The landscape of multimodal architectures in 2025 represents a significant evolution from the foundational LLaVA approach, which originally connected vision encoders to language models via a simple linear projection or MLP connector [LLaVA]. While the core corpus of retrieved records does not contain papers explicitly dated 2025, indicating that the primary indexed literature ends at 2024 with models such as Chameleon, LLaVA-OneVision, SHOW-O, and Transfusion [as_of 2025], external records and derivative works reveal several key architectural innovations and variants emerging in 2025 that build upon or diverge from the LLaVA lineage . A primary direction of 2025 development involves the optimization and specialization of the LLaVA family, focusing on efficiency and domain-specific applications. LLaVA-GM, published in *Frontiers of Computer Science* in 2025, addresses the computational redundancy of the Vicuna backbone used in earlier LLaVA iterations . By identifying the backbone as \"too redundant,\" LLaVA-GM implements a lightweight variant that greatly reduces model parameters, enabling deployment on low-resource devices while maintaining performance on common Visual Question Answering (VQA) tasks . Similarly, LLaVA-ST, presented at CVPR 2025, extends the architecture to handle spatial-temporal data, addressing the need for more complex temporal reasoning in multimodal contexts . In the medical domain, LLaVA-NeXT-Med emerges as a specialized Multimodal Large Language Model (MLLM) tailored for clinical applications . Furthermore, LLaVA-FL, presented at WACV 2025, adapts the LLaVA framework for federated learning, allowing for privacy-preserving training across distributed devices . These variants collectively demonstrate a trend toward making the LLaVA architecture more efficient, specialized, and adaptable to constrained or distributed environments. Beyond the direct LLaVA derivatives, 2025 has seen the introduction of novel multimodal architectures that rethink the fusion and encoding mechanisms. DLLaVA, presented at IJCNN 2025, introduces a novel architecture characterized by an enhanced vision encoder and the integration of curriculum learning . This approach suggests a move away from static feature extraction toward more dynamic and staged training processes for multimodal alignment . Another significant 2025 architecture is MMU, which utilizes a unified transformer with single-stream attention . MMU employs lightweight modality adapters and a hybrid objective that combines contrastive and generative learning, benchmarked on datasets including COCO, Flickr30k, VQAv2, and NLVR2 . This design contrasts with the earlier LLaVA-1.5 approach, which relied on a fully-connected MLP cross-modal connector that was described as \"surprisingly powerful and data-efficient\" . The shift toward single-stream attention and hybrid objectives in MMU indicates a broader 2025 trend toward more integrated and efficient fusion strategies. Additionally, 2025 architectures are exploring efficiency through connector optimization and specialized foundation models. OpenUni-Efficient focuses specifically on connector architecture optimization to improve the efficiency of multimodal AI systems . In a more specialized domain, GlobeCore-ChipNet, a 2025 multimodal foundation model, is designed for cloud and chiplet co-design . This model employs a graph-transformer hybrid encoder and a spatio-temporal tokenizer, and includes a differentiable co-simulator . This represents a departure from general-purpose vision-language models toward domain-specific foundation models that integrate complex physical and computational simulations. It is important to contextualize these 2025 developments against the 2024 state-of-the-art, which serves as the immediate predecessor to these innovations. The 2024 model Chameleon utilized an early-fusion mixed-modal approach, converting images into 1024 discrete tokens and processing them through a uniform transformer end-to-end . Chameleon demonstrated strong performance, matching or exceeding Gemini Pro and GPT-4V, with a task fulfillment rate of 55.2% and a win rate of 41.5% . However, it suffered from a weakness where its tokenizer failed on images containing large amounts of text . Other 2024 models like SHOW-O and Transfusion explored unifying understanding and generation in a single transformer or combining next-token prediction with image diffusion, respectively . LLaVA-OneVision also established strong transfer capabilities across modalities and scenarios in 2024 . The 2025 architectures discussed above, such as MMU and DLLaVA, appear to refine these early-fusion and unified transformer concepts with a greater emphasis on efficiency, specialized encoders, and hybrid training objectives. The consulted records did not surface detailed quantitative benchmarks for the 2025 models like LLaVA-GM, MMU, or DLLaVA, nor did they provide specific architectural diagrams or parameter counts beyond the general descriptions of \"lightweight\" or \"enhanced\" components. The lineage walk from LLaVA within the primary corpus identified no in-corpus 2025 successors, confirming that the 2025 innovations are primarily found in external or derivative literature rather than the core indexed dataset [lineage_walk LLaVA].",
+  "citations_all": [
+   {
+    "marker": "[external]",
+    "stems": [
+     "external"
+    ],
+    "ctx_indices": [],
+    "mapped": false
+   },
+   {
+    "marker": "[Improved_Baselines_with_Visual_Instruction_Tuning]",
+    "stems": [
+     "Improved_Baselines_with_Visual_Instruction_Tuning"
+    ],
+    "ctx_indices": [],
+    "mapped": false
+   },
+   {
+    "marker": "[Chameleon_Mixed-Modal_Early-Fusion_Foundation_Models]",
+    "stems": [
+     "Chameleon_Mixed-Modal_Early-Fusion_Foundation_Models"
+    ],
+    "ctx_indices": [],
+    "mapped": false
+   },
+   {
+    "marker": "[SHOW-O_ONE_SINGLE_TRANSFORMER_TO_UNIFY_MULTIMODAL_UNDERSTANDING_AND_GENERATION]",
+    "stems": [
+     "SHOW-O_ONE_SINGLE_TRANSFORMER_TO_UNIFY_MULTIMODAL_UNDERSTANDING_AND_GENERATION"
+    ],
+    "ctx_indices": [],
+    "mapped": false
+   },
+   {
+    "marker": "[Transfusion_Predict_the_Next_Token_and_Diffuse_Images_with_One_Multi-Modal_Mode]",
+    "stems": [
+     "Transfusion_Predict_the_Next_Token_and_Diffuse_Images_with_One_Multi-Modal_Mode"
+    ],
+    "ctx_indices": [],
+    "mapped": false
+   },
+   {
+    "marker": "[LLaVA-OneVision_Easy_Visual_Task_Transfer]",
+    "stems": [
+     "LLaVA-OneVision_Easy_Visual_Task_Transfer"
+    ],
+    "ctx_indices": [],
+    "mapped": false
+   }
+  ],
+  "answer_official_first": "The landscape of multimodal architectures in 2025 represents a significant evolution from the foundational LLaVA approach, which originally connected vision encoders to language models via a simple linear projection or MLP connector [LLaVA]. While the core corpus of retrieved records does not contain papers explicitly dated 2025, indicating that the primary indexed literature ends at 2024 with models such as Chameleon, LLaVA-OneVision, SHOW-O, and Transfusion [as_of 2025], external records and derivative works reveal several key architectural innovations and variants emerging in 2025 that build upon or diverge from the LLaVA lineage . A primary direction of 2025 development involves the optimization and specialization of the LLaVA family, focusing on efficiency and domain-specific applications. LLaVA-GM, published in *Frontiers of Computer Science* in 2025, addresses the computational redundancy of the Vicuna backbone used in earlier LLaVA iterations . By identifying the backbone as \"too redundant,\" LLaVA-GM implements a lightweight variant that greatly reduces model parameters, enabling deployment on low-resource devices while maintaining performance on common Visual Question Answering (VQA) tasks . Similarly, LLaVA-ST, presented at CVPR 2025, extends the architecture to handle spatial-temporal data, addressing the need for more complex temporal reasoning in multimodal contexts . In the medical domain, LLaVA-NeXT-Med emerges as a specialized Multimodal Large Language Model (MLLM) tailored for clinical applications . Furthermore, LLaVA-FL, presented at WACV 2025, adapts the LLaVA framework for federated learning, allowing for privacy-preserving training across distributed devices . These variants collectively demonstrate a trend toward making the LLaVA architecture more efficient, specialized, and adaptable to constrained or distributed environments. Beyond the direct LLaVA derivatives, 2025 has seen the introduction of novel multimodal architectures that rethink the fusion and encoding mechanisms. DLLaVA, presented at IJCNN 2025, introduces a novel architecture characterized by an enhanced vision encoder and the integration of curriculum learning . This approach suggests a move away from static feature extraction toward more dynamic and staged training processes for multimodal alignment . Another significant 2025 architecture is MMU, which utilizes a unified transformer with single-stream attention . MMU employs lightweight modality adapters and a hybrid objective that combines contrastive and generative learning, benchmarked on datasets including COCO, Flickr30k, VQAv2, and NLVR2 . This design contrasts with the earlier LLaVA-1.5 approach, which relied on a fully-connected MLP cross-modal connector that was described as \"surprisingly powerful and data-efficient\" . The shift toward single-stream attention and hybrid objectives in MMU indicates a broader 2025 trend toward more integrated and efficient fusion strategies. Additionally, 2025 architectures are exploring efficiency through connector optimization and specialized foundation models. OpenUni-Efficient focuses specifically on connector architecture optimization to improve the efficiency of multimodal AI systems . In a more specialized domain, GlobeCore-ChipNet, a 2025 multimodal foundation model, is designed for cloud and chiplet co-design . This model employs a graph-transformer hybrid encoder and a spatio-temporal tokenizer, and includes a differentiable co-simulator . This represents a departure from general-purpose vision-language models toward domain-specific foundation models that integrate complex physical and computational simulations. It is important to contextualize these 2025 developments against the 2024 state-of-the-art, which serves as the immediate predecessor to these innovations. The 2024 model Chameleon utilized an early-fusion mixed-modal approach, converting images into 1024 discrete tokens and processing them through a uniform transformer end-to-end . Chameleon demonstrated strong performance, matching or exceeding Gemini Pro and GPT-4V, with a task fulfillment rate of 55.2% and a win rate of 41.5% . However, it suffered from a weakness where its tokenizer failed on images containing large amounts of text . Other 2024 models like SHOW-O and Transfusion explored unifying understanding and generation in a single transformer or combining next-token prediction with image diffusion, respectively . LLaVA-OneVision also established strong transfer capabilities across modalities and scenarios in 2024 . The 2025 architectures discussed above, such as MMU and DLLaVA, appear to refine these early-fusion and unified transformer concepts with a greater emphasis on efficiency, specialized encoders, and hybrid training objectives. The consulted records did not surface detailed quantitative benchmarks for the 2025 models like LLaVA-GM, MMU, or DLLaVA, nor did they provide specific architectural diagrams or parameter counts beyond the general descriptions of \"lightweight\" or \"enhanced\" components. The lineage walk from LLaVA within the primary corpus identified no in-corpus 2025 successors, confirming that the 2025 innovations are primarily found in external or derivative literature rather than the core indexed dataset [lineage_walk LLaVA].",
+  "citation_mapped": 0,
+  "citation_dropped": 12,
+  "unresolved_markers": 6,
+  "steps": 11,
+  "gate": {
+   "note_rejects": 41,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 7,
+   "a_chars": 588,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 35,
+   "reject_reasons": {
+    "bad_backref": 41
+   },
+   "_consec_full_reject": 0,
+   "merge_downgraded_lines": 45,
+   "merge_total_lines": 125,
+   "relaxed_writes": 9,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 16,
+   "fallback_compiled": true,
+   "compiled_numeric_fail": {
+    "missing_nums": [
+     "1.2"
+    ],
+    "unsourced": 1
+   },
+   "compiled_numeric_residual": false
+  },
+  "cited_pids": []
+ },
+ {
+  "qid": "probe_lnp_gap",
+  "question": "What recent methods solve the challenge that polymer nanoparticles lack high encapsulation rate?",
+  "raw_answer": "The challenge of low encapsulation rates in polymer nanoparticles is primarily addressed by the development of hybrid lipid-polymer nanoparticles (LPNs) and the utilization of specific lipid-based systems such as solid lipid nanoparticles (SLNs) and nanostructured lipid carriers (NLCs). The fundamental limitation of conventional polymer nanoparticles is explicitly stated as having a low encapsulation rate, a characteristic that is further compounded by the high molecular weight of the polymers, which can easily induce immune responses [3601707f5fff8e]. This deficiency is confirmed by review literature, which notes that polymer nanoparticles lack a high encapsulation rate [93d2e595e3bbcb].\n\nThe most direct method to overcome this limitation is the synthesis of hybrid lipid-polymer nanoparticles (LPNs). In these systems, the polymer component controls drug release while the lipid component controls stability [b0a9ec971588d1]. This hybrid architecture yields a significantly higher encapsulation rate of 59%, compared to the 37% rate observed in pure polymer nanoparticles [93d2e595e3bbcb]. Beyond encapsulation efficiency, LPNs offer improved release kinetics; the lipid-controlled release barrier on the surface inhibits the burst release effect, resulting in a time of 20 hours for 50% drug release, whereas pure polymer nanoparticles release 50% of the drug in only 7 hours . These hybrid systems also demonstrate good potential to enhance physical stability and biocompatibility [cfd59676d90705]. Specific applications of this method include cisplatin-loaded lipid-polymer hybrid nanoparticles, which have been reported as effective drug delivery systems [37468055e3db13].\n\nAlternative lipid-based methods, specifically solid lipid nanoparticles (SLNs) and nanostructured lipid carriers (NLCs), also address the encapsulation challenge by providing superior physical stability and improved drug loading compared to nanoemulsions, liposomes, and other carriers [59c778e122dc1d]. Quantitative data for these systems using Compritol 888 ATO shows that SLNs achieve an encapsulation efficiency (EE) of 76% with a drug loading (DL) of 1% w/w, while NLCs achieve a higher EE of 83% with a DL of 1.12% w/w . While liposomes are noted to require a delicate balance between high drug loading and particle size stability [2538de16311d21], the lipid-polymer and solid lipid approaches provide the specific numeric improvements in encapsulation rates that pure polymer systems lack.\n\nOther methods involving modified polymers, such as modified chitosan nano-microcapsules, have also shown high encapsulation rates [d41b1fac10bcbf], and chitosan derivatives like trimethyl chitosan (TMC) and thiolated chitosan are used to improve properties [3f40d628342e99]. However, the consulted records did not surface specific numeric encapsulation rates for these chitosan-based methods, nor did they provide detailed numeric encapsulation data for semiconducting polymer nanoparticles (SPNs), which are noted for their versatility in drug delivery [d4d02189a1f691] and higher tumor accumulation compared to traditional polymeric nanoparticles [2538de16311d21]. The primary numeric evidence for solving the low encapsulation rate challenge remains concentrated in the hybrid lipid-polymer and solid lipid nanoparticle systems.",
+  "references": [],
+  "answer_official_all": "The challenge of low encapsulation rates in polymer nanoparticles is primarily addressed by the development of hybrid lipid-polymer nanoparticles (LPNs) and the utilization of specific lipid-based systems such as solid lipid nanoparticles (SLNs) and nanostructured lipid carriers (NLCs). The fundamental limitation of conventional polymer nanoparticles is explicitly stated as having a low encapsulation rate, a characteristic that is further compounded by the high molecular weight of the polymers, which can easily induce immune responses . This deficiency is confirmed by review literature, which notes that polymer nanoparticles lack a high encapsulation rate . The most direct method to overcome this limitation is the synthesis of hybrid lipid-polymer nanoparticles (LPNs). In these systems, the polymer component controls drug release while the lipid component controls stability . This hybrid architecture yields a significantly higher encapsulation rate of 59%, compared to the 37% rate observed in pure polymer nanoparticles . Beyond encapsulation efficiency, LPNs offer improved release kinetics; the lipid-controlled release barrier on the surface inhibits the burst release effect, resulting in a time of 20 hours for 50% drug release, whereas pure polymer nanoparticles release 50% of the drug in only 7 hours . These hybrid systems also demonstrate good potential to enhance physical stability and biocompatibility . Specific applications of this method include cisplatin-loaded lipid-polymer hybrid nanoparticles, which have been reported as effective drug delivery systems . Alternative lipid-based methods, specifically solid lipid nanoparticles (SLNs) and nanostructured lipid carriers (NLCs), also address the encapsulation challenge by providing superior physical stability and improved drug loading compared to nanoemulsions, liposomes, and other carriers . Quantitative data for these systems using Compritol 888 ATO shows that SLNs achieve an encapsulation efficiency (EE) of 76% with a drug loading (DL) of 1% w/w, while NLCs achieve a higher EE of 83% with a DL of 1.12% w/w . While liposomes are noted to require a delicate balance between high drug loading and particle size stability , the lipid-polymer and solid lipid approaches provide the specific numeric improvements in encapsulation rates that pure polymer systems lack. Other methods involving modified polymers, such as modified chitosan nano-microcapsules, have also shown high encapsulation rates , and chitosan derivatives like trimethyl chitosan (TMC) and thiolated chitosan are used to improve properties . However, the consulted records did not surface specific numeric encapsulation rates for these chitosan-based methods, nor did they provide detailed numeric encapsulation data for semiconducting polymer nanoparticles (SPNs), which are noted for their versatility in drug delivery and higher tumor accumulation compared to traditional polymeric nanoparticles . The primary numeric evidence for solving the low encapsulation rate challenge remains concentrated in the hybrid lipid-polymer and solid lipid nanoparticle systems.",
+  "citations_all": [
+   {
+    "marker": "[3601707f5fff8e]",
+    "stems": [
+     "A_Review_on_Polymer_and_Lipid-Based_Nanocarriers_and_Its_Application_to_Nano-Pha"
+    ],
+    "ctx_indices": [],
+    "mapped": false
+   },
+   {
+    "marker": "[93d2e595e3bbcb]",
+    "stems": [
+     "A_Review_on_Polymer_and_Lipid-Based_Nanocarriers_and_Its_Application_to_Nano-Pha"
+    ],
+    "ctx_indices": [],
+    "mapped": false
+   },
+   {
+    "marker": "[b0a9ec971588d1]",
+    "stems": [
+     "A_Review_on_Polymer_and_Lipid-Based_Nanocarriers_and_Its_Application_to_Nano-Pha"
+    ],
+    "ctx_indices": [],
+    "mapped": false
+   },
+   {
+    "marker": "[cfd59676d90705]",
+    "stems": [
+     "A_Review_on_Polymer_and_Lipid-Based_Nanocarriers_and_Its_Application_to_Nano-Pha"
+    ],
+    "ctx_indices": [],
+    "mapped": false
+   },
+   {
+    "marker": "[37468055e3db13]",
+    "stems": [
+     "A_Review_on_Polymer_and_Lipid-Based_Nanocarriers_and_Its_Application_to_Nano-Pha"
+    ],
+    "ctx_indices": [],
+    "mapped": false
+   },
+   {
+    "marker": "[59c778e122dc1d]",
+    "stems": [
+     "A_Review_on_Polymer_and_Lipid-Based_Nanocarriers_and_Its_Application_to_Nano-Pha"
+    ],
+    "ctx_indices": [],
+    "mapped": false
+   },
+   {
+    "marker": "[2538de16311d21]",
+    "stems": [
+     "Leveraging_Semiconducting_Polymer_Nanoparticles_for_Combination_Cancer_Immunothe"
+    ],
+    "ctx_indices": [],
+    "mapped": false
+   },
+   {
+    "marker": "[d41b1fac10bcbf]",
+    "stems": [
+     "A_Review_on_Polymer_and_Lipid-Based_Nanocarriers_and_Its_Application_to_Nano-Pha"
+    ],
+    "ctx_indices": [],
+    "mapped": false
+   },
+   {
+    "marker": "[3f40d628342e99]",
+    "stems": [
+     "A_Review_on_Polymer_and_Lipid-Based_Nanocarriers_and_Its_Application_to_Nano-Pha"
+    ],
+    "ctx_indices": [],
+    "mapped": false
+   },
+   {
+    "marker": "[d4d02189a1f691]",
+    "stems": [
+     "Leveraging_Semiconducting_Polymer_Nanoparticles_for_Combination_Cancer_Immunothe"
+    ],
+    "ctx_indices": [],
+    "mapped": false
+   }
+  ],
+  "answer_official_first": "The challenge of low encapsulation rates in polymer nanoparticles is primarily addressed by the development of hybrid lipid-polymer nanoparticles (LPNs) and the utilization of specific lipid-based systems such as solid lipid nanoparticles (SLNs) and nanostructured lipid carriers (NLCs). The fundamental limitation of conventional polymer nanoparticles is explicitly stated as having a low encapsulation rate, a characteristic that is further compounded by the high molecular weight of the polymers, which can easily induce immune responses . This deficiency is confirmed by review literature, which notes that polymer nanoparticles lack a high encapsulation rate . The most direct method to overcome this limitation is the synthesis of hybrid lipid-polymer nanoparticles (LPNs). In these systems, the polymer component controls drug release while the lipid component controls stability . This hybrid architecture yields a significantly higher encapsulation rate of 59%, compared to the 37% rate observed in pure polymer nanoparticles . Beyond encapsulation efficiency, LPNs offer improved release kinetics; the lipid-controlled release barrier on the surface inhibits the burst release effect, resulting in a time of 20 hours for 50% drug release, whereas pure polymer nanoparticles release 50% of the drug in only 7 hours . These hybrid systems also demonstrate good potential to enhance physical stability and biocompatibility . Specific applications of this method include cisplatin-loaded lipid-polymer hybrid nanoparticles, which have been reported as effective drug delivery systems . Alternative lipid-based methods, specifically solid lipid nanoparticles (SLNs) and nanostructured lipid carriers (NLCs), also address the encapsulation challenge by providing superior physical stability and improved drug loading compared to nanoemulsions, liposomes, and other carriers . Quantitative data for these systems using Compritol 888 ATO shows that SLNs achieve an encapsulation efficiency (EE) of 76% with a drug loading (DL) of 1% w/w, while NLCs achieve a higher EE of 83% with a DL of 1.12% w/w . While liposomes are noted to require a delicate balance between high drug loading and particle size stability , the lipid-polymer and solid lipid approaches provide the specific numeric improvements in encapsulation rates that pure polymer systems lack. Other methods involving modified polymers, such as modified chitosan nano-microcapsules, have also shown high encapsulation rates , and chitosan derivatives like trimethyl chitosan (TMC) and thiolated chitosan are used to improve properties . However, the consulted records did not surface specific numeric encapsulation rates for these chitosan-based methods, nor did they provide detailed numeric encapsulation data for semiconducting polymer nanoparticles (SPNs), which are noted for their versatility in drug delivery and higher tumor accumulation compared to traditional polymeric nanoparticles . The primary numeric evidence for solving the low encapsulation rate challenge remains concentrated in the hybrid lipid-polymer and solid lipid nanoparticle systems.",
+  "citation_mapped": 0,
+  "citation_dropped": 20,
+  "unresolved_markers": 10,
+  "steps": 10,
+  "gate": {
+   "note_rejects": 6,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 14,
+   "a_chars": 1435,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 11,
+   "a_forged": 56,
+   "_consec_full_reject": 0,
+   "notes_truncated": 6569,
+   "reject_reasons": {
+    "bad_backref": 6
+   },
+   "merge_downgraded_lines": 6,
+   "merge_total_lines": 83,
+   "relaxed_writes": 2,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 2,
+   "fallback_compiled": true
+  },
+  "cited_pids": []
+ },
+ {
+  "qid": "probe_newfield",
+  "question": "What are the main approaches to protein design with diffusion models as of 2025?",
+  "raw_answer": "As of 2025, the landscape of protein design utilizing diffusion models is characterized by a diverse array of methodological approaches, ranging from continuous atomic-level generative modeling to discrete sequence-based diffusion and unified bidirectional frameworks. The primary strategies can be categorized into continuous/atomic 3D diffusion, discrete sequence diffusion, joint sequence-structure generation, structure-free conditional design, and specialized applications for conformational dynamics and multi-target binding.\n\n**Continuous and Atomic 3D Diffusion**\nA dominant approach involves continuous diffusion models operating in 3D atomic or backbone space, often referred to as the RFdiffusion lineage [Scaling_LLM_Test_Time_Compute_Optimally]. This category includes SCUBA-D, which employs denoising diffusion with non-zero-mean priors to generate de novo protein backbones [10.1101/2022.12.17.520847]. SCUBA-D utilizes one-step denoising for prior backbones and high-resolution structure diffusion, assisted by the simultaneous diffusion of a language model representation of the amino acid sequence, while incorporating adversarial training to ensure physical plausibility [10.1101/2022.12.17.520847]. More recently, GeoFlow-V2 has emerged as a unified atomic diffusion model that handles both protein structure prediction and de novo design [10.1101/2025.05.06.652551]. GeoFlow-V2 is bidirectional, capable of handling sequence-to-structure and structure-to-sequence tasks, and extends its capabilities to accommodate proteins, DNA/RNA, and small molecules while integrating experimental constraints [10.1101/2025.05.06.652551]. The efficacy of these continuous models is often validated through pipelines that combine RFdiffusion with AlphaFold2, as demonstrated in the de novo design of proteins targeting voltage-gated sodium channel 1.7 [10.1016/j.bpj.2023.11.771]. However, practical applications of RFdiffusion for de novo binder design show variable success; in one evaluation for biochemical detection, RFdiffusion generated two Strep-Tag II binders that outperformed streptavidin in Western blot assays, yet none matched the sensitivity of antibodies, and other targets failed due to low expression [10.1101/2025.02.07.636769]. To enhance design outcomes, RFdiffusion is increasingly integrated with evolutionary analysis, such as in the de novo design of aggregation-resistant frataxin [10.1002/prot.70114].\n\n**Discrete Sequence Diffusion and Joint Generation**\nIn contrast to continuous spatial diffusion, discrete diffusion models focus on the sequence space [10.1101/2025.06.13.659451]. A notable 2025 approach is the use of Discrete Diffusion Probabilistic Models (D3PM) combined with a modified ByteNet and SELFIES all-atom representation for protein sequence design [10.1101/2025.06.13.659451]. This method addresses the limitation of traditional approaches that rely solely on the 20 canonical amino acids, thereby enabling the inclusion of non-canonical and post-translationally modified residues [10.1101/2025.06.13.659451]. Another significant development is the joint generation of protein sequence and structure, exemplified by ProteinGenerator (RoseTTAFold Sequence Space Diffusion) [10.1101/2023.05.08.539766]. This model simultaneously generates sequence and structure pairs through iterative denoising, guided by desired sequence or structural attributes, resulting in proteins enriched for specific amino acids, internal repeats, or masked bioactive sites [10.1101/2023.05.08.539766]. The generative model Chroma, published in Nature Methods in 2024, also represents a key diffusion-based approach for protein design [10.1038/s41592-023-02155-9].\n\n**Structure-Free and Conditional Diffusion**\nFor applications where structural data is unavailable or where ligand design is the primary goal, structure-free diffusion models are employed [10.1101/2025.06.16.659955]. ProtoBind-Diff utilizes masked diffusion conditioned on protein sequences via language model embeddings to generate ligands [10.1101/2025.06.16.659955]. Trained on over 1 million BindingDB pairs, this approach facilitates protein-conditioned design without requiring explicit structural inputs [10.1101/2025.06.16.659955]. Similarly, ProDualNet addresses the challenge of multi-target design by using a heterogeneous graph network pretraining strategy [10.1101/2025.02.28.640919]. It employs noise-augmented single-target and real dual-target fine-tuning to design proteins that can bind two distinct receptors [10.1101/2025.02.28.640919].\n\n**Conformational Dynamics and Comparative Analysis**\nBeyond static structure and sequence design, diffusion models are being applied to protein dynamics [10.21203/rs.3.rs-7773775/v1]. FlowDyn uses Denoising Diffusion Probabilistic Models (DDPM) in internal coordinate space, incorporating geometric constraints and energy-informed regularization to generate conformational ensembles [10.21203/rs.3.rs-7773775/v1]. This approach captures loop rearrangements, domain shifts, and allosteric motions, focusing on dynamics rather than de novo design [10.21203/rs.3.rs-7773775/v1]. A systematic comparison of 13 state-of-the-art generative protein models in 2025 highlights fundamental trade-offs between structural and sequence-based approaches [10.1101/2025.03.23.644844]. The study found that structural diffusion models generally exhibit higher confidence and more plausible energy landscapes but suffer from limited diversity and sequence biases [10.1101/2025.03.23.644844]. Conversely, protein language models generate more diverse and novel sequences but with lower structural confidence [10.1101/2025.03.23.644844]. Furthermore, while conditional generation on the TEV protease was successful, the resulting proteins showed diminished activity [10.1101/2025.03.23.644844].\n\nThe consulted records did not surface specific details regarding the core architectural parameters of RFdiffusion or the specific hybridization mechanisms of ESM with diffusion models, nor did they provide a comprehensive list of all diffusion-based protein design methods published in 2025.",
+  "references": [],
+  "answer_official_all": "As of 2025, the landscape of protein design utilizing diffusion models is characterized by a diverse array of methodological approaches, ranging from continuous atomic-level generative modeling to discrete sequence-based diffusion and unified bidirectional frameworks. The primary strategies can be categorized into continuous/atomic 3D diffusion, discrete sequence diffusion, joint sequence-structure generation, structure-free conditional design, and specialized applications for conformational dynamics and multi-target binding. **Continuous and Atomic 3D Diffusion**\nA dominant approach involves continuous diffusion models operating in 3D atomic or backbone space, often referred to as the RFdiffusion lineage . This category includes SCUBA-D, which employs denoising diffusion with non-zero-mean priors to generate de novo protein backbones [10.1101/2022.12.17.520847]. SCUBA-D utilizes one-step denoising for prior backbones and high-resolution structure diffusion, assisted by the simultaneous diffusion of a language model representation of the amino acid sequence, while incorporating adversarial training to ensure physical plausibility [10.1101/2022.12.17.520847]. More recently, GeoFlow-V2 has emerged as a unified atomic diffusion model that handles both protein structure prediction and de novo design [10.1101/2025.05.06.652551]. GeoFlow-V2 is bidirectional, capable of handling sequence-to-structure and structure-to-sequence tasks, and extends its capabilities to accommodate proteins, DNA/RNA, and small molecules while integrating experimental constraints [10.1101/2025.05.06.652551]. The efficacy of these continuous models is often validated through pipelines that combine RFdiffusion with AlphaFold2, as demonstrated in the de novo design of proteins targeting voltage-gated sodium channel 1.7 [10.1016/j.bpj.2023.11.771]. However, practical applications of RFdiffusion for de novo binder design show variable success; in one evaluation for biochemical detection, RFdiffusion generated two Strep-Tag II binders that outperformed streptavidin in Western blot assays, yet none matched the sensitivity of antibodies, and other targets failed due to low expression [10.1101/2025.02.07.636769]. To enhance design outcomes, RFdiffusion is increasingly integrated with evolutionary analysis, such as in the de novo design of aggregation-resistant frataxin [10.1002/prot.70114]. **Discrete Sequence Diffusion and Joint Generation**\nIn contrast to continuous spatial diffusion, discrete diffusion models focus on the sequence space [10.1101/2025.06.13.659451]. A notable 2025 approach is the use of Discrete Diffusion Probabilistic Models (D3PM) combined with a modified ByteNet and SELFIES all-atom representation for protein sequence design [10.1101/2025.06.13.659451]. This method addresses the limitation of traditional approaches that rely solely on the 20 canonical amino acids, thereby enabling the inclusion of non-canonical and post-translationally modified residues [10.1101/2025.06.13.659451]. Another significant development is the joint generation of protein sequence and structure, exemplified by ProteinGenerator (RoseTTAFold Sequence Space Diffusion) [10.1101/2023.05.08.539766]. This model simultaneously generates sequence and structure pairs through iterative denoising, guided by desired sequence or structural attributes, resulting in proteins enriched for specific amino acids, internal repeats, or masked bioactive sites [10.1101/2023.05.08.539766]. The generative model Chroma, published in Nature Methods in 2024, also represents a key diffusion-based approach for protein design [10.1038/s41592-023-02155-9]. **Structure-Free and Conditional Diffusion**\nFor applications where structural data is unavailable or where ligand design is the primary goal, structure-free diffusion models are employed [10.1101/2025.06.16.659955]. ProtoBind-Diff utilizes masked diffusion conditioned on protein sequences via language model embeddings to generate ligands [10.1101/2025.06.16.659955]. Trained on over 1 million BindingDB pairs, this approach facilitates protein-conditioned design without requiring explicit structural inputs [10.1101/2025.06.16.659955]. Similarly, ProDualNet addresses the challenge of multi-target design by using a heterogeneous graph network pretraining strategy [10.1101/2025.02.28.640919]. It employs noise-augmented single-target and real dual-target fine-tuning to design proteins that can bind two distinct receptors [10.1101/2025.02.28.640919]. **Conformational Dynamics and Comparative Analysis**\nBeyond static structure and sequence design, diffusion models are being applied to protein dynamics [10.21203/rs.3.rs-7773775/v1]. FlowDyn uses Denoising Diffusion Probabilistic Models (DDPM) in internal coordinate space, incorporating geometric constraints and energy-informed regularization to generate conformational ensembles [10.21203/rs.3.rs-7773775/v1]. This approach captures loop rearrangements, domain shifts, and allosteric motions, focusing on dynamics rather than de novo design [10.21203/rs.3.rs-7773775/v1]. A systematic comparison of 13 state-of-the-art generative protein models in 2025 highlights fundamental trade-offs between structural and sequence-based approaches [10.1101/2025.03.23.644844]. The study found that structural diffusion models generally exhibit higher confidence and more plausible energy landscapes but suffer from limited diversity and sequence biases [10.1101/2025.03.23.644844]. Conversely, protein language models generate more diverse and novel sequences but with lower structural confidence [10.1101/2025.03.23.644844]. Furthermore, while conditional generation on the TEV protease was successful, the resulting proteins showed diminished activity [10.1101/2025.03.23.644844]. The consulted records did not surface specific details regarding the core architectural parameters of RFdiffusion or the specific hybridization mechanisms of ESM with diffusion models, nor did they provide a comprehensive list of all diffusion-based protein design methods published in 2025.",
+  "citations_all": [
+   {
+    "marker": "[Scaling_LLM_Test_Time_Compute_Optimally]",
+    "stems": [
+     "Scaling_LLM_Test_Time_Compute_Optimally"
+    ],
+    "ctx_indices": [],
+    "mapped": false
+   }
+  ],
+  "answer_official_first": "As of 2025, the landscape of protein design utilizing diffusion models is characterized by a diverse array of methodological approaches, ranging from continuous atomic-level generative modeling to discrete sequence-based diffusion and unified bidirectional frameworks. The primary strategies can be categorized into continuous/atomic 3D diffusion, discrete sequence diffusion, joint sequence-structure generation, structure-free conditional design, and specialized applications for conformational dynamics and multi-target binding. **Continuous and Atomic 3D Diffusion**\nA dominant approach involves continuous diffusion models operating in 3D atomic or backbone space, often referred to as the RFdiffusion lineage . This category includes SCUBA-D, which employs denoising diffusion with non-zero-mean priors to generate de novo protein backbones [10.1101/2022.12.17.520847]. SCUBA-D utilizes one-step denoising for prior backbones and high-resolution structure diffusion, assisted by the simultaneous diffusion of a language model representation of the amino acid sequence, while incorporating adversarial training to ensure physical plausibility [10.1101/2022.12.17.520847]. More recently, GeoFlow-V2 has emerged as a unified atomic diffusion model that handles both protein structure prediction and de novo design [10.1101/2025.05.06.652551]. GeoFlow-V2 is bidirectional, capable of handling sequence-to-structure and structure-to-sequence tasks, and extends its capabilities to accommodate proteins, DNA/RNA, and small molecules while integrating experimental constraints [10.1101/2025.05.06.652551]. The efficacy of these continuous models is often validated through pipelines that combine RFdiffusion with AlphaFold2, as demonstrated in the de novo design of proteins targeting voltage-gated sodium channel 1.7 [10.1016/j.bpj.2023.11.771]. However, practical applications of RFdiffusion for de novo binder design show variable success; in one evaluation for biochemical detection, RFdiffusion generated two Strep-Tag II binders that outperformed streptavidin in Western blot assays, yet none matched the sensitivity of antibodies, and other targets failed due to low expression [10.1101/2025.02.07.636769]. To enhance design outcomes, RFdiffusion is increasingly integrated with evolutionary analysis, such as in the de novo design of aggregation-resistant frataxin [10.1002/prot.70114]. **Discrete Sequence Diffusion and Joint Generation**\nIn contrast to continuous spatial diffusion, discrete diffusion models focus on the sequence space [10.1101/2025.06.13.659451]. A notable 2025 approach is the use of Discrete Diffusion Probabilistic Models (D3PM) combined with a modified ByteNet and SELFIES all-atom representation for protein sequence design [10.1101/2025.06.13.659451]. This method addresses the limitation of traditional approaches that rely solely on the 20 canonical amino acids, thereby enabling the inclusion of non-canonical and post-translationally modified residues [10.1101/2025.06.13.659451]. Another significant development is the joint generation of protein sequence and structure, exemplified by ProteinGenerator (RoseTTAFold Sequence Space Diffusion) [10.1101/2023.05.08.539766]. This model simultaneously generates sequence and structure pairs through iterative denoising, guided by desired sequence or structural attributes, resulting in proteins enriched for specific amino acids, internal repeats, or masked bioactive sites [10.1101/2023.05.08.539766]. The generative model Chroma, published in Nature Methods in 2024, also represents a key diffusion-based approach for protein design [10.1038/s41592-023-02155-9]. **Structure-Free and Conditional Diffusion**\nFor applications where structural data is unavailable or where ligand design is the primary goal, structure-free diffusion models are employed [10.1101/2025.06.16.659955]. ProtoBind-Diff utilizes masked diffusion conditioned on protein sequences via language model embeddings to generate ligands [10.1101/2025.06.16.659955]. Trained on over 1 million BindingDB pairs, this approach facilitates protein-conditioned design without requiring explicit structural inputs [10.1101/2025.06.16.659955]. Similarly, ProDualNet addresses the challenge of multi-target design by using a heterogeneous graph network pretraining strategy [10.1101/2025.02.28.640919]. It employs noise-augmented single-target and real dual-target fine-tuning to design proteins that can bind two distinct receptors [10.1101/2025.02.28.640919]. **Conformational Dynamics and Comparative Analysis**\nBeyond static structure and sequence design, diffusion models are being applied to protein dynamics [10.21203/rs.3.rs-7773775/v1]. FlowDyn uses Denoising Diffusion Probabilistic Models (DDPM) in internal coordinate space, incorporating geometric constraints and energy-informed regularization to generate conformational ensembles [10.21203/rs.3.rs-7773775/v1]. This approach captures loop rearrangements, domain shifts, and allosteric motions, focusing on dynamics rather than de novo design [10.21203/rs.3.rs-7773775/v1]. A systematic comparison of 13 state-of-the-art generative protein models in 2025 highlights fundamental trade-offs between structural and sequence-based approaches [10.1101/2025.03.23.644844]. The study found that structural diffusion models generally exhibit higher confidence and more plausible energy landscapes but suffer from limited diversity and sequence biases [10.1101/2025.03.23.644844]. Conversely, protein language models generate more diverse and novel sequences but with lower structural confidence [10.1101/2025.03.23.644844]. Furthermore, while conditional generation on the TEV protease was successful, the resulting proteins showed diminished activity [10.1101/2025.03.23.644844]. The consulted records did not surface specific details regarding the core architectural parameters of RFdiffusion or the specific hybridization mechanisms of ESM with diffusion models, nor did they provide a comprehensive list of all diffusion-based protein design methods published in 2025.",
+  "citation_mapped": 0,
+  "citation_dropped": 2,
+  "unresolved_markers": 1,
+  "steps": 13,
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 22,
+   "fallback_compiled": true,
+   "compiled_numeric_fail": {
+    "missing_nums": [
+     "1.7",
+     "13",
+     "20",
+     "2025."
+    ],
+    "unsourced": 4
+   },
+   "compiled_numeric_residual": true
+  },
+  "cited_pids": []
+ },
+ {
+  "qid": "probe_llava_succ",
+  "question": "What methods replaced or improved upon LLaVA-1.5 in 2024 and 2025?",
+  "raw_answer": "I was unable to complete the retrieval loop for this question: the step budget was exhausted before the three planned queries (card on LLaVA-1.5, lineage successors, and an external search for 2024–2025 successors) could return results. The only evidence I hold is a set of auto-transcribed verbatim lines from an earlier card() observation on LLaVA-1.5, which give baseline numbers and configuration details for LLaVA-1.5 itself but do not name any successor methods:\n\n- LLaVA-1.5 reports VQAv2 = 80.0 and GQA = 78.2 (demonstrated) [918a1ea5931556] [9aad7cbaa5db16].\n- Its vision encoder is CLIP-ViT-L-336px and its vision-language connector is a fully-connected layer [5e24f983ff70d5] [055b9f64d320dd].\n- Several ablation values are recorded (62.9, 1425.8, 31.9, 63.8, 1497.5, 35.1) [21813684ffd044] [2464228e711d79] [47d7984598c4a6] [e02d3fa7e36bfb] [5bbb825e88ba7e] [81206c043ba322].\n\nNone of these lines identify a method that replaced or improved upon LLaVA-1.5 in 2024 or 2025. The corpus entity list does include LLaVA-1.5* (grounded in the corpus) and related names such as LLaVA, LLaVA-OneVision, and several 2024 multimodal papers (e.g., Chameleon, SHOW-O, Transfusion, LLaVA-OneVision), but I did not get to query their lineage or card dossiers before the budget ran out.\n\nHonest disclosure of what I could NOT establish:\n- I did not retrieve the lineage edges (extends/improves/replaces) that point from LLaVA-1.5 to successor methods, so I cannot list, from this knowledge base, which specific 2024–2025 methods are recorded as successors.\n- I did not complete the external literature search for 2024–2025 papers that explicitly build on LLaVA-1.5.\n- I therefore cannot provide a verified, citation-backed list of methods that replaced or improved upon LLaVA-1.5 in 2024 and 2025.\n\nIf the search budget is restored, the correct next steps would be: (1) card(\"LLaVA-1.5\") to read its full dossier including any successor references; (2) lineage(\"LLaVA-1.5\", direction=\"successors\") to pull typed extends/improves/replaces edges; and (3) search_papers for \"LLaVA-1.5 improved upon successor multimodal LLM 2024 2025\" to capture external successors not yet in the corpus.",
+  "references": [],
+  "answer_official_all": "I was unable to complete the retrieval loop for this question: the step budget was exhausted before the three planned queries (card on LLaVA-1.5, lineage successors, and an external search for 2024–2025 successors) could return results. The only evidence I hold is a set of auto-transcribed verbatim lines from an earlier card() observation on LLaVA-1.5, which give baseline numbers and configuration details for LLaVA-1.5 itself but do not name any successor methods: - LLaVA-1.5 reports VQAv2 = 80.0 and GQA = 78.2 (demonstrated) .\n- Its vision encoder is CLIP-ViT-L-336px and its vision-language connector is a fully-connected layer .\n- Several ablation values are recorded (62.9, 1425.8, 31.9, 63.8, 1497.5, 35.1) . None of these lines identify a method that replaced or improved upon LLaVA-1.5 in 2024 or 2025. The corpus entity list does include LLaVA-1.5* (grounded in the corpus) and related names such as LLaVA, LLaVA-OneVision, and several 2024 multimodal papers (e.g., Chameleon, SHOW-O, Transfusion, LLaVA-OneVision), but I did not get to query their lineage or card dossiers before the budget ran out. Honest disclosure of what I could NOT establish:\n- I did not retrieve the lineage edges (extends/improves/replaces) that point from LLaVA-1.5 to successor methods, so I cannot list, from this knowledge base, which specific 2024–2025 methods are recorded as successors.\n- I did not complete the external literature search for 2024–2025 papers that explicitly build on LLaVA-1.5.\n- I therefore cannot provide a verified, citation-backed list of methods that replaced or improved upon LLaVA-1.5 in 2024 and 2025. If the search budget is restored, the correct next steps would be: (1) card(\"LLaVA-1.5\") to read its full dossier including any successor references; (2) lineage(\"LLaVA-1.5\", direction=\"successors\") to pull typed extends/improves/replaces edges; and (3) search_papers for \"LLaVA-1.5 improved upon successor multimodal LLM 2024 2025\" to capture external successors not yet in the corpus.",
+  "citations_all": [
+   {
+    "marker": "[918a1ea5931556]",
+    "stems": [
+     "Improved_Baselines_with_Visual_Instruction_Tuning"
+    ],
+    "ctx_indices": [],
+    "mapped": false
+   },
+   {
+    "marker": "[9aad7cbaa5db16]",
+    "stems": [
+     "Improved_Baselines_with_Visual_Instruction_Tuning"
+    ],
+    "ctx_indices": [],
+    "mapped": false
+   },
+   {
+    "marker": "[5e24f983ff70d5]",
+    "stems": [
+     "Improved_Baselines_with_Visual_Instruction_Tuning"
+    ],
+    "ctx_indices": [],
+    "mapped": false
+   },
+   {
+    "marker": "[055b9f64d320dd]",
+    "stems": [
+     "Improved_Baselines_with_Visual_Instruction_Tuning"
+    ],
+    "ctx_indices": [],
+    "mapped": false
+   },
+   {
+    "marker": "[21813684ffd044]",
+    "stems": [
+     "Improved_Baselines_with_Visual_Instruction_Tuning"
+    ],
+    "ctx_indices": [],
+    "mapped": false
+   },
+   {
+    "marker": "[2464228e711d79]",
+    "stems": [
+     "Improved_Baselines_with_Visual_Instruction_Tuning"
+    ],
+    "ctx_indices": [],
+    "mapped": false
+   },
+   {
+    "marker": "[47d7984598c4a6]",
+    "stems": [
+     "Improved_Baselines_with_Visual_Instruction_Tuning"
+    ],
+    "ctx_indices": [],
+    "mapped": false
+   },
+   {
+    "marker": "[e02d3fa7e36bfb]",
+    "stems": [
+     "Improved_Baselines_with_Visual_Instruction_Tuning"
+    ],
+    "ctx_indices": [],
+    "mapped": false
+   },
+   {
+    "marker": "[5bbb825e88ba7e]",
+    "stems": [
+     "Improved_Baselines_with_Visual_Instruction_Tuning"
+    ],
+    "ctx_indices": [],
+    "mapped": false
+   },
+   {
+    "marker": "[81206c043ba322]",
+    "stems": [
+     "Improved_Baselines_with_Visual_Instruction_Tuning"
+    ],
+    "ctx_indices": [],
+    "mapped": false
+   }
+  ],
+  "answer_official_first": "I was unable to complete the retrieval loop for this question: the step budget was exhausted before the three planned queries (card on LLaVA-1.5, lineage successors, and an external search for 2024–2025 successors) could return results. The only evidence I hold is a set of auto-transcribed verbatim lines from an earlier card() observation on LLaVA-1.5, which give baseline numbers and configuration details for LLaVA-1.5 itself but do not name any successor methods: - LLaVA-1.5 reports VQAv2 = 80.0 and GQA = 78.2 (demonstrated) .\n- Its vision encoder is CLIP-ViT-L-336px and its vision-language connector is a fully-connected layer .\n- Several ablation values are recorded (62.9, 1425.8, 31.9, 63.8, 1497.5, 35.1) . None of these lines identify a method that replaced or improved upon LLaVA-1.5 in 2024 or 2025. The corpus entity list does include LLaVA-1.5* (grounded in the corpus) and related names such as LLaVA, LLaVA-OneVision, and several 2024 multimodal papers (e.g., Chameleon, SHOW-O, Transfusion, LLaVA-OneVision), but I did not get to query their lineage or card dossiers before the budget ran out. Honest disclosure of what I could NOT establish:\n- I did not retrieve the lineage edges (extends/improves/replaces) that point from LLaVA-1.5 to successor methods, so I cannot list, from this knowledge base, which specific 2024–2025 methods are recorded as successors.\n- I did not complete the external literature search for 2024–2025 papers that explicitly build on LLaVA-1.5.\n- I therefore cannot provide a verified, citation-backed list of methods that replaced or improved upon LLaVA-1.5 in 2024 and 2025. If the search budget is restored, the correct next steps would be: (1) card(\"LLaVA-1.5\") to read its full dossier including any successor references; (2) lineage(\"LLaVA-1.5\", direction=\"successors\") to pull typed extends/improves/replaces edges; and (3) search_papers for \"LLaVA-1.5 improved upon successor multimodal LLM 2024 2025\" to capture external successors not yet in the corpus.",
+  "citation_mapped": 0,
+  "citation_dropped": 20,
+  "unresolved_markers": 10,
+  "steps": 48,
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": false,
+   "a_rows": 10,
+   "a_chars": 707,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 470,
+   "_consec_full_reject": 0,
+   "notes_truncated": 608,
+   "f28_autos": 0,
+   "max_evidence_streak": 1,
+   "f28_hard_stop": false
+  },
+  "cited_pids": []
+ }
+]

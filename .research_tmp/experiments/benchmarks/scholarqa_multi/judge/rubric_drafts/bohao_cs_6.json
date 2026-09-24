@@ -1,0 +1,96 @@
+{
+ "question": "In survey-based research, generating questions with different granularity is usually a heavy work. Are there any question-generation models that are controllable over the specificity of the questions?",
+ "case_id": "bohao_cs_6",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer must open with a clear yes/no/unsupported statement: the reference passages describe no question-generation model whose question specificity/granularity is controllable, so the question cannot be answered affirmatively from these sources.",
+   "weight": 0.19,
+   "examples": [
+    "Begins with 'Based on the provided passages, no such model is described.'",
+    "States the sources are unresponsive to this question.",
+    "Concludes the passages are silent on question generation and granularity control."
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer must indicate that the passages concern photonic-crystal-enhanced fluorescence (quantum dots, organic-molecule lasing, biosensing) — a domain unrelated to survey question generation — demonstrating that each passage was actually examined.",
+   "weight": 0.17,
+   "examples": [
+    "Passages [0]-[2] cover quantum-dot fluorescence enhancement, organic-molecule lasing, and PC-enhanced biosensing respectively.",
+    "Topics include Fano resonances, Purcell effect, and blinking suppression — none relate to NLP question generation.",
+    "Confirms none of the three passages mention questions, surveys, or NLP."
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer must not invent or name a question-generation model, dataset, or controllability mechanism not present in the passages, and must not blend in outside knowledge of QG systems.",
+   "weight": 0.15,
+   "examples": [
+    "Does not cite a nonexistent 'granularity-controllable QG model'.",
+    "Does not name off-the-shelf models (e.g., 'a T5-based controllable QG system') as if supported by the sources.",
+    "Avoids describing hypothetical controllable QG architectures."
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer must keep optical physics and question generation conceptually separate: 'controllable'/'tunable' in the passages refers to device parameters (e.g., Q-factor, resonance lifetimes), not question specificity.",
+   "weight": 0.14,
+   "examples": [
+    "Passage [0]'s adjustable Q-factor is device physics, not question granularity control.",
+    "Does not equate 'Q-factor control' with 'question specificity control'.",
+    "Does not present the five fluorescence-enhancement mechanisms as QG mechanisms."
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "The answer must support its verdict by referencing what the passages actually contain, with any cited content accurately represented (e.g., correctly naming enhancement mechanisms if mentioned).",
+   "weight": 0.13,
+   "examples": [
+    "Notes passage [2] covers excitation enhancement, extraction, Purcell effect, directionality, and blinking suppression.",
+    "Explicitly notes no passage mentions 'question generation', 'granularity', or 'specificity control'.",
+    "Cites passage titles/subject matter rather than answering generically."
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer should acknowledge that the conclusion is limited to the provided passages (not a claim about all QG research) and that the retrieved passages constitute a retrieval failure for this question.",
+   "weight": 0.08,
+   "examples": [
+    "'Within these passages, no; the broader literature is outside scope.'",
+    "'These passages appear to have been retrieved in error for this query.'",
+    "States the negative finding is source-bounded, not a claim about all QG research."
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer should suggest that answering the question requires different reference materials — NLP/question-generation, controlled text generation, or survey-methodology literature — without fabricating specifics.",
+   "weight": 0.08,
+   "examples": [
+    "Suggests consulting NLP papers on controllable question generation.",
+    "Recommends re-running retrieval with queries like 'controllable question generation'.",
+    "Points to work on controllable text generation applied to question synthesis."
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer must lead with the verdict before elaborating, so the reader immediately knows the conclusion, then justify it.",
+   "weight": 0.06,
+   "examples": [
+    "Leads with the verdict, then justifies it with passage evidence.",
+    "Opens with an explicit statement that the sources are unresponsive to the question.",
+    "Verdict first, explanation second."
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

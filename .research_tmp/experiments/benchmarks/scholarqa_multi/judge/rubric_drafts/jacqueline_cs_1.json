@@ -1,0 +1,98 @@
+{
+ "question": "What exactly is the \"dark knowledge\" that gets distilled in the standard formulation of knowledge distillation, wherein information is transferred from a teacher network to a student network? ",
+ "case_id": "jacqueline_cs_1",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "Answers the question directly: dark knowledge is implicit (not explicit) information transferred from teacher to student through soft labels/soft targets — the teacher's output class probabilities — used in place of or alongside hard ground-truth labels.",
+   "weight": 0.2,
+   "examples": [
+    "The 'dark knowledge' is transferred to students via soft labels from teachers, not explicit information.",
+    "Soft targets derived from the teacher's class probabilities are the vehicle of dark knowledge.",
+    "The teacher's class probabilities act as soft targets for training the student."
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "Explains that dark knowledge goes beyond one-hot ground truth: the full probability distribution over classes (including low-probability 'negative' classes) carries much more information per example, with high-entropy soft targets providing far more information than a single hard label.",
+   "weight": 0.16,
+   "examples": [
+    "When the soft targets have high entropy, they provide much more information than a single hard label.",
+    "The extra information lies in the relative similarities encoded across the full class distribution, including negative classes."
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "Connects dark knowledge to the teacher's way of generalizing: the student is trained to generalize in the same way as the teacher (e.g., an ensemble), which is knowledge about how to generalize to new data not available from training labels alone.",
+   "weight": 0.14,
+   "examples": [
+    "We can train the small model to generalize in the same way as the large model.",
+    "Dark knowledge encodes information about the correct way to generalize, which is not normally available at training time."
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "Mentions the temperature hyper-parameter introduced to raise attention on negative (low-probability) logits, where much of the dark information in the teacher's distribution resides.",
+   "weight": 0.08,
+   "examples": [
+    "The hyper-parameter temperature was introduced for raising the attention on negative logits.",
+    "Temperature scaling emphasizes the small probabilities on non-target classes."
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "Acknowledges that despite thousands of KD papers, what exactly gets distilled remains fundamentally ill-understood — a gap in the literature motivating open questions about which implicit properties transfer.",
+   "weight": 0.08,
+   "examples": [
+    "There appears to be a gap in our fundamental understanding of what exactly the knowledge is that gets distilled.",
+    "Whether adversarial vulnerability or invariance transfers to the student has not been thoroughly answered."
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "Enumerates concrete implicit properties hypothesized or shown to transfer as dark knowledge: looking at similar regions when classifying, adversarial vulnerability, invariance to data transformations, and harmful biases.",
+   "weight": 0.09,
+   "examples": [
+    "Does distillation make the student look at similar regions as the teacher when classifying images?",
+    "Harmful biases and invariances may also be inherited by the student."
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "Distinguishes the two main families of what is transferred: distillation from output logits (distributions) and from intermediate features.",
+   "weight": 0.08,
+   "examples": [
+    "KD works can be divided into distillation from logits and from intermediate features."
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "Covers implementation details: for ensemble teachers, soft targets can be the arithmetic or geometric mean of member models' predictive distributions; the transfer stage can use the original training set or a separate 'transfer' set.",
+   "weight": 0.09,
+   "examples": [
+    "When the cumbersome model is a large ensemble, we can use an arithmetic or geometric mean of their predictive distributions as soft targets.",
+    "For this transfer stage, we could use the same training set or a separate 'transfer' set."
+   ]
+  },
+  {
+   "name": "valuable_3",
+   "tier": "valuable",
+   "criterion": "Frames KD as a large/cumbersome teacher compressing its behavior into a small, efficient student, and notes the payoff: a distilled student typically performs better on test data than one trained normally on the same training set.",
+   "weight": 0.08,
+   "examples": [
+    "A small model trained to generalize in the same way as the ensemble does much better on test data than one trained in the normal way.",
+    "KD employs a bigger teacher network to guide the training of a smaller student."
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

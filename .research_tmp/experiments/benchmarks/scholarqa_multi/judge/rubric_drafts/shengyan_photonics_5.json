@@ -1,0 +1,88 @@
+{
+ "question": "Which integrated phononic devices have been realized?",
+ "case_id": "shengyan_photonics_5",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "Answer identifies the phononic integrated circuit platform realized on GaN-on-sapphire and enumerates its demonstrated passive components: low-loss single-mode phononic waveguides, chip-to-cable connectors, evanescent directional couplers, and waveguide-coupled high-Q acoustic ring resonators.",
+   "weight": 0.22,
+   "examples": [
+    "Waveguides, connectors, couplers, and high-Q ring resonators were all integrated on GaN-on-sapphire",
+    "High-Q ring resonators coupled to waveguides complete the basic PnIC"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "Answer includes the adiabatic phononic mode converter: a tapered phononic waveguide exploiting substrate anisotropy to convert quasi-Rayleigh to quasi-Love modes with >96% efficiency, GHz-band operation (~1.44 GHz 3 dB bandwidth), and tolerance to fabrication errors.",
+   "weight": 0.18,
+   "examples": [
+    "A tapered waveguide achieves adiabatic Rayleigh-to-Love conversion exceeding 96% efficiency",
+    "The converter is broadband (1.44 GHz 3 dB bandwidth) and robust to fabrication errors"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "Answer includes the realized phonon beam splitter, characterized with single phonons using two superconducting qubits and shown to preserve quantum behavior via two-phonon interference.",
+   "weight": 0.17,
+   "examples": [
+    "A beam splitter was fully characterized using single phonons and two superconducting qubits",
+    "Two-phonon interference was demonstrated through the beam splitter"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "Answer frames the realized devices as passive phononic integrated components that mirror photonic integrated circuit elements (waveguides, couplers, resonators), replicating basic PIC functionalities.",
+   "weight": 0.08,
+   "examples": [
+    "The PnIC architecture is an acoustic analog of PICs",
+    "These passive components mirror waveguides, couplers, and resonators from integrated photonics"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "Answer mentions the platform's compatibility with PICs for on-chip phonon-photon coupling and quantum links between superconducting qubits and optical fields, or improved performance in cryogenic environments.",
+   "weight": 0.12,
+   "examples": [
+    "Phonons and photons can be coupled on a single chip via optoacoustic interaction",
+    "Cryogenic operation paves the way for interfacing superconducting quantum devices"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "Answer notes that the ring resonator geometry gives rise to coupling between phonon orbital angular momentum and spin, enabling gyroscopic or non-reciprocal devices.",
+   "weight": 0.08,
+   "examples": [
+    "Ring geometry couples phonon OAM and spin",
+    "This opens doors to acoustic gyroscopes and non-reciprocal devices"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "Answer notes that confining phonons in small volume with long lifetime and routing them in circuits enhances conventional acoustic sensing devices.",
+   "weight": 0.07,
+   "examples": [
+    "Long-lifetime, small-volume phonon confinement enhances acoustic sensing",
+    "Complex phononic routing improves sensor versatility"
+   ]
+  },
+  {
+   "name": "valuable_3",
+   "tier": "valuable",
+   "criterion": "Answer notes that the mode converter and beam splitter serve both classical and quantum phononic information processing, e.g., linear mechanical quantum computing and conversion between itinerant phonons and superconducting qubits.",
+   "weight": 0.08,
+   "examples": [
+    "The beam splitter supports linear mechanical quantum computing with phonons",
+    "Straightforward conversion between itinerant phonons and superconducting qubits"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

@@ -1,0 +1,98 @@
+{
+ "question": "Hi everyone! I was wondering if anyone knows about work on how LLM fine-tuning (perhaps when done poorly) causes the model to become worse at some things? For example, I’ve heard lots of anecdotes that fine-tuning LLMs for specific tasks “hurts their generation ability”, but I’m looking for papers with more systematic exploration.",
+ "case_id": "akari_cs_3",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer directly confirms that task-specific fine-tuning can substantially degrade general abilities such as in-context learning, cross-task generalization, and generation, citing [0] and/or [2].",
+   "weight": 0.14,
+   "examples": [
+    "Fine-tuning causes loss of general in-context learning abilities to a large extent [0]",
+    "Task-specific fine-tuning may impair generalization across diverse tasks [0][2]"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer identifies format specialization as the mechanism: the model rapidly overfits to the task's output format and reproduces it regardless of input, citing [0].",
+   "weight": 0.13,
+   "examples": [
+    "The model learns to follow a specific output format no matter what the input sequence is [0]",
+    "The loss of ICL ability is largely caused by format specialization [0]"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer presents the mT5 fine-tuned on RTE (binary classification) as a concrete illustration, with quantitative severity evidence such as ~90% of outputs becoming 'True'/'False' on 1-shot TriviaQA after 300 steps and >99% on 1-shot WMT16 En-De after 500 steps, citing [0] and/or [1].",
+   "weight": 0.13,
+   "examples": [
+    "After 300 RTE fine-tuning steps, 90% of outputs to a 1-shot TriviaQA prompt were 'True' or 'False' [1]",
+    "With a 1-shot WMT16 En-De prompt, over 99% of outputs became 'True'/'False' after 500 steps of RTE fine-tuning [1]"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer notes that format specialization occurs at the very beginning of fine-tuning, before the model fully learns the task's semantic content, citing [0].",
+   "weight": 0.08,
+   "examples": [
+    "Format specialization happens early, before the model learns the semantic content of the task [0]",
+    "Specialization happens at the very beginning of fine-tuning, before full learning of task semantics [0]"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer describes the generation-vs-classification asymmetry from [2]: classification fine-tuning yields positive transfer on out-of-domain classification but typically breaks generation, while generation fine-tuning generally does not hurt classification.",
+   "weight": 0.1,
+   "examples": [
+    "Classification fine-tuning gives positive transfer on out-of-domain classification but fails on generation [2]",
+    "Generation fine-tuning generally does not hurt classification performance [2]"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer mentions parameter-efficient or two-stage fine-tuning methods (e.g., PROMPT) that alleviate specialization and catastrophic forgetting while improving generalization across formats, citing [5] and/or [6].",
+   "weight": 0.14,
+   "examples": [
+    "Two-stage parameter-efficient training significantly alleviates specialization during fine-tuning [5]",
+    "Training only a small number of parameters reduces the risk of catastrophic forgetting [6]"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "The answer mentions training on a diverse set of tasks with in-context learning demonstrations (e.g., MetaICL) so the model retains generalization after training while performing well in-domain, citing [4].",
+   "weight": 0.13,
+   "examples": [
+    "MetaICL outperforms ICL without meta-training and multi-task zero-shot transfer, especially under domain shift [4]",
+    "Training LMs with ICL demonstrations across many tasks preserves generalization after training [4]"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer mentions supporting factors from [2], such as integrating ICL strategies during generation fine-tuning, training data size, or number of in-context examples as influences on generalization.",
+   "weight": 0.08,
+   "examples": [
+    "Integrating ICL during generation fine-tuning enhances generalization [2]",
+    "Training data size and number of in-context examples were also investigated [2]"
+   ]
+  },
+  {
+   "name": "valuable_3",
+   "tier": "valuable",
+   "criterion": "The answer is framed as concrete paper recommendations with named papers/methods (e.g., the two-stage fine-tuning paper, MetaICL, the generalization study) rather than a generic discussion.",
+   "weight": 0.07,
+   "examples": [
+    "Points to papers like 'Two-stage LLM Fine-tuning with Less Specialization and More Generalization' and MetaICL",
+    "References 'Unveiling the Generalization Power of Fine-Tuned LLMs' as systematic evidence"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

@@ -1,0 +1,99 @@
+{
+ "question": "What astrophysical phenomena and physics theories can be found by the multi-messenger astrophysics (MMA) approach?",
+ "case_id": "minyang_physics_3",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "Defines multi-messenger astrophysics as combining observations of the same astrophysical phenomena from multiple cosmic messengers: gravitational waves, electromagnetic radiation, neutrinos, and cosmic rays.",
+   "weight": 0.1,
+   "examples": [
+    "MMA combines gravitational-wave, electromagnetic, neutrino, and cosmic-ray observations of the same source",
+    "multiple messengers from the same event are analyzed jointly to study astrophysical phenomena"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "Identifies binary stellar-mass black hole mergers as phenomena found by MMA, citing LIGO's first direct gravitational-wave detection (GW150914), which proved such systems exist.",
+   "weight": 0.14,
+   "examples": [
+    "GW150914 was the first direct detection of gravitational waves and the first observation of a binary black hole merger",
+    "LIGO demonstrated the existence of binary stellar-mass black hole systems"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "Identifies binary neutron star inspirals as phenomena found by MMA, citing GW170817 with its electromagnetic counterpart GRB 170817A, which demonstrated the presence of matter.",
+   "weight": 0.14,
+   "examples": [
+    "GW170817 is the only event so far detected in both gravitational waves and electromagnetically",
+    "the GRB 170817A emission demonstrated matter was present, ruling out a pure BBH merger"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "Enumerates electromagnetic source classes studied via MMA: gamma-ray bursts, AGNs including blazars, supernovae (including core-collapse), compact-binary mergers, and the diffuse cosmic gamma-ray background.",
+   "weight": 0.13,
+   "examples": [
+    "Swift and Fermi detected GRBs, AGNs including blazars, and supernovae",
+    "a diffuse cosmic gamma-ray background has been observed up to TeV energies by Fermi",
+    "extreme events like BNS and NSBH mergers and core-collapse supernovae are MMA targets"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "Identifies high-energy neutrino detections as MMA discoveries: IceCube-170922A traced to blazar TXS 0506+056 and IC191001A associated with a tidal disruption event near a supermassive black hole.",
+   "weight": 0.13,
+   "examples": [
+    "IceCube-170922A provided evidence that blazars emit high-energy neutrinos",
+    "IC191001A suggests tidal disruption events may produce high-energy cosmic neutrinos"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "Notes that MMA tests physics theories, specifically that the detected GW waveforms (e.g., GW150914) match general relativity's predictions for black hole inspiral, merger, and ringdown in the strong-field regime.",
+   "weight": 0.1,
+   "examples": [
+    "the GW150914 waveform matched GR predictions for inspiral, merger, and ringdown",
+    "GW observations provide a direct test of general relativity in the strong-gravity regime"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "Explains that combining messengers constrains the nature of compact objects: GW masses and compactness limits plus EM emission distinguish neutron stars from quark stars, black holes, or more exotic objects.",
+   "weight": 0.1,
+   "examples": [
+    "GW data alone set a lower limit on compactness but could not exclude quark stars or black holes",
+    "masses consistent with known neutron stars and inconsistent with known black holes indicated a BNS source in GW170817"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "Names the instruments enabling MMA and their coverage: LIGO (GWs), Swift (optical to 150 keV gamma), Fermi (10 keV to TeV), ground-based Cherenkov telescopes MAGIC/HESS/VERITAS/HAWC (100 GeV to multi-TeV gamma rays), and IceCube (neutrinos).",
+   "weight": 0.08,
+   "examples": [
+    "LIGO detects gravitational waves; Swift and Fermi cover optical through TeV gamma-ray observations",
+    "MAGIC, HESS, VERITAS, and HAWC measure 100 GeV to multi-TeV gamma rays from the ground"
+   ]
+  },
+  {
+   "name": "valuable_3",
+   "tier": "valuable",
+   "criterion": "Concludes that combining multiple observational channels yields new capabilities and insights, such as the first localization of a source using neutrino observations and EM counterparts invisible to a single messenger.",
+   "weight": 0.08,
+   "examples": [
+    "IceCube-170922A marked the first time neutrino observations were used to locate an object in space",
+    "joint GW+EM campaigns let optical surveys find counterparts to GW events, revealing phenomena invisible to a single messenger"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

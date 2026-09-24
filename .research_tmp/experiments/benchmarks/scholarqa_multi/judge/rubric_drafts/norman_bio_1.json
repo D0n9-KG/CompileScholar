@@ -1,0 +1,98 @@
+{
+ "question": "What are the key mechanisms for lipid nanoparticles (LNPs) to form biomolecular corona with various serum proteins and blood components?",
+ "case_id": "norman_bio_1",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer identifies electrostatic interaction between the LNP surface and serum proteins as a main driving force of corona formation, applicable to both negatively and positively charged particles, and notes that protein adsorption neutralizes surface charge as evidenced by zeta potential shifts (e.g., -18 to -10 mV).",
+   "weight": 0.17,
+   "examples": [
+    "Electrostatic attraction between charged lipid surfaces and oppositely charged serum proteins is a primary driver of corona formation for both anionic and cationic particles",
+    "Wan et al. observed the zeta potential shifting from -18 to -10 mV upon corona formation, showing partial charge neutralization"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer describes the biomolecular corona as a two-layer system: an inner hard corona of tightly bound, high-affinity biomolecules and an outer soft corona of loosely associated proteins removable by washing or centrifugation.",
+   "weight": 0.14,
+   "examples": [
+    "The hard corona consists of high-affinity proteins that bind tightly to the particle surface, while the soft corona can be washed or centrifuged off",
+    "Corona formation yields a two-component layer of tightly and loosely bound proteins"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer states that plasma proteins bind specifically to functional chemical groups on the lipid surface and that each lipid species' protein affinity is influenced by co-present lipid species in the bilayer.",
+   "weight": 0.14,
+   "examples": [
+    "Specific chemical groups on lipid surfaces serve as binding sites for particular plasma proteins",
+    "The lipid composition of the bilayer modulates each lipid's affinity for plasma proteins"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer explains that proteins with high affinity for the LNP surface outcompete others and form the tightly bound hard corona, while lower-affinity proteins remain loosely associated in the soft corona.",
+   "weight": 0.1,
+   "examples": [
+    "High-affinity proteins outcompete others and bind tightly in the hard corona",
+    "Protein affinity for the LNP surface dictates which proteins compose the corona layers"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "The answer acknowledges that the biomolecular corona includes non-protein blood components such as sugars, lipids, and lipoproteins, not just serum proteins.",
+   "weight": 0.11,
+   "examples": [
+    "LNPs interact with proteins, sugars, and lipids to form the biomolecular corona",
+    "Glycoproteins and lipoproteins contribute to the corona alongside free proteins"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer notes that steric stabilization effects maintain colloidal stability during protein adsorption, despite charge neutralization that would otherwise promote aggregation.",
+   "weight": 0.08,
+   "examples": [
+    "Even though adsorption neutralizes surface charge, steric stabilization from adsorbed proteins preserves colloidal stability",
+    "The corona's steric effects prevent aggregation as surface charge is screened"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer mentions that corona formation modifies particle physicochemical properties including size, shape, surface charge, and surface chemistry.",
+   "weight": 0.08,
+   "examples": [
+    "Corona formation changes particle size, shape, surface charge, and surface chemistry",
+    "The adsorbed biomolecule layer modifies the LNP's physicochemical identity"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer contrasts in vivo and in vitro corona composition, noting that in vivo coronas comprise a wider variety of proteins with less fibrinogen and complement proteins but more lipoproteins.",
+   "weight": 0.1,
+   "examples": [
+    "AmBisome in vivo corona had fewer fibrinogen chains and complement proteins but more lipoproteins than the in vitro corona",
+    "The in vivo environment produces a different, more diverse protein corona than incubation in plasma in vitro"
+   ]
+  },
+  {
+   "name": "valuable_3",
+   "tier": "valuable",
+   "criterion": "The answer indicates that the corona modulates LNP behavior in vivo, influencing biodistribution, cellular association, cytotoxicity, and targeting ability.",
+   "weight": 0.08,
+   "examples": [
+    "Corona composition modulates LNP biodistribution and cellular uptake",
+    "The biomolecular corona affects cytotoxicity and the targeting ability of LNPs in vivo"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

@@ -1,0 +1,98 @@
+{
+ "question": "In knowledge distillation, the teacher model is typically a larger (more powerful) network than the student model. Has there been work showing that the teacher model is size-matched or smaller (but perhaps more targeted in knowledge) than the student model, and for knowledge transfer to still be effective? ",
+ "case_id": "jacqueline_cs_3",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "States that in conventional knowledge distillation the teacher is a larger, more powerful (cumbersome) model — possibly an ensemble — and the goal is transferring its generalization ability to a small student.",
+   "weight": 0.12,
+   "examples": [
+    "In standard KD the teacher is a cumbersome larger network and the student a small model trained to generalize in the same way as the teacher",
+    "Conventionally, distillation transfers knowledge from a large ensemble or powerful model into a smaller student model"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "Explains that knowledge is transferred by using the teacher's class probabilities (predictive distribution) as soft targets for training the student, possibly on a separate transfer set; ensemble soft targets may be arithmetic or geometric means of member distributions.",
+   "weight": 0.12,
+   "examples": [
+    "The cumbersome model's predictive distribution is used as soft targets when training the small model",
+    "When the teacher is a large ensemble, an arithmetic or geometric mean of the members' predictive distributions forms the soft targets"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "Identifies work (Revisiting KD via Label Smoothing Regularization) showing that a weak student model can transfer its soft targets to the larger teacher and improve it — reverse knowledge distillation (Re-KD).",
+   "weight": 0.14,
+   "examples": [
+    "Re-KD: letting student models teach teacher models via their soft targets showed the weak student can improve the teacher",
+    "Reverse KD: transferring soft targets from student to teacher yields significant enhancement of the teacher"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "Identifies the companion experiment (De-KD) showing that a poorly-trained teacher with worse performance than the student can still remarkably enhance the student model.",
+   "weight": 0.14,
+   "examples": [
+    "De-KD: a teacher with worse accuracy than the student still boosts student performance",
+    "Poorly-trained teachers were shown to enhance student models remarkably, contradicting the common belief"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "Explicitly characterizes these results as contradictory/counterintuitive relative to the common belief that weak models cannot provide reliable similarity information between categories — motivating a rethinking of KD.",
+   "weight": 0.1,
+   "examples": [
+    "The common belief is that weak models cannot provide reliable similarity information, but experiments show contradictory results",
+    "Both a weak student teaching the teacher and a weak teacher teaching the student are effective, counterintuitively"
+   ]
+  },
+  {
+   "name": "answer_critical_5",
+   "tier": "critical",
+   "criterion": "Explains the results by re-interpreting KD as a regularization term, connected to Label Smoothing Regularization, where smoothed labels replace one-hot labels during training.",
+   "weight": 0.12,
+   "examples": [
+    "KD is reinterpreted as a form of regularization akin to label smoothing regularization",
+    "LSR regularizes training by replacing one-hot labels with smoothed ones, mirroring what soft targets do in KD"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "States that dark knowledge does not just contain similarity information between categories; a model lacking sufficient similarity information can still provide dark knowledge that enhances other models.",
+   "weight": 0.08,
+   "examples": [
+    "Dark knowledge is argued to contain more than similarity information, so even models lacking reliable similarity can enhance others",
+    "Even without enough similarity information, a model can provide dark knowledge that enhances another model"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "Notes that high-entropy soft targets carry much more information per training case, and that a student trained to generalize the way a good teacher does performs better on test data than one trained normally.",
+   "weight": 0.08,
+   "examples": [
+    "High-entropy soft targets provide much more information per training case",
+    "A small model trained to generalize like a well-generalizing ensemble does better on test data than one trained normally"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "Concludes affirmatively that size-matched or smaller/weaker teachers have been shown to enable effective knowledge transfer (via Re-KD/De-KD from 'Revisiting Knowledge Distillation via Label Smoothing Regularization'), with effectiveness explained by regularization from dark knowledge rather than teacher capacity.",
+   "weight": 0.1,
+   "examples": [
+    "Yes — follow-up work demonstrates effective knowledge transfer from weaker or size-matched models",
+    "The answer concludes teacher strength is not a prerequisite; KD acts as regularization through dark knowledge"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

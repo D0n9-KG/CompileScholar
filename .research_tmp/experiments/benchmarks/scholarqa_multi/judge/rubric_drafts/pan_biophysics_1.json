@@ -1,0 +1,90 @@
+{
+ "question": "Find some papers that discuss the methods to suppress multiple light scattering effect on light scattering imaging",
+ "case_id": "pan_biophysics_1",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer identifies multi-focus averaging as a method for suppressing multiple scattering in optical coherence tomography by combining images captured at different focal depths.",
+   "weight": 0.16,
+   "examples": [
+    "Multi-focus averaging integrates images at various focal depths to reduce multiple scattering artifacts in OCT",
+    "Combining OCT images taken at multiple focal depths improves clarity and contrast in highly scattering biological tissues"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer identifies the digital camera-based detection approach used in dynamic light scattering to suppress multiple scattering by selectively capturing ballistic photons.",
+   "weight": 0.16,
+   "examples": [
+    "A digital camera detection scheme in dynamic light scattering selectively captures ballistic photons in turbid media",
+    "Digital camera-based detection suppresses multiple scattering, enhancing accuracy of dynamic measurements in turbid media"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer identifies cross-correlation as a technique that differentiates and suppresses multiply scattered photons using the statistical properties of scattered light.",
+   "weight": 0.16,
+   "examples": [
+    "Cross-correlation methods distinguish single from multiple scattering events by analyzing statistical properties of scattered light",
+    "Cross-correlation suppresses multiply scattered photons and improves signal-to-noise ratio in optical measurements"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer correctly attributes each method to its modality: multi-focus averaging to OCT and the camera scheme to dynamic light scattering, presenting at least two distinct papers/methods (survey-style synthesis).",
+   "weight": 0.09,
+   "examples": [
+    "Multi-focus averaging is used in optical coherence tomography",
+    "The digital camera scheme applies to dynamic light scattering in turbid media",
+    "Three techniques are discussed: multi-focus averaging, digital camera detection, and cross-correlation"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "The answer explains at least one suppression mechanism in terms of photon selection or differentiation, e.g., capturing ballistic photons or statistically separating single from multiple scattering events.",
+   "weight": 0.08,
+   "examples": [
+    "Ballistic photons are selectively captured to reject multiply scattered light",
+    "The statistical properties of scattered light are used to separate single and multiple scattering events"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "For each method mentioned, the answer states the resulting benefit such as improved image clarity, contrast, resolution, signal-to-noise ratio, or measurement accuracy and reliability.",
+   "weight": 0.13,
+   "examples": [
+    "Multi-focus averaging leads to improved image clarity and contrast in OCT",
+    "Cross-correlation improves the signal-to-noise ratio in optical measurements",
+    "Digital camera detection enhances the accuracy and reliability of dynamic measurements"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer specifies the scattering context in which methods apply, such as highly scattering biological tissues or turbid media.",
+   "weight": 0.1,
+   "examples": [
+    "Multi-focus averaging is especially effective in highly scattering biological tissues",
+    "The digital camera scheme works in turbid media"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer frames the methods collectively as a body of techniques developed to mitigate the adverse effects of multiple light scattering, enabling clearer, more reliable imaging in scattering media.",
+   "weight": 0.12,
+   "examples": [
+    "Several techniques have been developed to mitigate the adverse effects of multiple scattering",
+    "Collectively, these methods enable clearer imaging in scattering media"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

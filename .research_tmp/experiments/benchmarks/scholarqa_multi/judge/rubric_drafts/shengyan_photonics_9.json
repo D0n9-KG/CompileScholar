@@ -1,0 +1,98 @@
+{
+ "question": "What experiments can be conducted to verify or further study the non-Hermitian skin effect?",
+ "case_id": "shengyan_photonics_9",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer must identify the coupled optical fiber loop setup (two unequally long loops, light pulses obeying the equations of a linear 1D photonic lattice) as the primary experimental platform to verify the non-Hermitian skin effect.",
+   "weight": 0.175,
+   "examples": [
+    "Light propagation in coupled fiber loops realizes an effective 1D photonic lattice",
+    "A mesh lattice of fiber loops connected by beam splitters can realize the skin effect"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer must reference the modified 1D discrete-time quantum walk (light walk) with left- and right-moving path amplitudes, where a beam splitter mediates hopping between lattice sites with a splitting ratio β tunable at will (e.g., β = π/4 for a homogeneous 50:50 lattice).",
+   "weight": 0.125,
+   "examples": [
+    "The NHSE can be studied via a modified 1D discrete-time quantum walk with tunable splitting β",
+    "Varying β controls the site-to-site coupling"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer must state that the key requirement is anisotropic (non-reciprocal) coupling, realized by direction-dependent amplification and attenuation (non-Hermitian gain/loss G_uv), analogous to the Hatano-Nelson model with an imaginary vector potential.",
+   "weight": 0.175,
+   "examples": [
+    "Introduce amplification/attenuation depending on hopping direction to create anisotropic coupling",
+    "This modulation reassembles the Hatano-Nelson model with an imaginary vector potential"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer must specify the control mechanisms: a variable beam splitter (VBS) to set the splitting β, acousto-optical modulators (AOMs) to implement gain/loss amplitudes G_uv, and a phase modulator (PM) to control the phase e^(iφ) (arbitrary real potential).",
+   "weight": 0.125,
+   "examples": [
+    "AOMs manipulate amplitudes via G_uv, and the PM controls e^(iφ)",
+    "The VBS controls the splitting ratio between the two fiber loops"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "The answer must describe forming an interface by combining two lattices with inverted amplification/attenuation modulation, producing a topological funneling effect where light flows toward the interface.",
+   "weight": 0.1125,
+   "examples": [
+    "Connect lattices with opposite anisotropy directions to obtain the funneling effect",
+    "The interface is realized by combining two lattices with inverted gain/loss modulation"
+   ]
+  },
+  {
+   "name": "answer_critical_5",
+   "tier": "critical",
+   "criterion": "The answer must state the verification signature: all eigenmodes localize (collapse) at the interface with no delocalized bulk modes, demonstrated by exciting the lattice from the left, at, and right of the interface and observing that the dynamics always direct light toward it.",
+   "weight": 0.1375,
+   "examples": [
+    "Excite left of, at, and right of the interface; all show light flow toward the interface",
+    "The interface forces all eigenmodes to collapse there, leaving no delocalized bulk modes"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer should propose using phase modulation to implement arbitrary real potentials and study the skin effect in the presence of disorder, testing its robustness.",
+   "weight": 0.075,
+   "examples": [
+    "Add disorder through phase modulation and test whether skin localization persists",
+    "Study the NHSE in disordered lattices using phase modulation"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer should note that the funneling relies on the nontrivial topological properties induced by the anisotropic coupling, situating the skin effect within topological characterization.",
+   "weight": 0.05,
+   "examples": [
+    "The funneling relies on nontrivial topology induced by anisotropic coupling",
+    "Interpret the interface localization as a topological feature of the skin effect"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer should note that similar gain/loss modulation was previously used to study PT-symmetric Bloch oscillations, situating the experiment in its experimental context.",
+   "weight": 0.025,
+   "examples": [
+    "A similar modulation was used to study PT-symmetric Bloch oscillations",
+    "Build on prior gain/loss modulation techniques from PT-symmetry experiments"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

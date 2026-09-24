@@ -1,0 +1,98 @@
+{
+ "question": "What is the correlation between the efficacy of the EPR effect and the progression of tumor (benign, solid tumor, metastasis, etc.)?",
+ "case_id": "benjamin_bio_10",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "States the central correlation: EPR efficacy is not constant but varies with tumor progression—weak or absent in early/benign lesions, most uniform in early-stage small solid tumors, and heterogeneous in advanced large tumors due to blood flow obstruction.",
+   "weight": 0.18,
+   "examples": [
+    "EPR is uniform in small early tumors but heterogeneous in advanced large tumors as blood flow becomes obstructed",
+    "Tumor progression shifts the EPR effect from absent (benign) to uniform (small solid) to heterogeneous (advanced large)"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "Defines the EPR effect as specific to solid tumors, arising from defective vascular architecture, large endothelial gaps, vascular mediators (bradykinin, NO, CO, VEGF), and impaired lymphatic recovery.",
+   "weight": 0.13,
+   "examples": [
+    "Defective vasculature and impaired lymphatic drainage cause extravasation and retention of nanomedicines",
+    "Abundant vascular mediators like bradykinin, nitric oxide, and VEGF increase vascular permeability"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "Explains that early-stage and benign tumors have few new blood vessels, incomplete vasculature, and small fenestrations, so they scarcely exhibit an EPR effect before a developed vascular structure forms.",
+   "weight": 0.13,
+   "examples": [
+    "Early tumor tissues have incomplete vasculature and small vascular fenestrations, so there is scarcely an EPR effect",
+    "Benign/early tumors lack the developed vascular structure needed to exploit EPR-based delivery"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "Explains both sides of advanced tumors: developed vasculature increases vascular leakage and enables a repository effect enhancing nanodrug accumulation, while blood flow obstruction creates EPR heterogeneity.",
+   "weight": 0.14,
+   "examples": [
+    "Large tumors favor vascular leakage and act as nanodrug repositories, but obstructed blood flow makes EPR heterogeneous",
+    "Developed vascular structure enhances accumulation while increasing spatial heterogeneity of delivery"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "Identifies tumor blood flow and vascular permeability as the key factors that vary greatly between tumors and with progression, determining EPR efficacy.",
+   "weight": 0.08,
+   "examples": [
+    "The EPR effect depends on blood flow and vascular permeability, which vary greatly across tumors",
+    "Obstruction of blood flow in large tumors reduces and heterogenizes EPR-mediated delivery"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "Notes that EPR efficacy varies by tumor origin, tissue type, and blood vessel density, e.g., hepatic and renal cancers show greater EPR due to high perfusion, while prostate and pancreatic tumors show less.",
+   "weight": 0.08,
+   "examples": [
+    "Hepatic and renal cancers exhibit greater EPR effect due to high blood perfusion",
+    "Prostate and pancreatic tumors show a weaker EPR effect; EPR varies with origin site and vessel density"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "Cites evidence distinguishing primary from metastatic tumors, e.g., lower lipiodol uptake/retention in metastatic liver cancer than in primary hepatocellular and renal cancers.",
+   "weight": 0.08,
+   "examples": [
+    "Lipiodol uptake and retention were higher in hepatocellular and renal cancers than in metastatic liver cancer",
+    "Metastatic liver tumors show weaker EPR than primary hepatic tumors"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "Acknowledges that the EPR effect is low and variable in human solid tumors and differs from animal models, contributing to disappointing clinical outcomes for EPR-based nanomedicines.",
+   "weight": 0.09,
+   "examples": [
+    "Low EPR effect in human solid tumors has limited nanomedicine clinical success",
+    "Human tumors are highly variable and heterogeneous, so EPR efficacy differs between species and models"
+   ]
+  },
+  {
+   "name": "valuable_3",
+   "tier": "valuable",
+   "criterion": "Mentions mitigation strategies such as EPR effect enhancers or alternative targeting mechanisms to make delivery more uniform and improve therapeutic outcomes in advanced cancers.",
+   "weight": 0.09,
+   "examples": [
+    "EPR effect enhancers can make the EPR effect more uniform in clinical settings",
+    "Alternative targeting mechanisms are needed to overcome EPR heterogeneity in advanced cancers"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

@@ -1,0 +1,88 @@
+{
+ "question": "What are different chemical methodologies to form ADC linkers?",
+ "case_id": "benjamin_bio_6",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer identifies conjugation via thiols of interchain cysteine residues as a major methodology for forming ADC linkers, noting IgG1's four interchain disulfides are reducible to eight thiol conjugation sites (typically targeting DAR 2-4).",
+   "weight": 0.2,
+   "examples": [
+    "Thiols of interchain cysteines are among the most used attachment sites; reducing the four interchain disulfides of IgG1 yields eight thiols for conjugation.",
+    "Interchain cysteine thiols are the most-used conjugation sites in monoclonal antibodies, typically targeting DARs of 2-4."
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer names TCEP and/or DTT as the reagents used to reduce interchain disulfide bonds and expose eight free thiol groups for drug conjugation.",
+   "weight": 0.1,
+   "examples": [
+    "The four interchain disulfide bonds can be reduced by tris(2-carboxyethyl)phosphine (TCEP) or dithiothreitol (DTT).",
+    "TCEP or DTT reduces four interchain disulfides, generating eight thiols for conjugation."
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer notes that conventional cysteine conjugation is heterogeneous, producing multiple DAR species (DAR 2-4) with several isomers each (over a hundred species total), despite clinical feasibility (Adcetris FDA approval, 2011).",
+   "weight": 0.12,
+   "examples": [
+    "Cysteine methods yield mixtures of DAR 2-4 with many isomers, giving over a hundred species, though Adcetris was still FDA-approved in 2011.",
+    "Each DAR value has several isomers, making conventional cysteine ADCs highly heterogeneous."
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer describes engineering cysteines at computationally selected optimal sites (in silico screening, e.g., within the Fab cavity) to produce well-defined homogeneous ADCs with retained potency, improved in vivo efficacy and exposure versus random conjugation, and shielding of hydrophobic linker-drugs.",
+   "weight": 0.16,
+   "examples": [
+    "In silico screening identifies Fab-cavity sites where linker-drug conjugation shields hydrophobicity while retaining cytotoxic potency.",
+    "Site-specific ADCs showed improved efficacy and exposure in xenograft models compared to randomly conjugated ADCs."
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "The answer mentions that a selective reducing agent can reduce engineered cysteines while leaving interchain disulfides oxidized, avoiding impurities from conventional reduction/oxidation procedures.",
+   "weight": 0.08,
+   "examples": [
+    "A selective reducing agent reduces only engineered cysteines, leaving interchain disulfides oxidized.",
+    "This avoids impurities from the conventional reduction/oxidation procedure, enabling impurity-free manufacture of site-specific ADCs."
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer notes that homogeneous ADCs can be made by conjugating drugs to all eight interchain cysteines, reaching the maximum DAR of 8, as in the anti-CD30 cAC10-vcMMAE conjugate with MMAE.",
+   "weight": 0.08,
+   "examples": [
+    "Senter and coworkers' cAC10-vcMMAE conjugate carries eight MMAE drugs per antibody, the maximum DAR obtainable via interchain cysteines.",
+    "Full conjugation of all eight interchain cysteines gives a homogeneous DAR 8 ADC."
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer articulates the linker's dual requirement: stability in plasma to prevent premature payload release (preserving therapeutic index and protecting non-target tissues) and intracellular payload liberation upon internalization.",
+   "weight": 0.08,
+   "examples": [
+    "Linkers must remain stable in plasma for extended periods so the ADC localizes to tumor cells without prematurely releasing payload.",
+    "Premature payload release indiscriminately damages tissue and lowers the therapeutic index; upon internalization, the linker should release the payload to bind its target."
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer addresses how hydrophobic linkers/payloads cause ADC aggregation, limiting achievable drug loading, risking hepatotoxicity (liver sequestration) and immunogenicity, and how conjugation site choice (e.g., Fab cavity) or shelf-life monitoring mitigates these risks.",
+   "weight": 0.18,
+   "examples": [
+    "Hydrophobic linker-drugs can cause aggregation, sequestration in the liver (hepatotoxicity), and increased immunogenicity; aggregation must be monitored to establish safe shelf-life.",
+    "Conjugating within the Fab cavity shields the hydrophobic linker-drug while maintaining potency."
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

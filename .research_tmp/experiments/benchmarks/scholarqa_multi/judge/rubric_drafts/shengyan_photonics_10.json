@@ -1,0 +1,88 @@
+{
+ "question": "What are some ways to overcome the heating issue due to residual optical absorption in the a levitated nanoparticle?",
+ "case_id": "shengyan_photonics_10",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer identifies that the heating problem arises from the levitated nanoparticle absorbing photons from the trapping laser, undermining cooling and quantum studies of its motion or embedded defects.",
+   "weight": 0.15,
+   "examples": [
+    "A particle levitated by a laser beam absorbs light and heats up",
+    "Heating from photon absorption conflicts with cooling the nanoparticle's motion for quantum studies"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer proposes using doughnut-shaped (vortex) beams instead of Gaussian beams, so the particle sits in the dark low-intensity center, suppressing light absorption and heating.",
+   "weight": 0.18,
+   "examples": [
+    "Trapping in doughnut beams with a dark center where intensity is minimal",
+    "Replacing the Gaussian trapping beam with a doughnut beam suppresses absorption"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer mentions designing core-shell particles, where a minimally absorptive shell shields a strongly absorptive core, to reduce heating — ideally combined with doughnut-beam trapping.",
+   "weight": 0.14,
+   "examples": [
+    "A highly absorptive core coated with a minimally absorptive shell",
+    "Core-shell particles trapped in doughnut beams show reduced heating while maintaining high mechanical quality factor"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer proposes replacing optical trapping with electrical levitation, such as a surface ion trap with AC high voltage, eliminating optical absorption heating entirely.",
+   "weight": 0.17,
+   "examples": [
+    "Levitating the nanoparticle in a surface ion trap with ~20 kHz, ~200 V AC voltage",
+    "Using a Paul trap instead of optical tweezers removes the optical field so no photon absorption occurs"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer provides supporting details of the electric trap, such as transparent sapphire substrate, corner electrodes for micro-motion compensation, and trap geometry.",
+   "weight": 0.08,
+   "examples": [
+    "Four corner electrodes compensate stray static fields to minimize micro-motion",
+    "Trap fabricated on sapphire transparent to visible/near-IR lasers, trapping center ~253 μm above the chip"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer notes that doughnut-beam trapping tolerates residual heat absorption while maintaining the high quality factor of mechanical oscillation.",
+   "weight": 0.08,
+   "examples": [
+    "The doughnut beam approach preserves the high mechanical Q factor",
+    "Excellent tolerance of heat absorption without degrading oscillation quality"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer mentions the role of the doughnut beam's topological (vortex) charge l in optimizing trapping and detection performance.",
+   "weight": 0.07,
+   "examples": [
+    "Appropriate vortex charge l improves performance by more than an order of magnitude",
+    "Choice of vortex charge matters for doughnut beam effectiveness"
+   ]
+  },
+  {
+   "name": "valuable_3",
+   "tier": "valuable",
+   "criterion": "The answer cites the demonstrated levitation of nanodiamonds in high vacuum with an electric trap, and notes that it enables simultaneous quantum control of embedded defects (e.g., NV spins via microwaves).",
+   "weight": 0.13,
+   "examples": [
+    "Nanodiamonds levitated above a transparent sapphire chip, enabling Berry phase studies of NV electron spins",
+    "Microwaves combined with AC voltage via a bias tee control NV center spins during levitation"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

@@ -1,0 +1,98 @@
+{
+ "question": "What are the recent research advancements in enhancing fluorescence for biosensing using photonic crystal?",
+ "case_id": "yanyu_photonics_10",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer attributes photonic crystal fluorescence enhancement to resonant coupling of fluorophore emission to leaky eigenmodes of the photonic crystal, which redirect emitted radiation out of the structure (spectral and spatial coupling).",
+   "weight": 0.14,
+   "examples": [
+    "resonant redirection of emitted radiation into leaky modes",
+    "engineering leaky modes to overlap fluorophore absorption/emission wavelengths"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer distinguishes excitation-side mechanisms (high-intensity near fields, coherent scattering at the PC surface) from emission-side extraction via leaky-mode redirection as complementary contributions to total enhancement.",
+   "weight": 0.1,
+   "examples": [
+    "near-field enhancement of local excitation fields",
+    "coherent scattering combined with leaky-mode extraction"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer cites up to 108-fold fluorescence enhancement for colloidal quantum dots on 2D photonic crystal slabs operating at visible wavelengths, with leaky modes engineered to overlap QD absorption and emission.",
+   "weight": 0.13,
+   "examples": [
+    "108x enhancement versus unpatterned surface",
+    "2D PC slabs with engineered leaky modes at QD wavelengths"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer mentions devices with different lattice symmetries compared to optimize spectral and spatial coupling, yielding a maximum enhancement factor approaching 220 in the model QD system.",
+   "weight": 0.09,
+   "examples": [
+    "comparison across lattice symmetries",
+    "maximum enhancement factor approaching 220"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "The answer describes the first enhanced-extraction biosensor demonstrating over 20-fold fluorescence signal enhancement in detecting TNF-alpha via a fluorescence sandwich immunoassay.",
+   "weight": 0.12,
+   "examples": [
+    "cytokine TNF-alpha sandwich immunoassay",
+    "over 20-fold signal enhancement"
+   ]
+  },
+  {
+   "name": "answer_critical_5",
+   "tier": "critical",
+   "criterion": "The answer explains coupling the PC surface to an underlying Fabry-Perot cavity via a gold mirror reflector, yielding a 6x increase in signal-to-noise ratio for dye-labeled polypeptides over ordinary PC-enhanced fluorescence.",
+   "weight": 0.12,
+   "examples": [
+    "gold mirror reflector beneath the PC forming a Fabry-Perot cavity",
+    "6x SNR improvement for dye-labeled polypeptides"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer grounds claims in experimental methods (angle-resolved and angle-integrated measurements, lifetime measurements, numerical calculations) and quantifies advancements with specific enhancement factors (108x, ~220, 6x SNR, >20x) rather than vague qualitative statements.",
+   "weight": 0.1,
+   "examples": [
+    "lifetime measurements confirming resonant redirection mechanism",
+    "numerical calculations validating the extraction effect"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer frames the motivation as efficient recovery of emitted light for high signal-to-noise biosensing and connects the advancements to applications such as DNA microarrays, fluorescence microscopy, and single-molecule detection.",
+   "weight": 0.1,
+   "examples": [
+    "high-SNR detection for DNA microarrays",
+    "single-molecule detection and fluorescence microscopy"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer organizes recent advancements as a progression: leaky-mode extraction demonstrations, lattice optimization, biosensor implementation, and cavity-coupling innovations using photonic structures to recover fluorophore-emitted light.",
+   "weight": 0.1,
+   "examples": [
+    "photonic structures for efficient light extraction from fluorescent molecules",
+    "progression from mechanism studies to biosensor demonstrations"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

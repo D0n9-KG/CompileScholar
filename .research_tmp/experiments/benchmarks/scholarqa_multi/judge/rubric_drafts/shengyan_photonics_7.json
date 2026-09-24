@@ -1,0 +1,88 @@
+{
+ "question": "Which motion degrees of freedom of levitated nanospheres have been experimentally studied?",
+ "case_id": "shengyan_photonics_7",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "Answer explicitly names the motion degrees of freedom experimentally studied: translation (center-of-mass), torsion/libration, rotation, precession, and nutation of levitated nanoparticles.",
+   "weight": 0.12,
+   "examples": [
+    "Studied DOF include COM translation, libration, rotation, precession and nutation",
+    "Both translational and multiple rotational DOF have been explored experimentally"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "Answer states that Brownian motion of levitated microspheres/nanospheres was studied via the translational degrees of freedom, including direct measurement of the instantaneous velocity, verification of energy equipartition, and observation of the ballistic regime and ballistic-to-diffusive crossover.",
+   "weight": 0.11,
+   "examples": [
+    "The instantaneous velocity of an optically trapped Brownian particle in air/vacuum was measured, verifying equipartition",
+    "The ballistic regime of Brownian motion was observed at short times"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "Answer states that translational motion was cooled, e.g., via feedback cooling with forces proportional to instantaneous velocity applied along orthogonal axes, reaching millikelvin temperatures for trapped microspheres.",
+   "weight": 0.11,
+   "examples": [
+    "Three orthogonal cooling beams applied counter-velocity feedback forces",
+    "Millikelvin cooling of an optically trapped microsphere was achieved"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "Answer states that translational motion was used for ultrasensitive force (and acceleration) detection, citing yoctonewton-level resolution (~166 yN) and zN/Hz^1/2-scale sensitivity characterized via Allan variance analysis.",
+   "weight": 0.11,
+   "examples": [
+    "Force resolution of ~166 yN at optimal measurement time, with ~6.3 zN/Hz^1/2 sensitivity",
+    "Applications include fifth-force searches and gravitational-wave detection"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "Answer identifies librational (torsional) oscillation of ellipsoidal nanoparticles' long axis about its equilibrium alignment with the polarization of a linearly polarized Gaussian trapping beam, detected via polarization changes of the light.",
+   "weight": 0.11,
+   "examples": [
+    "The long axis of an ellipsoidal nanoparticle oscillates about the light polarization direction",
+    "Librational oscillations are read out from polarization changes of the laser"
+   ]
+  },
+  {
+   "name": "answer_critical_5",
+   "tier": "critical",
+   "criterion": "Answer identifies rotation of dumbbell-shaped nanoparticles driven by circularly polarized light, reaching frequencies above 1 GHz and measured through polarization modulation of the transmitted light.",
+   "weight": 0.11,
+   "examples": [
+    "A levitated dumbbell nanoparticle rotates at over 1 GHz under circular polarization",
+    "The rotation frequency is inferred from polarization modulation of the beam"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "Answer notes that rotational degrees of freedom enable precision torque measurement, citing sensitivities around (4.2 ± 1.2) × 10^-27 Nm/Hz^1/2, among the most sensitive reported.",
+   "weight": 0.16,
+   "examples": [
+    "GHz-rotating dumbbells serve as ultrasensitive torque detectors at the 10^-27 Nm/Hz^1/2 level",
+    "Torque detection with ~4.2 × 10^-27 Nm/Hz^1/2 sensitivity was achieved"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "Answer mentions that precession and nutation of non-spherical nanoparticles were experimentally observed in agreement with theoretical predictions, with potential torque precision of (3.6 ± 1.1) × 10^-31 Nm/Hz^1/2 at pressures below 10^-7 mbar.",
+   "weight": 0.17,
+   "examples": [
+    "Precession and nutation were observed in high vacuum, matching theory",
+    "At <10^-7 mbar, torque precision could in principle reach ~3.6 × 10^-31 Nm/Hz^1/2"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

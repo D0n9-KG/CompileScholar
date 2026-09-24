@@ -1,0 +1,94 @@
+{
+ "question": "What are some ways to overcome the heating issue due to residual optical absorption in the integrated optomechanical devices?",
+ "case_id": "hao_photonics_1",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "weight": 0.18,
+   "criterion": "Answer identifies redesigning the device from a traditional 1D nanobeam to a quasi-2D optomechanical crystal cavity as a primary strategy to reduce optically induced parasitic heating.",
+   "examples": [
+    "Moving from 1D nanobeam OMCs to quasi-2D cavities lowers the hot bath occupancy",
+    "A 2D cavity design substantially reduces heating compared to the 1D nanobeam geometry",
+    "Dimensional expansion of the OMC from 1D to 2D mitigates residual optical-absorption heating"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "weight": 0.17,
+   "criterion": "Answer explains the mechanism: the 2D geometry provides a larger surrounding area and greatly enhanced thermal conductance to the cold reservoir of the surrounding chip, consistent with ballistic phonon transport models and FEM simulations.",
+   "examples": [
+    "FEM simulations with ballistic phonon transport predict a thermal conductance ratio of ~42 between 2D and 1D cavities",
+    "Thermal conductance to the surrounding chip is increased by 68x compared to 1D devices",
+    "The 2D design has more surrounding material to conduct heat away"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "weight": 0.12,
+   "criterion": "Answer describes the dual role of the 2D phononic bandgap structure: shielding/protecting the acoustic cavity mode while phonon modes above the bandgap serve as extra channels carrying heat away from the cavity region.",
+   "examples": [
+    "Phonon modes above the acoustic bandgap act as additional heat-removal channels",
+    "The phononic bandgap shields the breathing mode while higher-bandgap modes carry heat away",
+    "The 2D bandgap material both isolates the mechanical mode and provides heat-dissipation channels"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "weight": 0.12,
+   "criterion": "Answer identifies slab-on-substrate optomechanical crystals (e.g., with bound states in the continuum) as a route to dissipate heat through the substrate.",
+   "examples": [
+    "A slab-on-substrate device architecture allows heat to flow into the substrate",
+    "2D slab-on-substrate OMCs with mechanical BICs provide radiation channels for heat dissipation",
+    "Placing the crystal on a substrate lets heat phonons radiate into the substrate"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "weight": 0.1,
+   "criterion": "Answer proposes short-pulsed optical excitation so heating occurs only during the pulse on-time while the resonator cools during the off-time, with phonon generation controlled by pulse duration.",
+   "examples": [
+    "Pulsed pump limits optical heating to the on-time of the pulse",
+    "During the off-time, optical heating is negligible and phonon occupancy decays exponentially",
+    "Tuning pulse duration controls the number of heat phonons generated"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "weight": 0.1,
+   "criterion": "Answer notes when substrate-based dissipation helps: at low temperatures (<1 K), where material absorption is also suppressed, or when substrate and slab thermal conductivities are comparable, since oxide conductivity at room temperature is ~100x lower than silicon.",
+   "examples": [
+    "Oxide substrate conductivity is two orders below silicon, masking the benefit at room temperature",
+    "Substrate benefit becomes evident below 1 K, relevant for GHz-mode quantum experiments",
+    "Material-absorption loss is suppressed at low temperatures"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "weight": 0.11,
+   "criterion": "Answer provides quantitative support, e.g., the factor-7.2 reduction in hot bath occupancy for the quasi-2D cavity and the power-law scaling of hot bath occupancy with intracavity photon number.",
+   "examples": [
+    "Hot bath occupancy magnitude dropped by a factor of 7.2 for the quasi-2D cavity",
+    "Hot bath occupancy follows a power law in intracavity photon number, same as 1D nanobeams"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "weight": 0.1,
+   "criterion": "Answer connects reduced heating to outcomes such as achieving effective quantum cooperativity Ceff > 1 under continuous-wave pumping, or enabling phonon sensing and quantum experiments with GHz mechanical modes.",
+   "examples": [
+    "Reduced heating allows Ceff > 1 under CW optical pumping",
+    "These architectures enable phonon sensing and macroscopic quantum oscillator experiments"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

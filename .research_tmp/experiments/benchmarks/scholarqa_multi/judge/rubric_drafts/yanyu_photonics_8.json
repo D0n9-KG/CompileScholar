@@ -1,0 +1,98 @@
+{
+ "question": "What are the limitations of usinhg quantitative reverse transcriptase PCR to detect miRNA at a very low concentration?",
+ "case_id": "yanyu_photonics_8",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer states that detecting miRNA at very low concentration is an unmet clinical need and that standard qRT-PCR assays fail or become unreliable in this regime, especially with small biospecimen volumes.",
+   "weight": 0.18,
+   "examples": [
+    "qRT-PCR assays fail for the analysis of small volumes of low-abundance miRNA",
+    "Detecting low-abundance miRNA in limited biospecimens is a key unmet need for qRT-PCR"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer explains that miRNAs' short length (~20 nt) forces specially designed primers (stem-loop or linear miR-specific RT primers with ~6–8 nt antisense regions, or polyA-tailing with universal primers), complicating assay development.",
+   "weight": 0.15,
+   "examples": [
+    "Because miRNAs are ~20 nt long, unique primers and special amplification strategies are needed",
+    "Either miR-specific stem-loop/linear primers or polyA extension with universal RT primers must be used"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer notes that qRT-PCR sensitivity relies entirely on enzymatic amplification: both reverse transcription to cDNA and complete PCR amplification must succeed for accurate quantification, a vulnerability amplified when targets are scarce.",
+   "weight": 0.14,
+   "examples": [
+    "Accuracy requires RT conversion to cDNA and amplification to completion",
+    "Incomplete RT or amplification compromises quantitation when targets are scarce"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer identifies that miRNA recovery depends heavily on the isolation method and input amount/type, with failure modes including column saturation by large RNAs/plasma components, poor recovery from limiting samples, and low RNA purity reducing RT-qPCR efficiency.",
+   "weight": 0.13,
+   "examples": [
+    "miRCURY columns saturate with large RNA species and plasma components; some miRNAs are preferentially isolated by certain kits",
+    "Trizol LS yields low-purity RNA that reduces RT-qPCR efficiency; kit choice and input size bias results"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "The answer describes the standard workflow (whole-blood RNA isolation/purification, then RT and PCR) as labor-intensive and time-consuming, with elaborate sample processing preceding detection.",
+   "weight": 0.09,
+   "examples": [
+    "The standard protocol of whole blood RNA isolation and purification followed by qRT-PCR is labor-intensive",
+    "Multiple processing steps increase turnaround time and hands-on effort"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer explains that stem-loop primers enhance mature-miRNA specificity and reduce qPCR background but hinder detection of isomiR variants, and that low-temperature annealing (~16°C) is needed to preserve pri-/pre-miR secondary structure and avoid amplifying unwanted precursor forms.",
+   "weight": 0.09,
+   "examples": [
+    "Stem-loop primers give enhanced specificity but hinder RT of isomiR sequences",
+    "Annealing at ~16°C keeps pri-/pre-miR structures sequestered, reducing RT of unwanted forms"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer notes that PCR-based assays demand complex thermocycling instrumentation, limiting point-of-care deployment in contrast to isothermal or amplification-free alternatives.",
+   "weight": 0.08,
+   "examples": [
+    "PCR-based assays have complex instrumental demands compared to isothermal point-of-care assays",
+    "Amplification-free detection with simple readout is desirable where qRT-PCR is impractical"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer mentions that qRT-PCR suffers sequence biases from RT and amplification steps and cannot reliably discriminate closely related miRNA sequences (family members or isomiRs differing by one base) at low concentrations.",
+   "weight": 0.08,
+   "examples": [
+    "Sequence biases arise from RT and amplification steps",
+    "Distinguishing miRNA family members differing by one base challenges qRT-PCR at low concentration"
+   ]
+  },
+  {
+   "name": "valuable_3",
+   "tier": "valuable",
+   "criterion": "The answer acknowledges that qRT-PCR quantification depends on standard curves or reference miRNAs for normalization, which are unreliable at very low concentrations, limiting absolute quantitation accuracy.",
+   "weight": 0.06,
+   "examples": [
+    "Normalization with reference miRNAs becomes unstable at low abundance",
+    "Standard-curve-based quantitation degrades for scarce targets"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

@@ -1,0 +1,108 @@
+{
+ "question": "What challenges are commonly encountered in the production of recombinant proteins in E. coli?",
+ "case_id": "norman_bio_10",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "Answer identifies inclusion body formation—insoluble aggregation of overexpressed recombinant proteins—as the commonly encountered primary challenge in E. coli production.",
+   "weight": 0.15,
+   "examples": [
+    "Recombinant proteins in E. coli commonly form insoluble inclusion bodies",
+    "Overexpressed proteins aggregate as inclusion bodies rather than soluble product"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "Answer explains that inclusion bodies arise from misfolding: self-association of nascent polypeptides outpaces proper folding, and the E. coli cytoplasm is an unfavorable folding environment.",
+   "weight": 0.12,
+   "examples": [
+    "Aggregation occurs because self-association of nascent chains outpaces proper folding",
+    "The E. coli cytoplasm provides an unfavorable folding environment"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "Answer notes that proteins containing or requiring disulfide bonds (e.g. lysozyme, protease zymogens) are particularly prone to misfolding and inclusion body formation.",
+   "weight": 0.12,
+   "examples": [
+    "High-level expression of disulfide-bonded proteins like lysozyme often yields inclusion bodies",
+    "Midgut protease zymogens with disulfides misfold in E. coli"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "Answer attributes misfolding of disulfide-containing proteins to the highly reducing E. coli cytoplasm maintained by thioredoxin and glutathione/glutaredoxin reductase pathways.",
+   "weight": 0.13,
+   "examples": [
+    "Disulfide bonds are reduced by thioredoxin and glutaredoxin pathways, causing misfolding",
+    "The highly reducing cytoplasm prevents correct disulfide formation"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "Answer states downstream consequences: aggregated/inclusion-body proteins are inactive or nonfunctional and harder to purify than soluble, properly folded proteins.",
+   "weight": 0.11,
+   "examples": [
+    "IB proteins are inactive and require solubilization/refolding",
+    "Soluble proteins are properly folded, functional, and easier to purify"
+   ]
+  },
+  {
+   "name": "answer_critical_5",
+   "tier": "critical",
+   "criterion": "Answer presents reducing the rate of protein synthesis via lower growth/expression temperature (e.g. 11-15°C) as a key strategy to reduce aggregation and improve solubility.",
+   "weight": 0.1,
+   "examples": [
+    "Growth at low temperature (11-15°C) markedly increased soluble protein",
+    "Lowering temperature slows synthesis, favoring proper folding over aggregation"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "Answer mentions that E. coli strain choice (e.g. BL21(DE3), Rosetta, ArcticExpress(DE3)) and culture parameters such as medium composition, induction time, and aeration influence solubility.",
+   "weight": 0.08,
+   "examples": [
+    "ArcticExpress(DE3) at 11°C yielded far more active enzyme than BL21(DE3) at 37°C",
+    "Solubility is affected by medium, induction timing, aeration, and strain"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "Answer identifies fusion partners (e.g. maltose-binding protein, GST) as strategies to enhance solubility, noting tags may improve solubility without guaranteeing correct folding.",
+   "weight": 0.07,
+   "examples": [
+    "MBP fusion enhanced solubility of aminotransferase FumI",
+    "GST or MBP fusions are used to improve soluble expression"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "Answer notes that retained hydrophobic eukaryotic signal/leader sequences cause aggregation and thermodynamically destabilize recombinant expression in E. coli.",
+   "weight": 0.06,
+   "examples": [
+    "The hydrophobic N-terminal signal peptide caused aggregation of the mosquito zymogen proteases",
+    "Hydrophobic leader peptides are thermodynamically destabilizing in E. coli"
+   ]
+  },
+  {
+   "name": "valuable_3",
+   "tier": "valuable",
+   "criterion": "Answer acknowledges that mitigation strategies do not always work—e.g. low-temperature culture can still yield inclusion bodies, and solubility tags may not ensure correct folding.",
+   "weight": 0.06,
+   "examples": [
+    "Even at 25°C with aeration, GST-ACLyz still formed inclusion bodies",
+    "MBP enhanced solubility more than it promoted correct folding of FumI"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

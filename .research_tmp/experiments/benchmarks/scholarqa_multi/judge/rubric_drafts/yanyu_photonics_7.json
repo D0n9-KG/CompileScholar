@@ -1,0 +1,110 @@
+{
+ "question": "Can you explain the significance of ultra-sensitive detection in life science research?\n",
+ "case_id": "yanyu_photonics_7",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer must explain that ultra-sensitive detection is significant because it enables identification and quantification of specific biomolecules at extremely low concentrations, making previously unobservable molecules observable in complex biological specimens.",
+   "weight": 0.148148,
+   "examples": [
+    "Quantify molecules in complex specimens that would otherwise be unobservable",
+    "Detects molecules at ultra-sensitive limits of detection where conventional methods fail"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer must describe digital-resolution technologies that count individual molecular units and observe individual biomolecular interactions rather than ensemble averages.",
+   "weight": 0.12037,
+   "examples": [
+    "Counting individual molecular units with digital precision",
+    "Observing characteristics of single binding events instead of ensemble averages"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer must present ctDNA-based detection as a noninvasive method for detecting tumors, citing quantitative evidence such as detection rates from the 640-patient study (>75% in several advanced cancers; 73% localized colorectal; ~50% localized breast) and KRAS mutation sensitivity of 87.2% with 99.2% specificity.",
+   "weight": 0.12963,
+   "examples": [
+    "ctDNA detected in >75% of advanced pancreatic, ovarian, colorectal and other cancers",
+    "73% of localized colorectal and ~50% of localized breast cancers detected",
+    "87.2% sensitivity / 99.2% specificity for KRAS mutation detection"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer must define liquid biopsy as analysis of circulating tumor cells or cell-free DNA in blood or body fluids as a non-invasive alternative to tissue biopsy, and list clinical applications such as early detection, monitoring disease progression, and identifying high-risk patients after curative surgery.",
+   "weight": 0.12037,
+   "examples": [
+    "Liquid biopsy analyzes circulating tumor cells or cell-free DNA in blood or body fluids",
+    "Blood can be explored diagnostically without invasive procedures",
+    "Identifying patients at high risk for progression after curative surgery"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "The answer must mention use of ultra-sensitive detection for monitoring tumor burden and treatment response, and for discovering therapy resistance mechanisms such as MAPK-pathway mutations after EGFR blockade (23 of 24 relapsed patients).",
+   "weight": 0.111111,
+   "examples": [
+    "Monitoring tumor burden and disease progression during therapy",
+    "23 of 24 relapsed patients developed MAPK-pathway mutations, revealing resistance to EGFR blockade"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer should note that ultra-sensitive methods enable characterization of biomolecular binding kinetics with greater precision, aiding life science research beyond diagnostics.",
+   "weight": 0.074074,
+   "examples": [
+    "More precise characterization of binding kinetics",
+    "Single interaction events inform kinetic models"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer should state that quantifying low-abundance molecules in complex specimens yields deeper insights into biological processes that were previously hidden.",
+   "weight": 0.074074,
+   "examples": [
+    "Deeper insights into biology through quantification of previously unobservable molecules",
+    "Reveals low-abundance molecular events in complex samples"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer may note that ctDNA and circulating tumor cells are distinct biomarkers, since ctDNA was often present in patients without detectable CTCs, providing complementary information.",
+   "weight": 0.074074,
+   "examples": [
+    "ctDNA often present even without detectable circulating tumor cells",
+    "Two distinct entities offering complementary biomarker information"
+   ]
+  },
+  {
+   "name": "valuable_3",
+   "tier": "valuable",
+   "criterion": "The answer may note that ctDNA detection rates vary by cancer type and stage, including lower detection (<50%) in primary brain, renal, prostate, and thyroid cancers.",
+   "weight": 0.074074,
+   "examples": [
+    "Detection below 50% in primary brain, renal, prostate, and thyroid cancers",
+    "Sensitivity varies by tumor type and stage"
+   ]
+  },
+  {
+   "name": "valuable_4",
+   "tier": "valuable",
+   "criterion": "The answer should mention applications such as early cancer detection before symptoms and post-surgical risk stratification for recurrence.",
+   "weight": 0.074074,
+   "examples": [
+    "Early detection of cancer before symptoms appear",
+    "Identifying high-risk patients after curative surgery"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

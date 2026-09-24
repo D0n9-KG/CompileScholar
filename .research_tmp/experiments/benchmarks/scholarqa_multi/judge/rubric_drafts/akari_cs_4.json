@@ -1,0 +1,88 @@
+{
+ "question": "Many papers study optimal scaling laws for training compute. Has anyone analyzed optimality for inference-time compute? For instance, self-consistency samples many outputs to find the right answers. While this is effective, can't we just sample once if we have a stronger model?",
+ "case_id": "akari_cs_4",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer must affirmatively identify recent work analyzing inference-time/test-time compute scaling, contrasting with the extensively studied training-compute scaling literature [0][1].",
+   "weight": 0.13,
+   "examples": [
+    "Yes, recent papers study scaling of inference-time computation, though little earlier work existed [0]",
+    "While optimal training configurations have been extensively studied, inference-time optimality was largely unexplored [1]"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer must frame the core question: given a fixed but non-trivial inference-time compute budget, how much can an LLM improve on a challenging prompt [0]?",
+   "weight": 0.1,
+   "examples": [
+    "If an LLM is allowed a fixed amount of test-time compute, how much can its performance on a hard prompt improve? [0]",
+    "Compute-optimal inference means trading off additional inference-time compute for improved performance [1]"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer must directly address the questioner's point with an empirical counterexample: a smaller model with a better inference strategy can match or beat a larger model, e.g., Llemma-7B with novel tree search matching Llemma-34B on MATH500 using 2x fewer FLOPs, showing Pareto-optimality of small-model-plus-sophisticated-decoding [1].",
+   "weight": 0.16,
+   "examples": [
+    "Llemma-7B with a novel tree search algorithm matches Llemma-34B on MATH500 with 2x less compute [1]",
+    "A smaller model with sophisticated decoding can be Pareto-optimal, so sampling once with a stronger model is not necessarily better [1]"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer must list concrete inference strategies evaluated, such as Greedy Search, Majority Voting, Best-of-N, Weighted Voting, and tree search variants, benchmarked across model sizes and compute budgets [1].",
+   "weight": 0.12,
+   "examples": [
+    "Strategies assessed included Greedy Search, Majority Voting, Best-of-N, and Weighted Voting on two tree search algorithms [1]",
+    "Majority voting (self-consistency) is one of several strategies benchmarked for computational efficiency [1]"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "The answer must distinguish the two primary mechanisms for scaling test-time compute: (1) searching against dense, process-based verifier reward models, and (2) adaptively updating the model's response distribution via finetuned iterative revision, noting that naive prompting for self-correction is largely ineffective [0][2].",
+   "weight": 0.15,
+   "examples": [
+    "One mechanism searches against a dense process-based verifier reward model; the other updates the proposal distribution adaptively [0]",
+    "Models finetuned to iteratively revise answers sequentially condition on previous attempts; simply prompting LLMs to self-correct tends to be ineffective [2]"
+   ]
+  },
+  {
+   "name": "answer_critical_5",
+   "tier": "critical",
+   "criterion": "The answer must state that the effectiveness of test-time scaling approaches varies critically with prompt difficulty, motivating compute-optimal strategies that adaptively allocate inference-time compute per prompt for improved efficiency [0].",
+   "weight": 0.13,
+   "examples": [
+    "The effectiveness of different scaling approaches varies depending on the difficulty of the prompt [0]",
+    "A compute-optimal strategy allocates test-time compute adaptively per prompt [0]"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer should connect inference-time scaling to implications for LLM pretraining, i.e., the tradeoff between inference-time and pre-training compute, including the claim that optimal test-time scaling can be more effective than scaling model parameters [0].",
+   "weight": 0.11,
+   "examples": [
+    "Scaling test-time compute optimally can be more effective than scaling model parameters [0]",
+    "These findings have implications for how one should trade off inference-time and pre-training compute [0]"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer should mention budget-constrained deployment scenarios (e.g., end devices) where smaller models with better decoding are advantageous, and note generalization to any generation task with a well-defined success measure [1].",
+   "weight": 0.1,
+   "examples": [
+    "Smaller models with sophisticated decoding algorithms are beneficial in budget-constrained settings such as end devices [1]",
+    "These findings could apply to any generation task with a well-defined measure of success [1]"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

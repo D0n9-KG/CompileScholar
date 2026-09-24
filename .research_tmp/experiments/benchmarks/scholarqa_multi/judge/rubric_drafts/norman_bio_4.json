@@ -1,0 +1,87 @@
+{
+ "question": "What are the most common applications of phage display-derived antibodies in biomedicine and diagnostics?",
+ "case_id": "norman_bio_4",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer frames phage display (introduced by Smith in 1985) as a key in vitro technology for selecting high-specificity/high-affinity antibodies from large libraries, widely applied across biomedicine and diagnostics spanning therapeutics, diagnostics, and research tools.",
+   "weight": 0.12,
+   "examples": [
+    "Phage display selects high-affinity binders from large libraries in vitro",
+    "Applications span therapeutics, diagnostics, biosensors, and research"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer states that phage display-derived antibodies are used to develop monoclonal antibody therapeutics for diseases including cancer, autoimmune disorders, infectious diseases, and neurological conditions.",
+   "weight": 0.15,
+   "examples": [
+    "Monoclonal antibodies for cancer and autoimmune disorders",
+    "Therapeutics for infectious and neurological diseases"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer identifies tumor-targeted antibodies as a major application, emphasizing tumor-selective binding plus efficient internalization (e.g., macropinocytosis-dependent uptake) enabling intracellular delivery of therapeutics such as antibody-drug conjugates.",
+   "weight": 0.14,
+   "examples": [
+    "Internalizing tumor-selective antibodies for ADCs",
+    "Macropinocytosis-mediated uptake improves potency and selectivity"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer describes diagnostic applications targeting disease biomarkers, exemplified by monoclonal antibodies against Plasmodium falciparum histidine-rich protein 2 for malaria detection.",
+   "weight": 0.13,
+   "examples": [
+    "Anti-PfHRP2 mAbs for malaria diagnostic tests",
+    "Recombinant antibodies against various disease biomarkers"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "The answer includes discovery of antibodies against viral pathogens such as influenza and HIV, useful for both diagnosis and treatment.",
+   "weight": 0.1,
+   "examples": [
+    "Influenza and HIV antibody discovery by phage display",
+    "Viral-pathogen antibodies serving diagnostic and therapeutic purposes"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer mentions phage display contributions to antibody engineering, epitope mapping, protein-protein interaction studies, and protein/peptide libraries for enzyme optimization.",
+   "weight": 0.12,
+   "examples": [
+    "Epitope mapping and protein interaction studies",
+    "Peptide ligand libraries and enzyme optimization"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer mentions development of biosensors for disease detection and identification of novel peptide ligands for drug targeting.",
+   "weight": 0.12,
+   "examples": [
+    "Disease-detection biosensors incorporating selected binders",
+    "Novel peptide ligands for drug targeting"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer notes that approximately 30% of human therapeutic antibodies reaching clinical trials in the past decade were identified through phage display.",
+   "weight": 0.12,
+   "examples": [
+    "~30% of clinical-trial-stage therapeutic antibodies from phage display"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

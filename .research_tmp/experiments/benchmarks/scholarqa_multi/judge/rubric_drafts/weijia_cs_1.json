@@ -1,0 +1,98 @@
+{
+ "question": "If we have a lot of specialized language models, how can we combine them to build a general system that combine the abilities of different models? Can this unified model be as good as the single large LM? ",
+ "case_id": "weijia_cs_1",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "Identifies Model MoErging as the paradigm for combining specialized LMs: recycling independently trained expert models into a single aggregate system to improve performance or generalization.",
+   "weight": 0.17,
+   "examples": [
+    "Combining specialized LMs is done via MoErging, which recycles expert models into an aggregate system with improved performance or generalization",
+    "The unified approach for combining specialized LMs is Model MoErging"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "States that the key component is a router deciding which expert model(s) to use for a given input or application at inference time.",
+   "weight": 0.16,
+   "examples": [
+    "A router decides which experts handle each input",
+    "The core challenge is selecting and routing queries to the appropriate specialized LM at inference time"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "Describes AdapterFusion's two-stage approach: (1) train task-specific adapters encapsulating each task's knowledge, (2) combine them via a new fusion module added on top of all single-task adapters.",
+   "weight": 0.16,
+   "examples": [
+    "Stage one trains single-task adapters; stage two adds a fusion module on top",
+    "Learn task-specific parameters first, then fuse in a separate combination step"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "Describes AdapterSoup: weight-space averaging of domain-specific adapters, with the choice of which adapters to average made at test time for each novel domain.",
+   "weight": 0.14,
+   "examples": [
+    "For each novel domain, determine which trained domain adapters to average",
+    "AdapterSoup performs weight-space averaging of domain adapters in an embarrassingly parallel way"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "Notes that expert models/adapters are trained independently on individual tasks or domains before being combined, without joint training.",
+   "weight": 0.09,
+   "examples": [
+    "Adapters are trained independently on individual tasks",
+    "Expert contributors train their models independently before recycling"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "Specifies that AdapterFusion's fusion module is an attention module using adapter input representations as queries and adapter output representations as keys/values.",
+   "weight": 0.08,
+   "examples": [
+    "Fusion via attention with query from the input representation and key/value from the output representations of adapters",
+    "The fusion module attends over adapter outputs"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "Mentions that combining adapters (e.g., via AdapterSoup) enables few-shot transfer/generalization to novel domains, addressing the generalization goal of the aggregate system.",
+   "weight": 0.07,
+   "examples": [
+    "AdapterSoup enables few-shot transfer to novel domains",
+    "Averaging domain adapters improves generalization on unseen domains"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "Highlights that methods like AdapterFusion enable non-destructive composition, sharing knowledge across tasks while avoiding interference, catastrophic forgetting, or retraining.",
+   "weight": 0.07,
+   "examples": [
+    "Share knowledge from multiple tasks without destroying task-specific parameters",
+    "Non-destructive task composition for transfer learning"
+   ]
+  },
+  {
+   "name": "valuable_3",
+   "tier": "valuable",
+   "criterion": "Observes that MoErging spans a large design space with many recently developed methods and different combination strategies (e.g., deep fusion vs. weight averaging).",
+   "weight": 0.06,
+   "examples": [
+    "The promise, effectiveness, and large design space of MoErging has spurred many new methods",
+    "Combination strategies range from attention-based fusion to parameter averaging"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}

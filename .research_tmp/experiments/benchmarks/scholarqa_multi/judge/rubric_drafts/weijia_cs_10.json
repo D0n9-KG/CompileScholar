@@ -1,0 +1,108 @@
+{
+ "question": "Could you please provide some references to work on multi-document summarization?",
+ "case_id": "weijia_cs_10",
+ "annotator": "auto-glm53",
+ "ingredients": [
+  {
+   "name": "answer_critical_0",
+   "tier": "critical",
+   "criterion": "The answer frames multi-document summarization as compressing content from multiple documents into short summaries, motivated by the rapid growth of online publications, with applications such as news story clustering, search results, and timeline generation.",
+   "weight": 0.1,
+   "examples": [
+    "MDS aims to compress large document collections into short summaries",
+    "MDS supports story clustering, search result presentation, and timeline generation"
+   ]
+  },
+  {
+   "name": "answer_critical_1",
+   "tier": "critical",
+   "criterion": "The answer states that a wide range of MDS datasets has been developed spanning news articles, event reports, and Wikipedia-based summarization, noting that large-scale datasets were needed because prior datasets were too small to train supervised models.",
+   "weight": 0.12,
+   "examples": [
+    "A wide range of MDS datasets have been developed, covering news, event reports, and Wikipedia summaries",
+    "Prior MDS news datasets had only a couple hundred examples, too small for supervised training"
+   ]
+  },
+  {
+   "name": "answer_critical_2",
+   "tier": "critical",
+   "criterion": "The answer cites Multi-News [0] as the first large-scale multi-document summarization dataset for news articles.",
+   "weight": 0.13,
+   "examples": [
+    "Multi-News [0] is the first large-scale MDS news dataset",
+    "Multi-News [0] addresses the prior limitation of MDS news datasets of only a couple hundred examples"
+   ]
+  },
+  {
+   "name": "answer_critical_3",
+   "tier": "critical",
+   "criterion": "The answer cites the Wikipedia Current Events Portal (WCEP) dataset [1] as a large-scale MDS dataset of human-written event summaries with linked source articles, large in both number of clusters and cluster size.",
+   "weight": 0.13,
+   "examples": [
+    "WCEP [1] provides concise human-written summaries of news events with links to source articles",
+    "The dataset [1] is large in total clusters and individual cluster size"
+   ]
+  },
+  {
+   "name": "answer_critical_4",
+   "tier": "critical",
+   "criterion": "The answer cites work [2] that frames generating Wikipedia articles as multi-document summarization of source documents.",
+   "weight": 0.13,
+   "examples": [
+    "Generating Wikipedia articles can be approached as multi-document summarization [2]",
+    "Liu et al. [2] show Wikipedia generation as MDS using extractive plus abstractive models"
+   ]
+  },
+  {
+   "name": "answer_critical_5",
+   "tier": "critical",
+   "criterion": "The answer distinguishes extractive summarization (selecting salient sentences from source documents) from abstractive summarization (generating new summary text).",
+   "weight": 0.07,
+   "examples": [
+    "MDS methods fall into extractive and abstractive categories",
+    "Extractive methods select salient sentences, while abstractive methods generate new summary content"
+   ]
+  },
+  {
+   "name": "valuable_0",
+   "tier": "valuable",
+   "criterion": "The answer describes methods that combine extractive selection of salient information with neural abstractive generation, as in the end-to-end Multi-News model [0] and the Wikipedia generation pipeline [2].",
+   "weight": 0.09,
+   "examples": [
+    "Multi-News [0] proposes an end-to-end model combining extractive summarization with a standard SDS model",
+    "[2] uses extractive summarization to identify salient information and a neural abstractive model to generate the article"
+   ]
+  },
+  {
+   "name": "valuable_1",
+   "tier": "valuable",
+   "criterion": "The answer mentions the decoder-only architecture in [2] that can attend to very long sequences, longer than typical encoder-decoder architectures, producing fluent, coherent multi-sentence paragraphs.",
+   "weight": 0.07,
+   "examples": [
+    "A decoder-only architecture [2] scalably attends to very long source sequences",
+    "The model [2] can generate fluent, coherent multi-sentence paragraphs and whole articles"
+   ]
+  },
+  {
+   "name": "valuable_2",
+   "tier": "valuable",
+   "criterion": "The answer notes that the WCEP dataset source articles were automatically extended with related articles from the Common Crawl archive.",
+   "weight": 0.08,
+   "examples": [
+    "WCEP source articles [1] were automatically extended with related articles from Common Crawl",
+    "The dataset construction [1] leverages the Common Crawl archive for augmentation"
+   ]
+  },
+  {
+   "name": "valuable_3",
+   "tier": "valuable",
+   "criterion": "The answer mentions that the datasets come with benchmarks of state-of-the-art MDS techniques, evaluated via ROUGE, perplexity, or human evaluations.",
+   "weight": 0.08,
+   "examples": [
+    "Several methods are benchmarked on Multi-News [0]",
+    "The model in [2] is assessed by perplexity, ROUGE, and human evaluations"
+   ]
+  }
+ ],
+ "n_pooled_drafts": 3
+}
