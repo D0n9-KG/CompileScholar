@@ -105,11 +105,16 @@ def _truncate_obs(rows: list[dict], cap: int = 6500) -> list[dict]:
 class ExternalTools:
     """Lazy holder — the engine stack is built once per answering process."""
 
-    def __init__(self, views: dict, kb_manifest: dict, model: str = "local:Qwen3.8-27B"):
+    def __init__(self, views: dict, kb_manifest: dict, model: str = "local:Qwen3.8-27B",
+                 registry: dict = None, blocklist: list = None,
+                 backflow_path: str = None):
         _ensure_env()
         self._model = model
         self._views = views
         self._kb_manifest = kb_manifest
+        self._registry = registry
+        self._blocklist = blocklist
+        self._backflow_path = backflow_path
         self._svc = None
         self._gap_docs = None
         self._embed = None
@@ -203,9 +208,12 @@ class ExternalTools:
             rows = [_cand_row(c) for c in r.external_candidates]
             return {"tool": "lineage_walk", "entity": entity,
                     "corpus_chain": chain, "frontier": frontier,
+                    "attached_external": r.attached_external,
                     "n_external": len(rows), "papers": _truncate_obs(rows),
                     "successor_annotations": r.successor_annotations[:8],
-                    "note": "frontier = corpus lineage ends here; papers are external continuations"}
+                    "note": "frontier = corpus lineage ends here; papers are external continuations; "
+                            "attached_external = papers already coarse-extracted into the library "
+                            "(their records are included — no re-search needed)"}
         except Exception as e:
             return {"tool": "lineage_walk", "n_external": 0,
                     "error": f"lineage walk failed: {str(e)[:120]}"}
@@ -246,19 +254,53 @@ class ExternalTools:
                      # carried no citable id — 4 consecutive reject steps)
                      "title": title}
                     for x in r["records"]]
-            return {"tool": "extract_paper", "n": len(recs), "records": recs,
-                    "title": title,
-                    "note": "coarse records from abstract only; cite this paper in notes as [title]"}
+            obs = {"tool": "extract_paper", "n": len(recs), "records": recs,
+                   "title": title,
+                   "note": "coarse records from abstract only; cite this paper in notes as [title]"}
+            # mentions backflow (batch-2): the records' mentions match
+            # registry entities -> attach this paper to the corpus
+            # genealogy as an external continuation node. The library
+            # grows; later lineage_walks reach this paper at zero cost.
+            try:
+                if self._registry is not None and r["records"]:
+                    from kb_compiler.records.backflow import build_backflow, apply_backflow
+                    bf = build_backflow(
+                        r, {"title": title, "year": None},
+                        self._registry, self._blocklist)
+                    res = apply_backflow(self._views, bf,
+                                         persist_path=self._backflow_path)
+                    if res.get("attached"):
+                        obs["attached_to_lineage"] = res["matched_entities"]
+                        obs["library_growth"] = (
+                            "paper attached as external continuation of: "
+                            + ", ".join(res["matched_entities"]))
+            except Exception as e:
+                obs["backflow_error"] = str(e)[:120]
+            return obs
         except Exception as e:
             return {"tool": "extract_paper", "n": 0,
                     "error": f"coarse extraction failed: {str(e)[:120]}"}
 
 
 def attach_external_tools(kb, views: dict, kb_manifest: dict,
-                          model: str = "local:Qwen3.8-27B") -> ExternalTools:
+                          model: str = "local:Qwen3.8-27B",
+                          registry: dict = None, blocklist: list = None,
+                          backflow_path: str = None) -> ExternalTools:
     """Inject the five external tools onto a KBTools instance and extend the
-    harness tool whitelist/catalog at runtime."""
-    ext = ExternalTools(views, kb_manifest, model)
+    harness tool whitelist/catalog at runtime. `registry` enables mentions
+    backflow (extract_paper -> genealogy attachment); `backflow_path`
+    persists + replays library growth across sessions."""
+    ext = ExternalTools(views, kb_manifest, model, registry=registry,
+                        blocklist=blocklist, backflow_path=backflow_path)
+    if backflow_path:
+        try:
+            from kb_compiler.records.backflow import load_backflow
+            n = load_backflow(views, backflow_path)
+            if n:
+                print(f"[backflow] replayed {n} external papers into "
+                      f"genealogy", flush=True)
+        except Exception:
+            pass
     kb.search_papers = ext.search_papers
     kb.gap_search = ext.gap_search
     kb.lineage_walk_ext = ext.lineage_walk

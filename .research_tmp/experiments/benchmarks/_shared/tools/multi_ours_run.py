@@ -124,8 +124,16 @@ def build_tools_multi():
     # broker wiring (2026-09-25): external retrieval tools injected
     # fork-side — blind search + gap-driven + lineage-driven + citation
     # graph + Tier-1 coarse extraction (see external_tools.py)
+    # mentions backflow (batch-2): coarse records' mentions attach the
+    # external paper to the corpus genealogy; growth persists in
+    # kb/backflow_edges.jsonl and replays on startup
     from external_tools import attach_external_tools
-    attach_external_tools(kb, views, manifest, model=MODEL)
+    _bl_path = os.path.join(KB, "blocklist_keep.json")
+    _blocklist = (json.load(open(_bl_path, encoding="utf-8"))
+                  if os.path.exists(_bl_path) else None)
+    attach_external_tools(kb, views, manifest, model=MODEL,
+                          registry=registry, blocklist=_blocklist,
+                          backflow_path=os.path.join(KB, "backflow_edges.jsonl"))
     return kb, records, views, manifest
 
 
