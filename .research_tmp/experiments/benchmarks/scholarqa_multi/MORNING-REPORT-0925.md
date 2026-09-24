@@ -68,12 +68,25 @@ sci-evo-extract 仓库五个模块 + 引用图服务：
 4. **服务器状态**：单流速率只有首跑一半（10 vs 20 tok/s），3 副本疑
    缺失——影响所有本地跑数的墙钟，方便时看下 GPUStack 仪表盘
 
-## 五、在跑/待跑
+## 五、全流程测试：九站全绿（10:00 更新）
 
-- **全流程测试**（你的 SQA2 前置指令）：12 篇分层样本（含 LSST 1.95MB
-  巨书/综述/小论文），cards 12/12 零失败、registry 106 实体零重复，
-  deep_extract 415 chunks 在跑（预计上午完成，逐站产物实读审查中）。
-  中间抓到一个环境 bug：管道默认 240s 墙钟装不下 9k-token 输出（81%
-  超时），已修
-- SQA2 开跑条件=全流程测试过 + broker 裁点定 → 接线后先 Multi 20 题
-  外扩臂冒烟
+12 篇分层样本（LSST 1.95MB 巨书/2 综述/常规论文）**全部九站通过，
+逐站产物实读**：
+- cards 12/12 零失败；registry 106 实体零重复 id（G3 源头守卫在新
+  数据上 0 折叠——修复被验证）
+- deep_extract 2,784 条记录、零 chunk 失败、中位 131 条/篇（生产 127
+  同族）、overflow 3.9%（生产 2.8%）
+- postcheck first-pass 96.4%（生产 95.0%）；87 条 drop 里 59 条是
+  quote 锚定门正确丢弃
+- registry_growth→dedup→views 形态正确（10 卡=10 own 实体）
+- **抓到环境真 bug**：管道默认 240s 墙钟装不下 9k-token 输出（服务器
+  降速态 81% attempt-0 超时）——马拉松 timeout 必须显式传，已修
+
+**裁点 1 已从官方源码定死**（免裁）：SQA2 判分=LLM 归因验证
+（claim+snippets→Attributable?），引用 id 格式自由；**官方自家检索
+工具就是 S2 API 且 abstract 即证据文本**——broker 输出形态与官方
+同构，且佐证了 S2 key 是 A6 词汇鸿沟主杠杆的判断。裁点剩 2-5（+
+新增：ASTA_TOOL_KEY 拿不到就用自家 SearchService，功能等价）。
+
+**SQA2 剩余前置** = 裁点 2-5 你裁定 → broker 接线（工具包装半天 +
+KB 短路 + Multi 20 题外扩臂冒烟半天）→ 开跑
