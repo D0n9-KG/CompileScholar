@@ -121,6 +121,11 @@ def build_tools_multi():
           f"{n_unstar} unstarred", flush=True)
     kb = KBTools(views, registry, vocab, manifest, records,
                  emb_cache_path=os.path.join(ARM, "emb_cache_records.bin"))
+    # broker wiring (2026-09-25): external retrieval tools injected
+    # fork-side — blind search + gap-driven + lineage-driven + citation
+    # graph + Tier-1 coarse extraction (see external_tools.py)
+    from external_tools import attach_external_tools
+    attach_external_tools(kb, views, manifest, model=MODEL)
     return kb, records, views, manifest
 
 

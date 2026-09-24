@@ -262,6 +262,11 @@ Tool catalog (local, deterministic, zero-cost, call as often as needed):
 10. fetch_chunk(record_id, window?) R-C: original text window around a record's chunk — use when a note/row needs surrounding context (table rows, neighboring sentences) beyond the <=40-word quote; returns the verbatim source passage
 11. describe_kb() B6: one-call inventory of this knowledge base (record counts by kind, matrix/lineage/coverage/card view sizes, registry size) — call it FIRST when unsure which view or entity scale you are facing; zero cost
 12. search_text(query, k<=12) A7: hybrid lexical+semantic search over the FULL RAW TEXTS of all corpus papers (BM25+vector fused). The escape hatch when a question targets content the compiled records may not cover (novel phrasings, appendix details, prose context around a known number). Returns verbatim source passages with chunk anchors ([paper_id#char_start]) usable as note backrefs
+13. search_papers(query, k?) EXTERNAL literature search over the whole world's papers (not just this corpus) — semantic channel leads, returns title+year+doi+abstract. Use when the corpus lacks coverage for the question's topic. Cite external papers in notes as [title]
+14. gap_search(query) knowledge-model-driven: matches the question against the KB's recorded ABSENCES (what corpus methods cannot do, what has no results), then searches externally for papers FILLING that gap with vocabulary the question does not contain. Prefer this over search_papers when the question hints at a limitation/unsolved aspect
+15. lineage_walk_ext(entity, direction?) typed method-genealogy walk: follows extends/improves/replaces edges in-corpus to the frontier, then continues externally for successors. Use for 'latest advances in X / what replaced X' questions
+16. citation_graph(doi?, title?, direction?) external citation neighbors of a paper (who it cites / who cites it), with in-corpus annotation
+17. extract_paper(title, abstract) Tier-1 coarse extraction: digest ONE external paper's abstract into structured records (method/finding/limitation). Run on the 1-3 external papers that look core to the question, then use their records as evidence
 
 Channel semantics: numeric experimental results live in compare (matrix rows) and card (main_results) — findings carries claim-type records only and will never return numbers; an empty findings result is not a signal to keep appending keywords to contains.
 
@@ -954,12 +959,36 @@ def shrink_obs(res, cap=OBS_CAP):
     return res
 
 
+def _harvest_handles(res, acc):
+    """external-tool observation -> acceptable citation handles: every
+    title/doi that appears in a papers/edges row becomes a valid backref."""
+    def _walk(o):
+        if isinstance(o, dict):
+            for key in ("title", "doi"):
+                v = o.get(key)
+                if isinstance(v, str) and len(v) > 8:
+                    acc.add(v)
+            for v in o.values():
+                _walk(v)
+        elif isinstance(o, list):
+            for v in o:
+                _walk(v)
+    _walk(res)
+
+
 def obs_record_ids(res, acc):
     if isinstance(res, dict):
         for key in ("record_id", "paper_id", "chunk_id"):
             v = res.get(key)
             if isinstance(v, str):
                 acc.add(v)
+        # external-tool observations (broker, 2026-09-25): papers carry
+        # title/doi as their citation handles — harvest them so note lines
+        # citing [title] / [doi] pass the backref gate
+        if res.get("tool") in ("search_papers", "gap_search",
+                               "lineage_walk_ext", "citation_graph"):
+            _harvest_handles(res, acc)
+            return
         for v in res.values():
             obs_record_ids(v, acc)
     elif isinstance(res, list):
