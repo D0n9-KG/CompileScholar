@@ -154,7 +154,7 @@ def run_kb_chain(paper_pid: str, _unused: str = None) -> dict:
         "PYTHONIOENCODING": "utf-8", "PYTHONUNBUFFERED": "1",
         "LLM_CALL_LOG": os.path.join(GROWTH, "ledger_growth.jsonl"),
         "LLM_RUN_ID": f"growth-{paper_pid}",
-        "LOCAL_MAX_CONCURRENT": "8",
+        "LOCAL_MAX_CONCURRENT": "32",
         "LOCAL_SOCK_TIMEOUT": "900", "LLM_WALL_TIMEOUT": "1200",
         "LLM_PROVIDER_ALLOWLIST": "local", "KB_EMBED_PROVIDER": "local",
     })
@@ -173,7 +173,7 @@ def run_kb_chain(paper_pid: str, _unused: str = None) -> dict:
                           else os.path.join(KB, "registry_v3.json"),
                           "--vocab", os.path.join(KB, "dim_vocab_v1.json"),
                           "--out", os.path.join(GROWTH, "records_growth.json"),
-                          "--model", MODEL, "--pool", "4"]),
+                          "--model", MODEL, "--pool", "16"]),
         ("postcheck", ["python", "-m", "kb_compiler.records.postcheck",
                        "--records", os.path.join(GROWTH, "records_growth.json"),
                        "--texts", GROWTH_TEXTS,
