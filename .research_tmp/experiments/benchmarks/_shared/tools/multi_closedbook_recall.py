@@ -93,8 +93,21 @@ def main():
     svc = SearchService(limit=args.k, doi_cache_path=os.path.join(
         _HERE, "..", "..", "scholarqa_multi", "judge",
         "closedbook_doi_cache.jsonl"))
+    # circuit hygiene for long runs: a shared circuit lets a mid-run rate
+    # limit (Sciverse 429 at q80) trip sources OPEN for 600s and every
+    # later question silently loses that tier — measured: 17/40 early
+    # questions had degraded pools vs 26/28 late, 7 with pool=0. Reset
+    # per question: recall evaluation measures retrieval capability, not
+    # cross-question state carryover.
+    from sci_evo_extract.library.circuit import SourceCircuit
+    _fresh_circuit = SourceCircuit(failure_threshold=3, window_s=120,
+                                   cooldown_s=60)
+    svc.circuit = _fresh_circuit
     rows = []
     for i, q in enumerate(qs):
+        # fresh circuit per question (see comment above)
+        svc.circuit = SourceCircuit(failure_threshold=3, window_s=120,
+                                    cooldown_s=60)
         gold = [c.get("title") for c in q.get("ctxs") or []]
         t0 = time.time()
         r = svc.search(q["input"], mode=args.mode, limit=args.k)
