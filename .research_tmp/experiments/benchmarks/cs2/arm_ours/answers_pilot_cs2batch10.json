@@ -1,0 +1,1687 @@
+[
+ {
+  "id": "dc761baf0fc9fead9889d9eb",
+  "type": "aggregation",
+  "question": "For different modulation types like MPSK, QPSK, and MQAM, I'm measuring the error rate but want to understand and measure the Error Vector Magnitude (EVM) more accurately. I'm using a general equation for all modulation types. Is this the right approach, and what should I expect from the EVM vs. Eb/No curve?",
+  "gold_hint": "",
+  "answer": "**Is a Single General Equation Valid for All Modulation Types?**\n\nThe approach of using a single general equation for Error Vector Magnitude (EVM) across different modulation types is fundamentally supported by the definition of the metric, but it requires specific normalization procedures to be valid. EVM is defined as the Root Mean Square (RMS) amplitude of the error vector, which is computed via a comparison of two signals: a reference signal and a test signal containing complex symbol values [coarse:63856d657a09]. The test signal is typically formed by passing the reference signal through one or more functional blocks, such as amplifiers, filters, mixers, converters, or a complete system [coarse:f013adbf6a3e].\n\nHowever, applying this general equation directly to raw signal amplitudes without adjustment is incorrect because different modulation systems, such as BPSK, 4-QAM, and 16-QAM, possess different amplitude levels [coarse:d585ac0b3e5b]. Therefore, normalization is required to account for these varying amplitude levels across modulation types [coarse:d585ac0b3e5b]. While the core mathematical definition of EVM as the RMS amplitude of the error vector remains consistent [coarse:05a22a548af8], the practical application of the equation must include this normalization step to ensure comparability across MPSK, QPSK, and MQAM systems [coarse:d585ac0b3e5b]. The consulted records did not surface specific modulation-specific equation variations beyond this requirement for amplitude normalization, nor did they provide detailed comparative analyses of EVM as a performance metric across these specific modulation types from the 2006 and 2013 studies referenced in the corpus.\n\n**Expected EVM vs. Eb/No Curve**\n\nThe consulted records did not surface any information regarding the expected shape or specific relationship of the EVM versus Eb/No curve. While EVM is identified as the most widely used metric to express modulation quality in wireless communication systems [coarse:c93cea5e6713] and is used to assess the modulation quality of a given signal in modern systems [coarse:454d975138fa], the provided notes do not contain data, theoretical derivations, or descriptions of how EVM values change as a function of Eb/No. Consequently, no specific expectations for the curve's behavior can be derived from the available information.\n\n**Measurement Context and Instrumentation**\n\nTo measure EVM accurately, it is important to note that signals are down-converted before EVM calculations are made [coarse:38f5b8a5c7cd]. These measurements are often performed on vector signal analyzers, real-time analyzers, or instruments that capture a time record and internally perform FFT [coarse:357640d1329f]. This instrumentation context is critical for ensuring that the \"test signal\" used in the general equation is properly captured and processed relative to the reference signal [coarse:63856d657a09].",
+  "arm": "main",
+  "steps": 6,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "robust computation of error vector magnitude"
+    },
+    "intent": "Get cross-paper dossier on EVM computation methods",
+    "obs_chars": 544,
+    "notes_chars": 533
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from the 2006 EVM paper",
+    "obs_chars": 187,
+    "notes_chars": 533
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_robust_computation_of_error_vector_magnitude_for_wireless_standards",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from the 2013 robust EVM paper",
+    "obs_chars": 1098,
+    "notes_chars": 533
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis",
+     "claim_type": "observation"
+    },
+    "intent": "Get observational findings (EVM vs Eb/No behavior) from the 2006 paper",
+    "obs_chars": 187,
+    "notes_chars": 533
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis"
+    },
+    "intent": "Get all finding records from the 2006 EVM performance metric paper",
+    "obs_chars": 1529,
+    "notes_chars": 1072
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_robust_computation_of_error_vector_magnitude_for_wireless_standards"
+    },
+    "intent": "Get all finding records from the 2013 robust EVM computation paper",
+    "obs_chars": 2021,
+    "notes_chars": 1072
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_evm_measurement_of_rf_zigbee_transceivers_using_standard_digital_ate"
+    },
+    "intent": "Get all finding records from the 2020 EVM measurement paper",
+    "obs_chars": 1428,
+    "notes_chars": 1072
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "query": "EVM Eb/No curve modulation type QPSK MQAM MPSK error vector magnitude relationship",
+     "k": 12
+    },
+    "intent": "Search raw text for EVM vs Eb/No relationship and modulation-specific considerations",
+    "obs_chars": 192,
+    "notes_chars": 1072
+   },
+   {
+    "step": 3,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis",
+     "sections": [
+      "EVM definition",
+      "modulation types",
+      "EVM vs Eb/No",
+      "normalization"
+     ]
+    },
+    "intent": "Get full-text detail on EVM definition, modulation-specific considerations, and EVM vs Eb/No curve from the 2006 compara",
+    "obs_chars": 810,
+    "notes_chars": 2576
+   },
+   {
+    "step": 3,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_robust_computation_of_error_vector_magnitude_for_wireless_standards",
+     "sections": [
+      "EVM computation",
+      "wireless standards",
+      "modulation types",
+      "robustness"
+     ]
+    },
+    "intent": "Get full-text detail on robust EVM computation method and how it handles different modulation types/standards from the 2",
+    "obs_chars": 763,
+    "notes_chars": 2576
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis",
+     "claim_type": "criticism"
+    },
+    "intent": "Check if the 2006 paper has self-limiting statements about EVM measurement limitations or when a general equation fails",
+    "obs_chars": 187,
+    "notes_chars": 2576
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 6,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "Q: EVM measurement across modulation types (MPSK, QPSK, MQAM) — is a single general equation valid? What does EVM vs Eb/No curve look like?\nRelevant corpus papers:\n- sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis (2006)\n- sciverse_robust_computation_of_error_vector_magnitude_for_wireless_standards (2013)\n- sciverse_evm_measurement_of_rf_zigbee_transceivers_using_standard_digital_ate (2020)\nEntity \"robust computation of error vector magnitude\" is marked * in entity list.\nN1. [coarse:63856d657a09] EVM computed via comparison of two signals: reference and test signal containing complex symbol values | anchor:\"EVM is computed via a comparison of two signals — a reference and a test signal containing\" | conditions:-> | epistemic:stated\nN2. [coarse:f013adbf6a3e] Test signal formed by passing reference through functional blocks (amplifiers, filters, mixers, converters, or complete system) | anchor:\"The test signal is normally formed by passing the reference signal through one or more fun\" | conditions:-> | epistemic:stated\nN3. [coarse:d585ac0b3e5b] Normalization needed because different modulation systems (BPSK, 4-QAM, 16-QAM) have different amplitude levels | anchor:\"Since different modulation systems viz. BPSK, 4-QAM, 16-QAM etc. have different amplitude\" | conditions:-> | epistemic:stated\nN4. [coarse:05a22a548af8] EVM defined as RMS amplitude of the error vector | anchor:\"EVM is then defined as the as the Root Mean Square (RMS) amplitude of the error vector\" | conditions:-> | epistemic:stated\nN5. [coarse:c93cea5e6713] EVM is the most widely used metric to express modulation quality in wireless communication systems | anchor:\"Error vector magnitude (EVM) is the most widely used metric to express the modulation qual\" | conditions:-> | epistemic:stated\nN6. [coarse:454d975138fa] EVM used in modern communication systems to assess modulation quality of a given signal | anchor:\"The concept of error vector magnitude (EVM) is used in modern communication systems to ass\" | conditions:-> | epistemic:stated\nN7. [coarse:357640d1329f] EVM measurements often performed on vector signal analyzers, real-time analyzers, or instruments that capture time record and internally perform FFT | anchor:\"Error Vector Magnitude (EVM) measurements are often performed on vector signal analyzers (\" | conditions:-> | epistemic:stated\nN8. [coarse:38f5b8a5c7cd] Signals are down converted before EVM calculations are made | anchor:\"Signals are down converted before EVM calculations are made [2].\" | conditions:-> | epistemic:stated",
+  "gaps_final": "G1. What does the 2006 paper say about EVM as a performance metric across modulation types? (need deep_read for details)\nG2. What does the 2013 paper say about robust computation of EVM for different wireless standards/modulations? (need deep_read)\nG3. What is the expected EVM vs Eb/No relationship?\nG4. Is a single general equation appropriate for all modulation types, or are modulation-specific considerations needed?",
+  "queried": [
+   "card|{\"entity\": \"robust computation of error vector magnitude\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_robust_computation_of_error_vector_magnitude_for_wireless_standards\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis\"}",
+   "findings|{\"paper_id\": \"sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis\"}",
+   "findings|{\"paper_id\": \"sciverse_robust_computation_of_error_vector_magnitude_for_wireless_standards\"}",
+   "findings|{\"paper_id\": \"sciverse_evm_measurement_of_rf_zigbee_transceivers_using_standard_digital_ate\"}",
+   "deep_read|{\"paper_id\": \"sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis\", \"sections\": [\"EVM definition\", \"modulation types\", \"EVM vs Eb/No\", \"normalization\"]}",
+   "deep_read|{\"paper_id\": \"sciverse_robust_computation_of_error_vector_magnitude_for_wireless_standards\", \"sections\": [\"EVM computation\", \"wireless standards\", \"modulation types\", \"robustness\"]}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis\"}"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 13,
+   "fallback_compiled": true,
+   "compiled_numeric_fail": {
+    "missing_nums": [],
+    "unsourced": 1
+   },
+   "compiled_numeric_residual": false
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "0919a8528cd20166163de3fd",
+  "type": "aggregation",
+  "question": "Have large langauge models been applied to the schema matching problem in databases and are they effective?",
+  "gold_hint": "",
+  "answer": "Based on the consulted records, there is no direct evidence confirming that large language models (LLMs) have been applied to the schema matching problem in databases, nor is there any data regarding their effectiveness. The retrieval process identified a 2024 paper titled \"combining small and large language models for schema matching\" as directly on-topic , but the specific methods, results, and effectiveness metrics for this work were not surfaced in the available notes . Similarly, while a 2022 paper on using deep learning to jointly schema match, impute, and transform databases was identified , the specific findings or reports from this study are absent from the records .\n\nThe available notes provide limited context on the broader landscape of schema matching. A 2022 deep learning paper states that properties of the schema, such as restrictions, can narrow the set of potential mappings, which fits into the category of comparing meta-data . Additionally, classic papers from 2009 and 2011 regarding the matching of schemas in heterogeneous relational databases and general schema matching and mapping were identified , , but the problem definitions and prior approaches detailed in these works were not retrieved . A 2025 paper on efficient schema linking with pathfinding graph algorithms  and a 2025 paper exploring the landscape of text-to-SQL with LLMs  were also noted, but no specific details from these sources were included in the final notes.\n\nConsequently, the consulted records did not surface any comparison matrices or numeric results regarding the effectiveness of schema matching methods , nor did they provide information on the limitations or criticisms of LLM-based schema matching . The entity \"schema matching\" itself was unmarked in the records, and multiple typed queries regarding the Magneto paper and the deep learning paper returned empty results, indicating a lack of detailed textual data for these specific sources in the current collection.",
+  "arm": "main",
+  "steps": 7,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "schema matching"
+    },
+    "intent": "Get cross-paper evidence dossier for schema matching entity",
+    "obs_chars": 427,
+    "notes_chars": 799
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_magneto_combining_small_and_large_language_models_for_schema_matching",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation findings from the Magneto LLM schema matching paper",
+    "obs_chars": 187,
+    "notes_chars": 799
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_magneto_combining_small_and_large_language_models_for_schema_matching",
+     "claim_type": "criticism"
+    },
+    "intent": "Get self-limiting/criticism statements from Magneto paper",
+    "obs_chars": 187,
+    "notes_chars": 799
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_deep_learning_to_jointly_schema_match_impute_and_transform_databases",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation findings from the deep learning schema matching paper",
+    "obs_chars": 187,
+    "notes_chars": 799
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {},
+    "intent": "Full-text retrieval for LLM schema matching content across all corpus papers",
+    "obs_chars": 192,
+    "notes_chars": 809
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {},
+    "intent": "Retrieve content from the 2022 deep learning schema matching paper",
+    "obs_chars": 192,
+    "notes_chars": 809
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {},
+    "intent": "Get all finding records (any claim type) for Magneto paper",
+    "obs_chars": 2485,
+    "notes_chars": 809
+   },
+   {
+    "step": 3,
+    "tool": "search_text",
+    "args": {
+     "query": "large language model schema matching database effectiveness",
+     "k": 12
+    },
+    "intent": "Full-text retrieval for LLM + schema matching content",
+    "obs_chars": 192,
+    "notes_chars": 809
+   },
+   {
+    "step": 3,
+    "tool": "search_text",
+    "args": {
+     "query": "Magneto small large language models schema matching results accuracy",
+     "k": 12
+    },
+    "intent": "Get Magneto paper details and numeric results",
+    "obs_chars": 286,
+    "notes_chars": 809
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_magneto_combining_small_and_large_language_models_for_schema_matching",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism records from Magneto paper",
+    "obs_chars": 187,
+    "notes_chars": 809
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_deep_learning_to_jointly_schema_match_impute_and_transform_databases",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism records from DL schema matching paper",
+    "obs_chars": 562,
+    "notes_chars": 809
+   },
+   {
+    "step": 4,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_magneto_combining_small_and_large_language_models_for_schema_matching",
+     "sections": [
+      "experimental setup",
+      "results",
+      "ablation"
+     ]
+    },
+    "intent": "Get full-text-level records for Magneto: methods, numeric results, ablations, limitations",
+    "obs_chars": 821,
+    "notes_chars": 1083
+   },
+   {
+    "step": 4,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_deep_learning_to_jointly_schema_match_impute_and_transform_databases",
+     "sections": [
+      "experimental setup",
+      "results"
+     ]
+    },
+    "intent": "Get full-text-level records for the 2022 DL schema-matching paper: methods, numeric results",
+    "obs_chars": 1029,
+    "notes_chars": 1083
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_schema_matching_and_mapping_",
+     "claim_type": "definition"
+    },
+    "intent": "Get problem definition from the 2011 classic schema matching paper",
+    "obs_chars": 187,
+    "notes_chars": 1083
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_matching_schemas_of_heterogeneous_relational_databases",
+     "claim_type": "definition"
+    },
+    "intent": "Get problem definition from the 2009 classic schema matching paper",
+    "obs_chars": 187,
+    "notes_chars": 1083
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 7,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "Q: Have LLMs been applied to schema matching in databases, and are they effective?\nKey papers:\n- sciverse_magneto_combining_small_and_large_language_models_for_schema_matching (2024) — directly on-topic\n- sciverse_schema_matching_and_mapping_ (2011) — classic\n- sciverse_matching_schemas_of_heterogeneous_relational_databases (2009) — classic\n- sciverse_deep_learning_to_jointly_schema_match_impute_and_transform_databases (2022) — DL for schema matching\n- sciverse_schemagraphsql_efficient_schema_linking_with_pathfinding_graph_algorithms_for_te (2025)\n- sciverse_exploring_the_landscape_of_text_to_sql_with_large_language_models_progresses_cha (2025)\nEntity \"schema matching\" unmarked (no card).\n3 consecutive empty typed queries on Magneto + DL paper → switch to search_text for full-text retrieval.\nN1. [coarse:9b965caa9bd8] DL schema-matching paper: schema properties (restrictions) can narrow set of potential mappings, fit in category of comparing meta-data | anchor:\"Properties of the schema (such as restrictions) can narrow the set of potential mappings\" | epistemic:stated",
+  "gaps_final": "G1. Magneto (2024): methods, results, effectiveness of LLMs for schema matching\nG2. Classic schema-matching papers (2009, 2011): problem definition, prior approaches\nG3. Deep-learning schema matching (2022): what it reports\nG4. Comparison matrices / numeric results on schema matching effectiveness\nG5. Limitations/criticisms of LLM-based schema matching",
+  "queried": [
+   "card|{\"entity\": \"schema matching\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_magneto_combining_small_and_large_language_models_for_schema_matching\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_magneto_combining_small_and_large_language_models_for_schema_matching\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_deep_learning_to_jointly_schema_match_impute_and_transform_databases\"}",
+   "findings|{}",
+   "search_text|{\"k\": 12, \"query\": \"Magneto small large language models schema matching results accuracy\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_magneto_combining_small_and_large_language_models_for_schema_matching\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_deep_learning_to_jointly_schema_match_impute_and_transform_databases\"}",
+   "deep_read|{\"paper_id\": \"sciverse_magneto_combining_small_and_large_language_models_for_schema_matching\", \"sections\": [\"experimental setup\", \"results\", \"ablation\"]}",
+   "deep_read|{\"paper_id\": \"sciverse_deep_learning_to_jointly_schema_match_impute_and_transform_databases\", \"sections\": [\"experimental setup\", \"results\"]}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_schema_matching_and_mapping_\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_matching_schemas_of_heterogeneous_relational_databases\"}"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 12,
+   "fallback_compiled": true
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "983e73defc06e6794a856330",
+  "type": "aggregation",
+  "question": "Does active learning work well when fine-tuning large language models?",
+  "gold_hint": "",
+  "answer": "The effectiveness of active learning when fine-tuning large language models (LLMs) is characterized by significant structural limitations and specific algorithmic challenges, rather than a straightforward success. A primary obstacle identified in the literature is the volume of data required for fine-tuning; the paper \"Can you label less\" states that most active learning approaches yield too few samples to feasibly fine-tune large deep-language models . This scarcity of data exacerbates other inherent risks of the fine-tuning process, as fine-tuning can lead to over-fitting, especially in the case of smaller train sets . Furthermore, the process is susceptible to catastrophic forgetting of pre-trained knowledge  and can result in detrimental domain shift if the fine-tuning data is out-of-domain .\n\nRegarding specific data selection strategies, the SIFT paper describes SIFT as a data selection algorithm designed to reduce uncertainty about the model's response given a prompt . However, the paper states that nearest neighbors retrieval for data selection tends to select redundant data, which limits effectiveness or hurts performance . The consulted records did not surface numeric results comparing active fine-tuning against baselines from the SIFT paper, nor did they detail the specific mechanisms or positive findings associated with SIFT's proposed solution. Similarly, while the \"Can you label less\" paper highlights the sample size issue, the records did not surface the specific findings regarding the solution proposed by that paper.\n\nIn the context of bias and representation, LLMs have been under scrutiny for exhibiting bias toward under-represented groups . Standard fine-tuning may not mitigate this issue, as a random sample from skewed data mirrors biases, causing the fine-tuned model to fail for underrepresented groups . In contrast, an inclusive generation active learning framework states that data acquired via their approach improves the performance of secondary models not in the learning loop . Historically, prior work mostly did not use pre-trained language models (PLMs) in an active and transfer learning setup . The consulted records did not surface comparison matrices for active fine-tuning.",
+  "arm": "main",
+  "steps": 11,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "active learning"
+    },
+    "intent": "Get cross-paper dossier on active learning to see what's covered",
+    "obs_chars": 364,
+    "notes_chars": 601
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "active learning",
+     "claim_type": "observation"
+    },
+    "intent": "Find observational findings about active learning effectiveness",
+    "obs_chars": 368,
+    "notes_chars": 601
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_efficiently_learning_at_test_time_active_fine_tuning_of_llms"
+    },
+    "intent": "Get all findings from the active fine-tuning of LLMs paper",
+    "obs_chars": 1014,
+    "notes_chars": 601
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_an_active_learning_framework_for_inclusive_generation_by_large_language_models"
+    },
+    "intent": "Get all findings from the active learning framework for inclusive generation paper",
+    "obs_chars": 1556,
+    "notes_chars": 601
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_efficiently_learning_at_test_time_active_fine_tuning_of_llms",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from SIFT paper",
+    "obs_chars": 187,
+    "notes_chars": 1096
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_efficiently_learning_at_test_time_active_fine_tuning_of_llms",
+     "claim_type": "criticism"
+    },
+    "intent": "Get criticisms/limitations from SIFT paper",
+    "obs_chars": 560,
+    "notes_chars": 1096
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_can_you_label_less_by_using_out_of_domain_data_active_transfer_learning_with_few"
+    },
+    "intent": "Get all findings from the 2022 active+transfer learning paper",
+    "obs_chars": 2281,
+    "notes_chars": 1096
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_an_active_learning_framework_for_inclusive_generation_by_large_language_models",
+     "claim_type": "criticism"
+    },
+    "intent": "Get criticisms from inclusive generation AL paper",
+    "obs_chars": 187,
+    "notes_chars": 1096
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_can_you_label_less_by_using_out_of_domain_data_active_transfer_learning_with_few",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism/positive findings from 'can you label less' paper",
+    "obs_chars": 187,
+    "notes_chars": 2148
+   },
+   {
+    "step": 3,
+    "tool": "compare",
+    "args": {
+     "entities": [
+      "active learning",
+      "sift"
+     ]
+    },
+    "intent": "Check for comparison matrices involving active learning or SIFT",
+    "obs_chars": 367,
+    "notes_chars": 2148
+   },
+   {
+    "step": 3,
+    "tool": "find_gap",
+    "args": {
+     "entity": "active learning"
+    },
+    "intent": "Check what is NOT covered regarding active learning in the corpus",
+    "obs_chars": 368,
+    "notes_chars": 2148
+   },
+   {
+    "step": 4,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_efficiently_learning_at_test_time_active_fine_tuning_of_llms",
+     "sections": [
+      "experimental setup",
+      "results",
+      "ablation"
+     ]
+    },
+    "intent": "Get full-text-level records with numbers and mechanisms from the SIFT active fine-tuning paper",
+    "obs_chars": 985,
+    "notes_chars": 2148
+   },
+   {
+    "step": 4,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_can_you_label_less_by_using_out_of_domain_data_active_transfer_learning_with_few",
+     "sections": [
+      "experimental setup",
+      "results",
+      "method"
+     ]
+    },
+    "intent": "Get full-text-level records with numbers and method details from the active+transfer learning paper",
+    "obs_chars": 878,
+    "notes_chars": 2148
+   },
+   {
+    "step": 4,
+    "tool": "search_text",
+    "args": {
+     "query": "active learning fine-tuning large language model results accuracy improvement",
+     "k": 12
+    },
+    "intent": "Find any additional corpus papers discussing active learning for LLM fine-tuning with numeric results",
+    "obs_chars": 192,
+    "notes_chars": 2148
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_efficiently_learning_at_test_time_active_fine_tuning_of_llms",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from SIFT paper for numeric results and positive findings",
+    "obs_chars": 187,
+    "notes_chars": 2148
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_can_you_label_less_by_using_out_of_domain_data_active_transfer_learning_with_few",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from 'can you label less' paper for their proposed solution results",
+    "obs_chars": 458,
+    "notes_chars": 2148
+   },
+   {
+    "step": 6,
+    "tool": "search_text",
+    "args": {
+     "query": "SIFT active fine-tuning LLM results accuracy improvement",
+     "k": 8
+    },
+    "intent": "Find numeric results and positive findings from the SIFT active fine-tuning paper",
+    "obs_chars": 192,
+    "notes_chars": 2148
+   },
+   {
+    "step": 6,
+    "tool": "search_text",
+    "args": {
+     "query": "active transfer learning few-shot fine-tuning large language model results",
+     "k": 8
+    },
+    "intent": "Find results from the 'can you label less' paper about their proposed solution",
+    "obs_chars": 286,
+    "notes_chars": 2148
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_efficiently_learning_at_test_time_active_fine_tuning_of_llms",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get SIFT paper's recommendations/positive claims about active fine-tuning effectiveness",
+    "obs_chars": 187,
+    "notes_chars": 2148
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_can_you_label_less_by_using_out_of_domain_data_active_transfer_learning_with_few",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get 'can you label less' paper's recommendations about their active+transfer approach",
+    "obs_chars": 187,
+    "notes_chars": 2148
+   },
+   {
+    "step": 7,
+    "tool": "compare",
+    "args": {
+     "entities": [
+      "sift",
+      "active learning",
+      "fine-tuning"
+     ]
+    },
+    "intent": "Check for comparison matrices involving SIFT or active fine-tuning methods",
+    "obs_chars": 367,
+    "notes_chars": 2148
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_efficiently_learning_at_test_time_active_fine_tuning_of_llms",
+     "claim_type": "qualitative_ablation"
+    },
+    "intent": "Get SIFT ablation findings showing which components matter",
+    "obs_chars": 187,
+    "notes_chars": 2148
+   },
+   {
+    "step": 8,
+    "tool": "search_text",
+    "args": {
+     "query": "SIFT active fine-tuning LLM results accuracy improvement",
+     "k": 8
+    },
+    "intent": "Get numeric results and mechanism from SIFT paper via full-text search",
+    "obs_chars": 192,
+    "notes_chars": 2148
+   },
+   {
+    "step": 8,
+    "tool": "search_text",
+    "args": {
+     "query": "active transfer learning out-of-domain data fine-tuning results accuracy",
+     "k": 8
+    },
+    "intent": "Get results from 'can you label less' paper about their proposed solution",
+    "obs_chars": 286,
+    "notes_chars": 2148
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 11,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "N1. [coarse:3d6f042c2e87] SIFT paper: Nearest Neighbors retrieval for data selection tends to select redundant data, limiting effectiveness or hurting performance | anchor:\"tends to select redundant data, limiting\" | epistemic:stated\nN2. [coarse:45d1f86b7d8a] SIFT is a data selection algorithm designed to reduce uncertainty about model's response given a prompt | anchor:\"SIFT, a data selection algorithm designed to reduce uncertai\" | epistemic:stated\nN3. [coarse:0b2fb1b68265] Inclusive generation AL framework: data acquired via approach improves performance of secondary models not in learning loop | anchor:\"data acquired via our approach improves the performance\" | epistemic:stated\nN4. [coarse:85b7ecb2a8ee] Standard fine-tuning may not mitigate bias; random sample from skewed data mirrors biases, fine-tuned model may fail for underrepresented groups | anchor:\"Standard fine-tuning may not mitigate this\" | epistemic:stated\nN5. [coarse:df1d5d7a4e28] LLMs under scrutiny for bias toward under-represented groups | anchor:\"LLMs have been under scrutiny for exhibiting\" | epistemic:stated\nN6. [coarse:fedf55562bef] \"Can you label less\" paper: Most active learning approaches yield too few samples to feasibly fine-tune large deep-language models | anchor:\"most active learning approaches usually yield too few samples (on the order of hu\" | epistemic:stated\nN7. [coarse:fb0cd4f443b2] Fine-tuning on out-of-domain data can lead to detrimental domain shift | anchor:\"fine-tuning on out-of-domain data can lead to detrimental domain shi\" | epistemic:stated\nN8. [coarse:71608b226bc1] Fine-tuning can lead to over-fitting, especially with smaller train sets | anchor:\"fine-tuning can also lead to over-fitting, especially in the case of smaller\" | epistemic:stated\nN9. [coarse:ae20b8141870] Fine-tuning can lead to catastrophic forgetting of pre-trained knowledge | anchor:\"fine-tuning can also lead to over-fitting, especially in the case of smaller\" | epistemic:stated\nN10. [coarse:16ae724e5694] Prior work mostly did not use PLMs in active+transfer learning setup | anchor:\"prior work mostly did not use PLMs in this setup\" | epistemic:stated",
+  "gaps_final": "G1. Need numeric results from SIFT paper (active fine-tuning vs baseline)\nG2. Need mechanism/positive findings from SIFT paper\nG3. Need findings from \"can you label less\" paper about their proposed solution\nG4. Need to check if there are comparison matrices for active fine-tuning",
+  "queried": [
+   "card|{\"entity\": \"active learning\"}",
+   "findings|{\"claim_type\": \"observation\", \"entity\": \"active learning\"}",
+   "findings|{\"paper_id\": \"sciverse_efficiently_learning_at_test_time_active_fine_tuning_of_llms\"}",
+   "findings|{\"paper_id\": \"sciverse_an_active_learning_framework_for_inclusive_generation_by_large_language_models\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_efficiently_learning_at_test_time_active_fine_tuning_of_llms\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_efficiently_learning_at_test_time_active_fine_tuning_of_llms\"}",
+   "findings|{\"paper_id\": \"sciverse_can_you_label_less_by_using_out_of_domain_data_active_transfer_learning_with_few\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_an_active_learning_framework_for_inclusive_generation_by_large_language_models\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_can_you_label_less_by_using_out_of_domain_data_active_transfer_learning_with_few\"}",
+   "compare|{\"entities\": [\"active learning\", \"SIFT\"]}",
+   "find_gap|{\"entity\": \"active learning\"}",
+   "deep_read|{\"paper_id\": \"sciverse_efficiently_learning_at_test_time_active_fine_tuning_of_llms\", \"sections\": [\"experimental setup\", \"results\", \"ablation\"]}",
+   "deep_read|{\"paper_id\": \"sciverse_can_you_label_less_by_using_out_of_domain_data_active_transfer_learning_with_few\", \"sections\": [\"experimental setup\", \"results\", \"method\"]}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_efficiently_learning_at_test_time_active_fine_tuning_of_llms\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_can_you_label_less_by_using_out_of_domain_data_active_transfer_learning_with_few\"}",
+   "search_text|{\"k\": 8, \"query\": \"active transfer learning few-shot fine-tuning large language model results\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_efficiently_learning_at_test_time_active_fine_tuning_of_llms\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_can_you_label_less_by_using_out_of_domain_data_active_transfer_learning_with_few\"}",
+   "compare|{\"entities\": [\"SIFT\", \"active learning\", \"fine-tuning\"]}",
+   "findings|{\"claim_type\": \"qualitative_ablation\", \"paper_id\": \"sciverse_efficiently_learning_at_test_time_active_fine_tuning_of_llms\"}",
+   "search_text|{\"k\": 8, \"query\": \"active transfer learning out-of-domain data fine-tuning results accuracy\"}"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 10,
+   "fallback_compiled": true
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "e2491bb6e4147c18762e7fb2",
+  "type": "aggregation",
+  "question": "Global Navigation Satellite Systems (GNSS) receivers can provide a reference clock signal known as Pulse-per-Second (PPS or 1-PPS). Is the PPS physically generated through a digitally-controlled oscillator (or line driver) whose offset is periodically re-initialized by the estimated clock bias (retrieved by means of PVT algorithms)?",
+  "gold_hint": "",
+  "answer": "Based on the consulted records, the specific hypothesis that the Pulse-per-Second (PPS) signal is physically generated by a digitally-controlled oscillator (DCO) or line driver whose offset is periodically re-initialized by the estimated clock bias from Position, Velocity, and Time (PVT) algorithms is not explicitly confirmed or detailed in the available literature. The compiled records do not surface an explicit description of a DCO or line-driver mechanism driven by PVT clock bias feedback for PPS generation. Instead, the available evidence describes the PPS as a standard output of GNSS receivers and disciplined oscillators, with specific characteristics regarding its accuracy, coherence with other signals, and its role as a phase reference.\n\nRegarding the physical generation and accuracy of the PPS signal, a typical GNSS receiver provides the time reference through its output 1PPS signals [a6c21bd2be3b]. The paper states that the GPS 1PPS offset from the true GPS second can be up to 50 ns, and a correction is provided periodically by the receiver [3a55f081acf8]. In specific hardware implementations, such as the GNSS RTK Receiver GINTEC M1G2, the PPS signal is generated by the receiver itself [cfe1be920f79]. For higher precision applications, reference PPS signals may be generated by specialized equipment, such as a Quartzlock E80-GPS disciplined rubidium oscillator synced to UTC [8abf40d46507]. Another example is the Spectracom 1200-233 multi-GNSS referenced rubidium oscillator, which is specified with 1 ppt stability on 10 MHz and ±25 ns accuracy [b1dd971bbe8d].\n\nThe relationship between the PPS and other GNSS outputs, such as the 10 MHz frequency signal, is characterized by coherence rather than an explicit DCO re-initialization loop in the provided texts. The output 10 MHz frequency signal from GNSS follows the 1PPS coherently [b7aa3497840e]. Furthermore, the derivative of the 1PPS phase in time is consistent with the output frequency [c3d26d43fb1b]. The unknown phase relationship between the PPS and 10 MHz signals from GNSS is considered irrelevant in certain contexts because the offset is bounded within ±1 ns [6db2fb268a2e].\n\nIn the context of FPGA-based autonomous GPS-disciplined oscillators for wireless sensor network nodes, the 1PPS signal serves a specific functional role. The 1PPS provides the phase reference for the counter block, which produces the sampling clock [2a3c73e28a6ad6]. Additionally, a temperature sensor collects the temperature values of the oscillator on the board, which are used in an adaptive algorithm on a Microblaze processor to compensate and adjust control parameters [0b3fa784daf69d]. This suggests a feedback mechanism involving temperature compensation, but the records do not explicitly link this to a PVT-derived clock bias re-initialization of a DCO for the PPS output.\n\nRegarding the measurement and correction of PPS errors, a time interval counter measures the bias of the PPS output between the receiver PPS(r) and the simulator [a898af2f1742]. An atomic clock provides the simulator and receiver with the reference clock [a455d9cf21b4]. The GNSS receiver also records data that can be used to reconstruct the phase error of the frequency offset, enabling post-correction [912553545b77]. While these records confirm that PPS bias is measured and that data is recorded for phase error reconstruction, they do not describe the internal physical mechanism of a DCO being re-initialized by PVT clock bias estimates. The consulted records lack the specific architectural details regarding the use of a digitally-controlled oscillator or line driver for PPS generation driven by PVT bias feedback.",
+  "arm": "main",
+  "steps": 13,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "1-pps",
+     "contains": "DCO|digitally controlled oscillator|line driver|clock bias|re-initializ|offset|PVT"
+    },
+    "intent": "Find mechanism records about PPS generation via DCO and clock bias",
+    "obs_chars": 564,
+    "notes_chars": 443
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "PPS signal",
+     "contains": "DCO|digitally controlled oscillator|line driver|clock bias|re-initializ|offset|PVT|generated"
+    },
+    "intent": "Find mechanism records about PPS signal generation",
+    "obs_chars": 1556,
+    "notes_chars": 443
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_research_on_absolute_calibration_of_gnss_receiver_delay_through_clock_steering_c",
+     "contains": "PPS|DCO|clock bias|PVT|offset|re-initializ|line driver|generated"
+    },
+    "intent": "Find PPS generation mechanism in the clock-steering calibration paper",
+    "obs_chars": 977,
+    "notes_chars": 443
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_fpga_based_autonomous_gps_disciplined_oscillatorsfor_wireless_sensor_network_nod",
+     "contains": "PPS|DCO|clock bias|PVT|offset|re-initializ|line driver|generated|disciplined"
+    },
+    "intent": "Find PPS generation mechanism in the FPGA GPS-disciplined oscillator paper",
+    "obs_chars": 2384,
+    "notes_chars": 443
+   },
+   {
+    "step": 2,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_fpga_based_autonomous_gps_disciplined_oscillatorsfor_wireless_sensor_network_nod",
+     "sections": [
+      "method",
+      "experimental setup",
+      "system architecture"
+     ]
+    },
+    "intent": "Get full-text mechanism detail on how PPS is generated in GPS-disciplined oscillators, including DCO/line driver and clo",
+    "obs_chars": 720,
+    "notes_chars": 2754
+   },
+   {
+    "step": 2,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_research_on_absolute_calibration_of_gnss_receiver_delay_through_clock_steering_c",
+     "sections": [
+      "method",
+      "experimental setup",
+      "clock steering"
+     ]
+    },
+    "intent": "Get full-text detail on PPS generation mechanism, clock bias estimation via PVT, and how PPS offset is corrected",
+    "obs_chars": 894,
+    "notes_chars": 2754
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "query": "PPS pulse per second generated digitally controlled oscillator DCO line driver clock bias PVT re-initialize",
+     "k": 12
+    },
+    "intent": "Search raw text across all papers for explicit description of PPS generation via DCO/line driver with PVT clock bias fee",
+    "obs_chars": 192,
+    "notes_chars": 2754
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "entity": "1-pps",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find mechanism-type records specifically about 1-pps generation",
+    "obs_chars": 2740,
+    "notes_chars": 2754
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_research_on_absolute_calibration_of_gnss_receiver_delay_through_clock_steering_c",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism records from the clock-steering paper after deep_read to understand PPS generation and clock bias feedback",
+    "obs_chars": 2821,
+    "notes_chars": 3918
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_fpga_based_autonomous_gps_disciplined_oscillatorsfor_wireless_sensor_network_nod",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism records from the FPGA GPS-disciplined oscillator paper after deep_read",
+    "obs_chars": 2636,
+    "notes_chars": 3918
+   },
+   {
+    "step": 3,
+    "tool": "search_text",
+    "args": {
+     "query": "PPS pulse per second generated digitally controlled oscillator DCO clock bias PVT reinitialize offset",
+     "k": 12
+    },
+    "intent": "Search raw text for explicit description of PPS generation via DCO and PVT clock bias feedback",
+    "obs_chars": 192,
+    "notes_chars": 3918
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "PPS|pulse per second|clock steering|bias correction|phase lock|disciplined oscillator"
+    },
+    "intent": "Find mechanism records about PPS generation and clock steering across all papers",
+    "obs_chars": 2740,
+    "notes_chars": 3918
+   },
+   {
+    "step": 4,
+    "tool": "search_text",
+    "args": {
+     "query": "DCO digitally controlled oscillator PPS pulse per second clock bias PVT re-initialize offset",
+     "k": 12
+    },
+    "intent": "Search raw text for explicit DCO + PVT clock bias feedback mechanism for PPS generation",
+    "obs_chars": 192,
+    "notes_chars": 5438
+   },
+   {
+    "step": 5,
+    "tool": "search_text",
+    "args": {
+     "query": "digitally controlled oscillator DCO PPS pulse per second clock bias PVT re-initialize offset",
+     "k": 12
+    },
+    "intent": "Search raw text for explicit DCO + PVT clock bias mechanism for PPS generation",
+    "obs_chars": 192,
+    "notes_chars": 5438
+   },
+   {
+    "step": 5,
+    "tool": "search_text",
+    "args": {
+     "query": "PPS generated line driver clock bias estimate PVT algorithm periodically reset",
+     "k": 12
+    },
+    "intent": "Search raw text for line driver + PVT bias reset mechanism",
+    "obs_chars": 192,
+    "notes_chars": 5438
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "DCO|digitally controlled|line driver|clock bias|PVT|re-initializ|reset|offset correction|phase correction",
+     "entity": "gnss"
+    },
+    "intent": "Find mechanism records about GNSS PPS generation via DCO/PVT",
+    "obs_chars": 244,
+    "notes_chars": 5438
+   },
+   {
+    "step": 6,
+    "tool": "search_text",
+    "args": {
+     "query": "PPS pulse per second generated digitally controlled oscillator DCO clock bias PVT reinitialize offset",
+     "k": 12
+    },
+    "intent": "Search raw text for explicit PPS generation mechanism (DCO, line driver, clock bias re-init)",
+    "obs_chars": 192,
+    "notes_chars": 5438
+   },
+   {
+    "step": 6,
+    "tool": "search_text",
+    "args": {
+     "query": "GNSS receiver PPS output clock bias estimate PVT algorithm phase correction reset",
+     "k": 12
+    },
+    "intent": "Search raw text for PVT clock bias feedback to PPS generation",
+    "obs_chars": 192,
+    "notes_chars": 5438
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "PPS|pulse per second|clock steering|bias correction|phase lock|disciplined oscillator",
+     "entity": "gnss"
+    },
+    "intent": "Find mechanism records about PPS generation in GNSS context",
+    "obs_chars": 1272,
+    "notes_chars": 5438
+   },
+   {
+    "step": 7,
+    "tool": "search_text",
+    "args": {
+     "query": "PPS pulse per second generated digitally controlled oscillator DCO line driver clock bias PVT re-initialize offset",
+     "k": 12
+    },
+    "intent": "Search raw text for explicit PPS generation mechanism (DCO, line driver, clock bias re-init)",
+    "obs_chars": 286,
+    "notes_chars": 2882
+   },
+   {
+    "step": 7,
+    "tool": "search_text",
+    "args": {
+     "query": "GNSS receiver PPS output clock bias correction PVT algorithm phase lock loop oscillator",
+     "k": 12
+    },
+    "intent": "Search raw text for PPS generation via clock bias from PVT",
+    "obs_chars": 286,
+    "notes_chars": 2882
+   },
+   {
+    "step": 8,
+    "tool": "card",
+    "args": {
+     "entity": "1-pps"
+    },
+    "intent": "Get cross-paper dossier for 1-pps entity to find mechanism details",
+    "obs_chars": 356,
+    "notes_chars": 3097
+   },
+   {
+    "step": 8,
+    "tool": "card",
+    "args": {
+     "entity": "PPS signal"
+    },
+    "intent": "Get cross-paper dossier for PPS signal entity",
+    "obs_chars": 376,
+    "notes_chars": 3097
+   },
+   {
+    "step": 8,
+    "tool": "card",
+    "args": {
+     "entity": "global navigation satellite system (gnss) receiver"
+    },
+    "intent": "Get cross-paper dossier for GNSS receiver entity",
+    "obs_chars": 536,
+    "notes_chars": 3097
+   },
+   {
+    "step": 9,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "PPS generation mechanism oscillator phase correction clock bias PVT solution feedback loop GNSS receiver internal architecture"
+    },
+    "intent": "Final search_text attempt with different phrasing targeting the internal PPS generation architecture",
+    "obs_chars": 192,
+    "notes_chars": 3170
+   },
+   {
+    "step": 9,
+    "tool": "search_papers",
+    "args": {
+     "query": "GNSS receiver PPS pulse per second generation digitally controlled oscillator DCO clock bias PVT re-initialization mechanism",
+     "k": 8
+    },
+    "intent": "External search for papers describing the specific PPS generation mechanism via DCO and PVT clock bias feedback",
+    "obs_chars": 2308,
+    "notes_chars": 3170
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "contains": "PPS|pulse per second|oscillator|clock bias|PVT|phase|offset|correction|steering",
+     "entity": "gnss"
+    },
+    "intent": "Check observation-type findings for PPS mechanism details in GNSS context",
+    "obs_chars": 1008,
+    "notes_chars": 3170
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 13,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "Q: Is PPS physically generated by a DCO/line driver whose offset is periodically re-initialized by estimated clock bias from PVT?\nPapers: sciverse_research_on_absolute_calibration_of_gnss_receiver_delay_through_clock_steering_c (2020), sciverse_fpga_based_autonomous_gps_disciplined_oscillatorsfor_wireless_sensor_network_nod (2022)\nN1. [coarse:3a55f081acf8] GPS 1PPS offset from true GPS second up to 50ns; correction provided periodically by receiver | anchor:\"offset from the true GPS second by up to $50\\mathrm{ns}$, and a c\" | epistemic:stated\nN2. [coarse:8abf40d46507] Reference PPS generated by Quartzlock E80-GPS disciplined rubidium oscillator, synced to UTC | anchor:\"reference PPS (Pulse Per S\" | epistemic:stated\nN3. [coarse:cfe1be920f79] Receiving side PPS generated by GNSS RTK Receiver GINTEC M1G2 | anchor:\"PPS signal was generated by the GNSS RTK Receiver GINTEC\" | epistemic:stated\nN4. [coarse:a455d9cf21b4] Atomic clock provides reference for simulator and receiver | anchor:\"An atomic clock provides the simulator and receiver with the reference clock\" | epistemic:stated\nN5. [coarse:a898af2f1742] Time interval counter measures bias of PPS output between receiver and simulator | anchor:\"A time interval counter measures the bias of PPS output between the receiver PPS(r) and si\" | epistemic:stated\nN6. [coarse:8169f880d1c9] FPGA-based autonomous GPS-disciplined oscillators proposed for WSN nodes | anchor:\"fpga-based autonomous gps-disciplined oscillatorsfor wireless sensor network nodes\" | epistemic:stated\nN7. [coarse:a6c21bd2be3b] Typical GNSS receiver provides time reference through output 1PPS signals | anchor:\"A typical GNSS receiver provides the time reference through its output 1PPS signals.\" | epistemic:stated\nN8. [coarse:b7aa3497840e] 10MHz frequency from GNSS follows 1PPS coherently | anchor:\"The output $10\\mathrm{MHz}$ frequency signal from GNSS follows the 1PPS coherently.\" | epistemic:stated\nN9. [coarse:c3d26d43fb1b] Derivative of 1PPS phase in time consistent with output frequency | anchor:\"The derivative of the 1PPS phase in time is consistent with the output frequency.\" | epistemic:stated\nN10. [coarse:6db2fb268a2e] Unknown phase relationship PPS/10MHz irrelevant because offset bounded within ±1ns | anchor:\"The unknown phase relationship between the PPS and $10\\mathrm{MHz}$ signals from GNSS beco\" | epistemic:stated\nN11. [0b3fa784daf69d] FPGA paper: temperature sensor collects oscillator temp, used in adaptive algorithm on Microblaze to compensate/adjust control params | anchor:\"The temperature sensor collects the temperature values of the oscillator on the board, whi\" | epistemic:stated\nN12. [2a3c73e28a6ad6] FPGA paper: 1PPS provides phase reference for counter block, which produces sampling clock | anchor:\"1PPS provides the phase reference for the counter block, which produces the sampling clock\" | epistemic:stated\nN13. [card:1-pps] No compiled dossier for 1-pps, PPS signal, or GNSS receiver — all out-of-corpus names with no records behind them\nN14. [coarse:912553545b77] GNSS receiver records data enabling postcorrection of frequency offset | anchor:\"The GNSS receiver also records data that can be used to reconstruct the phase error of the\" | epistemic:stated\nN15. [coarse:b1dd971bbe8d] Spectracom 1200-233 multi-GNSS referenced rubidium oscillator: 1 ppt stability on 10MHz, ±25ns accuracy | anchor:\"This unit is a multi-GNSS referenced rubidium oscillator model with specifications for 1 p\" | epistemic:stated\nGAP: No explicit DCO/line-driver/PVT-bias-reinit mechanism found in compiled records. search_text errored. External search returned irrelevant results.",
+  "gaps_final": "G1. Need explicit mechanism: how PPS is physically generated (DCO, line driver, clock bias re-init) — not yet found in compiled records\nG2. Check if any paper explicitly describes DCO + PVT clock bias feedback loop for PPS\nG3. Try external search for the specific PPS generation mechanism (DCO + PVT bias re-initialization)",
+  "queried": [
+   "findings|{\"contains\": \"DCO|digitally controlled oscillator|line driver|clock bias|re-initializ|offset|PVT\", \"entity\": \"1-pps\"}",
+   "findings|{\"contains\": \"DCO|digitally controlled oscillator|line driver|clock bias|re-initializ|offset|PVT|generated\", \"entity\": \"PPS signal\"}",
+   "findings|{\"contains\": \"PPS|DCO|clock bias|PVT|offset|re-initializ|line driver|generated\", \"paper_id\": \"sciverse_research_on_absolute_calibration_of_gnss_receiver_delay_through_clock_steering_c\"}",
+   "findings|{\"contains\": \"PPS|DCO|clock bias|PVT|offset|re-initializ|line driver|generated|disciplined\", \"paper_id\": \"sciverse_fpga_based_autonomous_gps_disciplined_oscillatorsfor_wireless_sensor_network_nod\"}",
+   "deep_read|{\"paper_id\": \"sciverse_fpga_based_autonomous_gps_disciplined_oscillatorsfor_wireless_sensor_network_nod\", \"sections\": [\"method\", \"experimental setup\", \"system architecture\"]}",
+   "deep_read|{\"paper_id\": \"sciverse_research_on_absolute_calibration_of_gnss_receiver_delay_through_clock_steering_c\", \"sections\": [\"method\", \"experimental setup\", \"clock steering\"]}",
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"1-pps\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_research_on_absolute_calibration_of_gnss_receiver_delay_through_clock_steering_c\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_fpga_based_autonomous_gps_disciplined_oscillatorsfor_wireless_sensor_network_nod\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"PPS|pulse per second|clock steering|bias correction|phase lock|disciplined oscillator\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"DCO|digitally controlled|line driver|clock bias|PVT|re-initializ|reset|offset correction|phase correction\", \"entity\": \"gnss\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"PPS|pulse per second|clock steering|bias correction|phase lock|disciplined oscillator\", \"entity\": \"gnss\"}",
+   "search_text|{\"k\": 12, \"query\": \"PPS pulse per second generated digitally controlled oscillator DCO line driver clock bias PVT re-initialize offset\"}",
+   "search_text|{\"k\": 12, \"query\": \"GNSS receiver PPS output clock bias correction PVT algorithm phase lock loop oscillator\"}",
+   "card|{\"entity\": \"1-pps\"}",
+   "card|{\"entity\": \"PPS signal\"}",
+   "card|{\"entity\": \"global navigation satellite system (gnss) receiver\"}",
+   "search_papers|{\"k\": 8, \"query\": \"GNSS receiver PPS pulse per second generation digitally controlled oscillator DCO clock bias PVT re-initialization mechanism\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"PPS|pulse per second|oscillator|clock bias|PVT|phase|offset|correction|steering\", \"entity\": \"gnss\"}"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "notes_truncated": 3184,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 12,
+   "fallback_compiled": true,
+   "compiled_numeric_fail": {
+    "missing_nums": [],
+    "unsourced": 2
+   },
+   "compiled_numeric_residual": false
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "e2d0eb391fbf674c070c74c3",
+  "type": "aggregation",
+  "question": "During pre-training, why is the transformer embedding layer initialized randomly, rather than with pre-trained embeddings from existing models?",
+  "gold_hint": "",
+  "answer": "Based on the consulted records, there is no explicit statement or direct rationale provided in the available literature explaining why transformer embedding layers are initialized randomly during pre-training rather than with pre-trained embeddings from existing models such as word2vec or GloVe. The retrieved notes indicate that searches for mechanism, criticism, and definition claims specifically addressing the \"why\" of random initialization versus pre-trained initialization yielded no direct results . While the DEPT paper (2024) is identified as the most relevant source discussing random versus pre-initialized embeddings, the specific records extracted from it focus on the procedural handling of these initialization states during continued pre-training rather than the foundational design rationale for choosing random initialization in the first place [sciverse_dept_decoupled_embeddings_for_pre_training_language_models].\n\nThe available data from the DEPT paper describes the optimization schedules applied to models based on their initialization status. For models initialized randomly during continued pre-training, the method begins with a learning rate of $\\eta_{max}$ and decays over $N_{CT}$ steps . The paper states that this decay schedule allows for quick embedding matrix learning without requiring another full training pass . In contrast, when using pre-initialized models, the process starts from $\\eta_{max} / 2$ because both the model and the embeddings are considered reasonably well-trained . These procedural details confirm that both random and pre-initialized embeddings are valid starting points for continued pre-training, but they do not articulate the theoretical or empirical reasons why random initialization is the standard choice for initial pre-training.\n\nOther consulted sources provide context on the use of pre-trained weights but do not address the specific question of random initialization for the embedding layer. The AMMU survey (2021) notes that several models, including BioBERT, ALeaseBERT, TOD-BERT, HateBERT, infoXLM, and XNLG, are obtained by initializing from existing pretrained models and further pretraining  . Additionally, the passion_net paper states that the success of pre-trained word embeddings motivated researchers to develop more generalized models that can provide pre-trained weights at all layers of the model . However, these references describe the practice of leveraging existing weights for downstream or continued training tasks, rather than explaining the rationale for random initialization in the context of original pre-training.\n\nGeneral architectural observations from the notes indicate that DNNs typically include a word embedding layer at the beginning of the network , and that the Transformer encoder is forced to keep a distributional contextual representation of every input token because it does not know which words it will be asked to predict [d207f13cb97e54]. Furthermore, it is noted that masked LM pre-training creates a mismatch between pre-training and finetuning [c984990ce3e025], and that the drawback of current sentence embedding from original BERT is mainly due to static token embedding bias and ineffective BERT layers . Despite these insights into embedding behavior and model architecture, the consulted records did not surface any specific argument, experiment, or theoretical justification for why random initialization is preferred over pre-trained embeddings during the initial pre-training phase of transformers.",
+  "arm": "main",
+  "steps": 17,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "type": "note_reject",
+    "n_bad": 4,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. Question asks WHY transformer embedding layer is initialized randomly during pre-training rather",
+     "N2. Most relevant paper in corpus: sciverse_dept_decoupled_embeddings_for_pre_training_language_mode",
+     "N3. Also relevant: sciverse_title_ammus_a_survey_of_transformer_based_pretrained_models_in_natural_l"
+    ]
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_dept_decoupled_embeddings_for_pre_training_language_models",
+     "contains": "random init|pre-trained embedding|word2vec|GloVe|initialization"
+    },
+    "intent": "Find mechanism/observation records in the DEPT paper about why embeddings are randomly initialized",
+    "obs_chars": 244,
+    "notes_chars": 803
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_title_ammus_a_survey_of_transformer_based_pretrained_models_in_natural_language_",
+     "contains": "random init|pre-trained embedding|word2vec|GloVe|initialization|embedding layer"
+    },
+    "intent": "Check if the AMMU survey discusses embedding initialization rationale",
+    "obs_chars": 244,
+    "notes_chars": 803
+   },
+   {
+    "step": 1,
+    "tool": "search_text",
+    "args": {
+     "query": "why randomly initialize embedding layer instead of pre-trained word embeddings transformer pre-training",
+     "k": 12
+    },
+    "intent": "Broad lexical+semantic search across full raw texts for the rationale behind random embedding initialization",
+    "obs_chars": 192,
+    "notes_chars": 803
+   },
+   {
+    "step": 2,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N4. Prior findings() calls with contains= returned 0 hits — need different phrasings or drop contain",
+     "N5. search_text errored (infra) — retry."
+    ]
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_dept_decoupled_embeddings_for_pre_training_language_models",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get all mechanism findings from DEPT paper without contains filter",
+    "obs_chars": 187,
+    "notes_chars": 669
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_title_ammus_a_survey_of_transformer_based_pretrained_models_in_natural_language_",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from AMMU survey",
+    "obs_chars": 187,
+    "notes_chars": 669
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "query": "embedding layer initialized randomly pre-trained word embeddings word2vec GloVe transformer pre-training",
+     "k": 12
+    },
+    "intent": "Full-text search for discussion of random vs pre-trained embedding initialization",
+    "obs_chars": 192,
+    "notes_chars": 669
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "contains": "random|initializ|pre-trained embedding|word2vec|GloVe|frozen|tied",
+     "claim_type": "observation"
+    },
+    "intent": "Broader observation search across corpus for embedding init discussion",
+    "obs_chars": 2549,
+    "notes_chars": 669
+   },
+   {
+    "step": 3,
+    "tool": "search_text",
+    "args": {
+     "query": "embedding layer initialized randomly pre-trained word embeddings word2vec GloVe transformer pre-training",
+     "k": 12
+    },
+    "intent": "Search raw text for discussion of why embeddings are randomly initialized vs pre-trained",
+    "obs_chars": 192,
+    "notes_chars": 904
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_dept_decoupled_embeddings_for_pre_training_language_models",
+     "contains": "random|initializ|pre-trained|frozen|tied|decoupl"
+    },
+    "intent": "Get all findings from DEPT paper with broader terms",
+    "obs_chars": 1523,
+    "notes_chars": 904
+   },
+   {
+    "step": 3,
+    "tool": "card",
+    "args": {
+     "entity": "embedding layer"
+    },
+    "intent": "Check if embedding layer has a dossier with cross-paper evidence",
+    "obs_chars": 396,
+    "notes_chars": 904
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_title_ammus_a_survey_of_transformer_based_pretrained_models_in_natural_language_",
+     "contains": "random|initializ|pre-trained|frozen|tied|embedding"
+    },
+    "intent": "Get all findings from AMMU survey with broader terms",
+    "obs_chars": 2841,
+    "notes_chars": 904
+   },
+   {
+    "step": 4,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_dept_decoupled_embeddings_for_pre_training_language_models",
+     "sections": [
+      "introduction",
+      "method",
+      "experimental setup"
+     ]
+    },
+    "intent": "Get full-text detail on DEPT's rationale for random vs pre-trained embedding initialization",
+    "obs_chars": 901,
+    "notes_chars": 1648
+   },
+   {
+    "step": 4,
+    "tool": "search_text",
+    "args": {
+     "query": "why random initialization embedding layer pre-trained word2vec GloVe transformer",
+     "k": 12
+    },
+    "intent": "Find any corpus paper discussing rationale for random vs pre-trained embedding init",
+    "obs_chars": 286,
+    "notes_chars": 1648
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "contains": "embedding|initializ|random|pre-trained"
+    },
+    "intent": "Check if any paper criticizes or discusses limitations of embedding initialization choices",
+    "obs_chars": 3531,
+    "notes_chars": 1648
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "claim_type": "definition",
+     "contains": "embedding|initializ|random|pre-trained|word2vec|GloVe"
+    },
+    "intent": "Check for definitional records about embedding initialization",
+    "obs_chars": 2456,
+    "notes_chars": 1648
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_dept_decoupled_embeddings_for_pre_training_language_models",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation records from DEPT paper about embedding initialization rationale",
+    "obs_chars": 519,
+    "notes_chars": 2095
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_title_ammus_a_survey_of_transformer_based_pretrained_models_in_natural_language_",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation records from AMMU survey about embedding initialization",
+    "obs_chars": 187,
+    "notes_chars": 2095
+   },
+   {
+    "step": 5,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "embedding layer initialized randomly pre-trained word2vec GloVe transformer pre-training rationale"
+    },
+    "intent": "Search raw text for explicit discussion of why random init is used over pre-trained embeddings",
+    "obs_chars": 286,
+    "notes_chars": 2095
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "embedding|initializ|random|pre-trained|word2vec|GloVe|frozen|tied"
+    },
+    "intent": "Find mechanism records across corpus about embedding initialization choices",
+    "obs_chars": 2405,
+    "notes_chars": 2095
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "contains": "embedding|initializ|random|pre-trained|word2vec|GloVe|frozen|tied"
+    },
+    "intent": "Find criticism/limitation records about embedding initialization choices",
+    "obs_chars": 3531,
+    "notes_chars": 2313
+   },
+   {
+    "step": 7,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "randomly initialized embedding layer pre-trained word2vec GloVe not used because transformer learns from scratch"
+    },
+    "intent": "Find the specific rationale text explaining why random init is used instead of pre-trained embeddings",
+    "obs_chars": 286,
+    "notes_chars": 2704
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "claim_type": "recommendation",
+     "contains": "embedding|initializ|random|pre-trained|word2vec|GloVe|frozen|tied"
+    },
+    "intent": "Check if any paper makes a recommendation about embedding initialization strategy",
+    "obs_chars": 1991,
+    "notes_chars": 2704
+   },
+   {
+    "step": 7,
+    "tool": "search_papers",
+    "args": {
+     "query": "why transformer embedding layer randomly initialized instead of pre-trained word2vec GloVe rationale",
+     "k": 5
+    },
+    "intent": "Search external literature for the standard rationale behind random embedding initialization in transformer pre-training",
+    "obs_chars": 2272,
+    "notes_chars": 2704
+   },
+   {
+    "step": 8,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_title_ammus_a_survey_of_transformer_based_pretrained_models_in_natural_language_",
+     "sections": [
+      "introduction",
+      "method",
+      "experimental setup"
+     ]
+    },
+    "intent": "Get full-text detail from AMMU survey on embedding initialization choices and rationale",
+    "obs_chars": 1020,
+    "notes_chars": 3179
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "entity": "embedding layer",
+     "claim_type": "observation"
+    },
+    "intent": "Find observation records about embedding layer design choices",
+    "obs_chars": 878,
+    "notes_chars": 3179
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "entity": "transformer",
+     "claim_type": "mechanism",
+     "contains": "embedding|initializ|random|pre-trained|word2vec|GloVe|frozen|tied"
+    },
+    "intent": "Find mechanism records about transformer embedding initialization",
+    "obs_chars": 541,
+    "notes_chars": 3179
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_title_ammus_a_survey_of_transformer_based_pretrained_models_in_natural_language_",
+     "claim_type": "observation",
+     "contains": "embedding|initializ|random|pre-trained|word2vec|GloVe|frozen|tied"
+    },
+    "intent": "Query the newly extracted AMMU survey records for observations about embedding initialization choices",
+    "obs_chars": 244,
+    "notes_chars": 3688
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_dept_decoupled_embeddings_for_pre_training_language_models",
+     "claim_type": "mechanism",
+     "contains": "random|pre-trained|word2vec|GloVe|initializ|frozen|tied|static|contextual"
+    },
+    "intent": "Query DEPT paper for mechanism records explaining why random init is used",
+    "obs_chars": 244,
+    "notes_chars": 3688
+   },
+   {
+    "step": 9,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "embedding layer randomly initialized because pre-trained word embeddings static not contextual transformer learns contextual representations from scratch"
+    },
+    "intent": "Search raw text for the specific rationale about static vs contextual embeddings as reason for random init",
+    "obs_chars": 192,
+    "notes_chars": 3688
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_title_ammus_a_survey_of_transformer_based_pretrained_models_in_natural_language_",
+     "claim_type": "mechanism",
+     "contains": "embedding|initializ|random|pre-trained|word2vec|GloVe|frozen|tied|static|contextual"
+    },
+    "intent": "Query AMMU survey for mechanism records about embedding initialization",
+    "obs_chars": 244,
+    "notes_chars": 3688
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_title_ammus_a_survey_of_transformer_based_pretrained_models_in_natural_language_",
+     "claim_type": "observation",
+     "contains": "embedding|initializ|random|pre-trained|word2vec|GloVe|frozen|tied|static|contextual"
+    },
+    "intent": "Query AMMU survey's deep-read records for observations about embedding initialization choices",
+    "obs_chars": 244,
+    "notes_chars": 3688
+   },
+   {
+    "step": 10,
+    "tool": "search_text",
+    "args": {
+     "query": "embedding layer randomly initialized pre-trained word2vec GloVe not used because transformer learns from scratch",
+     "k": 12
+    },
+    "intent": "Full-text search for the specific rationale about why random init is preferred over pre-trained embeddings",
+    "obs_chars": 192,
+    "notes_chars": 3688
+   },
+   {
+    "step": 11,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_dept_decoupled_embeddings_for_pre_training_language_models",
+     "claim_type": "criticism"
+    },
+    "intent": "Get criticism records from DEPT paper — may discuss limitations of pre-trained embeddings or why random init is used",
+    "obs_chars": 187,
+    "notes_chars": 3811
+   },
+   {
+    "step": 11,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_title_ammus_a_survey_of_transformer_based_pretrained_models_in_natural_language_",
+     "claim_type": "criticism"
+    },
+    "intent": "Get criticism records from AMMU survey — may discuss limitations of pre-trained embeddings or why random init is used",
+    "obs_chars": 187,
+    "notes_chars": 3811
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_dept_decoupled_embeddings_for_pre_training_language_models",
+     "contains": "random|pre-trained|word2vec|GloVe|initializ|frozen|tied|static|contextual"
+    },
+    "intent": "Get ALL findings from DEPT paper about embedding initialization choices and rationale",
+    "obs_chars": 1523,
+    "notes_chars": 3811
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_title_ammus_a_survey_of_transformer_based_pretrained_models_in_natural_language_",
+     "contains": "random|pre-trained|word2vec|GloVe|initializ|frozen|tied|static|contextual"
+    },
+    "intent": "Get ALL findings from AMMU survey about embedding initialization choices and rationale",
+    "obs_chars": 2841,
+    "notes_chars": 3811
+   },
+   {
+    "step": 12,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "embedding layer randomly initialized not pre-trained word2vec GloVe because contextual dynamic learned from scratch transformer"
+    },
+    "intent": "Broader search for the specific rationale of random vs pre-trained embedding initialization in transformers",
+    "obs_chars": 192,
+    "notes_chars": 3811
+   },
+   {
+    "step": 13,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_dept_decoupled_embeddings_for_pre_training_language_models",
+     "claim_type": "observation",
+     "contains": "random|pre-trained|word2vec|GloVe|initializ|frozen|tied|static|contextual"
+    },
+    "intent": "Get observation records from DEPT paper about embedding initialization rationale",
+    "obs_chars": 519,
+    "notes_chars": 3811
+   },
+   {
+    "step": 13,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_title_ammus_a_survey_of_transformer_based_pretrained_models_in_natural_language_",
+     "claim_type": "observation",
+     "contains": "random|pre-trained|word2vec|GloVe|initializ|frozen|tied|static|contextual"
+    },
+    "intent": "Get observation records from AMMU survey about embedding initialization",
+    "obs_chars": 244,
+    "notes_chars": 3811
+   },
+   {
+    "step": 13,
+    "tool": "search_text",
+    "args": {
+     "query": "why randomly initialize embedding layer instead of pre-trained word embeddings transformer pre-training rationale",
+     "k": 12
+    },
+    "intent": "Search raw text for explicit rationale about random vs pre-trained embedding initialization",
+    "obs_chars": 286,
+    "notes_chars": 3811
+   },
+   {
+    "step": 14,
+    "tool": "search_text",
+    "args": {
+     "query": "randomly initialized embedding layer pre-training from scratch word2vec GloVe static embeddings contextual",
+     "k": 12
+    },
+    "intent": "Search raw text for explicit discussion of why random init is used instead of pre-trained static embeddings",
+    "obs_chars": 286,
+    "notes_chars": 3811
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 17,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "N1. [unsourced] Question: WHY is transformer embedding layer initialized randomly during pre-training rather than with pre-trained embeddings (word2vec/GloVe)? Mechanism/design-rationale question.\nN2. [sciverse_dept_decoupled_embeddings_for_pre_training_language_models] DEPT paper (2024) most relevant — discusses random vs pre-initialized embeddings.\nN3. [sciverse_title_ammus_a_survey_of_transformer_based_pretrained_models_in_natural_language_] AMMU survey (2021) — discusses design choices.\nN4. [coarse:acf02bef56b5] DEPT: for models initialized randomly during continued pre-training, method begins with η_max and decays over N_CT steps | anchor:\"During continued pre-training, for models initialized randomly, we begin with η_max\" | epistemic:stated\nN5. [coarse:214a0901453f] DEPT: decay schedule allows quick embedding matrix learning without requiring another full training pass | anchor:\"quick embedding matrix learning without requiring another full training pass\" | epistemic:stated\nN6. [coarse:567b7cee54ca] DEPT: when using pre-initialized models, starts from η_max/2 since both model and embeddings are reasonably well-trained | anchor:\"When using pre-initialized models, we start from η_max / 2 since both the\" | epistemic:stated\nN7. [coarse:f0844e3be477] AMMU: BioBERT obtained by initializing from existing pretrained models and further pretraining | epistemic:stated\nN8. [coarse:adf00cd97003] AMMU: ALeaseBERT, TOD-BERT, HateBERT, infoXLM, XNLG all obtained by initializing from existing pretrained models | epistemic:stated\nN9. [unsourced] search_text saturated (3+ times) — STOP searching this theme.\nN10. [unsourced] findings(claim_type=mechanism) on both papers returned 0 — no mechanism records.\nN11. [c984990ce3e025] hub_W28964: Masked LM pre-training creates a mismatch between pre-training and finetuning | epistemic:stated\nN12. [55ff2b72941dfc] hub_W42830: Later work found that further scaling a decoder-only language model was... | epistemic:stated\nN13. [0291990b3e16f7] hub_W2896457183: Each downstream task has separate fine-tuned models, even though they are initialized with the same pre-trained parameters (BERT) | epistemic:stated\nN14. [coarse:11bd4b112ee2] PromptBERT: drawback of current sentence embedding from original BERT is mainly due to the static token embedding bias and ineffective BERT layers | epistemic:stated\nN15. [unsourced] findings(claim_type=criticism) with embedding/initializ/random/pre-trained returned 11 results but NONE directly address WHY random init is preferred over pre-trained embeddings for transformer pre-training.\nN16. [unsourced] findings(claim_type=definition) with embedding/initializ/random/pre-trained/word2vec/GloVe returned 0.\nN17. [unsourced] search_papers returned 2 external papers: \"pretrained transformers for text ranking: bert and beyond\" (2020) and \"word-class embeddings for multiclass text classification\" (2021) — neither directly addresses the WHY of random init.\nN18. [coarse:0050050b0150] passion_net: \"The success of pre-trained word embeddings motivated researchers to develop more generalized models that can provide pre-trained weights at all layers of the model.\" | epistemic:stated\nN19. [d207f13cb97e54] hub_W2896457183: The Transformer encoder is forced to keep a distributional contextual representation of every input token because it does not know which words it will be asked to predict | epistemic:stated\nN20. [coarse:1814f7573901] sciverse_all_you_need_is_love_: DNNs typically include a word embedding layer in the beginning of the network | epistemic:stated\nN21. [unsourced] deep_read of AMMU survey completed (29 records from 5 sections) — now queryable via findings(paper_id=...)\nN22. [unsourced] deep_read of DEPT paper completed (12 records from 3 sections) — now queryable via findings(paper_id=...)",
+  "gaps_final": "G1. What does the DEPT paper say about WHY embeddings are initialized randomly vs. pre-trained? (rationale)\nG2. Does the AMMU survey or other papers discuss the rationale for random embedding initialization?\nG3. Are there findings/observations in the corpus about embedding initialization choices?",
+  "queried": [
+   "findings|{\"contains\": \"random init|pre-trained embedding|word2vec|GloVe|initialization\", \"paper_id\": \"sciverse_dept_decoupled_embeddings_for_pre_training_language_models\"}",
+   "findings|{\"contains\": \"random init|pre-trained embedding|word2vec|GloVe|initialization|embedding layer\", \"paper_id\": \"sciverse_title_ammus_a_survey_of_transformer_based_pretrained_models_in_natural_language_\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_dept_decoupled_embeddings_for_pre_training_language_models\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_title_ammus_a_survey_of_transformer_based_pretrained_models_in_natural_language_\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"random|initializ|pre-trained embedding|word2vec|GloVe|frozen|tied\"}",
+   "findings|{\"contains\": \"random|initializ|pre-trained|frozen|tied|decoupl\", \"paper_id\": \"sciverse_dept_decoupled_embeddings_for_pre_training_language_models\"}",
+   "card|{\"entity\": \"embedding layer\"}",
+   "findings|{\"contains\": \"random|initializ|pre-trained|frozen|tied|embedding\", \"paper_id\": \"sciverse_title_ammus_a_survey_of_transformer_based_pretrained_models_in_natural_language_\"}",
+   "deep_read|{\"paper_id\": \"sciverse_dept_decoupled_embeddings_for_pre_training_language_models\", \"sections\": [\"introduction\", \"method\", \"experimental setup\"]}",
+   "search_text|{\"k\": 12, \"query\": \"why random initialization embedding layer pre-trained word2vec GloVe transformer\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"embedding|initializ|random|pre-trained\"}",
+   "findings|{\"claim_type\": \"definition\", \"contains\": \"embedding|initializ|random|pre-trained|word2vec|GloVe\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_dept_decoupled_embeddings_for_pre_training_language_models\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_title_ammus_a_survey_of_transformer_based_pretrained_models_in_natural_language_\"}",
+   "search_text|{\"k\": 12, \"query\": \"embedding layer initialized randomly pre-trained word2vec GloVe transformer pre-training rationale\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"embedding|initializ|random|pre-trained|word2vec|GloVe|frozen|tied\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"embedding|initializ|random|pre-trained|word2vec|GloVe|frozen|tied\"}",
+   "search_text|{\"k\": 12, \"query\": \"randomly initialized embedding layer pre-trained word2vec GloVe not used because transformer learns from scratch\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"contains\": \"embedding|initializ|random|pre-trained|word2vec|GloVe|frozen|tied\"}",
+   "search_papers|{\"k\": 5, \"query\": \"why transformer embedding layer randomly initialized instead of pre-trained word2vec GloVe rationale\"}",
+   "deep_read|{\"paper_id\": \"sciverse_title_ammus_a_survey_of_transformer_based_pretrained_models_in_natural_language_\", \"sections\": [\"introduction\", \"method\", \"experimental setup\"]}",
+   "findings|{\"claim_type\": \"observation\", \"entity\": \"embedding layer\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"embedding|initializ|random|pre-trained|word2vec|GloVe|frozen|tied\", \"entity\": \"transformer\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"embedding|initializ|random|pre-trained|word2vec|GloVe|frozen|tied\", \"paper_id\": \"sciverse_title_ammus_a_survey_of_transformer_based_pretrained_models_in_natu",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"random|pre-trained|word2vec|GloVe|initializ|frozen|tied|static|contextual\", \"paper_id\": \"sciverse_dept_decoupled_embeddings_for_pre_training_language_models\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"embedding|initializ|random|pre-trained|word2vec|GloVe|frozen|tied|static|contextual\", \"paper_id\": \"sciverse_title_ammus_a_survey_of_transformer_based_pretraine",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"embedding|initializ|random|pre-trained|word2vec|GloVe|frozen|tied|static|contextual\", \"paper_id\": \"sciverse_title_ammus_a_survey_of_transformer_based_pretrai",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_dept_decoupled_embeddings_for_pre_training_language_models\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_title_ammus_a_survey_of_transformer_based_pretrained_models_in_natural_language_\"}",
+   "findings|{\"contains\": \"random|pre-trained|word2vec|GloVe|initializ|frozen|tied|static|contextual\", \"paper_id\": \"sciverse_dept_decoupled_embeddings_for_pre_training_language_models\"}",
+   "findings|{\"contains\": \"random|pre-trained|word2vec|GloVe|initializ|frozen|tied|static|contextual\", \"paper_id\": \"sciverse_title_ammus_a_survey_of_transformer_based_pretrained_models_in_natural_language_\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"random|pre-trained|word2vec|GloVe|initializ|frozen|tied|static|contextual\", \"paper_id\": \"sciverse_dept_decoupled_embeddings_for_pre_training_language_models\"",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"random|pre-trained|word2vec|GloVe|initializ|frozen|tied|static|contextual\", \"paper_id\": \"sciverse_title_ammus_a_survey_of_transformer_based_pretrained_models",
+   "search_text|{\"k\": 12, \"query\": \"why randomly initialize embedding layer instead of pre-trained word embeddings transformer pre-training rationale\"}",
+   "search_text|{\"k\": 12, \"query\": \"randomly initialized embedding layer pre-training from scratch word2vec GloVe static embeddings contextual\"}"
+  ],
+  "gate": {
+   "note_rejects": 6,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "reject_reasons": {
+    "bad_backref": 6
+   },
+   "_consec_full_reject": 0,
+   "merge_downgraded_lines": 7,
+   "merge_total_lines": 9,
+   "relaxed_writes": 2,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 9,
+   "fallback_compiled": true
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ }
+]

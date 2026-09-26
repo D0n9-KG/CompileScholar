@@ -1,0 +1,485 @@
+Article
+
+# FPGA-Based Autonomous GPS-Disciplined Oscillators for Wireless Sensor Network Nodes
+
+Toan Quang The Bui *, Arul Elango † and René Jr. Landry †
+
+École de Technologie Supérieure, Université du Québec, Montréal, QC H3C 1K3, Canada; arul.elango@ens.etsmtl.ca (A.E.); rene landry@etsmtl.ca (R.J.L.)
+
+Abstract: Numerous devices in distributed wireless sensor arrays require a high-accuracy timing reference. Although the GPS-disciplined oscillators have been developed for decades, the hardware design still has performance limitations. In this context, we present the hardware implementation for a GPS-disciplined oscillator with an automatic adaptive drift correction algorithm, which is implemented in a low-cost, high-speed field-programmable gate array (FPGA) device. The system design and the hardware implementation are presented to demonstrate the advantages of the proposed oscillator.
+
+To verify this oscillator in real-time applications, we tested the device in multiple environments and compared it to state-of-the-art designs. The experimental results showed that our proposed device has a low cost and high performance. This device can achieve less than 80 ns and 356 ns in 1PPS signal drift in the indoor environment test and the outdoor environment test, respectively, after 24 h of working without a GPS signal.
+
+Keywords: TCXO; GPSDO; timing correction; Kalman filter; FPGA; wireless sensor network
+
+![](dt=2026-03-26/ht=04/a475ad53d683fa903893ed6a4ec48a5993dc7d3c2a4913f5eddfa1aeb1828599.jpg)
+
+# check for updates
+
+Citation: Bui, T.Q.T.; Elango, A.; Landry, R.J. FPGA-Based
+
+Autonomous GPS-Disciplined Oscillatorsfor Wireless Sensor
+
+Network Nodes. Sensors 2022, 22, 3135. https://doi.org/10.3390/s22093135
+
+Academic Editor: Yuh-Shyan Chen
+
+Received: 16 February 2022
+
+Accepted: 17 April 2022
+
+Published: 20 April 2022
+
+Publisher's Note: MDPI stays neutral with regard to jurisdictional claims in published maps and institutional affiliations.
+
+![](dt=2026-03-26/ht=04/cbaac425bd6bb1bd7cab1cfe95ae9281f10cff10f66414a19d1900832800ab94.jpg)
+
+Copyright: © 2022 by the authors. Licensee MDPI, Basel, Switzerland. This article is an open access article distributed under the terms and conditions of the Creative Commons Attribution (CC BY) license (https://creativecommons.org/licenses/by/4.0/).
+
+# 1. Introduction
+
+High-precision Global Positioning System (GPS)-disciplined oscillators (GPSDOs) have been designed to work as a source of reference timing, whose output is controlled to agree with the clock signals generated and broadcast by GPS in the Global Navigation Satellite System (GNSS) [1,2]. GPSDOs are widely used in measurement devices and communication systems due to their cost-effective, high-precision, and self-calibrating operation. The work in [3] presented the use of GPSDOs in synchronizing network radar.
+
+The GPS-disciplined clock was also used in an analog-to-digital converter (ADC) for phase measurement application as presented in [4]. Moreover, GPS signals have been used in wireless sensor networks (WSNs) for positioning the sensor nodes in recent research [5-7]. In this context, the timing calibration and synchronization between local oscillators in devices and the references are important to obtain high-accuracy results. The commonly used GPS modules can perform time synchronization with a resolution of 100 ns or smaller.
+
+Numerous GPSDOs are available on the market and in research laboratories. Four devices of one specific low-cost GPSDO type are characterized and compared using a tested GPSDO combining a GNSS signal simulator and a reference signal stability measurement system based on software-defined radio (SDR) and digital signal processing (DSP) [8].
+
+However, there are several factors that would affect the accuracy of the frequency correction [9]. The first is the random errors and outlines contained in one pulse per second (PPS), which is the broadcast output of the GPSs [10]. The second factor is the frequency nonlinear drift of the crystal oscillators because of the aging and the temperature [11]. Therefore, several works have been developed to filter designs to eliminate the noise and adaptive algorithms are applied to compensate the temperature and aging effects [12,13]. However, most of the previous designs have a shortage of investigating the relationship between frequency variation and temperature change. In this paper, we present an adaptive
+
+#
+
+sensors
+
+MDPI
+
+Sensors 2022, 22, 3135. https://doi.org/10.3390/s22093135
+
+https://www.mdpi.com/journal/sensors
+
+algorithm based on Kalman filter models for temperature and aging effects. Moreover, a test is performed to verify the relationship between the temperature of the GPSDO and the frequency variation at the TCXO.
+
+Additionally, as the GPS signals received are highly sensitive to the environment, especially in moving objects or in complex geography, the GPS-based timing systems occasionally lose their accuracy. Therefore, the main focus of this work is to design the GPS-disciplined oscillator (GPSDO), which achieves a high-precision self-calibration when the GPS signals from the satellites are not available.
+
+Many different factors influence the performance of the accuracy of receiving the 1PPS reference signal from the source and to maintain the accuracy of $1\mu s$ during the non-availability of the GPS signal in disruptive conditions.
+
+Therefore, there is a need for a low-cost, low-power, compact-size, more robust, and re-configurable hardware architecture for developing the timing board that can be upgraded or tailored to various standards running on a high-speed, low-power processor to make it possible to compensate the temperature calibration and drift in the frequency within the allowable accuracy level.
+
+In designing GPSDOs, the data acquisition (DAQ) is an important part that directly affects the performance of GPSDOs. Conventional GPSDOs require long time constants of integration to inherit the GPS signal's long-term accuracy [14,15]. The higher the frequency of DAQ that is used, the smaller the time step achieved. Then, the accuracy of the system is increased while the latency is shortened. However, previous works developed the DAQ and the adaptive algorithms in embedded microprocessors, which have a limited operating frequency (a maximum of $20\mathrm{MHz}$ ) [16,17].
+
+Therefore, in this work, we concentrated on developing the integrated hardware architecture for utilizing the central processing unit of the Spartan-7 FPGA, which provides a $200\mathrm{MHz}$ operating frequency, integrated with the GNSS module, the voltage-controlled TCXO (VC-TCXO), and the temperature sensor for improving the timing error to less than $1\mu s$ .
+
+To verify the design's performance, we provide multiple tests under different room temperatures in the indoor and outdoor environment to prove the capability of the autonomous embedded timing system in real applications. The results obtained with the newly designed timing board indicate that the improvement in the speed in clock counting is achieved by replacing the microcontroller with the FPGA chip, and the marginal stabilization time and frequency/temperature stability can also be attained by introducing a compact-size, low-cost alternative oscillator VC-TCXO.
+
+From the testing results, it was also inferred that the estimated time errors are close to the specification requirement of the timing board. On very few occasions, the estimated timing error of $20\%$ crossed the requirement of $1\mu s$ . Further, to improve the results, we suggest continuing to design new Kalman filter algorithms on FPGAs to replace the old mean filter algorithms, which seem to regain the timing error within the bound running on this framework. In the new algorithm, we also plan to incorporate the aging and temperature parameter to improve the disciplined ability of this system.
+
+The remainder of this paper is organized as follows. Related works are reviewed in Section 2. The system model of the proposed FPGA-based autonomous GPS-disciplined oscillator is presented in detail in Section 3. The hardware implementation and the tools are detailed in Section 4. The measurement method is mentioned and clarified in Section 5. The experimental results are presented and discussed in Section 6. Finally, Section 7 summarizes the work in this paper
+
+# 2. Related Works
+
+To solve the previously addressed problems, the following state-of-the-art works are presented. The authors in [12] proposed a predictive finite impulse response (FIR) filter to synchronize the local clock using the GPS 1PPS signal. The work in [13] presented an adaptive unscented Kalman filter for GPSDOs, which provides high precision. However, the algorithm was simulated using MATLAB, while the implementation of the frequency difference measurement module was not clearly presented.
+
+Sensors 2022, 22, 3135
+
+2 of 17
+
+The work presented in [18] characterized four different GPSDOs under test in distributed vehicle-to-X (V2X) measurement applications. The 1PPS and $10\mathrm{MHz}$ signals were collected from four GPSDOs and compared in different modes (stationary and on-road tests, with/without the GPS reference signal). These devices accumulate a maximum of $133~\mu \mathrm{s}$ of time error within $24\mathrm{h}$ , compared to the reference signal.
+
+In [19], the authors provided the quality evaluation of the 1PPS signals in commercial devices, which can mitigate the systematic error of the reference clock. However, the practical design to obtain a high-accuracy timing clock was not presented. The authors in [20] developed the adaptive unscented Kalman filter to compensate for the temperature variation. Even though the model was simulated successfully in MATLAB, the experimental results were not provided. As the frequency difference is the input signal, its accuracy is a crucial factor that has a great impact on the output's performance. The method and system design of a local reference clock by using the GPS 1PPS signal were proposed in [21].
+
+Some works have been presented recently in hardware design to accomplish high-accuracy results for the generated 1PPS signal. As the frequency for the counter increases, so does the precision of the measurement. It should increase the counter frequency or extend the measurement window time. The work in [16] used a gate trigger to start and stop counting the $20\mathrm{MHz}$ local oscillator. This hardware design was implemented in the complex programmable logic device (CPLD). However, due to the frequency-counting mechanism, the system had a long latency. as implemented in the complex programmable logic device (CPLD). However, due to the frequency-counting mechanism, the system had a long latency.
+
+These previous works presented GPSDOs' applications and improved the performance of generated clock with adaptive algorithms. However, the practical design of GPSDOs and the evaluation of their performance in real-time applications have not been addressed properly. Therefore, in this paper, we present our hardware design of an autonomous GPSDO in an FPGA, which provides a high frequency for data acquisition (DAQ). Then, the latency of the system is reduced, and the counter is more precise due to the smaller time step.
+
+# 3. System Model
+
+Figure 1 illustrates the FPGA-based autonomous GPS-disciplined oscillator (AGPSDO) board and the external hardware verification. The AGPSDO board includes an FPGA Spartan 7 chip, where the phase lock loop (PLL), data acquisition module, and an adaptive algorithm are implemented, and the external peripheral devices are a $10\mathrm{MHz}$ TCXO, the universal serial bus (USB) to universal asynchronous receiver-transmitter (USB-UART) converter, GPS receiver module, and temperature sensor. A GPIO connector is used to test and observe the important signals on the oscilloscope. The USB-UART converter is deployed to collect data on the computer for the test, verification, and evaluation.
+
+![](dt=2026-03-26/ht=04/93ff7d4e138d72754a81ddda86cf5a034aad7f046316654ac869235453eda607.jpg)
+
+Sensors 2022, 22, 3135
+
+3 of 17
+
+An algorithm called the adaptive oscillator model (AOM) models the frequency drift characteristics of the TCXO. This model is used when the GPS time reference signal is lost. This algorithm is composed of two Kalman filters to adaptively model the frequency drift of the TCXO due to temperature and component aging. In addition, the AOM uses three infinite impulse response filters (IIRFs). IIRF1 attenuates the GPS receiver noise. IIRF2 attenuates the temperature component of the correction signal, but passes the aging component.
+
+Subtracting the output of IIRF2 (aging) from the output of IIRF1 gives the temperature component. This temperature component is fed into the IIRF3 to further attenuate the GPS receiver noise and glitches due to the subtraction. A training controller can choose between three modes of operation, depending on the status of the GPS satellite lock: the normal mode on which the AOM is trained; the average mode if the AOM has not had enough time to train, i.e.
+
+, $2\mathrm{h}$ ; the hold-over mode provides the correction predicted by the AOM, which loops the output of the Kalman filters back to their input.
+
+# 3.1. Kalman Filter Design
+
+The state estimation equation of the Kalman aging model is defined as follows.
+
+$$
+x _ {k + 1} = \phi_ {k} \times x _ {k} = \left[ \begin{array}{c c c} 1 & \Delta t & 0 \\ 0 & 1 & \alpha \times \Delta t \\ 0 & 0 & 1 \end{array} \right] \times \left[ \begin{array}{c} \frac {\Delta f}{f _ {0}} \\ \frac {d}{d t} \left(\frac {\Delta f}{f _ {0}}\right) \\ \frac {d ^ {2}}{d t ^ {2}} \left(\frac {\Delta f}{f _ {0}}\right) \end{array} \right]. \tag {1}
+$$
+
+In the state transition matrix $\phi_{k}$ , $\Delta t$ is the time step. Parameter $\alpha$ is set when the GPS signal is available and is 0 when the system switches to hold-over, in order to have a purely linear prediction model. The state vector is denoted as $x_{k}$ , while $\frac{\Delta f}{f_0}$ is the TCXO frequency stability. $\frac{d}{dt} \left( \frac{\Delta f}{f_0} \right)$ and $\frac{d^2}{dt^2} \left( \frac{\Delta f}{f_0} \right)$ are the first and second derivative of the stability with respect to time, respectively.
+
+The state estimation equation of the Kalman temperature model is calculated as follows.
+
+$$
+y _ {k + 1} = \phi_ {k} \times y _ {k} = \left[ \begin{array}{c c c} 1 & \Delta T & 0 \\ 0 & 1 & \beta \times \Delta T \\ 0 & 0 & 1 \end{array} \right] \times \left[ \begin{array}{c} \frac {\Delta f}{f _ {0}} \\ \frac {d}{d t} \left(\frac {\Delta f}{f _ {0}}\right) \\ \frac {d ^ {2}}{d t ^ {2}} \left(\frac {\Delta f}{f _ {0}}\right) \end{array} \right]. \tag {2}
+$$
+
+$\Delta T$ is the temperature step, and the derivatives concern the temperature. The temperature step is calculated from the measurements from the temperature sensor. $\beta$ is the same constant as $\alpha$ .
+
+# 3.2. Adaptive Algorithm
+
+To verify the conceptual operation of the Kalman filters, we simulated the frequency variation from the stability of the TCXO that we used on the board. The maximum values of frequency variation caused by temperature and aging were chosen. The variation due to temperature was $3.5\mathrm{ppb}$ C, and the variation was due to aging of $1\mathrm{ppb} / 24\mathrm{h}$ . The temperature profile applied by the simulation to the TCXO was created by a temperature chamber, as shown in Figure 2.
+
+Then, the aging component is fed into the input of the Kalman aging model. The temperature component is used as the input of the Kalman temperature model. The total variation includes both aging and temperature frequency variation. The result of the simulation of the system that switches to hold-over after $2\mathrm{h}$ is shown in Figure 3.
+
+Sensors 2022, 22, 3135
+
+4 of 17
+
+![](dt=2026-03-26/ht=04/5e361a8bd2abed03e021f2b448e3fb116bf449045f78cb891def4544cb817244.jpg)
+
+![](dt=2026-03-26/ht=04/08c5e3f4342a2398c6303615936c645c50b6d9750f52a8909c39b1bc9b5626bf.jpg)
+
+# 4. Hardware Implementation
+
+The hardware implementation comprises two parts: an autonomous GPS-discipline oscillator and an external hardware verification, as shown in Figure 4. The device has a very compact size of $40 \times 27 \mathrm{~mm}$ .
+
+![](dt=2026-03-26/ht=04/ed639c526d64cbf80535f30b29f0d856983d0fdbf4e905e4cbb976c2a20ec508.jpg)
+
+# 4.1. Autonomous GPS-Disciplined Oscillator
+
+The autonomous GPS-disciplined oscillator board provides a high-stability clock source for timing applications. The GPS clock frequency is constantly monitored by the Spartan-7 FPGA chip:
+
+Sensors 2022, 22, 3135
+
+5 of 17
+
+for centimeter-level accuracy. The module enables precise navigation and automation of moving industrial machinery by means of a small, surface-mounted module. The ZED-F9P GNSS module has a serial data communication interface, a timing pulse connected to the FPGA, and serial communication.
+
+The following part presents the hardware design inside the FPGA Spartan 7chip, which has the top block diagram as depicted in Figure 5. The microBlaze microprocessor, which provides standard connectivities to the peripheral devices such as the USB-UART device and GPIOs using the advanced extensible interface (AXI) connection was developed and integrated in the FPGA chip.
+
+![](dt=2026-03-26/ht=04/a2ce2269230514409b1c51d6c3e3c476ecce5b00b2afd1df54c820c4e37d2dbb.jpg)
+
+# 4.1.1. MicroBlaze
+
+The MicroBlaze processor, which provides multiple communication protocols such as UART, SPI, $I_{2}C$ , and various general purpose inputs–outputs (GPIOs) was used. The adaptive algorithm was implemented in this processor using the C/C++ programming language. The output data from the MicroBlaze microprocessor were collected and observed in real-time on a computer using MATLAB Simulink. A low clock frequency at 50 MHz was used for the processor to reduce power consumption.
+
+The block diagram of the processing system has 3 main parts: MicroBlaze controller, AXI interrupt controller, and MicroBlaze local memory. The Microblaze controller part is the main component, which has a microcontroller configuration mode to calculate the floating-point number in the adaptive algorithm. The AXI interrupt controller manages all interrupts in our firmware: UART, timer, $I_{2}C$ , and quad serial peripheral interface (QSPI). The MicroBlaze memory is a virtual RAM inside the FPGA built by the look-up tables (LUTs) of the FPGA.
+
+In this design, its capacity is 16 kB, in total, and the capacity can be expanded depending on the complex algorithm on MicroBlaze.
+
+# 4.1.2. AXI Connection
+
+The AXI-LITE module was used to create the interfaces of other intellectual property (IP) modules with MicroBlaze. This module provides the parallel interfaces, and the data from other modules are transferred to MicroBlaze immediately and otherwise. This allows the C source code on MicroBlaze to process the data in real-time. This is an advantage of the firmware on the FPGA compared to other solutions.
+
+# 4.1.3. Peripheral Module
+
+The peripheral module includes a QSPI module, a $I_{2}C$ module, and a UART module. The QSPI module was used to provide the interface to the Spartan 7 FPGA and the Flash chip to store the bitstreams of the FPGA. First, the Flash chip is detected via the SPI interface
+
+Sensors 2022, 22, 3135
+
+6 of 17
+
+by the JTAG programmer. Then, the interrupts are used to receive and send data to and from the Flash.
+
+The $I_{2}C$ module was used to interface the FPGA and the temperature sensor chip by the $I_{2}C$ interface standard. The temperature sensor collects the temperature values of the oscillator on the board, which is used in the adaptive algorithm on Microblaze to compensate and adjust the control parameter to the 1PPS module.
+
+The UART module was used to provide the communication between the application of the FPGA and the external devices via the UART to USB chip. This module was used to display debug information.
+
+# 4.1.4. Counter Module/Data Acquisition Module
+
+The 1-pulse-per-second (1PPS) signal received from the GPS was used to discipline the number of pulses from a high-frequency clock generated by the FPGA. Figure 6 illustrates the sampling clock (high frequency at $200\mathrm{MHz}$ ) disciplined to 1PPS. A rising-edge counter was used to count the number of samples within a one-period clock cycle of 1PPS. That is, 1PPS provides the phase reference for the counter block, which produces the sampling clock [22,23]. The sampling time is guaranteed by the universal availability of 1PPS signals at different geographical locations.
+
+The number of counters is determined by the intrinsic accuracy of the 1PPS signal, the quality of the receiver, and the quality of clock sampling. A $200\mathrm{MHz}$ clock frequency was used and generated by the FPGA, which provides a high-accuracy clock generator compared to previous designs, which used a low frequency. A sampling rate of $200\mathrm{MHz}$ was used, yielding nominally $200\mathrm{M}$ samples per cycle. The counter number was transferred to the main processor of MicroBlaze by the AXI-LITE module.
+
+![](dt=2026-03-26/ht=04/2ad9fdb7e6e9934fde5325d4c2a66e11c77c8b24f76ca16dbc4788f34a4f6eca.jpg)
+
+# 4.2. External Hardware Devices
+
+To collect the experimental data and verify the working conditions, the external hardware components included a computer and an oscilloscope. The following part presents the external tools and software we used to verify the proposed AGPSDO:
+
+Sensors 2022, 22, 3135
+
+7 of 17
+
+# 5. Measuring Oscillator Frequency
+
+There are mainly three methods for time and frequency measurements: time interval measurement, frequency measurement, and period measurement. Time interval measurement is mostly for sine wave or PPS signals, and will not be further detailed. In the frequency measurement method, the number of cycles of the oscillator clock is measured during a certain period of time. In the period measurement method, the number of cycles of other higher-frequency clocks is measured during an integer number of cycles of the oscillator clock. In this work, we used the frequency measurement method for measuring the period error and the normalized frequency error.
+
+![](dt=2026-03-26/ht=04/7f7797a2b62d6420b76b3df2e3fa2ac6057355e3a89791a9fb481f04416bae23.jpg)
+
+In the frequency measurement method, illustrated in Figure 7, the actual period and frequency of the oscillator clock can be expressed as:
+
+$$
+T = (M + \Delta M) \tilde {T} _ {0} \rightarrow \tilde {T} _ {0} = \frac {T}{(M + \Delta M)} \rightarrow \tilde {f} _ {0} = \frac {(M + \Delta M)}{T}, \tag {3}
+$$
+
+with $M$ an integer and $\Delta M$ a real number between -1 and 1. To be more accurate, $\Delta M = \Delta M^{+} - \Delta M^{-}$ , in which $\Delta M^{+}$ is the portion not counted after the last rising edge and $\Delta M^{-}$ is the portion counted too much before the first rising edge. Both of them are random variables with a uniform distribution between 0 and 1. Since $\Delta M$ is the difference of these two random variables, it is a random variable with a triangular distribution between -1 and 1.
+
+However, during the measurement, only an integer number of cycles can be measured; thus, the part $\Delta M$ is not measured by the counter, and the estimate is within $\pm 1$ clock cycle of the reality. Therefore, the measured (or estimated) period and frequency of the oscillator clock are obtained as:
+
+$$
+T = M \hat {T} _ {0} \rightarrow \hat {T} _ {0} = \frac {T}{M} \rightarrow \hat {f} _ {0} = \frac {M}{T}. \tag {4}
+$$
+
+The period error and normalized period error are thus:
+
+$$
+\begin{array}{l} \Delta \hat {T} _ {0} = \hat {T} _ {0} - \tilde {T} _ {0} = \frac {\Delta M T}{M (M + \Delta M)} = \frac {\Delta M}{M} \tilde {T} _ {0}, \\ \Delta \hat {T} _ {0} ^ {\prime} = \frac {\hat {T} _ {0} - \tilde {T} _ {0}}{\tilde {T} _ {0}} = \frac {\Delta M}{M} = \frac {\Delta M}{\tilde {f} _ {0} T - \Delta M ^ {\prime}}. \tag {5} \\ \end{array}
+$$
+
+Sensors 2022, 22, 3135
+
+8 of 17
+
+The frequency error and normalized frequency error are calculated as:
+
+$$
+\Delta \hat {f} _ {0} = \hat {f} _ {0} - \tilde {f} _ {0} = \frac {\Delta M}{T},
+$$
+
+$$
+\Delta \hat {T} _ {0} ^ {\prime} = \frac {\hat {T} _ {0} - \tilde {T} _ {0}}{\tilde {T} _ {0}} = \frac {\Delta M}{M} = \frac {\Delta M}{\tilde {f} _ {0} T - \Delta M ^ {\prime}}. \tag {6}
+$$
+
+Note that the worst case $\Delta M = \pm 1$ can happen during one measurement, but not on several consecutive measurements. Indeed, looking at Figure 7, for the measurement period shown, there is a clock rising edge just after the PPS rising edge, whereas for the next measurement period, there is a clock rising edge just before the PPS rising edge; therefore, the "configuration" is different, and it is not possible to have the worst case on consecutive measurement periods. This is illustrated in Figure 7.
+
+This means that the errors made in consecutive estimates are not independent; $M + \Delta M$ is always the same since $T$ and $\tilde{T}_0$ are assumed fixed, and since $M$ can change by $\pm 1$ , the current $\Delta M$ is the previous one $\pm 1$ ; consequently, consecutive $\Delta M$ are not independent. This point will be important later for counting the time because the time counted relies on consecutive measurements.
+
+Note that it is also possible to send the oscillator clock to a phase-locked loop (PLL) that will multiply the frequency, and it is the cycles of this high-frequency clock that will be counted. In this case, if the multiplication factor of the frequency is $\mathrm{P}$ , the periods and frequencies become:
+
+$$
+T = (M + \Delta M) \frac {\tilde {T} _ {0}}{P} \rightarrow \tilde {T} _ {0} = \frac {P T}{M + \Delta M} \rightarrow \tilde {f} _ {0} = \frac {M + \Delta M}{P T}, \tag {7}
+$$
+
+$$
+T = M \frac {\hat {T} _ {0}}{P} \rightarrow \hat {T} _ {0} = \frac {P T}{M} \rightarrow \hat {f} _ {0} = \frac {M}{P T}.
+$$
+
+Then, the error and normalized error become:
+
+$$
+\Delta \hat {T} _ {0} = \frac {\Delta M P T}{M (M + \Delta M)} = \frac {\Delta M}{M} \tilde {T} _ {0}, \Delta \hat {T} _ {0} ^ {\prime} = \frac {\Delta M}{M} = \frac {\Delta M}{P f _ {0} T}, \tag {8}
+$$
+
+$$
+\Delta \tilde {f} _ {0} = - \frac {\Delta M}{P T}, \Delta \tilde {f} _ {0} ^ {\prime} = - \frac {\Delta M}{P \tilde {f} _ {0} T} = - \frac {\Delta M}{M + \Delta M ^ {\prime}}.
+$$
+
+From these equations, it is shown that the higher the measured frequency, the lower the error.
+
+# 6. Experimental Results
+
+# 6.1. Clock Synchronization
+
+Due to computation time in the data acquisition phase and software-adaptive algorithm in the FPGA chip, there was a constant delay between the 1PPS signal from the GNSS receiver module and the generated 1PPS signal, which was measured as $145\mathrm{ms}$ . The sawtooth correction method and the counter clock adjustment techniques are some of the clock synchronization techniques used to synchronize the timing signal employed in the literature [3,24]. The phase alignment between the GNSS and atomic clock is essential for an unbiased and deterministic time distribution downstream.
+
+A typical GNSS receiver provides the time reference through its output 1PPS signals. The output $10\mathrm{MHz}$ frequency signal from GNSS follows the 1PPS coherently. The derivative of the 1PPS phase in time is consistent with the output frequency. The unknown phase relationship between the PPS and $10\mathrm{MHz}$ signals from GNSS becomes irrelevant; this offset may be a constant one, and it is strictly bounded within $\pm 1(ns)$ .
+
+Sometimes a time difference may arise due to the change in the electronically advanced or delayed internal clock signal to generate the 1PPS signal aligned to GPS time. The adjustment of the time difference between the two 1PPS signals is carried out in the firmware of the FPGA. The perfect alignment after modifying the FPGA firmware is illustrated in Figure 8.
+
+Sensors 2022, 22, 3135
+
+9 of 17
+
+![](dt=2026-03-26/ht=04/418269761e9e08cc4c5ea82a982592964f4c7eb2dd5b786dc961651e04bcf1c8.jpg)
+
+![](dt=2026-03-26/ht=04/65f98fb45d7cc0fb4d130c9a5ca65782a412fda65f2d49148d6a0a9dc19df45f.jpg)
+
+# 6.2. Temperature Dependency of Frequency
+
+To evaluate the effect of temperature on the board's performance, the frequency varies according to the change of temperature as observed from the TCXO on the AGPSDO board. The board was set up in a stable temperature chamber. The temperature was controlled to vary in the range of $\pm 1.2^{\circ}\mathrm{C}$ . The temperature profile applied to the TCXO is shown in Figure 9. The temperature variation was the input of the adaptive Kalman temperature model. The board was switched to hold-over mode after $2\mathrm{h}$ of learning mode.
+
+The result of frequency variation with noise and with the noise filter is described in Figure 10. The temperature variation contributes significantly to the frequency of TCXO at the maximum of $3.5\mathrm{ppb} / {}^{\circ}\mathrm{C}$ . Therefore, the temperature compensation is necessary to achieve a high-precision timing clock.
+
+![](image)neru_full_text/v0/result=success/type=image/dt=2026-03-26/ht=04//e455285662377b5237325b7b1107f1ccc7fe1fa6d9b5e79163962b0a7a69bf89.jpg)
+
+Sensors 2022, 22, 3135
+
+10 of 17
+
+![](dt=2026-03-26/ht=04/5b928d5edf228731832aeb33254428a784f06ba32e5e04b1de730e4994554c12.jpg)
+
+# 6.3. Measurement Results
+
+In the measurements, we use the term $\Delta PPS$ (DeltaPPS), which is the timing error between two adjacent PPS pulses [19]. The 1PPS GPS received signal and the 1PPS signal from the AGPSDO have a relationship:
+
+$$
+1 s = \left(t _ {n} + t _ {\text {o f f s e t} n}\right) - \left(t _ {n - 1}\right) - t _ {\text {o f f s e t} n - 1}). \tag {9}
+$$
+
+The PPS time intervals were measured during the test; therefore, the difference between two adjacent 1PPS signal is the measured $\Delta PPS$ , which is expressed as:
+
+$$
+\Delta P P S = t _ {\text {o f f s e t} n} - t _ {\text {o f f s e t} n - 1} = 1 s - \left(t _ {n} - t _ {n - 1}\right). \tag {10}
+$$
+
+# 6.3.1. Indoor Experimental Result
+
+The experimental setup for the indoor test is depicted in Figure 11. The setup included a digital storage oscilloscope (DSO) to capture and observe the real-time signals including the GNSS 1PPS signal and the 1PPS signal generated from the AGPSDO board. A computer was used to collect signals from UART ports (GNSS 1PPS signal and generated 1PPS signal).
+
+Based on the setup shown in this figure, the advanced GNSS simulator Orolia was connected to the AGPSDO board, and the Dektec DTA-2115B SDR card generates the GPS $L_{1}$ signal at a sampling rate of $12.5M -$ samples/s coming from the four RF channels combined to connect the DC-block to the antenna port of the GNSS receiver. The power level of the simulated signal was set at $-130$ dBm, and the default gain of $50$ dB was chosen during the lock-in mode of the receiver.
+
+The second channel of the DSO was allocated to know the readings, and in the Agilent scope, the settings of the measurement mode of difference between the channels in the two rising edges were kept for finding the deviation between the signals.
+
+At the beginning of the initial measurement, the lock-in mode that is the GNSS signal was ON; in this mode, the difference between the two signals is noted, and at the start of the first hour, the interference option was set up in the GNSS simulator so that after a fraction of seconds, slowly, the availability of the GNSS signal was vanishing.
+
+Then, the time of the 1PPS timing signal was examined after $24\mathrm{h}$ (1 day), and the behavior of the timing signal was carefully verified to see the stability of the signal generation in the FPGA firmware concerning the amplitude and the time duration as in Table 1. We found that the readings were good enough to achieve the anticipated variations in the UART console of the FPGA, as well as in the real-time reading from the DSO, as depicted in Figure 12.
+
+Sensors 2022, 22, 3135
+
+11 of 17
+
+![](dt=2026-03-26/ht=04/cb02c572e5acfdaa741af823be2284018356193dd458fddc4cae5070e0583dd6.jpg)
+
+![](dt=2026-03-26/ht=04/fee617212b579670924f209ab7f531fbf28bc31e2ba9b1dea11e826de57f6466.jpg)
+
+![](dt=2026-03-26/ht=04/d997b0accb0be268f098dbea050d478f56349659155d3101db9830ba5ff2ed9f.jpg)
+
+![](dt=2026-03-26/ht=04/ccbb01f4f742f5ade245186663b8f1c0d725e983513da7db145e47408814a8b4.jpg)
+
+Figure 13 shows the collected $\Delta PPS$ and the temperature measurement for the indoor experiment. The histogram plot presented in Figure 14 for a difference between the two integer time instants is given, and the respective changes in the histogram plot were also observed in this period. To evaluate the long-term stability of the PPS, we kept it fluctuating around the GPS integer seconds, and it had about a zero cumulative error. In other words, the PPS offsets from the corresponding GPS integer seconds can be regarded as a zero-mean Gaussian variable.
+
+The assumptions considered that the offsets of the difference between two time instants after the hold-over period obey a Gaussian distribution. Therefore, the difference between two adjacent offsets $t_{offset_n} - t_{offset_{n-1}}$ obeys the Gaussian distribution.
+
+Table 1. Measurement of $\Delta {PPS}$ in an indoor environment with hold-over mode.
+
+![](dt=2026-03-26/ht=04/5dd2470a2a9747d83b3a8237e38e72a4dd4ddf6373e50ce12a8e4b3706691cd0.jpg)
+
+<table><tr><td>Measurements</td><td>GPS ON
+Mean Time
+(Start of 1 h)</td><td>GPS OFF
+Hold-Over
+Min. Time
+(End of 1 h)</td><td>GPS OFF
+Hold-Over
+Max. Time
+(End of 1 h)</td><td>GPS OFF
+Hold-Over
+Mean Time
+(End of 1 h)</td><td>GPS OFF
+Hold-Over
+Min. Time
+(End of 24 h)</td><td>GPS OFF
+Hold-Over
+Max. Time
+(End of 24 h)</td><td>GPS OFF
+Hold-Over
+Mean Time
+(End of 24 h)</td></tr><tr><td>1PPS GPS (ms)</td><td>999.999397</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr><tr><td>1PPS AGPSDO (ms)</td><td>999.999341</td><td>999.998973</td><td>999.998901</td><td>999.999347</td><td>999.999419</td><td>999.999597</td><td>999.999609</td></tr><tr><td>Δ PPS (ms)</td><td></td><td>0.000020
+(0.002 μs)</td><td>0.000042
+(0.042 μs)</td><td>0.000050
+(0.005 μs)</td><td>0.000072
+(0.072 μs)</td><td>0.000068
+(0.068 μs)</td><td>0.000080
+(0.080 μs)</td></tr></table>
+
+Sensors 2022, 22, 3135
+
+12 of 17
+
+![](dt=2026-03-26/ht=04/4bad1545336a59a8a71a2c53486ec215e1a13a58bc5c17b577e6c496503047cf.jpg)
+
+![](dt=2026-03-26/ht=04/b6e931154bafbdf58f0ddeaba9107a964023bfbcef900ea0b7aab728f799d62c.jpg)
+
+# 6.3.2. Outdoor Experimental Result
+
+To evaluate the real-time measurements that were clock accurate (atomic clock) from the satellites based on live signals, it was decided to record and playback the live sky signals rather than the generated GNSS signals. First, the test in the corridor of the first floor was set up as depicted in Figure 15. The GNSS antenna was connected to the RF input port of the AGPSDO board. For blocking the satellite signals, we used the blade RF to generate a single-tone CWI to disable the detection of the GNSS signal on the AGPSDO device.
+
+The interference setup in Simulink of the RFI generation was used. On the other hand, the satellite visibility was observed from the UCenter software installed on a laptop. The lock-in period was kept within only one hour since the continuous reception of the GNSS signal is a challenging task in this indoor arena, so we restricted it only to $1\mathrm{h}$ . In this lock-in period, the initial reading of 1PPS of both pulse signals was recorded, then we enabled the blocking of satellite signals at the start of the second hour; both signals were observed to see the difference in $\Delta PPS$ .
+
+Then, we continuously measured the readings of the hold-over period over a day.
+
+Sensors 2022, 22, 3135
+
+13 of 17
+
+![](dt=2026-03-26/ht=04/15018a96e2cbcad62e0a34bc5933958cec1a904c711198e39e0aa6a78d7c0883.jpg)
+
+The measurements were not stable because the receiver switched from lock-in mode to hold-over mode rapidly due to the low signal power; thus, one can notice much variation in the mean value of the 1PPS signal for a $24\mathrm{h}$ duration. The values obtained in this experiment may not be accurate to evaluate the difference. For example, for the difference between the reference signal and the timing signal from $2\mathrm{h}$ to $2\mathrm{h}5\mathrm{min}$ , (5 min of observation time), the switching occurred 11 times; therefore, the calculation of $\Delta PPS$ , which is relevant to the reference GPS signal, is a difficult task to measure and to evaluate the changes in $\Delta PPS$ .
+
+From the tabulated results in Table 2, the mean difference of 1 PPS for the first-hour lock-in mode showed $0.00378~\mu \mathrm{s}$ after changing the mode of hold-over and a shift of $0.225\rightarrow 0.767~\mu \mathrm{s}$ in the 1PPS measurements for the first $5\mathrm{min}$ . At the end of one hour, the variations kept under the required level of $1 / 10~\mu \mathrm{s}$ . However, the drift changed to $0.178~\mu \mathrm{s}$ , slightly beyond the threshold value, after $2\mathrm{h}$ .
+
+Table 2. Measurement of $\Delta {PPS}$ in the outdoor environment with hold-over mode.
+
+![](dt=2026-03-26/ht=04/1cdca4d1debadcdcb4aa3274c97b51f798903064c4faf78f25501add05154331.jpg)
+
+<table><tr><td>Measurements</td><td>GPS ON
+Mean Time
+(Start of 1 h)</td><td>GPS OFF
+Hold-Over
+Min. Time
+(End of 1 h)</td><td>GPS OFF
+Hold-Over
+Max. Time
+(End of 1 h)</td><td>GPS OFF
+Hold-Over
+Mean Time
+(End of 1 h)</td><td>GPS OFF
+Hold-Over
+Min. Time
+(End of 24 h)</td><td>GPS OFF
+Hold-Over
+Max. Time
+(End of 24 h)</td><td>GPS OFF
+Hold-Over
+Mean Time
+(End of 24 h)</td></tr><tr><td>1PPS GPS (ms)</td><td>999.999397</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr><tr><td>1PPS AGPSDO (ms)</td><td>999.999341</td><td>999.998973</td><td>999.998901</td><td>999.999347</td><td>999.999419</td><td>999.999597</td><td>999.999609</td></tr><tr><td>Δ 1PPS (ms)</td><td></td><td>0.000020</td><td>0.000042</td><td>0.000050</td><td>0.000072</td><td>0.000068</td><td>0.000080</td></tr><tr><td></td><td></td><td>(0.002 μs)</td><td>(0.042 μs)</td><td>(0.005 μs)</td><td>(0.072 μs)</td><td>(0.068 μs)</td><td>(0.080 μs)</td></tr></table>
+
+# 6.4. Comparison to the Reference Boards
+
+In this part, we provide measurement results of the generated 1PPS signal with several reference boards. Most of the measurement procedures of comparing the timing signal based on the reference receivers have been given in several references [25]. To distinguish between two timing signals in hold-over mode, we needed a reference signal to see the time difference after lock-in mode, so we decided to employ four GNSS receivers to confirm that the pattern of the PPS signal was the same for all cases.
+
+In our experiment, the Ublox GPS M8T receiver, the Pmod GPS, and the two-timing boards having the same Ublox ZED-F9P receivers were used to see the functioning and the deviation of the 1PPS GNSS signal relevant for all 1PPS signals of the reference receivers. As illustrated in Figure 16, all the receivers were connected to the GNSS simulator with the same GPS $L_{1}$ signals simultaneously, and their corresponding 1PPS signals were displayed in the four channels of the DSO, respectively.
+
+Sensors 2022, 22, 3135
+
+14 of 17
+
+![](dt=2026-03-26/ht=04/16b164ecea250490530dc162de3758e34dd4cb0d959cf00449d36308f610d930.jpg)
+
+# 6.5. Discussion
+
+In this part, we provide the comparison of the proposed AGPSDO and the previous works in Table 3. The work in [11] achieved a time error of $1.5\mu s$ over a $24\mathrm{h}$ hold-over period, then the frequency stability was $0.017\mathrm{ppb}$ . The authors also presented an adaptive algorithm to compensate the temperature effect, and the achievement met the timing requirement for the CDMA network base station. However, the hardware design and the power consumption were not provided.
+
+The authors in [16] provided the hardware implementation of the GPSDO, which aimed to reduce the power consumption of the wireless sensor nodes. The above-mentioned GPSDO achieved a $5.03\mu s$ time drift within a $1800s$ window time of disciplining, which consumed below $100\mathrm{mW}$ . However, the frequency stability was low considering the hold-over time of $1800s$ in the experiment. Our proposed AGPSDO achieved a $0.004\mathrm{ppb}$ frequency stability while consuming $600\mathrm{mW}$ .
+
+It is noted that commercial products that provides higher frequency stability (1 ppb) consume around $500\mathrm{mW}$ .
+
+Table 3. Comparison of the proposed AGPSDO and the previous works.
+
+![](dt=2026-03-26/ht=04/bf335b524da65d4d591cadad7df3b4b4f1c0ab80397c86cbf171af45ad2d7e46.jpg)
+
+<table><tr><td>GPSDO</td><td>Hold-Over Time</td><td>ΔPPS</td><td>Frequency Stability</td><td>Power Consumption</td></tr><tr><td>[11]</td><td>24 h</td><td>1.5 μs</td><td>0.017 ppb</td><td>-</td></tr><tr><td>[16]</td><td>1800 s</td><td>5.03 μs</td><td>-</td><td>100 mW</td></tr><tr><td>This work</td><td>24 h</td><td>0.356 μs</td><td>0.004 ppb</td><td>600 mW</td></tr></table>
+
+# 7. Conclusions
+
+In this paper, we presented our proposed autonomous GPS-disciplined oscillator in an FPGA-based hardware design, which was aimed for use in wireless sensor network nodes. The timing requirement for the sensor nodes could be achieved by using the proposed AGPSDO. The design, which takes advantage of the high frequency in data acquisitions and an adaptive algorithm for calibration, provided high accuracy for the timing reference board.
+
+Experimental results with indoor and outdoor environments verified the accuracy of the proposed algorithm and hardware implementation of the autonomous GPS-disciplined oscillator. The AGPSDO board showed that it had only an 80 ns frequency drift after $24\mathrm{h}$ of working without GPS signals. The frequency stability achieved 0.004 ppb with the outdoor experiment, proving the advantages of the proposed hardware implementation and software design. The timing performance was compared to the commercial reference boards and the state-of-the-art.
+
+In the future, sensor nodes using the proposed AGPSDO could be implemented and tested in real-time applications.
+
+Author Contributions: Methodology, A.E. and R.J.L.; Writing—original draft, T.Q.T.B. All authors have read and agreed to the published version of the manuscript.
+
+Funding: This research received no external funding.
+
+Institutional Review Board Statement: Not applicable.
+
+Informed Consent Statement: Not applicable.
+
+Sensors 2022, 22, 3135
+
+15 of 17
+
+# Data Availability Statement: Not applicable.
+
+Conflicts of Interest: The authors declare no conflict of interest.
+
+# References
+
+Sensors 2022, 22, 3135
+
+16 of 17
+
+Sensors 2022, 22, 3135
+
+17 of 17

@@ -1,0 +1,1097 @@
+[
+ {
+  "qid": "baee287ff68f0fd60dcbd0d8",
+  "question": "Apart from preventing overfitting, are there any side effects (desirable or otherwise) of applying dropout in deep neural networks?",
+  "sections": [
+   {
+    "title": "Structural and Ensemble Mechanisms",
+    "text": "Beyond its primary role in regularization, dropout fundamentally alters the dynamics of network training by inducing a virtual change in the architecture at every step. This process involves the temporary elimination of neurons, which forces the model to learn redundant representations. The training procedure is conceptually analogous to bagging, an ensemble technique typically associated with decision trees [1]. By effectively training an ensemble of thinned networks, the method leverages the benefits of model averaging without requiring the explicit storage of multiple distinct models during the inference phase.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "The training procedure for dropout is similar to bagging [11], which is an ensemble method usually applied to decision trees."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Impact on Generalization Performance",
+    "text": "While the prevention of overfitting is the most widely recognized benefit of dropout, its influence on final model quality is substantial. The technique exerts a dramatic effect on performance metrics observed on test sets. This suggests that the side effects of dropout extend beyond simple noise injection, significantly shaping the generalization capabilities of the deep neural network. The magnitude of this impact indicates that dropout is not merely a passive regularizer but an active component in determining the model's predictive accuracy on unseen data.",
+    "citations": []
+   },
+   {
+    "title": "Privacy Implications in Federated Learning",
+    "text": "In distributed and federated learning contexts, the application of dropout introduces specific risks regarding data confidentiality. Research indicates that the use of dropout, alongside other components like ReLU activation functions, can be detrimental to the privacy of a client's local dataset [2]. This finding highlights a critical side effect where the regularization mechanism may inadvertently leak information about the local training data, posing challenges for privacy-preserving machine learning systems that rely on such architectures.",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "We evaluate some key design decisions and show that the usage of ReLu and Dropout are detrimental to the privacy of a client's local dataset."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Effectiveness in Industrial Recommendation Systems",
+    "text": "The utility of dropout variants extends to specialized domains such as large-scale recommendation platforms. Specifically, recency dropout has been demonstrated to be effective across a range of experimental settings, including simulation studies, offline evaluations, and live industrial deployments [3]. This evidence confirms that the side effects and benefits of dropout mechanisms are not limited to standard classification tasks but are also applicable and beneficial in complex, real-world industrial environments where data recency plays a significant role in model performance.",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [
+       "We demonstrate the effectiveness of recency dropout in various experimental settings including a simulation study, offline experiments, as well as live experiments on a large-scale industrial recommendation platform."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 14,
+   "n_claims_usable": 6,
+   "claims_dropped_noref": 8,
+   "claims_invalidated": 0,
+   "orphan_markers": 3,
+   "word_count": 324,
+   "n_sections": 4,
+   "n_citations": 3,
+   "record_level": 3,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "880129a65489610c5c805e17",
+  "question": "Can you recommend a suitable theoretical lens for qualitative research concerning robotics process automation (RPA) implementations?",
+  "sections": [
+   {
+    "title": "Theoretical Foundations for RPA Implementation",
+    "text": "To address the need for a suitable theoretical lens for qualitative research on Robotics Process Automation (RPA), one must first consider the specific frameworks developed for this domain. Recent scholarship has introduced distinct frameworks designed to guide RPA adoption, including a general RPA framework [3] and a specific viability framework that assesses the feasibility of implementation [2]. These models provide the structural basis for understanding how RPA integrates into existing organizational structures. Furthermore, the concept of the future digital workforce offers a critical perspective on how RPA reshapes labor dynamics, suggesting that qualitative inquiries should examine the evolving relationship between human and automated agents [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [],
+      "title": "the future digital work force: robotic process automation (rpa)",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [],
+      "title": "a framework to evaluate the viability ofrobotic process automation forbusiness process activities",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [],
+      "title": "a framework to support robotic process automation",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     }
+    ]
+   },
+   {
+    "title": "Methodological Approaches to Formative Research",
+    "text": "Qualitative research in this area benefits from established methodological traditions in formative research. Several studies outline specific methods for conducting formative research, which are essential for iterative design and evaluation processes [6] [7]. Observation is highlighted as a key technique within this formative research context, allowing researchers to gather in-situ data on user interactions and process flows [5]. A broader review of qualitative research methods provides a foundational overview of the techniques available for such studies, ensuring that the chosen lens aligns with rigorous qualitative standards [4]. These methodological guidelines support the collection of rich, contextual data necessary for understanding the nuances of RPA deployment.",
+    "citations": [
+     {
+      "id": "[4]",
+      "snippets": [],
+      "title": "qualitative research methods in health technology assessment: a review of the literature",
+      "metadata": {
+       "year": 1998,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     },
+     {
+      "id": "[5]",
+      "snippets": [],
+      "title": "observe before you leap: why observation provides critical insights for formative research and intervention design that you'll never get from focus groups, interviews, or kap surveys",
+      "metadata": {
+       "year": 2018,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [],
+      "title": "formative research for hygiene promotion in kyrgyzstan",
+      "metadata": {
+       "year": 2005,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     },
+     {
+      "id": "[7]",
+      "snippets": [],
+      "title": "formative research methods for designing culturally appropriate, integrated child nutrition and development interventions: an overview",
+      "metadata": {
+       "year": 2014,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     }
+    ]
+   },
+   {
+    "title": "User Perception and Interaction Paradigms",
+    "text": "A critical component of any theoretical lens is the understanding of user experience and perception. Recent research distinguishes between different interaction paradigms, specifically contrasting 'do it for me' versus 'do it with me' approaches, which significantly influence user acceptance and workflow integration [8]. These perceptions are central to qualitative investigations, as they reveal how users interpret the autonomy and collaboration levels of RPA systems. By focusing on these paradigms, researchers can better understand the psychological and practical implications of automation on daily work routines.",
+    "citations": [
+     {
+      "id": "[8]",
+      "snippets": [],
+      "title": "do it for me vs. do it with me: investigating user perceptions of different paradigms of automation in copilots for feature-rich software",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     }
+    ]
+   },
+   {
+    "title": "Process Analysis and Decision Support",
+    "text": "Theoretical frameworks must also account for the technical and procedural aspects of RPA. There is a recognized need for decision support models that estimate the impact of RPA on business processes, enabling organizations to prioritize which processes are most suitable for automation [11]. This prioritization is supported by techniques for process matching, which help align RPA capabilities with specific business needs [10]. Additionally, the analysis of process-related user interaction logs provides empirical data that can inform qualitative interpretations of how RPA actually functions in practice [9]. These elements ensure that the theoretical lens is grounded in both strategic decision-making and operational reality.",
+    "citations": [
+     {
+      "id": "[9]",
+      "snippets": [],
+      "title": "a reference data model for process-related user interaction logs",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2207.12054",
+       "authors": []
+      }
+     },
+     {
+      "id": "[10]",
+      "snippets": [],
+      "title": "process matching: performance trade-off between summary and full-length descriptions",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     },
+     {
+      "id": "[11]",
+      "snippets": [
+       "These results underline the need for decision support models to estimate impact of RPA on business processes, and, as such, prioritize business processes for RPA implementation."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Broader Research Context and Ethical Considerations",
+    "text": "While the primary focus is on RPA, the broader context of management science and research ethics informs the theoretical landscape. Management science is undergoing a transition that presents challenges for global research, which may affect how RPA studies are framed and disseminated [26]. Although some claims reference unrelated fields such as psychology research platforms [24] [25], synthetic data quality [23], and the ethical use of large language models [22], these highlight the increasing complexity of modern research environments. Specifically, the ethical considerations surrounding new technologies, such as LLMs, suggest that RPA research should also address ethical implications, even if the specific claims regarding LLMs [22] and other technical surveys [12] [13] [14] [15] [16] [17] [18] [19] [20] [21] are not directly applicable to RPA qualitative design. The focus should remain on the RPA-specific frameworks and user-centric paradigms identified in the core claims.",
+    "citations": [
+     {
+      "id": "[12]",
+      "snippets": [],
+      "title": "large language models for software testing: a research roadmap",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     },
+     {
+      "id": "[13]",
+      "snippets": [],
+      "title": "evaluation metrics for personalized recommendation systems",
+      "metadata": {
+       "year": 2021,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     },
+     {
+      "id": "[14]",
+      "snippets": [],
+      "title": "title:ammus : a survey of transformer-based pretrained models in natural language processing",
+      "metadata": {
+       "year": 2021,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     },
+     {
+      "id": "[15]",
+      "snippets": [],
+      "title": "large language model for table processing: a survey",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": "2402.05121",
+       "authors": []
+      }
+     },
+     {
+      "id": "[16]",
+      "snippets": [],
+      "title": "neural dynamics of the processing of speech features: evidence for a progression of features from acoustic to sentential processing",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     },
+     {
+      "id": "[17]",
+      "snippets": [],
+      "title": "research challenges in relational database management systems for llm queries",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     },
+     {
+      "id": "[18]",
+      "snippets": [],
+      "title": "a survey of deep network solutions for learning control in robotics: from reinforcement to imitation",
+      "metadata": {
+       "year": 2016,
+       "doi": null,
+       "arxiv": "1612.07139",
+       "authors": []
+      }
+     },
+     {
+      "id": "[19]",
+      "snippets": [],
+      "title": "i move therefore i learn: experience-based traversability in outdoor robotics",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     },
+     {
+      "id": "[20]",
+      "snippets": [],
+      "title": "a radiomics-based framework for liver cancer analysis using explainable artificial intelligence (xai) methods",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     },
+     {
+      "id": "[21]",
+      "snippets": [],
+      "title": "can you label less by using out-of-domain data? active & transfer learning with few-shot instructions",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2211.11798",
+       "authors": []
+      }
+     },
+     {
+      "id": "[22]",
+      "snippets": [],
+      "title": "guidance for researchers and peer-reviewers on the ethical use of large language models (llms) in scientific research workflows",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     },
+     {
+      "id": "[23]",
+      "snippets": [],
+      "title": "can i trust my fake data -- a comprehensive quality assessment framework for synthetic tabular data in healthcare",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": "2401.13716",
+       "authors": []
+      }
+     },
+     {
+      "id": "[24]",
+      "snippets": [],
+      "title": "available online platforms for psychology research: introduction and application progress",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     },
+     {
+      "id": "[25]",
+      "snippets": [],
+      "title": "web-based platform for psychology research",
+      "metadata": {
+       "year": 2017,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     },
+     {
+      "id": "[26]",
+      "snippets": [],
+      "title": "ouverture de “management science in transition: challenges for global research”",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 32,
+   "n_claims_usable": 32,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "title_only_citations": 25,
+   "word_count": 539,
+   "n_sections": 5,
+   "n_citations": 26,
+   "record_level": 1,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "e03c49cccc971cf3ae675565",
+  "question": "Are there papers that use different formats of Q&A with the user to clarify intent and compose more complicated prompts to LLM?",
+  "sections": [
+   {
+    "title": "Interactive Clarification Mechanisms",
+    "text": "Several systems employ interactive methods to refine user intent before generating complex outputs. One approach involves mixed-initiative data wrangling, where users demonstrate actions on multiple tables while providing natural language prompts within a conversational interface [2]. To further ensure accuracy, users may be required to answer multiple-choice clarification questions posed by the LLM to disambiguate their requests [2]. Another framework utilizes an intent corrector module that receives extracted user intent, confirms or corrects it, converts it into JSON format, and updates the system's understanding of the user's goals [1]. These mechanisms highlight a shift toward active user participation in the prompt composition process.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [],
+      "title": "A Survey of using Large Language Models for Generating Infrastructure as Code",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": "2404.00227",
+       "authors": []
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [],
+      "title": "visegpt: towards better alignment of llm-generated data wrangling scripts and user prompts",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     }
+    ]
+   },
+   {
+    "title": "Paradigms of LLM Assistance",
+    "text": "Research has examined user perceptions of distinct interaction paradigms for LLM-based assistance. Specifically, studies compare a \"do it for me\" format, where the system acts autonomously, against a \"do it with me\" format, which emphasizes collaborative interaction [4]. This distinction is relevant to how users engage with systems that aim to compose more complicated prompts, as the level of user involvement can significantly impact the final outcome. Additionally, the effectiveness of these assistants is being evaluated, with findings indicating that risk-aware conversational search agents outperform non-risk-aware baselines in certain contexts [3].",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [],
+      "title": "why and when llm-based assistants can go wrong: investigating the effectiveness of prompt-based interactions for software help-seeking",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": "2402.08030",
+       "authors": []
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [],
+      "title": "do it for me vs. do it with me: investigating user perceptions of different paradigms of automation in copilots for feature-rich software",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     }
+    ]
+   },
+   {
+    "title": "Diverse Question and Prompt Formats",
+    "text": "The structure of questions and prompts varies significantly across different applications. Some systems utilize specific question templates, such as a set of 24 templates tagged for subjects and objects that can be dynamically filled in [6]. In educational or testing contexts, quiz-style question generation produces questions that span various forms and answer types, extending beyond simple \"who\" or \"where\" inquiries [2]. Furthermore, LLMs are capable of generating a wide array of instructional formats, including instructions, demonstrations, probing sets, and chain-of-thought reasoning [5]. This diversity allows for the creation of more nuanced and complex prompts tailored to specific tasks.",
+    "citations": [
+     {
+      "id": "[5]",
+      "snippets": [],
+      "title": "A Survey on In-context Learning",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2301.00234",
+       "authors": []
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [],
+      "title": "visegpt: towards better alignment of llm-generated data wrangling scripts and user prompts",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [],
+      "title": "Hallucination Detection in Foundation Models for Decision-Making: A Flexible Definition and Review of the State of the Art",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": "2403.16527",
+       "authors": []
+      }
+     }
+    ]
+   },
+   {
+    "title": "Analysis of Q&A Characteristics",
+    "text": "Quantitative analysis of question formats provides insight into how Q&A structures are characterized in research. Metrics used to evaluate these formats include the length of questions, specifically identifying those with more than 20 tokens, and the percentage of questions that begin with wh-words [3]. Additionally, researchers track the percentage of questions that utilize the word \"if\" and measure the number of prompts per customer [3]. These specific metrics suggest a detailed examination of the linguistic and structural properties of Q&A interactions, which can inform the design of more effective prompt engineering strategies.",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [],
+      "title": "why and when llm-based assistants can go wrong: investigating the effectiveness of prompt-based interactions for software help-seeking",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": "2402.08030",
+       "authors": []
+      }
+     }
+    ]
+   },
+   {
+    "title": "Application Domains and Intent Awareness",
+    "text": "The application of these Q&A and prompt composition techniques spans various domains, including code-based problem solving and general tool usage. For instance, intent-aware code-based problem solving relies on the direct understanding capabilities of LLMs to interpret user needs [8]. In broader tool categorization, LLM tools are classified into five categories, including chatbots, content creation, teaching aides, and quiz generators [7]. These categories reflect the diverse ways in which LLMs are integrated into workflows, often requiring the system to clarify intent and compose appropriate prompts to deliver useful results.",
+    "citations": [
+     {
+      "id": "[7]",
+      "snippets": [],
+      "title": "Large Language Models for Education: A Survey and Outlook",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": "2403.18105",
+       "authors": []
+      }
+     },
+     {
+      "id": "[8]",
+      "snippets": [],
+      "title": "neurosync: intent-aware code-based problem solving via direct llm understanding modification",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 11,
+   "n_claims_usable": 11,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "title_only_citations": 8,
+   "word_count": 472,
+   "n_sections": 5,
+   "n_citations": 8,
+   "record_level": 0,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "2345ff0aa0b13fc87a46d552",
+  "question": "Compare the various algorithms for compressing trees in terms of computation complexity.",
+  "sections": [
+   {
+    "title": "Foundational DAG-Based Approaches",
+    "text": "The earliest technique for tree compression involves transforming the input structure into a Directed Acyclic Graph (DAG) by storing identical shared fringe subtrees only once [3]. This method is computationally efficient, as the smallest possible DAG resulting from this process is unique and can be derived in linear time [2]. While this approach is sufficient for generating universal binary-tree codes for trees that are fringe-dominated, it has limitations in other contexts [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "While good enough to yield universal binary-tree codes for fringe-dominated trees (cf. the \"Representation Ratio Negligibility Property\" in [83] and similar sufficient conditions [76]), it is easy to construct examples where DAG compressio"
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "The smallest such DAG is unique and can be computed in linear time [13]."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "DAG compression is the oldest method. It stores identical shared fringe subtrees only once and hence transforms a tree $t$ into a DAG."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Sliding-Window Approximation Methods",
+    "text": "An alternative strategy is represented by BPLEX, which functions as a sliding-window based linear time approximation algorithm [5]. Rather than relying solely on global structural sharing, this method searches for repeating tree patterns in a bottom-up manner within a fixed window [5]. This approach is often compared against other techniques to evaluate its effectiveness in tree structure compression [4].",
+    "citations": [
+     {
+      "id": "[4]",
+      "snippets": [
+       "Basically, we compare our implementation of Re-pair for Trees with two other compression algorithms based on linear SLCF tree grammars, namely, BPLEX [BLM08] and Extended-Repair [Kri08,BHK10]."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[5]",
+      "snippets": [
+       "The former is a sliding-window based linear time approximation algorithm. It searches bottom-up in a fixed window for repeating tree patterns."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Grammar-Based Compression and Repair",
+    "text": "Modern compression strategies often utilize linear SLCF tree grammars, with Re-pair for Trees serving as a primary example for comparison [4]. This algorithm is evaluated alongside BPLEX and Extended-Repair, which also rely on linear SLCF tree grammars for their compression mechanisms [4]. These methods represent a shift from simple structural sharing to more complex grammatical representations of tree data [4].",
+    "citations": [
+     {
+      "id": "[4]",
+      "snippets": [
+       "Basically, we compare our implementation of Re-pair for Trees with two other compression algorithms based on linear SLCF tree grammars, namely, BPLEX [BLM08] and Extended-Repair [Kri08,BHK10]."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Transform-Based Compression Pipelines",
+    "text": "The TreeCompress algorithm employs a multi-stage pipeline that begins by computing the XBW-transform of the labeled tree [6]. This transformation yields specific string components, namely Slast and Sα, which are then processed separately [6]. The algorithm applies dedicated compressors to these individual components to achieve the final compressed representation [6]. This approach decouples the structural transformation from the entropy coding steps [6].",
+    "citations": [
+     {
+      "id": "[6]",
+      "snippets": [
+       "Algorithm TreeCompress(T, Clast, Cα) (1) Compute the XBW-transform of T, namely xbw[T] = (Slast, Sα). (2) Use compressor Clast to squeeze Slast. (3) Use compressor Cα to squeeze Sα."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Entropy Coding Considerations",
+    "text": "While the primary focus is on structural algorithms, the efficiency of the final encoded output is also influenced by the choice of coding scheme. For instance, Huffman coding is utilized to minimize the length of the encoded text for a given alphabet [7]. This principle applies to the symbols generated during the compression process, ensuring that the resulting bitstream is as compact as possible given the statistical properties of the data [7].",
+    "citations": [
+     {
+      "id": "[7]",
+      "snippets": [
+       "A text written using symbols from a given alphabet can be compressed using the Huffman code, which minimizes the length of the encoded text."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 10,
+   "n_claims_usable": 7,
+   "claims_dropped_noref": 3,
+   "claims_invalidated": 0,
+   "word_count": 325,
+   "n_sections": 5,
+   "n_citations": 7,
+   "record_level": 7,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "928646729f5d824dd9a52e9d",
+  "question": "Describe what is known about overfitting in in-context learning.",
+  "sections": [
+   {
+    "title": "General Prevalence of Overfitting",
+    "text": "Overfitting is a well-documented phenomenon across various forms of learning, particularly in supervised tasks where models are trained on finite data. In machine learning, limited sample sizes often lead to overfitting, which can cause errors in regression tasks and subsequent failures in modeling complex variables [5]. This issue is frequently exacerbated in deep learning due to the large number of parameters involved, which increases the risk of the model memorizing noise rather than learning generalizable patterns [4]. Specific architectures, such as implicit neural representations, are typically overparameterized and prone to overfitting during the learning process, resulting in suboptimal or noisy outcomes [3]. Furthermore, in the context of adversarial training, over-parameterized networks often exhibit robust overfitting, where they achieve near-zero training error but fail to generalize robustly [2]. Even in co-teaching models, rapid convergence combined with the fast overfitting of noisy labels can lead to the incorrect selection of samples, mistaking noisy data for clean data [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "However, the quick convergence of co-teaching models to select the same clean subsets combined with relatively fast overfitting of noisy labels may induce the wrong selection of noisy label samples as clean, leading to an inevitable confirmation bias that damages accuracy."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "However, it is empirically observed that adversarial training on over-parameterized networks often suffers from the \\textit{robust overfitting}: it can achieve almost zero adversarial training error while the robust generalization performance is not promising."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "However, INR models are typically overparameterized; consequently, these models are prone to overfitting during learning, resulting in suboptimal results, even noisy ones."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "While this is generally a concern in ML solution, the large number of parameters in DL can exacerbate the problem."
+      ],
+      "title": "A Comprehensive Survey of Machine Learning Based Localization with Wireless Signals",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": "2012.11171",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "VII-B 1 Discussion",
+         "chunk_id": "arxiv_2012.11171#c62",
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[5]",
+      "snippets": [
+       "However, in finite samples, machine learning algorithms are prone to overfitting, leading to errors in the regression of the intervening variables, which will further lead to failure in the regression of the resulting coefficients."
+      ],
+      "title": "Instrumental Variables in Causal Inference and Machine Learning: A Survey",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2212.05778",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "IV-D 1 Limitation",
+         "chunk_id": "arxiv_2212.05778#c28",
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Mechanisms for Mitigating Overfitting",
+    "text": "Several strategies are employed to reduce the risk of overfitting in neural networks. Dropout is a common technique that functions by averaging a large number of different neural networks, thereby reducing the model's tendency to overfit [7]. In specific dimensional contexts, dimension-wise early stopping has been shown to mitigate the risk of dimension-specific overfitting while also highlighting differences in model complexity across various dimensions [6]. These methods aim to regularize the learning process, ensuring that models do not become overly specialized to the training data.",
+    "citations": [
+     {
+      "id": "[6]",
+      "snippets": [
+       "The dimension-wise early stopping not only reduces the risk of dimension-specific overfitting, but also reveals differences in model complexity across dimensions."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[7]",
+      "snippets": [
+       "So, dropout averages large number of different neural networks; hence, reduces overfitting."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Characteristics of In-Context Learning",
+    "text": "In-context learning (ICL) is a training-free framework that does not require parameter updates, as it is performed directly on pretrained large language models [8][8]. The core concept of ICL is to learn from analogy, allowing the model to adapt to new tasks based on the examples provided in the prompt [8]. Because ICL operates without traditional supervised training, it presents a distinct paradigm compared to standard fine-tuning approaches, relying instead on the model's existing capabilities to infer patterns from context.",
+    "citations": [
+     {
+      "id": "[8]",
+      "snippets": [
+       "The key idea of in-context learning is to learn from analogy.",
+       "Third, compared to supervised training, ICL is a training-free learning framework.",
+       "In contrast, ICL does not require parameter updates and is directly performed on pretrained LLMs.",
+       "optimizing the conciseness of demonstration examples and improving the computational efficiency of ICL are critical areas of ongoing research",
+       "This scarcity poses a challenge to the generalization ability of ICL"
+      ],
+      "title": "A Survey on In-context Learning",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2301.00234",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "1 Introduction",
+         "chunk_id": "arxiv_2301.00234#c2",
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Generalization Challenges in ICL",
+    "text": "Despite its training-free nature, ICL faces significant challenges regarding generalization. The scarcity of demonstration examples poses a particular hurdle, as limited data can restrict the model's ability to generalize effectively to new instances [8]. Consequently, optimizing the conciseness of these demonstration examples and improving the computational efficiency of ICL are considered critical areas of ongoing research [8]. These factors are essential for enhancing the robustness and applicability of ICL in practical scenarios.",
+    "citations": [
+     {
+      "id": "[8]",
+      "snippets": [
+       "The key idea of in-context learning is to learn from analogy.",
+       "Third, compared to supervised training, ICL is a training-free learning framework.",
+       "In contrast, ICL does not require parameter updates and is directly performed on pretrained LLMs.",
+       "optimizing the conciseness of demonstration examples and improving the computational efficiency of ICL are critical areas of ongoing research",
+       "This scarcity poses a challenge to the generalization ability of ICL"
+      ],
+      "title": "A Survey on In-context Learning",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2301.00234",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "1 Introduction",
+         "chunk_id": "arxiv_2301.00234#c2",
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Specific Overfitting Phenomena and Data Gaps",
+    "text": "A specific form of overfitting known as inter-task overfitting involves a model becoming overly specialized to a specific environment, leading to a significant drop in performance when the environment changes slightly [10]. This phenomenon is particularly relevant in sim-to-real contexts, where the simulation environment differs from the target environment, or when the environment undergoes minor changes [9]. However, direct evidence linking these specific overfitting mechanisms to in-context learning is currently lacking. Searches for records regarding overfitting mechanisms, criticisms, or observations in ICL papers returned no results, indicating a gap in the documented literature. Additionally, technical errors in search tools have hindered further verification of related findings.",
+    "citations": [
+     {
+      "id": "[9]",
+      "snippets": [
+       "This appears in the context of sim-to-real, where the simulation is different from the target environment on which a well performing policy is desired, or when the environment changes slightly, for example, because of a different visual appearance"
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[10]",
+      "snippets": [
+       "Inter-task overfitting describes overfitting to a specific environment such that performance on slightly different environments drops significantly."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 20,
+   "n_claims_usable": 18,
+   "claims_dropped_noref": 2,
+   "claims_invalidated": 0,
+   "orphan_markers": 4,
+   "word_count": 499,
+   "n_sections": 5,
+   "n_citations": 10,
+   "record_level": 10,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ }
+]

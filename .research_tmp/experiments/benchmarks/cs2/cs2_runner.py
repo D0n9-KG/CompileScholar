@@ -120,7 +120,9 @@ def build_tools_cs2():
                               deep_cache_path=os.path.join(
                                   BASE_KB, "deep_read_cache.jsonl"),
                               deep_text_dir=os.path.join(
-                                  BASE_KB, "deep_read_texts"))
+                                  BASE_KB, "deep_read_texts"),
+                              deep_records_path=os.path.join(
+                                  BASE_KB, "deep_read_records.json"))
     return kb, records, views, manifest
 
 

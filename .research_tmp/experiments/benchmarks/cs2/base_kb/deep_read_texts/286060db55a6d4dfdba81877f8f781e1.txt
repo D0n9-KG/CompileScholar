@@ -1,0 +1,425 @@
+# Magneto: Combining Small and Large Language Models for Schema Matching
+
+Yurong Liu* New York University yurong.liu@nyu.edu
+
+Eduardo H. M. Pena*†  
+Federal University of Technology Paraná  
+eduardopena@utfpr.edu.br
+
+Aécio Santos  
+New York University  
+aécio.santos@nyu.edu
+
+Eden Wu New York University eden.wu@nyu.edu
+
+Juliana Freire  
+New York University  
+juliana.freire@nyu.edu
+
+# ABSTRACT
+
+Recent advances in language models (LMs) open new opportunities for schema matching (SM). Recent approaches have shown their potential and key limitations: while small LMs (SLMs) require costly, difficult-to-obtain training data, large LMs (LLMs) demand significant computational resources and face context window constraints. We present Magneto, a cost-effective and accurate solution for SM that combines the advantages of SLMs and LLMs to address their limitations.
+
+By structuring the SM pipeline in two phases, retrieval and reranking, Magneto can use computationally efficient SLM-based strategies to derive candidate matches which can then be reranked by LLMs, thus making it possible to reduce runtime while improving matching accuracy. We propose (1) a self-supervised approach to fine-tune SLMs which uses LLMs to generate syntactically diverse training data, and (2) prompting strategies that are effective for reranking.
+
+We also introduce a new benchmark, developed in collaboration with domain experts, which includes real biomedical datasets and presents new challenges for SM methods. Through a detailed experimental evaluation, using both our new and existing benchmarks, we show that Magneto is scalable and attains high accuracy for datasets from different domains.
+
+# PVLDB Reference Format:
+
+Yurong Liu, Eduardo H. M. Pena, Aécio Santos, Eden Wu, and Juliana Freire. Magneto: Combining Small and Large Language Models for Schema Matching. PVLDB, 18(8): 2681 - 2694, 2025. doi:10.14778/3742728.3742757
+
+# PVLDB Artifact Availability:
+
+The source code, data, and/or other artifacts have been made available at https://github.com/VIDA-NYU/magneto-matcher.
+
+# 1 INTRODUCTION
+
+The rapid increase in the volume of structured data- from data published in scientific articles [63, 72] and repositories [29, 60, 66, 80] to open government portals [19, 64] - creates new opportunities to answer important questions through analytics and predictive modeling. But often, data from multiple sources must be integrated to answer these questions. Consider the following example.
+
+Example 1.1. In the context of the National Cancer Institute's Clinical Proteomic Tumor Analysis Consortium (CPTAC) [15], Li et al. [52] carried out a comprehensive proteogenomic analysis of cancer tumors. They collected data from ten studies (published as supplementary material in research papers) that cover multiple patient cohorts and cancer types. To facilitate their analysis, they mapped each dataset into the GDC standard, a data model set by the National Cancer Institute's Genomic Data Commons (GDC) for cancer genomic data [38, 60].
+
+Even though the studies had been carried out by members of the CPTAC effort, the datasets containing patient case and sample data used different representations for variable names and values. Integrating these data required a substantial effort to match variables from each dataset source schemata to the target GDC format, which encompasses over 700 attributes.
+
+Even though the schema matching problem has been extensively studied [8, 22, 48, 58], matching still requires a time-consuming, manual curation process for complex tasks, which like the one described above, involves ambiguity and heterogeneity in the representation of attributes and values (see Table 1). Schema matching approaches that rely on attribute names, data types and values for similarity assessments are likely to fail for such matches. As a point of reference, we assessed the effectiveness of state-of-the-art strategies for the biomedical datasets from Example 1.1. As shown in Figure 1, they perform poorly: the best technique achieves at most 0.45 of mean reciprocal rank (MRR) and incurs high computational costs. We discuss these results in detail in Section 6.
+
+Determining correspondences between columns may require knowledge beyond the schema and contents of a table. Table 1 shows some possible matches for the proteogenomic analysis. Sometimes, selecting the correct match is difficult even for subject matter experts. For example, for the attribute patient_age from one of the datasets, there are at least three plausible matches in GDC: age_at.Diagnosis,days_to_birth,and age_at_index.Without additional context, it is difficult to determine the correct match.
+
+\*Equal contribution. $\dagger$ Work done as a visiting researcher at New York University.   
+This work is licensed under the Creative Commons BY-NC-ND 4.0 International License. Visit https://creativecommons.org/licenses/by-nc-nd/4.0/ to view a copy of this license. For any use beyond those covered by this license, obtain permission by emailing info@vldb.org. Copyright is held by the owner/author(s). Publication rights licensed to the VLDB Endowment.   
+Proceedings of the VLDB Endowment, Vol. 18, No. 8 ISSN 2150-8097. doi:10.14778/3742728.3742757
+
+Table 1: Examples of candidate matches between source tables and the GDC that highlight schema heterogeneity.
+
+![](dt=2026-05-28/ht=18/34843499400477170806ecd31984ad53d330b9ea0f734bd3e0412999670439fa.jpg)
+
+<table><tr><td>Source Column and Values</td><td>Target Candidate Columns</td></tr><tr><td>Histologic_Grade_FIGO: FIGO grade 1,FIGO grade 2, FIGO grade 3</td><td>tumor_grade: G1, G2, G3who_nte_grade: G1, G2, G3adverse_event_grade: Grade 1,Grade 2, Grade 3</td></tr><tr><td>Path_Stage_Primary_Tumor-pT: pT1a(FIGO IA), pT2 (FIGO II), pT3b (FIGO IIIB)</td><td>uicc_pathologic_t: T1a, T2, T3bajcc_pathologic_t: T1a, T2, T3b</td></tr><tr><td>Age: 65, 72, 49</td><td>age_at.Diagnosis: n/adays_to_birth: n/age_at_index: n/a</td></tr></table>
+
+Schema Matching and Language Models. Renewed interest in data integration has emerged due to the capabilities of language models [34, 59]. For schema matching, promising approaches have been proposed [10, 11, 27, 79]. A key challenge in schema matching is estimating the similarity between two columns. Pre-trained Language Models (PLMs), referred to as SLMs in this paper to distinguish them from large language models (LLMs), create column representations (or embeddings) enriched with semantic information. The similarity between two embeddings serve as a proxy for column-matching scores [10, 11]. SLMs have also been fine-tuned for schema matching [27] and general matching tasks [79].
+
+LLMs, in contrast, are trained using large, generic data corpora and thus contain knowledge that can assist in obtaining additional semantics necessary to identify matches. Prompting strategies combined with fine-tuned models have been shown effective to improve table understanding and help in integration tasks [50].
+
+While prior work has shown the usefulness of SLMs and LLMs for schema matching, they also present significant practical challenges:
+
+Our Approach. We introduce Magneto, a framework that combines SLMs and LLMs to derive cost-effective and general schema matching solutions. As illustrated in Figure 2, Magneto is structured in two phases: candidate retrieval selects a subset of the possible matches; and reranker, which ranks the candidates to make it easier for users to examine and select matches. To address Challenge 1, Magneto leverages LLMs to automate SLMs fine-tuning. Instead of relying on manually created training data and structure-based augmentation (e.g.
+
+, row shuffling and sampling [27, 31]), we use LLMs to derive data. Using LLMs, we can add syntactic diversity and capture different representations for column names and their values. Magneto addresses Challenge 2 by using cheaper SLM-based methods for finding candidates thereby reducing the number of matches that need to be checked by more costly LLM-based rerankers. To ensure that all necessary details are included in the prompt while
+
+![](dt=2026-05-28/ht=18/ac8f839eb3a9750e512d0dc8b09652ab4af1c6699e37e83b49d2495dc0d5ae4a.jpg)
+
+staying within the context window limit, we need to create representative samples of the columns in candidate matches to be ranked by the LLM. In addition, since LLMs are designed for textual data, we must serialize the column content. Selecting the right serialization strategy is still an open research problem that has attracted substantial attention [23, 32]. We explore different alternatives for both sampling and serialization.
+
+Our goal with Magneto is to achieve high accuracy for schema matching at a low cost. Figure 1 illustrates the trade-offs between runtime and accuracy for existing schema matching algorithms and different variants of Magneto. Note that traditional methods tend to cluster at relatively high accuracy with long runtimes or relatively low runtimes with reduced accuracy. In contrast, Magneto variants strike a balance across both dimensions and have the advantage of requiring no training data.
+
+We conduct an extensive experimental study of Magneto on various datasets from two benchmarks. The first is a new benchmark, that we developed in collaboration with domain experts, which includes real biomedical datasets. Our experiments show that many existing schema matching solutions struggle with this benchmark, particularly given the complexity and syntactic variability present in its datasets. In contrast, Magneto demonstrates superior accuracy and generally faster runtimes. We also evaluate Magneto on the Valentine benchmark [48] and observe that it also performs well for the Valentine datasets which cover a variety of domains.
+
+Contributions. Our main contributions are summarized as follows:
+
+![](s3://lakehouse2/hive-ha/produce.db/mineru_full_text/v0/result=success/type=image/dt=2026-05-28/ht=18//1efaf9268c2efa55d7942db59a8516be2468307e91d5440f333910004f3c1fab.jpg)
+
+encompassing characteristics not present in existing benchmarks and introducing new challenges for SM methods (Section 5).
+
+- We perform an extensive experimental evaluation of different strategies derived using our framework, comparing them against SM methods over datasets that cover a wide range of domains. We also carry out ablation studies to assess the effectiveness of different choices for column sampling and serialization (Section 6).
+
+# 2 MOTIVATION AND SOLUTION OVERVIEW
+
+Biomedical Data Integration: Opportunities and Challenges. Due to substantial investments made in infrastructure to share biomedical data [62], many datasets are now stored in repositories with related research articles [60, 66]. Pooling these data can advance research across various diseases and populations, but current technologies are limited in their ability to integrate these data. Our research was motivated by this challenge as part of a collaboration with biomedical researchers in the context of the ARPA-H Biomedical Data Fabric (BDF) program [2], which aims to develop usable data integration methods and tools.
+
+Our interviews with biomedical experts revealed that current data integration practices rely heavily on manual processes and dataset-specific scripts for schema matching [12, 52, 57]. As illustrated in Example 1.1, this approach is both error-prone and difficult to reproduce, creating significant barriers to biomedical research.
+
+Based on these findings, we identified two critical requirements that guided the design of Magneto. First, researchers need approaches that generalize across the diverse landscape of biomedical data—spanning different data types (genomics, proteomics, electronic health records), disease categories (various cancers, autoimmune and rare diseases), and data sources (publications, hospitals, data commons). Second, given the complexity of biomedical schemas, these approaches must facilitate curation, as even subject matter experts often struggle to determine correct matches.
+
+# 2.1 Definitions and Evaluation Metrics
+
+Before describing our approach, we introduce the notation, schema matching definition, and evaluation metrics used in this paper.
+
+Definition 2.1. (Schema Matching) Let $\mathbf{S}(A_1, \ldots, A_n)$ be a source table and $\mathbf{T}(B_1, \ldots, B_m)$ be a target table, where $A_i \in \mathbf{S}$ and $B_j \in \mathbf{T}$ are columns that define the schemata. Each column $A \in \mathbf{S} \cup \mathbf{T}$ has an associated domain, denoted $\mathcal{D}(A)$ , representing the set of possible values that the column can take; note that $\mathcal{D}(A)$ may be empty. Schema matching focuses on aligning the table schemata by establishing correspondences between columns representing the same real-world concept or entity.
+
+A matching algorithm (or matcher) aims to identify pairs $(A_i, B_j)$ that represent the same (or semantically equivalent) column based on various factors, such as their domains and names. Thus, a matcher $\mathcal{M}$ can be seen as a function that generates a schema mapping $M \subseteq \mathbf{S} \times \mathbf{T}$ , where each element $(A, B) \in M$ represents a correspondence between a source column $A$ and a target column $B$ , where $\mathcal{D}(A) \approx \mathcal{D}(B)$ , meaning that the domains of columns $A$ and $B$ are related or overlap.
+
+Matching algorithms often associate a score with each match they derive. These scores are used to generate ranked lists containing the derived matches, which help users explore matches by prioritizing the highest-scoring candidates. These lists provide a global ranking of best matches $(A_{i},B_{j})$ among all pairs of possible matches of a given pair of tables $\mathbf{S}$ and $\mathbf{T}$ or a per-column ranking of the best matches $B_{j}$ for a given source attribute $A_{i}\in \mathbf{S}$ . Thus, a common approach to evaluate schema matching methods is to assess their ability to produce high-quality ranked lists of matches [27, 48]. We use two evaluation metrics: Mean Reciprocal Rank (MRR) and Recall at Ground-Truth Size (Recall@GT), as detailed next.
+
+Definition 2.2. (Mean Reciprocal Rank) Let matches $[A]$ denote the ranked list of matches produced by a schema-matching algorithm for the source column $A \in \mathbf{S}$ , and $r_A$ be the position of the first correct target column $B$ within the ordered list matches $[A]$ . The reciprocal rank (RR) of an individual column $A$ is the multiplicative inverse of the rank, i.e., $\frac{1}{r_A}$ . The mean reciprocal rank (MRR) for a table $\mathbf{S}$ is the average RR over the subset of columns $\mathbf{S}'$ that contain a correct match in the ground truth:
+
+$$
+\mathrm {M R R} = \frac {1}{| \mathbf {S} ^ {\prime} |} \sum_ {A \in \mathbf {S} ^ {\prime}} \frac {1}{r _ {A}}. \tag {1}
+$$
+
+Intuitively, MRR measures how long it takes to find the first relevant match when examining the ranked list of matches.
+
+MRR is a standard evaluation metric for ranked lists in search engines and question-answering systems [71, 83]. For schema matching, high-quality results correspond to ranking the most relevant match for each source column as highly as possible. A high MRR score therefore indicates that users can more easily identify correct matches when evaluating candidate matches for a given column.
+
+We also use the recall at ground truth size (Recall@GT), a standard measure used in recent schema matching literature [48]. Unlike MRR, which evaluates rankings per source column, Recall@GT operates on a global ranking that merges all candidate matches across columns into a single list.
+
+Definition 2.3. (Recall@GT) Let matches denote the global ranked list containing all matches produced by a matcher that considers all
+
+pairs of possible matches between columns from $\mathbf{S}$ and $\mathbf{T}$ , and let $\mathcal{M}$ denote a set containing only the top- $k$ best results in matches. Moreover, let $\mathcal{G}$ be the set of ground truth matching pairs $(A,B)$ . Recall@GT measures the fraction of relevant matches in the ground truth that also appears in $\mathcal{M}$ , where $k$ is given by the size of the ground truth, $k = |\mathcal{G}|$ . More formally,
+
+$$
+\operatorname {R e c a l l} @ \mathrm {G T} = \frac {| \mathcal {G} \cap \mathcal {M} |}{k}. \tag {2}
+$$
+
+Intuitively, it measures how well the matcher can place all correct matches of a table $\mathbf{S}$ at the top of the global ranked list.
+
+# 2.2 Magneto: Overview
+
+Magneto first applies a cheaper approach to retrieve and filter candidates so that a more sophisticated method can accurately identify the correct matches from a smaller candidate set. Figure 2 shows one variant of Magneto that uses a fine-tuned language model as the retriever and a large language model as the reranker.
+
+Candidate Retriever. The candidate retriever leverages an SLM to generate a ranked list of potential matches from the target table for each input column. It uses column embeddings to estimate column pair similarities [10, 31]. SLMs are a good choice for this step given their ability to capture semantic similarity and efficiency. General-purpose pre-trained SLMs such as BERT [20], RoBERTa [53], and MPNet [75], may struggle with syntactic differences and lack contextual knowledge for domains absent in their training data. To perform complex tasks effectively, these models need to be finetuned.
+
+We propose to leverage LLMs to automatically generate the data needed to fine tune SLMs. We show that LLMs can help derive high-quality training data that reflect instances of variability for semantically similar columns that arise in real data. This approach, described in Section 3, improves the robustness of the SLM-based retriever, making it possible for it to handle complex matches without requiring human-labeled training data. We refer to Magneto configurations that use this approach using the label ft.
+
+Note that Magneto-ft invokes LLMs only during the offline training phase for a given domain. Once trained, the fine-tuned SLM can perform multiple inferences efficiently without making calls to LLMs.
+
+Match Reranker. While fine-tuning improves SLM performance, it is not sufficient to handle schema matching tasks involving domains and heterogeneity unseen during the fine tuning. To improve generalizability, Magneto uses LLMs as rerankers to refine the candidates identified by the SLM-based retriever. This approach, which we refer to as Magneto-11m, enhances accuracy by leveraging carefully designed prompts and techniques that enable the LLM to judiciously assess matches and discern subtle semantic nuances, which are challenging for the SLM to detect independently. As discussed in Section 4, Magneto-11m also reduces LLM costs.
+
+Varying Retrievers and Rerankers. The architecture of Magneto allows the combination of different alternatives for retrievers and rerankers. We can combine traditional matching techniques with the embedding strategies for the candidate retriever. For example, when columns in a match have the same name, modulo minor variations in case and punctuation, we assign a perfect similarity score of 1.0. During our experiments, this simple technique consistently improved overall accuracy, albeit slightly, in most cases.
+
+We also implemented bipartite-graph reranker as an algorithmic alternative that adapts the filtering technique from Melnik et al. [56]. This approach, which we refer as Magneto-bp, is particularly suitable for scenarios where LLMs are unavailable during inference or where strict runtime constraints must be met. The algorithm combines all ranked match candidates across source columns into a single global list and transforms it into an undirected bipartite graph. There are two (disjoint) node sets consisting of the columns in the source and target tables (respectively).
+
+The graph contains two disjoint node sets representing the source and target table columns, respectively, with potential matches represented as weighted edges between nodes. Edge weights correspond to match confidence scores. To identify the best match for the set of attributes in the source column, it uses the algorithm from [16], which solves the assignment problem in polynomial time and scales to large graphs. The final ranking prioritizes matches selected by the assignment algorithm at the top of the list, while unselected matches are placed at the bottom in their original relative order.
+
+# 3 USING LLMS TO FINE-TUNE SLMS
+
+Pre-trained small language models (SLMs) have been used to help with schema-matching related tasks by encoding semantic information from column names and values into dense vector representations—embeddings [14, 25, 27, 31, 79, 91]. To identify matches, embeddings of source and target columns can be compared using cosine similarity: high similarity scores indicate a higher likelihood that the columns match. SLMs work well for general natural language tasks, but their ability to interpret tabular data is limited. These models must often be fine-tuned to handle tasks that involve tables.
+
+However, fine-tuning approaches require large amounts of labeled data for training [25, 79]. Unfortunately, this is impractical in many scenarios such as the integration of biomedical data (Example 1.1), for which training data is hard to obtain.
+
+In the absence of training data, it is possible to apply augmentation techniques to automatically generate variations of data to be used as positive examples. For example, given a column, different versions can be generated by shuffling rows, sampling values, and applying perturbations to values [25, 31]. However, these variations may not fully capture the heterogeneity found in real data. We introduce a new method that leverages LLMs to generate training data and present a pipeline to fine-tune SLMs for schema matching (Section 3.2). Another key consideration is how to represent tables and their columns, which we discuss in Section 3.1.
+
+# 3.1 Value Sampling and Column Compilation
+
+Priority Sampling for Column Values. We generate embeddings to retrieve candidate matches by including a sample of column values in the column representation. Sampling strategies have been adopted for data management tasks, including column type annotation [34] and table union search [31]. A common approach is to use weighted sampling and assign higher weights to more frequent values. We adopt this approach and incorporate coordination into the sampling process with priority sampling [17]. For inner product sketching, priority sampling maximizes the likelihood of selecting corresponding values across vectors by emphasizing elements with larger magnitudes.
+
+In our setting, priority sampling is adapted to optimize the selection of column values. This approach not only prioritizes frequent values, which are statistically more representative of the column domain, but it also increases the likelihood of identifying shared values across different columns that act as inter-column anchors. These anchors enhance similarity detection in SLMs, which are sensitive to token co-occurrence patterns learned during pre-training. Specifically, we use a random seed $s$ to select a uniformly random hash function $h: \{1, \dots, N\} \to [0, 1]$ , where $N$ represents the maximum number of unique values across all columns. For each value $v_i$ , we compute a rank:
+
+$$
+R _ {i} = \frac {\operatorname {f r e q} (v _ {i})}{h (v _ {i})},
+$$
+
+where $\mathrm{freq}(v_i)$ denotes the frequency of $v_i$ . Then, we select the sample's first $m$ values with the largest priorities $R_i$ .
+
+Column Localization. Since SLMs interpret inputs as sequences of tokens (i.e., regular text), we must transform each column into a token sequence that the model can process. Recent research has explored various approaches to serializing columns into a textual format [5]. Here, we explore the impact of different approaches to column serialization for schema matching.
+
+Given column $A$ with column type type $(A)$ and sample values $v_{1}, v_{2}, \ldots, v_{m}$ , we consider the following serialization approaches:
+
+$$
+\begin{array}{l} S _ {\text {d e f a u l t}} (A) = [ \mathrm {C L S} ] A [ \mathrm {S E P} ] \text {t y p e} (A) \\ [ \text {S E P} ] v _ {1} [ \text {S E P} ] \dots [ \text {S E P} ] v _ {m}, \\ \mathcal {S} _ {\text {v e r b o s e}} (A) = [ \mathrm {C L S} ] \text {C o l u m n : A [ S E P ] T y p e : t y p e} (A) \\ [ \text {S E P} ] \text {V a l u e s :} v _ {1} [ \text {S E P} ] \dots [ \text {S E P} ] v _ {m}, \\ \end{array}
+$$
+
+$$
+S _ {\text {r e p e a t}} (A) = [ \mathrm {C L S} ] A [ \mathrm {S E P} ] \dots [ \mathrm {S E P} ] A [ \mathrm {S E P} ] \text {t y p e} (A)
+$$
+
+$$
+k \text {t i m e s}
+$$
+
+$$
+[ \text {S E P} ] v _ {1} [ \text {S E P} ] \dots [ \text {S E P} ] v _ {m},
+$$
+
+where the [CLS] token is a special symbol that indicates the start of a column, and [SEP] separates column components.
+
+$S_{\text{default}}$ is a variant of a widely-adopted serialization strategy [77, 88]. Instead of employing commas to separate sample values, we utilize the [SEP] token. This modification prevents the model from interpreting the values as an ordered text sequence, thereby treating them as unordered, discrete features. This change is crucial in schema matching as it emphasizes the structured and independent nature of the data in each column.
+
+$S_{\text{verbose}}$ is an extension of $S_{\text{default}}$ where prefixes are added to delineate each component and provide additional context for the SLM. By explicitly tagging each data segment, it helps models better contextualize the information, leading to improved interpretability and alignment accuracy in schema matching tasks.
+
+$S_{\text{repeat}}$ repeats the column name multiple times to reinforce its importance, nudging the model to prioritize column names. This strategy is inspired by findings in attention-based neural network research where repetition can enhance item salience [82]. It attempts to mitigate attention drift in SLMs, which can disproportionately focus on later tokens or values rather than column names, especially in zero-shot settings where the model is not optimized to learn the importance of different column components. For our experiments, we set $k = 5$ to strike a balance between reinforcing column names without overwhelming the model with redundancy.
+
+![](dt=2026-05-28/ht=18/32cc942d070b3292655cb62d20d26eea926f9ff732e0c47142671d7adede00b6.jpg)
+
+In addition to column name and values, we incorporate data types into the column representation. For column type inference, we classify columns into basic types: numerical, categorical, date, or binary. We classify columns with a high proportion of unique values (e.g., over $90\%$ distinct values) as "key" columns, as they often represent unique identifiers. When column value is unavailable or type detection fails, we label the column type as "unknown".
+
+In Magneto, we use serialization as a hyperparameter. We study the impact of different serialization strategies for schema matching in Section 6, where we also investigate different approaches to sampling column values. We experimented with varying column value sample sizes (from 10 to 30) and observed only marginal differences. Interestingly, smaller sample sizes (e.g., ten values) sometimes outperformed larger ones, likely because of reduced noise. Thus, we fixed the sample size to 10 as a default.
+
+# 3.2 LLM-Powered Fine Tuning
+
+By fine-tuning, we aim to learn column representations whose embeddings cluster spatially to reflect semantic relationships. This spatial arrangement enables efficient retrieval of related columns via cosine similarity. Our training methodology thus minimizes the distance between embeddings of identical or semantically related columns while maximizing separation between distance ones.
+
+LLM-Derived Training Data. As discussed above, an important challenge in fine-tuning lies in obtaining high-quality training data. With the goal of capturing syntactic heterogeneity common in real datasets, we introduce LLM-based augmentation (11m-aug), an approach that generates variations of columns that are semantically equivalent but syntactically different. The derived columns serve as the training data fine-tuning process, which adopts a self-supervised contrastive learning approach (Figure 3).
+
+Synthetic columns are derived from an input (anchor) column as follows: 1) The anchor name and a sample of its values are given to the LLM using the structured prompt depicted in Figure 4, and 2) the LLM outputs columns that are semantically similar to the anchor. Examples of synthetic columns are shown in Table 2. This method establishes a class of columns considered matches (derived from the same anchor); columns within the same class serve as positive examples and those from different classes as negative examples.
+
+We combine the LLM-based augmentation with other structure-based augmentation methods (struct-aug) such as random sampling and shuffling of values, and minor perturbations to the column
+
+Figure 4: Training Data Generation Prompt.
+
+![](dt=2026-05-28/ht=18/2d5568ea7adeae322f447a4bc7d6113d020578b4640c509059d9f1c7b99bba12.jpg)
+
+<table><tr><td>Instruction</td><td>Given the table column [Column Name] with values [Sample Column Values], generate three alternative column names that adhere to typical database naming conventions such as underscores and abbreviations. Additionally, provide distinct, technically correct synonyms, variants, or abbreviations for the listed values. For columns with numerical or datetime data, generate random numbers or dates appropriate to the column&#x27;s semantic meaning.</td></tr><tr><td>Format</td><td>Ensure that each set does not exceed 15 values. Format your output as follows: alternative_name_1, value1, value2, value3, ...; alternative_name_2, value1, value2, value3, ...; alternative_name_3, value1, value2, value3, ... Ensure your response excludes additional information and quotations.</td></tr></table>
+
+Table 2: Examples of the provided data to LLM-based reranker and the generated data.
+
+![](dt=2026-05-28/ht=18/513c3f2d3a818e2b9313dccc29d93fa43551251561aac1c087c0b76bdb4e8091.jpg)
+
+<table><tr><td></td><td>Original Data</td><td>Generated Data</td></tr><tr><td>Column:</td><td>tissue_sourceSites</td><td>tumor_site</td></tr><tr><td>Values:</td><td>Thyroid, Ovary</td><td>Thyroidal, Ovarian</td></tr><tr><td>Column:</td><td>exon</td><td>gene_segments</td></tr><tr><td>Values:</td><td>exon11, exon15</td><td>segment11, segment15</td></tr><tr><td>Column:</td><td>masked_somatic_mutations</td><td>genetic_variants</td></tr><tr><td>Values:</td><td>MET_D1010N, FLT3_ITD</td><td>D1010N_MET, ITD_FLT3</td></tr><tr><td>Column:</td><td>max_tumor_bulk_site</td><td>primary_tumor_location</td></tr><tr><td>Values:</td><td>Maxilla, Splenic lymph nodes</td><td>Maxillary, Splenic_nodes</td></tr></table>
+
+name, including random character replacements or deletions [31]. These techniques inject variability while preserving syntactic and structural similarity to the original column. By using both augmentation strategies, the model can learn to identify matches with different characteristics. We restrict this fine-tuning and training process to the target table columns to avoid inaccuracies. Applying this process to source tables with unknown true matches to target tables could mistakenly classify them as negative examples, introducing errors into the embedding space.
+
+Triplet Loss and Online Triplet Mining. To leverage the generated synthetic columns, we implement a contrastive learning framework using triplet loss and online triplet mining [70]. Unlike standard contrastive losses, triplet loss directly optimizes relative similarities, improving schema alignment precision.
+
+Each training triplet includes an anchor column $a$ , a same-class positive $p$ , and a different-class negative $n$ . The model learns to minimize $D(a, p)$ and maximize $D(a, n)$ , where $D$ is cosine distance. Specifically, we incorporate Batch Hard triplet loss [70] which is defined as follows:
+
+$$
+\mathcal{L} = \sum_{i = 1}^{P}\sum_{a = 1}^{K}\left[\max \left(0,m + \max_{p = 1\dots K}D(a,p) - \min_{\substack{j = 1\dots P\\ n = 1\dots K\\ j\neq i}}D(a,n)\right)\right] \tag{3}
+$$
+
+Here, $m$ is a margin hyperparameter that ensures a minimum distance between the positive and negative embeddings relative to the anchor, thereby enhancing the separability between classes. The loss iterates over $P$ classes and $K$ columns within each training batch, optimizing the embeddings to emphasize inter-class distinctions and intra-class similarities.
+
+Additionally, we apply Online Triplet Mining [40, 70], which enhances the learning process by dynamically selecting the most challenging positive and negative examples within each training batch. This technique prioritizes triplets that maximize learning efficiency, specifically focusing on:
+
+These conditions help the model not settle for easy examples and instead learn to distinguish subtle differences, developing more robust and discriminative features to distinguish columns. Together, triplet loss and mining improve embedding discriminability for schema matching.
+
+Model Selection for Schema Matching. To select the optimal fine-tuned model during training, we must define an effective validation metric specifically tailored for schema matching tasks. Our selection process uses the measures described in Section 2.1 to evaluate model performance on synthetic data. Since no groundtruth data is available, we rely on synthetic datasets to simulate real-world scenarios. These metrics are specifically chosen to ensure that the model identifies correct matches and ranks them in a manner that reflects their true relevance.
+
+We compute a validation score that averages the MRR and recall at ground truth: Validation Score = $(\mathrm{MRR} + \mathrm{Recall}@\mathrm{GT}) / 2$ . We implement early stopping when the validation accuracy remains unchanged for 5 epochs, selecting the model with the highest validation score as the best fine-tuned model.
+
+# 4 LLMS AS RERANKERS
+
+SLMs can serve as efficient retrievers, but they may fail to capture complex semantic relationships. Moreover, models fine-tuned with LLM-derived data are inherently domain-specific. To mitigate these limitations, Magneto incorporates a Large Language Model (LLM) as a reranker. Unlike existing methods that adjust match rankings based on heuristic and similarity metrics [1, 21, 35, 54, 56, 67], Magneto leverages LLM understanding to complement initial retrieval and improve overall schema matching performance.
+
+A natural question arises: Why not just use an LLM for schema matching? While there are approaches that employ LLMs for schema matching [50, 65], their applicability in scenarios that involve many or large tables is limited due to high computational costs and challenges related to context windows (Challenge 2, Section 1). We also empirically demonstrate that LLM-only approaches underperform an SLM-LLM combination for large target schemas (Figure 11). We posit that LLMs must be used judiciously and designed Magneto accordingly.
+
+The core of our reranking approach is a carefully designed prompt template that converts the abstract task of column-pair similarity assessment into a more structured and interpretable process. We designed this prompt inspired by recent lessons learned from column type annotation [34] and trends in prompt engineering [59, 86]. Figure 5 shows the structure of the prompt.
+
+![](dt=2026-05-28/ht=18/64ce94cfdafa1444baf4bb1df0fcaa4a66ce74393a3b3f88f28cc5f1476ff243.jpg)
+
+<table><tr><td>Scoring-OrientedInstruction</td><td>From a score of 0.00 to 1.00, judge the similarity of the candidate column in the source table to each target column in the target table. Each column is represented by its name and a sample of its respective values, if available.</td></tr><tr><td>One-shotExample</td><td>Example:Candidate Column::Column: EMPID, Sample values: [100, 101, 102]Target Schemas:Column: WORKERID, Sample values: [100, 101, 102]Column: EMPCODE, Sample values: [00A, 00B, 00C]Column: STAFFNAME, Sample values: [&quot;ALICE&quot;, &quot;BOB&quot;, &quot;CHARLIE&quot;]Response: WORKERID(0.95); EMPCODE(0.30); STAFFNAME(0.05)</td></tr><tr><td>Format</td><td>Provide the name of each target column followed by its similarity score in parentheses, formatted to two decimals, and separated by semicolons. Rank the column-score pairs in descending orderExclude additional information and quotations.</td></tr><tr><td>Input</td><td>Candidate Column::[Serializable Source Column]Target Schemas:[Serializable Target Columns]Response:</td></tr></table>
+
+Figure 5: Schema Matching Prompt.
+
+Scoring-Oriented Prompt Design. The Scoring-Oriented Instruction aligns the model with schema matching by sending one source column and the top $k$ target candidates from the SLM to the LLM. Prior works [50, 65] use table-wise prompts that rank columns without individual scores, limiting scalability. Column-wise ranking without scoring also hinders table-wise comparisons, such as recall@GT evaluation. To address these limitations, we propose a novel prompt design that requires the model to assign scores from 0.00 to 1.00 to each column pair, rather than merely producing a ranked list.
+
+This facilitates direct comparisons across different pairs and allows the model to adopt a holistic view by considering all $k$ target columns simultaneously during scoring. Additionally, our serialization of the column data clarifies to the model that a text sequence comprising a column name followed by its values represents a column in a relational table. This allows more accurately scoring matches based not only on the semantic and contextual relevance but also on the structural characteristics of the data.
+
+Few-Shot In-Context Learning. By providing a few examples of a task to an LLM, few-shot learning can lead to significant improvement in LLM performance [7, 24]. This method has been shown effective in various data management tasks, enabling robust performance without the need for extensive fine-tuning [39, 74].
+
+In the One-shot Example strategy, we provide a single example of the schema matching task, which outputs a ranked list with scores. This approach clarifies both the objective of the task and expected output format, and establishes a uniform scoring standard, enhancing the comparability of matches across all source and target column pairs. Utilizing only one example helps maintain a lightweight prompt structure, crucial for minimizing input and output token counts. The number of tokens directly impacts runtime and cost, and it can also influence accuracy [51].
+
+Optimization of Model Cost. To ensure reliability, we attempt to parse the LLM's output up to three times. If parsing fails after these attempts, we revert to using the embedding scores as a fallback mechanism. During testing, output-related issues were infrequent; however, they occurred more commonly with larger tables and in scenarios lacking a candidate retriever.
+
+Note that the design of Magneto makes it possible to balance accuracy with computational cost. Based on operational constraints (or requirements), the number of candidates sent to the reranker can be adjusted. The scores for candidates not assessed by the reranker are normalized such that the maximum score aligns with the lowest score received from the reranker. Therefore, a complete ranked list can still be returned to the user.
+
+# 5 THE GDC BENCHMARK
+
+A major challenge in evaluating schema-matching algorithms is the lack of benchmarks reflecting the diversity of real-world data. Benchmarks are often synthetically fabricated from real data [18, 48], which can introduce biases. Moreover, as show in Section 6 (and in [48]), publicly available benchmarks based on real data such as Magellan [18] and WikiData [48] are quickly becoming "saturated" since many algorithms attain near-perfect performance and leave small room for algorithmic improvements. This makes it difficult to extract useful insights about the strengths of different algorithms.
+
+To address this problem, we built a new benchmark dataset [68] based on the real data harmonization scenario described in Example 1.1. We collaborated with biomedical researchers to design a benchmark that reflects the challenges they face when working with biomedical data. We obtained datasets from ten studies related to tumor analysis [9, 13, 26, 36, 43, 49, 55, 69, 81, 85], and, with the experts' help, manually aligned and matched these datasets to the Genomics Data Commons (GDC) standard [60].
+
+The GDC is a program of the US National Institutes of Health responsible for handling genomic, clinical, and biospecimen data from cancer research initiatives. Its standard dictionary describes data using a graph model that includes names and descriptions for nodes and attributes and acceptable values for some attributes. To be compatible with existing schema matching solutions, we transformed the model to a relational schema that contains only column names and domain information (i.e., we disregard column descriptions). We created a simplified table reflecting the GDC format, the "target" table, listing domain values for each column without repetition.
+
+Table 1 illustrates a few samples of the data published by Dou et al. [26] alongside their corresponding GDC format. As we can observe, matching clinical data with the GDC standard poses several challenges, including terminology mismatches and data format variations. The benchmark includes 10 pairs of source-target tables. The number of columns in the source tables ranges from 16 to 179, and the number of rows ranges from 93 to 225. Our simplified GDC target schema comprises a single table with 736 columns. While some columns have a small number of distinct values (e.g.
+
+, binary yes/no attributes), some contain up to 4478 distinct values. The ground truth was manually curated by multiple annotators, who used a mix of manual and automated methods to identify possible candidate matches (e.g., GDC search tools [61] and bdikit [78]). Given that the correctness of some matches is challenging to determine even for bioinformatics experts (e.g., it may require reading the original papers or asking data producers), the final match decisions were made by consensus based on what users would expect from an algorithm given the limited context.
+
+Table 3: Statistics of the datasets used for experiments.
+
+![](dt=2026-05-28/ht=18/d417450c0edd3a92cffb04194850022778682460949512ce8ecc83c646818c92.jpg)
+
+<table><tr><td>Dataset</td><td>#Table Pairs</td><td>#Cols</td><td>#Rows</td><td>Match Type</td></tr><tr><td>GDC</td><td>10</td><td>16–736</td><td>93–4.5k</td><td>Human-Curated</td></tr><tr><td>Magellan</td><td>7</td><td>3–7</td><td>0.9k–131k</td><td>Human-Curated</td></tr><tr><td>WikiData</td><td>4</td><td>13–20</td><td>5.4k–10.8k</td><td>Human-Curated</td></tr><tr><td>Open Data</td><td>180</td><td>26–51</td><td>11.6k–23k</td><td>Fabricated</td></tr><tr><td>ChEMBL</td><td>180</td><td>12–23</td><td>7.5k–15k</td><td>Fabricated</td></tr><tr><td>TPC-DI</td><td>180</td><td>11–22</td><td>7.5k–15k</td><td>Fabricated</td></tr></table>
+
+# 6 EXPERIMENTAL EVALUATION
+
+# 6.1 Experimental Setup
+
+Datasets. We evaluated Magneto on six datasets (Table 3), grouped as: (1) Human-Curated-reflecting real-world matches, and (2) Fabricated—systematically generated to capture structural variations and diverse match types. The GDC benchmark (Section 5) reflects challenges in biomedical data integration. The other five datasets are from the Valentine schema matching benchmark [48] and have been used to evaluate recent schema matching solutions [27, 79].
+
+Baselines. We compare Magneto against several approaches, ranging from traditional string-similarity-based methods to sophisticated model-driven techniques. For traditional approaches, we use:
+
+We evaluated the Jaccard-Levenshtein baseline proposed in [48] and the Cupid algorithm [54]. However, both methods consistently performed significantly worse than other approaches across all experiments, so we excluded them from the plots for clarity. We used the implementations available in the Valentine repository for all traditional approaches [48].
+
+We also compared Magneto against recent approaches that use LMs: ISResMat which leverages contrastive learning and embeddings from SLMs [27], and Unicorn, a supervised and general approach using language models for data encoding and trained for data integration tasks [79]. We used the implementation from the authors for ISResMat. For Unicorn, we used the pre-trained model and implementation provided by the authors. The match scores were derived from the model's predicted match probabilities. It is important to note that Unicorn requires external training data for optimal performance.
+
+The zero-shot version performed significantly worse than other baselines and was excluded from our evaluation. We report Unicorn numbers for the algorithm in Valentine datasets for completeness, but note that its model was trained on the fabricated datasets from Valentine [48], so data leakage can influence the reported results.
+
+Implementation Details. The COMA algorithm is implemented in Java. Magneto and all other methods are written in Python. We use
+
+![](dt=2026-05-28/ht=18/0b830e7156c4d8012e4b7bdcaff78941ca3e8c41a50b43dee6868b9fcd9df1e0.jpg)
+
+MPNet as our underlying small language model. It is pre-trained on masked and permuted language tasks, enabling precise contextual understanding of unordered text in column headers and entries [25, 73, 75]. For the LLM reranker, we use the GPT-4o-mini model from the OpenAI API due to its robust performance and cost-effectiveness. However, these choices are flexible; alternative models can be easily integrated as replacements based on cost or performance requirements. It is important to note that our study does not focus on determining the optimal model for this task.
+
+We assess four variations of Magneto that represent different combinations of retrievers and rerankers: Magneto-zs-bp (zero-shot SLM, bipartite reranker), Magneto-ft-bp (fine-tuned SLM, bipartite reranker), Magneto-zs-llm (zero-shot SLM, LLM reranker), Magneto-ft-llm (fine-tuned SLM, LLM retriever).
+
+We set margin $m = 0.5$ for the fine-tuning configuration, and run the model for 30 epochs on the GDC benchmark and 10 epochs on the Valentine datasets.
+
+Execution platform. The experiments were run on a server running Red Hat Enterprise Linux version 9.2. We used a single node consisting of 8 cores and 64 GB of memory for CPU-based tasks. The GPU-intensive experiments used an NVIDIA A100 GPU. For Magneto variations, Unicorn, and IsResMat, we used a GPU to run all experiments, except the scalability experiment described in Section 6.3, conducted on a CPU for consistency with other methods.
+
+# 6.2 End-to-End Accuracy
+
+Performance on GDC. Figure 6 shows the accuracy (measured by MRR and Recall@GT) for all versions of Magneto and the baseline methods for the GDC benchmark. The Magneto variations outperform all other methods for both measures. Magneto-ft-11m has the highest overall accuracy, confirming that the combination of a fine-tuned SLM and an LLM is effective for this complex matching task. The fact that the zero-shot Magneto variations also outperform recent state-of-the-art approaches demonstrates the effectiveness of the serialization and sampling techniques we designed for schema matching. We ablate the different components of Magneto in Section 6.4, where we discuss this in more detail.
+
+![](dt=2026-05-28/ht=18/55d5538bad231b5ea43d68803d5fefa7c0ecebcc34e830d45bf16bb9be2f01e4.jpg)
+
+Performance on Valentine. The accuracy results for the Valentine benchmark are shown in Figure 7. Note that the different methods attain much higher accuracies for these datasets than for GDC. The Valentine datasets are derived either from open data sources or synthetic repositories, and they are also meticulously curated. In contrast, the GDC benchmark includes real scientific datasets and features a diverse set of column names and values, which, as these results confirm, is particularly challenging for schema matching solutions.
+
+For all Valentine datasets, Magneto performs on par with or better than the baselines. The only exception is *Unicorn*. However, as previously noted, this can likely be attributed to data leakage: *Unicorn* is trained using Valentine datasets. This advantage is particularly apparent in datasets like OpenData: *Unicorn* achieves significantly higher recall than competing methods. Conversely, for the Magellan dataset, which was not used to train *Unicorn*, *Unicorn* has lower accuracy than the other methods, including methods that use only basic metadata, which achieve perfect scores.
+
+The high accuracy of the zero-shot configurations of Magneto leaves little room for improvement. Specifically, fine-tuning faces challenges within the Valentine datasets, which predominantly contain lexical rather than semantic matches. For instance, the OpenData dataset includes matches like Gender to Ge and Employer to Em, which areuncommon in practical applications. Despite these obstacles, our LLM-based fine-tuning and re-ranking generally
+
+![](dt=2026-05-28/ht=18/77088f23e072119f163bdbf0ad2f9028bd2e984491e6a40c36f9f0524c6d1bc9.jpg)
+
+enhance performance. Additionally, we demonstrate in Section 6.4 that combining simple synthetic data generation techniques with LLM-derived data leads to better performance in this context.
+
+# 6.3 Scalability Assessment
+
+We compare the runtime of Magneto to those of the top three baselines in accuracy: Unicorn, Coma++, and ISResMat. Since Coma++ does not support GPU execution, we ran this experiment in CPU mode to ensure a fair comparison. We report only the results of Magneto-zs-bp and Magneto-zs-11m since their runtime is similar to Magneto-ft-bp and Magneto-ft-11m, respectively.
+
+For this experiment, we focus on datasets featuring tables with a large number of columns or rows, and we select one source-target pair each from the GDC and OpenData. For the GDC dataset, the source table comprises 179 rows and 153 columns, while the target table contains $4.5\mathrm{k}$ rows and 733 columns. For OpenData, both the source and the target table contain $23\mathrm{k}$ rows and 43 columns. We maintain the input table static and incrementally increase the number of target columns using a random selection. Each execution is repeated 10 times per column number to accommodate randomness. We used a time limit of 2 hours per execution and canceled the executions of any method that exceeded this limit. The results are shown in Figure 8.
+
+Magneto-zs-bp and Magneto-zs-11m remain stable with increasing table size: the runtime for Magneto-zs-bp grows slightly and Magneto-zs-11m maintains a stable runtime despite its complexity. For GDC, Magneto-zs-bp shows runtimes ranging from 11-33 seconds. Such a low increase in runtime reflects its efficient design, bounded primarily by the embedding computations. As expected, Magneto-zs-11m incurs higher runtimes due to the LLM requests (545-589 seconds), but it shows stability as the number of columns increases since the amount of data sent does not change. The runtimes of Magneto variations are even lower for OpenData: the dataset has fewer columns but many more rows, which Magneto compensates through sampling.
+
+Coma++ shows low runtimes for a small number of columns, but its performance decreases as the number of columns grows. IsResMat and Unicorn exhibit significant scalability challenges, as their runtime grows substantially with the number of columns. IsResMat was not able to complete the execution for GDC, not even for the lowest number of columns, and its runtime for OpenData
+
+![](dt=2026-05-28/ht=18/240248393f149480d8636b7b199877d6128cc7a896d1272f26e6c7b468c0e834.jpg)
+
+was orders of magnitude higher than the other methods. Unicorn could only process the initial 100 columns for GDC.
+
+# 6.4 Ablation of Magneto Components
+
+Column serialization. Figure 9 shows the impact of the serialization methods (Section 3.1) on schema matching performance across all datasets based on MRR. We used the serialization strategies on fine-tuned (FT) and zero-shot (ZS) settings: Default, using $S_{\text{default}}$ , which combines column names with a small sample of values; Verbose, which uses $S_{\text{verbose}}$ and enriches $S_{\text{default}}$ by incorporating additional instructions; Repeat, which emphasizes header names with $S_{\text{repeat}}$ . We also include Header only-ZS, which uses only column headers without values, serving as a baseline.
+
+In zero-shot settings, $S_{\text{repeat}}$ consistently outperforms other methods, demonstrating the effectiveness of emphasizing the column header and raising its cumulative attention in the zero-shot regime. While $S_{\text{verbose}}$ under-performs in zero-shot settings, it excels after fine-tuning because the prefixes act as learnable anchors that guide the model to separate and re-weight heterogeneous components (name, type, values) during representation learning, highlighting the benefits of integrating semantic details when domain-specific training is applied. The Header only-ZS approach shows the lowest performance in all datasets, confirming that column headers alone are insufficient in complex scenarios.
+
+The results further support our assumption that fine-tuning can greatly improve the performance gains on the GDC dataset. This improvement is likely related to the requirement for external knowledge, which we capture with the LLM-derived training data.
+
+Value Sampling. We compare the effectiveness our proposed Priority Sampling (Section 3.1) against the following sampling methods: Coordinated, a variation of Priority that excludes frequency weights; Weighted and Frequency, variations of Priority without coordination but with value frequencies – Frequency uses the most frequent values and Weighted uses weighted sampling based on these frequencies; Random uses basic random sampling.
+
+We used GDC and the three synthetic datasets from Valentine; we exclude Wikidata and Magellan since as all methods already perform well on them. As the results in Table 4 show, Magneto-zs-bp with $S_{\text{repeat}}$ , the best zero-shot setting configuration, Priority, generally outperforms other methods in both Recall@GT and MRR, and sometimes is a close second. Priority Sampling prioritizes frequently occurring values and enhances the likelihood of sampling
+
+Table 4: Ablation of sampling techniques using Magneto-zs-bp with $S_{\text{repeat}}$ . Priority generally outperforms other techniques in Recall@GT and MRR metrics. The best-performing techniques are highlighted in dark blue, with the second best in light blue.
+
+![](dt=2026-05-28/ht=18/ee2532529a2702cef2b0bece95ba949b35292f52f9327df471b4af9b48ea50f9.jpg)
+
+<table><tr><td>Sampling Method</td><td>GDC</td><td>ChEMBL</td><td>OpenData</td><td>TPC-DI</td></tr><tr><td colspan="5">Recall@GT</td></tr><tr><td>Priority</td><td>0.344±0.081</td><td>0.620±0.264</td><td>0.543±0.294</td><td>0.726±0.174</td></tr><tr><td>Coordinated</td><td>0.336±0.069</td><td>0.601±0.260</td><td>0.506±0.292</td><td>0.675±0.224</td></tr><tr><td>Weighted</td><td>0.342±0.070</td><td>0.603±0.266</td><td>0.497±0.291</td><td>0.643±0.210</td></tr><tr><td>Frequency</td><td>0.332±0.062</td><td>0.525±0.296</td><td>0.526±0.300</td><td>0.692±0.196</td></tr><tr><td>Random</td><td>0.334±0.075</td><td>0.572±0.268</td><td>0.489±0.282</td><td>0.665±0.197</td></tr><tr><td colspan="5">MRR</td></tr><tr><td>Priority</td><td>0.591±0.094</td><td>0.900±0.103</td><td>0.847±0.200</td><td>0.948±0.082</td></tr><tr><td>Coordinated</td><td>0.586±0.106</td><td>0.902±0.105</td><td>0.837±0.196</td><td>0.937±0.087</td></tr><tr><td>Weighted</td><td>0.599±0.099</td><td>0.888±0.104</td><td>0.823±0.212</td><td>0.930±0.091</td></tr><tr><td>Frequency</td><td>0.577±0.104</td><td>0.851±0.163</td><td>0.833±0.202</td><td>0.886±0.130</td></tr><tr><td>Random</td><td>0.579±0.096</td><td>0.885±0.106</td><td>0.830±0.195</td><td>0.918±0.101</td></tr></table>
+
+similar values across columns, a beneficial feature for schema matching. The top three techniques—including Priority and its ablations—perform comparably well, also representing viable choices.
+
+Synthetic Data Generation. We evaluate our 11m-aug for SLM fine-tuning against two other methods: struct-aug, which incorporates row shuffling, sampling, and column name perturbation, and mixed-aug, which combines these methods. We used the optimal settings from serialization studies, $S_{\mathrm{repeat}}$ , on Magneto-ft-bp and Magneto-ft-11m. We assess MRR for both methods and Recall@GT for Magneto-ft-bp, as Recall@GT for Magneto-ft-11m is largely influenced by the reranker instead of the fine-tuned candidate retriever.
+
+This analysis focuses on the four datasets that have the potential for improvement. Table 5 shows that 11m-aug and mixed-aug outperform simple perturbations on the GDC dataset. However, on Valentine datasets, LLM-generated data has limited impact due to sparse, uncommon matches. Still, the strong GDC results highlight the effectiveness of our fine-tuning for real data.
+
+Model Ablations. We extended our ablation studies to include RoBERTa [53] and E5 [84] (SLMs), and LLaMA3.3-70B [28] (LLM). Table 6 shows the results. Regarding SLMs the default MPNet outperforms other SLMs in most variations of Magneto. In general, the serialization and score-based prompt proposed are robust. While $S_{\text{repeat}}$ dominates most zero-shot settings, $S_{\text{verbose}}$ and $S_{\text{default}}$ yield even higher gains after fine-tuning, which is consistent with our findings in Figure 9.
+
+The tested models benefit from the same prompting framework, which confirms that Magneto performs consistently using different models with a robust cost-accuracy tradeoff. For LLMs, LLaMA3.3-70B surpasses GPT-4o-mini (MRR=0.837 vs. 0.815), confirming that larger LLMs enhance reranking. Combining LLaMA3.3-70B with fine-tuned MPNet achieves the best overall performance (MRR=0.860), reinforcing the value of having a pipeline that performs retrieval and reranking.
+
+Match Reranker. We first examine the impact of using the bipartite strategy (Section 2.2). Figure 10 shows the increase/decrease in accuracy from Magneto-zs, which directly returns the retriever
+
+Table 5: Ablation of data generation techniques. LLM-powered data generation is effective, and better performance can be achieved by combining multiple techniques.
+
+![](dt=2026-05-28/ht=18/9242247e996011c2090329b3d235247e0d6a40815793176c10b7a49ea8f55376.jpg)
+
+<table><tr><td>Data Generation</td><td>GDC</td><td>ChEMBL</td><td>OpenData</td><td>TPC-DI</td></tr><tr><td colspan="5">Recall@GT for Magneto-ft-bp</td></tr><tr><td>11m-aug</td><td>0.414±0.106</td><td>0.785±0.263</td><td>0.729±0.271</td><td>0.740±0.298</td></tr><tr><td>mixed-aug</td><td>0.438±0.085</td><td>0.774±0.273</td><td>0.743±0.255</td><td>0.763±0.255</td></tr><tr><td>struct-aug</td><td>0.418±0.099</td><td>0.764±0.282</td><td>0.711±0.271</td><td>0.773±0.261</td></tr><tr><td colspan="5">MRR for Magneto-ft-bp</td></tr><tr><td>11m-aug</td><td>0.754±0.093</td><td>0.932±0.103</td><td>0.851±0.152</td><td>0.917±0.100</td></tr><tr><td>mixed-aug</td><td>0.761±0.071</td><td>0.931±0.101</td><td>0.841±0.162</td><td>0.885±0.125</td></tr><tr><td>struct-aug</td><td>0.731±0.099</td><td>0.927±0.103</td><td>0.817±0.181</td><td>0.905±0.117</td></tr><tr><td colspan="5">MRR for Magneto-ft-11m</td></tr><tr><td>11m-aug</td><td>0.866±0.083</td><td>0.960±0.089</td><td>0.939±0.080</td><td>0.971±0.079</td></tr><tr><td>mixed-aug</td><td>0.830±0.077</td><td>0.949±0.109</td><td>0.927±0.096</td><td>0.965±0.096</td></tr><tr><td>struct-aug</td><td>0.798±0.116</td><td>0.955±0.097</td><td>0.917±0.105</td><td>0.969±0.081</td></tr></table>
+
+![](dt=2026-05-28/ht=18/f1c7867529c90bdb0a4b66ea75d16d725a16add3243d5cdece50db6631c9c0b7.jpg)
+
+![](dt=2026-05-28/ht=18/75f0924a8fa2a0cd8e683577286d0d54e302f0b497a2699a3c90cbad8666924b.jpg)
+
+matches, to Magneto-zs-bp. Note that the bipartite approach can significantly improve Recall@GT. All datasets benefit from the technique at some point, except Magellan, whose scores are already very high. The absolute increase can reach nearly 0.6. The improvements for MRR are lower but still sizable for ChEMBL and OpenData.
+
+We also evaluate: (1) improvements of the LLM-based reranker over the bipartite method, (2) performance variations with more candidates sent to the LLM, and (3) outcomes when bypassing the SLM retrieval stage. We focus on the GDC dataset, noted for its high column count, using zero-shot settings for the retriever. Figure 11 presents accuracy and runtime for different numbers of candidates $(k)$ processed by GPT-4o-mini in Magneto-zs-11m, comparing it against the use of LLaMA3.3-70B (Llama) and Magneto-zs-bp (BP).
+
+The LLM-based re-ranking approach improves over the bipartite. For example, at $k = 5$ , we observe a $6.7\%$ improvement in MRR over the bipartite baseline, rising from 0.731 to 0.780. Recall@GT shows even more promising gains, from 0.375 to 0.475—a $26.7\%$ increase. Increasing $k$ enhances MRR, although non-forwarded candidates score lower, reducing Recall@GT which considers all pairs.
+
+When all schemas sent to the LLM reranker, both GPT-4o-mini (All Schema) and LLaMA3.3-70B (Llama), the performance is lower than all Magneto variations. Furthermore, runtime increases with column count and is substantial when reranking all schemas, reaching over 6,000 seconds per table for GPT-4o due to LLM API latency.
+
+![](dt=2026-05-28/ht=18/a7b93bb6f1664018409fa69b4a862e54a53b4a8ec782c9c8b546160a18399a22.jpg)
+
+In contrast, when the SLM-based retriever is used, the runtime remains practical. We used $k = 20$ for our other experiments, as it balances good MRR, Recall@GT, and runtime across GDC and other datasets. These results demonstrate the effectiveness of combining SLMs and LLMs for schema matching.
+
+# 7 RELATED WORK
+
+This section discusses schema and ontology matching approaches related to our work.
+
+Traditional Methods. A straightforward approach for schema matching is detecting overlap in column names [21, 54, 56] and overlap in column values [3, 89]. Some incorporate relaxations when measuring overlaps, such as accounting for syntactic and semantic similarities between column names and values [3, 54]. Others also consider factors like data type relevance and value distribution [3, 89]. Among these, the COMA algorithm stands out for integrating the most strategies and weighting their outputs to achieve better accuracy [3, 21], often remaining competitive even against more recent approaches [48]. However, these approaches often struggle to capture complex relationships and deeper semantics within datasets [46].
+
+Small Language Model-Driven Methods. Methods based on small language models (SLMs) usually use embeddings to encode and compare column data [10]. Contrastive learning can improve an SLM's ability to distinguish matching and non-matching column pairs [14, 31, 91], while synthetic tabular data generation can help models to improve without ground truth [27, 31]. Among these methods, ISResMat customizes pre-trained models for dataset-specific adaptation, generating training pairs from table fragments, and applying pairwise comparison losses to refine matching accuracy [27]. Unicorn, a general matching model, employs contrastive learning and a Mixture-of-Experts (MoE) layer within its architecture to discern matches but relies on supervised training [79].
+
+Table 6: Model ablation comparing three SLMs and two LLMs with MRR/Recall@GT metrics. Bold indicates best serialization per model; shows best zero-shot model and best fine-tuned model.
+
+![](dt=2026-05-28/ht=18/e7aeae8e64b72f75e79848ac325b298bfde4ed5d84989f0641d26e175ee6ced2.jpg)
+
+<table><tr><td>Model</td><td>zs-bp</td><td>ft-bp</td><td>zs-gpt4o-mini</td><td>ft-gpt4o-mini</td><td>zs-liama3.3-70b</td><td>ft-liama3.3-70b</td></tr><tr><td>MPNet (Sdefault)</td><td>0.656±0.082 / 0.357±0.093</td><td>0.740±0.089 / 0.400±0.094</td><td>0.775±0.102 / 0.412±0.115</td><td>0.846±0.104 / 0.537±0.162</td><td>0.772±0.101 / 0.339±0.155</td><td>0.860±0.088 / 0.423±0.170</td></tr><tr><td>MPNet (Sverbose)</td><td>0.627±0.119 / 0.341±0.114</td><td>0.761±0.071 / 0.438±0.085</td><td>0.758±0.118 / 0.469±0.131</td><td>0.830±0.766 / 0.479±0.154</td><td>0.776±0.098 / 0.323±0.153</td><td>0.838±0.121 / 0.446±0.185</td></tr><tr><td>MPNet (Srepeat)</td><td>0.731±0.086 / 0.375±0.108</td><td>0.701±0.110 / 0.172±0.103</td><td>0.808±0.095 / 0.430±0.131</td><td>0.820±0.117 / 0.524±0.104</td><td>0.828±0.096 / 0.358±0.117</td><td>0.819±0.102 / 0.419±0.138</td></tr><tr><td>RoBERTa (Sdefault)</td><td>0.631±0.105 / 0.336±0.081</td><td>0.703±0.120 / 0.378±0.107</td><td>0.734±0.119 / 0.381±0.088</td><td>0.784±0.131 / 0.490±0.149</td><td>0.755±0.098 / 0.292±0.119</td><td>0.815±0.121 / 0.432±0.164</td></tr><tr><td>RoBERTa (Sverbose)</td><td>0.621±0.063 / 0.350±0.083</td><td>0.692±0.114 / 0.367±0.112</td><td>0.743±0.097 / 0.400±0.099</td><td>0.821±0.092 / 0.511±0.160</td><td>0.751±0.075 / 0.324±0.140</td><td>0.854±0.101 / 0.424±0.147</td></tr><tr><td>RoBERTa (Srepeat)</td><td>0.710±0.103 / 0.373±0.097</td><td>0.681±0.096 / 0.368±0.111</td><td>0.794±0.097 / 0.434±0.173</td><td>0.774±0.101 / 0.504±0.161</td><td>0.814±0.088 / 0.398±0.161</td><td>0.810±0.090 / 0.428±0.165</td></tr><tr><td>E5 (Sdefault)</td><td>0.623±0.104 / 0.329±0.105</td><td>0.729±0.081 / 0.406±0.094</td><td>0.738±0.144 / 0.356±0.144</td><td>0.832±0.080 / 0.480±0.117</td><td>0.756±0.120 / 0.405±0.090</td><td>0.857±0.076 / 0.388±0.112</td></tr><tr><td>E5 (Sverbose)</td><td>0.602±0.094 / 0.322±0.102</td><td>0.692±0.114 / 0.367±0.112</td><td>0.745±0.131 / 0.382±0.135</td><td>0.821±0.092 / 0.511±0.160</td><td>0.746±0.100 / 0.327±0.100</td><td>0.838±0.121 / 0.446±0.185</td></tr><tr><td>E5 (Srepeat)</td><td>0.715±0.120 / 0.372±0.100</td><td>0.701±0.110 / 0.372±0.103</td><td>0.797±0.121 / 0.379±0.112</td><td>0.813±0.113 / 0.502±0.154</td><td>0.812±0.118 / 0.325±0.144</td><td>0.810±0.090 / 0.428±0.165</td></tr></table>
+
+Large Language Model-Driven Methods. Recent works have leveraged large language models (LLMs) for various aspects of tabular data management, predominantly focusing on single-table tasks [39, 45]. Some studies discuss LLM applications for schema matching and highlight the potential of LLMs for this task [34, 50]. However, these approaches often rely solely on prompting strategies—either fine-tuned or zero-shot—which suffer from scalability issues and high computational costs [32, 33, 50, 65]. Sheetrit et al. [73] and Zhang et al. [90] utilize zero-shot pre-trained LLMs for schema matching.
+
+Sheetrit et al. [73] addresses multiple-table matching, whereas our work focuses on two-table schema matching, particularly for tables with numerous columns. Zhang et al. [90] uses rule-based feature extraction and trains an XGBoost classifier with gold data, a supervised approach distinct from our unsupervised method. Xu et al. [87] proposed manually-derived rules to guide LLMs during the matching process and incorporated external knowledge to deal with hallucinations. Parciak et al. [65] explored various prompting strategies for matching source attributes to a target schema.
+
+Note that the evaluation of these methods only take into account table/attribute names and descriptions [65, 87]—unlike Magneto, they do not consider values.
+
+Ontology Matching. Ontology matching (OM) is related to schema matching (SM) but focuses on identifying semantic correspondences between elements (e.g., classes and properties) across different ontologies expressed in languages like OWL and RDF/XML [30]. Some OM approaches use heuristics, rule-based methods [30, 42], structural similarity, linguistics, and domain-specific resources [37, 44]. To facilitate the matching of domain-specific terminology, semiautomatic annotation using vocabularies and ontologies has been used to enrich schema labels [6, 76].
+
+Recent OM approaches leverage LLMs and, like Magneto, use a two-phase matching process [4, 41]. OLaLa uses embeddings for candidate matches and LLM evaluation with natural language conversion [41], while LLMs4OM employs RAG to extract and classify concept similarities [4]. Unlike these methods that prompt per candidate pair, Magneto efficiently generates a ranked list for each input column.
+
+Adapting OM methods to SM is not straightforward: OM approaches target structured relationships rather than flat tabular data, may disregard the similarity of column values, and require format conversions that can impact performance. We compared Magneto against two OM systems, LogMap [44] and LLMs4OM [4], by treating tables as classes and columns as properties. They underperformed SM-based baselines by a large margin. Nonetheless, given their shared goals and challenges, combining OM and SM techniques is an interesting direction for future work.
+
+# 8 CONCLUSIONS AND FUTURE WORK
+
+We proposed Magneto, a framework that leverages small and large language models to derive schema matching strategies that generalize across domains and balance accuracy and runtime tradeoffs. We introduced a new benchmark that captures some of the complexities in biomedical data integration and presents new challenges for schema matching. With a detailed experimental evaluation, including comparisons against state-of-the-art methods and ablations, we demonstrate the effectiveness of Magneto and our design choices.
+
+There are several directions for our future work. Magneto's accuracy depends on SLM retrieval—if the correct match is missing from the top- $k$ , reranking cannot recover it. We plan to explore hybrid retrieval strategies and training SLMs on large, multi-domain datasets. To address limitations in underrepresented domains, we also aim to integrate external knowledge for better zero-shot performance. Reranking quality can vary due to prompt dependence—a known limitation of instruction-tuned LLMs [34]. Future work may leverage prompt tuning frameworks like DSPy [47] for systematic, task-aware optimization. While LLM-based reranking improves accuracy, it introduces cost overheads. Future work could optimize reranking with smaller, efficient LLMs.
+
+# ACKNOWLEDGMENTS
+
+This work was supported by NSF awards IIS-2106888 and OAC-2411221, the DARPA ASKEM program Agreement No. HR0011262087, and the ARPA-H BDF program. The views, opinions, and findings expressed are those of the authors and should not be interpreted as representing the official views or policies of the DARPA, ARPA-H, the U.S. Government, or NSF. We thank our collaborators from the NYU School of Medicine, David Fenyo, Wenke Liu, and Sarah Keegan, for sharing their experience in biomedical data integration and contributing to the GDC benchmark. We also thank Roque Lopez for his contributions to the code.
+
+# REFERENCES

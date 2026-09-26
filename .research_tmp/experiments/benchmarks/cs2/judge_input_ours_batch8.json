@@ -1,0 +1,439 @@
+[
+ {
+  "qid": "983e73defc06e6794a856330",
+  "question": "Does active learning work well when fine-tuning large language models?",
+  "sections": [
+   {
+    "title": "Research Scope and Methodological Limitations",
+    "text": "The inquiry into the efficacy of active learning for fine-tuning large language models is addressed through a review of recent literature, including studies from 2022 and 2024 [3][2][1]. However, the compilation of this report is significantly constrained by technical failures in the underlying knowledge retrieval system. Attempts to extract specific claims regarding the performance of active learning strategies resulted in empty responses for all typed queries, indicating that the search text was saturated or that the specific entity filters did not yield data. Furthermore, efforts to perform deep reads on the two most relevant papers failed because the required tool was unavailable in the current session, returning an error status. Consequently, the analysis relies on the limited metadata and high-level relevance tags provided by the system rather than detailed textual evidence from the papers themselves.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [],
+      "title": "can you label less by using out-of-domain data? active & transfer learning with few-shot instructions",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2211.11798",
+       "authors": []
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [],
+      "title": "an active learning framework for inclusive generation by large language models",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [],
+      "title": "efficiently learning at test-time: active fine-tuning of llms",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     }
+    ]
+   },
+   {
+    "title": "Relevant Literature on Active Fine-Tuning",
+    "text": "Despite the retrieval errors, the knowledge base identifies specific works that are directly relevant to the question of whether active learning works well in this context. A 2024 paper titled \"Efficiently Learning at Test-Time: Active Fine-Tuning of LLMs\" is flagged as directly relevant to the core research question [3]. This suggests that recent research has focused on the efficiency of active fine-tuning processes, particularly in test-time scenarios. Additionally, another 2024 study, \"An Active Learning Framework for Inclusive Generation by LLMs,\" is noted as relevant, indicating that active learning frameworks are being applied to specific generation tasks such as inclusivity [2]. These citations confirm that active learning is a recognized and active area of investigation for LLM fine-tuning, though the specific outcomes are not detailed in the available claims [3][2].",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [],
+      "title": "an active learning framework for inclusive generation by large language models",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [],
+      "title": "efficiently learning at test-time: active fine-tuning of llms",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     }
+    ]
+   },
+   {
+    "title": "Intersection with Transfer Learning and Data Efficiency",
+    "text": "The relevance of active learning in the context of large language models is also linked to broader themes of data efficiency and transfer learning. A 2022 paper titled \"Can You Label Less by Using Out-of-Domain Data? Active & Transfer Learning with Few...\" is identified as relevant to the inquiry [1]. This work suggests that active learning strategies are often explored in conjunction with transfer learning to reduce the amount of labeled data required, particularly when leveraging out-of-domain sources [1]. The inclusion of this earlier study highlights that the challenge of reducing labeling costs through active selection has been a persistent concern in the field, predating the more recent 2024 studies on specific fine-tuning frameworks [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [],
+      "title": "can you label less by using out-of-domain data? active & transfer learning with few-shot instructions",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2211.11798",
+       "authors": []
+      }
+     }
+    ]
+   },
+   {
+    "title": "Gaps in Critical Analysis and Future Directions",
+    "text": "The available claims indicate that a critical assessment of active learning's effectiveness remains incomplete due to the inability to access specific criticism-type findings. A query for claims containing the term \"active learning\" with a criticism type was initiated but did not provide substantive results in the provided set. To address these gaps, the system suggests alternative analytical angles, such as using different search phrasings, removing entity filters, or utilizing gap search tools to uncover further insights. These recommended steps imply that the current evidence base is insufficient to provide a definitive answer on the efficacy of active learning without further, more targeted data retrieval. The conflict between the high relevance of the cited papers and the lack of extractable evidence underscores the need for improved tool availability and search strategies in future compilations.",
+    "citations": []
+   }
+  ],
+  "diag": {
+   "n_claims_input": 7,
+   "n_claims_usable": 7,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_markers": 10,
+   "title_only_citations": 3,
+   "word_count": 512,
+   "n_sections": 4,
+   "n_citations": 3,
+   "record_level": 0,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "e2491bb6e4147c18762e7fb2",
+  "question": "Global Navigation Satellite Systems (GNSS) receivers can provide a reference clock signal known as Pulse-per-Second (PPS or 1-PPS). Is the PPS physically generated through a digitally-controlled oscillator (or line driver) whose offset is periodically re-initialized by the estimated clock bias (retrieved by means of PVT algorithms)?",
+  "sections": [
+   {
+    "title": "PPS Generation and Synchronization",
+    "text": "In high-precision measurement systems, the Pulse-per-Second (PPS) signal serves as a critical reference for synchronizing transmitting and receiving equipment. This reference signal is typically generated by specialized hardware, such as a GPS-disciplined rubidium oscillator, which ensures alignment with the beginning of the UTC second [2]. On the receiving end, the PPS signal is often produced directly by the GNSS receiver, such as an RTK model, to facilitate accurate timing coordination [2]. The primary function of this signal is to allow embedded microcontrollers to timestamp measurements relative to the start of a whole second, thereby establishing a consistent temporal framework for data acquisition [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "The embedded microcontroller can then timestamp measurements relative the beginning of a whole second."
+      ],
+      "title": "the syncline model -- analyzing the impact of time synchronization in sensor fusion",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": "2209.01136",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "while on the receiving side, the PPS signal was generated by the GNSS RTK Receiver GINTEC M1G2.",
+       "To ensure full synchronization of transmitting and receiving, a reference PPS (Pulse Per Second) signal was used, generated on the transmitting side by the Quartzlock E80-GPS disciplined rubidium oscillator (whose starting point is synchronized with the beginning of the UTC second)"
+      ],
+      "title": "radio channel modelling for vhf system operating in the offshore wind farms propagation environment",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Oscillator Control and Phase Dynamics",
+    "text": "The physical generation of the PPS signal involves the management of oscillator phase and frequency. In systems utilizing FPGA-based GPS-disciplined oscillators, the relationship between the 1PPS phase and the output frequency is fundamental to the signal's integrity. Specifically, the derivative of the 1PPS phase with respect to time is consistent with the output frequency of the oscillator [3]. This dynamic indicates that the PPS is not merely a static digital pulse but is derived from a continuous oscillation process where phase and frequency are intrinsically linked, supporting the notion of a controlled oscillator architecture rather than a simple line driver.",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [
+       "The derivative of the 1PPS phase in time is consistent with the output frequency."
+      ],
+      "title": "fpga-based autonomous gps-disciplined oscillatorsfor wireless sensor network nodes",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Signal Offset and Periodic Correction",
+    "text": "Despite the use of disciplined oscillators, the PPS signal is not perfectly aligned with the true GPS second. The GPS 1 PPS signal can exhibit an offset from the true GPS second of up to 50 nanoseconds [4]. To mitigate this discrepancy, the receiver provides a periodic correction for this offset [4]. This mechanism suggests that while the oscillator maintains a stable frequency, its phase (and thus the timing of the PPS edge) may drift or contain a static bias that must be accounted for through external correction data rather than continuous real-time re-initialization of the oscillator state.",
+    "citations": [
+     {
+      "id": "[4]",
+      "snippets": [
+       "The GPS 1 PPS signal is offset from the true GPS second by up to $50\\mathrm{ns}$ , and a correction for this offset is provided periodically by the receiver."
+      ],
+      "title": "the pierre auger observatory upgrade - preliminary design report",
+      "metadata": {
+       "year": 2016,
+       "doi": null,
+       "arxiv": "1604.03637",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Implications for Clock Bias Re-initialization",
+    "text": "The available evidence describes a system where the PPS is generated by disciplined oscillators and corrected for known offsets, but it does not explicitly confirm that the oscillator's offset is periodically re-initialized by estimated clock bias from Position, Velocity, and Time (PVT) algorithms. Instead, the data highlights that corrections are provided periodically by the receiver to address the inherent offset of the PPS signal [4]. The consistency between the 1PPS phase derivative and output frequency [3] further supports a model where the oscillator runs continuously, with timing accuracy maintained through post-hoc correction or disciplined locking, rather than through frequent digital re-initialization of the oscillator's phase based on PVT-derived bias estimates.",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [
+       "The derivative of the 1PPS phase in time is consistent with the output frequency."
+      ],
+      "title": "fpga-based autonomous gps-disciplined oscillatorsfor wireless sensor network nodes",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "The GPS 1 PPS signal is offset from the true GPS second by up to $50\\mathrm{ns}$ , and a correction for this offset is provided periodically by the receiver."
+      ],
+      "title": "the pierre auger observatory upgrade - preliminary design report",
+      "metadata": {
+       "year": 2016,
+       "doi": null,
+       "arxiv": "1604.03637",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 5,
+   "n_claims_usable": 5,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "word_count": 411,
+   "n_sections": 4,
+   "n_citations": 4,
+   "record_level": 4,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "0919a8528cd20166163de3fd",
+  "question": "Have large langauge models been applied to the schema matching problem in databases and are they effective?",
+  "sections": [
+   {
+    "title": "Application of Large Language Models to Schema Matching",
+    "text": "Recent research confirms that large language models have been directly applied to the schema matching problem in database systems. Specifically, studies by Sheetrit et al. and Zhang et al. have utilized zero-shot pre-trained LLMs to perform schema matching tasks [1]. This approach leverages the general capabilities of these models to align database schemas without requiring task-specific fine-tuning, marking a significant shift in how automated schema integration is approached [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Sheetrit et al. [73] and Zhang et al. [90] utilize zero-shot pre-trained LLMs for schema matching."
+      ],
+      "title": "magneto: combining small and large language models for schema matching",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Limitations in Large-Scale Database Environments",
+    "text": "Despite their utility, the application of LLMs to database tasks faces significant scalability challenges. When employing full-schema prompting strategies, these models demonstrate effectiveness only on small databases [2]. As the size of the database increases, this specific approach fails to maintain performance, indicating a critical limitation in handling complex or extensive data structures [2]. This failure mode suggests that simply providing the entire schema to the model is not a viable strategy for large-scale environments [2].",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "While effective on small databases, this approach fails on"
+      ],
+      "title": "scaling text2sql via llm-efficient schema filtering with functional dependency graph rerankers",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Alternative Approaches for Efficient Schema Linking",
+    "text": "To address the scalability issues inherent in direct LLM prompting, alternative methodologies have been developed for efficient schema linking. One such approach, known as SchemaGraphSQL, utilizes pathfinding graph algorithms to facilitate text-to-SQL generation on large-scale databases [3]. By treating schema linking as a graph traversal problem, this method aims to overcome the limitations observed in full-schema prompting techniques [3]. This structural approach offers a potential solution for maintaining accuracy and efficiency in complex database settings where LLMs alone may struggle [3].",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [
+       "schemagraphsql: efficient schema linking with pathfinding graph algorithms for text-to-sql on large-scale databases"
+      ],
+      "title": "schemagraphsql: efficient schema linking with pathfinding graph algorithms for text-to-sql on large-scale databases",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Synthesis of Effectiveness and Future Directions",
+    "text": "The current evidence indicates that while LLMs are applicable to schema matching, their effectiveness is highly dependent on the scale of the database and the specific prompting strategy employed [1] [2]. Zero-shot LLMs provide a viable baseline for schema matching tasks [1], but their performance degrades significantly when applied to large databases using full-schema inputs [2]. Consequently, hybrid or algorithmic approaches, such as those using graph-based pathfinding, are emerging as necessary complements to pure LLM-based methods for handling large-scale data environments [3]. Future research will likely focus on integrating these algorithmic efficiencies with the semantic understanding provided by LLMs to achieve robust schema matching across diverse database sizes [1] [2] [3].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Sheetrit et al. [73] and Zhang et al. [90] utilize zero-shot pre-trained LLMs for schema matching."
+      ],
+      "title": "magneto: combining small and large language models for schema matching",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "While effective on small databases, this approach fails on"
+      ],
+      "title": "scaling text2sql via llm-efficient schema filtering with functional dependency graph rerankers",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "schemagraphsql: efficient schema linking with pathfinding graph algorithms for text-to-sql on large-scale databases"
+      ],
+      "title": "schemagraphsql: efficient schema linking with pathfinding graph algorithms for text-to-sql on large-scale databases",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 3,
+   "n_claims_usable": 3,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "word_count": 337,
+   "n_sections": 4,
+   "n_citations": 3,
+   "record_level": 3,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ }
+]

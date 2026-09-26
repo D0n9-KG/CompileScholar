@@ -1,0 +1,1864 @@
+[
+ {
+  "id": "983e73defc06e6794a856330",
+  "type": "aggregation",
+  "question": "Does active learning work well when fine-tuning large language models?",
+  "gold_hint": "",
+  "answer": "Based on the consulted records, the specific question of whether active learning works well when fine-tuning large language models (LLMs) cannot be definitively answered with quantitative success metrics, as the available notes do not surface numeric results comparing active versus passive fine-tuning of LLMs [sciverse_efficiently_learning_at_test_time_active_fine_tuning_of_llms] [sciverse_an_active_learning_framework_for_inclusive_generation_by_large_language_models] [sciverse_can_you_label_less_by_using_out_of_domain_data_active_transfer_learning_with_few]. The records identify several relevant studies that investigate this intersection, including \"Efficiently Learning at Test-Time: Active Fine-Tuning of LLMs\" (2024), which is noted as directly relevant to the topic [sciverse_efficiently_learning_at_test_time_active_fine_tuning_of_llms]. Additionally, \"An Active Learning Framework for Inclusive Generation by LLMs\" (2024) is identified as relevant, suggesting an application of active learning specifically for inclusive generation tasks [sciverse_an_active_learning_framework_for_inclusive_generation_by_large_language_models]. Another relevant study, \"Can You Label Less by Using Out-of-Domain Data? Active & Transfer Learning with Few-Shot LLMs\" (2022), explores the potential to reduce labeling efforts by utilizing out-of-domain data in the context of few-shot LLMs [sciverse_can_you_label_less_by_using_out_of_domain_data_active_transfer_learning_with_few].\n\nThe consulted records also highlight methodological components that may support active learning in this context, such as the existence of a \"bert-based active learning pipeline\" in the registry, which may connect to the broader context of LLM fine-tuning [sciverse_bert_based_active_learning_pipeline]. Furthermore, \"prior work for uncertainty in fine-tuned language models\" is noted as relevant, likely due to the role of uncertainty-based sampling in active learning strategies [sciverse_prior_work_for_uncertainty_in_fine_tuned_language_models]. However, the records do not surface specific limitations or criticisms specific to active learning for LLM fine-tuning, nor do they provide a detailed lineage of active learning methods for LLMs [sciverse_efficiently_learning_at_test_time_active_fine_tuning_of_llms] [sciverse_an_active_learning_framework_for_inclusive_generation_by_large_language_models] [sciverse_can_you_label_less_by_using_out_of_domain_data_active_transfer_learning_with_few]. A tangential paper, \"Selecting LLM to Fine-Tune via Rectified Scaling Law\" (2024), is noted but is not directly focused on active learning [sciverse_selecting_large_language_model_to_fine_tune_via_rectified_scaling_law]. One note states that \"expecting current LLMs to solve problems fully autonomously is suboptimal,\" but this claim is not directly about active learning . Consequently, while the existence of research frameworks and pipelines for active fine-tuning of LLMs is confirmed, the specific performance outcomes and comparative efficacy remain unaddressed in the provided notes.",
+  "arm": "main",
+  "steps": 7,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "active learning"
+    },
+    "intent": "Get cross-paper dossier on active learning to see what's covered",
+    "obs_chars": 364,
+    "notes_chars": 757
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "active learning",
+     "contains": "fine-tuning|fine tuning|LLM|large language model"
+    },
+    "intent": "Find finding records linking active learning to LLM fine-tuning",
+    "obs_chars": 368,
+    "notes_chars": 757
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_efficiently_learning_at_test_time_active_fine_tuning_of_llms",
+     "claim_type": "observation"
+    },
+    "intent": "Get observations from the active fine-tuning of LLMs paper",
+    "obs_chars": 187,
+    "notes_chars": 757
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_an_active_learning_framework_for_inclusive_generation_by_large_language_models",
+     "claim_type": "observation"
+    },
+    "intent": "Get observations from the active learning framework for inclusive generation paper",
+    "obs_chars": 187,
+    "notes_chars": 757
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_efficiently_learning_at_test_time_active_fine_tuning_of_llms"
+    },
+    "intent": "Get all finding records from the active fine-tuning of LLMs paper",
+    "obs_chars": 63,
+    "notes_chars": 844
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_an_active_learning_framework_for_inclusive_generation_by_large_language_models"
+    },
+    "intent": "Get all finding records from the active learning framework for inclusive generation paper",
+    "obs_chars": 63,
+    "notes_chars": 844
+   },
+   {
+    "step": 2,
+    "tool": "card",
+    "args": {
+     "entity": "active learning framework for inclusive generation by large language models"
+    },
+    "intent": "Get cross-paper dossier for the active learning framework entity",
+    "obs_chars": 636,
+    "notes_chars": 844
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "contains": "active learning|fine-tuning|fine tuning|LLM|large language model"
+    },
+    "intent": "Find criticism/limitation records about active learning + LLM fine-tuning",
+    "obs_chars": 476,
+    "notes_chars": 844
+   },
+   {
+    "step": 3,
+    "tool": "search_text",
+    "args": {
+     "query": "active learning fine-tuning large language model results accuracy",
+     "k": 12
+    },
+    "intent": "Find raw text passages about active learning + LLM fine-tuning with results",
+    "obs_chars": 192,
+    "notes_chars": 1240
+   },
+   {
+    "step": 3,
+    "tool": "compare",
+    "args": {
+     "entities": [
+      "active learning",
+      "fine-tuned language models",
+      "large language model"
+     ]
+    },
+    "intent": "Get numeric comparison matrix for active learning vs fine-tuning LLMs",
+    "obs_chars": 367,
+    "notes_chars": 1240
+   },
+   {
+    "step": 3,
+    "tool": "lineage",
+    "args": {
+     "entity": "active learning",
+     "direction": "descendants"
+    },
+    "intent": "Trace lineage of active learning methods, especially those applied to LLMs",
+    "obs_chars": 367,
+    "notes_chars": 1240
+   },
+   {
+    "step": 3,
+    "tool": "find_gap",
+    "args": {
+     "entity": "active learning"
+    },
+    "intent": "Check what the corpus records as absent/undone regarding active learning",
+    "obs_chars": 368,
+    "notes_chars": 1240
+   },
+   {
+    "step": 4,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N6. [sciverse_bert_based_active_learning_pipeline] Entity \"bert-based active learning pipeline\" exis",
+     "N7. [sciverse_prior_work_for_uncertainty_in_fine_tuned_language_models] Entity \"prior work for uncer"
+    ]
+   },
+   {
+    "step": 4,
+    "tool": "search_text",
+    "args": {
+     "query": "active learning fine-tuning large language models",
+     "k": 12
+    },
+    "intent": "Find raw text passages about active learning applied to LLM fine-tuning across all corpus papers",
+    "obs_chars": 286,
+    "notes_chars": 1363
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_can_you_label_less_by_using_out_of_domain_data_active_transfer_learning_with_few",
+     "claim_type": "observation"
+    },
+    "intent": "Get findings from the active+transfer learning with few-shot LLMs paper",
+    "obs_chars": 187,
+    "notes_chars": 1363
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_can_you_label_less_by_using_out_of_domain_data_active_transfer_learning_with_few",
+     "claim_type": "criticism"
+    },
+    "intent": "Get criticisms/limitations from the active+transfer learning paper",
+    "obs_chars": 187,
+    "notes_chars": 1363
+   },
+   {
+    "step": 4,
+    "tool": "card",
+    "args": {
+     "entity": "fine-tuned language models"
+    },
+    "intent": "Get cross-paper dossier on fine-tuned language models to see if active learning results are captured there",
+    "obs_chars": 440,
+    "notes_chars": 1363
+   },
+   {
+    "step": 5,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N6. [sciverse_bert_based_active_learning_pipeline] Entity \"bert-based active learning pipeline\" exis",
+     "N7. [sciverse_prior_work_for_uncertainty_in_fine_tuned_language_models] Entity \"prior work for uncer"
+    ]
+   },
+   {
+    "step": 6,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N6. [sciverse_bert_based_active_learning_pipeline] Entity \"bert-based active learning pipeline\" exis",
+     "N7. [sciverse_prior_work_for_uncertainty_in_fine_tuned_language_models] Entity \"prior work for uncer"
+    ]
+   },
+   {
+    "step": 7,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N6. [sciverse_bert_based_active_learning_pipeline] Entity \"bert-based active learning pipeline\" exis",
+     "N7. [sciverse_prior_work_for_uncertainty_in_fine_tuned_language_models] Entity \"prior work for uncer"
+    ]
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 7,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "N1. [sciverse_efficiently_learning_at_test_time_active_fine_tuning_of_llms] Paper: \"Efficiently Learning at Test-Time: Active Fine-Tuning of LLMs\" (2024) — directly relevant.\nN2. [sciverse_an_active_learning_framework_for_inclusive_generation_by_large_language_models] Paper: \"An Active Learning Framework for Inclusive Generation by LLMs\" (2024) — relevant.\nN3. [sciverse_can_you_label_less_by_using_out_of_domain_data_active_transfer_learning_with_few] Paper: \"Can You Label Less by Using Out-of-Domain Data? Active & Transfer Learning with Few-Shot LLMs\" (2022) — relevant.\nN4. [sciverse_selecting_large_language_model_to_fine_tune_via_rectified_scaling_law] Paper: \"Selecting LLM to Fine-Tune via Rectified Scaling Law\" (2024) — tangential.\nN5. [coarse:59744bcc12bc] \"Expecting current LLMs to solve problems fully autonomously is suboptimal\" | anchor:\"expecting current LLMs to solve problems fully autonomously is\" | epistemic:stated — not directly about active learning.\n[unsourced] N6. [sciverse_bert_based_active_learning_pipeline] Entity \"bert-based active learning pipeline\" exists in registry — may connect to LLM fine-tuning context.\n[unsourced] N7. [sciverse_prior_work_for_uncertainty_in_fine_tuned_language_models] Entity \"prior work for uncertainty in fine-tuned language models\" exists — relevant to active learning (uncertainty-based sampling).",
+  "gaps_final": "G1. What does the corpus say about active learning + LLM fine-tuning? (search_text for raw content)\nG2. Numeric results comparing active vs passive fine-tuning of LLMs?\nG3. Limitations/criticisms specific to active learning for LLM fine-tuning?\nG4. Lineage of active learning methods for LLMs?",
+  "queried": [
+   "card|{\"entity\": \"active learning\"}",
+   "findings|{\"contains\": \"fine-tuning|fine tuning|LLM|large language model\", \"entity\": \"active learning\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_efficiently_learning_at_test_time_active_fine_tuning_of_llms\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_an_active_learning_framework_for_inclusive_generation_by_large_language_models\"}",
+   "findings|{\"paper_id\": \"sciverse_efficiently_learning_at_test_time_active_fine_tuning_of_llms\"}",
+   "findings|{\"paper_id\": \"sciverse_an_active_learning_framework_for_inclusive_generation_by_large_language_models\"}",
+   "card|{\"entity\": \"active learning framework for inclusive generation by large language models\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"active learning|fine-tuning|fine tuning|LLM|large language model\"}",
+   "compare|{\"entities\": [\"active learning\", \"fine-tuned language models\", \"large language model\"]}",
+   "lineage|{\"direction\": \"descendants\", \"entity\": \"active learning\"}",
+   "find_gap|{\"entity\": \"active learning\"}",
+   "search_text|{\"k\": 12, \"query\": \"active learning fine-tuning large language models\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_can_you_label_less_by_using_out_of_domain_data_active_transfer_learning_with_few\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_can_you_label_less_by_using_out_of_domain_data_active_transfer_learning_with_few\"}",
+   "card|{\"entity\": \"fine-tuned language models\"}"
+  ],
+  "gate": {
+   "note_rejects": 8,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "reject_reasons": {
+    "bad_backref": 8
+   },
+   "merge_downgraded_lines": 8,
+   "merge_total_lines": 28,
+   "relaxed_writes": 4,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 1,
+   "fallback_compiled": true
+  },
+  "backfills": [
+   "backfill:magneto->magnet"
+  ],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "e2d0eb391fbf674c070c74c3",
+  "type": "aggregation",
+  "question": "During pre-training, why is the transformer embedding layer initialized randomly, rather than with pre-trained embeddings from existing models?",
+  "gold_hint": "",
+  "answer": "Based on the consulted records, the specific rationale or mechanism explaining why the transformer embedding layer is initialized randomly during pre-training, rather than with pre-trained embeddings from existing models such as word2vec or GloVe, was not surfaced. The available documentation contains a general statement that deep learning models utilize pre-trained word embeddings at the embedding layer to extract more comprehensive information, particularly from smaller datasets . However, this claim does not address the design rationale for random initialization in the context of transformer pre-training.\n\nThe records indicate that the \"transformer\" entity lacks a specific dossier within the corpus, and targeted searches for mechanism claims regarding random initialization, pre-trained embeddings, word2vec, or GloVe within the transformer entity yielded no results . Additionally, while a key paper titled \"sciverse_dept_decoupled_embeddings_for_pre_training_language_models\" (2024) is identified as relevant to the topic of decoupled embeddings for pre-training language models, the consulted records did not surface any mechanism, observation, or criticism claims from this specific paper regarding the initialization of the embedding layer . Other retrieved notes, such as those concerning fine-tuned Transformer baselines in legal NLP, are noted as not relevant to the initialization rationale . Consequently, the specific design justification for choosing random initialization over pre-trained embeddings in this context remains unaddressed in the provided materials.",
+  "arm": "main",
+  "steps": 8,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "type": "note_reject",
+    "n_bad": 3,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. Question asks WHY transformer embedding layer is initialized randomly during pre-training rather",
+     "N2. Relevant entities in corpus: \"embedding layer\", \"transformer\", \"pre-trained model\", \"Shallow emb",
+     "N3. Information-need: mechanism/rationale -> findings(claim_type=mechanism) + findings(claim_type=ob"
+    ]
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "embedding layer"
+    },
+    "intent": "Get cross-paper dossier on embedding layer to find design rationale records",
+    "obs_chars": 396,
+    "notes_chars": 695
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "embedding layer",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find mechanism records explaining why embedding layer is initialized randomly",
+    "obs_chars": 538,
+    "notes_chars": 695
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "transformer",
+     "claim_type": "mechanism",
+     "contains": "random init|pre-trained embedding|word2vec|GloVe|initialization"
+    },
+    "intent": "Find mechanism records in transformer context about embedding initialization choice",
+    "obs_chars": 244,
+    "notes_chars": 695
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_dept_decoupled_embeddings_for_pre_training_language_models",
+     "claim_type": "mechanism"
+    },
+    "intent": "Check the dept paper for mechanism records about embedding initialization",
+    "obs_chars": 187,
+    "notes_chars": 695
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_dept_decoupled_embeddings_for_pre_training_language_models",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from the dept paper which is most likely to discuss embedding initialization choices",
+    "obs_chars": 187,
+    "notes_chars": 1522
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "query": "random initialization embedding layer pre-trained word embeddings transformer",
+     "k": 12
+    },
+    "intent": "Search raw text of all corpus papers for discussion of random vs pre-trained embedding initialization in transformers",
+    "obs_chars": 192,
+    "notes_chars": 1522
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "entity": "transformer",
+     "claim_type": "observation",
+     "contains": "random|initializ|pre-trained embedding|word2vec|GloVe"
+    },
+    "intent": "Find observation records about transformer that mention random init or pre-trained embeddings",
+    "obs_chars": 491,
+    "notes_chars": 1522
+   },
+   {
+    "step": 2,
+    "tool": "card",
+    "args": {
+     "entity": "transformer"
+    },
+    "intent": "Get cross-paper dossier on transformer entity for broader context on embedding design choices",
+    "obs_chars": 380,
+    "notes_chars": 1522
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "entity": "transformer",
+     "contains": "random|initializ|pre-trained embedding|word2vec|GloVe|frozen|static"
+    },
+    "intent": "Find criticism/limitation records about pre-trained embeddings in transformer context",
+    "obs_chars": 244,
+    "notes_chars": 1964
+   },
+   {
+    "step": 3,
+    "tool": "search_text",
+    "args": {
+     "query": "random initialization embedding layer pre-trained word embeddings transformer",
+     "k": 12
+    },
+    "intent": "Search raw texts for discussion of random init vs pre-trained embeddings in transformers",
+    "obs_chars": 192,
+    "notes_chars": 1964
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "claim_type": "definition",
+     "entity": "embedding layer",
+     "contains": "random|initializ|pre-trained|word2vec|GloVe"
+    },
+    "intent": "Find definition records about embedding layer initialization",
+    "obs_chars": 244,
+    "notes_chars": 1964
+   },
+   {
+    "step": 4,
+    "tool": "search_text",
+    "args": {
+     "query": "transformer embedding layer random initialization pre-trained word embeddings word2vec GloVe",
+     "k": 12
+    },
+    "intent": "Search raw text for discussion of why transformer uses random init instead of pre-trained embeddings",
+    "obs_chars": 192,
+    "notes_chars": 1964
+   },
+   {
+    "step": 5,
+    "tool": "search_text",
+    "args": {
+     "query": "random initialization embedding layer pre-trained word embeddings transformer",
+     "k": 12
+    },
+    "intent": "Search raw text for discussion of why random init is used instead of pre-trained embeddings",
+    "obs_chars": 286,
+    "notes_chars": 1964
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 8,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "N1. [unsourced] Question: WHY is transformer embedding layer initialized randomly during pre-training, not with pre-trained embeddings (word2vec/GloVe)? Mechanism/design-rationale question.\nN2. [unsourced] Relevant corpus entities: \"embedding layer\", \"transformer\", \"pre-trained model\", \"Shallow embedding models\", \"Simple Word-Embedding-Based Models\". Key paper: sciverse_dept_decoupled_embeddings_for_pre_training_language_models (2024).\nN3. [coarse:fd0b886897e2] \"Deep learning models make use of pre-trained word embeddings at the embedding layer to extract more comprehensive information even from smaller datasets.\" | anchor:\"At embedding layer, deep learning models make use of pre-trained word embeddings that faci\" | conditions:-> | epistemic:stated — general claim about pre-trained embeddings being useful; does NOT explain why transformers use random init.\nN4. [unsourced] card(\"embedding layer\") empty. findings(claim_type=mechanism, entity=\"embedding layer\") → 1 hit (N3). findings(claim_type=mechanism, contains=\"random init|pre-trained embedding|word2vec|GloVe|initialization\", entity=\"transformer\") → 0. findings(claim_type=mechanism, paper_id=\"sciverse_dept...\") → 0. findings(claim_type=observation, paper_id=\"sciverse_dept...\") → 0. card(\"transformer\") → no dossier (out-of-corpus name).\nN5. [coarse:2cd48bcc4aa2] \"Fine-tuned Transformer baselines show promising results, performing well above random on most questions.\" | anchor:\"Our fine-tuned Transformer baselines show promising results, with models performing well a\" | conditions:-> | epistemic:stated — from MAUD legal NLP paper; not relevant to init rationale.\nN6. [unsourced] search_text errored (infra). Need retry or alternative: findings(claim_type=criticism, entity=\"transformer\"), findings(claim_type=observation, contains=\"random|initializ|pre-trained embedding|word2vec|GloVe\", entity=\"transformer\"), findings(claim_type=definition, entity=\"embedding layer\"), search_text retry.",
+  "gaps_final": "G1. Find the specific rationale/mechanism explanation for random init of embedding layer in transformer pre-training\nG2. Check if the dept paper or other corpus papers discuss this design choice\nG3. Check if there are criticism/limitation records about pre-trained embeddings in transformer context",
+  "queried": [
+   "card|{\"entity\": \"embedding layer\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"embedding layer\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"random init|pre-trained embedding|word2vec|GloVe|initialization\", \"entity\": \"transformer\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_dept_decoupled_embeddings_for_pre_training_language_models\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_dept_decoupled_embeddings_for_pre_training_language_models\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"random|initializ|pre-trained embedding|word2vec|GloVe\", \"entity\": \"transformer\"}",
+   "card|{\"entity\": \"transformer\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"random|initializ|pre-trained embedding|word2vec|GloVe|frozen|static\", \"entity\": \"transformer\"}",
+   "findings|{\"claim_type\": \"definition\", \"contains\": \"random|initializ|pre-trained|word2vec|GloVe\", \"entity\": \"embedding layer\"}",
+   "search_text|{\"k\": 12, \"query\": \"random initialization embedding layer pre-trained word embeddings transformer\"}"
+  ],
+  "gate": {
+   "note_rejects": 3,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "reject_reasons": {
+    "bad_backref": 3
+   },
+   "_consec_full_reject": 0,
+   "merge_downgraded_lines": 3,
+   "merge_total_lines": 3,
+   "relaxed_writes": 1,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 4,
+   "fallback_compiled": true
+  },
+  "backfills": [
+   "backfill:magneto->magnet"
+  ],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "e2491bb6e4147c18762e7fb2",
+  "type": "aggregation",
+  "question": "Global Navigation Satellite Systems (GNSS) receivers can provide a reference clock signal known as Pulse-per-Second (PPS or 1-PPS). Is the PPS physically generated through a digitally-controlled oscillator (or line driver) whose offset is periodically re-initialized by the estimated clock bias (retrieved by means of PVT algorithms)?",
+  "gold_hint": "",
+  "answer": "Based on the consulted records, the specific internal mechanism by which the Pulse-per-Second (PPS) signal is physically generated—specifically whether it is produced by a digitally-controlled oscillator (DCO) or line driver whose offset is periodically re-initialized by the estimated clock bias from Position, Velocity, and Time (PVT) algorithms—was not surfaced. The available documentation does not provide details on the internal hardware architecture or the specific control loop dynamics (such as DCO offset re-initialization) used to generate the PPS output.\n\nInstead, the records characterize the PPS strictly as an external output signal provided by the GNSS receiver. It is stated that a typical GNSS receiver provides the time reference through its output 1PPS signals . This signal is defined as a pulse generated at each GPS time second change  and functions as a 1-wire input signal that expects a flank at the beginning of each second . The temporal consistency of this signal is noted, with the derivative of the 1PPS phase in time being consistent with the output frequency . Furthermore, the 1PPS signal serves as a coherent reference for other outputs; for instance, the output 10MHz frequency signal from the GNSS follows the 1PPS coherently , and some receivers offer a 10MHz reference clock synchronized to the 1-PPS signal .\n\nRegarding the accuracy and timing of the PPS relative to the true GPS time, the records indicate that the GPS 1 PPS signal is offset from the true GPS second by up to 50ns, and a correction for this offset is provided periodically by the receiver . This periodic correction implies that the receiver adjusts for timing errors, but the specific method of applying this correction to the physical oscillator (e.g., via DCO bias re-initialization) is not detailed in the available notes. The 1PPS signal is also utilized for timestamping measurements relative to the beginning of a whole second . While external ensembles of reference clocks, such as CSO oscillators, are mentioned in the context of GNSS time validation , no records in the consulted corpus describe the internal PPS generation mechanism involving DCOs or line drivers re-initialized by PVT-derived clock bias.",
+  "arm": "main",
+  "steps": 12,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "1-pps",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find mechanism records about how 1-PPS is generated",
+    "obs_chars": 903,
+    "notes_chars": 443
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "PPS signal",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find mechanism records about PPS signal generation",
+    "obs_chars": 507,
+    "notes_chars": 443
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_research_on_absolute_calibration_of_gnss_receiver_delay_through_clock_steering_c",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find mechanism records in the clock-steering calibration paper",
+    "obs_chars": 187,
+    "notes_chars": 443
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_fpga_based_autonomous_gps_disciplined_oscillatorsfor_wireless_sensor_network_nod",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find mechanism records in the FPGA GPS-disciplined oscillator paper",
+    "obs_chars": 187,
+    "notes_chars": 443
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "query": "PPS pulse per second generated digitally controlled oscillator clock bias PVT re-initialized",
+     "k": 12
+    },
+    "intent": "Search raw text for PPS generation mechanism details including DCO, clock bias, PVT",
+    "obs_chars": 192,
+    "notes_chars": 1088
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "entity": "1-pps",
+     "claim_type": "definition"
+    },
+    "intent": "Find definition records about 1-PPS signal generation",
+    "obs_chars": 1284,
+    "notes_chars": 1088
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "entity": "PPS signal",
+     "claim_type": "definition"
+    },
+    "intent": "Find definition records about PPS signal generation",
+    "obs_chars": 464,
+    "notes_chars": 1088
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "query": "clock steering PPS phase offset bias GNSS receiver delay calibration",
+     "k": 12
+    },
+    "intent": "Search for clock steering and PPS phase offset details in the calibration paper",
+    "obs_chars": 192,
+    "notes_chars": 1088
+   },
+   {
+    "step": 3,
+    "tool": "search_text",
+    "args": {
+     "query": "PPS pulse per second generated digitally controlled oscillator clock bias PVT",
+     "k": 12
+    },
+    "intent": "Search raw text for PPS generation mechanism involving DCO, clock bias, PVT",
+    "obs_chars": 192,
+    "notes_chars": 1652
+   },
+   {
+    "step": 3,
+    "tool": "search_text",
+    "args": {
+     "query": "1PPS signal generation line driver offset reinitialize clock bias",
+     "k": 12
+    },
+    "intent": "Search raw text for PPS line driver and offset re-initialization by clock bias",
+    "obs_chars": 286,
+    "notes_chars": 1652
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "PPS|pulse per second|clock bias|DCO|disciplined oscillator",
+     "paper_id": "sciverse_fpga_based_autonomous_gps_disciplined_oscillatorsfor_wireless_sensor_network_nod"
+    },
+    "intent": "Find mechanism records in FPGA GPS-disc paper about PPS generation and clock bias",
+    "obs_chars": 244,
+    "notes_chars": 1652
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "PPS|pulse per second|clock bias|DCO|disciplined oscillator",
+     "paper_id": "sciverse_research_on_absolute_calibration_of_gnss_receiver_delay_through_clock_steering_c"
+    },
+    "intent": "Find mechanism records in clock-steering calibration paper about PPS and clock bias",
+    "obs_chars": 244,
+    "notes_chars": 1652
+   },
+   {
+    "step": 4,
+    "tool": "search_text",
+    "args": {
+     "query": "PPS pulse per second generated digitally controlled oscillator line driver clock bias PVT reinitialize",
+     "k": 12
+    },
+    "intent": "Search raw text for PPS generation mechanism details including DCO, line driver, clock bias, PVT",
+    "obs_chars": 192,
+    "notes_chars": 1652
+   },
+   {
+    "step": 5,
+    "tool": "search_text",
+    "args": {
+     "query": "PPS pulse per second generated digitally controlled oscillator line driver clock bias PVT reinitialize",
+     "k": 12
+    },
+    "intent": "Retry raw-text search for PPS generation mechanism details (DCO, line driver, clock bias, PVT)",
+    "obs_chars": 286,
+    "notes_chars": 1652
+   },
+   {
+    "step": 5,
+    "tool": "card",
+    "args": {
+     "entity": "1-pps"
+    },
+    "intent": "Get cross-paper dossier for 1-pps entity to find mechanism/config records about PPS generation",
+    "obs_chars": 356,
+    "notes_chars": 1652
+   },
+   {
+    "step": 5,
+    "tool": "card",
+    "args": {
+     "entity": "PPS signal"
+    },
+    "intent": "Get cross-paper dossier for PPS signal entity",
+    "obs_chars": 376,
+    "notes_chars": 1652
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "entity": "1-pps",
+     "claim_type": "observation"
+    },
+    "intent": "Check observation-type findings for 1-pps about how it is generated",
+    "obs_chars": 1309,
+    "notes_chars": 1652
+   },
+   {
+    "step": 6,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "clock steering PPS generation oscillator phase correction GNSS receiver internal"
+    },
+    "intent": "Search raw text of the clock-steering paper and others for PPS generation mechanism details",
+    "obs_chars": 192,
+    "notes_chars": 2027
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "contains": "PPS|pulse per second|clock bias|oscillator|phase",
+     "paper_id": "sciverse_research_on_absolute_calibration_of_gnss_receiver_delay_through_clock_steering_c"
+    },
+    "intent": "Get all observation records from the clock-steering paper mentioning PPS/oscillator/phase",
+    "obs_chars": 244,
+    "notes_chars": 2027
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "contains": "PPS|pulse per second|clock bias|oscillator|phase|DCO",
+     "paper_id": "sciverse_fpga_based_autonomous_gps_disciplined_oscillatorsfor_wireless_sensor_network_nod"
+    },
+    "intent": "Get all observation records from FPGA GPS-disc paper mentioning PPS/oscillator/phase/DCO",
+    "obs_chars": 244,
+    "notes_chars": 2027
+   },
+   {
+    "step": 7,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "PPS generation mechanism oscillator phase lock loop clock bias PVT solution"
+    },
+    "intent": "Try different phrasing to find internal PPS generation mechanism details in raw text",
+    "obs_chars": 286,
+    "notes_chars": 2027
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "PPS|pulse|oscillator|phase|bias|PVT|steering",
+     "paper_id": "sciverse_research_on_absolute_calibration_of_gnss_receiver_delay_through_clock_steering_c"
+    },
+    "intent": "Broader mechanism search in clock-steering paper with more terms",
+    "obs_chars": 244,
+    "notes_chars": 2027
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "PPS|pulse|oscillator|phase|bias|PVT|steering|FPGA|DCO",
+     "paper_id": "sciverse_fpga_based_autonomous_gps_disciplined_oscillatorsfor_wireless_sensor_network_nod"
+    },
+    "intent": "Broader mechanism search in FPGA GPS-disc paper with more terms",
+    "obs_chars": 244,
+    "notes_chars": 2027
+   },
+   {
+    "step": 8,
+    "tool": "search_papers",
+    "args": {
+     "query": "GNSS receiver 1PPS pulse per second generation mechanism digitally controlled oscillator clock bias PVT solution",
+     "k": 5
+    },
+    "intent": "Search external literature for the internal PPS generation mechanism in GNSS receivers to confirm or refute the question",
+    "obs_chars": 1422,
+    "notes_chars": 2146
+   },
+   {
+    "step": 8,
+    "tool": "find_gap",
+    "args": {
+     "entity": "1-pps"
+    },
+    "intent": "Check if the corpus records any explicit absence/limitation regarding PPS generation mechanism details",
+    "obs_chars": 120,
+    "notes_chars": 2146
+   },
+   {
+    "step": 9,
+    "tool": "search_papers",
+    "args": {
+     "k": 5,
+     "query": "GNSS receiver 1PPS generation phase-locked loop clock bias PVT solution pulse per second hardware implementation"
+    },
+    "intent": "Search externally for papers describing the internal hardware mechanism of 1PPS generation in GNSS receivers",
+    "obs_chars": 2294,
+    "notes_chars": 2398
+   },
+   {
+    "step": 9,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "clock steering PPS phase correction bias estimate PVT solution oscillator"
+    },
+    "intent": "Search raw corpus text for clock steering / PPS phase correction mechanism details",
+    "obs_chars": 286,
+    "notes_chars": 2398
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 12,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "Q: Is PPS physically generated by a DCO/line driver whose offset is periodically re-initialized by estimated clock bias from PVT?\nRelevant papers: sciverse_research_on_absolute_calibration_of_gnss_receiver_delay_through_clock_steering_c (2020), sciverse_fpga_based_autonomous_gps_disciplined_oscillatorsfor_wireless_sensor_network_nod (2022)\nN1. [coarse:c3d26d43fb1b] FPGA GPS-disc: \"The derivative of the 1PPS phase in time is consistent with the output frequency.\" | epistemic:stated\nN2. [coarse:7f4179e01608] Syncline model: \"The embedded microcontroller can timestamp measurements relative to the beginning of a whole second using the 1PPS signal.\" | epistemic:stated\nN3. [sciverse_research_on_absolute_calibration_of_gnss_receiver_delay_through_clock_steering_c] No mechanism records found (findings empty, 2 attempts)\nN4. [sciverse_fpga_based_autonomous_gps_disciplined_oscillatorsfor_wireless_sensor_network_nod] No mechanism records found (findings empty, 2 attempts)\nN5. [coarse:a6c21bd2be3b] FPGA GPS-disc: \"A typical GNSS receiver provides the time reference through its output 1PPS signals.\" | epistemic:stated\nN6. [coarse:361d81204a92] Sethi flying lab: \"All GPS receivers produce a signal called 1-PPS, which is a pulse generated at each GPS time second change.\" | epistemic:stated\nN7. [coarse:0267d244d82a] Syncline model: \"A 1PPS is a 1-wire input signal which expects a flank at the beginning of each second.\" | epistemic:stated\nN8. [coarse:b7aa3497840e] FPGA GPS-disc: \"The output 10MHz frequency signal from GNSS follows the 1PPS coherently.\" | epistemic:stated\nN9. [coarse:b88f67889ad9] Sethi flying lab: \"Some GPS receivers offer a 10MHz reference clock, synchronized to the 1-PPS signal.\" | epistemic:stated\nN10. [coarse:3a55f081acf8] Pierre Auger: \"The GPS 1 PPS signal is offset from the true GPS second by up to 50ns, and a correction for this offset is provided periodically by the receiver.\" | epistemic:stated\nN11. [high-precision hardware oscillators ensemble for gnss attack detection] External: on-board ensemble of reference clocks for GNSS time validation; mentions CSO oscillators. No PPS generation mechanism detail.\nsearch_text saturated (3+ searches) — no raw-text mechanism details found in corpus\nAll typed queries (findings mechanism/observation/definition, card, search_text) returned empty for PPS generation mechanism\nfind_gap(1-pps): no absences recorded",
+  "gaps_final": "G1. No corpus record describes the internal PPS generation mechanism (DCO, line driver, clock bias re-initialization via PVT) — the corpus only describes PPS as an output signal\nG2. Try external search to confirm whether the standard PPS generation mechanism matches the question's description",
+  "queried": [
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"1-pps\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"PPS signal\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_research_on_absolute_calibration_of_gnss_receiver_delay_through_clock_steering_c\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_fpga_based_autonomous_gps_disciplined_oscillatorsfor_wireless_sensor_network_nod\"}",
+   "findings|{\"claim_type\": \"definition\", \"entity\": \"1-pps\"}",
+   "findings|{\"claim_type\": \"definition\", \"entity\": \"PPS signal\"}",
+   "search_text|{\"k\": 12, \"query\": \"1PPS signal generation line driver offset reinitialize clock bias\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"PPS|pulse per second|clock bias|DCO|disciplined oscillator\", \"paper_id\": \"sciverse_fpga_based_autonomous_gps_disciplined_oscillatorsfor_wireless_sensor_network",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"PPS|pulse per second|clock bias|DCO|disciplined oscillator\", \"paper_id\": \"sciverse_research_on_absolute_calibration_of_gnss_receiver_delay_through_clock_steeri",
+   "search_text|{\"k\": 12, \"query\": \"PPS pulse per second generated digitally controlled oscillator line driver clock bias PVT reinitialize\"}",
+   "card|{\"entity\": \"1-pps\"}",
+   "card|{\"entity\": \"PPS signal\"}",
+   "findings|{\"claim_type\": \"observation\", \"entity\": \"1-pps\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"PPS|pulse per second|clock bias|oscillator|phase\", \"paper_id\": \"sciverse_research_on_absolute_calibration_of_gnss_receiver_delay_through_clock_steering_c\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"PPS|pulse per second|clock bias|oscillator|phase|DCO\", \"paper_id\": \"sciverse_fpga_based_autonomous_gps_disciplined_oscillatorsfor_wireless_sensor_network_nod",
+   "search_text|{\"k\": 12, \"query\": \"PPS generation mechanism oscillator phase lock loop clock bias PVT solution\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"PPS|pulse|oscillator|phase|bias|PVT|steering\", \"paper_id\": \"sciverse_research_on_absolute_calibration_of_gnss_receiver_delay_through_clock_steering_c\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"PPS|pulse|oscillator|phase|bias|PVT|steering|FPGA|DCO\", \"paper_id\": \"sciverse_fpga_based_autonomous_gps_disciplined_oscillatorsfor_wireless_sensor_network_nod\"",
+   "search_papers|{\"k\": 5, \"query\": \"GNSS receiver 1PPS pulse per second generation mechanism digitally controlled oscillator clock bias PVT solution\"}",
+   "find_gap|{\"entity\": \"1-pps\"}",
+   "search_papers|{\"k\": 5, \"query\": \"GNSS receiver 1PPS generation phase-locked loop clock bias PVT solution pulse per second hardware implementation\"}",
+   "search_text|{\"k\": 12, \"query\": \"clock steering PPS phase correction bias estimate PVT solution oscillator\"}"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 9,
+   "fallback_compiled": true
+  },
+  "backfills": [
+   "backfill:magneto->magnet"
+  ],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "0919a8528cd20166163de3fd",
+  "type": "aggregation",
+  "question": "Have large langauge models been applied to the schema matching problem in databases and are they effective?",
+  "gold_hint": "",
+  "answer": "Yes, large language models (LLMs) have been applied to the schema matching problem in databases, with recent research indicating that they are effective, particularly when integrated into hybrid pipelines that address their inherent computational and contextual limitations. The application of LLMs to this domain is not limited to standalone zero-shot approaches but extends to specialized architectures designed to balance accuracy with cost-efficiency.\n\nA prominent example of this application is the Magneto framework, a two-phase pipeline that combines small language models (SLMs) and LLMs for schema matching [magneto: combining small and large language models for schema matching]. This approach is motivated by the distinct limitations of using either model class in isolation: SLMs require expensive training data, while LLMs incur high computational costs and are constrained by context window limits [magneto: combining small and large language models for schema matching]. Magneto addresses these issues by using an SLM for the initial retrieval phase and an LLM for the reranking phase, resulting in a system that is both cost-effective and accurate [magneto: combining small and large language models for schema matching]. The literature also notes that other researchers, specifically Sheetrit et al. and Zhang et al., have utilized zero-shot pre-trained LLMs for schema matching [coarse:2e63eea2aff1].\n\nDespite their effectiveness, the application of LLMs to schema matching and mapping faces specific challenges that impact their performance and scalability. A study identifies three core issues: first, LLMs produce inconsistent outputs due to sensitivity to input phrasing and structure, which can be mitigated through sampling and aggregation; second, the need for more expressive mappings, such as those defined by the GLaV framework, strains the limited context windows of LLMs; and third, the computational cost associated with repeated LLM calls is significant [towards scalable schema mapping using large language models]. Furthermore, in the broader context of database interactions, prompting LLMs with entire schemas alongside user questions has been found to fail on large databases, a limitation observed in text-to-SQL contexts that is relevant to schema processing [coarse:47616bbd7296].\n\nBeyond static schema matching, LLMs are being applied to dynamic and runtime aspects of database interoperability. For instance, the SAGAI-MID middleware utilizes LLMs to dynamically detect and resolve schema mismatches at runtime, facilitating dynamic runtime interoperability [sagai-mid: a generative ai-driven middleware for dynamic runtime interoperability]. Additionally, the broader landscape of data agents is being spurred by LLMs to handle complex data tasks, including those related to schema understanding [a survey of data agents: emerging paradigm or overstated hype?]. However, it is noted that LLMs remain suboptimal on complex table tasks, such as natural language to code generation and data cleaning, suggesting that task-specific fine-tuning, such as iterative generator-validator fine-tuning, may be necessary to achieve optimal performance [table-llm-specialist: language model specialists for tables using iterative generator-validator fine-tuning].\n\nRegarding the specific quantitative effectiveness of these models, the consulted records did not surface specific numeric results, such as F1 scores or accuracy metrics, for the Magneto framework or other LLM-based schema matching systems. Similarly, the records did not provide detailed problem definitions from classic schema matching papers or specific reports from deep learning approaches to schema matching. Consequently, while the qualitative effectiveness and architectural advantages of LLMs in schema matching are documented, specific comparative numerical benchmarks against baselines are not present in the available information.",
+  "arm": "main",
+  "steps": 12,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "schema matching"
+    },
+    "intent": "Get cross-paper dossier on schema matching entity",
+    "obs_chars": 427,
+    "notes_chars": 799
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_magneto_combining_small_and_large_language_models_for_schema_matching"
+    },
+    "intent": "Pull all finding records from the Magneto LLM schema matching paper",
+    "obs_chars": 63,
+    "notes_chars": 799
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_deep_learning_to_jointly_schema_match_impute_and_transform_databases"
+    },
+    "intent": "Pull findings from the deep-learning schema matching paper",
+    "obs_chars": 63,
+    "notes_chars": 799
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_schema_matching_and_mapping_"
+    },
+    "intent": "Pull findings from the classic schema matching and mapping paper",
+    "obs_chars": 63,
+    "notes_chars": 799
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "query": "large language model schema matching database effectiveness results",
+     "k": 12
+    },
+    "intent": "Full-text retrieval to find prose content about LLMs applied to schema matching, including numeric results and effective",
+    "obs_chars": 192,
+    "notes_chars": 929
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "query": "magneto small large language models schema matching accuracy F1",
+     "k": 12
+    },
+    "intent": "Target the Magneto paper specifically for its method and numeric results",
+    "obs_chars": 192,
+    "notes_chars": 929
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "query": "deep learning schema match impute transform databases results",
+     "k": 12
+    },
+    "intent": "Find content from the 2022 deep learning schema matching paper",
+    "obs_chars": 192,
+    "notes_chars": 929
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "query": "schema matching heterogeneous relational databases approach",
+     "k": 12
+    },
+    "intent": "Find content from the classic 2009/2011 schema matching papers",
+    "obs_chars": 286,
+    "notes_chars": 929
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "entity": "schema matching",
+     "contains": "LLM|large language model|language model"
+    },
+    "intent": "Find finding records about LLMs applied to schema matching across all papers",
+    "obs_chars": 431,
+    "notes_chars": 1082
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "entity": "schema matching",
+     "claim_type": "criticism"
+    },
+    "intent": "Find limitations/criticisms of schema matching approaches including LLM-based",
+    "obs_chars": 431,
+    "notes_chars": 1082
+   },
+   {
+    "step": 3,
+    "tool": "find_gap",
+    "args": {
+     "entity": "schema matching"
+    },
+    "intent": "Check coverage gaps: what is NOT reported about schema matching in corpus",
+    "obs_chars": 431,
+    "notes_chars": 1082
+   },
+   {
+    "step": 3,
+    "tool": "search",
+    "args": {
+     "query": "large language model schema matching database effectiveness results",
+     "k": 10
+    },
+    "intent": "Embedding search for LLM schema matching content across corpus",
+    "obs_chars": 1868,
+    "notes_chars": 1082
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_magneto_combining_small_and_large_language_models_for_schema_matching",
+     "contains": "schema matching|LLM|large language model|effective|accuracy|F1"
+    },
+    "intent": "Get findings from Magneto paper with broader contains terms",
+    "obs_chars": 244,
+    "notes_chars": 1592
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_deep_learning_to_jointly_schema_match_impute_and_transform_databases",
+     "contains": "schema matching|deep learning|neural|effective|accuracy|F1"
+    },
+    "intent": "Get findings from deep-learning schema matching paper",
+    "obs_chars": 244,
+    "notes_chars": 1592
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_schema_matching_and_mapping_",
+     "contains": "schema matching|mapping|approach|method|effective"
+    },
+    "intent": "Get findings from classic schema matching and mapping paper",
+    "obs_chars": 244,
+    "notes_chars": 1592
+   },
+   {
+    "step": 4,
+    "tool": "find_gap",
+    "args": {
+     "paper_id": "sciverse_magneto_combining_small_and_large_language_models_for_schema_matching"
+    },
+    "intent": "Find limitations/absences in Magneto paper",
+    "obs_chars": 161,
+    "notes_chars": 1592
+   },
+   {
+    "step": 5,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "magneto schema matching LLM small large language model results F1 accuracy"
+    },
+    "intent": "Get verbatim passages from magneto paper on methods and results",
+    "obs_chars": 286,
+    "notes_chars": 1591
+   },
+   {
+    "step": 5,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "schema matching deep learning neural network database impute transform results"
+    },
+    "intent": "Get verbatim passages from deep learning schema matching paper",
+    "obs_chars": 192,
+    "notes_chars": 1591
+   },
+   {
+    "step": 5,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "schema matching mapping heterogeneous databases approach method"
+    },
+    "intent": "Get verbatim passages from classic schema matching papers",
+    "obs_chars": 286,
+    "notes_chars": 1591
+   },
+   {
+    "step": 5,
+    "tool": "compare",
+    "args": {
+     "entities": [
+      "magnet",
+      "schema matching"
+     ]
+    },
+    "intent": "Check if any comparison matrix exists for schema matching methods",
+    "obs_chars": 430,
+    "notes_chars": 1591
+   },
+   {
+    "step": 6,
+    "tool": "search_papers",
+    "args": {
+     "query": "large language models schema matching database effectiveness benchmark F1",
+     "k": 8
+    },
+    "intent": "Find external papers on LLMs for schema matching with numeric results, since corpus records are sparse",
+    "obs_chars": 2327,
+    "notes_chars": 1729
+   },
+   {
+    "step": 6,
+    "tool": "search_papers",
+    "args": {
+     "query": "magneto combining small large language models schema matching Sheetrit",
+     "k": 5
+    },
+    "intent": "Find the magneto paper externally to get its abstract and results",
+    "obs_chars": 2299,
+    "notes_chars": 1729
+   },
+   {
+    "step": 6,
+    "tool": "search_papers",
+    "args": {
+     "query": "zero-shot LLM schema matching database entity resolution benchmark",
+     "k": 5
+    },
+    "intent": "Find other LLM schema matching papers with numeric comparisons",
+    "obs_chars": 2304,
+    "notes_chars": 1729
+   },
+   {
+    "step": 7,
+    "tool": "extract_paper",
+    "args": {
+     "title": "magneto: combining small and large language models for schema matching",
+     "abstract": "Recent advances in language models opened new opportunities to address complex schema matching tasks. Schema matching approaches have been proposed that demonstrate the usefulness of language models, but they have also uncovered important limitations: Small language models (SLMs) require training data (which can be both expensive and challenging to obtain), and large language models (LLMs) often incur high computational costs and must deal with constraints imposed by context windows. We present Magneto, a cost-effective and accurate solution for schema matching that combines the advantages of SLMs and LLMs to address their limitations. By structuring the schema matching pipeline in two phases, retrieval and reranking, Magneto can use computationally efficient SLM-based strategies to derive candidate matches which can then be reranked by LLMs, thus making it possible to reduce runtime with"
+    },
+    "intent": "Extract structured records from Magneto paper to get methods, results, and limitations",
+    "obs_chars": 2574,
+    "notes_chars": 3107
+   },
+   {
+    "step": 7,
+    "tool": "extract_paper",
+    "args": {
+     "title": "towards scalable schema mapping using large language models",
+     "abstract": "The growing need to integrate information from a large number of diverse sources poses significant scalability challenges for data integration systems. These systems often rely on manually written schema mappings, which are complex, source-specific, and costly to maintain as sources evolve. While recent advances suggest that large language models (LLMs) can assist in automating schema matching by leveraging both structural and natural language cues, key challenges remain. In this paper, we identify three core issues with using LLMs for schema mapping: (1) inconsistent outputs due to sensitivity to input phrasing and structure, which we propose methods to address through sampling and aggregation techniques; (2) the need for more expressive mappings (e.g., GLaV), which strain the limited context windows of LLMs; and (3) the computational cost of repeated LLM calls, which we propose to miti"
+    },
+    "intent": "Extract structured records from scalable schema mapping paper to get methods, results, and limitations",
+    "obs_chars": 2157,
+    "notes_chars": 3107
+   },
+   {
+    "step": 7,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "schema matching deep learning neural network results F1 accuracy heterogeneous databases"
+    },
+    "intent": "Find numeric results from deep learning schema matching paper and classic papers",
+    "obs_chars": 286,
+    "notes_chars": 3107
+   },
+   {
+    "step": 7,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "schema matching problem definition correspondence mapping heterogeneous databases survey"
+    },
+    "intent": "Find problem definition and prior approaches from classic schema matching papers",
+    "obs_chars": 192,
+    "notes_chars": 3107
+   },
+   {
+    "step": 9,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "magneto schema matching F1 accuracy results benchmark comparison"
+    },
+    "intent": "Get numeric results from magneto paper",
+    "obs_chars": 286,
+    "notes_chars": 3107
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 12,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "Q: Have LLMs been applied to schema matching in databases, and are they effective?\nCorpus papers:\n- sciverse_magneto_combining_small_and_large_language_models_for_schema_matching (2024) — directly on-topic\n- sciverse_schema_matching_and_mapping_ (2011) — classic\n- sciverse_matching_schemas_of_heterogeneous_relational_databases (2009) — classic\n- sciverse_deep_learning_to_jointly_schema_match_impute_and_transform_databases (2022)\n- sciverse_schemagraphsql_efficient_schema_linking_with_pathfinding_graph_algorithms_for_te (2025)\n- sciverse_exploring_the_landscape_of_text_to_sql_with_large_language_models_progresses_cha (2025)\nEntity \"schema matching\" unmarked (no *), card() empty.\nfindings(paper_id=...) on magneto, deep_learning, schema_matching_and_mapping → all empty.\nfindings(contains=LLM|large language model|language model, entity=schema matching) → 0\nfindings(claim_type=criticism, entity=schema matching) → 0\nfind_gap(entity=schema matching) → 0 absences\nfind_gap(paper_id=magneto) → 0 absences\ncompare(entities=[magneto, schema matching]) → error: \"magneto\" resolves to paper title, not entity.\nsearch (embedding) hits:\n- [coarse:2e63eea2aff1] magneto: \"Sheetrit et al. [73] and Zhang et al. [90] utilize zero-shot pre-trained LLMs for schema matching.\"\n- [coarse:47616bbd7296] limitation: \"Prompting large language models with entire schemas alongside the user's question fails on large databases.\" (text2sql context)\n- [coarse:1369afae894f] gemma-sql: novel text-to-SQL model based on LLMs\n- [coarse:ea84c023df21] mtsql-r1: long-horizon multi-turn text-to-sql via agentic training\nExternal search_papers results:\n- [magneto: combining small and large language models for schema matching] (2024): SLMs need training data (expensive), LLMs incur high computational costs + context window constraints. Magneto = two-phase pipeline: retrieval (SLM) + reranking (LLM). Cost-effective and accurate.\n- [towards scalable schema mapping using large language models] (2025): Three core issues with LLMs for schema mapping: (1) inconsistent outputs due to sensitivity to input phrasing/structure → sampling+aggregation; (2) need for more expressive mappings (GLaV) strains limited context windows; (3) computational cost of repeated LLM calls.\n- [table-llm-specialist: language model specialists for tables using iterative generator-validator fine-tuning] (2024): LLMs on complex table tasks (NL-to-Code, data cleaning) remain suboptimal; task-specific fine-tuning needed.\n- [sagai-mid: a generative ai-driven middleware for dynamic runtime interoperability] (2026): LLMs to dynamically detect and resolve schema mismatches at runtime.\n- [a survey of data agents: emerging paradigm or overstated hype?] (2025): LLMs spurring data agents for complex data tasks.\nGaps:\nG1. Magneto: specific numeric results (F1, accuracy) — need extract_paper\nG2. Classic schema-matching papers: problem definition, prior approaches\nG3. Deep-learning schema matching (2022): what it reports\nG4. Numeric results / comparisons showing LLM effectiveness vs baselines\nG5. Limitations/criticisms of LLM-based schema matching",
+  "gaps_final": "G1. Magneto: specific numeric results (F1, accuracy) — need extract_paper\nG2. Classic schema-matching papers: problem definition, prior approaches\nG3. Deep-learning schema matching (2022): what it reports\nG4. Numeric results / comparisons showing LLM effectiveness vs baselines\nG5. Limitations/criticisms of LLM-based schema matching",
+  "queried": [
+   "card|{\"entity\": \"schema matching\"}",
+   "findings|{\"paper_id\": \"sciverse_magneto_combining_small_and_large_language_models_for_schema_matching\"}",
+   "findings|{\"paper_id\": \"sciverse_deep_learning_to_jointly_schema_match_impute_and_transform_databases\"}",
+   "findings|{\"paper_id\": \"sciverse_schema_matching_and_mapping_\"}",
+   "search_text|{\"k\": 12, \"query\": \"schema matching heterogeneous relational databases approach\"}",
+   "findings|{\"contains\": \"LLM|large language model|language model\", \"entity\": \"schema matching\"}",
+   "findings|{\"claim_type\": \"criticism\", \"entity\": \"schema matching\"}",
+   "find_gap|{\"entity\": \"schema matching\"}",
+   "search|{\"k\": 10, \"query\": \"large language model schema matching database effectiveness results\"}",
+   "findings|{\"contains\": \"schema matching|LLM|large language model|effective|accuracy|F1\", \"paper_id\": \"sciverse_magneto_combining_small_and_large_language_models_for_schema_matching\"}",
+   "findings|{\"contains\": \"schema matching|deep learning|neural|effective|accuracy|F1\", \"paper_id\": \"sciverse_deep_learning_to_jointly_schema_match_impute_and_transform_databases\"}",
+   "findings|{\"contains\": \"schema matching|mapping|approach|method|effective\", \"paper_id\": \"sciverse_schema_matching_and_mapping_\"}",
+   "find_gap|{\"paper_id\": \"sciverse_magneto_combining_small_and_large_language_models_for_schema_matching\"}",
+   "search_text|{\"k\": 12, \"query\": \"magneto schema matching LLM small large language model results F1 accuracy\"}",
+   "search_text|{\"k\": 12, \"query\": \"schema matching mapping heterogeneous databases approach method\"}",
+   "compare|{\"entities\": [\"magneto\", \"schema matching\"]}",
+   "search_papers|{\"k\": 8, \"query\": \"large language models schema matching database effectiveness benchmark F1\"}",
+   "search_papers|{\"k\": 5, \"query\": \"magneto combining small large language models schema matching Sheetrit\"}",
+   "search_papers|{\"k\": 5, \"query\": \"zero-shot LLM schema matching database entity resolution benchmark\"}",
+   "extract_paper|{\"abstract\": \"Recent advances in language models opened new opportunities to address complex schema matching tasks. Schema matching approaches have been proposed that demonstrate the usefulness of lan",
+   "extract_paper|{\"abstract\": \"The growing need to integrate information from a large number of diverse sources poses significant scalability challenges for data integration systems. These systems often rely on manual",
+   "search_text|{\"k\": 12, \"query\": \"schema matching deep learning neural network results F1 accuracy heterogeneous databases\"}",
+   "search_text|{\"k\": 12, \"query\": \"magneto schema matching F1 accuracy results benchmark comparison\"}"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 9,
+   "fallback_compiled": true,
+   "compiled_numeric_fail": {
+    "missing_nums": [
+     "2022."
+    ],
+    "unsourced": 0
+   },
+   "compiled_numeric_residual": false
+  },
+  "backfills": [
+   "backfill:magneto->magnet"
+  ],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "dc761baf0fc9fead9889d9eb",
+  "type": "aggregation",
+  "question": "For different modulation types like MPSK, QPSK, and MQAM, I'm measuring the error rate but want to understand and measure the Error Vector Magnitude (EVM) more accurately. I'm using a general equation for all modulation types. Is this the right approach, and what should I expect from the EVM vs. Eb/No curve?",
+  "gold_hint": "",
+  "answer": "**Applicability of a General Equation Across Modulation Types**\n\nThe approach of using a single, general equation for Error Vector Magnitude (EVM) across different modulation types such as MPSK, QPSK, and MQAM is fundamentally supported by the literature, provided the definition includes appropriate normalization. EVM is defined as the deviation of the I/Q components from the ideal reference constellation points . To ensure this metric is comparable across different modulation schemes, the 2006 study on extended relationships among EVM, BER, and SNR defines EVM with normalization so that it stands for multi-modulation systems, including BPSK, DPSK, and NLPSK . This normalized definition allows EVM to be equivalently useful as a performance metric alongside Signal-to-Noise Ratio (SNR) and Bit Error Rate (BER) . While BER is explicitly a function of the specific PSK modulation type, EVM can substitute for both BER and SNR in performance evaluation . Therefore, a general equation is appropriate if it accounts for the specific constellation geometry through normalization, rather than assuming a fixed amplitude for all modulation orders.\n\n**Measurement Methodology and Robustness**\n\nWhen measuring EVM, it is critical to recognize that EVM represents modulation accuracy, specifically the distance from the reference at the symbol level . The 2013 research on robust computation highlights that EVM optimization is generally a non-convex problem, which necessitates the use of robust optimization methods to compute the metric accurately for wireless standards . In practical measurement scenarios, such as those involving RF ZigBee transceivers, EVM is measured using standard digital Automatic Test Equipment (ATE) [sciverse_evm_measurement_of_rf_zigbee_transceivers_using_standard_digital_ate]. For high-frequency applications, such as 300-GHz transmission systems, EVM is typically assessed via Vector Signal Analyzers (VSA), with behavior studied with respect to various modulation schemes and symbol rates . The 2006 in-corpus paper and the 2013 in-corpus paper further address EVM as a performance metric and robust computation for wireless standards, respectively, though the specific details regarding their comparative analyses across modulation types were not surfaced in the consulted records [sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis] [sciverse_robust_computation_of_error_vector_magnitude_for_wireless_standards].\n\n**Expected Behavior of the EVM vs. Eb/No Curve**\n\nRegarding the specific shape and behavior of the EVM versus Eb/No curve, the consulted records did not surface explicit descriptions of the curve's trajectory or specific numerical values for this relationship. However, the literature establishes that EVM, BER, and SNR are linked through extended relationships, and Monte Carlo simulations have been used to analyze these metrics . Since EVM is a measure of modulation accuracy and deviation from the ideal constellation, it is expected to correlate with SNR; however, the precise functional form of the EVM vs. Eb/No curve for MPSK, QPSK, and MQAM was not detailed in the available notes. The 2006 study confirms that EVM can substitute for SNR and BER, implying a direct dependency, but the specific curve characteristics (e.g., linear vs. logarithmic decay) were not provided in the retrieved information .\n\n**Summary of Gaps**\n\nThe consulted records did not surface the specific comparative analysis details from the 2006 in-corpus paper regarding EVM across modulation types [sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis]. Additionally, the specific robust EVM computation methods for different standards detailed in the 2013 in-corpus paper were not fully elaborated in the notes [sciverse_robust_computation_of_error_vector_magnitude_for_wireless_standards]. Finally, the specific contribution of the ZigBee EVM paper to measurement practice beyond the use of standard digital ATE was not detailed in the available records [sciverse_evm_measurement_of_rf_zigbee_transceivers_using_standard_digital_ate].",
+  "arm": "main",
+  "steps": 21,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "robust computation of error vector magnitude"
+    },
+    "intent": "Get cross-paper dossier on EVM computation methodology",
+    "obs_chars": 544,
+    "notes_chars": 872
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis",
+     "contains": "modulation|EVM|error vector|equation|general"
+    },
+    "intent": "Find key claims from the 2006 EVM comparative analysis paper",
+    "obs_chars": 244,
+    "notes_chars": 872
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_robust_computation_of_error_vector_magnitude_for_wireless_standards",
+     "contains": "modulation|EVM|error vector|equation|general|standard"
+    },
+    "intent": "Find key claims from the 2013 robust EVM computation paper",
+    "obs_chars": 244,
+    "notes_chars": 872
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_evm_measurement_of_rf_zigbee_transceivers_using_standard_digital_ate",
+     "contains": "EVM|error vector|measurement|modulation|equation"
+    },
+    "intent": "Find key claims from the ZigBee EVM measurement paper",
+    "obs_chars": 244,
+    "notes_chars": 872
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "query": "EVM error vector magnitude modulation QPSK MQAM MPSK equation general formula",
+     "k": 12
+    },
+    "intent": "Full-text search for EVM equations and modulation-specific content across all corpus papers",
+    "obs_chars": 192,
+    "notes_chars": 632
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "query": "EVM versus Eb/No curve error rate performance metric wireless",
+     "k": 12
+    },
+    "intent": "Search for EVM vs Eb/No curve behavior and performance metric discussion",
+    "obs_chars": 192,
+    "notes_chars": 632
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "query": "robust computation error vector magnitude wireless standards modulation type",
+     "k": 12
+    },
+    "intent": "Search for the 2013 paper's content on robust EVM computation across standards",
+    "obs_chars": 192,
+    "notes_chars": 632
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism-type findings from the 2006 EVM paper without keyword filtering",
+    "obs_chars": 187,
+    "notes_chars": 632
+   },
+   {
+    "step": 3,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "Need to try: findings without claim_type filter, card on \"error vector\", and retry search_text."
+    ]
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis",
+     "contains": "EVM|error vector|modulation|QPSK|MPSK|MQAM|BER|Eb/No|equation|general|metric"
+    },
+    "intent": "Get all finding records from the 2006 EVM paper without claim_type filter",
+    "obs_chars": 244,
+    "notes_chars": 836
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_robust_computation_of_error_vector_magnitude_for_wireless_standards",
+     "contains": "EVM|error vector|modulation|QPSK|MPSK|MQAM|BER|Eb/No|equation|general|standard|robust"
+    },
+    "intent": "Get all finding records from the 2013 robust EVM paper without claim_type filter",
+    "obs_chars": 244,
+    "notes_chars": 836
+   },
+   {
+    "step": 3,
+    "tool": "card",
+    "args": {
+     "entity": "error vector"
+    },
+    "intent": "Get cross-paper dossier for error vector entity",
+    "obs_chars": 384,
+    "notes_chars": 836
+   },
+   {
+    "step": 3,
+    "tool": "search_text",
+    "args": {
+     "query": "EVM error vector magnitude modulation QPSK MPSK MQAM Eb/No BER curve equation",
+     "k": 12
+    },
+    "intent": "Full-text search for EVM vs modulation type and Eb/No curve content",
+    "obs_chars": 192,
+    "notes_chars": 836
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis"
+    },
+    "intent": "Get ALL finding records from the 2006 EVM paper without any contains filter",
+    "obs_chars": 63,
+    "notes_chars": 1025
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_robust_computation_of_error_vector_magnitude_for_wireless_standards"
+    },
+    "intent": "Get ALL finding records from the 2013 robust EVM paper without any contains filter",
+    "obs_chars": 63,
+    "notes_chars": 1025
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_evm_measurement_of_rf_zigbee_transceivers_using_standard_digital_ate"
+    },
+    "intent": "Get ALL finding records from the 2020 ZigBee EVM paper without any contains filter",
+    "obs_chars": 63,
+    "notes_chars": 1025
+   },
+   {
+    "step": 4,
+    "tool": "search_text",
+    "args": {
+     "query": "EVM error vector magnitude modulation QPSK MQAM MPSK Eb/No BER curve",
+     "k": 12
+    },
+    "intent": "Search raw text across all papers for EVM/modulation/Eb-No content",
+    "obs_chars": 286,
+    "notes_chars": 1025
+   },
+   {
+    "step": 5,
+    "tool": "search_papers",
+    "args": {
+     "query": "error vector magnitude EVM modulation QPSK MQAM MPSK Eb/No BER curve relationship",
+     "k": 8
+    },
+    "intent": "Find external papers on EVM vs Eb/No curve behavior and modulation-specific EVM equations",
+    "obs_chars": 2996,
+    "notes_chars": 1337
+   },
+   {
+    "step": 5,
+    "tool": "gap_search",
+    "args": {
+     "query": "EVM error vector magnitude measurement modulation type specific equation general formula"
+    },
+    "intent": "Check what the corpus records as absent/unsolved regarding EVM measurement across modulation types",
+    "obs_chars": 212,
+    "notes_chars": 1337
+   },
+   {
+    "step": 5,
+    "tool": "search_papers",
+    "args": {
+     "query": "robust computation error vector magnitude wireless standards modulation independent",
+     "k": 5
+    },
+    "intent": "Find the 2013 robust EVM paper and related work on modulation-independent EVM computation",
+    "obs_chars": 2077,
+    "notes_chars": 1337
+   },
+   {
+    "step": 6,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N9. [2019 ieee mtt-s international microwave symposium (ims) - 5g mm-wave link range estimation base"
+    ]
+   },
+   {
+    "step": 6,
+    "tool": "extract_paper",
+    "args": {
+     "title": "on the extended relationships among evm, ber and snr as performance metrics",
+     "abstract": "Abstract-In this paper, we relate the error vector magnitude (EVM) bit error rate (BER) and signal to noise ratio (SNR). The BER is a function of the phase shift keying (PSK), which is possible to predict or in cases substitute EVM in places of BER or even SNR. In doing so, we first define EVM with normalization so that the definition stands for multi-modulation systems, viz. binary phase shift keying (BPSK), quadrature phase shift keying (DPSK), and non-linear phase shift keying (NLPSK). The metrics and show that EVM can be equivalently useful as signal to noise ratio and bit error rate. The relationships are based on stream based communication systems. A few Monte Carlo simulations are also illustrated to illustrate the performance of EVM based on these relationships."
+    },
+    "intent": "Extract structured records from the 2006 EVM-BER-SNR paper to get specific equations and modulation-specific details",
+    "obs_chars": 2248,
+    "notes_chars": 2433
+   },
+   {
+    "step": 6,
+    "tool": "extract_paper",
+    "args": {
+     "title": "robust computation of error vector magnitude for wireless standards",
+     "abstract": "The modulation accuracy described by an error vector magnitude is a critical parameter in modern communications. The estimation of the error vector magnitude is often transmitted but now also used in receiver design and for more general signal analysis. The modulation accuracy is a measure of how far a test signal is from a reference signal at the symbol level. In this paper, we propose a new method that is optimized for best agreement. This paper provides an approach to computation of error vector magnitude as described in several previous works [1-3]. The proposed method is based on robust optimization problem, where the error vector magnitude optimization problem is generally non-convex. Robust estimation of the initial conditions for the optimizer is suggested, which is particularly important for a system with complex dynamics. The proposed method can be used to separate convex and n…"
+    },
+    "intent": "Extract structured records from the 2013 robust EVM paper to get method details and modulation-specific considerations",
+    "obs_chars": 1931,
+    "notes_chars": 2433
+   },
+   {
+    "step": 6,
+    "tool": "search_papers",
+    "args": {
+     "k": 8,
+     "query": "EVM error vector magnitude vs Eb/No curve shape behavior QPSK 16QAM 64QAM modulation dependent"
+    },
+    "intent": "Find papers specifically discussing the EVM vs Eb/No curve shape and how it differs across modulation types",
+    "obs_chars": 3151,
+    "notes_chars": 2433
+   },
+   {
+    "step": 6,
+    "tool": "search_papers",
+    "args": {
+     "k": 8,
+     "query": "EVM definition formula modulation independent general equation QAM PSK normalization reference constellation"
+    },
+    "intent": "Find papers discussing whether a single general EVM equation works across all modulation types or if modulation-specific",
+    "obs_chars": 3085,
+    "notes_chars": 2433
+   },
+   {
+    "step": 7,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N7. [2019 ieee mtt-s international microwave symposium (ims) - 5g mm-wave link range estimation base"
+    ]
+   },
+   {
+    "step": 7,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "EVM definition formula normalization reference constellation modulation independent general equation"
+    },
+    "intent": "Find the actual EVM equation/definition from the 2006 and 2013 papers in raw text",
+    "obs_chars": 192,
+    "notes_chars": 2035
+   },
+   {
+    "step": 7,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "EVM versus Eb/No curve shape behavior QPSK 16QAM 64QAM modulation dependent error rate"
+    },
+    "intent": "Find EVM vs Eb/No curve behavior and modulation-specific differences",
+    "obs_chars": 286,
+    "notes_chars": 2035
+   },
+   {
+    "step": 7,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "ZigBee EVM measurement digital ATE transceiver modulation accuracy"
+    },
+    "intent": "Find ZigBee EVM measurement details from the 2020 paper",
+    "obs_chars": 192,
+    "notes_chars": 2035
+   },
+   {
+    "step": 7,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "EVM definition formula normalization reference constellation modulation independent general equation"
+    },
+    "intent": "Find the actual EVM equation/definition from the 2006 and 2013 papers in raw text",
+    "obs_chars": 192,
+    "notes_chars": 2035
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis",
+     "claim_type": "definition"
+    },
+    "intent": "Get definition/mechanism records from 2006 paper on EVM across modulation types",
+    "obs_chars": 187,
+    "notes_chars": 1337
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_robust_computation_of_error_vector_magnitude_for_wireless_standards",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism records from 2013 paper on robust EVM computation",
+    "obs_chars": 187,
+    "notes_chars": 1337
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_evm_measurement_of_rf_zigbee_transceivers_using_standard_digital_ate",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation records from ZigBee EVM measurement paper",
+    "obs_chars": 187,
+    "notes_chars": 1337
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation records from 2006 paper on EVM vs BER/SNR behavior",
+    "obs_chars": 187,
+    "notes_chars": 1337
+   },
+   {
+    "step": 9,
+    "tool": "card",
+    "args": {
+     "entity": "EVM measurement of RF ZigBee transceivers using standard digital ATE"
+    },
+    "intent": "Get full dossier for the ZigBee EVM measurement paper",
+    "obs_chars": 547,
+    "notes_chars": 1337
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis",
+     "contains": "modulation|QPSK|MQAM|MPSK|BER|SNR|Eb/No|curve|equation|formula"
+    },
+    "intent": "Find specific findings about EVM across modulation types and EVM vs Eb/No relationship in the 2006 paper",
+    "obs_chars": 244,
+    "notes_chars": 1337
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis",
+     "claim_type": "criticism"
+    },
+    "intent": "Get the 2006 paper's own critical/limiting statements about EVM as a metric across modulation types",
+    "obs_chars": 187,
+    "notes_chars": 1337
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_robust_computation_of_error_vector_magnitude_for_wireless_standards",
+     "claim_type": "criticism"
+    },
+    "intent": "Get the 2013 paper's critical statements about EVM computation across standards",
+    "obs_chars": 187,
+    "notes_chars": 1337
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_evm_measurement_of_rf_zigbee_transceivers_using_standard_digital_ate",
+     "claim_type": "criticism"
+    },
+    "intent": "Get the ZigBee EVM paper's critical statements about measurement practice",
+    "obs_chars": 187,
+    "notes_chars": 1337
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get the 2006 paper's recommendations about EVM usage across modulation types",
+    "obs_chars": 187,
+    "notes_chars": 1337
+   },
+   {
+    "step": 11,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "EVM formula definition sqrt mean square error vector normalized reference constellation symbol"
+    },
+    "intent": "Find the actual EVM equation/formula in raw text to address the general equation question",
+    "obs_chars": 286,
+    "notes_chars": 1337
+   },
+   {
+    "step": 12,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "EVM Eb/No curve shape asymptotic floor modulation order QPSK 16QAM 64QAM error rate relationship"
+    },
+    "intent": "Find raw text describing EVM vs Eb/No curve behavior across modulation orders",
+    "obs_chars": 286,
+    "notes_chars": 1337
+   },
+   {
+    "step": 13,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_robust_computation_of_error_vector_magnitude_for_wireless_standards",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation findings from the 2013 robust EVM paper — what they observed about EVM computation across standards",
+    "obs_chars": 187,
+    "notes_chars": 1337
+   },
+   {
+    "step": 14,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "EVM definition formula normalized by constellation energy reference symbol distance all modulation types general"
+    },
+    "intent": "Find the exact EVM formula and whether it is modulation-agnostic",
+    "obs_chars": 286,
+    "notes_chars": 1337
+   },
+   {
+    "step": 14,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "EVM versus SNR Eb/No curve shape behavior QPSK 16QAM 64QAM modulation dependent error rate"
+    },
+    "intent": "Find EVM vs Eb/No curve shape and modulation dependence",
+    "obs_chars": 286,
+    "notes_chars": 1337
+   },
+   {
+    "step": 16,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_robust_computation_of_error_vector_magnitude_for_wireless_standards",
+     "claim_type": "definition"
+    },
+    "intent": "Get the EVM definition and robust computation details from the 2013 paper",
+    "obs_chars": 187,
+    "notes_chars": 1337
+   },
+   {
+    "step": 16,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_evm_measurement_of_rf_zigbee_transceivers_using_standard_digital_ate",
+     "claim_type": "definition"
+    },
+    "intent": "Get EVM measurement definition and practice from the ZigBee paper",
+    "obs_chars": 187,
+    "notes_chars": 1337
+   },
+   {
+    "step": 18,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "EVM BER SNR relationship formula QPSK 16QAM 64QAM modulation order error rate curve"
+    },
+    "intent": "Find the mathematical relationship between EVM, BER, and SNR across modulation orders",
+    "obs_chars": 286,
+    "notes_chars": 1337
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 21,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "N1. [sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis] 2006 in-corpus: EVM as performance metric + comparative analysis\nN2. [sciverse_robust_computation_of_error_vector_magnitude_for_wireless_standards] 2013 in-corpus: robust EVM computation for wireless standards\nN3. [sciverse_evm_measurement_of_rf_zigbee_transceivers_using_standard_digital_ate] 2020 in-corpus: EVM measurement of RF ZigBee transceivers\nN4. [on the extended relationships among evm, ber and snr as performance metrics] 2006 external: EVM defined with normalization so it stands for multi-modulation (BPSK, DPSK, NLPSK). EVM equivalently useful as SNR and BER. BER is a function of PSK; EVM can substitute for BER/SNR. Monte Carlo simulations.\nN5. [robust computation of error vector magnitude for wireless standards] 2013 external: EVM = modulation accuracy (distance from reference at symbol level). Proposes robust optimization method. EVM optimization generally non-convex.\nN6. [characterization of a 300-ghz transmission system for digital communications] 2017 external: EVM via VSA; behaviour studied w.r.t. various modulation schemes and symbol rates.\nN7. [evm as generic qos trigger for heterogeneous wieless overlay network] 2010 external: EVM proposed as generic QoS trigger. EVM defined as deviation of I/Q components.",
+  "gaps_final": "G1. What does the 2006 in-corpus paper say about EVM across modulation types?\nG2. What does the 2013 in-corpus paper say about robust EVM for different standards?\nG3. Is there a \"general equation\" that works for all modulations, or modulation-specific considerations?\nG4. What is the expected shape/behavior of EVM vs Eb/No curve?\nG5. What does the ZigBee EVM paper contribute to measurement practice?",
+  "queried": [
+   "card|{\"entity\": \"robust computation of error vector magnitude\"}",
+   "findings|{\"contains\": \"modulation|EVM|error vector|equation|general\", \"paper_id\": \"sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis\"}",
+   "findings|{\"contains\": \"modulation|EVM|error vector|equation|general|standard\", \"paper_id\": \"sciverse_robust_computation_of_error_vector_magnitude_for_wireless_standards\"}",
+   "findings|{\"contains\": \"EVM|error vector|measurement|modulation|equation\", \"paper_id\": \"sciverse_evm_measurement_of_rf_zigbee_transceivers_using_standard_digital_ate\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis\"}",
+   "findings|{\"contains\": \"EVM|error vector|modulation|QPSK|MPSK|MQAM|BER|Eb/No|equation|general|metric\", \"paper_id\": \"sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis\"}",
+   "findings|{\"contains\": \"EVM|error vector|modulation|QPSK|MPSK|MQAM|BER|Eb/No|equation|general|standard|robust\", \"paper_id\": \"sciverse_robust_computation_of_error_vector_magnitude_for_wireless_standards\"}",
+   "card|{\"entity\": \"error vector\"}",
+   "findings|{\"paper_id\": \"sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis\"}",
+   "findings|{\"paper_id\": \"sciverse_robust_computation_of_error_vector_magnitude_for_wireless_standards\"}",
+   "findings|{\"paper_id\": \"sciverse_evm_measurement_of_rf_zigbee_transceivers_using_standard_digital_ate\"}",
+   "search_text|{\"k\": 12, \"query\": \"EVM error vector magnitude modulation QPSK MQAM MPSK Eb/No BER curve\"}",
+   "search_papers|{\"k\": 8, \"query\": \"error vector magnitude EVM modulation QPSK MQAM MPSK Eb/No BER curve relationship\"}",
+   "gap_search|{\"query\": \"EVM error vector magnitude measurement modulation type specific equation general formula\"}",
+   "search_papers|{\"k\": 5, \"query\": \"robust computation error vector magnitude wireless standards modulation independent\"}",
+   "extract_paper|{\"abstract\": \"Abstract-In this paper, we relate the error vector magnitude (EVM) bit error rate (BER) and signal to noise ratio (SNR). The BER is a function of the phase shift keying (PSK), which is p",
+   "extract_paper|{\"abstract\": \"The modulation accuracy described by an error vector magnitude is a critical parameter in modern communications. The estimation of the error vector magnitude is often transmitted but now",
+   "search_papers|{\"k\": 8, \"query\": \"EVM error vector magnitude vs Eb/No curve shape behavior QPSK 16QAM 64QAM modulation dependent\"}",
+   "search_papers|{\"k\": 8, \"query\": \"EVM definition formula modulation independent general equation QAM PSK normalization reference constellation\"}",
+   "search_text|{\"k\": 12, \"query\": \"EVM versus Eb/No curve shape behavior QPSK 16QAM 64QAM modulation dependent error rate\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_robust_computation_of_error_vector_magnitude_for_wireless_standards\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_evm_measurement_of_rf_zigbee_transceivers_using_standard_digital_ate\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis\"}",
+   "card|{\"entity\": \"EVM measurement of RF ZigBee transceivers using standard digital ATE\"}",
+   "findings|{\"contains\": \"modulation|QPSK|MQAM|MPSK|BER|SNR|Eb/No|curve|equation|formula\", \"paper_id\": \"sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_robust_computation_of_error_vector_magnitude_for_wireless_standards\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_evm_measurement_of_rf_zigbee_transceivers_using_standard_digital_ate\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis\"}",
+   "search_text|{\"k\": 12, \"query\": \"EVM formula definition sqrt mean square error vector normalized reference constellation symbol\"}",
+   "search_text|{\"k\": 12, \"query\": \"EVM Eb/No curve shape asymptotic floor modulation order QPSK 16QAM 64QAM error rate relationship\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_robust_computation_of_error_vector_magnitude_for_wireless_standards\"}",
+   "search_text|{\"k\": 12, \"query\": \"EVM definition formula normalized by constellation energy reference symbol distance all modulation types general\"}",
+   "search_text|{\"k\": 12, \"query\": \"EVM versus SNR Eb/No curve shape behavior QPSK 16QAM 64QAM modulation dependent error rate\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_robust_computation_of_error_vector_magnitude_for_wireless_standards\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_evm_measurement_of_rf_zigbee_transceivers_using_standard_digital_ate\"}",
+   "search_text|{\"k\": 12, \"query\": \"EVM BER SNR relationship formula QPSK 16QAM 64QAM modulation order error rate curve\"}"
+  ],
+  "gate": {
+   "note_rejects": 3,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "reject_reasons": {
+    "bad_backref": 3
+   },
+   "merge_downgraded_lines": 12,
+   "merge_total_lines": 25,
+   "relaxed_writes": 3,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 9,
+   "fallback_compiled": true
+  },
+  "backfills": [
+   "backfill:magneto->magnet"
+  ],
+  "auto_rows": [],
+  "degenerate": false
+ }
+]

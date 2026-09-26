@@ -17,10 +17,30 @@ sys.path.insert(0, r"C:\Users\D0n9\Desktop\CompileScholar\src")
 os.environ.setdefault("LOCAL_SOCK_TIMEOUT", "900")
 
 
+def _load_records_with_deep():
+    """records_merged + deep_read_records 叠加（批 10 教训：深抽终化
+    记录若不进 EvidenceStore，笔记里的深记录回指解析不了→空壳报告）。
+    合并非替换：粗抽记录的回指仍然有效（deep payload 不含 coarse id）。"""
+    records = json.load(open(BASE / "records_merged.json", encoding="utf-8"))
+    dp = BASE / "deep_read_records.json"
+    if dp.exists():
+        deep = json.load(open(dp, encoding="utf-8"))
+        for pid, payload in deep.items():
+            if not (isinstance(payload, dict) and payload.get("records")):
+                continue
+            base_recs = (records.get(pid) or {}).get("records") or []
+            seen = {r.get("id") for r in base_recs if r.get("id")}
+            merged_recs = list(base_recs) + [
+                r for r in payload["records"]
+                if r.get("id") not in seen]
+            records[pid] = {"records": merged_recs}
+    return records
+
+
 def adapt_batch(b: int) -> str:
     from report_adapter import (EvidenceStore, assemble, narrative_compile,
                                 parse_notes)
-    records = json.load(open(BASE / "records_merged.json", encoding="utf-8"))
+    records = _load_records_with_deep()
     manifest = json.load(open(BASE / "manifest_all.json", encoding="utf-8"))
     store = EvidenceStore(records, manifest)
     rows = json.load(open(ARM_OURS / f"answers_pilot_cs2batch{b}.json",

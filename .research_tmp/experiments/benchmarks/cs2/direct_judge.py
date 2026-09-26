@@ -99,7 +99,16 @@ async def main():
             scores = await judge_one(r["question"], rubric, report)
             done[r["qid"]] = scores
             json.dump(done, open(out_path, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
-            flat = {k: (v.get("score") if isinstance(v, dict) else v) for k, v in scores.items()}
+            flat = {}
+            for k, v in scores.items():
+                if isinstance(v, dict):
+                    # score 值形态是嵌套 dict（{'ingredient_recall': 0.46} /
+                    # citation 三键）——flat 打印取第一个数值键
+                    nums = {kk: vv for kk, vv in v.items()
+                            if isinstance(vv, (int, float))}
+                    flat[k] = (list(nums.values())[0] if nums else None)
+                else:
+                    flat[k] = v
             print(f"  -> {flat}", flush=True)
         except Exception as e:
             print(f"  -> FAIL {type(e).__name__}: {str(e)[:100]}", flush=True)

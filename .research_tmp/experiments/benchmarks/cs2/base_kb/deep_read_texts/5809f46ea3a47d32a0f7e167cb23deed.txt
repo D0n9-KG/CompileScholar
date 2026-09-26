@@ -1,0 +1,2318 @@
+Deep Learning to Jointly Schema Match, Impute, and Transform Databases 
+ 
+ 
+ 
+
+ 
+ 
+ 
+ 
+ 
+ 
+
+ 
+ 
+ 
+ 
+ 
+
+ 
+ Title: 
+ 
+
+ Content selection saved. Describe the issue below:
+
+ Description: 
+ 
+ 
+
+ 
+ 
+ 
+ 
+ arXiv is now an independent nonprofit! 
+ Learn more 
+ 
+ 
+
+ 
+ 
+ 
+ 
+ License: CC BY 4.0
+ 
+ 
+arXiv:2207.03536v1 [cs.DB] 22 Jun 2022 
+ 
+ 
+
+# Deep Learning to Jointly Schema Match, Impute, and Transform Databases
+
+ 
+ 
+ Sandhya Tripathi
+ † † thanks: sandhyat@wustl.edu 
+ Affiliation:  Department of Anesthesiology, Washington
+University in St Louis, MO, USA
+ 
+    
+ Bradley A. Fritz
+ † † thanks: bafritz@wustl.edu 
+ Affiliation:  Department of Anesthesiology, Washington
+University in St Louis, MO, USA
+ 
+    
+ Mohamed Abdelhack
+ † † thanks: mohamed.abdelhack.37a@kyoto-u.jp 
+ Affiliation:  Krembil Centre for Neuroinformatics, Centre for Addiction and Mental Health, Toronto, Ontario, Canada
+ 
+    
+ Michael S. Avidan
+ † † thanks: avidanm@wustl.edu 
+ Affiliation:  Department of Anesthesiology, Washington
+University in St Louis, MO, USA
+ 
+    
+ Yixin Chen
+ † † thanks: ychen25@wustl.edu 
+ Affiliation:  Department of Computer Science and
+Engineering, Washington University in St Louis, St Louis,
+MO, USA
+ 
+    
+ Christopher R. King
+ † † thanks: christopherking@wustl.edu 
+ Affiliation:  Department of Anesthesiology, Washington
+University in St Louis, MO, USA
+ 
+
+ Abstract 
+ 
+ An applied problem facing all areas of data science is harmonizing data sources.
+Joining data from multiple origins with unmapped and only partially overlapping features is a prerequisite to developing and testing robust, generalizable algorithms, especially in health care.
+We approach this issue in the common but difficult case of numeric features such as nearly Gaussian and binary features, where unit changes and variable shift make simple matching of univariate summaries unsuccessful.
+We develop two novel procedures to address this problem.
+First, we demonstrate multiple methods of “fingerprinting” a feature based on its associations to other features.
+In the setting of even modest prior information, this allows most shared features to be accurately identified.
+Second, we demonstrate a deep learning algorithm for translation between databases.
+Unlike prior approaches, our algorithm takes advantage of discovered mappings while identifying surrogates for unshared features and learning transformations.
+In synthetic and real-world experiments using two electronic health record databases, our algorithms outperform existing baselines for matching variable sets, while jointly learning to impute unshared or transformed variables.
+
+ 
+ 
+ 
+ Keywords: EHRs, autoencoders, database fingerprints
+
+ 
+ 
+
+## 1 Introduction
+
+ 
+ A perennial problem in modern data science is integrating multiple data sources.
+We focus on the problem in which similar or identical concepts are measured in distinct data sources, commonly referred to as the schema matching problem [ 10 ] .
+Manually reconciling large scale databases where the “columns” (database attributes) have not been previously mapped to a common ontology is an expensive and error prone process.
+Our motivating example comes from healthcare, where electronic health records (EHR) store thousands of distinct types of observations, many of them using redundant or ambiguous names.
+Combining these databases is a necessity for the development of large-scale registries, generalizable clinical decision support tools, and measuring performance in small subpopulations.
+
+ 
+ 
+ Where possible, matching the meta-data from two sources (such as column names) is a useful approach, reviewed briefly below.
+However, in many cases it is not sufficient and using summary statistics of a column as a fingerprint (instance-based matching) is both necessary and powerful [ 35 ] .
+The EHR context is particularly challenging for instance-based matching using summary statistics for several reasons.
+First, a large fraction of EHR data columns are binary, meaning that other than the frequency and missingness ratio no univariate summary statistics are possible.
+All binary columns with similar frequencies are indistinguishable potential matches in a univariate approach.
+Second, a shift in variable distributions is the norm when concatenating databases from distinct contexts.
+This can occur both naturally, for example, when populations in two hospitals have different weight and age distributions, and artificially when systems use incompatible units to record observations.
+For example, in EHR data originating in the United States, weight, height, pressure, and concentration could be recorded in SI or US conventional units.
+More generally, up to a unit change, any approximately normally distributed set of variables will be possible matches.
+Finally, some columns may be simple but nonlinear re-parameterizations of others; for example, body surface area of height and weight.
+This final problem confounds many prior approaches to matching the distribution of features from multiple databases.
+
+ 
+ 
+ We propose a novel deep-learning based solution to the schema matching problem inspired by distributional semantics.
+That is, the relationships between entries for a given column and other database columns define the semantics of that column.
+For example, indicators for a patient having diabetes, overweight, high blood pressure, and hyperlipidemia are a cluster known clinically as “metabolic syndrome,” and this cluster of correlation could be identified in each dataset.
+Relationships between variables are plausibly unchanged across databases even with substantial variable shift, especially if they are causal relationships.
+In some special cases, meaningful matching can be performed with no prior information, but we focus on the more realistic case where a few columns in two databases are known to be semantically identical.
+That is, we assume that at least some features are mapped by auxiliary knowledge or manual verification (known-mapped columns).
+We then use autoencoders to compress the data to a relatively low-dimension latent space, using the known-mapped columns to anchor the latent spaces of the autoencoders together.
+Those autoencoders contain the pattern of dependency between columns (the semantics) in each database.
+
+ 
+ 
+ To extract human-readable interpretations from the semantics of the autoencoders, we take a novel knowledge distillation approach.
+We create “chimeric” encoders that transform from the format of the first database to the second.
+To identify additional matching variables, we then compute cross-format associations between the original and transformed data.
+We use a simple matching algorithm to pair columns from the first database to the second, maximizing the sum of correlations between proposed matches.
+A step-down procedure is used to reject low correlation proposed matches while controlling the overall false discovery rate.
+The discovery of low-dimensional transformations is facilitated by graphical analysis and mutual information between the original and transformed data.
+These chimeric encoders also function to impute features between databases where an exact match is not found.
+This is a very common occurrence in medical databases where a feature is not measured in some sources, but strong correlates are.
+For example, in our real dataset, the diagnosis of atrial fibrillation (a common abnormal heart rhythm) may not be explicitly noted, but the presence of medications related to atrial fibrillation allow it to be inferred reasonably well.
+Remarkably, the algorithm does not require the “imputed” variable to be present in both databases.
+A complete pipeline of our approach is presented in Figure 1 .
+To summarize, we make the following contributions :
+
+ 
+ • 
+ 
+ We propose a novel summary statistic (fingerprint) method that solves the schema matching problem with moderate accuracy and high efficiency.
+
+ 
+
+ • 
+ 
+ Our algorithm identifies surrogates for features that are not shared by both databases but have a closely-related concept available.
+
+ 
+
+ • 
+ 
+ Our chimeric encoders learn to jointly impute and transform samples from one database to another when correlates or re-parameterizations of unshared features are present.
+
+ 
+
+ 
+ 
+ 
+ Figure 1 : An illustration of the KMF initialized chimeric schema matching algorithm with module-wise description at the start of Section 2.3 . It also depicts how the input datasets could be differently sized with few mapped features (first three blue coloured columns with common feature names) and majority unmapped (pink and orange coloured columns with ambiguous feature names). 
+ 
+ 
+ Terminology. 
+
+ 
+ The literature on related problems has used a confusing variety of terms.
+Each data source will be represented by a database which is a combination of a dataset (a set of tuples each of which represents the information on a single object e.g. a patient) and schema information, meta-data, relationships, and restrictions.
+Datasets are also organized by features (also commonly called attributes ), which in the simplest cases correspond to a column index in a data matrix.
+We will occasionally refer to a column as the slice of all data for a feature in a dataset.
+Each feature is a measurement of a real-world variable , and features in multiple databases can represent the same variable.
+We refer to these features as mapping to one another.
+ Meta-data is information about a feature, such as its name, data type, and ontology tags.
+A fingerprint of a feature is a set of summary statistics about that column; this is also commonly called an embedding .
+The process of discovering features across databases that reflect the same variable is schema matching ; features that share a variable are maps of one another.
+When two databases have exactly the same set of variables, they have a bijective map or are permutations of one another.
+When the variables in one database are a proper subset of another, they have an onto map.
+When the two share some but not all variables, they have a partial map.
+
+ 
+ 
+ Organization. In Section 1.1 , we start with a brief review of related literature in schema matching and autoencoders.
+In Section 2.1 , we provide details about our motivating example involving EHRs.
+We present the proposed schema matching algorithm in Section 2.3 .
+In Section 3 , we compare the performance of proposed algorithms to baselines and simple alternatives on multiple synthetic and real-data examples.
+Finally, in Section 4 we discuss the results, alternatives, and agenda for future work.
+
+ 
+ 
+ 
+
+### 1.1 Related work
+
+ 
+ Prior approaches to schema matching fall into a few categories; a recent review is provided in [ 1 ] .
+First, meta-data about each feature (such as names) can be compared across databases.
+Modern deep-learning approaches to language embedding can be used to combine text descriptions and other meta-data of a feature before sequence-pair classification, as in [ 22 ] .
+Properties of the schema (such as restrictions) can narrow the set of potential mappings and fit within this category.
+Second, if specific examples are present in multiple databases (e.g. shared patients across hospitals), these can be used to match schema using entity matching algorithms [ 18 ] .
+Third, fingerprints of each feature can be compared across databases to find the best matches (instance-based matching).
+Authors in [ 19 ] provide a comprehensive review of the above categories with pros and cons of the algorithms available in each category and present an interface that can evaluate different types of schema matching methods on a common metric.
+Practical implementations combine these approaches to complement each other [ 23 ] .
+
+ 
+ 
+ The use of meta data for schema matching is the first approach to be used if the schema has clear and comprehensible attribute names.
+Authors in [ 5 ] review many of the element-level matchers that use the name and description of a column.
+They further demonstrate that a hybrid of these matchers (combining different similarity measures between the entity pairs) using machine learning outperforms the individual matchers.
+Recent work by [ 30 ] uses RoBERTa, a transformer-based deep learning model to obtain the embeddings for the attribute names from a given schema and then computes similarity on the generated embeddings. Another attention-based deep learning solution is proposed by [ 39 ] that only uses attribute names and descriptions.
+
+ 
+ 
+ Instance-based matching requires a set of summaries of a data column (a fingerprint);
+one of many matching algorithms is then used to select the best mapping of features of multiple databases based on the similarity of fingerprints.
+Much of this literature uses string data types, where formatting patterns, word frequencies, and neural embedding can identify the semantics of a feature.
+For quantitative data, simple characteristics such as the mean, variance, mode, and fraction missing are commonly used [ 35 , 29 ] .
+Others have proposed more complex fingerprints for continuous data.
+Dhamankar and colleagues [ 10 ] computed the Kullback-Leibler divergence between each pair of quantitative columns (that is, using the distribution function as a high dimensional summary).
+Jaiswal and colleagues [ 13 ] similarly fingerprint a feature by fitting a Gaussian mixture model to its distribution and compared the fit pairwise to candidate variables.
+Mueller and Smola [ 25 ] used a corpus of labeled correspondences between datasets to learn a neural-network based embedding of distributions.
+Because of the large (infinite) dimension of possible embedding of continuous columns, variable reduction has been proposed using penalized regression [ 3 ] and random projections [ 4 ] .
+
+ 
+ 
+ Notably, the above proposed fingerprints are functions of a single column.
+However, there is good reason to believe that associations between variables (and hence features) will tend to be more reproducible across databases.
+For example, although the fraction of men at a given hospital can vary, the relationship between sex and height is likely very similar.
+Several authors have proposed using the dependencies between columns to define the fingerprint.
+Kang and colleagues [ 15 ] proposed a 3 step process: first, in both datasets compute the mutual information of every pair of columns; second, filter potential pairs from across databases as potential mappings based on univariate entropy (or other summary statistics); third, search over assignments from the second database to the first maximizing the similarity of the mutual information matrices.
+They later compared optimization criteria and exhaustive versus heuristic methods for searching over mapping assignments in [ 16 ] .
+Cruz and colleagues [ 9 ] (details unpublished) combined the entropy and mutual information characteristics with a privacy preserving set intersection method to replace graph alignment.
+Authors in [ 40 ] presented a similar proposal that replaced mutual information with the earth movers distance and took a stepwise approach to correlation clustering and matching the similarity of clusters.
+Rabinovich and Last [ 27 ] modified the Kang approach by filtering potential assignments on absolute correlation (or an equivalent measure for binary variables) and added noise (or knock-off) columns to force the two databases to have the same number of columns.
+In Kang and related approaches, any features which are known to map are fixed during the initialization of the graph search.
+
+ 
+ 
+ Translating between two databases (i.e. estimating for a given row in database A, a row which approximately matches the semantics of database B) is a similar problem, which has been approached by one prior method.
+RadialGAN [ 36 ] attempts to generate samples from auxiliary databases in the format of a primary database to support training a classifier.
+Briefly, for each database an autoencoder (AE) is fitted.
+To encourage the latent spaces to have the same semantics, two modification to a standard AE are taken.
+First a cycle consistency loss is added while training the autoencoders by comparing encoded examples to re-encoded translated examples (Mapping A to B, then back to A).
+Second, a discriminator is trained to distinguish true samples from generated samples, and the loss of that discriminator maximized, similar to a GAN except using the latent representation of alternative databases to supply the generator (the decoder) rather than noise.
+After training (when the discriminator can no longer differentiate generated from authentic samples), the generated examples are concatenated to the primary dataset for training a classifier.
+The RadialGAN method does not propose to match the schemas directly, but it produces mechanically similar translations to our chimeric encoders and can be used as input to matching methods.
+
+ 
+ 
+ The process of transforming estimated similarities between columns into proposed matches and evaluating the result can itself be a complicated process.
+Shraga, Gal, and Roitman review current approaches to this step of the algorithm, including the use of neural networks to learn transformation which optimally adjust estimated similarities [ 31 ] .
+Another approach that improves the matches is proposed by [ 38 ] where algorithms generate questions for crowd-sourced workers to maximize reduction in uncertainty of the matches.
+Authors in [ 37 ] also consider this issue while matching multiple schema by finding pairwise schema overlap using some existing similarity measure based schema matches.
+
+ 
+ 
+ These approaches have substantial deficiencies in our motivating example.
+For example, metadata may be absent or misleading.
+The most common and useful metadata is often the feature name.
+In the Epic EHR, many data elements (“smartdata”) have short, meaningless names assigned differently at different sites; some examples are available in Table A.2 in Appendix A.3 .
+Where present, names that appear similar may be distinct concepts, such as “Ur Creatinine” and “POC Creatinine” or may contain ambiguous abbreviations such as “PHTN” representing “pulmonary hypertension,” “portal hypertension,” or “pre-hypertension” which are themselves distinct from “HTN” or “hypertension” as a concept.
+True database schema properties may not be available or preserved, as data is often exported to a flat format.
+Finally, in the healthcare setting, few identical records from the same source will exist between databases in most cases.
+That is, from two hospitals in different states or time periods we expect few contemporaneous records of the same patient.
+However, we fully expect these methods to produce some successful high-confidence matches, and regard them as one source of known-mapped columns in our approach.
+As mentioned above, instance-based fingerprints are also very limited by binary variables and distributional shifts between data sources.
+For example, indicator variables for two diseases with roughly the same frequency would have very similar fingerprints and be vulnerable to mis-mapping.
+
+ 
+ 
+ Generative adversarial networks (GANs) can fulfil some of the same application needs as schema matching.
+For example, realistic synthetic data in the format of a target database can augment training a classifier.
+Our method uses autoencoders (AE), and many researchers have adapted GANs to improve the training of AE or enforce desired properties; for example, [ 24 ] use a discriminator network to make the encoder output similar in distribution to spherical Gaussian data.
+After jointly training the AE and discriminator network, Gaussian random variables can be fed into the AE’s decoder to generate new data points.
+Variational AEs such as α \alpha -GAN [ 28 ] can be used to generate synthetic data with additional distributional requirements.
+However, a discriminator network may not be necessary for these models. The Adversarial Generator-Encoder Networks (AGE) [ 33 ] model uses the divergence of two induced latent distributions as a kind of pre-made discriminator.
+Expanding this approach with multiple discriminators and generators/encoders such as done in [ 20 ] can stabilize the mapping of data points to a latent space and back, perhaps reducing the mode collapse and training difficulty of many GANs.
+Even though the above methods have the potential to generate augmenting data, they do not directly address all the use cases of a schema-matched dataset and do not exploit the relationships between features across databases.
+
+ 
+ 
+ 
+ 
+
+## 2 Methods
+
+ 
+
+### 2.1 Description of motivating example
+
+ 
+ ACTFAST 
+
+ 
+ Clinicians and informaticists in the Anesthesiology department at Washington University School of Medicine developed a database of surgical patients including preoperative clinical characteristics, laboratory data, high-frequency intraoperative monitor data, and postoperative outcomes.
+This database was developed by manually linking multiple existing sources for applications in clinical epidemiology [ 17 ] and clinical decision support tools [ 11 ] .
+It was also linked to an existing ontology as part of a large registry project [ 8 ] .
+However, in 2018 the hospital switched from the prior combination of EHRs (MetaVision, Allscripts) to Epic.
+Although many variables were able to be mapped using manual exploration, ontology links, and hierarchical representations within Epic, others were not.
+A data query revealed thousands of potential mapping variables, making exhaustive manual review impossible.
+
+ 
+ 
+ 
+ MIMIC 
+
+ 
+ The Medical Information Mart for Intensive Care (MIMIC) dataset includes routinely collected EHR and administrative data on a large number of critically ill patients, and is the most widely used dataset for experimentation with machine learning in critical care [ 14 ] .
+One interesting feature of MIMIC is that during the study, the Carevue EHR was replaced with the Metavision EHR.
+Data from many systems which indirectly feed into the EHR, such as laboratory values, has a consistent representation over the entire study, but discrete data which is manually charted (the chartevents table) have inconsistent identification numbers (called d_items) after the change.
+Prior projects 1 1 
+ 1 
+ 
+ 
+ 
+ 1) https://github.com/USC-Melady/Benchmarking_DL_MIMICIII/blob/master/Codes/mimic3_mvcv/10_get_99plus-features-raw.ipynb 
+ 2) https://github.com/YerevaNN/mimic3-benchmarks/blob/master/mimic3benchmark/resources/itemid_to_variable_map.csv have mapped many chartevent d_items from the two eras using column names, units of measure, data distributions, and contextual clues.
+However, many
+d_items have no known mapping between the two eras.
+In practice, because the most important d_items are believed to have been mapped, machine learning experiments usually ignore the unmapped features or learn distinct patterns in the two eras.
+Because of changes in documentation practice related to the new EHR and temporal changes in patient makeup or medical practices, some shift in feature distributions between these eras is expected.
+
+ 
+ 
+ 
+ 
+
+### 2.2 Notation
+
+ 
+ Assume that we have multiple databases { D 1 , D 2 , … , D I } \{D^{1},D^{2},\ldots,D^{I}\} to be schema-matched.
+Indexing databases by i i , each has p i p^{i} features.
+To simplify the notation, we will focus on the case where I = 2 , i ∈ { A , B } I=2,i\in\{A,B\} , avoiding the need to index many quantities that depend on the pair of databases.
+When more than two databases need to be joined, one could directly apply pairwise methods in a round-robin fashion.
+The I = 2 I=2 case supports the most common application for medicine: a new database ( D B D^{B} ) joins an existing consortium ( D A D^{A} ).
+
+ 
+ 
+ We distinguish the database D i D^{i} (which also contains meta-data) from the contained data x i x^{i} .
+We will focus on the case that databases contain only numeric data (i.e., they are matrices in ℝ 2 \mathbb{R}^{2} ) although extensions to higher-order (tensor) databases and embedding complex objects are possible.
+Denote an encoder for database i i as f i f^{i} and a decoder g i g^{i} ; that is for any example j j , x j i ≈ ( g i ∘ f i ) ​ ( x j i ) x^{i}_{j}\approx\left(g^{i}\circ f^{i}\right)(x^{i}_{j}) .
+Denote by L ( , ) L(,) a loss function appropriate to the data type at hand.
+Because f f and g g operate on row-vectors, we will write them as functions of both tuples ( x j i x^{i}_{j} ) and matrices ( x i x^{i} ) where unambiguous.
+We require the output spaces of f A f^{A} and f B f^{B} to be identical in dimension, and we refer to g A ∘ f B g^{A}\circ f^{B} as the chimeric encoder from B B to A A .
+We also compute chimeric dependence denoted by r r and defined as the dependence between every pair of features from x i x^{i} and the output of chimeric encoder (when x i x^{i} is given as an input).
+
+ 
+ 
+ 
+
+### 2.3 Proposed algorithms
+
+ 
+ This section presents the modules involved in the algorithm in order.
+The complete algorithm is presented in Figure 1 .
+The overall flow is as follows:
+
+ 
+ 1. 
+ 
+ Pre-process both databases to create a tabular representation without explicit missingness. Identify a small number of features known to correspond across the two databases using any of the other approaches to schema matching.
+
+ 
+
+ 2. 
+ 
+ KMF Module. Compute an association vector between each unmapped feature and the set of mapped features. Use the cosine similarity of these vectors to create a similarity matrix between unmapped features in the two databases.
+
+ 
+
+ 3. 
+ 
+ Gale-Shapley Matching Module. Transform the above similarity matrix to a discrete set of proposed mappings using the rankings of similarities as an affinity between two features.
+
+ 
+
+ 4. 
+ 
+ Chimeric autoencoder module. Using the features mapped in the pre-processing and KMF modules, fit a pair of AE with a common latent space. Using the encoder from one dataset and decoder from the other, estimate paired samples of original data and data transformed to the format of the other database.
+
+ 
+
+ 5. 
+ 
+ Discover mappings in transformed data. Create a similarity matrix between known-mapped features and transformed features using a bivariate association measure. Use the Gale-Shapley module to identify additional matches, surrogates, and transformed variables.
+
+ 
+
+ 
+ 
+ 
+
+#### 2.3.1 Pre-processing
+
+ 
+ In our real-data example, we use several pre-processing steps.
+First, we assume that a subset of variables are pre-mapped in the two databases.
+This can be based on the multiple sources of metadata discussed in the “related work” section above.
+For continuous variables, although unit conversions can cause unexpected failures, nearly matching ranges, means, or variance are likely to be identical and this information can be included in the pre-matching stage.
+Similarly, the numerous methods for matching text variables can be applied and that text can be transformed into continuous variables via neural embedding.
+In practice, this would likely be followed by a manual verification stage.
+Even if exploring all potential matches is impossible, checking some initial guesses with a content expert can likely be accomplished quickly.
+We assume that K K variables are matched with certainty weights w k w_{k} with k ∈ [ 1 , K ] k\in[1,K] . Also, for clarity in indexing, the known-mapped variables are moved to the front of each database in the same order.
+
+ 
+ 
+ We one-hot encode categorical variables in each dataset.
+Our justification for this step is that categorical variables are semi-arbitrarily split and combined in real data sets, so forcing a 1 : 1 1:1 match between databases may fail unexpectedly.
+We unit-norm quantitative variables because, as mentioned above, we suspect that unit conversions occur commonly and because the mean and scale information are expected to have been used as part of the initialization of known-mapped columns.
+This step also simplifies the development of our neural network-based procedures, which can be adversely affected by inputs on very different scales.
+Although not required, we greatly simplify the presentation by assuming that preliminary exploration (for example, using a single autoencoder) has been performed to detect and merge features that are identical concepts within a single dataset.
+This assumption is necessary to define a “correct” mapping rather than an equivalence-class of features.
+We also assume that missing data in each database has already been imputed; however, modifications to the proposal to allow missing data are straightforward.
+In our example, we use imputation with predictive mean matching [ 6 ] to fill in missing data.
+For higher-dimensional objects like time series, an approach like Gaussian process adapters [ 21 ] can embed irregularly sampled data.
+
+ 
+ 
+ 
+
+#### 2.3.2 Known-Map Association Fingerprints (KMF)
+
+ 
+ As a fast alternative or initialization for the Chimeric encoder, we use a simple correlation-based approach.
+We create a fingerprint of each unmapped column using the K K -vector of correlation to the mapped columns.
+We use the Pearson correlation coefficient because it is invariant to scale and centering, which are affected by unit of measure changes and assumed to have already been used in the verification of known mapped columns.
+The matrix of cosine similarity between fingerprints can then be estimated across databases and maximized by the matching algorithm below.
+
+ 
+ 
+ 
+
+#### 2.3.3 Mapping via Gale-Shapley
+
+ 
+ After creating a similarity matrix between features, many methods have been used to infer a set of mappings, and there is no uniformly optimal way to do so [ 31 ] .
+The Gale-Shapley algorithm is a widely-used algorithm for matching preferences of “applicants” and “reviewers” which has the advantage of depending only on the ranks of r r rather than absolute values [ 12 ] .
+Before running Gale-Shapley, a-priori impossible matches (such as those with different types or extremely different marginal distributions) can be removed, as are variables with known matches.
+Because of the extensive prior work on creating univariate summaries to use as a filter reviewed in Section 1.1 , we do not recapitulate that development here.
+Gale-Shapley produces locally optimal matches (no pairwise trades are mutually beneficial) and is robust to misrepresentation of preferences by applicants, meaning that matches are never degraded by improving the optimization of r r or addition of irrelevant alternatives.
+In the examples where the number of features is identical in D A D^{A} and D B D^{B} , the “stable marriage” version of Gale-Shapley is used; otherwise, the “hospital-resident” version is used with a single acceptance slot per “hospital”.
+
+ 
+ 
+ After creating proposed mappings, we determine a threshold at which matches are so weak that they are likely false positives.
+Because sample correlation has well-known statistical properties, we compute approximate p p -values for each proposed mapping in a hold-out sample.
+We use the Benjamini–Yekutieli procedure [ 2 ] on the p p -values to set an acceptance threshold which controls the false discovery rate under arbitrary correlation, as implemented by the Pingouin Python module [ 34 ] .
+
+ 
+ 
+ Since, KMF is computationally inexpensive, we identify the proposals (new matches) above a threshold of similarity or a top fraction of proposals and add them to the “known map” set before running the chimeric encoder in Section 2.3.4 .
+
+ 
+ 
+ 
+
+#### 2.3.4 Chimeric translation
+
+ 
+ Even though KMF is simple and works efficiently for schema matching, it does not have the capability to identify surrogates for features with no match or to transform features.
+Therefore, we propose chimeric encoders that in addition to matching, can jointly transform and impute features between two databases.
+The overall approach is illustrated in Figure 1 .
+
+ 
+ 
+ Define an autoencoder (AE) for each database using the notations in Section 2.2 :
+
+ 
+
+ 
+ | 
+ x ^ i = g i ​ ( f i ​ ( x i ) ) , \hat{x}^{i}=g^{i}(f^{i}(x^{i})), | 
+ | 
+ (1) | 
+ 
+
+ and define a chimeric encoder:
+
+ 
+
+ 
+ | 
+ z i , i ′ = g i ′ ​ ( f i ​ ( x i ) ) . z^{i,i^{\prime}}=g^{i^{\prime}}(f^{i}(x^{i})). | 
+ | 
+ (2) | 
+ 
+
+ In the 2-database case, we omit the redundant index and label z i , i ′ z^{i,i^{\prime}} as z i ′ z^{i^{\prime}} .
+With databases with very different numbers of features, a shared output dimension of the encoders can have unacceptably poor reconstruction accuracy, in which case an adapter function would need to be applied between f i f^{i} and g i ′ g^{i^{\prime}} in equation ( 2 ).
+During training, the total loss is the reconstruction loss of each AE ( ∑ i L ⁡ ( x ^ i , x i ) \sum_{i}L(\hat{x}^{i},x^{i}) ) plus any regularization losses, plus a cross-reconstruction loss (encode, decode to other space) on the chimeric encoder which considers only the K K known-mapped features:
+
+ 
+
+ 
+ | 
+ ∑ k = 1 K w k ​ L ​ ( z k B , x k B ) , \sum_{k=1}^{K}w_{k}L(z^{B}_{k},x^{B}_{k}), | 
+ | 
+ (3) | 
+ 
+
+ plus the symmetric expression in A A .
+We also add a cycle-consistency loss (encode, decode to the other space, re-encode, decode to original space):
+
+ 
+
+ 
+ | 
+ L ⁡ ( g B ​ ( f A ​ ( g A ​ ( f B ​ ( x B ) ) ) ) , x B ) , L(g^{B}(f^{A}(g^{A}(f^{B}(x^{B})))),x^{B}), | 
+ | 
+ (4) | 
+ 
+
+ plus the symmetric expression reconstructing X A X^{A} .
+The paired samples ( x i , z i ′ ) (x^{i},z^{i^{\prime}}) are the key inputs to the next step of the algorithm.
+
+ 
+ 
+ The rationale for the loss in equation ( 3 ) is that encoded space elements which are important to reconstruct the K K mapped features will also tend to be important in reconstructing the unmapped variables, similar to the latent components in principal components analysis.
+Requiring that the two encoded spaces have similar relationships to the known-mapped columns will hopefully encourage that they have similar relationships to the unmapped columns.
+The cycle consistency loss ( 4 ) also encourages the encoded spaces to have similar or identical semantics because they are used to cross-decode across databases.
+Unlike the cross-reconstruction loss ( 3 ), the cycle consistency loss includes structure within the unmapped columns.
+
+ 
+ 
+ We consider regularization losses including weight decay and orthogonalization of the latent space [ 7 ] , but we do not present here due to space constraints.
+The encoders are given substantial noise injection (Bernoulli or Gaussian dropout) and a narrow latent dimension to encourage the latent space to collapse the data to a shared representation (i.e. requiring information from each component to be used for reconstructing multiple columns).
+
+ 
+ 
+ 
+
+#### 2.3.5 Chimeric mapping
+
+ 
+ Having created paired samples ( x i , z i ′ ) (x^{i},z^{i^{\prime}}) , we then have the task of identifying feature correspondence.
+We propose to create a similarity matrix using chimeric dependence, r k ​ l r_{kl} , for each pair ( k , l ) (k,l) of columns in ( x i , z i ′ ) (x^{i},z^{i^{\prime}}) .
+As explained earlier, we use Pearson correlation
+as r r for our experiments to detect features which are mapped without any transformation.
+Alternatives such as mutual information are considered in the discussion section and are more appropriate to detect features which are transformed.
+We then use the same Gale-Shapley algorithm on the chimeric dependence as we described for KMF.
+A step by step procedure including both Chimeric encoding and Gale Shapley matching is given in Algorithm AE_GS_matching .
+We considered a threshold in the absolute similarity in addition to the Benjamini–Yekutieli based stopping; however, we found that the high degree of compression in our autoencoder networks tended to degrade these correlations from the ideal and that a single threshold could not easily be selected.
+Gale-Shapley is an asymmetric matching process; a given application may provide a rationale to favor one database over the other (such as D A D^{A} being much larger); alternatively, in a symmetric problem this procedure can be repeated with ( x i , z i ′ ) (x^{i},z^{i^{\prime}}) from each i i , and either the similarity matrices are combined prior to mapping or the mappings are compared for consistency.
+The optimal way to combine similarity matrices is itself a topic of active research [ 31 ] .
+In our examples, we arbitrarily use the ( x A , z B ) (x^{A},z^{B}) mapping for simplicity.
+
+ 
+ 
+ Algorithm AE_GS_matching Chimeric schema matching with k k pre-mapped features 
+ 
+ 
+ 1: 
+ 
+ 
+ Mini-batch inner loop within epochs not shown for readability. Also omitted any regularization losses such as weight decay and orthogonalization.
+
+ 
+ 
+ 2: 
+ 
+ 
+ Input: Training data: x A x^{A} (feature set ℱ A \mathcal{F}_{A} ), x B x^{B} (feature set ℱ B \mathcal{F}_{B} ), List of mapped features ℱ m \mathcal{F}_{m} of size k k 
+
+ 
+ 
+ 3: 
+ 
+ 
+ Require: Learning rate α \alpha , max epochs n e n_{e} , Weight for cross loss w c w_{c} , Weight for cycle consistency loss w c ​ y w_{cy} , initial parameters θ A \theta_{A} , θ B \theta_{B} , Matching algorithm GSM .
+
+ 
+ 
+ 4: 
+ 
+ 
+ Output: Mappings between ℱ A \mathcal{F}_{A} and ℱ B \mathcal{F}_{B} , i.e., M x A M_{x^{A}} , M x B M_{x^{B}} .
+
+ 
+ 
+ 5: 
+ 
+ 
+ Let ( f A , g A ) (f^{A},g^{A}) and ( f B , g B ) (f^{B},g^{B}) be the encoder and decoder of x A x^{A} and x B x^{B} 
+
+ 
+ 
+ 6: 
+ 
+ 
+ for t = 0 , ⋯ , n e t=0,\cdots,n_{e} do 
+
+ 
+ 
+ 7: 
+ 
+ 
+    A ​ E A ​ ( θ A ) = 𝐋 ⁡ ( x A , g A ​ ( f A ​ ( x A ) ) ) AE_{A}(\theta_{A})=\mathbf{L}(x^{A},g^{A}(f^{A}(x^{A}))) ,   A ​ E B ​ ( θ B ) = 𝐋 ⁡ ( x B , g B ​ ( f B ​ ( x B ) ) ) AE_{B}(\theta_{B})=\mathbf{L}(x^{B},g^{B}(f^{B}(x^{B}))) 
+
+ 
+ 
+ 8: 
+ 
+ 
+    C E A ( θ A , θ B ) = 𝐋 ( x A [ , 1 : k ] , g B ( f A ( x A ) ) ) [ , 1 : k ] CE_{A}(\theta_{A},\theta_{B})=\mathbf{L}(x^{A}[,1:k],g^{B}(f^{A}(x^{A})))[,1:k] ,   C E B ( θ A , θ B ) = 𝐋 ( x B [ , 1 : k ] , g A ( f B ( x B ) ) [ , 1 : k ] ) CE_{B}(\theta_{A},\theta_{B})=\mathbf{L}(x^{B}[,1:k],g^{A}(f^{B}(x^{B}))[,1:k]) 
+
+ 
+ 
+ 9: 
+ 
+ 
+    C ​ Y A ​ ( θ A , θ B ) = 𝐋 ⁡ ( x A , g A ​ ( f B ​ ( g B ​ ( f A ​ ( x A ) ) ) ) ) CY_{A}(\theta_{A},\theta_{B})=\mathbf{L}(x^{A},g^{A}(f^{B}(g^{B}(f^{A}(x^{A}))))) ,   C ​ Y B ​ ( θ A , θ B ) = 𝐋 ⁡ ( x B , g B ​ ( f A ​ ( g A ​ ( f B ​ ( x B ) ) ) ) ) CY_{B}(\theta_{A},\theta_{B})=\mathbf{L}(x^{B},g^{B}(f^{A}(g^{A}(f^{B}(x^{B}))))) 
+
+ 
+ 
+ 10: 
+ 
+ 
+   loss = ( A ​ E A + A ​ E B ) + w c ​ ( C ​ E A + C ​ E B ) + w c ​ y ​ ( C ​ Y A + C ​ Y B ) =(AE_{A}+AE_{B})+w_{c}(CE_{A}+CE_{B})+w_{cy}(CY_{A}+CY_{B}) 
+
+ 
+ 
+ 11: 
+ 
+ 
+    θ A = θ A − α ∗ ∇ ( loss , θ A ) \theta_{A}=\theta_{A}-\alpha*\nabla(\textrm{loss},\theta_{A}) 
+
+ 
+ 
+ 12: 
+ 
+ 
+    θ B = θ B − α ∗ ∇ ( loss , θ B ) \theta_{B}=\theta_{B}-\alpha*\nabla(\textrm{loss},\theta_{B}) 
+
+ 
+ 
+ 13: 
+ 
+ 
+ end for 
+ 
+ 
+ 14: 
+ 
+ 
+ C ​ C x A CC_{x^{A}} = Cor ( x A , g B ​ ( f A ​ ( x A ) ) ) (x^{A},g^{B}(f^{A}(x^{A}))) , C ​ C x B CC_{x^{B}} = Cor ( x B , g A ​ ( f B ​ ( x B ) ) ) (x^{B},g^{A}(f^{B}(x^{B}))) 
+
+ 
+ 
+ 15: 
+ 
+ 
+ M x A = 𝐆𝐒𝐌 ⁡ ( C ​ C x A ) M_{x^{A}}=\mathbf{GSM}(CC_{x^{A}}) , M x B = 𝐆𝐒𝐌 ⁡ ( C ​ C x B ) M_{x^{B}}=\mathbf{GSM}(CC_{x^{B}}) 
+
+ 
+ 
+ 
+ 
+ Hyperparameter tuning 
+
+ 
+ We recommend a leave-one-out approach to select the architecture of encoders and decoders, regularization strength, learning rate, and other hyperparameters in Algorithm AE_GS_matching .
+That is, after verifying the K K known mapped features, mark only K − 1 K-1 as known, run Algorithm AE_GS_matching , and evaluate the mapping accuracy on the held-out feature in K K runs.
+As in any hyperparameter tuning, prior knowledge from related tasks and iterative evaluation of the results in easily verified cases are likely to narrow the search space and reduce computational costs.
+
+ 
+ 
+ 
+ Federated learning 
+
+ 
+ We note that the above chimeric schema matching algorithm does not require any party to have direct access to more than one database.
+Each database can be hosted on a distinct server and pass current parameters of f f and g g for parameter updates, gradient calculations, or partial loss function calculation using the other databases.
+
+ 
+ 
+ 
+ End-to-end schema matching procedure 
+
+ 
+ The final schema matching procedure is a combination of the above two methods where we use KMF as an initialization step to increase the number of pre-mapped features and then run the chimeric encoder to obtain the final mapping and transformations. A schematic diagram of the above combination is depicted in Figure 1 .
+
+ 
+ 
+ We envision that the above process would be iterative.
+Having created candidate matches, these could be verified using alternative data sources.
+With these new “known” variables the algorithm can be restarted, bootstrapping to identify more matches.
+Having assigned maps to most features from D A D^{A} to D B D^{B} , the translated value would be an element-wise combination of the mapped variable (where defined) and the chimerically encoded value otherwise.
+
+ 
+ 
+ We also evaluated a simpler supervised learning approach to generating paired ( x i , z i ′ ) (x^{i},z^{i^{\prime}}) samples.
+First, fit a classifier or regression function for the unmapped features in each dataset as a function of the mapped features only, x i ′ ∼ h i ′ ( x 1 : k i ′ ) x^{i^{\prime}}\sim h^{i^{\prime}}(x^{i^{\prime}}_{1:k}) , second use the fitted function from one dataset on samples from the other dataset h i ′ ( x 1 : k i ) h^{i^{\prime}}(x^{i}_{1:k}) to generate z i ′ z^{i^{\prime}} by parametric simulation or predictive mean matching to a sample in x i ′ x^{i^{\prime}} .
+This approach does not take advantage of any structure within the unmapped features, but is much easier to fit.
+However, we did not find any performance advantages over the full chimeric encoder, and its results are not reported.
+
+ 
+ 
+ 
+ 
+ 
+
+### 2.4 Experimental details
+
+ 
+
+#### 2.4.1 Synthetic Data generation
+
+ 
+ We consider three synthetic data-generating mechanisms: multivariate Gaussian,
+2-cluster multivariate Gaussian, and a binarized version of the 2-cluster multivariate Gaussian. The mixture case is intended to mimic data derived from a case-control study.
+Details of the simulation can be found in the Appendix A.2 and a code repository in A.1 .
+Samples for each database are drawn independently from these distributions.
+We consider simulations where the two column spaces are identical, one is a subset of the other, and where they only partially overlap by randomly dropping columns from one or both datasets respectively.
+Known mapped columns are assigned randomly from the set of shared columns.
+The remainder (unmapped columns) have their order randomly permuted.
+In some experiments, we transform a randomly selected column by squaring it, making it zero correlation with the raw data.
+Finally, to check the null behavior of our models, we generate data according to independent Gaussians, from which no information for matching should be available. The results for this experiment are provided in Appendix A.4 , but in no settings did the algorithm produce less than the maximal number of mismatches.
+
+ 
+ 
+ 
+
+#### 2.4.2 Real data description
+
+ 
+ We used the MIMIC-III v1.3 dataset [ 14 ] to demonstrate our algorithm for mapping features between two eras, Carevue (CV) and Metavision (MV).
+We included patients who were 18 years and older at the time of hospital admission and survived beyond the first 24 hours of their first ICU stay.
+Where more than 1 ICU stay occurred, we included only the first.
+We treated the laboratory table (labevents) as the known-mapped columns, and used the nurse-charted data table (chartevents) as the unmapped columns.
+Features were identified as belonging to the CV or MV era based on the value of their d_items index. A small number of features appeared to substantially overlap the two eras and were removed from the unmapped set.
+Some labevents data is directly copied into chartevents, and these features were removed from chartevents.
+Because both tables are time series, we selected the last observation in the first 24 hours for each patient, excluding any observations tagged as errors.
+We excluded features with no data in more than 90 % 90\% of patients in labevents and 80 % 80\% in chartevents.
+After these restrictions, the CV dataset had 26130 26130 patients, and the MV dataset had 21125 21125 patients. Both datasets had 71 71 chartevents features and 58 58 labevents features.
+Of the included chartevents features, 49 have been mapped by prior work, and these mappings are treated as a “gold standard” to evaluate the algorithm.
+The remaining 22 features are included in the procedure, but the results are not included in the evaluation.
+We treat mapping a feature with a gold-standard pairing to another feature as an error, but mapping between two features with no gold standard are ignored.
+In experiments varying the number of mapped features, features are selected at random from the labevents table.
+Labevents features not included as mapped are included in the evaluation set of unmapped features.
+
+ 
+ 
+ We used the MIMIC dataset to validate our proposal for hyperparameter selection for the chimeric encoder method.
+Because the number of mapped features ( k k ) in MIMIC dataset was large, we chose to randomly split the sample of lab features into half used for training (marked as known in the procedure) and hold-out (used to evaluate F1 score). This cross-validation split was chosen instead of leave-one-out because with increase in k k , using leave-one out strategy for hyperparameter tuning would become computationally expensive and the estimates would have higher variance.
+10 such cross-validation folds were evaluated for each hyperparameter set (grid search) and the true accuracy on the chartevents table compared between the cross-validation selected hyperparameters and the global optimizer.
+
+ 
+ 
+ For the ACTFAST dataset, we included all binary or categorical features from the preoperative evaluation. The dataset had 97068 97068 patients with 31 31 binary features and 9 9 categorical features. Feature names are available in Table A.1 in Appendix A.3 . Meta data and more details about the features can be found in [ 11 ] .
+We always select the mapped features from the set of categorical features, since it seems more realistic that these text values would be pre-mapped by meta data.
+All categorical features are one hot encoded before analysis and therefore the total number of features is 81 81 and the number of binary mapped features can vary with the selection of categorical features.
+Most of these binary variables have a low frequency of positive values, and no missing data was present in these features.
+Two experimental databases were created by randomly partitioning the patients and randomly dropping and permuting unmapped columns, simulating two “eras” in an identical manner to the synthetic data experiments.
+
+ 
+ 
+ 
+
+#### 2.4.3 Implementation and Baseline Methods
+
+ 
+ Details of the neural network model architecture for algorithm Algorithm AE_GS_matching and hyperparameter search for each experiment are contained in Appendix A.7 .
+We use PyTorch to implement all the neural network steps, and code is made available in Appendix A.1 .
+
+ 
+ 
+ We compare Algorithm Algorithm AE_GS_matching and the simplified version stopping after KMF initialization to two baselines in instance-based schema matching.
+First, the mutual-information-similarity method of Kang and colleagues [ 16 ] is labeled “Kang” in plots and tables.
+Unfortunately, there was no publicly available implementation of the Kang methods and we received no reply from the corresponding author.
+We therefore include a re-implementation of their method in our code.
+Second, RadialGAN [ 36 ] transforms samples between database formats. Although it does not explicitly match features, we can feed its output into the same similarity-matrix and mapping steps in Algorithm AE_GS_matching .
+The authors of RadialGAN also declined to share code or data, and we have done our best to re-implement their approach.
+
+ 
+ 
+ 
+
+#### 2.4.4 Metrics
+
+ 
+ Our primary evaluation metric is F1 score computed on the accepted mappings between previously unmapped features.
+The average F1 scores from the proposed methods and the baseline are compared with the Wilcoxon rank sum test.
+In experiments where columns are intentionally dropped or transformed, we quantify the results where no match exists (imputation) or a transformation occurs with the correlation between the reconstructed value and the true masked value.
+Because we generally think of the method as being applied to matching a large local pool of candidate variables to a smaller number in an existing consortium, we report matching with the larger number of columns as “reviewers” and the smaller number as “applicants”, optimizing the “preferences” of the consortium more.
+Alternatively, the two sets of proposals could be combined or compared.
+
+ 
+ 
+ We considered augmenting classifier training data as an evaluation metric similar to Yoon and colleagues [ 36 ] ; however, we found this to require repeated tuning on the sample sizes, classifier complexity, and problem difficulty to prevent the classifier from effectively saturating its learning and therefore not improving much from additional data. If the primary dataset is small, the results on combined data quickly converge to simply using the external data. For example, logistic regression weights (coefficients) converge to population values with error ∝ n − 1 2 \propto n^{-\frac{1}{2}} , and therefore at realistic sample sizes only modest changes occur with additional data.
+
+ 
+ 
+ 
+ 
+ 
+
+## 3 Results
+
+ 
+
+### 3.1 Synthetic data results
+
+ 
+ Table 1 presents the performance evaluations with statistical tests over all experiments.
+
+ 
+ 
+ Figure 2 shows the results in the simplest synthetic dataset Multivariate Gaussian simulated (20-D) .
+Figure 2(b) shows the performance as the number of mapped features varies.
+First, the RadialGAN method performs poorly under all conditions, and we will not repeat this finding with each scenario.
+Second, the KMF and chimeric encoder quickly saturate the task, and Kang also performs well once more than 25% of the features are mapped.
+The high standard deviation in Figure 2(b) is due to the selection of different mapped features across different trials.
+As can be seen in Figure 2(a) , there are only a few features with strong correlation to the rest of the features, and if the mapped feature set includes them then the F1 score for that trial is high.
+
+ 
+ 
+ In Figure 2(c) , we vary the sample size of the total dataset with the number of mapped features fixed at 4.
+For KMF and chimeric encoder methods, performance stabilizes around 5000 5000 samples, suggesting the variation that we observe in other experiments (using 10000 samples) is the large sample behavior.
+The chimeric encoder performs worse than KMF at small sample sizes, which is expected given the potential for its autoencoders to overfit.
+The sample-size dependence of Kang is less easy to explain.
+In Figure 2(d) , we evaluate onto mapping (one feature set is a subset of the other) varying the number of unshared features.
+The chimeric encoder slightly outperformed others, but differences were small.
+Interestingly, increasing the number of candidate features had minimal effect on the F1 score.
+
+ 
+ 
+ 
+ 
+ 
+ (a) 
+ 
+ 
+ (b) 
+ 
+ 
+ (c) 
+ 
+ 
+ (d) 
+ 
+ Figure 2 : Comparison between KMF (red), KMF initialized chimeric encoder (blue), Kang (brown) and RadialGAN (green) on Multivariate Gaussian simulated (20-D) dataset (a) Correlation structure among features obtained after spectral clustering with 5 clusters (b) Performance variation as the number of mapped features increase and as expected the average F1 score increases with more prior information (c) Performance variation with increase in the total sample size with 4 pre-mapped features (d) Performance variation as the feature size increase in x B x^{B} (onto map case) with 2 pre-mapped features. 
+ 
+ 
+ Figure 3 shows the performance on the somewhat more complex mixture distribution synthetic data.
+Figure 3(a) shows that KMF, chimeric, and Kang methods are all successful with mixture data.
+The F1 score is little smaller when these features are transformed to binary data (Figure 3(b) ), but again all three methods work well.
+Figure 3(e) shows that transforming variables overall degrades performance.
+As expected, KMF and chimeric (which use Pearson correlation in this setup) are more affected than Kang, which is using mutual information as its dependence measure and should therefore be minimally affected by transformations.
+Figure 3(f) presents an example of chimeric encoder learning an inverse square transformation for a feature from x A x^{A} . We attempted to generate a similar plot for RadialGAN to set as a baseline. However, RadialGAN was unable to learn the transformation for similar settings (as shown in Figure 2(a) in Appendix A.6 ).
+
+ 
+ 
+ Figure 3(c) is the more challenging setup of incomplete overlap (columns randomly dropped from both datasets).
+We vary the total number of features in x B x^{B} with the number of pre-mapped features fixed at 4.
+While for all methods there is a decrease in F1 score values, the KMF and chimeric encoder methods are substantially better than the baseline. Figure 3(d) displays the unobserved true values on an unshared feature and the reconstruction from chimeric encoder, showing the method’s ability to learn to impute unobserved features from those that act as surrogate.
+
+ 
+ 
+ We observed that the Gale-Shapley matching step’s performance was much worse when reversing the direction of application (large database applying to small database). This was evident as the difference between the size of feature set of x A x^{A} and x B x^{B} increases, the gap between the performance of two directions also increases. An illustration of this phenomenon is presented in Figure 2(b) in Appendix A.6 .
+Our initial experiments also suggested that the choice of the encoder output dimension in the chimeric method has a significant effect on its accuracy. An example for 2-cluster Gaussian simulated (20-D) with dim = 5 =5 and dim = 10 =10 is provided in Figure 1(b) of Appendix A.5 and clearly, as the dimension decreases, the chimeric AE gets better at mapping between databases. This affirms that our algorithm relies on the compression power of the autoencoders.
+
+ 
+ 
+ 
+ 
+ 
+ (a) 
+ 
+ 
+ (b) 
+ 
+ 
+ (c) 
+ 
+ 
+ (d) 
+ 
+ 
+ (e) 
+ 
+ 
+ (f) 
+ 
+ Figure 3 : Average F1 score for the KMF initialized chimeric encoder based schema matching in comparison to Kang method and KMF method on synthetic datasets. 2-cluster Gaussian simulated (20-D) : (a) x A x^{A} and x B x^{B} have equal number of columns but they are permuted, (b) both x A x^{A} and x B x^{B} have been binarized by thresholding all values at 0 after the original dataset has been normalized.
+ Multivariate Gaussian simulated (50-D) : (c) The plot shows the performance comparison when x A x^{A} has 15 features and there is a partial map between the features of x A x^{A} and x B x^{B} (with 4 pre-mapped features) (d) an illustration of chimeric encoder being able to learn a feature’s representation (not present while training) using the surrogate correlations. 2-cluster Gaussian simulated (20-D) : (e) x A x^{A} and x B x^{B} have equal number of columns but 5 5 random features in unmapped set in x B x^{B} were square transformed, (f) an illustration of chimeric encoder learning an inverse square transformation when 6 features were pre-mapped. 
+ 
+ 
+ 
+ 
+ 
+ Dataset and scenarios | 
+ Kang | 
+ KMF | 
+ KMF → \rightarrow ChimericE | 
+
+ 
+ 
+ 
+ 
+ Multivariate Gaussian simulated (20-D): | 
+
+ 
+ Avg F1 score vs mapped features (Perm) | 
+
+ | 
+ 0.782 | 
+ 0.937 | 
+ 0.924 | 
+
+ 
+ 
+ 
+ 
+ Multivariate Gaussian simulated (20-D): | 
+
+ 
+ Avg F1 score vs sample size (Perm) | 
+
+ | 
+ 0.388 | 
+ 0.919 | 
+ 0.728 | 
+
+ 
+ 
+ 
+ 
+ Multivariate Gaussian simulated (20-D): Avg F1 score | 
+
+ 
+ vs number of features in larger database (Onto) | 
+
+ | 
+ 0.715 | 
+ 0.773 | 
+ 0.808 | 
+
+ 
+ 
+ 
+ 
+ 2-cluster Gaussian simulated (20-D): | 
+
+ 
+ Avg F1 score vs mapped features (Perm) | 
+
+ | 
+ 0.949 | 
+ 0.934 | 
+ 0.932 | 
+
+ 
+ 
+ 
+ 
+ Binarized 2-cluster Gaussian simulated (20-D): | 
+
+ 
+ Avg F1 score vs mapped features (Perm) | 
+
+ | 
+ 0.977 | 
+ 0.918 | 
+ 0.905 | 
+
+ 
+ 
+ 
+ 
+ 2-cluster Gaussian simulated (20-D) with some non-linear | 
+
+ 
+ transf features : Avg F1 score vs mapped features (Perm) | 
+
+ | 
+ 0.936 | 
+ 0.819 | 
+ 0.652 | 
+
+ 
+ 
+ 
+ 
+ Multivariate Gaussian simulated (50-D): Avg F1 score | 
+
+ 
+ vs number of features in larger database (Partial mapping) | 
+
+ | 
+ 0.393 | 
+ 0.689 | 
+ 0.646 | 
+
+ 
+ ACTFAST data: Avg F1 score vs mapped features (Perm) | 
+ 0.282 | 
+ 0.961 | 
+ 0.702 | 
+
+ 
+ ACTFAST data: Avg F1 score vs sample size (Perm) | 
+ 0.523 | 
+ 0.770 | 
+ 0.472 | 
+
+ 
+ 
+ 
+ 
+ ACTFAST data: Avg F1 score vs number of features in | 
+
+ 
+ larger database (Onto) | 
+
+ | 
+ 0.943 | 
+ 0.878 | 
+ 0.882 | 
+
+ 
+ 
+ 
+ 
+ ACTFAST data: Avg F1 score vs number of features in | 
+
+ 
+ larger database (Partial mapping) | 
+
+ | 
+ 0.861 | 
+ 0.832 | 
+ 0.805 | 
+
+ 
+ MIMIC data: Avg F1 score vs mapped features (Partial mapping) | 
+ 0.148 | 
+ 0.484 | 
+ 0.424 | 
+
+ 
+
+ Table 1 : Table showing the average F1 score for different methods in different scenarios. Bold values denote the method with a statistically significant higher average F1 score in comparison to others based on the Wilcoxon test. 
+ 
+ 
+ 
+
+### 3.2 Real data results
+
+ 
+ MIMIC-III 
+
+ 
+ Figure 4(a) and 4(b) show the correlograms for the Carevue and Metavision eras respectively.
+Although the number of mapped features is fairly high, the correlation between individual mapped and unmapped features is generally low.
+Figure 4(c) shows the matching performance while varying the number of included mapped laboratory features.
+The performance is overall lower (correctly mapping at most 22 of 49 features), as we might expect given the weak dependence between features and the large fraction of features not shared between the two datasets.
+Even after choosing the optimal parameters for the baseline method (Kang), its performance is extremely poor compared to our KMF and chimeric encoder methods.
+The cross-validation hyperparameter tuning strategy when applied to the MIMIC dataset yielded an average F1 score of 0.40 0.40 , which was modestly lower than the global optimum of 0.45 0.45 .
+On an average, the proposed algorithms are able to correctly match 22 out of 49 (KMF) and 20 out of 49 (KMF initialized Chimeric) unknown chartevents features when 58 features are known-mapped.
+
+ 
+ 
+ 
+ 
+ 
+ (a) 
+ 
+ 
+ (b) 
+ 
+ 
+ (c) 
+ 
+ Figure 4 : Performance of chimeric encoder in terms of average F1 score on MIMIC-III dataset. Correlation structure within features (labevents and chartevents combined) of MIMIC-III data in (a) Carevue (CV) era and (b) Metavision (MV) era. (c) Average F1 score for schema matching between CV and MV era data by chimeric encoder and baselines. 
+ 
+ 
+ 
+ ACTFAST 
+
+ 
+ Figure 5(a) presents a correlogram for the ACTFAST dataset.
+Some features like ASA, Anesthesia type, and Functional capacity are substantially correlated with many variables.
+In Figure 5(b) , we present F1 score while varying the number of mapped features, and in Figure 5(c) we vary the sample size.
+KMF is consistently the best performing algorithm, and RadialGAN is consistently the worst.
+Chimeric encoding is superior to the Kang baseline when a small number of features are mapped, and the two are largely equivalent otherwise.
+As we saw before, the chimeric encoder is more sample-size dependent than any other method because of its complexity.
+Although the sample size of ACTFAST dataset is larger than the other setting we consider, the frequency of the binary features is much less, and as a result the performance has not saturated with the entire dataset used.
+The large standard errors are a function of the random selection of variables to treat as pre-mapped, since a few variables are very informative.
+
+ 
+ 
+ Figure 5(d) displays mapping accuracy as a function of the number of unshared features in the case where one column space is a subset of the other, and Figure 5(e) displays the same when two column spaces have unique features too.
+When the number of features in the consortium is fixed at 50 50 and the size of the new database interested in joining is increased, we observe that the F1 score does not show a substantial decrease.
+The Kang baseline has a statistically significant edge in performance averaged over settings in this experiment (Table 1 ), but the absolute difference performance is small with all 3 methods performing about the same.
+The findings are similar in the partial mapping experiment in Figure 5(e) .
+We investigated the lower F1 scores in the chimeric and KMF methods,
+and found that the chimeric and KMF methods were declaring incorrect matches to exist when a statistically significant surrogate was identified.
+Given that some of the clinical entities in the assessment are closely correlated (seen in Figure 5(a) ), we feel that this represents more of a problem with the evaluation metric.
+Figure 2(c) in Appendix A.6 depicts a histogram of density of the true correlations on the GS matches for ‘no-match’ features that were declared significant by step down procedure.
+Most of these mistakes are due to the ‘no-match’ features being matched to correlated surrogates as seen on the right half of the plot.
+
+ 
+ 
+ However, the surrogate feature matches have the advantage of allowing one to create composite measures or reconstruct features that are not present in one dataset using the chimeric encoder.
+Figure 5(f) shows such an example, displaying the cumulative distribution function of the reconstruction of a binary feature “Outpatient insulin” that was not present in x A x^{A} , stratified based on the true unobserved value.
+The distribution of this feature is very skewed with only 0.052 0.052 positive ratio.
+The distribution functions for the two populations are well separated, which is an evidence for good reconstruction of a binary feature at a variety of potential thresholds.
+
+ 
+ 
+ 
+ 
+ 
+ (a) 
+ 
+ 
+ (b) 
+ 
+ 
+ (c) 
+ 
+ 
+ (d) 
+ 
+ 
+ (e) 
+ 
+ 
+ (f) 
+ 
+ Figure 5 : Performance of chimeric encoder in terms of average F1 score on ACTFAST dataset (a) Correlation structure within features (after one-hot encoding) of ACTFAST data obtained after spectral clustering with 10 clusters (b) Comparison between proposed methods and the baselines (c) Performance variation with increase in the total sample size when number of mapped features were fixed at 5 categorical variables (d) Effect of feature overlap extent on F1 score when the consortium size is only 50 features (onto map case, 3 pre-mapped features) (e) Effect of feature overlap extent on F1 score when the consortium size is only 50 features (partial map case, 3 pre-mapped features) (f) Empirical cumulative distribution function of reconstructed binary feature using chimeric encoder that had ‘no-match’; difference in two curves show that the reconstructed feature values ( { 0 , 1 } \{0,1\} ) are well discriminated. 
+ 
+ 
+ 
+ 
+ 
+
+## 4 Discussion
+
+ 
+ The problem of combining two data sources with shared features is complex and multi-step in applied work.
+Recently, major software firms have put forward proposals to match healthcare databases 2 2 
+ 2 
+ 
+ 
+ 
+ 1) https://cloud.google.com/healthcare 2) https://aws.amazon.com/healthlake/ .
+Most approaches to this task either rely on extensive meta-data or columns with very distinct distributions, such as text fields.
+We envision our contribution as addressing a specific step in these applications.
+After identifying easily mapped features using the above sources of information,
+we focus on the challenging case of binary or continuous features without substantial metadata.
+We further assume that variable shift or rescaling in continuous variables make recognizing univariate distributions unreliable.
+In that setting, we proposed a procedure that jointly learns to match features between databases, identify transformed features, and impute missing features when a surrogate is present.
+
+ 
+ 
+ Our method has several novel contributions.
+First, our use of Gale-Shapley matching provides a locally optimal transformation of a similarity matrix to a set of mappings.
+The procedure is fast compared to the heuristic stochastic search proposal of Kang and colleagues [ 16 ] and provides candidates for the next-best matches, should the reviewer find a proposal to be incorrect.
+In practice, we would expect the final review stage of matching the two databases to consider a small number of mappings, so the incorrect modifications by the chimeric encoder are of little applied consequence.
+Because Gale-Shapley is very fast, if any corrections are made by users it can be interactively re-run with those corrections enforced.
+Gale-Shapley does have some disadvantages.
+First, it does not identify global optima, only a local one.
+Second, the results depend on the selection of proposal direction.
+Third, Gale-Shapley on its own does not produce any measure of uncertainty and requires an ad-hoc secondary step to identify when to stop accepting matches.
+The procedure of matching between inputs and chimeric outputs can be seen as a form of knowledge distillation;
+we are searching over the space of permutations (and discarding some features) for a function that approximates the chimeric encoder.
+Search strategies built into the neural network optimization are certainly possible, but we defer this to future work.
+
+ 
+ 
+ Second, we are the first, to our knowledge, to use false discovery rate control to define a cutoff for partial mapping.
+In our experiments with low dimensional latent classes or spaces, we find that this cutoff is generally liberal (allows too many matches) because a surrogate variable related to the same latent class is identified with low but statistically non-zero correlation.
+By ranking the proposed matches by the estimated correlation, users can detect when the chimeric correlation is no longer meaningful.
+As discussed below, a leave-k-out or cross-validation approach to validation is also possible, which can help define a threshold.
+
+ 
+ 
+ We are also the first to combine the schema matching problem with learning transformations, including multivariable transformations used to impute missing features.
+The chimeric encoder reveals the transformation both graphically and quantitatively with the highly-ranked matches.
+We regard identifying semantically identical features as a distinct task from transformed features, and recommend this as a multi-stage procedure.
+We used Pearson correlation to generate a similarity matrix between features using the chimeric data, which preferentially matches native versus transformed features.
+As discussed above, this aspect of the proposal (linking a feature to a surrogate) probably explains its lower than expected F1 score in the partial mapping case.
+Non-parametric associations like distance correlation [ 32 ] or mutual information expand the notion of “matching” to any one-to-one univariate transformation, which would modify the problem definition for KMF.
+Multiple association measures per pair of features (for example, if the conditional relationship is not homogeneous and there is substantial distributional shift) are also possible.
+
+ 
+ 
+ Our work is naturally compared to that of Kang [ 15 ] and others following the same theme.
+Kang relies upon the association between features to form a fingerprint and searches the space of permutations between databases to optimize the overall similarity of association matrices.
+Interestingly, our simple initialization procedure performed better in almost all cases.
+In the Gaussian case, the pairwise covariance matrix completely defines the dependency between features, and the method’s poor performance was surprising.
+We observed that in datasets with binary features the Kang method retains good performance.
+We identified several relative weaknesses of the Kang method.
+First, it was sensitive to the choice of “normal metric” versus “Euclidean metric” (data not shown).
+Second, it performed poorly in the more realistic and difficult partial mapping case even after tuning over its free parameter.
+Third, we observed it to have occasional dramatic failures resulting in wide standard deviations, presumably related to difficulty with its stochastic search over permutations.
+One advantage of the Kang method is that it can work without any prior knowledge matching features (or a very small number); our method is engineered assuming this prior data is available.
+In such cases, one can replace the correlation-fingerprint initialization we propose with Kang’s method and rely on the chimeric encoder for transformation.
+
+ 
+ 
+ Our method also resembles the work of Yoon and colleagues in RadialGAN [ 36 ] .
+They have a similar approach to transformation between datasets, but they replace the known-mapped chimeric loss with a discriminator.
+RadialGAN has no natural way to take advantage of prior information mapping some variables.
+The RadialGAN authors explicitly do not attempt to match schemas, but there is no reason not to use their network to estimate similarity matrices across datasets.
+We found RadialGAN to be conceptually problematic, because if there is feature shift between databases (such as different mixes of patient classes), then the algorithm will be forced to awkwardly transform patients from one class to another (otherwise the discriminator will easily notice the differences in distribution).
+We note that our cycle consistency loss is slightly different from the same term in RadialGAN, L ⁡ ( g A ​ ( f B ​ ( z B ) ) , x A ) L(g^{A}(f^{B}(z^{B})),x^{A}) versus L ⁡ ( f B ​ ( z B ) , f A ​ ( x A ) ) L(f^{B}(z^{B}),f^{A}(x^{A})) where z B ≡ g B ​ ( f A ​ ( x A ) ) z^{B}\equiv g^{B}(f^{A}(x^{A})) .
+The RadialGAN cycle consistency loss shifts the comparison to the encoded latent space, which has artificial neural network output in both terms.
+During development, we found that this version of cycle consistency requirement leads to difficulty in training similar to mode collapse in other GANs.
+That is, various undesirable solutions (like a constant value in the encoded space) maximize the discriminator loss.
+Because our cycle consistency is anchored to real data, these mode collapse problems did not occur.
+We found the RadialGAN method to suffer slow and inconsistent training leading to poor evaluation metrics despite multiple attempts to tune it for this purpose.
+However, the inclusion of both cross-reconstruction and cycle consistency losses improved matching performance in the early development of the chimeric encoder approach, and we suspect cycle consistence is a valuable component encouraging the unmapped features to be effectively represented.
+Unfortunately, the RadialGAN authors were not able to share code or data for us to further understand the differences between their experiments and ours.
+
+ 
+ 
+
+### 4.1 Limitations
+
+ 
+ Our method assumes that the data has a true latent representation (effective compression) with a substantial association between the known-mapped features and unmapped features to allow the latent spaces to be aligned.
+We found that the results were sensitive to the degree of compression in the encoder architecture.
+For example, with too much compression the associations between features and their chimeric decoding are unreliable, making the matching stage struggle.
+On the other hand, with too little compression there is no shared representation to align the latent spaces; in the limiting case, the encoder could simply learn an identity transformation.
+The encoder hyperparameters like dropout are also important, as dropout encourages the encoder to spread out influence for the latent representation.
+The addition of nonlinearity was also important; permutation is a linear operator, and so a network without nonlinearity can learn such a transformation effectively.
+However, without nonlinearity, the encoder struggles with nonlinear representation in the latent space and nonlinearly transformed variables.
+There was tension when choosing hyperparameters between the quality of the mapping and imputation (requires more compression) and quality of transformation reconstructions (favors less compression).
+This suggests that a multistage procedure with distinct hyperparameters for the mapping and transformation stages can further improve this work.
+We expect that users seeing output like in Figure 3(f) would fit a polynomial or similar relationship to the ( x , z ) (x,z) pairs and update the data to include the transformation.
+Although the chimeric encoder may lose a substantial amount of accuracy in reconstruction with heavy compression, we stress that this is unimportant if a mapping or transformation is ultimately discovered.
+
+ 
+ 
+ Selecting these hyperparameters is difficult.
+As demonstrated for the MIMIC-III dataset, we can withhold some prior-mapped inputs from the algorithm and estimate its performance in matching them.
+This is easy when the number of mapped features is large and they have saturated their contribution to learn the encoded latent space;
+however, if the number of mapped features available is small, this would be a very noisy estimate.
+In practice, we examined the performance of the autoencoders and cycle consistency outputs with typical validation samples to narrow the search space, although these do not guarantee good mapping performance.
+To be fair to the baselines, we tuned our method and Kang method on the same dataset in synthetic data case and the presented results in Figure 2(b) - 2(d) are optimal for all methods.
+In a real example, verification of the proposed mapping with other sources would also give an indication of whether the selected hyperparameters had failed.
+
+ 
+ 
+ We find that there is a substantial tradeoff between the chimeric encoder’s ability to schema match and its ability to impute .
+Heuristically, this occurs because schema matching using autoencoders requires a substantial amount of compression.
+Only by compression to a low-dimensional latent space using diffuse inputs for each latent variable are we able to closely align the semantics of the two databases.
+Otherwise, one can easily imagine a latent space that “separates” into a term for the known-mapped features and unmapped features.
+However, with mapping mostly accomplished, learning to impute and transform benefits from a lower level of compression and regularization.
+Fortunately, the simple initialization with KMF seems to get most of the “easy” cases and so we can let the chimeric encoder optimize for imputation and transformation.
+
+ 
+ 
+ We illustrated our proposal with numeric and binary features, or categorical features easily transformed to those types.
+Many real databases will have more complex data types, which will require modification of this approach.
+For example, lists of diagnostic codes using the ICD10, ICD9, or SNOMED CT ontologies would need an appropriate embedding applied.
+Because these structured data are recognizable by their formats and have fully-developed equivalence maps, we assume that in practice they would be “known-mapped” features if present in both databases.
+Applying the same (pre-trained) embedding to both databases would create comparable numeric columns.
+If structured data was present in only one database, the ability to map features to the existing ontology would depend on the embedding chosen and creating a suitable loss function for the hierarchy of entities in that ontology.
+For example, the AHRQ CCS system creates a moderate number of categorical variables representing less fine-grained detail in the ICD9 and ICD10 ontologies, and these would be suitable for mapping.
+Mapping features containing text documents, for example, determining that a pair of text features were both “discharge summaries,” is likely better handled by techniques specific to that task.
+However, if text columns are mapped, they can be embedded to a numeric space and treated as known-mapped features in our proposal.
+
+ 
+ 
+ Missing data creates both logistic and conceptual difficulties for transformation between databases.
+The correct transformation of informatively missing but easily imputed data could be either “missing” or the unobserved value.
+For example, many patients do not have invasive arterial blood gas measurements, because they are measured only under special clinical concerns, but they do have non-invasive measurements which are closely related.
+Whether or not the two ought to be mapped will depend on the goals of the project.
+To simplify our presentation, we assumed an imputation model was already available to fill in sporadic missing data, but it is straightforward to combine masking strategies used in imputing autoencoders [ 26 ] with our pipeline for a more integrated algorithm.
+
+ 
+ 
+ Finally, we observed the optimization problem behind the chimeric encoder to be a difficult one.
+The achieved loss functions were often far from the optimum in cases where it performed poorly, and the optimization was very dependent on batch size and other learning hyperparameters.
+This behaviour suggests that further experimentation with initialization and optimization strategies could meaningfully improve its performance.
+As these details are likely to be problem- and architecture-specific, we have not exhaustively explored them.
+
+ 
+ 
+ 
+ 
+
+## 5 Conclusion
+
+ 
+ We study the problem of schema matching across databases using Electronic Health Records (EHRs) from different hospitals or from different time points as a motivating example.
+We address this problem in two stages: first, we find many easy or exact matches using a pairwise correlation-based fingerprint method. Second, we improve on those matches and transform or impute features without a direct match using deep learning.
+Our proposed method relies on the dependencies between a few known mapped features and the rest of the unmapped features.
+
+ 
+ 
+ 
+
+## References
+
+ 
+ 
+ [1] 
+ 
+Ali A Alwan, Azlin Nordin, Mogahed Alzeber, and Abedallah Zaid Abualkishik.
+
+ 
+ A survey of schema matching research using database schemas and
+instances.
+
+ 
+ International Journal of Advanced Computer Science and
+Applications , 8(10), 2017.
+
+ 
+
+ 
+ [2] 
+ 
+Yoav Benjamini and Daniel Yekutieli.
+
+ 
+ The control of the false discovery rate in multiple testing under
+dependency.
+
+ 
+ The Annals of Statistics , 29(4):1165–1188, 2001.
+
+ 
+
+ 
+ [3] 
+ 
+Jacob Berlin and Amihai Motro.
+
+ 
+ Database Schema Matching Using Machine Learning with
+Feature Selection.
+
+ 
+ In Proceedings of the 14th International Conference on
+Advanced Information Systems Engineering , CAiSE ’02, pages
+452–466, Berlin, Heidelberg, May 2002. Springer-Verlag.
+
+ 
+
+ 
+ [4] 
+ 
+Farid Bourennani and Mike Bourque.
+
+ 
+ A Content-Based Schema Matching Tool.
+
+ 
+ World of Computer Science Information Technology Journal ,
+9(5):22–27, 2019.
+
+ 
+
+ 
+ [5] 
+ 
+Lev Bulygin.
+
+ 
+ Combining lexical and semantic similarity measures with machine
+learning approach for ontology and schema matching problem.
+
+ 
+ In Proceedings of the XX International Conference “Data
+Analytics and Management in Data Intensive Domains”(DAMDID/RCDL’2018) ,
+pages 245–249, 2018.
+
+ 
+
+ 
+ [6] 
+ 
+Stef van Buuren and Karin Groothuis-Oudshoorn.
+
+ 
+ mice: Multivariate Imputation by Chained Equations in R.
+
+ 
+ Journal of Statistical Software , 45(1):1–67, December 2011.
+
+ 
+
+ 
+ [7] 
+ 
+Xiaobin Chang, Tao Xiang, and Timothy M Hospedales.
+
+ 
+ Scalable and effective deep cca via soft decorrelation.
+
+ 
+ In 2018 IEEE/CVF Conference on Computer Vision and Pattern
+Recognition , pages 1488–1497. IEEE, 2018.
+
+ 
+
+ 
+ [8] 
+ 
+Douglas A. Colquhoun, Amy M. Shanks, Steven R. Kapeles, Nirav Shah, Leif
+Saager, Michelle T. Vaughn, Kathryn Buehler, Michael L. Burns, Kevin K.
+Tremper, Robert E. Freundlich, Michael Aziz, Sachin Kheterpal, and Michael R.
+Mathis.
+
+ 
+ Considerations for Integration of Perioperative Electronic
+Health Records Across Institutions for Research and Quality
+Improvement: The Approach Taken by the Multicenter Perioperative
+Outcomes Group.
+
+ 
+ Anesthesia and Analgesia , 130(5):1133–1146, May 2020.
+
+ 
+
+ 
+ [9] 
+ 
+Isabel F Cruz, Roberto Tamassia, and Danfeng Yao.
+
+ 
+ Privacy-preserving schema matching using mutual information.
+
+ 
+ In IFIP Annual Conference on Data and Applications Security and
+Privacy , pages 93–94. Springer, 2007.
+
+ 
+
+ 
+ [10] 
+ 
+Robin Dhamankar, Yoonkyong Lee, A. Doan, A. Halevy, and Pedro M. Domingos.
+
+ 
+ iMAP: discovering complex semantic matches between database
+schemas.
+
+ 
+ In SIGMOD ’04 , 2004.
+
+ 
+
+ 
+ [11] 
+ 
+Bradley A. Fritz, Zhicheng Cui, Muhan Zhang, Yujie He, Yixin Chen, Alex
+Kronzer, Arbi Ben Abdallah, Christopher R. King, and Michael S. Avidan.
+
+ 
+ Deep-learning model for predicting 30-day postoperative mortality.
+
+ 
+ British Journal of Anaesthesia , 123(5):688–695, 2019.
+
+ 
+
+ 
+ [12] 
+ 
+Kazuo Iwama and Shuichi Miyazaki.
+
+ 
+ A Survey of the Stable Marriage Problem and Its Variants.
+
+ 
+ In International Conference on Informatics Education and
+Research for Knowledge-Circulating Society (icks 2008) , pages
+131–136, January 2008.
+
+ 
+
+ 
+ [13] 
+ 
+Anuj Jaiswal, David J. Miller, and Prasenjit Mitra.
+
+ 
+ Schema matching and embedded value mapping for databases with opaque
+column names and mixed continuous and discrete-valued data fields.
+
+ 
+ ACM Transactions on Database Systems , 38(1):2:1–2:34, April
+2013.
+
+ 
+
+ 
+ [14] 
+ 
+Alistair EW Johnson, Tom J Pollard, Lu Shen, Li-wei H Lehman, Mengling Feng,
+Mohammad Ghassemi, Benjamin Moody, Peter Szolovits, Leo A Celi, and Roger G
+Mark.
+
+ 
+ Mimic-III, a freely accessible critical care database.
+
+ 
+ Scientific data , 3(1):1–9, 2016.
+
+ 
+
+ 
+ [15] 
+ 
+Jaewoo Kang and J. Naughton.
+
+ 
+ On schema matching with opaque column names and data values.
+
+ 
+ In SIGMOD ’03 , 2003.
+
+ 
+
+ 
+ [16] 
+ 
+Jaewoo Kang and J. Naughton.
+
+ 
+ Schema Matching Using Interattribute Dependencies.
+
+ 
+ IEEE Transactions on Knowledge and Data Engineering , 2008.
+
+ 
+
+ 
+ [17] 
+ 
+Christopher R. King, Bradley A. Fritz, Krisztina Escallier, Yo-El S. Ju, Nan
+Lin, Sherry McKinnon, Michael S. Avidan, and Ben Julian Palanca.
+
+ 
+ Association Between Preoperative Obstructive Sleep Apnea
+and Preoperative Positive Airway Pressure With Postoperative
+Intensive Care Unit Delirium.
+
+ 
+ JAMA network open , 3(4):e203125, April 2020.
+
+ 
+
+ 
+ [18] 
+ 
+Hanna Köpcke and Erhard Rahm.
+
+ 
+ Frameworks for entity matching: A comparison.
+
+ 
+ Data Knowledge Engineering , 69(2):197–210, 2010.
+
+ 
+
+ 
+ [19] 
+ 
+Christos Koutras, George Siachamis, Andra Ionescu, Kyriakos Psarakis, Jerry
+Brons, Marios Fragkoulis, Christoph Lofi, Angela Bonifati, and Asterios
+Katsifodimos.
+
+ 
+ Valentine: Evaluating matching techniques for dataset discovery.
+
+ 
+ In 2021 IEEE 37th International Conference on Data Engineering
+(ICDE) , pages 468–479. IEEE, 2021.
+
+ 
+
+ 
+ [20] 
+ 
+Conor Lazarou.
+
+ 
+ Autoencoding generative adversarial networks.
+
+ 
+ arXiv preprint arXiv:2004.05472 , 2020.
+
+ 
+
+ 
+ [21] 
+ 
+Steven Cheng-Xian Li and Benjamin M. Marlin.
+
+ 
+ A scalable end-to-end Gaussian process adapter for irregularly
+sampled time series classification.
+
+ 
+ In NIPS , 2016.
+
+ 
+
+ 
+ [22] 
+ 
+Yuliang Li, Jinfeng Li, Yoshihiko Suhara, AnHai Doan, and Wang-Chiew Tan.
+
+ 
+ Deep entity matching with pre-trained language models.
+
+ 
+ Proceedings of the VLDB Endowment , 14(1):50–60, 2021.
+
+ 
+
+ 
+ [23] 
+ 
+Jayant Madhavan, Philip A. Bernstein, and Erhard Rahm.
+
+ 
+ Generic Schema Matching with Cupid.
+
+ 
+ In Proceedings of the 27th International Conference on
+Very Large Data Bases , VLDB ’01, pages 49–58, San Francisco, CA,
+USA, September 2001. Morgan Kaufmann Publishers Inc.
+
+ 
+
+ 
+ [24] 
+ 
+Alireza Makhzani, Jonathon Shlens, Navdeep Jaitly, and Ian Goodfellow.
+
+ 
+ Adversarial autoencoders.
+
+ 
+ In International Conference on Learning Representations , 2016.
+
+ 
+
+ 
+ [25] 
+ 
+Jonas Mueller and Alex Smola.
+
+ 
+ Recognizing Variables from Their Data via Deep Embeddings
+of Distributions.
+
+ 
+ In 2019 IEEE International Conference on Data Mining
+(ICDM) , pages 1264–1269, November 2019.
+
+ 
+ ISSN: 2374-8486.
+
+ 
+
+ 
+ [26] 
+ 
+R. Pereira, M. S. Santos, P. Rodrigues, and P. Abreu.
+
+ 
+ Reviewing Autoencoders for Missing Data Imputation:
+Technical Trends, Applications and Outcomes.
+
+ 
+ J. Artif. Intell. Res. , 2020.
+
+ 
+
+ 
+ [27] 
+ 
+B. Rabinovich and Mark Last.
+
+ 
+ A Scalable Algorithm for One-to-One, Onto, and Partial
+Schema Matching with Uninterpreted Column Names and Column
+Values.
+
+ 
+ J. Database Manag. , 2014.
+
+ 
+
+ 
+ [28] 
+ 
+Mihaela Rosca, Balaji Lakshminarayanan, David Warde-Farley, and Shakir Mohamed.
+
+ 
+ Variational approaches for auto-encoding generative adversarial
+networks.
+
+ 
+ arXiv preprint arXiv:1706.04987 , 2017.
+
+ 
+
+ 
+ [29] 
+ 
+Tanvi Sahay, Ankita Mehta, and Shruti Jadon.
+
+ 
+ Schema Matching using Machine Learning.
+
+ 
+ 2020 7th International Conference on Signal Processing and
+Integrated Networks (SPIN) , pages 359–366, February 2020.
+
+ 
+ arXiv: 1911.11543.
+
+ 
+
+ 
+ [30] 
+ 
+Fahad Ahmed Satti, Musarrat Hussain, Jamil Hussain, Syed Imran Ali, Taqdir Ali,
+Hafiz Syed Muhammad Bilal, Taechoong Chung, and Sungyoung Lee.
+
+ 
+ Unsupervised semantic mapping for healthcare data storage schema.
+
+ 
+ IEEE Access , 9:107267–107278, 2021.
+
+ 
+
+ 
+ [31] 
+ 
+Roee Shraga, Avigdor Gal, and Haggai Roitman.
+
+ 
+ Adnev: Cross-domain schema matching using deep similarity matrix
+adjustment and evaluation.
+
+ 
+ Proceedings of the VLDB Endowment , 13(9):1401–1415, 2020.
+
+ 
+
+ 
+ [32] 
+ 
+Gábor J. Székely, Maria L. Rizzo, and Nail K. Bakirov.
+
+ 
+ Measuring and testing dependence by correlation of distances.
+
+ 
+ The Annals of Statistics , 35(6):2769–2794, December 2007.
+
+ 
+ Publisher: Institute of Mathematical Statistics.
+
+ 
+
+ 
+ [33] 
+ 
+Dmitry Ulyanov, Andrea Vedaldi, and Victor Lempitsky.
+
+ 
+ It takes (only) two: Adversarial generator-encoder networks.
+
+ 
+ In Thirty-Second AAAI Conference on Artificial Intelligence ,
+2018.
+
+ 
+
+ 
+ [34] 
+ 
+Raphael Vallat.
+
+ 
+ Pingouin: statistics in python.
+
+ 
+ Journal of Open Source Software , 3(31):1026, 2018.
+
+ 
+
+ 
+ [35] 
+ 
+Yuan Yang, Mengdong Chen, and Bin Gao.
+
+ 
+ An Effective Content-Based Schema Matching Algorithm.
+
+ 
+ In 2008 International Seminar on Future Information
+Technology and Management Engineering , pages 7–11, November 2008.
+
+ 
+
+ 
+ [36] 
+ 
+Jinsung Yoon, James Jordon, and Mihaela Schaar.
+
+ 
+ RadialGAN: Leveraging multiple datasets to improve
+target-specific predictive models using Generative Adversarial
+Networks.
+
+ 
+ In International Conference on Machine Learning , pages
+5699–5707. PMLR, July 2018.
+
+ 
+ ISSN: 2640-3498.
+
+ 
+
+ 
+ [37] 
+ 
+Aola Yousfi, Moulay Hafid El Yazidi, and Ahmed Zellou.
+
+ 
+ Towards a holistic schema matching approach designed for large-scale
+schemas.
+
+ 
+ In International Conference on Computational Collective
+Intelligence , pages 3–15. Springer, 2020.
+
+ 
+
+ 
+ [38] 
+ 
+Chen Jason Zhang, Lei Chen, Hosagrahar Visvesvaraya Jagadish, Mengchen Zhang,
+and Yongxin Tong.
+
+ 
+ Reducing uncertainty of schema matching via crowdsourcing with
+accuracy rates.
+
+ 
+ IEEE Transactions on Knowledge and Data Engineering ,
+32(1):135–151, 2018.
+
+ 
+
+ 
+ [39] 
+ 
+Jing Zhang, Bonggun Shin, Jinho D Choi, and Joyce C Ho.
+
+ 
+ Smat: An attention-based deep learning solution to the automation of
+schema matching.
+
+ 
+ In European Conference on Advances in Databases and Information
+Systems , pages 260–274. Springer, 2021.
+
+ 
+
+ 
+ [40] 
+ 
+Meihui Zhang, Marios Hadjieleftheriou, B. Ooi, C. Procopiuc, and D. Srivastava.
+
+ 
+ Automatic discovery of attributes in relational databases.
+
+ 
+ In SIGMOD ’11 , 2011.
+
+ 
+
+ 
+ 
+ 
+ 
+
+## Appendix A Appendix
+
+ 
+
+### A.1 Code
+
+ 
+ Code for the algorithm and synthetic data experiments are available at github.com/sandhyat/KMFChimericE_SchMatch .
+Neither MIMIC nor ACTFAST is available without restrictions, and so the raw data is not included.
+Processing code for MIMIC and ACTFAST are included.
+
+ 
+ 
+ 
+
+### A.2 Synthetic Data
+
+ 
+ We generate covariance matrices by 𝐖𝐖 T + D \mathbf{W}\mathbf{W}^{T}+D where 𝐖 \mathbf{W} is a spherical Gaussian matrix of size ( n , k ) (n,k) and D D is a diagonal matrix with n n integer values randomly drawn from the interval [ 1 , 20 ] [1,20] .
+Here, k k denotes the underlying factor dimension of the generated data. For the 2-cluster Gaussian case, we use common covariance matrix and mean vectors sampled from a uniform distribution. For each data generating mechanism, we sample 5 5 datasets of 10,000 10,000 examples.
+
+ 
+ 
+ For the case where the two databases have equal number of columns and onto mapping where smaller set of column is always a subset of the larger column set, we demonstrate the performance of proposed algorithm on samples from following two data generating distributions.
+
+ 
+ 1. 
+ 
+ 2-cluster Gaussian simulated (20-D) : Mixture of two 20 20 -dim Gaussians with mean vectors randomly sampled from [ 10 , 20 ] [10,20] separately. The true factor dimension is taken to be k = 10 k=10 .
+
+ 
+
+ 2. 
+ 
+ Multivariate Gaussian simulated (20-D) : 20 20 -dim Gaussian with covariance as above.
+
+ 
+
+ 
+ For the partial map example, where the number of columns in two databases are not equal and there is an incomplete overlap between the feature sets, we use the following data generating mechanism:
+
+ 
+ 1. 
+ 
+ Multivariate Gaussian simulated (50-D) : 50 50 -dim Gaussian with covariance matrix generated as above.
+
+ 
+
+ 
+ 
+ 
+ To account for randomness while partitioning the dataset and selecting the set of mapped variables, for a fixed number of mapped features, we repeat the experiment n t n_{t} times with different samples of pre-mapped features. Also, to account for the randomness in permutation or the features that are added/removed, for a fixed set of mapped features, we repeat the experiment n p n_{p} times. So, for a given number of pre-mapped features, we repeat the experiment n t ∗ n p n_{t}*n_{p} times.
+
+ 
+ 
+ 
+
+### A.3 ACTFAST data details
+
+ 
+ Feature names and their types for ACTFAST data that were used in this study are presented in Table A.1 . The pre-mapped feature set was chosen from the categorical features that were further one-hot encoded. Table A.2 shows how the metadata is not always useful for mapping two databases.
+
+ 
+ 
+ 
+ 
+ 
+ Categorical features | 
+ Binary features | 
+
+ 
+ 
+ 
+ Anesthesia Type | 
+ HTN | 
+ CAD | 
+ CAD prior MI | 
+
+ 
+ Valvular disease | 
+ CHF Diastolic function | 
+ AFIB | 
+ PPM ICD | 
+
+ 
+ CPAP usage | 
+ CV TIA Stroke | 
+ PAD | 
+ DVT | 
+
+ 
+ ASA | 
+ CKD | 
+ Outpatient insulin | 
+ Dialysis history | 
+
+ 
+ PAP Type | 
+ PHTN | 
+ COPD | 
+ Asthma | 
+
+ 
+ Surgery type | 
+ OSA | 
+ Cirrhosis | 
+ Cancer_hx | 
+
+ 
+ Functional Capacity | 
+ GERD | 
+ Anemia | 
+ Coombs pos | 
+
+ 
+ Sex | 
+ Dementia | 
+ Smokingever | 
+ Stopbang observed | 
+
+ 
+ Race | 
+ Stopbang pressure | 
+ Stopbang snore | 
+ Stopbang tired | 
+
+ 
+ | 
+ CHF | 
+ DM | 
+ PE | 
+
+ 
+ | 
+ | 
+ Emergency | 
+ | 
+
+ 
+
+ Table A.1 : Feature names for ACTFAST data used in Section 3.2 
+ 
+ 
+ 
+ 
+ 
+ Epic feature name | 
+ Contextually derived name | 
+
+ 
+ 
+ 
+ BW#608 | 
+ Hypertension | 
+
+ 
+ EPIC#55845 | 
+ Diagnosis year | 
+
+ 
+ EPIC#31000009721 | 
+ Typical SBP | 
+
+ 
+ EPIC#31000040796 | 
+ Typical DBP | 
+
+ 
+ EPIC#5266 | 
+ Hyperlipidemia | 
+
+ 
+ EPIC#HPI0118 | 
+ CAD | 
+
+ 
+ EPIC#20764 | 
+ CCS angina class | 
+
+ 
+ BW#164 | 
+ No revasc but 50% stenotic coronary | 
+
+ 
+ EPIC#10072 | 
+ MI | 
+
+ 
+ BW#165 | 
+ Number of MIs | 
+
+ 
+ EPIC#62854 | 
+ Date of last MI | 
+
+ 
+ EPIC#3710 | 
+ History of CABG | 
+
+ 
+ EPIC#62856 | 
+ Prior CABG date | 
+
+ 
+
+ Table A.2: Table showing example features where metadata (feature names) can not be used by language model algorithms for schema matching. 
+ 
+ 
+ 
+
+### A.4 Null case result verification on synthetic data
+
+ 
+ In this section, we present the null behaviour of our model. To achieve this, we generated a 20-dimensional Gaussian dataset with covariance as identity matrix. As in this case, there is no correlation among the features, choosing any number of mapped features cannot provide the information about the others and hence can not be used by the decoder of other AE.
+The results from this experiment are illustrated in Figure 1(a) . Clearly, even when the number of features are as high as 10, the fraction of mistakes is still close to 1 1 .
+
+ 
+ 
+ 
+
+### A.5 Effect of latent representation size
+
+ 
+ In Figure 1(b) , we consider 2-cluster Gaussian simulated (20-D) dataset to demonstrate the observation that smaller latent dimension is beneficial as far as matching features is concerned.
+
+ 
+ 
+ 
+ 
+ 
+ (a) 
+ 
+ 
+ (b) 
+ 
+ Figure A.1 : (a) Performance of chimeric AE on a synthetic dataset Multivariate Gaussian IID simulated (20-D) in which there is no inter-feature dependence within the feature set. As expected, the method performs badly in the absence of any correlations between the mapped and unmapped features. (b) chimeric encoder’s performance variation on 2-cluster Gaussian simulated (20-D) w.r.t. the size (L dim) of the latent representation; higher compression (small L dim) leads to good matching performance. 
+ 
+ 
+ 
+
+### A.6 Additional results for learning some non-linear transformations and partial map experiments with step down procedure
+
+ 
+ We first present a scatter plot that demonstrates the ability of RadialGAN to learn an inverse square transformation. As can be seen in Figure 2(a) , RadialGAN is not even able to learn the sign correctly, whereas chimeric encoder could learn an inverted parabola as seen in Figure 3(f) .
+
+ 
+ 
+ Moving to the incomplete feature overlap case, we provide an example in Figure 2(b) that shows the difference between the fraction of mistakes obtained from the two different direction of proposals as the size of one of the databases is increased. As explained earlier this is due to the inability of chimeric encoder (that generates z A z_{A} ) to reconstruct the latent representation (of x B x_{B} ) containing information of larger number of features than x A x_{A} and hence the performance worsens (red curve ) as the number of features in x B x_{B} increase. This phenomenon is not true vice versa as the latent representation of x A x_{A} has more flexibility when the chimeric encoder transforms it to z B z_{B} and hence the performance is invariant (blue curve) to increase in feature size.
+
+ 
+ 
+ Next we present the example where the match for an originally ‘no-match’ feature is a surrogate and we demonstrate it by providing the density of the true correlations on the GS matches for ‘no-match’ features that were declared significant by step down (mistakes) in Figure 2(c) . Some examples of such GS matched feature pairs used to obtain the above mentioned density along with their frequency and the corresponding correlation are reported in Table A.3 .
+
+ 
+ 
+ 
+ 
+ 
+ (a) 
+ 
+ 
+ (b) 
+ 
+ 
+ (c) 
+ 
+ Figure A.2 : 2-cluster Gaussian simulated (20-D) (a) RadialGAN transformed feature data; actual transformation to be learnt is an inverse square transformation which RadialGAN fails to learn for the same settings as in Figure 3(f) .
+ ACTFAST data (b) Example to show the difference in the performance in case of onto or partial map case when two different proposing directions are used in GS algorithm. (c) Histogram of true correlation between ‘no-match’ features and their proposed match using GS algorithm. These matches were wrongly accepted as correct by step down procedure as they act as surrogate matches due to high correlation. 
+ 
+ 
+ 
+ 
+ 
+ match by GS for no-match features | 
+ frequency | 
+ true_correlation | 
+ estimated_cross_corr | 
+
+ 
+ 
+ 
+ ( HTN , StopBang_Pressure ) | 
+ 9 | 
+ 0.723 | 
+ 0.947 | 
+
+ 
+ ( Dialysis_History , CKD ) | 
+ 1 | 
+ 0.426 | 
+ 0.175 | 
+
+ 
+ ( CKD , Dialysis_History ) | 
+ 4 | 
+ 0.426 | 
+ 0.343 | 
+
+ 
+ ( PPM_ICD , CHF ) | 
+ 9 | 
+ 0.415 | 
+ 0.419 | 
+
+ 
+ ( OSA , CPAP.Usage_1 ) | 
+ 1 | 
+ 0.408 | 
+ 0.150 | 
+
+ 
+ ( OSA , StopBang_Observed ) | 
+ 14 | 
+ 0.288 | 
+ 0.164 | 
+
+ 
+ ( PAP_Type_1 , CAD ) | 
+ 7 | 
+ 0.268 | 
+ 0.361 | 
+
+ 
+ ( OSA , StopBang_Snore ) | 
+ 1 | 
+ 0.248 | 
+ 0.161 | 
+
+ 
+ ( CKD , CHF_Diastolic_Function ) | 
+ 10 | 
+ 0.242 | 
+ 0.357 | 
+
+ 
+ ( PAP_Type_1 , PHTN ) | 
+ 5 | 
+ 0.235 | 
+ 0.324 | 
+
+ 
+ ( CKD , CAD_PRIORMI ) | 
+ 3 | 
+ 0.230 | 
+ 0.468 | 
+
+ 
+ ( PAP_Type_1 , CHF_Diastolic_Function ) | 
+ 1 | 
+ 0.222 | 
+ 0.300 | 
+
+ 
+ ( OSA , CPAP.Usage_2 ) | 
+ 1 | 
+ 0.208 | 
+ 0.152 | 
+
+ 
+ ( OSA , HTN ) | 
+ 1 | 
+ 0.205 | 
+ 0.185 | 
+
+ 
+
+ Table A.3 : List of ‘no-match’ features and their corresponding match from chimeric encoder across different permutations and different trials. The high value of true correlation implies there are features that have surrogate matches that FDR step down procedure is not able to identify as mistakes. 
+ 
+ 
+ 
+
+### A.7 Model hyperparameters
+
+ 
+ In all the experiments, we chose both the encoders and decoders to be multi-layer perceptrons with two hidden layers each. For synthetic and ACTFAST datasets, hidden units for first and second layer is 80 and 40 respectively for encoder and vice versa for the decoder.
+For MIMIC experiments, the hidden layer neurons were chosen to be 120 and 70.
+For the optimizer, we used Adam optimizer with weight decay of 10 − 5 10^{-5} along with a learning rate scheduler. The initial learning rate of the scheduler for synthetic and ACTFAST experiments is fixed at 10 − 2 10^{-2} , but it was tuned in the MIMIC experiments.
+
+ 
+ 
+ For the synthetic data experiments, we used tanh activation and dropout after second hidden layer of encoder and after first hidden layer of the decoder.
+We used batch size of 64 64 for both x A x^{A} and x B x^{B} .
+Number of epochs for all synthetic data experiments was kept at 40 40 for chimeric AE.
+We encouraged orthogonalization of the latent space with a regularization loss ‖ f i ​ ( x i ) T ​ f i ​ ( x i ) − 𝕀 l ‖ 2 \|f^{i}(x^{i})^{T}f^{i}(x^{i})-\mathbb{I}_{l}\|_{2} evaluated within batches with weighing parameter value w o = 0.01 w_{o}=0.01 . For the binarized synthetic data experiment in Figure 3(b) , we use the same settings as above except for no tanh activation within the network and add sigmoid activation at the end of the encoders.
+Hyperparameter optimization was done on one of the synthetic datasets ( Multivariate Gaussian simulated (20-D) ), and the set with best matching performance was chosen and used in all other Gaussian synthetic dataset examples. We compared dropout rate p ∈ { 0.5 , 0.6 , 0.7 } p\in\{0.5,0.6,0.7\} , encoder dimension l ∈ { 5 , 8 , 10 , 12 } l\in\{5,8,10,12\} , and the weights for different loss terms from { 0.5 , 0.8 , 0.9 , 1.0 , 1.1 , 1.2 } \{0.5,0.8,0.9,1.0,1.1,1.2\} in cross-validation.
+We set the FDR value in the mapping step at 0.05 0.05 .
+
+ 
+ 
+ For MIMIC data experiments, we used tanh activation and dropout after the second hidden layer of the encoder and after the first hidden layer of the decoder.
+For other hyperparameters, we performed a grid search as follows: dropout rate p ∈ { 0.4 , 0.5 , 0.6 , 0.7 , 0.8 } p\in\{0.4,0.5,0.6,0.7,0.8\} , latent representation size l ∈ { 20 , 30 , 40 } l\in\{20,30,40\} , batch size ∈ { 32 , 64 } \in\{32,64\} , learning rate ∈ { 10 − 2 , 10 − 3 } \in\{10^{-2},10^{-3}\} and the weights for different loss terms ∈ { 0.5 , 0.7 , 0.8 , 1.0 , 1.1 , 1.2 , 1.4 } \in\{0.5,0.7,0.8,1.0,1.1,1.2,1.4\} .
+Number of epochs was set at 50 for chimeric encoders.
+
+ 
+ 
+ For the ACTFAST data experiments, we add sigmoid activation at the end of the encoders. We used ReLu activation (only in onto and partial map case) and dropout with dropout rate p ∈ { 0.5 , 0.6 , 0.7 } p\in\{0.5,0.6,0.7\} after second hidden layer of encoder and after first hidden layer of the decoder. We used batch size of 32 32 for both x A x^{A} and x B x^{B} . The output layer of encoder (latent space) was tuned over l ∈ { 10 , 20 , 30 , 40 } l\in\{10,20,30,40\} . Number of epochs for all data experiments were set at 50 50 for chimeric encoders. Other settings remain same as for the synthetic experiments described above.
+Hyperparameter tuning was done separately for permutation case and onto map case with matching performance as the criterion.
+The best set from onto map experiment was also used in partial map training except for latent space dimension which was 20 20 for onto and 10 10 for partial map.
+In all 3 experiments for ACTFAST dataset, we set number of trials n t = 4 n_{t}=4 and number of permutations within a trial as n p = 3 n_{p}=3 .
+
+ 
+ 
+ For the Kang method we optimize Euclidean distance for the permutation map case and Normal distance for the onto and partial map case with α \alpha tuned in the set { 1 , 1.2 , 1.4 , 1.6 , 1.8 , 2 , , 4 , 5 , 10 } \{1,1.2,1.4,1.6,1.8,2,,4,5,10\} . 3000 iterations were used in the Kang method search for Euclidean distance and 5000 for Normal distance.
+To choose the best value of α \alpha , we ran the experiments over 2 trials and 2 permutations and then for the final experiment, use the value that has the highest F1 score. For the number of iterations, we gradually increased the number of iterations, until the average performance saturated and used the corresponding number in our experiments.
+
+ 
+ 
+ For RadialGAN, we use the same architecture settings and hyperparameter tuning range as suggested by the authors and run the experiment for 100 epochs (no changes in performance were noted out to 1000 epochs in initial experiments).

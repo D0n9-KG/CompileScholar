@@ -387,6 +387,31 @@ class ExternalTools:
             self._deep_cache = cache
         return self._deep_cache
 
+    def _persist_deep_records(self, paper_id: str, recs: list, replace: bool):
+        """终化记录持久化（批10 第三断口修复）：deep_read/L2 的记录若只
+        活在答题进程内存，report_adapter 的 EvidenceStore（独立进程）解析
+        不了深记录回指→空壳报告。落 deep_read_records.json（合并非替换，
+        粗抽记录的回指仍有效）。"""
+        p = getattr(self, "_deep_records_path", None)
+        if not p or not recs:
+            return
+        with ExternalTools._CACHE_LOCK:
+            try:
+                cur = {}
+                if os.path.exists(p):
+                    cur = json.load(open(p, encoding="utf-8"))
+                base_recs = [] if replace else \
+                    (cur.get(paper_id) or {}).get("records") or []
+                seen = {r.get("id") for r in base_recs if r.get("id")}
+                merged = list(base_recs) + [
+                    r for r in recs if r.get("id") not in seen]
+                cur[paper_id] = {"records": merged}
+                json.dump(cur, open(p, "w", encoding="utf-8"),
+                          ensure_ascii=False, indent=1)
+            except Exception as e:
+                print(f"[deep_read-persist] {paper_id[:40]}: {str(e)[:80]}",
+                      flush=True)
+
     def _cache_append(self, paper_id: str, text_hash: str, entries: list):
         """entries: [{"type": "card", "card": ...} | {"chunk_id": cid,
         "obj": ...}] — 追加落盘 + 内存同步（线程安全）。"""
@@ -701,6 +726,9 @@ class ExternalTools:
                             REC_INDEX[r.get("id")] = r
                     except Exception:
                         pass
+                # L2 全量=替换语义（recs 已含 L1 记录，重放 replace 免叠
+                # 加膨胀）；落盘给 report_adapter（独立进程）
+                self._persist_deep_records(paper_id, recs, replace=True)
                 print(f"[deep_read-L2] {paper_id[:50]} background complete: "
                       f"{len(recs)} records", flush=True)
             except Exception as e:
@@ -795,6 +823,8 @@ class ExternalTools:
                           seed_reg, card, title)
             recs = out.get("records", [])
             # ⑥ 会话 KB 入账（typed tools 数据源）+ REC_INDEX 同步
+            #    + 持久化（report_adapter 的 EvidenceStore 是独立进程——
+            #    批10 第三断口：不落盘=深记录回指解析不了→空壳报告）
             if self._records_target is not None and recs:
                 self._records_target.setdefault(paper_id, {"records": recs})
                 try:
@@ -803,6 +833,7 @@ class ExternalTools:
                         REC_INDEX[r.get("id")] = r
                 except Exception:
                     pass
+            self._persist_deep_records(paper_id, recs, replace=False)
             ExternalTools._DEEP_READ_DONE.add(paper_id)
             # ⑦ L2 异步后台：剩余 chunk 增量补齐（缓存命中跳过）+ absence
             n_rest = len(chunks_all) - len(sel)
@@ -839,7 +870,8 @@ def attach_external_tools(kb, views: dict, kb_manifest: dict,
                           tier_db: str = None,
                           manifest_path: str = None,
                           deep_cache_path: str = None,
-                          deep_text_dir: str = None) -> ExternalTools:
+                          deep_text_dir: str = None,
+                          deep_records_path: str = None) -> ExternalTools:
     """Inject the external tools onto a KBTools instance and extend the
     harness tool whitelist/catalog at runtime. `registry` enables mentions
     backflow (extract_paper -> genealogy attachment); `backflow_path`
@@ -858,6 +890,7 @@ def attach_external_tools(kb, views: dict, kb_manifest: dict,
     ext._manifest_path = manifest_path
     ext._deep_cache_path = deep_cache_path
     ext._deep_text_dir = deep_text_dir
+    ext._deep_records_path = deep_records_path
     ext._records_target = kb.records   # deep_read 记录直落入账
     if backflow_path:
         try:
