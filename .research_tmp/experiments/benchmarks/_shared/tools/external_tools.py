@@ -843,16 +843,39 @@ class ExternalTools:
             kinds = dict(_C(r.get("kind") for r in recs))
             secs = list(dict.fromkeys(
                 (c.get("section") or "?") for c in sel))[:6]
+            # 样本预览（批10 0919a852 教训：模型深读 123 条记录却一条没
+            # 捞——obs 只报数量，模型要再花一步 findings 才见内容，它不
+            # 干。直接把最有信息量的 6 条嵌进 obs：数值类优先（ingredient
+            # recall 吃这个），每条带 record_id 供笔记回指）
+            _PRI = {"result": 0, "config": 1, "finding": 2}
+            _prev = sorted(recs, key=lambda r: (_PRI.get(r.get("kind"), 9),
+                                                -(len(str(
+                                                    (r.get("measure") or {})
+                                                    .get("value")
+                                                    or r.get("claim") or "")))))[:6]
+            sample = []
+            for r in _prev:
+                m = r.get("measure") or {}
+                body = (f"{m.get('metric')}: {m.get('value')}"
+                        f"{m.get('unit') or ''}"
+                        if m.get("value") else
+                        str(r.get("claim") or r.get("item")
+                            or r.get("missing") or "")[:110])
+                sample.append({"id": r.get("id"), "kind": r.get("kind"),
+                               "content": body[:130]})
             obs = {"tool": "deep_read", "paper_id": paper_id,
                    "mode": f"L1/{mode}", "n_records": len(recs),
                    "kinds": kinds, "sections_read": secs,
                    "n_chunks_read": len(sel), "total_chunks": len(chunks_all),
                    "n_cache_hits": n_cached, "src": src,
+                   "sample_records": sample,
                    "note": (f"L1 directed extraction complete — {len(recs)} "
                             f"full-text records from sections "
                             f"{json.dumps(secs, ensure_ascii=False)} now "
                             f"queryable via findings(paper_id=\"{paper_id}\") "
-                            f"and card(entity=...); remaining {n_rest} "
+                            f"and card(entity=...); sample_records shows the "
+                            "most informative ones (cite them by their id); "
+                            f"remaining {n_rest} "
                             "sections are extracting in the background and "
                             "will be queryable in later questions")}
             if miss_note:
