@@ -85,19 +85,18 @@ def build_tools_cs2():
     """KBTools over the CS2 base KB (coarse + survey + hub records)."""
     from kb_compiler.views.tools import KBTools
 
+    # 批10 复盘（2026-09-28）：改载 records_merged.json（键桥接的完整
+    # KB：sciverse 需求池粗抽+survey refs 粗抽+hub 深抽，paper_id 键）。
+    # 旧路径载 coarse_records.json（title[:40] 键）——需求池 793 篇的
+    # findings(paper_id="sciverse_...") 全空（Q1 三篇 in-topic 论文查
+    # 0 记录→诚实弃答）；1896 键桥接工作落在 merged 里而 runner 从未
+    # 加载它。7,816/7,819 coarse 记录 id 已被 merged 覆盖。
     records = {}
-    coarse = json.load(open(os.path.join(BASE_KB, "coarse_records.json"),
+    merged = json.load(open(os.path.join(BASE_KB, "records_merged.json"),
                             encoding="utf-8"))
-    for pid_key, payload in coarse.items():
+    for pid_key, payload in merged.items():
         if isinstance(payload, dict) and payload.get("records"):
             records[pid_key] = payload
-    # survey records (S1-S4)
-    survey = json.load(open(os.path.join(BASE_KB, "records_survey.json"),
-                            encoding="utf-8"))
-    for pid, payload in survey.items():
-        if payload.get("records"):
-            records[pid] = payload
-    # TODO(hub): merge hub deep records when available
     views = json.load(open(os.path.join(BASE_KB, "views_cs2.json"),
                            encoding="utf-8"))
     registry = json.load(open(os.path.join(BASE_KB, "registry_v2.json"),

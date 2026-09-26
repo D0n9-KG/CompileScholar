@@ -556,6 +556,8 @@ class ExternalTools:
         类问题的主力记录类型）。返回 (selected, mode, note)。"""
         import re as _re
         if sections:
+            if isinstance(sections, str):   # 模型传了单个字符串——包成列表
+                sections = [sections]
             want = [str(s).lower().strip() for s in sections if s and str(s).strip()]
             sel = []
             for ch in chunks:
@@ -638,7 +640,14 @@ class ExternalTools:
                 done_evt = _th.Event()
                 remaining = [len(todo) + (0 if f"{paper_id}#absence"
                                           in cached else 1)]
+                cnt_lock = _th.Lock()
                 sem = _th.Semaphore(2)   # 后台低优先：一次 2 路不抢道
+
+                def _tick():
+                    with cnt_lock:
+                        remaining[0] -= 1
+                        if remaining[0] <= 0:
+                            done_evt.set()
 
                 def _work(ch, prompt):
                     try:
@@ -649,9 +658,7 @@ class ExternalTools:
                                                [{"chunk_id": ch["chunk_id"],
                                                  "obj": obj}])
                     finally:
-                        remaining[0] -= 1
-                        if remaining[0] <= 0:
-                            done_evt.set()
+                        _tick()
 
                 workers = [_th.Thread(target=_work, args=(ch, p), daemon=True)
                            for ch, p in todo]
@@ -668,17 +675,13 @@ class ExternalTools:
                                                  f"{paper_id}#absence",
                                                  "obj": aobj}])
                     finally:
-                        remaining[0] -= 1
-                        if remaining[0] <= 0:
-                            done_evt.set()
+                        _tick()
 
                 if f"{paper_id}#absence" not in cached:
                     _th.Thread(target=_absence, daemon=True,
                                name=f"deep-l2-abs-{paper_id[:14]}").start()
                 else:
-                    remaining[0] -= 1
-                    if remaining[0] <= 0:
-                        done_evt.set()
+                    _tick()
 
                 done_evt.wait(timeout=7200)   # 2h 安全阀
                 # 全量 finalize（含 L1 已抽 chunk——确定性合并）并替换入账
