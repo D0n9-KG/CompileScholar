@@ -107,6 +107,7 @@ STEP_CAP = {"broad": 20, "precise": 6}   # H1; F5-rev (user directive 09-09): r1
 BROAD_TYPES = {"aggregation", "coverage", "temporal"}
 TOKEN_CAP_TOTAL = 3_050_000              # prereg total ceiling
 _search_lock = threading.Lock()
+_SEARCH_FAMILY = []   # query token-sets this question (saturation)
 _cost_lock = threading.Lock()
 COST = {"calls": 0, "est_tokens": 0, "by_stage": defaultdict(lambda: [0, 0])}
 
@@ -214,9 +215,29 @@ def ground_lists(kb, grounding, question):
         t = (m.get("title") or "")[:80]
         c = _cite(m)   # rDiMgZulwi measured: manifest authors EMPTY -> no cite
         return f"{pid}({t}; {c})" if c else f"{pid}({t})"   # string; omit "; "
-    papers = ", ".join(_prow(pid, m)
-                       for pid, m in sorted((kb.manifest or {}).items())) \
-        if getattr(kb, "manifest", None) else grounding["papers"]
+    # CS2 大库优化（2026-09-28）：papers 全量清单在 2,100 篇库上=164k chars
+    # 每步重复注入（实测 grounding 总量 148k tokens，prefill 瓶颈主因）。
+    # 按题目 token 相关性裁剪：题面词命中 title/paper_id 的论文优先，
+    # 上限 GROUND_PAPERS_CAP（默认 60）。全量行为保留：GROUND_PAPERS_FULL=1。
+    if os.environ.get("GROUND_PAPERS_FULL", "") == "1":
+        papers = ", ".join(_prow(pid, m)
+                           for pid, m in sorted((kb.manifest or {}).items())) \
+            if getattr(kb, "manifest", None) else grounding["papers"]
+    else:
+        cap_p = int(os.environ.get("GROUND_PAPERS_CAP", "60"))
+        scored_p = []
+        for pid, m in (kb.manifest or {}).items():
+            t = (m.get("title") or "").lower()
+            pov = sum(1 for t_ in qtoks if t_ in t or t_ in pid.lower())
+            if pov:
+                scored_p.append((pov, pid, m))
+        scored_p.sort(key=lambda x: -x[0])
+        keep = [pid for _, pid, _ in scored_p[:cap_p]]
+        if not keep:  # 零重叠：退化为全量（罕见——题面词太泛时）
+            papers = grounding["papers"]
+        else:
+            papers = ", ".join(_prow(pid, kb.manifest[pid])
+                               for pid in keep)
     # R2-C (PSV2, 2026-09-12): rich-dossier catalog — SEPARATE prompt line
     # (never appended to entity names: arg-pollution risk). card(<name>) on
     # these returns substantial evidence (findings+configs+results >= 10).
@@ -245,7 +266,7 @@ def ground_lists(kb, grounding, question):
 NOTES_SPEC = """Notes format (fixed schema, full rewrite every step, telegraphic):
 N<i>. [<record_id or paper_id>] <claim> | anchor:"<verbatim number/phrase from source>" | conditions:<band/conditions, or -> | epistemic:<stated|demonstrated|cited — ONLY when the source record carries this field>
 X<i>. [invalidated] <overturned old claim> | reason:<one line>
-Rules: (1) every N line must carry a [backref id] — copied verbatim from the record_id / paper_id / chunk_id fields in tool observations; catalog observations (entities/list_papers) may use [entity canonical name]; entries with missing or fabricated ids are rejected by the system. NEVER write composite backrefs like [card|entity] or [tool|entity] — the bracket must contain ONLY the id (or one catalog entity name), never a tool name. (2) numbers must be copied verbatim into anchors, never rewritten. (3) claims overturned by new evidence become X lines and are kept, never erased. (4) notes are your only memory: next step you see only notes + gaps + the latest observation, no older history. (4b) LENGTH DISCIPLINE: keep notes under ~5000 characters — they are telegraphic working memory, not a transcript. Each step, PRUNE superseded/merged lines (older partial values replaced by better-sourced ones, duplicates from parallel observations) instead of accumulating; a full rewrite that keeps growing the notes will be truncated by the output limit and the step will be lost. (5) stop discipline: when the gap list is NONE and the notes already contain the question's key points, output <answer> immediately; further retrieval wastes budget. Minor gaps may be disclosed honestly inside the answer and are never a reason to keep searching. (6) epistemic segment (v1.4 records): when a tool observation shows epistemic on a record, copy it into the note line — cited = another paper's claim restated by the source paper: attribute it in the answer ("as restated from the cited work" / name the original authors if the note carries them), never assert it as the source paper's own finding; stated = the paper's own claim without experimental backing here ("the paper states"); demonstrated = experimentally supported. Dropping the marker loses attribution that later steps cannot recover."""
+Rules: (1) every N line must carry a [backref id] — copied verbatim from the record_id / paper_id / chunk_id fields in tool observations; catalog observations (entities/list_papers) may use [entity canonical name]; entries with missing or fabricated ids are rejected by the system. NEVER write composite backrefs like [card|entity] or [tool|entity] — the bracket must contain ONLY the id (or one catalog entity name), never a tool name. (2) numbers must be copied verbatim into anchors, never rewritten. (3) claims overturned by new evidence become X lines and are kept, never erased. (4) notes are your only memory: next step you see only notes + gaps + the latest observation, no older history. (4b) LENGTH DISCIPLINE: keep notes under ~3000 characters — they are telegraphic working memory, not a transcript. Each step, PRUNE superseded/merged lines (older partial values replaced by better-sourced ones, duplicates from parallel observations) instead of accumulating; a full rewrite that keeps growing the notes will be truncated by the output limit and the step will be lost. (5) stop discipline: when the gap list is NONE and the notes already contain the question's key points, output <answer> immediately; further retrieval wastes budget. Minor gaps may be disclosed honestly inside the answer and are never a reason to keep searching. (6) epistemic segment (v1.4 records): when a tool observation shows epistemic on a record, copy it into the note line — cited = another paper's claim restated by the source paper: attribute it in the answer ("as restated from the cited work" / name the original authors if the note carries them), never assert it as the source paper's own finding; stated = the paper's own claim without experimental backing here ("the paper states"); demonstrated = experimentally supported. Dropping the marker loses attribution that later steps cannot recover."""
 
 MAIN_SYSTEM = """You are a retrieval-reasoning agent over a scientific-literature knowledge base. {kb_stats} Every record carries a verbatim source quote and a record_id. You answer through a multi-step loop: each step outputs notes (full rewrite) + open gaps + one or more INDEPENDENT actions (tool calls) or the final answer. When several calls do not depend on each other's results, emit them TOGETHER as separate <action> blocks in the same step (2-4 parallel calls: e.g. a card() sweep across the question's entities, or parallel findings(paper_id=...) probes) — a step costs one unit of budget regardless of how many actions it carries.
 
@@ -306,7 +327,8 @@ EXT_CATALOG = """
 14. gap_search(query) knowledge-model-driven: matches the question against the KB's recorded ABSENCES (what corpus methods cannot do, what has no results), then searches externally for papers FILLING that gap with vocabulary the question does not contain. Prefer this over search_papers when the question hints at a limitation/unsolved aspect
 15. lineage_walk_ext(entity, direction?) typed method-genealogy walk: follows extends/improves/replaces edges in-corpus to the frontier, then continues externally for successors. Use for 'latest advances in X / what replaced X' questions
 16. citation_graph(doi?, title?, direction?) external citation neighbors of a paper (who it cites / who cites it), with in-corpus annotation
-17. extract_paper(title, abstract) Tier-1 coarse extraction: digest ONE external paper's abstract into structured records (method/finding/limitation). Run on the 1-3 external papers that look core to the question, then use their records as evidence"""
+17. extract_paper(title, abstract) Tier-1 coarse extraction: digest ONE external paper's abstract into structured records (method/finding/limitation). Run on the 1-3 external papers that look core to the question, then use their records as evidence
+18. deep_read(paper_id, sections?) L1 DIRECTED deep upgrade (~3 min): fetches a corpus paper's FULL TEXT and deep-extracts the 2-3 sections most relevant to the question (result/config/finding records at full-text level), then query them via findings(paper_id=...). Pass sections=["ablation", "experimental setup", ...] to read specific sections; omit for automatic question-relevant selection. Remaining sections extract in the background (free for later questions). USE IT when you have found the right paper but its coarse records are too shallow to answer with (no numbers, no mechanisms, no experimental detail) — do NOT abstain, deep_read the 1-3 most relevant papers instead"""
 _OPEN_SET = os.environ.get("KB_OPEN_SET", "0") == "1"
 MAIN_SYSTEM = MAIN_SYSTEM.replace("{ext_catalog}",
                                    EXT_CATALOG if _OPEN_SET else "")
@@ -354,8 +376,10 @@ def build_step_prompt(system, q, notes, gaps, queried, obs, steps_left, glist=No
         if glist.get("dossiers"):   # R2-C (PSV2): rich-dossier catalog line
             parts.append("\nRich dossiers (card(<name>) returns full evidence — "
                          "f=findings, c=configs, r=main results): " + glist["dossiers"])
-    parts.append(f"\n\nAlready-queried list (do not repeat identical calls): {json.dumps(queried[-14:], ensure_ascii=False)}")
+    # 2026-09-28 APC: obs 与 queried 对调——queried 滑窗每步变，
+    # 放前面会截断缓存前缀；静态前缀=system+question+grounding
     parts.append(f"\n\nLatest observation:\n{obs if obs else '(first step: plan and issue the first query)'}")
+    parts.append(f"\n\nAlready-queried list (do not repeat identical calls): {json.dumps(queried[-14:], ensure_ascii=False)}")
     tail = (" (FINAL WINDOW: if the notes already contain the key points, output <answer> now; disclose remaining gaps honestly inside it)"
             if steps_left <= 2 else " (once exhausted you must answer from notes)")
     parts.append(f"\n\nSteps remaining: {steps_left}{tail}")
@@ -1342,7 +1366,15 @@ def run_question(q, arm, kb, tkb, grounding, glog):
         cap = cap + min(_RE_DEMAND_MAX_BONUS,
                         max(0, n_demand - _RE_DEMAND_FREE)
                         * _RE_DEMAND_PER_ENTITY)
-        cap = min(cap, 48)  # absolute safety ceiling
+        # CS2 批1实测（09-28）：3/5 题磨满 48 步（笔记不收敛+同主题重复
+        # 检索），20 步时材料已齐。天花板降 30（CS2_CAP_MAX 可调/回滚）。
+        cap = min(cap, int(os.environ.get('CS2_CAP_MAX', '30')))
+    _SEARCH_FAMILY.clear()  # per-question query-family saturation state
+    # deep_read L1 定向模式（2026-09-28）：把当前题目注入 broker——
+    # Agent 未显式传 sections 时的默认选择依据（题目 token 重叠前 3 节）
+    _ext = getattr(kb, "_ext_tools", None)
+    if _ext is not None:
+        _ext._current_question = q["question"]
     glist = ground_lists(kb, grounding, q["question"]) if arm == "main" else None
     system = MAIN_SYSTEM if arm == "main" else CONTROL_SYSTEM
     notes, gaps, queried, obs = "", "", [], ""
@@ -1684,7 +1716,7 @@ def run_question(q, arm, kb, tkb, grounding, glog):
                     _prio.sort(key=lambda t: t[0])
                     _out, _sz = [], 0
                     for _t, l in _prio:
-                        if _sz + len(l) + 1 > 5000 and _out:
+                        if _sz + len(l) + 1 > 3000 and _out:
                             break
                         _out.append(l)
                         _sz += len(l) + 1
@@ -1877,8 +1909,31 @@ def run_question(q, arm, kb, tkb, grounding, glog):
                                         k=int(args.get("k", 8) or 8))
                     res = compact("search", res)
                 elif tool == "search_text":
-                    res = _text_search(args.get("query", q["question"]),
-                                       args.get("k", 8))
+                    # 批1实测（09-28）：同主题查询重复 39 次（模型换措辞
+                    # 反复搜）。查询族饱和反馈：主题 token 集合已搜过 3 次
+                    # 以上→返回饱和提示而非新结果，强迫转向笔记整理。
+                    _q = str(args.get("query", q["question"]))[:300]
+                    _qtoks = frozenset(t for t in re.findall(
+                        r"[a-z]{4,}", _q.lower()))
+                    if _qtoks:
+                        _fam_hits = sum(1 for _prev in _SEARCH_FAMILY
+                                        if len(_qtoks & _prev) >=
+                                        max(2, len(_qtoks) // 3))
+                        if _fam_hits >= 3:
+                            res = {"tool": "search_text", "n": 0,
+                                   "saturation": True,
+                                   "note": ("this topic has already been "
+                                            "searched 3+ times — the results "
+                                            "are in your notes; STOP searching "
+                                            "this theme and either search a "
+                                            "DIFFERENT aspect, use typed tools "
+                                            "(card/findings/compare), or write "
+                                            "the answer from your notes now")}
+                        else:
+                            _SEARCH_FAMILY.append(_qtoks)
+                            res = _text_search(_q, args.get("k", 8))
+                    else:
+                        res = _text_search(_q, args.get("k", 8))
                 elif tool in TOOL_WHITELIST or tool == "entities" or tool == "fetch_chunk" or tool == "describe_kb":
                     glog_ = []
                     cands = gate_entity_args(kb, args, glog_) if tool in (

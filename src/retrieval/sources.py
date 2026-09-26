@@ -715,9 +715,18 @@ class SciverseClient:
         timeout_seconds: int = 30,
     ):
         self.token = os.environ.get("SCIVERSE_API_TOKEN") if token is ENV_TOKEN else token
-        self.request_json = request_json or sciverse_request_json
+        # 构造参数 token 原生生效（合并前遗留坑：默认 request_json 只读
+        # 环境变量，显式传入的 token 被静默忽略）。自定义 request_json
+        # 仍然全权接管（测试替身路径不变）。
+        self.request_json = request_json or self._bound_request_json
         self.base_url = base_url.rstrip("/")
         self.timeout_seconds = timeout_seconds
+
+    def _bound_request_json(self, method, path, *, payload=None, query=None,
+                            timeout_seconds=30):
+        return sciverse_request_json(
+            method, path, payload=payload, query=query,
+            timeout_seconds=timeout_seconds, token=self.token)
 
     def fetch_by_doi(self, doi: str) -> SourceCandidate:
         normalized = normalize_doi(doi)
@@ -1481,8 +1490,9 @@ def sciverse_request_json(
     payload: object | None = None,
     query: dict[str, object] | None = None,
     timeout_seconds: int,
+    token: str | None = None,
 ) -> object:
-    token = os.environ.get("SCIVERSE_API_TOKEN")
+    token = token or os.environ.get("SCIVERSE_API_TOKEN")
     if not token:
         raise SourceAdapterError("缺少 SCIVERSE_API_TOKEN，无法调用 Sciverse。")
     # pace to the documented per-endpoint limit BEFORE firing (default 30/min;

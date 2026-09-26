@@ -784,8 +784,14 @@ def call_local(prompt: str, model: str = "Qwen3.8-27B", max_tokens: int = 4000,
             if max_tokens >= 8000:
                 global _LOCAL_SEM_LARGE
                 if "_LOCAL_SEM_LARGE" not in globals():
-                    _LOCAL_SEM_LARGE = threading.Semaphore(max(
-                        2, int(os.environ.get("LOCAL_MAX_CONCURRENT", "4")) // 8))
+                    # CS2 L1 定向深抽（2026-09-28）：大输出车道宽度可独立
+                    # 配额——答题循环与 deep_read chunk 抽取分道，互不饿死
+                    # （实测 SIFT 18 chunks 在默认 2 车道下串行 48 分钟）
+                    _LOCAL_SEM_LARGE = threading.Semaphore(int(
+                        os.environ.get(
+                            "LOCAL_LARGE_MAX_CONCURRENT",
+                            str(max(2, int(os.environ.get(
+                                "LOCAL_MAX_CONCURRENT", "4")) // 8)))))
                 _sem = _LOCAL_SEM_LARGE
             with _sem:
                 _rl = _walled_open(req, sock_timeout=sock_to)
