@@ -229,11 +229,23 @@ class KBTools:
                 anc_ids = g.get("ancestor_closure", {}).get(eid, set())
                 ancestors = [g["nodes"][a]["canonical"] for a in anc_ids
                              if a in g.get("nodes", {})]
-        return {"tool": "lineage", "entity": entity, "paper_id": paper_id,
-                "n_edges": len(edges),
-                "edges": sorted(edges, key=lambda e: e["year"] or 9999),
-                "transitive_ancestors": ancestors,
-                "as_of_year": as_of_year}
+        res = {"tool": "lineage", "entity": entity, "paper_id": paper_id,
+               "n_edges": len(edges),
+               "edges": sorted(edges, key=lambda e: e["year"] or 9999),
+               "transitive_ancestors": ancestors,
+               "as_of_year": as_of_year}
+        # P2-10（REPAIR-WAVE-0928）：零边+有 entity 时不裸死路——附最近
+        # 实体建议（复用 card 的 redirect 哲学；审计实证 lineage 空返回
+        # 零 hint 纯死路，模型只能瞎换名重试）
+        if not edges and entity:
+            near = self._nearest_in_corpus(entity, k=3)
+            if near:
+                res["nearest_candidates"] = near
+                res["note"] = ("no lineage edges for this exact name — "
+                               "it may be registered under a different "
+                               "surface; try one of nearest_candidates, "
+                               "or entities(contains=...) to browse)")
+        return res
 
     # ---------- typed tool 3: find_gap ----------
 
@@ -320,16 +332,26 @@ class KBTools:
         target_ref, OR claim text; contains = norm substring on claim+quote,
         '|' separates alternative wordings (IL-B6: planner guessed
         "kl divergence" while records said "KL loss" — one wording, one miss,
-        A15 cost 3 points; OR-alternatives make wording mismatch survivable)."""
+        A15 cost 3 points; OR-alternatives make wording mismatch survivable).
+        contains 词法零命中时走语义兜底（P0-3 REPAIR-WAVE-0928）：查询与
+        候选记录 claim 的 embedding 余弦 ≥ 阈值→以 semantic match 返回。
+        同义词盲赌（'programming by example' vs 库内 'teach by example'
+        ——批13 实证 1 vs 11 hits 整题弃答）由此可恢复。"""
         names = self._alias_set(entity) if entity else None
-        cns = [_norm(c) for c in str(contains or "").split("|") if c.strip()] or None
+        raw_cns = [c for c in str(contains or "").split("|") if c.strip()]
+        cns = [_norm(c) for c in raw_cns] or None
         out = []
         for pid, payload in self.records.items():
             if paper_id and pid != paper_id:
                 continue
             recs = payload.get("records", payload) if isinstance(payload, dict) else payload
             for r in recs:
-                if r.get("kind") != "finding":
+                # CS2 热库（09-28）：粗抽记录 kind ∈ {method, limitation}——
+                # 它们是摘要级 claim（粗抽契约），findings 工具不认=热库对
+                # 模型不可见（批3实测：magneto 3 条记录 findings 查 0）。
+                # method/limitation 按 claim 类记录放行（粗抽契约：kind 是
+                # 摘要级分类不是记录层语义）。
+                if r.get("kind") not in ("finding", "method", "limitation"):
                     continue
                 if claim_type and r.get("claim_type") != claim_type:
                     continue
@@ -377,10 +399,119 @@ class KBTools:
         out = out[:k]
         res = {"tool": "findings", "n": total, "returned": len(out),
                "truncated": total > len(out), "entries": out}
-        if total == 0 and cns:
-            res["note"] = ("contains 零命中——记录用词可能与查询用词不同，"
-                           "换措辞或用 | 分隔多组候选词重试")
+        if total < 3 and cns:
+            # P0-3 语义兜底：词法零/低命中（<3）≠库内无相关内容（同义词
+            # 盲赌的代价不对称——批13 实证 1 hit 起步整题弃答）。零命中
+            # 全量替换；低命中补充合并（去重）。
+            sem = self._semantic_contains_fallback(
+                raw_cns, entity, claim_type, paper_id, names, k)
+            if sem:
+                if total == 0:
+                    res["entries"] = sem
+                    res["returned"] = len(sem)
+                else:
+                    seen_ids = {e.get("record_id") for e in out}
+                    merged = list(out) + [
+                        e for e in sem if e.get("record_id") not in seen_ids]
+                    res["entries"] = merged[:k]
+                    res["returned"] = len(res["entries"])
+                res["semantic_match"] = True
+                res["note"] = ("lexical contains had few/no hits; entries "
+                               "marked with semantic_score are SEMANTIC "
+                               "matches (embedding) — the records' wording "
+                               "differs from your query. They are still "
+                               "verbatim-anchored evidence.")
+                return res
+            if total == 0:
+                res["note"] = ("contains 零命中——记录用词可能与查询用词不同，"
+                               "换措辞或用 | 分隔多组候选词重试")
         return res
+
+    _SEM_CONTAINS_TH = 0.50   # 与 deep_read 节匹配同一定标（同义对
+    # 0.50-0.57 / 无关对 0.38-0.48 实测带）
+
+    def _semantic_contains_fallback(self, raw_cns, entity, claim_type,
+                                    paper_id, names, k):
+        """词法零命中时的 embedding 兜底。查询串=contains 词组合并；
+        候选=全部过了非词法过滤的记录 claim。返回带 semantic 标注的
+        entries（限 k 条，按余弦降序）。embedding 不可用→None（降级为
+        原零命中路径，绝不阻塞）。"""
+        try:
+            from kb_infra.embedding import embed_local
+        except Exception:
+            return None
+        _raw_total = sum(
+            len(p.get("records", [])) if isinstance(p, dict) else 0
+            for p in ([self.records[paper_id]] if paper_id
+                      else list(self.records.values())))
+        cands = []
+        for pid, payload in self.records.items():
+            if paper_id and pid != paper_id:
+                continue
+            recs = payload.get("records", payload) if isinstance(payload, dict) else payload
+            for r in recs:
+                if r.get("kind") not in ("finding", "method", "limitation"):
+                    continue
+                if claim_type and r.get("claim_type") != claim_type:
+                    continue
+                # 大库（>6k 候选）先做单 token 词法粗筛：任一查询 token
+                # 出现在 claim/quote 里即入围（比子串全词组匹配宽得多，
+                # 是 embedding 前的召回粗网）。粗筛后仍 >6k 才放弃。
+                if _raw_total > 6000:
+                    toks = {t for t in re.split(r"[^a-z0-9]+",
+                            " ".join(raw_cns).lower()) if len(t) >= 4}
+                    if toks:
+                        blob = _norm(str(r.get("claim") or "") + " " +
+                                     str(r.get("quote") or ""))
+                        if not any(t in blob for t in toks):
+                            continue
+                if names:
+                    claim_n = _norm(str(r.get("claim") or ""))
+                    scope = _ref_name(r.get("scope_ref_ref"))
+                    target = _ref_name(r.get("target_ref_ref"))
+                    if not (_norm(scope) in names or _norm(target) in names
+                            or any(n and (re.search(
+                                r"\b" + re.escape(n) + r"\b", claim_n)
+                                if len(n) < 5 else n in claim_n)
+                                for n in names)):
+                        continue
+                cands.append((pid, r))
+        if not cands or len(cands) > 6000:
+            return None   # 候选过大（全库兜底成本失控）——维持词法结论
+        try:
+            q = " ".join(raw_cns)
+            qe = embed_local([q[:300]])[0]
+            ce = embed_local([str(c[1].get("claim") or "")[:300]
+                              for c in cands], batch_size=64)
+        except Exception:
+            return None
+        import math as _math
+
+        def _cos(a, b):
+            d = sum(x * y for x, y in zip(a, b))
+            na = _math.sqrt(sum(x * x for x in a))
+            nb = _math.sqrt(sum(x * x for x in b))
+            return d / (na * nb) if na and nb else 0.0
+
+        scored = sorted(
+            ((_cos(qe, ce[i]), pid, r) for i, (pid, r) in enumerate(cands)),
+            key=lambda t: -t[0])
+        out = []
+        for score, pid, r in scored[:k]:
+            if score < KBTools._SEM_CONTAINS_TH:
+                break
+            out.append({
+                "paper_id": pid, "claim": str(r.get("claim") or ""),
+                "claim_type": r.get("claim_type"),
+                "strength": r.get("strength"),
+                "epistemic": r.get("epistemic"),
+                "condition": r.get("condition"),
+                "scope": _ref_name(r.get("scope_ref_ref")),
+                "target": _ref_name(r.get("target_ref_ref")),
+                "record_id": r.get("id"),
+                "quote": (r.get("quote") or "")[:120],
+                "semantic_score": round(score, 3)})
+        return out or None
 
     # ---------- typed tool 7: card (entity evidence dossier) ----------
 
