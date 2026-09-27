@@ -442,6 +442,26 @@ class ExternalTools:
 
     # ---- 全文获取（三通道，文本级缓存） ----
 
+    def _index_deep_text(self, paper_id: str, text: str):
+        """全文进 search_text 索引（L2' 兜底对外部论文生效——批10 后
+        的架构补齐）：deep_read 拉回的原文不只是抽取管线的输入，本身
+        可被后续任意题的 search_text 直接检索（harness 的 fetch_chunk
+        语义，但走我们的编译层索引）。幂等；索引单例原地更新。"""
+        try:
+            import evidence_gate2r_harness as _H
+            from kb_compiler.views.search_text import TextSearchIndex
+            idx = _H._TSI
+            if idx is None:
+                idx = TextSearchIndex(_H._TEXT_INDEX_DIR)
+                _H._TSI = idx
+            n = idx.append_paper(paper_id, text)
+            if n:
+                print(f"[deep_read-index] {paper_id[:45]}: +{n} chunks "
+                      f"into search_text index", flush=True)
+        except Exception as e:
+            print(f"[deep_read-index] {paper_id[:40]}: {str(e)[:80]}",
+                  flush=True)
+
     def _fetch_full_text(self, paper_id: str, m: dict):
         """(text, src)。文本缓存优先（Sciverse 分页 20 请求/篇不重付）。"""
         import hashlib as _hl
@@ -841,6 +861,9 @@ class ExternalTools:
                                  f"sciverse={'yes' if m.get('doc_id') else 'no'})"}
             text_hash = _hl.md5(text.encode("utf-8")).hexdigest()[:16]
             title = m.get("title") or paper_id
+            # ①b 全文进 search_text 索引（幂等，~50 chunks 一次 embed 批
+            # 调用）——后续任何题可 L2' 直查原文
+            self._index_deep_text(paper_id, text)
             # ② card（缓存命中免 LLM）
             cache = self._cache_load()
             ent = cache.get(paper_id) or {}

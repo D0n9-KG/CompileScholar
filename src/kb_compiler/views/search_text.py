@@ -143,6 +143,64 @@ class TextSearchIndex:
             })
         return {"tool": "search_text", "n": len(hits), "hits": hits}
 
+    # ---------- incremental append (deep_read L2' wiring, 2026-09-28) ----------
+
+    def append_paper(self, paper_id: str, text: str,
+                     chunk_chars: int = CHUNK_CHARS,
+                     overlap: int = OVERLAP) -> int:
+        """Append one paper's full text into the index (in-memory + disk).
+
+        Idempotent: a paper_id already present is skipped (returns 0). The
+        harness's search_text singleton sees in-place updates (same object);
+        a later cold load reads the appended disk files. Embedding follows
+        the index's provider tag (dim discipline)."""
+        if any(c["paper_id"] == paper_id for c in self.chunks):
+            return 0
+        new_chunks = []
+        step = max(1, chunk_chars - overlap)
+        for s in range(0, len(text), step):
+            e = min(s + chunk_chars, len(text))
+            seg = text[s:e]
+            if len(seg.strip()) < 80:
+                continue
+            new_chunks.append({"paper_id": paper_id, "char_start": s,
+                               "char_end": e, "text": seg})
+            if e >= len(text):
+                break
+        if not new_chunks:
+            return 0
+        sys.path.insert(0, os.path.dirname(os.path.dirname(
+            os.path.dirname(os.path.abspath(__file__)))))
+        from kb_infra.embedding import embed_cst, embed_local
+        if self.meta.get("provider") == "local-qwen3":
+            embs = embed_local([c["text"][:3000] for c in new_chunks])
+        else:
+            embs = embed_cst([c["text"][:3000] for c in new_chunks])
+        if len(embs) != len(new_chunks):
+            return 0
+        # in-memory: chunks/embs + BM25 statistics
+        for c, e_ in zip(new_chunks, embs):
+            self.chunks.append(c)
+            self.embs.append(e_)
+            toks = _tokens(c["text"])
+            self._doc_toks.append(toks)
+            self._doc_len.append(len(toks))
+            for term in set(toks):
+                self._df[term] = self._df.get(term, 0) + 1
+        self._n += len(new_chunks)
+        self._avgdl = sum(self._doc_len) / max(1, len(self._doc_len))
+        # disk: append-only chunks/emb + meta rewrite
+        with open(os.path.join(self.index_dir, "chunks.jsonl"), "a",
+                  encoding="utf-8") as f:
+            for c in new_chunks:
+                f.write(json.dumps(c, ensure_ascii=False) + "\n")
+        with open(os.path.join(self.index_dir, "emb.bin"), "ab") as f:
+            array("f", (x for e_ in embs for x in e_)).tofile(f)
+        self.meta["n_chunks"] = self._n
+        json.dump(self.meta, open(os.path.join(self.index_dir, "meta.json"),
+                                  "w", encoding="utf-8"))
+        return len(new_chunks)
+
     # ---------- build ----------
     @classmethod
     def build(cls, texts_dir: str, index_dir: str,
