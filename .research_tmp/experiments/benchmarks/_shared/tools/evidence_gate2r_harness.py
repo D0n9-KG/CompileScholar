@@ -566,6 +566,13 @@ def note_gate(notes, valid_ids):
         s = line.strip()
         if not s:
             continue
+        # 批11 审计修复：模型会写 "[unsourced] N12. [真实id] ..."——
+        # unsourced 前缀挡在 N 前面，但行里带合法 record id。整体放行
+        # 会让 parse_notes 当 unsourced 丢弃（批11 实测丢 14 条主张）。
+        # 剥掉前缀按 N 行正常走门（id 校验照旧）。
+        if s.startswith("[unsourced]") and re.match(
+                r"\[unsourced\]\s*N\d+\.\s*\[", s):
+            s = re.sub(r"^\[unsourced\]\s*", "", s)
         if s.startswith("X") or s.startswith("[unsourced]"):
             kept.append(s)   # invalidated + relaxed-marked lines pass through
             continue

@@ -67,6 +67,17 @@ def parse_notes(notes_text: str) -> list[dict]:
     """
     claims = []
     for line in (notes_text or "").splitlines():
+        s = line.strip()
+        # 批11 审计修复："[unsourced] N12. [真实id] ..." 前缀形态——
+        # 行带合法回指就不是 unsourced（note_gate 同款剥法）
+        if s.startswith("[unsourced]"):
+            m2 = _NOTE_LINE.match(s[len("[unsourced]"):].lstrip())
+            if m2:
+                line = s[len("[unsourced]"):].lstrip()
+            elif not _BACKREF.search(s):
+                continue   # 真 unsourced 且无回指：不可引用主张，跳过
+            else:
+                line = s   # 无 N 前缀但带回指（如 "- [id] ..."）走下面
         m = _NOTE_LINE.match(line)
         md = _NOTE_LINE_DASH.match(line) if not m else None
         if not m and not md:
@@ -88,16 +99,25 @@ def parse_notes(notes_text: str) -> list[dict]:
 # ---------------------------------------------------------------- 证据库
 
 class EvidenceStore:
-    """record_id / paper_id → 引用载荷（quote + 论文元数据）。
+    """record_id / paper_id / chunk 锚（paper_id#char_start）→ 引用载荷。
 
     records_checked.json: {paper_id: {"records": [record], ...}}；
     record 携带 quote（verbatim）、paper_id、section、chunk_char_start。
     manifest 行: paper_id/title/year/doi/arxiv_id/authors。
+
+    chunk 锚（批11 审计修复）：search_text（L2' 通道）的命中带
+    paper_id#char_start 形态的 chunk_id——模型拿它做笔记回指是合法
+    证据（verbatim 原文），但旧 resolve 只认 record_id/paper_id，
+    装配时全部被丢（批11 实测 12/12 锚无效）。texts_dir 给定时按锚
+    原位截 400 字符作 snippet（与 search_text 观测同长度语义）。
     """
 
-    def __init__(self, records_checked: dict, manifest: list[dict]):
+    def __init__(self, records_checked: dict, manifest: list[dict],
+                 texts_dir: str | None = None):
         self.by_record: dict[str, dict] = {}
         self.by_paper: dict[str, dict] = {}
+        self._texts_dir = texts_dir
+        self._text_cache: dict[str, str] = {}
         for pid, payload in records_checked.items():
             for rec in payload.get("records", []):
                 rid = rec.get("id")
@@ -105,6 +125,23 @@ class EvidenceStore:
                     self.by_record[rid] = rec
         for row in manifest:
             self.by_paper[row["paper_id"]] = row
+
+    def _chunk_text(self, paper_id: str) -> str | None:
+        """deep_read_texts/<md5(pid)>.txt 惰性加载（chunk 锚的原文）。"""
+        if paper_id in self._text_cache:
+            return self._text_cache[paper_id]
+        if not self._texts_dir:
+            return None
+        import hashlib
+        import os
+        p = os.path.join(self._texts_dir,
+                         hashlib.md5(paper_id.encode()).hexdigest() + ".txt")
+        try:
+            t = open(p, encoding="utf-8", errors="replace").read()
+        except OSError:
+            t = None
+        self._text_cache[paper_id] = t
+        return t
 
     def paper_meta(self, paper_id: str) -> dict:
         row = self.by_paper.get(paper_id, {})
@@ -145,6 +182,21 @@ class EvidenceStore:
                 "meta": self.paper_meta(ref_id),
                 "loc": None,
             }
+        # chunk 锚（批11 审计修复）：paper_id#char_start = search_text
+        # 命中的 verbatim 原文位置——合法 1.0 档证据
+        if "#" in ref_id:
+            pid, _, cstart = ref_id.partition("#")
+            if pid in self.by_paper and cstart.isdigit():
+                text = self._chunk_text(pid)
+                if text:
+                    s = int(cstart)
+                    return {
+                        "tier": "full",
+                        "paper_id": pid,
+                        "quote": text[s:s + 400].strip(),
+                        "meta": self.paper_meta(pid),
+                        "loc": {"chunk_id": ref_id, "char_start": s},
+                    }
         return None
 
 
@@ -158,8 +210,9 @@ STRICT RULES:
 1. Use ONLY the given claims as content. Do not invent facts, numbers, or papers. You may merge related claims into one sentence.
 2. Every sentence that states a finding MUST end with the marker(s) of the claim(s) it draws on, e.g. "Protein adsorption is selective [C4]." A sentence without a marker may only be a transitional/organizing sentence.
 3. PARAPHRASE — never copy an evidence quote's wording into the report text. Quotes are for your understanding only.
-4. 3-6 sections, {word_budget} words total. Direct, factual, survey-style prose. No filler.
+4. {word_budget} words total. Direct, factual, survey-style prose. No filler.
 5. If the claims conflict, present both and attribute each to its marker.
+6. NUMBERS: every specific value, quantity, model name, or dataset name that appears in a claim MUST appear in the report — claims are dense transcriptions, and dropping their numbers loses the evidence. A report that omits the numeric details of its claims is a failed report, not a concise one.
 
 QUESTION: {question}
 
@@ -171,7 +224,7 @@ Return ONLY valid JSON (no markdown fences): {{"sections": [{{"title": str, "tex
 
 def narrative_compile(question: str, claims: list[dict], store: EvidenceStore,
                       section_template: list[str] | None = None,
-                      word_budget: str = "300-700",
+                      word_budget: str = "600-1200 (scale with claim count)",
                       model: str = NARRATIVE_MODEL) -> dict:
     """主张集 → 分节草稿（含 [Ck] 标记）。LLM 组件=叙事编译层本体。"""
     usable = [c for c in claims if c["text"] and c["refs"]
