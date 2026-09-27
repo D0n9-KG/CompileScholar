@@ -1760,9 +1760,7 @@ def run_question(q, arm, kb, tkb, grounding, glog):
                         # /批全静默=回退第二根因）
                         _dropped = [l for _t, l in _prio if l not in set(_out)]
                         _subj = "; ".join(
-                            (re.findall(r"\[([A-Za-z0-9_:\-#\.]{8,})\]", d)
-                             or [d.strip()[:30] for d in _dropped[:2]])
-                            [:3] for d in _dropped[:3])
+                            d.strip()[:30] for d in _dropped[:3])
                         pending_sys = (pending_sys + "\n" if pending_sys else "") + (
                             f"[SYSTEM] Notes over budget: {len(kept)-_sz} chars "
                             "were trimmed (oldest/lowest-priority lines first, "
