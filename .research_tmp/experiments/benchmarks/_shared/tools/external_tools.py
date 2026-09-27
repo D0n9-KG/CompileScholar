@@ -143,6 +143,129 @@ class ExternalTools:
 
     # ---- lazy singletons -------------------------------------------------
 
+    def _sciverse(self):
+        """SciverseClient 单例（admit_paper / 外部解析用）。"""
+        if getattr(self, "_scv", None) is None:
+            from sci_evo_extract.library.sources import SciverseClient
+            self._scv = SciverseClient()
+        return self._scv
+
+    def admit_paper(self, title: str = None, doi: str = None) -> dict:
+        """统一入库通道（2026-09-28 系统级修复，用户裁定："知识模型辅助
+        开放探索"的愿景要求外部论文可入库——检索/谱系/引用链拿到的候选
+        不能是断头路）。任何来源的外部论文 → 解析 doc_id → 注册进
+        manifest（临时条目）→ 立即可 deep_read（全文）/ extract_paper。
+        幂等：已在库的论文直接返回其 paper_id。"""
+        import re as _re
+        try:
+            if not title and not doi:
+                return {"tool": "admit_paper", "error":
+                        "pass a title or doi"}
+            manifest = self._kb_manifest or {}
+            # 已在库（按 doi 或标题匹配）——直接返回
+            if doi:
+                for pid, m in manifest.items():
+                    if (m or {}).get("doi") and \
+                            _re.sub(r"^doi:|https?://doi\.org/", "",
+                                    str(doi).lower()) in \
+                            str(m.get("doi", "")).lower():
+                        return {"tool": "admit_paper", "paper_id": pid,
+                                "status": "already_in_kb"}
+            if title:
+                nt = _re.sub(r"[^a-z0-9]+", " ", title.lower()).strip()
+                if nt:
+                    for pid, m in manifest.items():
+                        mt = _re.sub(r"[^a-z0-9]+", " ",
+                                     str((m or {}).get("title") or "").lower()).strip()
+                        if mt and (nt == mt or nt[:60] == mt[:60]):
+                            return {"tool": "admit_paper", "paper_id": pid,
+                                    "status": "already_in_kb"}
+            # 解析：meta-search（doi 或 title）拿 doc_id + 元数据。
+            # 注意 doc 空间分裂（实测）：meta-search 的 doc_id 在
+            # /content 上 404——agentic-search 的 doc 空间才有全文。
+            # 所以：meta-search 只出元数据（标题/年份/摘要/doi），
+            # doc_id 一律从 agentic-search 解析并探针验证（500 chars）。
+            sc = self._sciverse()
+            cand = None
+            try:
+                if doi:
+                    cands = [sc.fetch_by_doi(doi)]
+                else:
+                    cands = sc.search_title(title[:150], limit=3)
+                for c in cands:
+                    if (c.raw or {}).get("doc_id") and c.status == "ready":
+                        cand = c
+                        break
+            except Exception:
+                cand = None
+            doc_id = None
+            title_r = (cand.title if cand else None) or title
+            year_r = cand.year if cand else None
+            abstract_r = ((cand.raw or {}).get("abstract") if cand else "") or ""
+            qtitle = _re.sub(r"\s+", " ", str(title or title_r).lower()).strip()
+            if qtitle:
+                try:
+                    hits = sc.agentic_search(qtitle[:200], limit=5)
+                    for h in hits:
+                        prov = (h.get("provenance") or {})
+                        ht = _re.sub(r"\s+", " ",
+                                     str(prov.get("title") or "")).strip().lower()
+                        if not ht:
+                            continue
+                        # 标题匹配（token 重叠——agentic 的标题常是
+                        # 简写/变形，前缀匹配漏；标题对不上的 hit 是
+                        # 别篇论文，不能 admit 错的全文）
+                        htoks = {t for t in ht.split() if len(t) >= 3}
+                        qtks = {t for t in qtitle.split() if len(t) >= 3}
+                        ov = len(htoks & qtks) / max(1, len(htoks | qtks))
+                        if ov < 0.6:
+                            continue
+                        # 探针：这个 doc_id 真的有全文吗
+                        try:
+                            probe = sc.read_content(doc_id=h["doc_id"],
+                                                    offset=0, limit=500)
+                            if str(probe.get("text") or ""):
+                                doc_id = h["doc_id"]
+                                title_r = title_r or prov.get("title")
+                                break
+                        except Exception:
+                            continue
+                except Exception:
+                    pass
+            if not doc_id:
+                return {"tool": "admit_paper", "error":
+                        f"could not resolve a full-text source for "
+                        f"{str(title or doi)[:60]!r} — deep_read channels: "
+                        "try passing the paper's arXiv id if you have one"}
+            # 注册：manifest 临时条目 + 落盘（跨题/跨批可用）
+            pid = "ext_" + _re.sub(r"[^a-z0-9]+", "_",
+                                   (title_r or title or doi).lower())[:80]
+            self._kb_manifest[pid] = {
+                "paper_id": pid, "title": title_r or title,
+                "doi": doi or (cand.normalized_doi if cand else None),
+                "doc_id": doc_id, "year": year_r,
+                "abstract": (abstract_r or "")[:2000],
+                "admitted_from": "external",  # 来源标记（统计/审计用）
+            }
+            _mp = getattr(self, "_manifest_path", None)
+            if _mp:
+                try:
+                    json.dump(list(self._kb_manifest.values()),
+                              open(_mp, "w", encoding="utf-8"),
+                              ensure_ascii=False, indent=1)
+                except Exception:
+                    pass
+            return {"tool": "admit_paper", "paper_id": pid,
+                    "status": "admitted", "title": title_r or title,
+                    "doc_id": doc_id[:16] + "…",
+                    "note": (f"paper admitted to the library — "
+                             f"deep_read(paper_id=\"{pid}\") now works "
+                             "on it; its records will enter the KB on "
+                             "extraction")}
+        except Exception as e:
+            return {"tool": "admit_paper",
+                    "error": f"admit failed: {str(e)[:120]}"}
+
     def _service(self):
         if self._svc is None:
             from sci_evo_extract.library.search_service import SearchService
@@ -180,7 +303,8 @@ class ExternalTools:
     def search_papers(self, query: str, k: int = 8) -> dict:
         """Blind external search through the shared tiered engine
         (Sciverse semantic leads, keyword fallbacks). Returns title+abstract
-        rows usable as evidence."""
+        rows usable as evidence. 外部论文不再是断头路：对想深读的论文先
+        admit_paper(title=...) 入库，再 deep_read。"""
         try:
             # agent mode (P14): the loop's query is already refined keyword
             # vocabulary — skip the A3 decomposition, semantic-first single
@@ -189,7 +313,10 @@ class ExternalTools:
             rows = [_cand_row(c) for c in r.candidates[:k]]
             return {"tool": "search_papers", "n": len(rows), "papers": _truncate_obs(rows),
                     "latency_ms": {k2: v for k2, v in r.latency.items()},
-                    "note": "external papers; cite by [title] or [doi] in notes"}
+                    "note": "external papers; to READ one in full: "
+                            "admit_paper(title=...) then "
+                            "deep_read(paper_id=...) — or cite by [title] "
+                            "as abstract-level evidence"}
         except Exception as e:
             return {"tool": "search_papers", "n": 0,
                     "error": f"external search failed: {str(e)[:120]}"}
@@ -232,9 +359,11 @@ class ExternalTools:
                     "attached_external": r.attached_external,
                     "n_external": len(rows), "papers": _truncate_obs(rows),
                     "successor_annotations": r.successor_annotations[:8],
-                    "note": "frontier = corpus lineage ends here; papers are external continuations; "
-                            "attached_external = papers already coarse-extracted into the library "
-                            "(their records are included — no re-search needed)"}
+                    "note": "frontier = corpus lineage ends here; papers are "
+                            "external continuations of this method line — "
+                            "to read one: admit_paper(title=...) then "
+                            "deep_read(paper_id=...); attached_external = "
+                            "papers already in the library (records included)"}
         except Exception as e:
             return {"tool": "lineage_walk", "n_external": 0,
                     "error": f"lineage walk failed: {str(e)[:120]}"}
@@ -253,7 +382,10 @@ class ExternalTools:
             return {"tool": "citation_graph", "anchor": g.anchor,
                     "n_edges": len(edges), "edges": _truncate_obs(edges, 5500),
                     "n_in_corpus": g.n_in_corpus,
-                    "note": "in_corpus=paper_id means the neighbor is already in our KB"}
+                    "note": "in_corpus=paper_id means the neighbor is "
+                            "already in our KB; any other neighbor can be "
+                            "read via admit_paper(title=... or doi=...) "
+                            "then deep_read(paper_id=...)"}
         except Exception as e:
             return {"tool": "citation_graph", "n_edges": 0,
                     "error": f"citation graph failed: {str(e)[:120]}"}
@@ -386,6 +518,40 @@ class ExternalTools:
                     pass
             self._deep_cache = cache
         return self._deep_cache
+
+    def _backflow_deep_records(self, paper_id: str, recs: list):
+        """深记录回流谱系（探索闭环，2026-09-28 系统级修复）：deep_read
+        的记录 mentions 命中 registry 实体 → 挂外部延续边——新读的论文
+        从此出现在后续 lineage_walk 的链上，知识模型随探索生长。与
+        extract_paper 的 backflow 同机制（复用 backflow 模块）。"""
+        try:
+            if self._registry is None or not recs:
+                return
+            from kb_compiler.records.backflow import (build_backflow,
+                                                      apply_backflow)
+            m = (self._kb_manifest or {}).get(paper_id) or {}
+            payload = {"records": [
+                {"kind": r.get("kind"),
+                 "mentions": [str((r.get(f or "method") or ""))[:60]
+                              for f in ("method", "from_method", "to_method",
+                                        "subject", "scope_ref", "target_ref")
+                              if r.get(f)][:6]}
+                for r in recs if isinstance(r, dict)]}
+            bf = build_backflow(payload,
+                                {"title": m.get("title") or paper_id,
+                                 "year": m.get("year")},
+                                self._registry, self._blocklist)
+            if bf.get("matches"):
+                res = apply_backflow(self._views, bf,
+                                     persist_path=self._backflow_path)
+                if res.get("attached"):
+                    print(f"[deep_read-backflow] {paper_id[:40]} -> "
+                          f"{res['matched_entities']}", flush=True)
+                    return res
+        except Exception as e:
+            print(f"[deep_read-backflow] {paper_id[:40]}: {str(e)[:80]}",
+                  flush=True)
+        return None
 
     def _persist_deep_records(self, paper_id: str, recs: list, replace: bool):
         """终化记录持久化（批10 第三断口修复）：deep_read/L2 的记录若只
@@ -934,6 +1100,9 @@ class ExternalTools:
                 except Exception:
                     pass
             self._persist_deep_records(paper_id, recs, replace=False)
+            # 探索闭环：L1 记录回流谱系（外部延续边——后续 lineage_walk
+            # 能到达这篇论文）
+            self._backflow_deep_records(paper_id, recs)
             ExternalTools._DEEP_READ_DONE.add(paper_id)
             # ⑦ L2 异步后台：剩余 chunk 增量补齐（缓存命中跳过）+ absence
             n_rest = len(chunks_all) - len(sel)
@@ -1029,6 +1198,7 @@ def attach_external_tools(kb, views: dict, kb_manifest: dict,
     kb.lineage_walk_ext = ext.lineage_walk
     kb.citation_graph = ext.citation_graph
     kb.extract_paper = ext.extract_paper
+    kb.admit_paper = ext.admit_paper
     kb.deep_read = ext.deep_read
     kb._ext_tools = ext   # harness run_question 钩子：注入当前题目
     # whitelist/catalog extension (runtime, fork-side; frozen home untouched)
@@ -1036,13 +1206,15 @@ def attach_external_tools(kb, views: dict, kb_manifest: dict,
         from evidence_b2_tools import TOOL_WHITELIST, TOOL_SIGS
         TOOL_WHITELIST.update({"search_papers", "gap_search",
                                "lineage_walk_ext", "citation_graph",
-                               "extract_paper", "deep_read"})
+                               "extract_paper", "admit_paper",
+                               "deep_read"})
         TOOL_SIGS.update({
             "search_papers": "(query,k?)",
             "gap_search": "(query)",
             "lineage_walk_ext": "(entity,direction?)",
             "citation_graph": "(doi?,title?,direction?)",
             "extract_paper": "(title,abstract)",
+            "admit_paper": "(title?,doi?)",
             "deep_read": "(paper_id,sections?)",
         })
     except Exception:
