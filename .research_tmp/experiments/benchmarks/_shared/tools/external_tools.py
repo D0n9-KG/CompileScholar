@@ -572,34 +572,102 @@ class ExternalTools:
 
     @staticmethod
     def _chunk_tokens(s: str) -> set:
+        """词元集（连字符拆分）。批10 复盘：'clock-steering' 作单 token
+        会让查询 'clock steering'（两 token）零交集——标题连字符形态的
+        节恰好是 rubric 要的节。拆分后两形态互通（通用修复非题特调）。"""
         import re as _re
-        return {t for t in _re.findall(r"[a-z][a-z0-9\-]{2,}", (s or "").lower())}
+        toks = set()
+        for t in _re.findall(r"[a-z][a-z0-9\-]{2,}", (s or "").lower()):
+            toks.add(t)
+            toks.update(p for p in t.split("-") if len(p) >= 3)
+        return toks
+
+    # ---- 语义匹配层（2026-09-28 用户裁定：词法不够上语义） ----
+    # 词法（连字符拆分 token 重叠）解决"拼法不同"；语义（本地 embedding
+    # 余弦）解决"同义不同词"——"experimental setup" vs "CONTINUED
+    # PRE-TRAINING AND EVALUATION" 词法永远零交集。混合评分=两条任一
+    # 过阈值即命中；embedding 服务不可用时降级纯词法（不阻塞）。
+    _SEM_TH = 0.50   # 查询↔节头余弦阈值。实测：同义对 0.50-0.57，
+    # 无关对 0.38-0.48——分离度薄，取 0.50 召回优先（漏抽=ingredient
+    # 丢失；误抽=多付一个 chunk 约 1 分钟）
+
+    def _sem_embed(self, texts: list) -> list | None:
+        """本地 embedding（一次批量调用）。失败返回 None——调用方降级。"""
+        try:
+            from kb_infra.embedding import embed_local
+            return embed_local(texts, batch_size=32)
+        except Exception:
+            return None
+
+    def _sem_section_scores(self, chunks: list, queries: list) -> dict | None:
+        """{chunk_id: max_i cos(节头_i, 查询)}。节头=节标题+前 200 字符
+        （节标题太短语义信息不足，纯标题会被通用查询推平）。"""
+        heads = [((ch.get("section") or "") + " "
+                  + (ch.get("text") or "")[:200]).strip() for ch in chunks]
+        vecs = self._sem_embed(heads + list(queries))
+        if not vecs or len(vecs) != len(heads) + len(queries):
+            return None
+        import math as _math
+        def _cos(a, b):
+            dot = sum(x * y for x, y in zip(a, b))
+            na = _math.sqrt(sum(x * x for x in a))
+            nb = _math.sqrt(sum(x * x for x in b))
+            return dot / (na * nb) if na and nb else 0.0
+        n = len(heads)
+        out = {}
+        for ci, ch in enumerate(chunks):
+            out[ch["chunk_id"]] = max(
+                _cos(vecs[ci], vecs[n + qi]) for qi in range(len(queries)))
+        return out
 
     def _select_l1_chunks(self, chunks: list, sections, question):
-        """Agent 指定 sections 优先（节名/关键词匹配）；缺省=题目 token
-        重叠度最高的前 3 chunks；无信号=结果/配置富集节优先（ingredient
-        类问题的主力记录类型）。返回 (selected, mode, note)。"""
+        """Agent 指定 sections 优先（词法+语义混合匹配）；缺省=题目相关
+        度最高的前 3 chunks（词法重叠+语义余弦合流）；无信号=结果/配置
+        富集节优先。返回 (selected, mode, note)。"""
         import re as _re
+        sem = None   # lazy：只在词法未全覆盖时才算（一次 embed 批量调用）
         if sections:
             if isinstance(sections, str):   # 模型传了单个字符串——包成列表
                 sections = [sections]
             want = [str(s).lower().strip() for s in sections if s and str(s).strip()]
             sel = []
-            for ch in chunks:
-                title = (ch.get("section") or "").lower()
-                head = title + " " + (ch.get("text") or "")[:300].lower()
-                thead = self._chunk_tokens(head)
-                for w in want:
+            miss = []
+            for w in want:
+                hit = None
+                for ch in chunks:
+                    title = (ch.get("section") or "").lower()
+                    head = title + " " + (ch.get("text") or "")[:300].lower()
+                    thead = self._chunk_tokens(head)
                     wtoks = self._chunk_tokens(w)
                     if (w in head
                             or (wtoks and thead
                                 and len(wtoks & thead) / len(wtoks) >= 0.6)):
-                        sel.append(ch)
+                        hit = ch
                         break
-            if len(sel) > 5:   # 关键词过泛（如 "results"）：按出现序截断
-                sel = sel[:5]
-            if sel:
-                return sel, "sections", None
+                if hit is not None:
+                    sel.append(hit)
+                else:
+                    miss.append(w)
+            if miss:
+                # 词法未命中的关键词走语义（同义节名；词法的结构性盲区）
+                sem = self._sem_section_scores(chunks, miss)
+                if sem:
+                    for w in miss:
+                        ranked = sorted(
+                            ((sem.get(ch["chunk_id"], 0.0), ch) for ch in chunks),
+                            key=lambda x: -x[0])
+                        if ranked and ranked[0][0] >= ExternalTools._SEM_TH:
+                            sel.append(ranked[0][1])
+            # 去重保序 + 泛词截断
+            seen, sel2 = set(), []
+            for ch in sel:
+                if ch["chunk_id"] not in seen:
+                    seen.add(ch["chunk_id"])
+                    sel2.append(ch)
+            if len(sel2) > 5:   # 关键词过泛（如 "results"）：按出现序截断
+                sel2 = sel2[:5]
+            if sel2:
+                return sel2, "sections", None
             # 指定节名全部未命中——降级到默认选择，并在 note 里给出可用节
             # 名清单让模型重试（不裸失败）
             avail = list(dict.fromkeys(
@@ -619,6 +687,15 @@ class ExternalTools:
                 scored.append((score, ch))
             scored.sort(key=lambda x: -x[0])
             top = [ch for s, ch in scored[:3] if s > 0]
+            if not top:
+                # 词法零命中（题目与节面措辞完全脱节）——语义兜底
+                sem = self._sem_section_scores(chunks, [question])
+                if sem:
+                    ranked = sorted(
+                        ((sem.get(ch["chunk_id"], 0.0), ch) for ch in chunks),
+                        key=lambda x: -x[0])
+                    top = [ch for s, ch in ranked[:3]
+                           if s >= ExternalTools._SEM_TH]
             if top:
                 return top, "question-top3", None
         # 无题目信号 / 全零：结果与配置富集节优先（ingredient 主力）
