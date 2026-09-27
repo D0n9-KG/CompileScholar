@@ -335,7 +335,7 @@ Explore with these BEFORE falling back to blind search_papers. External papers a
 16. search_papers(query, k?) EXTERNAL literature search over the whole world's papers — semantic channel leads, returns title+year+doi+abstract. The blind fallback when the structured leads above do not apply
 17. admit_paper(title?, doi?) register an external paper into the library: resolves a full-text source and returns its paper_id — after which deep_read(paper_id=...) works on it. Run this on the 1-3 external papers most core to the question (from any exploration tool's results)
 18. extract_paper(title, abstract) Tier-1 coarse extraction: digest ONE external paper's abstract into structured records (method/finding/limitation). Cheaper than deep_read when the abstract alone suffices
-19. deep_read(paper_id, sections?) L1 DIRECTED deep upgrade (~3 min): fetches the paper's FULL TEXT (corpus or admitted) and deep-extracts the 2-3 sections most relevant to the question (result/config/finding records at full-text level), then query them via findings(paper_id=...). Pass sections=["ablation", "experimental setup", ...] to read specific sections; omit for automatic question-relevant selection. Remaining sections extract in the background (free for later questions). USE IT when you have found the right paper but its coarse records are too shallow to answer with (no numbers, no mechanisms, no experimental detail) — do NOT abstain, deep_read the 1-3 most relevant papers instead"""
+19. deep_read(paper_id, sections?) L1 DIRECTED deep upgrade (~3 min): fetches the paper's FULL TEXT (corpus or admitted) and deep-extracts the 2-3 sections most relevant to the question (result/config/finding records at full-text level), then query them via findings(paper_id=...). Pass sections=["ablation", "experimental setup", ...] to read specific sections; omit for automatic question-relevant selection. Remaining sections extract in the background (free for later questions). USE IT when you have found the right paper AND the answer needs SPECIFIC depth — concrete numbers, mechanisms, experimental setups, named case studies. IMPORTANT: coarse (abstract-level) records are NEVER deep enough for these, even when they return plenty of results — abstract-level findings state THAT something works, full-text records explain HOW with what values. When a paper is central to the question, deep_read it instead of stacking more coarse findings; do NOT abstain"""
 _OPEN_SET = os.environ.get("KB_OPEN_SET", "0") == "1"
 MAIN_SYSTEM = MAIN_SYSTEM.replace("{ext_catalog}",
                                    EXT_CATALOG if _OPEN_SET else "")
@@ -788,12 +788,29 @@ def auto_transcribe(res, obs_text, notes_blob, auto_rows, question, step, tool, 
                 # Prose claims (no value) stay the model's transcription job
                 # (F25 nudge guards them); duplicating label-as-value wasted
                 # cap space (gate-0 finding) and crowded out ranking rows.
-                if row.get("value") in (None, ""):
+                if row.get("value") not in (None, ""):
+                    lab = row.get("item") or row.get("claim") or row.get("metric") or sec
+                    _push(row.get("record_id") or row.get("id"),
+                          pid_ctx or row.get("paper") or row.get("paper_id"),
+                          lab, row.get("value"), row.get("epistemic"), None, "")
                     continue
-                lab = row.get("item") or row.get("claim") or row.get("metric") or sec
-                _push(row.get("record_id") or row.get("id"),
-                      pid_ctx or row.get("paper") or row.get("paper_id"),
-                      lab, row.get("value"), row.get("epistemic"), None, "")
+                # P0-2（REPAIR-WAVE-0928）：findings 的 claim 文本里挖数值
+                # （record 无 value 字段≠无数值——深抽记录的数值藏在 claim/
+                # quote 措辞里："achieves 94.6% accuracy"。regex 提取数值
+                # 短语作为 value，label=claim 前缀。A-block 三来源里
+                # findings 是模型最高频调用，此前天然零命中）
+                claim_txt = str(row.get("claim") or "")
+                for mm in re.finditer(
+                        r"([a-zA-Z][a-zA-Z0-9 \-]{2,30}?)\s+((?:\d+\.\d+%"
+                        r"|\d+%|\d+\.\d+(?![\w])|\b\d{2,4}\b(?![\w\-])))",
+                        claim_txt):
+                    val = mm.group(2)
+                    labv = (mm.group(1).strip() or claim_txt[:36])[:36]
+                    if re.search(r"\d", val):
+                        _push(row.get("record_id") or row.get("id"),
+                              pid_ctx or row.get("paper_id"),
+                              labv, val, row.get("epistemic"), None, "")
+                        break   # 每条 claim 最多贡献一个数值（防灌水）
         stats["_a_seq"] = seq0 + len(cands)
         # entity-diverse selection (frozen policy): first pass guarantees
         # <=1 line per entity in (rank desc, seq asc) order — same-entity
@@ -1737,6 +1754,22 @@ def run_question(q, arm, kb, tkb, grounding, glog):
                     if _sz < len(kept):
                         gate_info["notes_truncated"] = \
                             gate_info.get("notes_truncated", 0) + (len(kept) - _sz)
+                        # P0-4（REPAIR-WAVE-0928）：裁剪对模型可见——注入
+                        # 下一步 obs 的系统提示（被剪规模+被剪主题摘要），
+                        # 模型可主动整理而非静默丢失证据（批13 剪 9489 字
+                        # /批全静默=回退第二根因）
+                        _dropped = [l for _t, l in _prio if l not in set(_out)]
+                        _subj = "; ".join(
+                            (re.findall(r"\[([A-Za-z0-9_:\-#\.]{8,})\]", d)
+                             or [d.strip()[:30] for d in _dropped[:2]])
+                            [:3] for d in _dropped[:3])
+                        pending_sys = (pending_sys + "\n" if pending_sys else "") + (
+                            f"[SYSTEM] Notes over budget: {len(kept)-_sz} chars "
+                            "were trimmed (oldest/lowest-priority lines first, "
+                            f"involving: {_subj[:150]}). If any of that "
+                            "evidence is still needed, re-query it now; "
+                            "otherwise PRUNE superseded lines yourself so "
+                            "truncation does not choose for you.")
                         kept = "\n".join(_out)
                 notes = kept
         if st["gaps"]:
@@ -1924,16 +1957,22 @@ def run_question(q, arm, kb, tkb, grounding, glog):
                     res = compact("search", res)
                 elif tool == "search_text":
                     # 批1实测（09-28）：同主题查询重复 39 次（模型换措辞
-                    # 反复搜）。查询族饱和反馈：主题 token 集合已搜过 3 次
-                    # 以上→返回饱和提示而非新结果，强迫转向笔记整理。
+                    # 反复搜）。查询族饱和反馈：主题 token 集合已搜过多次
+                    # →返回饱和提示而非新结果，强迫转向笔记整理。
+                    # P1-8（REPAIR-WAVE-0928）：3→5 次且新实体词豁免——
+                    # 批12 实测误杀一半合法查询（ontology 题 6 条不同
+                    # 措辞全被拦；换措辞含新实体词=实质新角度，不该拦）。
                     _q = str(args.get("query", q["question"]))[:300]
                     _qtoks = frozenset(t for t in re.findall(
                         r"[a-z]{4,}", _q.lower()))
+                    _prev_all = set().union(*_SEARCH_FAMILY) if _SEARCH_FAMILY else set()
+                    _new_toks = _qtoks - _prev_all
                     if _qtoks:
                         _fam_hits = sum(1 for _prev in _SEARCH_FAMILY
                                         if len(_qtoks & _prev) >=
                                         max(2, len(_qtoks) // 3))
-                        if _fam_hits >= 3:
+                        if _fam_hits >= 5 or (_fam_hits >= 3
+                                               and not _new_toks):
                             res = {"tool": "search_text", "n": 0,
                                    "saturation": True,
                                    "note": ("this topic has already been "
@@ -2088,6 +2127,23 @@ def run_question(q, arm, kb, tkb, grounding, glog):
                          "intent": str(act.get("intent", ""))[:120],
                          "obs_chars": len(obs_text), "notes_chars": len(notes)})
         obs = "\n---\n".join(obs_parts)
+        # P2-9（REPAIR-WAVE-0928）：首步脆弱性护栏——前 3 步全部零命中
+        # 时定向教学（审计实证：首步词面赌错穿透所有放弃护栏，批13 DSL
+        # 题 3 步弃答）。词面零命中≠库内无内容，教正确的恢复路径。
+        if steps < 3 and obs_parts and not step_error:
+            _any_hit = any(
+                isinstance(json.loads(p) if p.startswith("{") else {}, dict)
+                and (json.loads(p).get("n") or 0) > 0
+                for p in obs_parts if p.startswith("{"))
+            if not _any_hit:
+                obs += ("\n[SYSTEM] Early zero-hit guidance: your first "
+                        "queries returned nothing. This is usually WORDING, "
+                        "not absence — records rarely echo the question's "
+                        "words. Recovery: (1) findings with 2-3 SYNONYM "
+                        "phrasings joined by | , (2) entities(contains=...) "
+                        "to find the actual entity names in this domain, "
+                        "(3) search_text for raw-text phrasing. Do NOT "
+                        "conclude the corpus lacks the answer yet.")
         if typed_empty_streak >= 3 and not a7_nudged:
             a7_nudged = True
             obs += ("\n[SYSTEM] Structured records return nothing for this "

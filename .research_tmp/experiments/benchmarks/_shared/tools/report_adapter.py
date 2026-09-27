@@ -86,8 +86,24 @@ def parse_notes(notes_text: str) -> list[dict]:
         refs = _BACKREF.findall(body)
         # 去掉行首回指标记得到纯主张文本
         text = _BACKREF.sub(" ", body, count=len(refs))
-        # 去掉尾部属性标注（| epistemic:... / | 锚点:... / | 条件:...）
+        # P1-5（REPAIR-WAVE-0928）：尾部属性拆解不再丢弃 anchor 内容——
+        # '| anchor:"verbatim"' 是笔记门规范要求的高质量逐字证据（批
+        # 1-13 实证 81 行被 split("|")[0] 整段剥掉，每题丢 0-6 个数值）。
+        # anchor 文本并入 claim text（数值进主张）；其他属性（epistemic/
+        # 条件）仍是纯标注，剥除。
+        tail = text.split("|", 1)[1] if "|" in text else ""
         text = text.split("|")[0].strip()
+        m_anchor = re.search(r'anchor\s*:\s*"([^"]+)"', tail)
+        if m_anchor:
+            anchor_txt = m_anchor.group(1).strip()
+            # 数值/公式只在 anchor 里有而 claim 文本没有时并入（去重）
+            _nums_a = set(re.findall(r"\d+\.?\d*", anchor_txt))
+            _nums_t = set(re.findall(r"\d+\.?\d*", text))
+            if (_nums_a - _nums_t) or not text:
+                text = (text + " " if text else "") + \
+                    (f'("{anchor_txt[:180]}"' +
+                     (")" if anchor_txt.endswith('"') or '"' not in anchor_txt
+                      else '\")'))
         claims.append({
             "text": text,
             "refs": refs,
@@ -320,6 +336,14 @@ def assemble(draft: dict, claims: list[dict], store: EvidenceStore) -> tuple[dic
                 snippets.append(q)
             if e.get("loc"):
                 locs.append(e["loc"])
+        # P1-7（REPAIR-WAVE-0928）：snippet 上限 3 条——官方 citation
+        # 判分把全部 snippets 拼一段喂 judge 做 entailment，中位 7 条
+        # （最大 11）的无关 snippet 稀释支撑信号。保留前 3（主张关联度
+        # 顺序=装配时的证据顺序）。
+        if len(snippets) > 3:
+            diag["snippets_capped"] = diag.get("snippets_capped", 0) + \
+                (len(snippets) - 3)
+            snippets = snippets[:3]
         meta = dict(evs[0]["meta"])
         if locs:
             meta["evidence_loc"] = locs
@@ -354,6 +378,9 @@ def assemble(draft: dict, claims: list[dict], store: EvidenceStore) -> tuple[dic
         return final_ids
 
     # 2) 替换 [Ck]（含 [C5, C7] 复合）→ 引用串；收集每节引用条目
+    # P1-6（REPAIR-WAVE-0928）：orphan 标记所在句整句删除——批12 实证
+    # 19 个 orphan 句被保留为无引用主张句（precision/ingredient 双损）。
+    # 无证据链的句子宁可不要（句子边界=最近的 [.!?] 切分）。
     sections_out = []
     for sec in draft["sections"]:
         text = sec.get("text") or ""
@@ -366,8 +393,22 @@ def assemble(draft: dict, claims: list[dict], store: EvidenceStore) -> tuple[dic
                     if i not in ids:  # 相邻同号去重（[1] [1] → [1]）
                         ids.append(i)
             if not ids:
-                text = text[:m.start()] + text[m.end():]
+                # 删除 orphan 标记所在的整句（句边界搜索）
+                _s = text.rfind(".", 0, m.start())
+                _s2 = text.rfind("!", 0, m.start())
+                _s3 = text.rfind("?", 0, m.start())
+                _s = max(_s, _s2, _s3)
+                _e = text.find(".", m.end())
+                _e2 = text.find("!", m.end())
+                _e3 = text.find("?", m.end())
+                _e = min(x for x in (_e, _e2, _e3) if x != -1) \
+                    if any(x != -1 for x in (_e, _e2, _e3)) else len(text)
+                _s = _s + 1 if _s != -1 else 0
+                _e = _e + 1 if _e < len(text) else len(text)
+                text = text[:_s] + text[_e:]
                 diag["orphan_markers"] = diag.get("orphan_markers", 0) + 1
+                diag["orphan_sentences_dropped"] = \
+                    diag.get("orphan_sentences_dropped", 0) + 1
                 continue
             text = text[:m.start()] + " ".join(ids) + text[m.end():]
             for i in ids:
