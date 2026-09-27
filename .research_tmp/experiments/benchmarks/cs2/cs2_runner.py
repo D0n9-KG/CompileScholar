@@ -43,6 +43,12 @@ os.environ.setdefault("LOCAL_MAX_CONCURRENT", "10")
 os.environ.setdefault("LOCAL_LARGE_MAX_CONCURRENT", "6")
 os.environ.setdefault("KB_EMBED_PROVIDER", "local")
 os.environ.setdefault("KB_OPEN_SET", "1")  # CS2 = open-world by design
+# search_text 断口修复（批11拦截）：harness 在模块导入时就把
+# PS53_TEXT_INDEX 读进 _TEXT_INDEX_DIR（默认=已不存在的 archive 路径），
+# multi_ours_run 的 setdefault 在答题期才执行=太晚。必须在 import
+# evidence_gate2r_harness 之前设好。全部 CS2 批次的 search_text 192
+# 字符错误 obs 根因即此（模型笔记"search_text errored (infra)"）。
+os.environ.setdefault("PS53_TEXT_INDEX", os.path.join(ARM, "text_index"))
 
 import evidence_gate2r_harness as _HF  # noqa: E402
 sys.modules["evidence_pilot_a1r2_harness"] = _HF
