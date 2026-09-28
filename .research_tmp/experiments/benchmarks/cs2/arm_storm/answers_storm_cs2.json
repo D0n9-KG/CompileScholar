@@ -1,0 +1,544 @@
+[
+ {
+  "qid": "2bb40aa93ac3a6a673c839bd",
+  "question": "Have specialized approaches been developed for providing LLM assistance when people author SQL queries?",
+  "article_path": "C:\\Users\\D0n9\\Desktop\\CompileScholar\\.research_tmp\\experiments\\benchmarks\\cs2\\arm_storm\\2bb40aa93ac3a6a673c839bd\\Have_specialized_approaches_been_developed_for_providing_LLM_assistance_when_peo\\storm_gen_article_polished.txt",
+  "sections": [
+   {
+    "title": "Specialized Approaches for LLM Assistance in Sensitive and High-Stakes Contexts",
+    "text": "\nThe deployment of Large Language Models (LLMs) in high-risk domains such as healthcare, finance, and law has necessitated the development of specialized approaches to ensure safety, compliance, and reliability. As these models are increasingly integrated into critical workflows, researchers and developers have focused on mitigating unique risks, including hallucination, privacy breaches, and ethical violations, through targeted architectural and methodological innovations.\n",
+    "citations": []
+   },
+   {
+    "title": "Domain-Specific Safety and Compliance Frameworks",
+    "text": "\nA primary area of focus is the alignment of LLM outputs with professional ethical standards. To address the gap in evaluating domain-specific safety, researchers have defined safety principles based on established codes of conduct, such as the AMA Principles of Medical Ethics, the ABA Model Rules of Professional Conduct, and the CFA Institute Code of Ethics [1]. Building on these principles, benchmarks like Trident-Bench have been introduced to systematically evaluate LLM safety in legal, financial, and medical contexts [1]. Evaluations using such benchmarks have revealed that even strong generalist models, such as GPT and Gemini, exhibit significant safety gaps when applied to these specialized domains [1].\nIn the medical field, the risk of \"hallucination\"—where models generate fabricated information—poses a direct threat to patient safety, particularly in areas like drug safety [2]. To mitigate this, proof-of-concept guardrail suites have been developed to detect anomalous documents, identify incorrect drug names or adverse event terms, and explicitly convey uncertainty in generated content [2]. These mechanisms are designed to prevent the ingestion of inappropriate data and reduce the likelihood of harmful inaccuracies in clinical settings [2].\n",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "As large language models (LLMs) are increasingly deployed in high-risk domains such as law, finance, and medicine, systematically evaluating their domain-specific safety and compliance becomes critical. While prior work has largely focused on improving LLM performance in these domains, it has often neglected the evaluation of domain-specific safety risks. To bridge this gap, we first define domain"
+      ],
+      "title": "trident: benchmarking llm safety in finance, medicine, and law",
+      "metadata": {
+       "url": "sciverse://trident-benchmarking-llm-safety-in-finance-medicine-and-law"
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "Large language models (LLMs) are useful tools with the capacity for performing specific types of knowledge work at an effective scale. However, LLM deployments in high-risk and safety-critical domains pose unique challenges, notably the issue of ``hallucination,'' where LLMs can generate fabricated information. This is particularly concerning in settings such as drug safety, where inaccuracies cou"
+      ],
+      "title": "the need for guardrails with large language models in medical safety-critical settings: an artificial intelligence application in the pharmacovigilance ecosystem",
+      "metadata": {
+       "url": "sciverse://the-need-for-guardrails-with-large-language-models-in-medica"
+      }
+     }
+    ]
+   },
+   {
+    "title": "Advanced Alignment and Control Mechanisms",
+    "text": "\nBeyond external guardrails, internal model alignment techniques are being refined to balance safety with utility. LATENTGUARD is a three-stage framework that combines behavioral alignment with supervised latent space control to achieve interpretable and precise safety steering [1]. This approach involves fine-tuning LLMs on rationalized datasets that include reasoning-enhanced refusal responses to adversarial prompts and normal responses to benign queries, thereby establishing robust behavioral priors [1]. Additionally, a structured variational autoencoder (VAE) is trained on intermediate MLP activations, supervised by multi-label annotations of attack types, to provide fine-grained controllability at the representation level [1].\n",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Achieving robust safety alignment in large language models (LLMs) while preserving their utility remains a fundamental challenge. Existing approaches often struggle to balance comprehensive safety with fine-grained controllability at the representation level. We introduce LATENTGUARD, a novel three-stage framework that combines behavioral alignment with supervised latent space control for interpre"
+      ],
+      "title": "latentguard: controllable latent steering for robust refusal of attacks and reliable response generation",
+      "metadata": {
+       "url": "sciverse://latentguard-controllable-latent-steering-for-robust-refusal-"
+      }
+     }
+    ]
+   },
+   {
+    "title": "Retrieval-Augmented Generation and Data Integrity",
+    "text": "\nTo enhance the accuracy and trustworthiness of LLMs in processing healthcare documents and scientific papers, Retrieval Augmented Generation (RAG) has emerged as a promising method [1]. RAG leverages external knowledge sources to ground model outputs, thereby reducing hallucinations and improving the synthesis of complex information [1]. Tools such as RAGEv (Retrieval Augmented Generation Evaluation) have been developed to assess the potentials and shortcomings of these approaches in the health domain, providing a pipeline for safe and trustable analysis of medical literature [1].\nHowever, the effectiveness of these models is heavily dependent on the quality and fairness of their training corpora. A systematic review of LLMs in healthcare identified that while common construction techniques include pre-training, prompt engineering, and RAG, critical gaps remain in corpus fairness [2]. Biases stemming from geographic, cultural, and socio-economic factors, as well as the reliance on unverified or unstructured data, highlight the need for better integration of evidence-based resources to ensure equitable and accurate assistance [2].\n",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Safe and trustworthy use of Large Language Models (LLM) in the processing of healthcare documents and scientific papers could substantially help clinicians, scientists and policymakers in overcoming information overload and focusing on the most relevant information at a given moment. Retrieval Augmented Generation (RAG) is a promising method to leverage the potential of LLMs while enhancing the ac"
+      ],
+      "title": "retrieval augmented generation evaluation for health documents",
+      "metadata": {
+       "url": "sciverse://retrieval-augmented-generation-evaluation-for-health-documen"
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "This study reviewed the use of Large Language Models (LLMs) in healthcare, focusing on their training corpora, customization techniques, and evaluation metrics. A systematic search of studies from 2021 to 2024 identified 61 articles. Four types of corpora were used: clinical resources, literature, open-source datasets, and web-crawled data. Common construction techniques included pre-training, pro"
+      ],
+      "title": "exploring large language models in healthcare: insights into corpora sources, customization strategies, and evaluation metrics",
+      "metadata": {
+       "url": "sciverse://exploring-large-language-models-in-healthcare-insights-into-"
+      }
+     }
+    ]
+   },
+   {
+    "title": "Privacy, Accessibility, and User-Centric Design",
+    "text": "\nSpecialized approaches also address the privacy and accessibility needs of users interacting with LLM-based conversational agents. In the context of privacy, the concept of \"contextual privacy\" has been characterized to minimize risks by ensuring users disclose only information that is relevant and necessary for their goals [1]. Studies have shown that even privacy-conscious users may inadvertently reveal sensitive information through indirect disclosures, leading to the proposal of locally deployable frameworks that operate between users and untrusted receivers to protect data [1].\nFurthermore, the integration of LLMs into interactive systems has driven the development of model-driven architectures for generating personalized, multimodal, and accessibility-aligned user interfaces [2]. These systems combine structured user profiles and declarative adaptation rules to refine baseline templates that conform to standards such as WCAG 2.2 and EN 301 549 [2]. By dynamically transforming language complexity, modality, and visual structure, LLMs can produce outputs like Plain-Language text and high-contrast layouts tailored to specific cognitive and sensory support needs, as demonstrated in healthcare use cases [2].\n",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Conversational agents are increasingly woven into individuals' personal lives, yet users often underestimate the privacy risks associated with them. The moment users share information with these agents-such as large language models (LLMs)-their private information becomes vulnerable to exposure. In this paper, we characterize the notion of contextual privacy for user interactions with LLM-based Co"
+      ],
+      "title": "protecting users from themselves: safeguarding contextual privacy in interactions with conversational agents",
+      "metadata": {
+       "url": "sciverse://protecting-users-from-themselves-safeguarding-contextual-pri"
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "The integration of Large Language Models (LLMs) into interactive systems opens new opportunities for adaptive user experiences, yet it also raises challenges regarding accessibility, explainability, and normative compliance. This paper presents an implemented model-driven architecture for generating personalised, multimodal, and accessibility-aligned user interfaces. The approach combines structur"
+      ],
+      "title": "llm-driven accessible interface: a model-based approach",
+      "metadata": {
+       "url": "sciverse://llm-driven-accessible-interface-a-model-based-approach"
+      }
+     }
+    ]
+   },
+   {
+    "title": "Specialized Architectures and Collaborative Intelligence",
+    "text": "\nThe evolution of specialized LLMs has transitioned from simple domain adaptation to sophisticated native architectures, marking a paradigm shift in AI development [1]. This progression is evident across healthcare, finance, legal, and technical domains, where innovations such as domain-native designs, sparse computation, and multimodal integration address the fundamental limitations of general-purpose models [1]. Additionally, frameworks like Multi-LLM Agent Collaborative Intelligence (MACI) propose coordinating multiple LLMs to achieve reasoning and planning capabilities that surpass those of any single model, potentially addressing critiques regarding the lack of grounding and memory in individual LLMs [2].\nThese specialized approaches collectively aim to make LLMs safer, more accurate, and more accessible, ensuring that their deployment in sensitive contexts meets the rigorous standards required for professional and personal use.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "The rapid evolution of specialized large language models (LLMs) has transitioned from simple domain adaptation to sophisticated native architectures, marking a paradigm shift in AI development. This survey systematically examines this progression across healthcare, finance, legal, and technical domains. Besides the wide use of specialized LLMs, technical breakthrough such as the emergence of domai"
+      ],
+      "title": "survey of specialized large language model",
+      "metadata": {
+       "url": "sciverse://survey-of-specialized-large-language-model"
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "This booklet, Unlocking the Wisdom of Multi-LLM Collaborative Intelligence, serves as an accessible introduction to the full volume The Path to Artificial General Intelligence. Through fourteen aphorisms, it distills the core principles of Multi-LLM Agent Collaborative Intelligence (MACI), a framework designed to coordinate multiple LLMs toward reasoning, planning, and decision-making that surpass"
+      ],
+      "title": "unlocking the wisdom of large language models: an introduction to the path to artificial general intelligence",
+      "metadata": {
+       "url": "sciverse://unlocking-the-wisdom-of-large-language-models-an-introductio"
+      }
+     }
+    ]
+   }
+  ],
+  "article_chars": 9121
+ },
+ {
+  "qid": "3d1ff2a80239a37908a6f4c4",
+  "question": "How are user demonstrations represented in domain-specific-language programs and used for automation tasks?",
+  "article_path": "C:\\Users\\D0n9\\Desktop\\CompileScholar\\.research_tmp\\experiments\\benchmarks\\cs2\\arm_storm\\3d1ff2a80239a37908a6f4c4\\How_are_user_demonstrations_represented_in_domain-specific-language_programs_and\\storm_gen_article_polished.txt",
+  "sections": [
+   {
+    "title": "Representation of User Demonstrations in Domain-Specific Language Programs",
+    "text": "\nThe representation of user demonstrations in domain-specific language (DSL) programs is a critical component in bridging the gap between human intent and executable robotic control. A primary approach involves the automatic generation of executable robot control programs directly from human task demonstrations, often captured in virtual reality (VR) environments. In such systems, the raw demonstration data is not merely stored as a sequence of movements but is semantically interpreted using common-sense knowledge and game engine-based physics. This interpretation allows the system to map human actions to an expressive and general task representation, which is then embedded into a state-of-the-art cognitive architecture to facilitate automatic path planning and code generation.[1]\nTo ensure the robustness and safety of these generated programs, particularly when dealing with physical interactions, specific control strategies are employed to represent the dynamics of the demonstrations. For instance, when learning variable impedance characteristics from multiple sets of demonstration trajectories, the data is first aligned on the time axis using Dynamic Time Warping. Subsequently, statistical methods such as Gaussian Mixture Regression are used to calculate variance, which is then represented as variable impedance characteristics using an improved Softplus function. This method allows the robotic arm to adapt its control policy to different joints, ensuring that the generated program accounts for the variability inherent in human demonstrations.[2]\nFurthermore, the representation of user input extends beyond simple kinematic tracking to include physiological and cognitive states. In systems utilizing consumer-grade sensors, such as armbands that capture orientation and muscle activity, machine learning classifiers are trained directly on the user to recognize the physiological state expressed by body motion. This approach compensates for the lower quality of sensor data by mapping dynamic control inputs to a state machine, thereby representing the user's demonstration as a sequence of recognized physiological states rather than raw sensor values.[3]\nIn the context of broader user modeling, deep learning methods, particularly those in Natural Language Processing (NLP), are increasingly used to learn rich and versatile representations of users. These methods focus on learning latent representations from heterogeneous data, which can be applied to interpret user interactions and intents more effectively. By leveraging the power of representation learning, systems can capture complex user behaviors and translate them into structured data that supports the generation of domain-specific programs.[4] Additionally, the analysis of user intent can be refined by examining the commonality of retrieved relevant documents or interactions, a technique that, while rooted in information retrieval, offers insights into how user goals can be modeled and represented to improve the effectiveness of automated systems.[5]",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "<jats:p>Aging societies, labor shortages and increasing wage costs call for assistance robots capable of autonomously performing a wide array of real-world tasks. Such open-ended robotic manipulation requires not only powerful knowledge representations and reasoning (KR&amp;R) algorithms, but also methods for humans to instruct robots what tasks to perform and how to perform them. In this paper, w"
+      ],
+      "title": "Knowledge-Driven Robot Program Synthesis from Human VR Demonstrations",
+      "metadata": {
+       "url": "https://doi.org/10.24963/kr.2023/4"
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "<jats:p>The purpose of this study was to ensure the compliance and safety of a robot’s movements during interactions with the external environment. This paper proposes a control strategy for learning variable impedance characteristics from multiple sets of demonstration trajectories. This strategy can adapt to the control of different joints by adjusting the parameters of the variable impedance co"
+      ],
+      "title": "Robot Variable Impedance Control and Generalizing from Human–Robot Interaction Demonstrations",
+      "metadata": {
+       "url": "https://doi.org/10.3390/math12233840"
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "<jats:p>In recent years, researchers have explored human body posture and motion to control robots in more natural ways. These interfaces require the ability to track the body movements of the user in three dimensions. Deploying motion capture systems for tracking tends to be costly and intrusive and requires a clear line of sight, making them ill adapted for applications that need fast deployment"
+      ],
+      "title": "Engaging with Robotic Swarms",
+      "metadata": {
+       "url": "https://doi.org/10.1145/3323213"
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "<jats:title>Traitement du langage naturel profond pour la modélisation d’utilisateurs</jats:title>\n                <jats:p xml:lang=\"fr\">La dernière décennie a vu s’imposer le développement des méthodes de Deep Learning (DL), aussi bien dans le monde académique qu’industriel. Ce succès peut s’expliquer par la capacité du DL à modéliser des entités toujours plus complexes. En particulier, les métho"
+      ],
+      "title": "Deep Natural Language Processing for User Representation",
+      "metadata": {
+       "url": "https://doi.org/10.70675/f1d99786zd4d3z4d46z9b86z5de95a2b3290"
+      }
+     },
+     {
+      "id": "[5]",
+      "snippets": [
+       "<jats:p>In this chapter, we study and present our results on the problem of employing a cognitive user model for Information Retrieval (IR) in which a user’s intent is captured and used for improving his/her effectiveness in an information seeking task. The user intent is captured by analyzing the commonality of the retrieved relevant documents. The effectiveness of our user model is evaluated wit"
+      ],
+      "title": "Modeling Users for Adaptive Information Retrieval by Capturing User Intent",
+      "metadata": {
+       "url": "https://doi.org/10.4018/978-1-60566-306-7.ch005"
+      }
+     }
+    ]
+   }
+  ],
+  "article_chars": 5960
+ },
+ {
+  "qid": "00bdd80debc8549198001289",
+  "question": "How can I use an hybridization of ontology and machine learning for text summarization ?",
+  "article_path": "C:\\Users\\D0n9\\Desktop\\CompileScholar\\.research_tmp\\experiments\\benchmarks\\cs2\\arm_storm\\00bdd80debc8549198001289\\How_can_I_use_an_hybridization_of_ontology_and_machine_learning_for_text_summari\\storm_gen_article_polished.txt",
+  "sections": [
+   {
+    "title": "Hybrid Ontology and Machine Learning for Text Summarization",
+    "text": "\nThe integration of ontology-based knowledge representation with machine learning techniques has emerged as a significant approach to enhancing the accuracy, coherence, and domain-specific understanding of automatic text summarization (ATS) systems. While traditional machine learning and deep learning models have shown promising results in compressing text, they often struggle with capturing deep semantic links and eliminating redundant information effectively.[1][2] Ontologies, defined as abstractions of concepts and the relations between them, provide a domain-oriented framework that allows systems to understand content through the meaning of specific terms and their interconnections.[3][4] By combining these two paradigms, researchers aim to address the challenges of information overload and the need for concise, meaningful summaries in an era of exponential data growth.[5]\nOne prominent application of this hybridization is the use of ontological structures to guide the generation of abstractive summaries. In one proposed approach, the system first extracts the most relevant sentences from a given text and then creates ontological structures from these sentences to generate a more concise abstractive summary.[5] This method was evaluated using the DUC 2002 dataset, achieving a ROUGE-1 score of 58.175, which outperformed other state-of-the-art systems at the time.[5] Similarly, research focused on summarizing government documents in the Marathi language utilized ontology as a knowledge base to improve the understanding of domain-specific terms.[3] By leveraging the relationships between significant concepts, the algorithm selects important information to generate summaries that maintain both clarity and the importance of the original text, addressing the difficulty of quickly reading long, detailed documents.[3]\nRecent advancements have further refined this hybrid approach by incorporating graph neural networks (GNNs) and transformer models to leverage the structural benefits of ontological representations. The Knowledge-Enhanced Transformer Graph Summary (KETGS) framework, for instance, develops a detailed graph representation of documents that embeds linguistic units ranging from words to key entities.[2] This structured graph is navigated via a Transformer-Guided Graph Neural Network (TG-GNN), which dynamically enhances node features to capture deep semantic links that conventional methods often miss.[2] Another model, GA-GNN, utilizes gated attention units to improve the extraction of key information features and eliminate local irrelevant information, thereby improving both the accuracy and readability of the summaries.[1] These methods demonstrate that modeling the relationship between words through structured, ontology-inspired graphs can significantly enhance the performance of deep learning-based summarization models.[1]\nDespite these advancements, challenges remain in the evaluation and reliability of hybrid systems. A critical issue in abstractive summarization is entity hallucination, where generated summaries include entities or groups not present in the original document.[6] To address this, researchers have proposed the Entity Hallucination Index (EHI), a metric designed to quantify the extent of such hallucinations by categorizing them by type and severity.[6] This metric allows for a fine-grained analysis of model outputs, ensuring that the integration of ontological knowledge does not inadvertently introduce factual errors.[6] Furthermore, while various machine learning approaches, such as modified K-Nearest Neighbor (KNN) algorithms, have been applied to text summarization by treating it as a binary classification problem for paragraphs, the field continues to evolve to better handle grammatical correctness and paraphrasing, areas where current systems still face limitations.[7][8] The ongoing development of these hybrid systems aims to create robust tools capable of handling the vast amounts of textual data across sectors, from patent research to e-learning, by combining the semantic depth of ontologies with the pattern recognition capabilities of machine learning.[7]",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "<jats:p>Text summarization is an information compression technology to extract important information from long text, which has become a challenging research direction in the field of natural language processing. At present, the text summary model based on deep learning has shown good results, but how to more effectively model the relationship between words, more accurately extract feature informat"
+      ],
+      "title": "Text Summarization Method Based on Gated Attention Graph Neural Network",
+      "metadata": {
+       "url": "https://doi.org/10.3390/s23031654"
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "<jats:p>The rapid proliferation of textual data across multiple sectors demands more sophisticated and efficient techniques for summarizing extensive texts. Focusing on extractive text summarization, this approach zeroes in on choosing key sentences from a document, providing an essential method for handling extensive information. While conventional methods often miss capturing deep semantic links"
+      ],
+      "title": "Knowledge-Enhanced Transformer Graph Summarization (KETGS): Integrating Entity and Discourse Relations for Advanced Extractive Text Summarization",
+      "metadata": {
+       "url": "https://doi.org/10.3390/math12233638"
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "<jats:p>Objectives/Background: Government documents of Maharashtra state are written in Marathi language, and they are long in length, detailed, and difficult to read quickly. There is a requirement to develop a system which will automatically summarize these documents to understand the key information quickly. Therefore, this research aims to create an ontology-based method for summarizing govern"
+      ],
+      "title": "Ontology-Based Text Summarization for Marathi Legal Documents",
+      "metadata": {
+       "url": "https://doi.org/10.17485/ijst/v19i24.520"
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "<title>Abstract</title>\n                <p>Ontology defined as abstraction of concepts and presents the relations between these concepts, it is a domain oriented, the construction and validation of ontologies is a hard work and it needs a lot of resources from domain experts to represent the concept of a specific domain in a computer understandable format, many algorithms have been developed to au"
+      ],
+      "title": "Using LLMs for Ontology generation by video summarization",
+      "metadata": {
+       "url": "https://doi.org/10.21203/rs.3.rs-10802097/v1"
+      }
+     },
+     {
+      "id": "[5]",
+      "snippets": [
+       "<p>Automatic summarization systems are much needed to lessen the information overload which is being faced by people due to exponential growth of data on World Wide Web. These systems choose the most significant part of the text from a single document or multiple documents and present the compressed surrogate form of the complete information which was intended to be conveyed. In this research pape"
+      ],
+      "title": "Ensemble of Support Vector Machine and Ontological Structures to Generate Abstractive Text Summarization",
+      "metadata": {
+       "url": "https://doi.org/10.4018/ijirr.300294"
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [
+       "<jats:sec>\n                  <jats:title>Purpose</jats:title>\n                  <jats:p>Entity hallucination poses a critical issue in abstractive text summarization, where generated summaries include entities or groups not present in the original document. This study aims to systematically evaluate entity hallucination across state-of-the-art summarization models and address the gap in existing e"
+      ],
+      "title": "Entity hallucination index for text summarization models",
+      "metadata": {
+       "url": "https://doi.org/10.1108/aci-09-2024-0371"
+      }
+     },
+     {
+      "id": "[7]",
+      "snippets": [
+       "<jats:p>Automatic Text Summarization (ATS) is the key challenge in the area of Natural Language Processing (NLP). It deals with generalizing a summary from a given text without losing the vital information. This is a contemporary area because of exponential content growth in internet and applied in summarizing the content available in books, newsletters, internal document analysis, patent research"
+      ],
+      "title": "An Exhaustive Survey on Automatic Text Summarization Using Machine Learning Approches",
+      "metadata": {
+       "url": "https://doi.org/10.14704/web/v18si05/web18299"
+      }
+     },
+     {
+      "id": "[8]",
+      "snippets": [
+       "<p>This article proposes the modified KNN (K Nearest Neighbor)algorithm which considers the feature similarity and is applied tothe text summarization. The words which are given as features forencoding words into numerical vectors have their own meanings andsemantic relations with others, and the text summarization is ableto be viewed into a binary classification where each paragraph isclassified "
+      ],
+      "title": "Text Summarization using Feature Similarity based K Nearest Neighbor",
+      "metadata": {
+       "url": "https://doi.org/10.31219/osf.io/ju8nr"
+      }
+     }
+    ]
+   }
+  ],
+  "article_chars": 8412
+ },
+ {
+  "qid": "fb607bc177d2efb926cb3dff",
+  "question": "How can question generation be used to mitigate hallucination in LLMs?",
+  "article_path": "C:\\Users\\D0n9\\Desktop\\CompileScholar\\.research_tmp\\experiments\\benchmarks\\cs2\\arm_storm\\fb607bc177d2efb926cb3dff\\How_can_question_generation_be_used_to_mitigate_hallucination_in_LLMs\\storm_gen_article_polished.txt",
+  "sections": [
+   {
+    "title": "Question Generation for Hallucination Mitigation in Large Language Models",
+    "text": "\nHallucination in Large Language Models (LLMs) refers to the generation of irrelevant, nonsensical, or factually unsupported text that deviates from the provided input or source documents.[1][2] This phenomenon poses significant challenges for the reliability of AI systems, particularly in high-stakes environments such as enterprise document intelligence, financial analysis, and news production.[3][4] While various mitigation strategies have been proposed, including retrieval-augmented generation (RAG), self-consistency, and chain-of-thought grounding, these methods often operate within the generative process and may not fully eliminate hallucinations.[3] Recent research has explored alternative approaches, such as question generation and contrastive decoding, to address this issue at the architectural or decoding level.\nOne novel approach involves the use of contrastive decoding with specific prompt types. The Dual Factual and Hallucination Prompting (DFHP) method incorporates both factual and hallucination prompts to highlight the disparity in output probabilities between model predictions influenced by these different prompt types.[1][2] By applying contrastive decoding, DFHP significantly improves the factual accuracy of LLMs without requiring additional training.[1] Experiments on multiple-choice and text generation tasks, including the TruthfulQA dataset, demonstrated that DFHP achieved an average improvement of 6.4% in factual accuracy for LLaMA models ranging from 7B to 65B parameters.[1]\nIn the domain of enterprise document processing, architectural interventions have been developed to mitigate hallucination by isolating reasoning processes. The Multi-modal Intelligent Knowledge Analysis (MIKA) platform, a five-layer multi-agent system, addresses hallucination by ensuring that each of its 12 reasoning agents maintains a strictly isolated vector partition.[3] This architecture eliminates cross-domain retrieval contamination by issuing four independent queries per analytical dimension, thereby reducing the likelihood of generating fluent but factually unsupported outputs.[3]\nRetrieval-Augmented Generation (RAG) remains a prominent strategy for enhancing factual accuracy by grounding model outputs in external knowledge sources.[5][6] Integrating weighted distributions of RAG with LLMs, such as Llama, has been shown to improve precision, recall, F1 scores, and BLEU scores by prioritizing high-quality information during generation.[5] Similarly, using external sources like Wikipedia with models such as Mistral has demonstrated substantial improvements in the coherence and quality of responses.[6] However, RAG systems are not immune to hallucinations, and their reliability in safety-critical settings remains a subject of ongoing investigation.[7]\nTo better evaluate and mitigate hallucinations, new benchmarks and detection methods have been introduced. The OKGQA benchmark is designed to assess LLMs augmented with Knowledge Graphs (KGs) in open-ended, real-world question answering settings, incorporating metrics to quantify both hallucination rates and reasoning improvements.[8] Additionally, Deception-Based Benchmarking offers a methodology to evaluate model susceptibility to hallucinations by testing their consistency and accuracy when required to begin responses with misleading sentences.[9] In the context of RAG, conformal prediction has been applied to hallucination detection, transforming heuristic scores into decision sets with finite-sample coverage guarantees, although challenges remain in distinguishing between synthetic and real-world hallucinations from RLHF-aligned models.[7]\nOther innovative approaches include pre-generative epistemic gating, where a structural admissibility check is performed before any token is generated to verify the presence of required elements in the session context.[10] This method, implemented in the CANONICAL channel, aims to address the structural cause of hallucination by distinguishing between claims grounded in context and those reconstructed from training priors.[10] Furthermore, in the field of financial AI, controlled ablations have indicated that deterministic verification is a more reliable pathway to reducing numerical hallucination in small language models than reasoning-based approaches.[11] These diverse strategies highlight the multifaceted nature of hallucination mitigation, ranging from decoding techniques and architectural isolation to rigorous benchmarking and pre-generative checks.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "<jats:p>Large language models have demonstrated impressive capabilities in many domains. But they sometimes generate irrelevant or nonsensical text, or produce outputs that deviate from the provided input, an occurrence commonly referred to as hallucination. To mitigate this issue, we introduce a novel decoding method that incorporates both factual and hallucination prompts (DFHP). It applies cont"
+      ],
+      "title": "Improving Factuality by Contrastive Decoding with Factual and Hallucination Prompts",
+      "metadata": {
+       "url": "https://doi.org/10.3390/s24217097"
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "<jats:p>Although large language models demonstrate impressive capabilities, they sometimes generate irrelevant or nonsensical text, or produce outputs that deviate from the provided source input—an occurrence commonly referred to as hallucination. To mitigate this issue, we introduce a novel decoding method that incorporates both factual and hallucination prompts(DFHP), utilizing a contrastive out"
+      ],
+      "title": "Decoding by Factual Prompts and Hallucination Prompts Improves Factuality in Large Language Models",
+      "metadata": {
+       "url": "https://doi.org/10.20944/preprints202409.2037.v1"
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "<jats:p>Hallucination in large language model (LLM) pipelines is the central unsolved problem in enterprise document intelligence: models produce fluent, structurally plausible outputs factually unsupported by the source document. Existing mitigation strategies operate within the generative process — retrieval augmentation, self-consistency, chain-of-thought grounding — and reduce but do not elimi"
+      ],
+      "title": "Architectural Hallucination Mitigation in Multi-Agent Document Intelligence: Domain-Isolated RAG, Dual-Channel Verification, and Schema-Free Extraction",
+      "metadata": {
+       "url": "https://doi.org/10.2139/ssrn.6555841"
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "<jats:p>As Large Language Models (LLMs) become increasingly embedded in news production, their tendency to generate hallucinated contentfabricated or misleading information presented as factraises serious legal concerns. This paper examines the implications of such content through the lens of both copyright and personality rights, focusing on civil defamation, privacy infringement, and unauthorize"
+      ],
+      "title": "Hallucinated harm: legal liability for AI-generated false content in mass media",
+      "metadata": {
+       "url": "https://doi.org/10.54254/2753-7102/2025.29861"
+      }
+     },
+     {
+      "id": "[5]",
+      "snippets": [
+       "<p>Introducing a novel concept, the integration of a weighted distribution of Retrieval-Augmented Generation (RAG) with the Llama Large language model significantly enhances factual accuracy and contextual relevance in generated text. Experimental results show substantial improvements in precision, recall, F1 score, and BLEU score, demonstrating the effectiveness of the weighted RAG mechanism in p"
+      ],
+      "title": "Achieving Higher Factual Accuracy in Llama LLM with Weighted Distribution of Retrieval-Augmented Generation",
+      "metadata": {
+       "url": "https://doi.org/10.31219/osf.io/ctw8v"
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [
+       "<p>Natural language understanding and generation have seen great progress, yet the persistent issue of hallucination undermines the reliability of model outputs. Introducing retrieval-augmented generation (RAG) with external knowledge sources, such as Wikipedia, presents a novel and significant approach to enhancing factual accuracy and coherence in generated content. By dynamically integrating re"
+      ],
+      "title": "Hallucination Reduction in Large Language Models with Retrieval-Augmented Generation Using Wikipedia Knowledge",
+      "metadata": {
+       "url": "https://doi.org/10.31219/osf.io/pv7r5"
+      }
+     },
+     {
+      "id": "[7]",
+      "snippets": [
+       "Retrieval-Augmented Generation (RAG) systems remain susceptible to hallucinations despite grounding in retrieved evidence. While current detection methods leverage embedding similarity and natural language inference (NLI), their reliability in safety-critical settings remains unproven. We apply conformal prediction to RAG hallucination detection, transforming heuristic scores into decision sets wi"
+      ],
+      "title": "the semantic illusion: certified limits of embedding-based hallucination detection in rag systems",
+      "metadata": {
+       "url": "sciverse://the-semantic-illusion-certified-limits-of-embedding-based-ha"
+      }
+     },
+     {
+      "id": "[8]",
+      "snippets": [
+       "Recent works integrating Knowledge Graphs (KGs) have shown promising improvements in enhancing the reasoning capabilities of Large Language Models (LLMs). However, existing benchmarks primarily focus on closed-ended tasks, leaving a gap in evaluating performance on more complex, real-world scenarios. This limitation also hinders a thorough assessment of KGs' potential to reduce hallucinations in L"
+      ],
+      "title": "can knowledge graphs make large language models more trustworthy? an empirical study over open-ended question answering",
+      "metadata": {
+       "url": "sciverse://can-knowledge-graphs-make-large-language-models-more-trustwo"
+      }
+     },
+     {
+      "id": "[9]",
+      "snippets": [
+       "<jats:p>We present a novel benchmarking methodology for Large Language Models (LLMs) to evaluate their susceptibility to hallucinations, thereby determining their reliability for real-world applications involving greater responsibilities. This method, called Deception-Based Benchmarking, involves testing the model with a task that requires composing a short paragraph. Initially, the model performs"
+      ],
+      "title": "Deception-Based Benchmarking: Measuring LLM Susceptibility to Induced Hallucination in Reasoning Tasks Using Misleading Prompts",
+      "metadata": {
+       "url": "https://doi.org/10.20944/preprints202407.0120.v1"
+      }
+     },
+     {
+      "id": "[10]",
+      "snippets": [
+       "<jats:p>Large language models (LLMs) produce fluent, confident responses regardless of whether those responses are grounded in provided context or reconstructed from training priors. This inability to distinguish-and declare-the epistemic origin of generated claims is a structural cause of hallucination. Existing mitigation approaches (retrieval-augmented generation, fine-tuning, output filtering,"
+      ],
+      "title": "Pre-Generative Epistemic Gating for Large Language Models: Enforcing Structural Admissibility Before Generation",
+      "metadata": {
+       "url": "https://doi.org/10.2139/ssrn.6363538"
+      }
+     },
+     {
+      "id": "[11]",
+      "snippets": [
+       "<jats:p>&lt;p&gt;We investigate a central question in financial AI deployment: what architectural interventions most reliably reduce numerical hallucination in small language models? Through a controlled ablation of five components on the full FinQA development set (n = 873), we find that deterministic verification is a more reliable pathway to numerical accuracy than reasoning-based prompting in "
+      ],
+      "title": "Modular Verification Outperforms Chain-of-Thought Reasoning in Small Financial LLMs: A Systematic Ablation Study on Numerical Hallucination Reduction",
+      "metadata": {
+       "url": "https://doi.org/10.2139/ssrn.6684379"
+      }
+     }
+    ]
+   }
+  ],
+  "article_chars": 7339
+ },
+ {
+  "qid": "99fd4c1b54e1367bcd3cb3b2",
+  "question": "How can the integration of GIS spatial analysis techniques with economic modeling improve the accuracy and effectiveness of environmental policy ?",
+  "article_path": "C:\\Users\\D0n9\\Desktop\\CompileScholar\\.research_tmp\\experiments\\benchmarks\\cs2\\arm_storm\\99fd4c1b54e1367bcd3cb3b2\\How_can_the_integration_of_GIS_spatial_analysis_techniques_with_economic_modelin\\storm_gen_article_polished.txt",
+  "sections": [
+   {
+    "title": "Integration of GIS Spatial Analysis Techniques with Economic Modeling",
+    "text": "\nThe integration of Geographic Information Systems (GIS) with economic modeling has emerged as a critical approach for analyzing spatial configurations of economic activity and supporting decision-making processes in urban and regional planning. By combining the spatial data management capabilities of GIS with quantitative economic models, researchers can address complex issues such as land-use change, real estate market dynamics, and industrial development. This integration allows for the simulation of spatial structures and temporal dynamics, providing a more comprehensive understanding of how economic systems interact with their physical environments.\n",
+    "citations": []
+   },
+   {
+    "title": "Spatial Simulation and Real Estate Analysis",
+    "text": "\nOne of the primary applications of this integration is in the simulation of real estate effects caused by urban transformations. Studies have proposed approaches that extend formalization methods, such as Monte Carlo simulations, within GIS frameworks to include spatial structure and temporal dynamics.[1] This combined application is particularly useful in spatial decision-making processes for urban planning, supporting the modeling of operations related to urban land-use change. For instance, analyses of historic building redevelopment, such as the Castel Capuano in Naples, have utilized these techniques to explore possible transformation scenarios and identify their effects on the urban real estate market.[1]\nFurthermore, spatial economic studies have traditionally relied on areal data at the regional or sub-regional levels; however, recent advancements have allowed scholars to exploit spatial data of different natures and extend the fields of application in economics.[2] This includes providing empirical evidence on phenomena such as socio-economic deprivation, land price volatility, and firm survival by utilizing data at the municipality, firm, house, and even individual level.[2] The ability to process data at these granular scales enhances the precision of economic models and their applicability to specific local contexts.\n",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "The objective of this study is to present a spatial simulation modelling of real estate effects caused by urban transformations. The proposed approach extends the formalization of the “Monte Carlo” simulation methods in Geographical Information Systems (GIS), including spatial structure and temporal dynamics. The combined application can be useful in spatial decision making process for urban plann"
+      ],
+      "title": "assessing urban transformations: a sdss for the master plan of castel capuano, naples",
+      "metadata": {
+       "url": "sciverse://assessing-urban-transformations-a-sdss-for-the-master-plan-o"
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "Spatial economic studies traditionally exploit areal data at the regional or sub-regional level. More recently, scholars have started to exploit spatial data of a different nature and, at the same time, extend the fields of application in economics. Specifically, this special issue contributes to the spatial economic literature by providing empirical evidence on a wide range of phenomena (socio-ec"
+      ],
+      "title": "advances in spatial economic data analysis: methods and applications",
+      "metadata": {
+       "url": "sciverse://advances-in-spatial-economic-data-analysis-methods-and-appli"
+      }
+     }
+    ]
+   },
+   {
+    "title": "Industrial Development and Quality of Life Assessment",
+    "text": "\nThe relationship between industrial development and broader regional growth is also examined through the lens of GIS and economic analysis. A geographical view provides a comprehensive concept of industrial development, which is closely related to balanced spatial development within a region.[1] Industry and agriculture form the economic basis for a region, with industrial development serving as a key tool for developing rural areas and supporting other activities, such as services, by absorbing labor force and providing requirements for other sectors.[1]\nTo evaluate the quality of life and industrial development simultaneously, studies have proposed methods that combine operational research with GIS.[2] This integrated approach allows for the evaluation of innovative approaches in various sectors using techniques such as TOPSIS (Technique for Order Preference by Similarity to Ideal Solution). The results indicate a very close relationship between the existence of strong industries and enterprises and the quality of life and socio-economic development in successful cities.[2] Consequently, these integrated models support recommendations for sustainable economic growth, such as the promotion of Small and Medium-Sized Enterprises (SMEs).\n",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "<jats:title>Abstract</jats:title>\n               <jats:p> Through presenting the main axes in this study, it is clear that identifying a precise concept of industrial development is related to a wider idea of development. Despite that, the geographical view gives a wider and more comprehensive concept of the industrial development. Moreover, balanced spatial development is closely related to indus"
+      ],
+      "title": "the role of geography in the analysis of industrial development strategies within the spatial organisation of a region",
+      "metadata": {
+       "url": "sciverse://the-role-of-geography-in-the-analysis-of-industrial-developm"
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "All successful cities are the most developed and productive cities in their regions and countries in terms of economy and quality of life. In addition, it is observed that there are strong industries and enterprises in these regions and cities. Therefore, this study tries to evaluate the quality of life and the development of the industry together. The proposed method can be considered as a combin"
+      ],
+      "title": "contribution of small and medium enterprises to economic development and quality of life in turkey",
+      "metadata": {
+       "url": "sciverse://contribution-of-small-and-medium-enterprises-to-economic-dev"
+      }
+     }
+    ]
+   },
+   {
+    "title": "Methodological Advances and Workflow Integration",
+    "text": "\nRecent methodological advances have focused on improving the efficiency and reusability of GIS workflows in economic analysis. In GIS, geoprocessing workflows allow analysts to organize methods on spatial data in complex chains.[1] New methods propose expressing these workflows as linked data and semi-automatically enriching them with semantics on the level of operations and datasets.[1] This approach enables GIS analysts to reuse workflows in a modular way, selecting and adapting resources based on compatible semantic types, which is crucial for handling the complex data structures often found in economic modeling.[1]\nAdditionally, the integration of spatial statistics with economic models has seen significant development. Spatial econometric models have been restructured in a linear mixed model framework to propose low-rank models that are robust to measurement error.[2] These models allow for fast parameter estimation and inference using Type II restricted likelihood maximization techniques, ensuring that direct and indirect effects can be estimated with high accuracy even when data are noisy.[2] Furthermore, spatial autocorrelation analysis, utilizing measurements such as Moran’s *I* and Geary’s *C*, has evolved from one-dimensional time series analysis to two-dimensional spatial autocorrelation functions, providing deeper insights into the spatial dependencies within economic data.[3]\n",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "In Geographic Information Systems (GIS), geoprocessing workflows allow analysts to organize their methods on spatial data in complex chains. We propose a method for expressing workflows as linked data, and for semi-automatically enriching them with semantics on the level of their operations and datasets. Linked workflows can be easily published on the Web and queried for types of inputs, results, "
+      ],
+      "title": "semantic typing of linked geoprocessing workflows",
+      "metadata": {
+       "url": "sciverse://semantic-typing-of-linked-geoprocessing-workflows"
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "This article presents a re-structuring of spatial econometric models in a linear mixed model framework. To that end, it proposes low rank spatial econometric models that are robust to the existence of noise (i.e., measurement error), and can enjoy fast parameter estimation and inference by Type II restricted likelihood maximization (empirical Bayes) techniques. The small sample properties of the p"
+      ],
+      "title": "low rank spatial econometric models",
+      "metadata": {
+       "url": "sciverse://low-rank-spatial-econometric-models"
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "<jats:p>A number of spatial statistic measurements such as Moran’s <jats:italic>I</jats:italic> and Geary’s <jats:italic>C</jats:italic> can be used for spatial autocorrelation analysis. Spatial autocorrelation modeling proceeded from the 1-dimension autocorrelation of time series analysis, with time lag replaced by spatial weights so that the autocorrelation functions degenerated to autocorrelati"
+      ],
+      "title": "an analytical process of spatial autocorrelation functions based on moran’s index",
+      "metadata": {
+       "url": "sciverse://an-analytical-process-of-spatial-autocorrelation-functions-b"
+      }
+     }
+    ]
+   },
+   {
+    "title": "Environmental and Urban Informatics Context",
+    "text": "\nThe application of GIS in economic modeling is also supported by its utility in environmental impact assessments (EIA) and urban informatics. GIS is considered useful in EIA for efficient map production and landscape evaluation, which are essential components of development plans that influence economic viability.[1] Moreover, the principles of urban informatics, which include techniques for urban big data acquisition and analytics, provide the foundational tools for addressing urban problems and possible solutions through data-driven economic analysis.[2] By integrating these environmental and informational frameworks with economic models, planners can better assess the long-term sustainability and economic impact of development projects.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "ABSTRACT: In the environmental impact assessment. Geographic Information System(GIS) is considered to be useful in following field. I.IEE(Initial Environmental Examination) 2. EIA(Environmental Impact Assessment) 3. Agreement with resident of the development plan This study aims to apply GIS to item 2 mentioned above. When EIA is carried out, the base will be the development plan which contains th"
+      ],
+      "title": "application of gis to environmental impact assessment.",
+      "metadata": {
+       "url": "sciverse://application-of-gis-to-environmental-impact-assessment-"
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "This open access book introduces systematically the principles of urban informatics, including urban system theories, techniques, and tools for urban big data acquisition, infrastructure, and analytics, as well as focusing these new tools on urban problems and possible solutions."
+      ],
+      "title": "urban informatics",
+      "metadata": {
+       "url": "sciverse://urban-informatics"
+      }
+     }
+    ]
+   }
+  ],
+  "article_chars": 8594
+ }
+]

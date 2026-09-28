@@ -1,0 +1,1194 @@
+[
+ {
+  "qid": "9b4f043c1561f830b2033f51",
+  "question": "How do external events influence software projects? Explain with a few recent examples.",
+  "sections": [
+   {
+    "title": "Defining External Events",
+    "text": "External events are defined as occurrences triggered from outside the specific component whose functionality is being examined [2]. In the context of simulation environments like EventSeer, these are characterized as time events generated outside the simulation itself [1]. Understanding these external triggers is critical because knowing what was happening in the field enabled researchers to gauge their specific impact on project trajectories.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "External events are time events that are generated outside the simulation."
+      ],
+      "title": "continuous system simulation",
+      "metadata": {
+       "year": 2006,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "Here, by external events, we refer to events which are triggered from outside the component whose functionality is being examined."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Technological Drivers in the Sundance Project",
+    "text": "The Sundance project provides a concrete example of how external events influence software development, illustrating that changes affecting product design often result from factors not directly related to the process work currently in progress [3]. Specifically, technology drove the initial change from Microsoft Windows to the web [3]. However, technological limitations subsequently drove the transition back to Windows [3]. This case demonstrates that external technological shifts can force significant architectural pivots independent of internal planning.",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [
+       "technology drove the change from Microsoft Windows to the web; and technological limitations drove the transition back to Windows.",
+       "The Sundance project experience illustrates examples of changes that affect product design. These changes resulted from external events, often not directly related to the process work in progress."
+      ],
+      "title": "designing as the world turns",
+      "metadata": {
+       "year": 1997,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Impact on Motivation and Project Effectiveness",
+    "text": "External influences can have complex effects on team dynamics and long-term success. The presence of external influences may remedy short-term problems, such as the tendency for firm members to become less involved in a project [4]. However, these same external forces may harm the effectiveness of future systems projects [4]. Furthermore, motivation to resolve development issues may decline when increased external influence forces agreement through pressure from consultant expertise or features in packaged software [4]. There is also a noted temptation to use unanticipated external events as an excuse for failures.",
+    "citations": [
+     {
+      "id": "[4]",
+      "snippets": [
+       "Their motivationto resolve development issues might decline with increased external influence that\"force\" agreement through pressure from consultant expertise orfeatures in packaged software.",
+       "Thepresence of external influences may thus remedy short-term problems,such as the tendency for firmmembers to belessinvolved in a project,but the external forces may harm the effectiveness of future systems projects."
+      ],
+      "title": "relationships between selected organizational factors and systems development",
+      "metadata": {
+       "year": 1987,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Robustness and Security Implications",
+    "text": "To mitigate the negative impacts of external events, sustainable Quality Improvement (QI) should be robust to the influences of unanticipated external events [6]. In the domain of software security, external threats from third-party libraries require specific defensive strategies. The Armor Within defense ensures that no unvalidated input crosses the channel between the main program and a third-party library [5]. These protections provide a strong guarantee that even if a third-party library is vulnerable to a crafted input attack, the overall application will not be exploited [5].",
+    "citations": [
+     {
+      "id": "[5]",
+      "snippets": [
+       "These protections will provide a strong guarantee that even if a third-party library is vulnerable to a crafted input attack, the overall application will not be exploited",
+       "the adversary may try to trick the main program into passing the right crafted input to the vulnerable library, but our defense will ensure that no unvalidated input crosses that channel."
+      ],
+      "title": "armor within: defending against vulnerabilities in third-party libraries",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [
+       "Sustainable QI should be robust to these influences."
+      ],
+      "title": "measuring persistence of implementation: queri series",
+      "metadata": {
+       "year": 2008,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Methodological Considerations",
+    "text": "Analyzing the influence of external events requires appropriate data collection methods. Snapshot metrics are not enough for analyzing software repositories; longitudinal metrics are needed to capture the evolving impact of external factors over time [7].",
+    "citations": [
+     {
+      "id": "[7]",
+      "snippets": [
+       "snapshot metrics are not enough: analyzing software repositories with longitudinal metrics"
+      ],
+      "title": "snapshot metrics are not enough: analyzing software repositories with longitudinal metrics",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2207.11767",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 14,
+   "n_claims_usable": 14,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_downgraded": [
+    {
+     "cid": "C11",
+     "sentence": "Understanding these external triggers is critical because knowing what was happening in the field enabled researchers to gauge their specific impact on project trajectories ."
+    },
+    {
+     "cid": "C10",
+     "sentence": "There is also a noted temptation to use unanticipated external events as an excuse for failures ."
+    }
+   ],
+   "word_count": 349,
+   "n_sections": 5,
+   "n_citations": 7,
+   "record_level": 7,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "323e85c9052082358fc0c045",
+  "question": "How do different fairness metrics correlate with each other across various datasets and model architectures?",
+  "sections": [
+   {
+    "title": "Model and Data Dependence",
+    "text": "The correlation structure between fairness metrics is not uniform but varies significantly based on the underlying model architecture and the specific dataset used [2]. Neural networks (NN) generally exhibit lower correlations between fairness metrics compared to other model types [2]. This reduced correlation arises because NNs are capable of constructing more complex decision boundaries, resulting in more flexible models that produce a wide range of fairness values for different metrics [2]. Furthermore, the strength of metric correlations is influenced by data complexity; while most metrics correlate on simple data sets, they often fail to correlate on more complex and realistic data [1]. Even when metrics are designed to quantify the same properties, such as disentanglement, two practitioners might choose different models if they use different metrics, as correlations are often weak even for the same dataset [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "While most metrics correlate on simple data sets, they do not on more complex and realistic data [ 16 ] ."
+      ],
+      "title": "Measuring Disentanglement: A Review of Metrics",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": "2012.09276",
+       "authors": []
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "In particular, NN which is capable of constructing more complex boundaries, resulting in more flexible models with a wide range of fairness values for different metrics.",
+       "As a result, the correlations between fairness metrics for NN was in general, less than the other models.",
+       "Looking at Figure 3, it is clear that correlations are model-dependent.",
+       "Similarly, Figure 4 verifies that correlations are data-dependent."
+      ],
+      "title": "finding representative group fairness metrics using correlation estimations",
+      "metadata": {
+       "year": 2021,
+       "doi": null,
+       "arxiv": "2109.05697",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Stability of Specific Metric Pairs",
+    "text": "Despite general variability, certain relationships between specific fairness metrics remain stable across datasets. The relationship between demographic parity (DI) and statistical parity difference (SPD) shows no substantial variability across different datasets [3]. Similarly, the relationship between equalized odds difference (EOD) and false positive rate (FPR) remains consistent [3]. This stability reinforces the conceptual overlap between these paired metrics [3]. Consequently, improvements in one metric, such as DI, are consistently reflected in the other, SPD, and the same holds true for EOD and FPR across all tested datasets [3]. This suggests that for these specific pairs, optimizing one metric effectively optimizes the other, regardless of the dataset context [3].",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [
+       "Therefore, improvements in one fairness metric, such as $DI$ , are consistently reflected in the other (SPD), and the same holds true for $EOD$ and $FPR$ across all datasets.",
+       "This consistency reinforces the conceptual overlap between these fairness metrics across various datasets.",
+       "This suggests that the relationship between these metrics remains stable across datasets, with no substantial variability."
+      ],
+      "title": "fairflrep: fairness aware fault localization and repair of deep neural networks",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Metric Diversity and Objectives",
+    "text": "Fairness metrics serve to identify bias and mathematically evaluate the fairness of AI systems [8]. Commonly used metrics include demographic parity, equal-opportunity, equal-mis-opportunity, average odds, and distance metrics [8]. These metrics target different objectives; for instance, statistical parity and equal acceptance rate only consider the predicted outcome, whereas equalized odds, predictive equality, and predictive parity consider additional factors [7]. In the domain of natural language processing, researchers have systematically devised six fairness criteria that can be further refined into 18 sub-categories [6]. Techniques for evaluating fairness have been exemplified in three specific notions: conditional value-at-risk, equality of opportunity, and statistical parity, with experiments conducted on several readily available datasets [5]. For contextualized language models, an overview of fairness metrics has been presented, focusing on the templates, embeddings, and measures these metrics utilize [4]. This work evaluated how these metrics correlate with each other, as well as how parts of these metrics correlate [4].",
+    "citations": [
+     {
+      "id": "[4]",
+      "snippets": [
+       "We evaluated how these metrics correlate with each other, as well as how parts of these metrics correlate.",
+       "In this paper, we presented an overview of fairness metrics for contextualized language models and we focused on which templates, embeddings and measures these metrics used."
+      ],
+      "title": "measuring fairness with biased rulers: a survey on quantifying biases in pretrained language models",
+      "metadata": {
+       "year": 2021,
+       "doi": null,
+       "arxiv": "2112.07447",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[5]",
+      "snippets": [
+       "We exemplify the use of our technique in three fairness notions: conditional value-at-risk, equality of opportunity, and statistical parity; and provide experiments on several readily available datasets."
+      ],
+      "title": "Fair Wrapping for Black-box Predictions",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2201.12947",
+       "authors": [
+        "Alexander Soen",
+        "Ibrahim Alabdulmohsin",
+        "Sanmi Koyejo",
+        "Yishay Mansour"
+       ],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [
+       "We have systematically devised six fairness criteria for NLP, which can be further refined into 18 sub-categories."
+      ],
+      "title": "Fairness Certification for Natural Language Processing and Large Language Models",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": "2401.01262",
+       "authors": [
+        "Vincent Freiberger",
+        "Erik Buchmann"
+       ],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[7]",
+      "snippets": [],
+      "title": "A Review of Speech-centric Trustworthy Machine Learning: Privacy, Safety, and Fairness",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2212.09006",
+       "authors": []
+      }
+     },
+     {
+      "id": "[8]",
+      "snippets": [
+       "Commonly used fairness metrics include demographic parity, equal-opportunity [Hardt et al., 2016], equal-mis-opportunity [Hinnefeld et al., 2018], average odds, and distance metrics [Pandit et al., 2011].",
+       "Fairness metrics help identify bias in AI systems and mathematically evaluate the fairness of such systems.",
+       "a seven-layer model for standardising ai fairness assessment"
+      ],
+      "title": "a seven-layer model for standardising ai fairness assessment",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2212.11207",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Standardization and Toolkits",
+    "text": "To address the complexity of evaluating these diverse metrics, standardization efforts have been proposed. A seven-layer model has been developed for standardizing AI fairness assessment [8]. Additionally, the AI Fairness 360 toolkit provides an extensible framework for detecting, understanding, and mitigating unwanted algorithmic bias [9]. These tools and models aim to provide a structured approach to the varied and sometimes conflicting correlations observed across different fairness definitions and model architectures [9] [8].",
+    "citations": [
+     {
+      "id": "[9]",
+      "snippets": [
+       "ai fairness 360: an extensible toolkit for detecting, understanding, and mitigating unwanted algorithmic bias"
+      ],
+      "title": "ai fairness 360: an extensible toolkit for detecting, understanding, and mitigating unwanted algorithmic bias",
+      "metadata": {
+       "year": 2018,
+       "doi": null,
+       "arxiv": "1810.01943",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[8]",
+      "snippets": [
+       "Commonly used fairness metrics include demographic parity, equal-opportunity [Hardt et al., 2016], equal-mis-opportunity [Hinnefeld et al., 2018], average odds, and distance metrics [Pandit et al., 2011].",
+       "Fairness metrics help identify bias in AI systems and mathematically evaluate the fairness of such systems.",
+       "a seven-layer model for standardising ai fairness assessment"
+      ],
+      "title": "a seven-layer model for standardising ai fairness assessment",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2212.11207",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 19,
+   "n_claims_usable": 19,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "title_only_citations": 2,
+   "word_count": 470,
+   "n_sections": 4,
+   "n_citations": 9,
+   "record_level": 8,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "46eecf06447c43657abf0420",
+  "question": "How does doping impact integrated circuit design?",
+  "sections": [
+   {
+    "title": "Fundamental Mechanisms and Material Properties",
+    "text": "Doping is defined as the process of adding impurities or intentionally introducing atoms into intrinsic semiconductors to modulate their electrical, optical, and structural properties [3] [4]. This technique serves as the basic method for adjusting the conductivity of inorganic semiconductors and aligning energy levels at interfaces between doped materials [1]. Specifically, the process involves adding electron acceptors to p-type semiconductors or donors to n-type semiconductors. By controlling the migration and diffusion of quasi-particles of charge in transistors and integrated circuits, semiconductor technology relies heavily on these doping mechanisms [2]. Consequently, doping technology plays a key role in determining the electrical and optical properties of semiconductor materials, which significantly affects overall device performance [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "In the study of modern semiconductor physics, doping technology has a key role in determining the electrical and optical properties of semiconductor materials, and significantly affects the device performance.[1–15]",
+       "Doping of inorganic semiconductors by controllably introducing impurity atoms is the basic method used to adjust the conductivity of materials as well as the energy-level alignment at interfaces between doped materials and metal contacts."
+      ],
+      "title": "clarification of the molecular doping mechanism in organic single-crystalline semiconductors and their application in color-tunable light-emitting devices",
+      "metadata": {
+       "year": 2018,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "Semiconductor technology depends on the control of migration and diffusion of quasi-particles of charge in transistors and integrated circuits."
+      ],
+      "title": "mathematical analysis on current–voltage relations via classical poisson–nernst–planck systems with nonzero permanent charges under relaxed electroneutrality boundary conditions",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "Doping is the process of adding impurities into intrinsic semiconductors to modulate its electrical, optical, and structural properties [12,13]."
+      ],
+      "title": "effects of diffusion coefficients and permanent charge on reversal potentials in ionic channels",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "Doping is the intentional addition of atoms to the intrinsic semiconductor to modulate the electrical properties of intrinsic semiconductors.",
+       "Therefore, doping is changed due to thickness changed that will definitely change device performance [70]."
+      ],
+      "title": "electrically doped nanoscale devices using first-principle approach: a comprehensive survey",
+      "metadata": {
+       "year": 2021,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "CMOS Design and Parasitic Mitigation",
+    "text": "In silicon CMOS design, contact and spacer regions undergo heavy doping with concentrations ranging from 10^21 to 10^22 cm^-3 [5]. This high concentration is utilized to reduce access resistance while keeping parasitic capacitance low [5]. Similarly, incorporating spacer design into the structure of 2D semiconductor devices is imperative for effectively mitigating parasitic effects, specifically the undesired capacitance and resistance that arise from device geometry [5]. Doping also aids in the design of field-effect transistors by helping to calibrate device parameters. Furthermore, changes in doping caused by variations in thickness will definitely change device performance, highlighting the sensitivity of integrated circuit behavior to physical dimensions [4].",
+    "citations": [
+     {
+      "id": "[4]",
+      "snippets": [
+       "Doping is the intentional addition of atoms to the intrinsic semiconductor to modulate the electrical properties of intrinsic semiconductors.",
+       "Therefore, doping is changed due to thickness changed that will definitely change device performance [70]."
+      ],
+      "title": "electrically doped nanoscale devices using first-principle approach: a comprehensive survey",
+      "metadata": {
+       "year": 2021,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[5]",
+      "snippets": [
+       "Hence, it is imperative to incorporate spacer design into the structure of 2D semiconductor devices for effectively mitigating parasitic effects, specifically the undesired capacitance and resistance that arise from the interactions between the gate, substrate and source-drain.",
+       "In silicon CMOS, the contact and spacer regions undergo heavy doping with a concentration ranging from $10^{21}$ to $10^{22} \\mathrm{cm}^{-3}$ to reduce access resistance while keeping parasitic capacitance low, thereby reducing the resistive-capacitive (RC) delay of the transistor [1]."
+      ],
+      "title": "two-dimensional semiconductor transistors and integrated circuits for advanced technology nodes",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Retrograde Doping Engineering",
+    "text": "Retrograde doping engineering is recommended to reduce body resistance and maximize the threshold voltage variation, denoted as ΔVt [6]. This approach results in a reduction of body resistance [6] and allows for the achievement of very large ΔVt values [6]. Compared to uniformly doped inverters, the current drivability of retrograde doped inverters is dramatically enhanced due to a higher body effect factor [6]. These improvements are critical for optimizing the performance of modern integrated circuits by balancing resistance and capacitance constraints.",
+    "citations": [
+     {
+      "id": "[6]",
+      "snippets": [
+       "The current drivability of the retrograde doped inverter is dramatically enhanced compared with that of the uniformly doped inverter due to the higher body effect factor.",
+       "In the previous study, very large ΔVt can be obtained by using the retrograde doping [9].",
+       "Also, note that the retrograde-doping results in reducing the body resistance.",
+       "Consequently, to reduce the body resistance and maximize ΔVt , retrograde doping engineering is recommended."
+      ],
+      "title": "a high speed and low power soi inverter using active body-bias",
+      "metadata": {
+       "year": 1999,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 14,
+   "n_claims_usable": 14,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_downgraded": [
+    {
+     "cid": "C14",
+     "sentence": "Specifically, the process involves adding electron acceptors to p-type semiconductors or donors to n-type semiconductors ."
+    },
+    {
+     "cid": "C4",
+     "sentence": "Doping also aids in the design of field-effect transistors by helping to calibrate device parameters ."
+    }
+   ],
+   "word_count": 299,
+   "n_sections": 3,
+   "n_citations": 6,
+   "record_level": 6,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "803bc7891917f823a52948eb",
+  "question": "How does in-context learning for LLMs differ from traditional machine learning model training?",
+  "sections": [
+   {
+    "title": "Mechanistic Differences",
+    "text": "In-context learning (ICL) is widely considered distinct from supervised or unsupervised learning, which typically focus on feature extraction, whereas ICL may execute algorithms to learn [6]. Unlike traditional machine learning approaches where models are updated using training examples, ICL operates without parameter updates [4] [5]. Instead of gradient descent, transformers can use ICL to approximate machine learning algorithms such as logistic regression and neural networks [3]. Pioneering tabular models by Hollmann et al. (2025) and Qu et al. (2025) have demonstrated that ML tasks can be solved purely by ICL without gradient descent [2]. From a Bayesian perspective, LLMs infer a latent variable containing task information within a probabilistic model of reasoning during ICL [1]. Furthermore, GPT models act as meta-optimizers by adapting their internal mechanisms through ICL, a process akin to meta-learning principles [1]. As model size grows, ICL capability emerges, differing from conventional ML in how examples are treated.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "These sections discuss how LLMs, specifically GPT, act as meta-optimizers by adapting their internal mechanisms through what is conceptualized as in-context learning—akin to meta-learning principles of",
+       "These sections discuss the Bayesian lens through which LLMs are viewed, proposing that LLMs infer a latent variable containing task information in a probabilistic model of reasoning during in-context learning."
+      ],
+      "title": "in-context learning in large language models (llms): mechanisms, capabilities, and implications for advanced knowledge representation and reasoning",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "Orthogonally, pioneering tabular models (Hollmann et al., 2025; Qu et al., 2025) have demonstrated ML tasks can be solved purely by ICL—without gradient descent."
+      ],
+      "title": "machinelearninglm: scaling many-shot in-context learning via continued pretraining",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "ICL first emerged in LLMs [3] and later studies revealed that transformers can use ICL to approximate machine learning algorithms such as logistic regression and neural networks [19, 35]."
+      ],
+      "title": "enabling few-shot alzheimer's disease diagnosis on biomarker data with tabular llms",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "Consequently, understanding the internal mechanisms that give rise to in-context learning in LLMs, has been a key focus in the machine learning community."
+      ],
+      "title": "a circuit for predicting hierarchical structure in-context in large language models",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[5]",
+      "snippets": [
+       "This differs from traditional machine learning approaches where models are updated using training examples."
+      ],
+      "title": "codebook llms: evaluating llms as measurement tools for political science concepts",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [
+       "Thus, many believe that the in-context learning mechanism is different from supervised learning or unsupervised learning, where the latter may focus on feature learning, while the ICL may perform some algorithm to learn."
+      ],
+      "title": "bypassing the exponential dependency: looped transformers efficiently learn in-context by multi-step gradient descent",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Workflow and Practical Implications",
+    "text": "The core idea of ICL is to learn from analogy via few demonstration examples provided in the prompt context [8]. This allows practitioners to customize prompts instead of undergoing the traditional machine learning procedure of training, validation, and deployment [8]. By presenting structured examples, explanations, and relevant background information, ICL enables models to recognize patterns and generalize solutions to new problems, particularly in reasoning-based tasks [10]. Content in the context influences LLM behavior, confirming that ICL is effective to some extent [9]. However, prompt engineering has become the most impactful factor affecting ICL performance [8]. While pre-training an LM is the most expensive step in the ICL procedure, both public and private pre-trained LLMs are currently available [8]. In terms of efficiency, test-time fine-tuning takes time linear in the number of tokens, whereas ICL with a transformer has quadratic complexity [7].",
+    "citations": [
+     {
+      "id": "[7]",
+      "snippets": [
+       "Notably, test-time fine-tuning takes time linear in the number of tokens whereas in-context learning with a transformer has quadratic complexity (Vaswani et al., 2017).",
+       "Next to this, Hardt & Sun (2024) and other works have found (test-time) fine-tuning to perform substantially better than in-context learning (Hu et al., 2022; Mosbach et al., 2023).",
+       "we find that fine-tuning at test-time tends to outperform or perform on-par with in-context learning."
+      ],
+      "title": "efficiently learning at test-time: active fine-tuning of llms",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "2 TEST-TIME FINE-TUNING",
+         "chunk_id": "sciverse_efficiently_learning_at_test_time_active_fine_tuning_of_llms#c3",
+         "char_start": 4685
+        }
+       ]
+      }
+     },
+     {
+      "id": "[8]",
+      "snippets": [
+       "Pre-training an LM is the most expensive step, but currently, both public and private pre-trained LLMs are available.",
+       "For instance, prompt engineering has become the most impactful part that affects the performance of an in-context learning method.",
+       "Machine learning practitioners now only need to customise prompts instead of going through the traditional machine learning procedure of training, validation, and deployment."
+      ],
+      "title": "utilising a large language model to annotate subject metadata: a case study in an australian national research data catalogue",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": "2310.11318",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[9]",
+      "snippets": [
+       "content in context can influence the behavior of LLMs, which means that in-context learning is indeed effective to some extent"
+      ],
+      "title": "mockingbird: how does llm perform in general machine learning tasks?",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[10]",
+      "snippets": [
+       "By presenting structured examples, explanations, and relevant background information, in-context learning allows models to recognize patterns and generalize solutions to new problems, particularly in reasoning-based tasks (Brown et al., 2020)."
+      ],
+      "title": "teaching llms music theory with in-context learning and chain-of-thought prompting: pedagogical strategies for machines",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Performance Comparisons",
+    "text": "Comparisons between ICL and fine-tuning reveal mixed results. Generally, fine-tuning at test-time tends to outperform or perform on par with in-context learning [7]. Specifically, Hardt & Sun (2024) and other works have found that test-time fine-tuning performs substantially better than in-context learning [7]. Conversely, ICL performs worse than manual prompting on some tasks and suffers from high variance [12]. In a specific application, ASIST shows 7% to 11% higher segmentation, detection, and tracking performance on microvilli relative to fully supervised methods, and comparable performance on Hela cell videos [11].",
+    "citations": [
+     {
+      "id": "[11]",
+      "snippets": [
+       "ASIST shows 7% to 11% higher segmentation, detection and tracking performance on microvilli relative to fully supervised methods, and comparable performance on Hela cell videos."
+      ],
+      "title": "ASIST: Annotation-free Synthetic Instance Segmentation and Tracking by Adversarial Simulations",
+      "metadata": {
+       "year": 2021,
+       "doi": null,
+       "arxiv": "2101.00567",
+       "authors": [
+        "Quan Liu",
+        "Isabella M. Gaeta",
+        "Mengyang Zhao",
+        "Ruining Deng"
+       ],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[12]",
+      "snippets": [
+       "We observe that in-context learning performs even worse than manual prompt on some tasks, and suffers from high variance."
+      ],
+      "title": "Black-Box Tuning for Language-Model-as-a-Service",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2201.03514",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "Overall Comparison.",
+         "chunk_id": "hub_W4225619898#c15",
+         "char_start": 30746
+        }
+       ]
+      }
+     },
+     {
+      "id": "[7]",
+      "snippets": [
+       "Notably, test-time fine-tuning takes time linear in the number of tokens whereas in-context learning with a transformer has quadratic complexity (Vaswani et al., 2017).",
+       "Next to this, Hardt & Sun (2024) and other works have found (test-time) fine-tuning to perform substantially better than in-context learning (Hu et al., 2022; Mosbach et al., 2023).",
+       "we find that fine-tuning at test-time tends to outperform or perform on-par with in-context learning."
+      ],
+      "title": "efficiently learning at test-time: active fine-tuning of llms",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "2 TEST-TIME FINE-TUNING",
+         "chunk_id": "sciverse_efficiently_learning_at_test_time_active_fine_tuning_of_llms#c3",
+         "char_start": 4685
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 19,
+   "n_claims_usable": 19,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_downgraded": [
+    {
+     "cid": "C16",
+     "sentence": "As model size grows, ICL capability emerges, differing from conventional ML in how examples are treated ."
+    }
+   ],
+   "word_count": 381,
+   "n_sections": 3,
+   "n_citations": 12,
+   "record_level": 12,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": [
+    "[11]"
+   ]
+  }
+ },
+ {
+  "qid": "ab3651c422a54f40aa4bac3f",
+  "question": "How do large language models like ChatGPT impact the diversity of published scientific ideas?",
+  "sections": [
+   {
+    "title": "Idea Generation and Distinctness",
+    "text": "Large language models demonstrate the capacity to produce research concepts that are relevant, feasible, and novel to a certain degree [1]. An evaluation across five domains—Computer Science, Economics, Chemistry, Physics, and Medicine—reveals significant variations in the distinctness of these generated ideas [1]. GPT-4 generally produces more distinct ideas than Gemini and GPT-3.5, with the exception of the Economics domain [1]. Conversely, GPT-3.5 exhibits the lowest distinctness overall, although it slightly outperforms Gemini in the Computer domain [1][1]. Gemini’s distinctness is also quite low, though marginally higher than GPT-3.5 in most areas [1]. In every domain assessed, GPT-3.5 and Gemini score lower than both GPT-4 and Claude [1]. However, measuring distinctness is complex; relying solely on the Idea Distinctness Index, which uses cosine similarity, may overlook semantic nuances where ideas appear similar but represent different research directions [1]. Therefore, comparing ideas requires semantic analysis rather than just syntactic differences [1]. Furthermore, LLMs may fail to generate many high-quality ideas because they lack access to the full context of recently published papers and methodological findings [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "But it may not generate many good ideas since it does not have access to recently published papers or other methodological findings related to the current paper.",
+       "However, comparing two ideas need semantic comparisons rather than just syntactic differences.",
+       "Also, Idea Distinctness Index, which relies on cosine similarity, might miss subtle differences between ideas that appear semantically similar but actually represent distinct research directions.",
+       "GPT-3.5 and Gemini have lower scores than both GPT-4 and Claude in every domain.",
+       "the distinctness of Gemini is also quite low; however, it is slightly better than GPT-3.5, except in the Computer domain.",
+       "re lower due to insufficient detail. We also conducted a human analysis to understand the quality of research ideas generated when the IAScore is low (see Appendix G).\n\n# 5.2 Distinctness Results\n\nWe show the comparative evaluation of idea distinctness scores in Figure 4. The line graph depicts the variation of distinctness between the generated ideas and the human-written ideas (AP-FRIs). GPT-3.5",
+       "GPT-3.5 shows the least distinctness among the generated ideas, except in the Computer domain, where it is slightly more distinct than Gemini.",
+       "Our findings demonstrate that LLMs have the potential to generate research ideas that are relevant, distinct, feasible, and novel—to some extent.",
+       "In the Chemistry and Economics domains, Claude has the highest IAScore, indicating strong alignment with the authors' future research ideas.",
+       "Our overall analysis shows that ideas of moderate length (20-40 words) achieve the highest Impact Assessment Scores (IAScores), balancing detail and clarity"
+      ],
+      "title": "can large language models unlock novel scientific research ideas?",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "C Effect of giving only Title and Abstract as Input",
+         "chunk_id": "sciverse_can_large_language_models_unlock_novel_scientific_research_ideas_#c37",
+         "char_start": 48357
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Impact on Scientific Writing and Readability",
+    "text": "The integration of LLMs into scientific workflows accelerates publication growth and reduces human workload [4]. However, this trend correlates with a steady annual decrease in the readability of abstracts, suggesting that scientific writing is becoming increasingly complex [3]. A significant change in readability was observed in 2023 and the analyzed months of 2024, following the release of ChatGPT [3]. These findings point to the likely influence of AI on broader scientific writing patterns [3]. In terms of content quality, ideas of moderate length (20-40 words) achieve the highest Impact Assessment Scores (IAScores) by balancing detail and clarity [1]. In the Chemistry and Economics domains, Claude achieved the highest IAScore, indicating strong alignment with authors' future research directions [1]. Despite these efficiencies, there is no evidence that LLMs are replacing human researchers in idea generation [2].",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "Our results indicate a strong bias in many widely used LLMs towards overgeneralizing scientific conclusions, posing a significant risk of large-scale misinterpretations of research findings.",
+       "Generics are known to obscure differences between individuals of a reference class since they are semantically underdetermined",
+       "Notably, newer models tended to perform worse in generalization accuracy than earlier ones.",
+       "with DeepSeek, ChatGPT-4o, and LLaMA 3.3 70B overgeneralizing in 26–73% of cases.",
+       "In a direct comparison of LLM-generated and human-authored science summaries, LLM summaries were nearly five times more likely to contain broad generalizations (OR = 4.85, 95% CI [3.06, 7.70], \\(p < 0.001\\)).",
+       "Even when explicitly prompted for accuracy, most LLMs produced broader generalizations of scientific results than those in the original texts"
+      ],
+      "title": "generalization bias in large language model summarization of scientific research",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "Generalization Bias in Large Language Model Summarization of Scientific Research",
+         "chunk_id": "sciverse_generalization_bias_in_large_language_model_summarization_of_scientific_research#c0",
+         "char_start": 0
+        }
+       ]
+      }
+     },
+     {
+      "id": "[1]",
+      "snippets": [
+       "But it may not generate many good ideas since it does not have access to recently published papers or other methodological findings related to the current paper.",
+       "However, comparing two ideas need semantic comparisons rather than just syntactic differences.",
+       "Also, Idea Distinctness Index, which relies on cosine similarity, might miss subtle differences between ideas that appear semantically similar but actually represent distinct research directions.",
+       "GPT-3.5 and Gemini have lower scores than both GPT-4 and Claude in every domain.",
+       "the distinctness of Gemini is also quite low; however, it is slightly better than GPT-3.5, except in the Computer domain.",
+       "re lower due to insufficient detail. We also conducted a human analysis to understand the quality of research ideas generated when the IAScore is low (see Appendix G).\n\n# 5.2 Distinctness Results\n\nWe show the comparative evaluation of idea distinctness scores in Figure 4. The line graph depicts the variation of distinctness between the generated ideas and the human-written ideas (AP-FRIs). GPT-3.5",
+       "GPT-3.5 shows the least distinctness among the generated ideas, except in the Computer domain, where it is slightly more distinct than Gemini.",
+       "Our findings demonstrate that LLMs have the potential to generate research ideas that are relevant, distinct, feasible, and novel—to some extent.",
+       "In the Chemistry and Economics domains, Claude has the highest IAScore, indicating strong alignment with the authors' future research ideas.",
+       "Our overall analysis shows that ideas of moderate length (20-40 words) achieve the highest Impact Assessment Scores (IAScores), balancing detail and clarity"
+      ],
+      "title": "can large language models unlock novel scientific research ideas?",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "C Effect of giving only Title and Abstract as Input",
+         "chunk_id": "sciverse_can_large_language_models_unlock_novel_scientific_research_ideas_#c37",
+         "char_start": 48357
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "These findings offer insights into the broader changes in readability and point to the likely influence of AI on scientific writing.",
+       "Additionally, following the release of ChatGPT, a significant change in readability is observed for 2023 and the analyzed months of 2024.",
+       "The results show a steady annual decrease in readability, suggesting that abstracts are likely becoming increasingly complex.",
+       "Similar trends are found across categories, with most experiencing a notable change in readability during 2023 and 2024."
+      ],
+      "title": "exploring the change in scientific readability following the release of chatgpt",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "Exploring the Change in Scientific Readability Following the Release of ChatGPT",
+         "chunk_id": "sciverse_exploring_the_change_in_scientific_readability_following_the_release_of_chatgpt#c0",
+         "char_start": 0
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "While this trend accelerates publication growth and reduces human workload, it also introduces serious risks.",
+       "Such issues can damage reputations, waste resources, and even endanger lives when flawed studies influence medical or safety-critical systems."
+      ],
+      "title": "chatgpt: excellent paper! accept it. editor: imposter found! review rejected",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Risks of Overgeneralization and Bias",
+    "text": "A major concern is that LLMs tend to overgeneralize scientific conclusions, posing a risk of large-scale misinterpretations [2]. Even when explicitly prompted for accuracy, most LLMs produced broader generalizations than those found in original texts [2]. In direct comparisons, LLM-generated summaries were nearly five times more likely to contain broad generalizations than human-authored ones, with an odds ratio of 4.85 (95% CI [3.06, 7.70], p<0.001) [2]. Specific models, including DeepSeek, ChatGPT-4o, and LLaMA 3.3 70B, overgeneralized in 26–73% of cases [2]. While newer models like GPT-4o and DeepSeek showed less overgeneralization than older ones, the text notes that newer models tended to perform worse in generalization accuracy than earlier ones [2]. This tendency to omit limiting details leads to conclusions broader than warranted [3]. Generic LLMs may lack the domain-specific knowledge required for truly novel ideas, as generics are semantically underdetermined and obscure individual differences [2]. Consequently, papers written or reviewed by LLMs may lack real novelty, contain fabricated or biased results, or mislead downstream research [4]. Such flawed studies can damage reputations, waste resources, and endanger lives in medical or safety-critical systems [4].",
+    "citations": [
+     {
+      "id": "[4]",
+      "snippets": [
+       "While this trend accelerates publication growth and reduces human workload, it also introduces serious risks.",
+       "Such issues can damage reputations, waste resources, and even endanger lives when flawed studies influence medical or safety-critical systems."
+      ],
+      "title": "chatgpt: excellent paper! accept it. editor: imposter found! review rejected",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "Our results indicate a strong bias in many widely used LLMs towards overgeneralizing scientific conclusions, posing a significant risk of large-scale misinterpretations of research findings.",
+       "Generics are known to obscure differences between individuals of a reference class since they are semantically underdetermined",
+       "Notably, newer models tended to perform worse in generalization accuracy than earlier ones.",
+       "with DeepSeek, ChatGPT-4o, and LLaMA 3.3 70B overgeneralizing in 26–73% of cases.",
+       "In a direct comparison of LLM-generated and human-authored science summaries, LLM summaries were nearly five times more likely to contain broad generalizations (OR = 4.85, 95% CI [3.06, 7.70], \\(p < 0.001\\)).",
+       "Even when explicitly prompted for accuracy, most LLMs produced broader generalizations of scientific results than those in the original texts"
+      ],
+      "title": "generalization bias in large language model summarization of scientific research",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "Generalization Bias in Large Language Model Summarization of Scientific Research",
+         "chunk_id": "sciverse_generalization_bias_in_large_language_model_summarization_of_scientific_research#c0",
+         "char_start": 0
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "These findings offer insights into the broader changes in readability and point to the likely influence of AI on scientific writing.",
+       "Additionally, following the release of ChatGPT, a significant change in readability is observed for 2023 and the analyzed months of 2024.",
+       "The results show a steady annual decrease in readability, suggesting that abstracts are likely becoming increasingly complex.",
+       "Similar trends are found across categories, with most experiencing a notable change in readability during 2023 and 2024."
+      ],
+      "title": "exploring the change in scientific readability following the release of chatgpt",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "Exploring the Change in Scientific Readability Following the Release of ChatGPT",
+         "chunk_id": "sciverse_exploring_the_change_in_scientific_readability_following_the_release_of_chatgpt#c0",
+         "char_start": 0
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 24,
+   "n_claims_usable": 24,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "word_count": 493,
+   "n_sections": 3,
+   "n_citations": 4,
+   "record_level": 4,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ }
+]

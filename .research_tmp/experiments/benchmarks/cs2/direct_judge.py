@@ -40,6 +40,10 @@ os.environ["OPENAI_API_KEY"] = "sk-placeholder"
 # provider 环境映射：openai-api/glm/GLM-5.3 需要 GLM_* 键（.env 里是 PARATERA_*）
 os.environ["GLM_API_KEY"] = os.environ.get("PARATERA_API_KEY", "")
 os.environ["GLM_BASE_URL"] = os.environ.get("PARATERA_BASE_URL", "")
+# DeepSeek-V4.1-Flash（09-28 换尺）：openai-api/deepseek/* 需要 DEEPSEEK_* 键
+# （同一 Paratera 网关）
+os.environ["DEEPSEEK_API_KEY"] = os.environ.get("PARATERA_API_KEY", "")
+os.environ["DEEPSEEK_BASE_URL"] = os.environ.get("PARATERA_BASE_URL", "")
 
 from astabench.evals.sqa.task import score_sqa, score_precision, score_citation
 from astabench.evals.sqa.rubric import extract_json_from_response
@@ -53,11 +57,36 @@ import astabench.evals.sqa.rubric as _mod_rubric
 import astabench.evals.sqa.precision_eval as _mod_precision
 import astabench.evals.sqa.citation_eval as _mod_citation
 _orig_gwr = _ru.generate_with_retry
+
+def _normalize_zero_based(parsed):
+    """0-based→1-based criteria_idx 归一化（模型编号习惯差异：GLM 1 起、
+    DeepSeek 0 起——语义同构，平移对齐官方 schema；非 0 起或非连续时
+    原样返回由原 validator 裁决）。"""
+    try:
+        scores = parsed.get("scores")
+        if isinstance(scores, list) and scores:
+            idxs = [s.get("criteria_idx") for s in scores
+                    if isinstance(s, dict) and isinstance(s.get("criteria_idx"), int)]
+            # 含 0 即 0-based 错位（1-based 合法域从 1 起）→ +1 平移
+            if idxs and 0 in idxs and max(idxs) <= len(scores):
+                for s in scores:
+                    if isinstance(s, dict) and isinstance(s.get("criteria_idx"), int):
+                        s["criteria_idx"] += 1
+    except Exception:
+        pass
+    return parsed
+
 async def _gwr_capped(*a, **kw):
     kw.setdefault("max_retries", 4)
     # 判分提速 A 档（09-28）：JSON 解析失败同分布重试，指数退避
     # （默认 2×1.5^n，5 次重试累计 ~30s）无意义——固定短间隔
     kw.setdefault("base_delay", 1.0)
+    # idx 归一化钩子（09-28 换尺 DeepSeek）：包 parsed_validator
+    orig_validator = kw.get("parsed_validator")
+    if orig_validator is not None:
+        def _norm_validator(parsed, _ov=orig_validator):
+            return _ov(_normalize_zero_based(parsed))
+        kw["parsed_validator"] = _norm_validator
     return await _orig_gwr(*a, **kw)
 for _m in (_mod_rubric, _mod_precision, _mod_citation):
     _m.generate_with_retry = _gwr_capped
@@ -77,9 +106,16 @@ class _State:
 _SCORER_CAP = 12
 _scorer_sem = None  # main() 里初始化（绑定事件循环）
 
-async def judge_one(question, rubric_json, report_json_str):
+async def judge_one(question, rubric_json, report_json_str,
+                    judge_model="openai-api/paratera/DeepSeek-V4.1-Flash"):
     """rubric_json=官方 rubric 行（含 ingredients），report=答案 JSON 串。"""
-    model = get_model("openai-api/glm/GLM-5.3")
+    model = get_model(judge_model)
+    # openai-api/<svc>/<model> 的 inspect provider 会把 '<svc>/<model>' 整段
+    # 当模型名发出去——Paratera 只认裸名（'DeepSeek-V4.1-Flash'）。service
+    # 前缀只用于定位 PARATERA_API_KEY/BASE_URL，发送名剥掉前缀。
+    _short = judge_model.split("/", 2)[-1] if judge_model.count("/") >= 2 else None
+    if _short and hasattr(model, "api") and hasattr(model.api, "model_name"):
+        model.api.model_name = _short
     target = Target([json.dumps(rubric_json, indent=2)])
     # 参数对齐官方 task.py（simplified_eval+assess_jointly=True 是
     # score_all 的默认；citation 走 all_at_once——与官方一致）
@@ -99,7 +135,8 @@ async def judge_one(question, rubric_json, report_json_str):
     # 判分提速 B 档（09-28）：JSON 解析失败同分布重试，指数退避无意义
     # （非限流）——固定 2s；retry_utils 的 base_delay patch。
     async def _run(name, sc):
-        async with _scorer_sem:
+        sem = _scorer_sem or asyncio.Semaphore(_SCORER_CAP)
+        async with sem:
             state = _State(report_json_str, {"initial_prompt": question})
             s = await sc(state, target)
         v = s.value if isinstance(s.value, dict) else {"score": s.value}
@@ -130,6 +167,11 @@ async def main():
     in_path = sys.argv[1] if len(sys.argv) > 1 else "judge_input_elicit_dev20.json"
     out_path = sys.argv[2] if len(sys.argv) > 2 else "direct_scores_elicit.json"
     n_par = int(sys.argv[3]) if len(sys.argv) > 3 else 8
+    # 判分模型（09-28 换尺）：GLM-5.3 思考模型长输出 JSON 易碎+分钟级延迟
+    # ——换 DeepSeek-V4.1-Flash（实测 2.7s 延迟、长 JSON 稳定）。
+    # 预注册更新：换尺后 GLM 判的历史分数作废、全量重判。
+    judge_model = (sys.argv[4] if len(sys.argv) > 4 else
+                   os.environ.get("JUDGE_MODEL", "openai-api/paratera/DeepSeek-V4.1-Flash"))
     global _scorer_sem
     _scorer_sem = asyncio.Semaphore(_SCORER_CAP)
     rows = json.load(open(in_path, encoding="utf-8"))
@@ -161,7 +203,7 @@ async def main():
         async with sem:
             print(f"[{i+1}/{len(rows)}] {r['qid'][:14]} judging...", flush=True)
             try:
-                scores = await judge_one(r["question"], rubric, report)
+                scores = await judge_one(r["question"], rubric, report, judge_model)
             except Exception as e:
                 print(f"  -> FAIL {r['qid'][:14]} {type(e).__name__}: "
                       f"{str(e)[:100]}", flush=True)

@@ -178,6 +178,12 @@ _REF_RE = re.compile(r"^\s*[-*]?\s*\[(\d+)\]\s*(.*)$", re.M)
 
 
 
+def _safe_topic(t):
+    """Windows 路径 sanitize：STORM 把 topic 拼进输出目录名——题面含
+    ?/: 等非法字符先清洗。"""
+    return re.sub(r'[^A-Za-z0-9_\- ]+', '', t)[:80].strip().replace(' ', '_') or 'topic'
+
+
 def article_to_cs2(article_md: str, url_to_info: dict | None = None) -> list[dict]:
     """STORM 产物 → CS2 sections/citations。polished 文章引用是 [n] 数字
     标记；url_to_info.json 给 n → {url, title, snippets}（snippets=检索
@@ -260,10 +266,6 @@ def run(smoke: bool = False):
         out_dir = os.path.join(BASE_DIR, qid)
         os.makedirs(out_dir, exist_ok=True)
         try:
-            # Windows 路径 sanitize：STORM 把 topic（CS2 题面含 ?/: 等
-            # 非法字符）拼进输出目录名——先清洗成安全形式
-            def _safe_topic(t):
-                return re.sub(r'[^A-Za-z0-9_\- ]+', '', t)[:80].strip().replace(' ', '_') or 'topic'
             args = STORMWikiRunnerArguments(
                 output_dir=out_dir,
                 # 官方默认全保留（显式写出防上游漂移）
