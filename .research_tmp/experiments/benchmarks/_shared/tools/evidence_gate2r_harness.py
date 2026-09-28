@@ -622,6 +622,11 @@ def note_gate(notes, valid_ids):
             else:
                 kept.append(s)
         else:
+            # FULLCHAIN 第二轮 V2（笔记形态前置约束）：非 N 前缀行不再
+            # 无条件放行——15b 实测 38 行全散文（下游 LLM 规范化兜底能
+            # 救但证据面已窄）。带 [id] 回指的散文行照旧放行（dash 形态
+            # 是合法变体）；完全无形态的自由散文首次出现时提示重写
+            # （不拒——拒了触发重写循环烧步数，提示+放行让下一步自纠）。
             kept.append(s)
     return "\n".join(kept), bad
 
@@ -1601,6 +1606,27 @@ def run_question(q, arm, kb, tkb, grounding, glog):
             _audit = coverage_audit(notes, queried, REC_INDEX, steps_left, cov_suggest, q_pids, n_matrix_tables=_nmt)
             if _audit:
                 obs = (_audit + "\n\n" + obs) if obs else _audit
+            # FULLCHAIN 第二轮 V3（窄面题广度引导）：批15 方差解剖实锤
+            # DSL/ontology 类窄面题（笔记覆盖论文 2-4 篇）一篇命中差异=
+            # 30-50% 证据面差→双样本极差 0.24。半程时覆盖论文 <3 且
+            # gap 未清 → 一次性广度引导（扩源查询建议），与 F22 同点位
+            # 注入（不新开提示位——27B 对多系统消息敏感）。
+            if arm == "main" and steps_left == 8:
+                _npapers = len({m for m in re.findall(
+                    r"\[([0-9A-Za-z_:\-#\.]{8,})\]", notes or "")})
+                if _npapers < 3 and (gaps or "").strip().upper() != "NONE":
+                    obs = ("[SYSTEM] BREADTH CHECK: your notes cite evidence "
+                           "from fewer than 3 distinct sources. For a survey "
+                           "question this is thin coverage — run 2-3 "
+                           "search_papers / findings(contains=...) calls with "
+                           "DIFFERENT phrasings to surface additional papers "
+                           "before answering.\n\n" + obs) if obs else (
+                        "[SYSTEM] BREADTH CHECK: your notes cite evidence "
+                        "from fewer than 3 distinct sources. For a survey "
+                        "question this is thin coverage — run 2-3 "
+                        "search_papers / findings(contains=...) calls with "
+                        "DIFFERENT phrasings to surface additional papers "
+                        "before answering.")
                 traj.append({"coverage_audit": True, "at_step": steps,
                              "unique_queries": len(queried)})
         p = build_step_prompt(system, q, notes_full(), gaps, queried, obs,
@@ -1656,6 +1682,17 @@ def run_question(q, arm, kb, tkb, grounding, glog):
                                 "A-lines wastes your step; continue with an "
                                 "<action> instead.")
             kept, bad = note_gate(st["notes"], valid_ids)
+            # FULLCHAIN 第二轮 V2（笔记形态前置约束）：自由散文行占比高
+            # 时提示按 NOTES_SPEC 重写（15b 实测 38 行全散文——下游 LLM
+            # 规范化能兜底但证据面已窄；前置提示让下一步自纠）。
+            _lines = [l.strip() for l in kept.split("\n") if l.strip()]
+            _n_form = sum(1 for l in _lines
+                          if re.match(r"(N\d+\.|X\d+\.|\[unsourced\])", l))
+            if _lines and _n_form / len(_lines) < 0.5 and steps >= 1:
+                obs += ("\n[SYSTEM] FORMAT: most of your notes are free-form "
+                        "prose lines. Rewrite them as N<i>. [record_id] "
+                        "<claim> lines per the notes spec — prose lines lose "
+                        "their evidence linkage at answer time.")
             if bad:
                 gate_info["note_rejects"] += len(bad)
                 # F28-era instrumentation (2026-09-19 batch 2): reject-reason

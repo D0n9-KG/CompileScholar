@@ -77,6 +77,10 @@ def _cand_row(c) -> dict:
         "year": getattr(c, "year", None),
         "doi": getattr(c, "normalized_doi", None),
         "source": getattr(c, "source_name", None),
+        # FULLCHAIN 接线（PaperQA2 CS2 臂）：doc_id 透传——Sciverse 全文
+        # 通道（分页 /content）靠它解析全文；行里不带=下游只能拿摘要级
+        # 命中（实测 _fetch_full 1.3s 返回空）。harness 臂多一个字段无副作用。
+        "doc_id": (raw.get("doc_id") if isinstance(raw, dict) else None),
         "abstract": (abstract[:900] + "…") if len(abstract) > 900 else abstract,
     }
 

@@ -55,6 +55,9 @@ import astabench.evals.sqa.citation_eval as _mod_citation
 _orig_gwr = _ru.generate_with_retry
 async def _gwr_capped(*a, **kw):
     kw.setdefault("max_retries", 4)
+    # 判分提速 A 档（09-28）：JSON 解析失败同分布重试，指数退避
+    # （默认 2×1.5^n，5 次重试累计 ~30s）无意义——固定短间隔
+    kw.setdefault("base_delay", 1.0)
     return await _orig_gwr(*a, **kw)
 for _m in (_mod_rubric, _mod_precision, _mod_citation):
     _m.generate_with_retry = _gwr_capped
@@ -93,6 +96,8 @@ async def judge_one(question, rubric_json, report_json_str):
     # FULLCHAIN-AUDIT P2-15：保存 scorer metadata（per-criterion 明细/
     # num_retries/irrelevant_texts）——排雷与审稿举证可审计；P2-16：
     # return_exceptions=True（一 scorer 崩不再丢弃其余两个的结果）
+    # 判分提速 B 档（09-28）：JSON 解析失败同分布重试，指数退避无意义
+    # （非限流）——固定 2s；retry_utils 的 base_delay patch。
     async def _run(name, sc):
         async with _scorer_sem:
             state = _State(report_json_str, {"initial_prompt": question})

@@ -120,9 +120,35 @@ class TextSearchIndex:
         return [(i, s) for s, i in sims]
 
     # ---------- fused search ----------
+    @staticmethod
+    def _expand_query(query: str) -> str:
+        """查询词的确定性形态变体（与 KBTools._expand_variants 同规则
+        ——单复数/连字符）。BM25 是 bag-of-words：把每个词的变体词都
+        并进查询文本即可（顺序无关，无组合爆炸）。"""
+        words = query.split()
+        if not words:
+            return query
+        extra = set()
+        for w in words[:12]:
+            if len(w) < 3:
+                continue
+            if w.endswith("s") and len(w) > 3:
+                extra.add(w[:-1])
+            else:
+                extra.add(w + "s")
+            if "-" in w:
+                extra.add(w.replace("-", " "))
+        if not extra:
+            return query
+        return query + " " + " ".join(sorted(extra)[:16])
+
     def search(self, query: str, k: int = 8) -> dict:
-        """RRF fusion of BM25 + vector rankings over raw chunks."""
-        lex = self._bm25_rank(query)
+        """RRF fusion of BM25 + vector rankings over raw chunks.
+        FULLCHAIN 第二轮 V1（方差治本缓解）：BM25 侧词汇敏感（单复数一
+        词之差=不同命中集——批15 双样本 DSL 题第 8 调用分叉实锤）。
+        查询的形态学变体（demonstration/demonstrations、连字符/空格）
+        确定性扩展后并入词法排名（vector 侧天然免疫词法变体，不动）。"""
+        lex = self._bm25_rank(self._expand_query(query))
         vec = self._vector_rank(query)
         rrf = {}
         for rank, (i, _s) in enumerate(lex):

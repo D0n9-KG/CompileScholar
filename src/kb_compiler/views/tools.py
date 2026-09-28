@@ -325,6 +325,36 @@ class KBTools:
 
     # ---------- typed tool 6: findings ----------
 
+    # FULLCHAIN 第二轮 V1：确定性形态学变体表（领域无关——纯英文词法
+    # 规则，无语义假设；语义变体交给 embedding 兜底）
+    _VARIANT_RULES = (
+        # 复数↔单数（最常见：demonstration/demonstrations）
+        (re.compile(r"^(.*[^s])$"), lambda w: w + "s"),
+        (re.compile(r"^(.*)s$"), lambda w: w[:-1]),
+        # 动词形态（record/records/recording 家族的核心两员）
+        (re.compile(r"^(.*)ing$"), lambda w: w[:-3] + "e"),
+        (re.compile(r"^(.*)e$"), lambda w: w[:-1] + "ing"),
+        # 连字符/空格等价（domain-specific ↔ domain specific）
+        (re.compile(r"^(.*)(-)(.*)$"), lambda w: w.replace("-", " ")),
+    )
+
+    @classmethod
+    def _expand_variants(cls, phrase: str) -> list[str]:
+        """单措辞 → [原词, 形态变体...]（确定性，去重，上限 4——防
+        contains 匹配退化为 OR 全库扫）。"""
+        out = [phrase]
+        p = phrase.strip()
+        for rx, fn in cls._VARIANT_RULES:
+            try:
+                v = fn(p) if rx.match(p) else None
+            except Exception:
+                v = None
+            if v and _norm(v) not in {_norm(x) for x in out}:
+                out.append(v)
+            if len(out) >= 4:
+                break
+        return out
+
     def findings(self, entity: str = None, claim_type: str = None,
                  contains: str = None, paper_id: str = None, k: int = 40) -> dict:
         """Deterministic query over finding records (claims/mechanisms/
@@ -339,6 +369,14 @@ class KBTools:
         ——批13 实证 1 vs 11 hits 整题弃答）由此可恢复。"""
         names = self._alias_set(entity) if entity else None
         raw_cns = [c for c in str(contains or "").split("|") if c.strip()]
+        # FULLCHAIN 第二轮 V1（方差治本缓解）：单措辞查询自动同义词扩展
+        # ——批15 双样本实锤：DSL 题前 7 调用一字不差、第 8 调用一词之差
+        # （encoding vs macro recording）→ 命中论文 2 vs 4 篇 → IR 0.47
+        # vs 0.86。词汇敏感度从"agent 抽奖"变"系统保证"：单措辞（无 |）
+        # 查询自动并常用形态学变体（确定性规则，不引入新随机性）。多措辞
+        # （agent 已显式给 | 候选）不重复扩。
+        if len(raw_cns) == 1:
+            raw_cns = self._expand_variants(raw_cns[0])
         cns = [_norm(c) for c in raw_cns] or None
         # FULLCHAIN-AUDIT A3：复合 pid 剥离——grounding 论文清单把 pid
         # 渲染成 'pid(title; cite)' 形态，模型复制整串作 paper_id → 精确
