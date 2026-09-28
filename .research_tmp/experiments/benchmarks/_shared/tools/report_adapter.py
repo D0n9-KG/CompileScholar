@@ -55,6 +55,10 @@ _NOTE_LINE = re.compile(
 # 破折号形态（N 编号缺失/门未拦），refs 仍然完整——按主张行容错解析
 # （引用完整性来自 refs+EvidenceStore 解析，与前缀形态无关）。
 _NOTE_LINE_DASH = re.compile(r"^\s*-\s*(\[[^\]]+\].*)$")
+# 批14 实证形态（2026-09-28）：'- claim text [ref]'——ref 在行尾而非
+# 紧随破折号（批14 ontology 题 34 条证据行全丢=适配失败根因之一）。
+_NOTE_LINE_DASH_TAIL = re.compile(
+    r"^\s*-\s*(.+?)\s*((?:\[[A-Za-z0-9_:\-#\.]{8,}\]\s*)+)$")
 _BACKREF = re.compile(r"\[([A-Za-z0-9_:\-#\.]+)\]")  # 含冒号：粗抽 record_id 是 coarse:xxx 形态（CS2 批1实测）
 
 
@@ -80,12 +84,14 @@ def parse_notes(notes_text: str) -> list[dict]:
                 line = s   # 无 N 前缀但带回指（如 "- [id] ..."）走下面
         m = _NOTE_LINE.match(line)
         md = _NOTE_LINE_DASH.match(line) if not m else None
-        if not m and not md:
+        mdt = _NOTE_LINE_DASH_TAIL.match(line) if not m and not md else None
+        if not m and not md and not mdt:
             continue
-        body = (m.group(2) if m else md.group(1))
+        body = (m.group(2) if m else (md.group(1) if md else mdt.group(0)))
         refs = _BACKREF.findall(body)
-        # 去掉行首回指标记得到纯主张文本
+        # 去掉行首回指标记得到纯主张文本（TAIL 形态行首还有 '- ' 前缀）
         text = _BACKREF.sub(" ", body, count=len(refs))
+        text = re.sub(r"^\s*-\s*", "", text)
         # P1-5（REPAIR-WAVE-0928）：尾部属性拆解不再丢弃 anchor 内容——
         # '| anchor:"verbatim"' 是笔记门规范要求的高质量逐字证据（批
         # 1-13 实证 81 行被 split("|")[0] 整段剥掉，每题丢 0-6 个数值）。
