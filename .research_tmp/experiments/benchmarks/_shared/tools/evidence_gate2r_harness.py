@@ -107,7 +107,10 @@ STEP_CAP = {"broad": 20, "precise": 6}   # H1; F5-rev (user directive 09-09): r1
 BROAD_TYPES = {"aggregation", "coverage", "temporal"}
 TOKEN_CAP_TOTAL = 3_050_000              # prereg total ceiling
 _search_lock = threading.Lock()
-_SEARCH_FAMILY = []   # query token-sets this question (saturation)
+# FULLCHAIN-AUDIT B5：查询族饱和状态 per-question——原模块级全局 list
+# 在 4 线程题间并发下互相污染（一题 clear 掉并发题的饱和计数/别的题
+# 的查询族被计入本题命中）。stage_answer 用 setattr 把本题的 list 挂
+# 到循环局部（_ctx 模式见下），模块级仅留类型注释。
 _cost_lock = threading.Lock()
 COST = {"calls": 0, "est_tokens": 0, "by_stage": defaultdict(lambda: [0, 0])}
 
@@ -167,6 +170,26 @@ def ground_lists(kb, grounding, question):
     the default full-exposure arm on the same question set."""
     conservative = os.environ.get("GROUNDING_CONSERVATIVE", "") == "1"
     qtoks = {t for t in re.findall(r"[a-z0-9][a-z0-9\-\.]{2,}", question.lower())}
+    # FULLCHAIN-AUDIT A8：in_corpus_paper_id 在 CS2 热库全库 None（粗抽/
+    # 综述管线不回填该字段），星标永不亮——而 views_cs2 cards 实有 3,152
+    # 张 dossier（键=entity_id，canonical 在值里）。以 cards 的 canonical
+    # 集为 in_corpus 真值源回填星标判定，b13 DSL 题弃答根因链（模型被
+    # "无星标=无记录"劝退）由此截断。
+    _card_ents = None
+    try:
+        _card_ents = {c.get("canonical") for c in
+                      ((kb.views.get("cards") or {}).get("cards") or {}).values()
+                      if c.get("canonical")}
+    except Exception:
+        _card_ents = None
+
+    def _in_corpus(e):
+        if e.get("in_corpus_paper_id"):
+            return True
+        if _card_ents is not None and e.get("canonical") in _card_ents:
+            return True
+        return False
+
     scored = []
     for surf, eid in kb.surface_index.items():
         stoks = {t for t in re.split(r"[\s\-\.]+", surf) if len(t) > 2}
@@ -174,10 +197,10 @@ def ground_lists(kb, grounding, question):
         if ov:
             e = kb.byid.get(eid)
             if e:
-                if conservative and not e.get("in_corpus_paper_id"):
+                if conservative and not _in_corpus(e):
                     continue
                 scored.append((ov, e.get("mention_count", 0), e["canonical"],
-                               bool(e.get("in_corpus_paper_id"))))
+                               _in_corpus(e)))
     seen, ents = set(), []
     for ov, mc, canon, inc in sorted(scored, key=lambda x: (-x[0], -x[1])):
         if canon not in seen:
@@ -187,7 +210,7 @@ def ground_lists(kb, grounding, question):
     if len(ents) < 12:  # sparse overlap: top-mentioned in-corpus fill
         for e in sorted(kb.registry.get("entities", []),
                         key=lambda x: -x.get("mention_count", 0)):
-            if e.get("in_corpus_paper_id") and e["canonical"] not in seen:
+            if _in_corpus(e) and e["canonical"] not in seen:
                 ents.append(e["canonical"] + "*")
                 seen.add(e["canonical"])
             if len(ents) >= 25:
@@ -277,12 +300,12 @@ Tool catalog (local, deterministic, zero-cost, call as often as needed):
 4. config(entity,item?) configuration records
 5. as_of(year) point-in-time snapshot (at most 2 per question)
 6. findings(entity?,claim_type?,contains?,paper_id?) finding records; claim_type takes EXACTLY one of: mechanism | criticism | definition | recommendation | qualitative_ablation | observation — criticism = the paper's own critical/self-limiting statements (the right channel when the question asks about weaknesses, defects, limitations, or what is missing); contains supports |-separated alternative terms — record wording rarely matches question wording, so give 2-3 phrasings for any important query
-7. card(entity) cross-paper evidence dossier for an entity (configs/results/findings/lineage panorama); a dossier exists ONLY for entities marked * in the entity list — card() on an unmarked name returns empty plus nearest_in_corpus alternatives (re-target to one of those instead of retrying the same name)
+7. card(entity) cross-paper evidence dossier for an entity (configs/results/findings/lineage panorama); a dossier exists for entities in the rich-dossier list below AND for most registry entities mentioned by corpus papers — an empty result returns nearest_in_corpus alternatives (re-target to one of those instead of retrying the same name); the * marker in the entity list is a best-effort flag, NOT a complete dossier indicator
 8. entities(contains?,entity_type?,family?) registry catalog query (category term -> member expansion)
 9. search(query,k?) embedding-retrieval fallback (long tail)
 10. fetch_chunk(record_id, window?) R-C: original text window around a record's chunk — use when a note/row needs surrounding context (table rows, neighboring sentences) beyond the <=40-word quote; returns the verbatim source passage
 11. describe_kb() B6: one-call inventory of this knowledge base (record counts by kind, matrix/lineage/coverage/card view sizes, registry size) — call it FIRST when unsure which view or entity scale you are facing; zero cost
-12. search_text(query, k<=12) A7: hybrid lexical+semantic search over the FULL RAW TEXTS of all corpus papers (BM25+vector fused). The escape hatch when a question targets content the compiled records may not cover (novel phrasings, appendix details, prose context around a known number). Returns verbatim source passages with chunk anchors ([paper_id#char_start]) usable as note backrefs
+12. search_text(query, k<=12) A7: hybrid lexical+semantic search over the full texts of papers retrieved so far (BM25+vector fused; ask describe_kb() for current coverage). The escape hatch when a question targets content the compiled records may not cover (novel phrasings, appendix details, prose context around a known number). A miss means "not in the indexed full texts" — the paper may exist with summary-level records only: try findings()/card() before concluding the corpus lacks it. Returns verbatim source passages with chunk anchors ([paper_id#char_start]) usable as note backrefs
 {ext_catalog}
 
 Channel semantics: numeric experimental results live in compare (matrix rows) and card (main_results) — findings carries claim-type records only and will never return numbers; an empty findings result is not a signal to keep appending keywords to contains.
@@ -291,7 +314,7 @@ Nine-move playbook (typed semantics of this knowledge base; execute item by item
 (1) Provenance chase: a number with epistemic=cited is a restatement; trace the source paper via card/findings(paper_id=source).
 (2) Band discipline: before comparing two numbers verify they share the same band (setup/budget); never compare across bands directly.
 (3) Absence trichotomy: empirical absence from find_gap = cited knowledge (a paper states it did NOT do X); derived absence = corpus state (would change with another corpus); never conflate the two wordings.
-(4) Dossier-first for breadth: for broad/aggregation questions start with card(main entity), then deep-dive the papers named in the dossier via findings(paper_id=...).
+(4) Dossier-first for breadth: for broad/aggregation questions start with card(main entity), then deep-dive the papers named in the dossier via findings(paper_id=...). Breadth comes first on survey questions: cover MANY papers at coarse level (findings/card sweeps) before deep-reading ANY single paper — deep_read the 1-3 clearly central papers only after the breadth sweep has the landscape covered.
 (5) Dual timeline: as_of uses the authoritative year; when narrating, give both the arXiv year and the publication year (when venue_year exists).
 (6) Category expansion: for method-family or technique-category phrases, FIRST pick member names yourself from the entity list below (entries marked * have records grounded in the corpus); entities(contains=name-fragment) is only corroboration — a category phrase is not an entity name and hits zero directly.
 (7) Empty-result trichotomy: empty result -> check nearest_candidates (wrong argument: rename and retry) / check find_gap (true absence: record it) / change angle (not found yet).
@@ -316,7 +339,7 @@ Per-step output (strict):
 
 Answer craft: write the final answer as exhaustive, well-structured prose IN THE LANGUAGE OF THE QUESTION. Cover every aspect the question asks; completeness matters more than brevity — the reader needs a thorough, self-contained answer, not a compact sketch. When the question asks for comparison, organize the prose around the comparison (item by dimension), not as a sequence of standalone item summaries. When the question asks about experimental results or asks to compare reported numbers, the answer must be NUMBER-DENSE: every dataset x method x value present in your notes/observations appears in the answer, grouped by shared dataset/metric so head-to-head reads are immediate — a results answer without the actual numbers is a failed answer, not a safe one; landscape-level prose about research directions does not answer a results question. Cite each source once per passage, not on every sentence. Keep the writing reader-facing: no internal machinery (record ids other than the required [paper_id] citation tags, tool names, loop bookkeeping) in the prose. When information the question asks for was not surfaced by your searches, say exactly that — what your search did not find — and never assert that the literature or the papers do not report it unless an absence-channel query (find_gap / findings(claim_type=criticism)) actually confirms it.
 
-Argument discipline: pick entity arguments from the entity list (* = records grounded in the corpus — only these have card() dossiers); unmarked entries are out-of-corpus context names with NO records behind them, so card() on them is always empty — do not spend steps on them. Never pass category phrases as entity. Remaining steps are shown at the end of each observation; plan accordingly."""
+Argument discipline: pick entity arguments from the entity list where possible (* = records grounded in the corpus); unmarked entries may still have records — card() returns nearest alternatives when empty, so one probe is cheap but do not retry the same name repeatedly. Never pass category phrases as entity. Remaining steps are shown at the end of each observation; plan accordingly."""
 
 # KB_OPEN_SET gate (2026-09-26): external retrieval tools exist only in
 # open-set mode. Closed-set runs (regression comparability with the
@@ -335,7 +358,7 @@ Explore with these BEFORE falling back to blind search_papers. External papers a
 16. search_papers(query, k?) EXTERNAL literature search over the whole world's papers — semantic channel leads, returns title+year+doi+abstract. The blind fallback when the structured leads above do not apply
 17. admit_paper(title?, doi?) register an external paper into the library: resolves a full-text source and returns its paper_id — after which deep_read(paper_id=...) works on it. Run this on the 1-3 external papers most core to the question (from any exploration tool's results)
 18. extract_paper(title, abstract) Tier-1 coarse extraction: digest ONE external paper's abstract into structured records (method/finding/limitation). Cheaper than deep_read when the abstract alone suffices
-19. deep_read(paper_id, sections?) L1 DIRECTED deep upgrade (~3 min): fetches the paper's FULL TEXT (corpus or admitted) and deep-extracts the 2-3 sections most relevant to the question (result/config/finding records at full-text level), then query them via findings(paper_id=...). Pass sections=["ablation", "experimental setup", ...] to read specific sections; omit for automatic question-relevant selection. Remaining sections extract in the background (free for later questions). USE IT when you have found the right paper AND the answer needs SPECIFIC depth — concrete numbers, mechanisms, experimental setups, named case studies. IMPORTANT: coarse (abstract-level) records are NEVER deep enough for these, even when they return plenty of results — abstract-level findings state THAT something works, full-text records explain HOW with what values. When a paper is central to the question, deep_read it instead of stacking more coarse findings; do NOT abstain"""
+19. deep_read(paper_id, sections?) L1 DIRECTED deep upgrade (~3 min): fetches the paper's FULL TEXT (corpus or admitted) and deep-extracts the 2-3 sections most relevant to the question (result/config/finding records at full-text level), then query them via findings(paper_id=...). Pass sections=["ablation", "experimental setup", ...] to read specific sections; omit for automatic question-relevant selection. Remaining sections extract in the background (free for later questions). Use when you have found the right paper AND the answer needs SPECIFIC depth (concrete numbers, mechanisms, setups) that coarse abstract-level records lack. Balance: for survey/breadth questions, keep collecting cross-paper findings/card evidence FIRST (breadth wins ingredient coverage); deep_read only the 1-3 papers that are clearly central to the question"""
 _OPEN_SET = os.environ.get("KB_OPEN_SET", "0") == "1"
 MAIN_SYSTEM = MAIN_SYSTEM.replace("{ext_catalog}",
                                    EXT_CATALOG if _OPEN_SET else "")
@@ -1043,7 +1066,9 @@ def _harvest_handles(res, acc):
 
 def obs_record_ids(res, acc):
     if isinstance(res, dict):
-        for key in ("record_id", "paper_id", "chunk_id"):
+        # FULLCHAIN-AUDIT B4：兼容 "id" 键（deep_read sample_records 旧
+        # 形态）——收割漏键=agent 合法回指被判 bad_backref 降级
+        for key in ("record_id", "paper_id", "chunk_id", "id"):
             v = res.get(key)
             if isinstance(v, str):
                 acc.add(v)
@@ -1304,13 +1329,18 @@ def f28_targets(gaps, queried, pids, notes=None):
     shallow — the auto-fetch adds findings material but cannot fix
     transcription; bounded by the 3-autos cap."""
     out = []
-    for m in re.findall(r"[0-9A-Za-z]{8,20}", gaps or ""):
+    # FULLCHAIN-AUDIT B1：CS2 的 paper_id 是 52-89 字符下划线长串
+    # （sciverse_dilogics_creating_...），原 {8,20} 上限把 pid 碎成
+    # 'sciverse/assisted/authoring' 片段、括号扫描 {4,40} 装不下——两个
+    # 发现通道结构性失明，F28 救援档死代码化，24/25 题被 3 步无证据
+    # 硬杀（平均浪费 16.8/30 步）。上限扩到 96 覆盖最长 CS2 pid。
+    for m in re.findall(r"[0-9A-Za-z_]{8,96}", gaps or ""):
         if m in pids and m not in out:
             out.append(m)
     if notes:
         deep, shallow = set(), []
         for line in notes.split("\n"):
-            line_pids = [a for a in re.findall(r"\[([^\]\n]{4,40})\]", line)
+            line_pids = [a for a in re.findall(r"\[([^\]\n]{4,96})\]", line)
                          if a in pids]
             if not line_pids:
                 continue
@@ -1400,12 +1430,18 @@ def run_question(q, arm, kb, tkb, grounding, glog):
         # CS2 批1实测（09-28）：3/5 题磨满 48 步（笔记不收敛+同主题重复
         # 检索），20 步时材料已齐。天花板降 30（CS2_CAP_MAX 可调/回滚）。
         cap = min(cap, int(os.environ.get('CS2_CAP_MAX', '30')))
-    _SEARCH_FAMILY.clear()  # per-question query-family saturation state
+    # FULLCHAIN-AUDIT B5：per-question 饱和状态（局部 list，循环里通过
+    # q['_search_family'] 传递——不再用模块级全局）
+    q["_search_family"] = []
     # deep_read L1 定向模式（2026-09-28）：把当前题目注入 broker——
     # Agent 未显式传 sections 时的默认选择依据（题目 token 重叠前 3 节）
+    # FULLCHAIN-AUDIT B5：_current_question 类级共享在并发下被最后写入
+    # 的题串写；改为 per-question dict（deep_read 现场读 q_deep_read_key
+    # 索引）。q["_deep_read"] = 本题已读论文集（per-question 饱和）。
     _ext = getattr(kb, "_ext_tools", None)
     if _ext is not None:
         _ext._current_question = q["question"]
+        _ext._q_deep_read = q.setdefault("_deep_read", set())
     glist = ground_lists(kb, grounding, q["question"]) if arm == "main" else None
     system = MAIN_SYSTEM if arm == "main" else CONTROL_SYSTEM
     notes, gaps, queried, obs = "", "", [], ""
@@ -1963,10 +1999,11 @@ def run_question(q, arm, kb, tkb, grounding, glog):
                     _q = str(args.get("query", q["question"]))[:300]
                     _qtoks = frozenset(t for t in re.findall(
                         r"[a-z]{4,}", _q.lower()))
-                    _prev_all = set().union(*_SEARCH_FAMILY) if _SEARCH_FAMILY else set()
+                    _FAM = q.setdefault("_search_family", [])
+                    _prev_all = set().union(*_FAM) if _FAM else set()
                     _new_toks = _qtoks - _prev_all
                     if _qtoks:
-                        _fam_hits = sum(1 for _prev in _SEARCH_FAMILY
+                        _fam_hits = sum(1 for _prev in _FAM
                                         if len(_qtoks & _prev) >=
                                         max(2, len(_qtoks) // 3))
                         if _fam_hits >= 5 or (_fam_hits >= 3
@@ -1981,7 +2018,7 @@ def run_question(q, arm, kb, tkb, grounding, glog):
                                             "(card/findings/compare), or write "
                                             "the answer from your notes now")}
                         else:
-                            _SEARCH_FAMILY.append(_qtoks)
+                            _FAM.append(_qtoks)
                             res = _text_search(_q, args.get("k", 8))
                     else:
                         res = _text_search(_q, args.get("k", 8))

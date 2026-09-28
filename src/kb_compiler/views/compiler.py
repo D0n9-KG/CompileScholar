@@ -103,8 +103,12 @@ def _budget_bucket(budget) -> str:
 
 
 def _year_of(rec_paper: str, manifest: dict) -> int | None:
+    # FULLCHAIN-AUDIT A10：兼容 CS2 manifest 的 year/published 字段
+    # （原 Multi 契约字段在 CS2 数据全库缺失→genealogy 15,100 节点
+    # year 全 None）
     m = manifest.get(rec_paper) or {}
-    return m.get("arxiv_year") or m.get("venue_year")
+    return (m.get("arxiv_year") or m.get("venue_year")
+            or m.get("year") or m.get("published"))
 
 
 def flatten_records(records_by_paper: dict, exclude=("canary",)) -> list[dict]:

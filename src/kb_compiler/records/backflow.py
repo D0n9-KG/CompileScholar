@@ -154,8 +154,11 @@ def build_backflow(coarse_payload: dict, paper_meta: dict,
         "paper_key": paper_key,
         # trimmed coarse records — everything a walk needs to surface the
         # paper's claims without another lookup
-        "records": [{"id": r["id"], "kind": r["kind"], "subject": r["subject"],
-                     "claim": r["claim"], "quote": (r.get("quote") or "")[:250]}
+        "records": [{"id": r.get("id") or r.get("record_id") or "",
+                     "kind": r.get("kind") or "finding",
+                     "subject": r.get("subject") or "",
+                     "claim": r.get("claim") or "",
+                     "quote": (r.get("quote") or "")[:250]}
                     for r in records[:10]],
     }
     edges = []

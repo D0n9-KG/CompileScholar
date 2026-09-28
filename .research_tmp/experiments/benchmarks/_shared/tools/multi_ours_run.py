@@ -247,28 +247,49 @@ def wrap_f21(kb):
     def fetch_chunk(record_id=None, window=1500):
         if not record_id:
             return {"tool": "fetch_chunk", "error": "record_id required (from a note anchor or tool row)"}
+        # FULLCHAIN-AUDIT B6：chunk 锚（paper_id#char_start，search_text
+        # 的合法命中形态）也接受——旧实现只认 record_id，锚传入报
+        # "not found in KB"（b13 实测 6 次调用全失败的一半成因）。
         rec = None
-        for pid, payload in (kb.records or {}).items():
-            for r in (payload.get("records") or []):
-                if r.get("id") == record_id:
-                    rec = r
+        _anchor_pid = _anchor_start = None
+        if "#" in record_id and record_id.partition("#")[2].isdigit():
+            _anchor_pid, _, _anchor_start = record_id.partition("#")
+            _anchor_start = int(_anchor_start)
+        else:
+            for pid, payload in (kb.records or {}).items():
+                for r in (payload.get("records") or []):
+                    if r.get("id") == record_id:
+                        rec = r
+                        break
+                if rec:
                     break
-            if rec:
-                break
-        if rec is None:
-            return {"tool": "fetch_chunk", "error": f"record_id {record_id} not found in KB"}
-        pid = rec.get("paper_id")
-        tf = os.path.join(_TEXTS, pid + ".md")
-        if not os.path.exists(tf):
-            tf = os.path.join(_TEXTS, pid + ".txt")
-        if not os.path.exists(tf):
+            if rec is None:
+                return {"tool": "fetch_chunk", "error": f"record_id {record_id} not found in KB"}
+        pid = rec.get("paper_id") if rec else _anchor_pid
+        # FULLCHAIN-AUDIT B6：_TEXTS 原硬编码 Multi 语料目录——CS2 臂
+        # 100% 失败（sciverse_*/arxiv_*/hub_* pid 一个不在）。改为多目录
+        # 查找：Multi 语料 + CS2 三文本库（survey/hub 明文命名 + deep
+        # 的 md5 命名）。
+        import hashlib as _hl
+        _cands = [
+            os.path.join(_TEXTS, pid + ".md"),
+            os.path.join(_TEXTS, pid + ".txt"),
+        ]
+        for _root in getattr(kb, "_cs2_text_roots", []):
+            _cands.append(os.path.join(_root, pid + ".md"))
+            _cands.append(os.path.join(_root, pid + ".txt"))
+            _cands.append(os.path.join(
+                _root, _hl.md5(pid.encode()).hexdigest() + ".txt"))
+        tf = next((p for p in _cands if os.path.exists(p)), None)
+        if tf is None:
             return {"tool": "fetch_chunk", "error": f"text file for {pid} not on disk"}
         txt = open(tf, encoding="utf-8", errors="replace").read()
-        start = rec.get("chunk_char_start") or 0
+        start = (rec.get("chunk_char_start") if rec else None) or _anchor_start or 0
         lo = max(0, start - window // 2)
         hi = min(len(txt), start + window)
         return {"tool": "fetch_chunk", "record_id": record_id, "paper_id": pid,
-                "quote": rec.get("quote"), "chunk_id": rec.get("chunk_id"),
+                "quote": rec.get("quote") if rec else txt[start:start + 400],
+                "chunk_id": rec.get("chunk_id") if rec else record_id,
                 "text_window": txt[lo:hi]}
 
     kb.findings, kb.card, kb.compare = findings_cx, card_cx, compare_cx

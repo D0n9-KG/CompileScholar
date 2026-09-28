@@ -19,7 +19,9 @@ CS2 官方契约（一手核验 astabench types/sqa.py + evals/sqa/task.py）：
     仅 title 无 snippet → 0.5 档；snippet 文本(alpha 规约)复现在正文 → 该条
     被过滤降档 → 提示词禁止逐字抄 quote
   - JSON 解析失败=0 分（extract_json_from_response：首个 { 到末个 }）
-  - 长度偏好 300-600 词（rubric low/high_length）
+  - 长度（FULLCHAIN-AUDIT C4 更正）：rubric _score_length ≤low_length
+    (300 词) 得满分，线性下降，≥high_length (600 词) 得 0（weight 0.05）
+    ——目标 250-450 词，绝不写长
 
 用法（冒烟）：
   python report_adapter.py \
@@ -120,6 +122,34 @@ def parse_notes(notes_text: str) -> list[dict]:
 
 # ---------------------------------------------------------------- 证据库
 
+def views_records_index(views_path: str) -> dict[str, dict]:
+    """FULLCHAIN-AUDIT C1：从 views_cs2.json 抽全部内嵌记录行
+    （cards/coverage 等视图里的 {record_id, paper_id, quote} 行——
+    模型笔记大量回指其 id，但适配器从未加载该源）。返回
+    record_id → 记录 dict（与记录库同形，quote 逐字）。"""
+    import json as _json
+    try:
+        views = _json.load(open(views_path, encoding="utf-8"))
+    except OSError:
+        return {}
+    out: dict[str, dict] = {}
+    cards = (views.get("cards") or {}).get("cards") or {}
+    for card in cards.values():
+        for key in ("findings", "results", "configs", "limitations"):
+            for row in (card.get(key) or []):
+                rid = row.get("record_id")
+                if rid and rid not in out:
+                    out[rid] = {
+                        "id": rid,
+                        "kind": "finding",
+                        "claim": row.get("claim") or row.get("text") or "",
+                        "quote": row.get("quote") or "",
+                        "paper_id": row.get("paper_id"),
+                        "section": row.get("section"),
+                    }
+    return out
+
+
 class EvidenceStore:
     """record_id / paper_id / chunk 锚（paper_id#char_start）→ 引用载荷。
 
@@ -135,7 +165,8 @@ class EvidenceStore:
     """
 
     def __init__(self, records_checked: dict, manifest: list[dict],
-                 texts_dir: str | None = None):
+                 texts_dir: str | None = None,
+                 views_path: str | None = None):
         self.by_record: dict[str, dict] = {}
         self.by_paper: dict[str, dict] = {}
         self._texts_dir = texts_dir
@@ -145,23 +176,41 @@ class EvidenceStore:
                 rid = rec.get("id")
                 if rid:
                     self.by_record[rid] = rec
+        # FULLCHAIN-AUDIT C1：views_cs2.json 内嵌记录（33 个笔记回指的
+        # 真实 id 在适配器加载空间外）——views 里带 quote 的记录行并入
+        # by_record，同 id 不覆盖记录库（记录库为准）。
+        if views_path:
+            for rid, rec in views_records_index(views_path).items():
+                self.by_record.setdefault(rid, rec)
         for row in manifest:
             self.by_paper[row["paper_id"]] = row
 
     def _chunk_text(self, paper_id: str) -> str | None:
-        """deep_read_texts/<md5(pid)>.txt 惰性加载（chunk 锚的原文）。"""
+        """chunk 锚原文的惰性加载。FULLCHAIN-AUDIT C1：全文分散三库——
+        deep_read_texts/<md5(pid)>.txt、survey_texts/<pid>.md、
+        hub_texts/<pid>.md（三套命名、无统一注册表，原实现只认 md5 单
+        目录=94.5% 的锚原文读不到）。按序尝试三种命名。"""
         if paper_id in self._text_cache:
             return self._text_cache[paper_id]
-        if not self._texts_dir:
-            return None
         import hashlib
         import os
-        p = os.path.join(self._texts_dir,
-                         hashlib.md5(paper_id.encode()).hexdigest() + ".txt")
-        try:
-            t = open(p, encoding="utf-8", errors="replace").read()
-        except OSError:
-            t = None
+        t = None
+        if self._texts_dir:
+            cands = [
+                os.path.join(self._texts_dir,
+                             hashlib.md5(paper_id.encode()).hexdigest() + ".txt"),
+                # survey/hub 明文命名（与 texts_dir 同级的 base_kb 下）
+                os.path.join(self._texts_dir, "..", "survey_texts",
+                             paper_id + ".md"),
+                os.path.join(self._texts_dir, "..", "hub_texts",
+                             paper_id + ".md"),
+            ]
+            for p in cands:
+                try:
+                    t = open(p, encoding="utf-8", errors="replace").read()
+                    break
+                except OSError:
+                    continue
         self._text_cache[paper_id] = t
         return t
 
@@ -246,7 +295,8 @@ Return ONLY valid JSON (no markdown fences): {{"sections": [{{"title": str, "tex
 
 def narrative_compile(question: str, claims: list[dict], store: EvidenceStore,
                       section_template: list[str] | None = None,
-                      word_budget: str = "600-1200 (scale with claim count)",
+                      word_budget: str = "250-450 (concise; official rubric "
+                                         "scores <=300 words highest, >=600 zero)",
                       model: str = NARRATIVE_MODEL) -> dict:
     """主张集 → 分节草稿（含 [Ck] 标记）。LLM 组件=叙事编译层本体。"""
     usable = [c for c in claims if c["text"] and c["refs"]
@@ -399,22 +449,23 @@ def assemble(draft: dict, claims: list[dict], store: EvidenceStore) -> tuple[dic
                     if i not in ids:  # 相邻同号去重（[1] [1] → [1]）
                         ids.append(i)
             if not ids:
-                # 删除 orphan 标记所在的整句（句边界搜索）
+                # FULLCHAIN-AUDIT C2/P0-8：orphan 处置从整句删除改为降级
+                # 保留。原 P1-6 删句实测误杀率 81-94%（b14 16 句中 13-15
+                # 句有真证据，断链主因是 EvidenceStore 盲区非 LLM 幻觉）
+                # 且不可逆。现在：剥 [Ck] 标记保留句子文本（无引用主张句
+                # 归 answer_precision/官方判分裁量），逐句记录被降级内容
+                # 可审计；不可逆删除退出。
+                text = text[:m.start()] + text[m.end():]
                 _s = text.rfind(".", 0, m.start())
                 _s2 = text.rfind("!", 0, m.start())
                 _s3 = text.rfind("?", 0, m.start())
-                _s = max(_s, _s2, _s3)
-                _e = text.find(".", m.end())
-                _e2 = text.find("!", m.end())
-                _e3 = text.find("?", m.end())
-                _e = min(x for x in (_e, _e2, _e3) if x != -1) \
-                    if any(x != -1 for x in (_e, _e2, _e3)) else len(text)
-                _s = _s + 1 if _s != -1 else 0
-                _e = _e + 1 if _e < len(text) else len(text)
-                text = text[:_s] + text[_e:]
-                diag["orphan_markers"] = diag.get("orphan_markers", 0) + 1
-                diag["orphan_sentences_dropped"] = \
-                    diag.get("orphan_sentences_dropped", 0) + 1
+                _sent_s = max(_s, _s2, _s3)
+                _sent_s = _sent_s + 1 if _sent_s != -1 else 0
+                _sent_e = text.find(".", m.start())
+                _sent_e = _sent_e + 1 if _sent_e != -1 else len(text)
+                _sent = text[_sent_s:_sent_e].strip()
+                diag.setdefault("orphan_downgraded", []).append(
+                    {"cid": m.group(1), "sentence": _sent[:200]})
                 continue
             text = text[:m.start()] + " ".join(ids) + text[m.end():]
             for i in ids:

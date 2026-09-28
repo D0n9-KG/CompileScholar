@@ -45,7 +45,10 @@ def ours_sections():
                 r for r in _payload["records"] if r.get("id") not in _seen]}
     manifest = json.load(open(BASE / "manifest_all.json",
                               encoding="utf-8"))
-    store = EvidenceStore(records, manifest)
+    # FULLCHAIN-AUDIT C1：texts_dir + views_cs2 接线（与 adapt_batches 同）
+    store = EvidenceStore(records, manifest,
+                          texts_dir=str(BASE / "deep_read_texts"),
+                          views_path=str(BASE / "views_cs2.json"))
     rows = json.load(open(ARM_OURS / "answers_pilot_cs2dev20.json",
                           encoding="utf-8"))
     out = []

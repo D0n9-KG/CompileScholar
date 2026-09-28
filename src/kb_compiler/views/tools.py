@@ -340,6 +340,16 @@ class KBTools:
         names = self._alias_set(entity) if entity else None
         raw_cns = [c for c in str(contains or "").split("|") if c.strip()]
         cns = [_norm(c) for c in raw_cns] or None
+        # FULLCHAIN-AUDIT A3：复合 pid 剥离——grounding 论文清单把 pid
+        # 渲染成 'pid(title; cite)' 形态，模型复制整串作 paper_id → 精确
+        # 匹配死（28/842 次 paper_id 调用，b14 GIS 题 3 篇论文整篇不可
+        # 达）。剥 '(' 后缀再匹配；同时容忍尾部截断（注入清单限长）。
+        if paper_id and "(" in paper_id:
+            paper_id = paper_id.partition("(")[0].strip()
+        # FULLCHAIN-AUDIT A3：claim_type 多候选（'|' 语法与 contains 一致）
+        _cts = {c.strip() for c in str(claim_type or "").split("|") if c.strip()} or None
+        if _cts:
+            claim_type = next(iter(_cts)) if len(_cts) == 1 else claim_type
         out = []
         for pid, payload in self.records.items():
             if paper_id and pid != paper_id:
@@ -351,10 +361,25 @@ class KBTools:
                 # 模型不可见（批3实测：magneto 3 条记录 findings 查 0）。
                 # method/limitation 按 claim 类记录放行（粗抽契约：kind 是
                 # 摘要级分类不是记录层语义）。
-                if r.get("kind") not in ("finding", "method", "limitation"):
+                # FULLCHAIN-AUDIT A1：survey_claim（12,712 条，全库 40.6%）/
+                # domain_snapshot（1,580 条）是综述抽取主体，claim+quote 结构
+                # 与 finding 同形——kind 白名单不放行=热库最大内容块对
+                # 最高频工具（992 次/三批）不可见。
+                if r.get("kind") not in ("finding", "method", "limitation",
+                                         "survey_claim", "domain_snapshot"):
                     continue
-                if claim_type and r.get("claim_type") != claim_type:
-                    continue
+                # FULLCHAIN-AUDIT A2：热库 method/limitation 记录 claim_type
+                # 全 None（粗抽契约不用该字段），claim_type 过滤一加即全零
+                # ——批12-14 的 159 次零命中中 61 次由此造成（正确 paper_id
+                # 也全灭）。None 记录在带 claim_type 过滤时放行（过滤语义
+                # =「确认要这类」而非「排除未分类」；A7：limitation 层
+                # 1,086 条同理，criticism 通道由 195 条恢复至全量）。
+                # A3 后半：claim_type 支持 | 多候选（与 contains 语法一致，
+                # 批12-14 模型自发写 "mechanism|definition" 11 次全被拒）。
+                if _cts:
+                    rt = r.get("claim_type")
+                    if rt not in _cts and rt is not None:
+                        continue
                 claim = str(r.get("claim") or "")
                 if cns:
                     blob = _norm(claim) + " " + _norm(r.get("quote"))
@@ -443,6 +468,7 @@ class KBTools:
         _raw_total = sum(
             len(p.get("records", [])) if isinstance(p, dict) else 0
             for p in ([self.records[paper_id]] if paper_id
+                      and paper_id in self.records
                       else list(self.records.values())))
         cands = []
         for pid, payload in self.records.items():
@@ -450,10 +476,14 @@ class KBTools:
                 continue
             recs = payload.get("records", payload) if isinstance(payload, dict) else payload
             for r in recs:
-                if r.get("kind") not in ("finding", "method", "limitation"):
+                # FULLCHAIN-AUDIT A1+A2：兜底继承与主路径相同的放行语义
+                if r.get("kind") not in ("finding", "method", "limitation",
+                                         "survey_claim", "domain_snapshot"):
                     continue
-                if claim_type and r.get("claim_type") != claim_type:
-                    continue
+                if claim_type:
+                    rt = r.get("claim_type")
+                    if rt is not None and rt != claim_type:
+                        continue
                 # 大库（>6k 候选）先做单 token 词法粗筛：任一查询 token
                 # 出现在 claim/quote 里即入围（比子串全词组匹配宽得多，
                 # 是 embedding 前的召回粗网）。粗筛后仍 >6k 才放弃。
@@ -584,9 +614,15 @@ class KBTools:
 
     def as_of(self, year: int) -> dict:
         """time-travel snapshot: what was known by `year` (manifest arxiv_year
-        authority; batch2 note 8: chronology = arxiv stamp, venue for display)."""
+        authority; batch2 note 8: chronology = arxiv stamp, venue for display).
+        FULLCHAIN-AUDIT A10：兼容 CS2 manifest 的 `year`/`published` 字段
+        （Multi 时代的 arxiv_year/venue_year 在 CS2 数据全库缺失→任何年
+        份 visible_papers=0 的精神分裂快照）。"""
+        def _yr(m):
+            return (m.get("arxiv_year") or m.get("venue_year")
+                    or m.get("year") or m.get("published") or 9999)
         visible_papers = {pid for pid, m in self.manifest.items()
-                          if (m.get("arxiv_year") or m.get("venue_year") or 9999) <= year}
+                          if _yr(m) <= year}
         g = genealogy_as_of(self.views["genealogy"], year)
         tables = {}
         for key, ents in self.views["matrix"]["tables"].items():
@@ -625,6 +661,14 @@ class KBTools:
                     fam_members.add(_norm(v.get("canonical", "")))
                     fam_members |= {_norm(h) for h in v.get("family_hints", [])}
         out = []
+        # FULLCHAIN-AUDIT A9：in_corpus_paper_id 全库 None（CS2 契约用
+        # mention_papers），以 cards 视图为 in_corpus 真值源（3,152 实有
+        # dossier，键=entity_id、canonical 在值里），否则 entities() 恒报
+        # in_corpus=False 与 grounding 星标口径不一并对模型说谎
+        _card_canons = set()
+        for _c in ((self.views.get("cards") or {}).get("cards") or {}).values():
+            if _c.get("canonical"):
+                _card_canons.add(_c["canonical"])
         for e in self.registry.get("entities", []):
             if entity_type and e.get("entity_type") != entity_type:
                 continue
@@ -633,10 +677,13 @@ class KBTools:
                 continue
             if fam_n and not any(_norm(n) in fam_members for n in names):
                 continue
+            _inc = bool(e.get("in_corpus_paper_id")) or e["canonical"] in _card_canons
             out.append({"canonical": e["canonical"],
                         "entity_type": e.get("entity_type"),
-                        "in_corpus": bool(e.get("in_corpus_paper_id")),
-                        "paper_id": e.get("in_corpus_paper_id"),
+                        "in_corpus": _inc,
+                        "paper_id": e.get("in_corpus_paper_id") or next(
+                            (mp for mp in (e.get("mention_papers") or [])
+                             if isinstance(mp, str) and len(mp) > 8), None),
                         "aliases": e.get("aliases", [])[:4],
                         "mention_count": e.get("mention_count", 0)})
         out.sort(key=lambda x: (not x["in_corpus"], -x["mention_count"]))
@@ -745,6 +792,10 @@ class KBTools:
             recs = payload.get("records", payload) if isinstance(payload, dict) else payload
             for r in recs:
                 kinds[r.get("kind")] = kinds.get(r.get("kind"), 0) + 1
+        # FULLCHAIN-AUDIT A9：stats["cards"] 是旧 gate（in_corpus_paper_id）
+        # 的产物恒为 0，cards 视图实有 dossier——以视图实数为准
+        _cards_n = len(((self.views.get("cards") or {}).get("cards") or {}))
+        _cards_report = _cards_n or st.get("cards")
         return {
             "tool": "describe_kb",
             "corpus_papers": n_papers,
@@ -760,7 +811,7 @@ class KBTools:
                 "coverage": {"entities": st.get("coverage_entities"),
                              "absences_extracted": st.get("absences_extracted"),
                              "absences_derived": st.get("absences_derived")},
-                "cards": {"entity_dossiers": st.get("cards"),
+                "cards": {"entity_dossiers": _cards_report,
                           "note": "card(entity) = per-entity panorama"},
                 "pair_deltas": st.get("pair_deltas_derived"),
                 "notation_index": st.get("notation"),

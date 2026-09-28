@@ -571,7 +571,11 @@ class ExternalTools:
                 seen = {r.get("id") for r in base_recs if r.get("id")}
                 merged = list(base_recs) + [
                     r for r in recs if r.get("id") not in seen]
-                cur[paper_id] = {"records": merged}
+                # FULLCHAIN-AUDIT B9：completeness 标记——L2 裸 daemon 随
+                # 进程退出而死时 L1 子集与完整产物形态不可分（3/19 篇
+                # 残缺无 absence 记录无人知）。replace=True=L2 终化（完整）
+                cur[paper_id] = {"records": merged,
+                                 "complete": bool(replace)}
                 json.dump(cur, open(p, "w", encoding="utf-8"),
                           ensure_ascii=False, indent=1)
             except Exception as e:
@@ -1013,7 +1017,15 @@ class ExternalTools:
         import hashlib as _hl
         import threading as _th
         try:
-            if paper_id in ExternalTools._DEEP_READ_DONE:
+            # FULLCHAIN-AUDIT B5：类级共享集合在 4 线程题间并发下把第二
+            # 题对同一论文的 deep_read 短路（其章节覆盖只服务第一题的
+            # 需求）。跳过条件改为「本题已读过」：每题的 deep_read 历史
+            # 由 harness 注入 q_deep_read（set）；未注入时退化为会话级
+            # （单线程行为不变）。
+            _done = getattr(self, "_q_deep_read", None)
+            if _done is None:
+                _done = ExternalTools._DEEP_READ_DONE
+            if paper_id in _done:
                 return {"tool": "deep_read", "paper_id": paper_id,
                         "note": "already deep-read this session — query its "
                                 "records via findings(paper_id=...)"}
@@ -1104,6 +1116,7 @@ class ExternalTools:
             # 能到达这篇论文）
             self._backflow_deep_records(paper_id, recs)
             ExternalTools._DEEP_READ_DONE.add(paper_id)
+            _done.add(paper_id)
             # ⑦ L2 异步后台：剩余 chunk 增量补齐（缓存命中跳过）+ absence
             n_rest = len(chunks_all) - len(sel)
             if n_rest > 0:
@@ -1130,7 +1143,10 @@ class ExternalTools:
                         if m.get("value") else
                         str(r.get("claim") or r.get("item")
                             or r.get("missing") or "")[:110])
-                sample.append({"id": r.get("id"), "kind": r.get("kind"),
+                # FULLCHAIN-AUDIT B4：键名 record_id（与 findings 行/笔记
+                # 规范一致）——旧 "id" 键收割器不认，agent 忠实抄深读 id
+                # 被 note_gate 判 bad_backref（b14 实测 10 连拒）
+                sample.append({"record_id": r.get("id"), "kind": r.get("kind"),
                                "content": body[:130]})
             obs = {"tool": "deep_read", "paper_id": paper_id,
                    "mode": f"L1/{mode}", "n_records": len(recs),

@@ -103,6 +103,23 @@ def build_tools_cs2():
     for pid_key, payload in merged.items():
         if isinstance(payload, dict) and payload.get("records"):
             records[pid_key] = payload
+    # FULLCHAIN-AUDIT B10：深读终化记录进运行时 KB——2,419 条深记录与
+    # records_merged 零交集，typed tools 每批冷启动对它们全盲（批 N 深抽
+    # 的知识批 N+1 只能靠 search_text 摸到）。「KB 随探索生长」在查询层
+    # 兑现。合并非替换（粗抽记录保留）。
+    deep_rp = os.path.join(BASE_KB, "deep_read_records.json")
+    if os.path.exists(deep_rp):
+        try:
+            deep = json.load(open(deep_rp, encoding="utf-8"))
+            for pid, payload in deep.items():
+                if not (isinstance(payload, dict) and payload.get("records")):
+                    continue
+                base_recs = records.get(pid, {}).get("records") or []
+                seen = {r.get("id") for r in base_recs if r.get("id")}
+                records[pid] = {"records": list(base_recs) + [
+                    r for r in payload["records"] if r.get("id") not in seen]}
+        except Exception as e:
+            print(f"[cs2] deep records merge skip: {str(e)[:80]}", flush=True)
     views = json.load(open(os.path.join(BASE_KB, "views_cs2.json"),
                            encoding="utf-8"))
     registry = json.load(open(os.path.join(BASE_KB, "registry_v2.json"),
@@ -146,6 +163,14 @@ def main():
         kb, records, views, manifest = build_tools_cs2()
         # F21b projections + F18 resolver（同 multi_ours_run 的包装）
         from multi_ours_run import wrap_f21  # 复用投影包装
+        # FULLCHAIN-AUDIT B6：fetch_chunk 的文本查找根——CS2 三文本库
+        # （survey/hub 明文 + deep md5），wrap_f21 的 fetch_chunk 依次尝试
+        # （原硬编码 Multi corpus/texts 目录，CS2 臂 100% 失败）
+        kb._cs2_text_roots = [
+            os.path.join(BASE_KB, "survey_texts"),
+            os.path.join(BASE_KB, "hub_texts"),
+            os.path.join(BASE_KB, "deep_read_texts"),
+        ]
         wrap_f21(kb)
         # F18 resolver 需 cards——base_kb 无 cards（survey 路线），
         # 传空（resolver 对空 cards 降级）
