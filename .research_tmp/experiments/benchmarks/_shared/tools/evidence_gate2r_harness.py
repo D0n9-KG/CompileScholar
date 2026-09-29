@@ -1637,7 +1637,7 @@ def run_question(q, arm, kb, tkb, grounding, glog):
             # 半程时笔记证据源仍稀薄（<4 唯一 id）且已做过 findings 尝试
             # → 注入"KB 可能没有此主题，去开放文献检索"引导（一次性，
             # 与 V3 同点位——KB 空转与窄面在半程点信号重叠，合并触发面）。
-            if arm == "main" and steps_left == 8:
+            if arm == "main" and steps_left <= 8 and steps >= 5:
                 _n_findings = sum(1 for s in queried
                                   if s.startswith("findings|"))
                 _n_ext = sum(1 for s in queried
