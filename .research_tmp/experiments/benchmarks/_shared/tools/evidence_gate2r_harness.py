@@ -1653,16 +1653,28 @@ def run_question(q, arm, kb, tkb, grounding, glog):
                            "search_papers(query=...) NOW to search the open "
                            "literature directly (recent events, social "
                            "impacts, and cross-domain topics often live "
-                           "only there), then admit_paper + deep_read the "
-                           "most relevant hits.\n\n" + obs) if obs else (
+                           "only there). From the results: cite "
+                           "concept-level claims with [title] backrefs "
+                           "and verbatim sentences from the abstract "
+                           "as anchors; emit MULTIPLE search_papers "
+                           "calls in one step (they are free in step "
+                           "budget); admit_paper + deep_read only the "
+                           "1-2 papers whose SPECIFIC numbers or "
+                           "mechanisms you need.\n\n" + obs) if obs else (
                         "[SYSTEM] KB COVERAGE CHECK: your findings() calls "
                         "return little usable evidence — this topic may "
                         "not be in the compiled knowledge base. Use "
                         "search_papers(query=...) NOW to search the open "
                         "literature directly (recent events, social "
                         "impacts, and cross-domain topics often live "
-                        "only there), then admit_paper + deep_read the "
-                        "most relevant hits.")
+                        "only there). From the results: cite "
+                        "concept-level claims with [title] backrefs "
+                        "and verbatim sentences from the abstract "
+                        "as anchors; emit MULTIPLE search_papers "
+                        "calls in one step (they are free in step "
+                        "budget); admit_paper + deep_read only the "
+                        "1-2 papers whose SPECIFIC numbers or "
+                        "mechanisms you need.")
                 traj.append({"coverage_audit": True, "at_step": steps,
                              "unique_queries": len(queried)})
         p = build_step_prompt(system, q, notes_full(), gaps, queried, obs,
