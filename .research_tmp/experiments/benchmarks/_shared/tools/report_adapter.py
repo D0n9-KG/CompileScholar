@@ -19,9 +19,11 @@ CS2 官方契约（一手核验 astabench types/sqa.py + evals/sqa/task.py）：
     仅 title 无 snippet → 0.5 档；snippet 文本(alpha 规约)复现在正文 → 该条
     被过滤降档 → 提示词禁止逐字抄 quote
   - JSON 解析失败=0 分（extract_json_from_response：首个 { 到末个 }）
-  - 长度（FULLCHAIN-AUDIT C4 更正）：rubric _score_length ≤low_length
-    (300 词) 得满分，线性下降，≥high_length (600 词) 得 0（weight 0.05）
-    ——目标 250-450 词，绝不写长
+  - 长度（09-29 二次修正）：rubric _score_length 是 5% 权重的软约束
+    （≤300 满分/≥600 零分），但 ingredient 覆盖占大头（critical 一个
+    ≈9.5 分）——coverage-first：700-1100 词，长度分牺牲封顶 5 分换
+    IR 空间。harness 1575 词 IR=0.856 实证此策略正确。P0-7 曾矫枉
+    过正压到 250-450，批16 IR 掉 0.28 的主因之一
 
 用法（冒烟）：
   python report_adapter.py \
@@ -62,6 +64,43 @@ _NOTE_LINE_DASH = re.compile(r"^\s*-\s*(\[[^\]]+\].*)$")
 _NOTE_LINE_DASH_TAIL = re.compile(
     r"^\s*-\s*(.+?)\s*((?:\[[A-Za-z0-9_:\-#\.]{8,}\]\s*)+)$")
 _BACKREF = re.compile(r"\[([A-Za-z0-9_:\-#\.]+)\]")  # 含冒号：粗抽 record_id 是 coarse:xxx 形态（CS2 批1实测）
+
+
+_NORMALIZE_PROMPT = """You are a formatting utility. The input is a researcher's raw working notes about a scientific question. The notes contain factual claims, each backed by evidence record ids in square brackets (like [ab12cd34ef56ab] or [coarse:abc123] or [sciverse_paper_name]).
+
+Reformat the notes into STRICT note lines, one claim per line:
+N<i>. [record_id] <the claim, telegraphic, numbers verbatim> | anchor:"<verbatim number/phrase from the claim>"
+
+Rules:
+- EVERY output line must start with N<number>. followed by ONE bracketed id (copy the id EXACTLY from the input — never invent or alter ids)
+- If a note sentence cites multiple ids, put the most relevant one in the leading bracket; you may list additional ids as [id] at the end of the line
+- Preserve every number, metric, model name, and dataset name VERBATIM
+- Drop pure process narration ("Next I will...", "Q: ...") and lines with no bracketed id
+- Output ONLY the N-lines, no preamble, no explanation
+
+RAW NOTES:
+{notes}"""
+
+
+def normalize_notes(notes_text: str, model: str = NARRATIVE_MODEL) -> str:
+    """FULLCHAIN-AUDIT C3 根本解法（批15 计划落地）：自由形态笔记 →
+    N 形态规范化的 LLM 前置层，再走确定性 parse_notes。三次前科
+    （unsourced 前缀/破折号/行尾 ref）+批15b 第四次（纯散文但 29 个
+    真实 record id 回指）证明：上游形态自由 × 下游正则刚性的失配
+    不能靠继续追加正则解决。LLM 规范化=语义层处理语义问题。失败时
+    返回原文（调用方退回原解析路径）。"""
+    try:
+        resp = call_local(
+            _NORMALIZE_PROMPT.format(notes=(notes_text or "")[:6000]),
+            model=model, temperature=0.0, max_tokens=2500,
+            enable_thinking=False)  # 思考吃输出预算→content 空→None（实测）
+        out = resp.strip()
+        # 规范化成功的最小判据：至少产出一行 N 形态
+        if out and _NOTE_LINE.match(out.splitlines()[0]):
+            return out
+    except Exception:
+        pass
+    return notes_text or ""
 
 
 def parse_notes(notes_text: str) -> list[dict]:
@@ -295,8 +334,10 @@ Return ONLY valid JSON (no markdown fences): {{"sections": [{{"title": str, "tex
 
 def narrative_compile(question: str, claims: list[dict], store: EvidenceStore,
                       section_template: list[str] | None = None,
-                      word_budget: str = "250-450 (concise; official rubric "
-                                         "scores <=300 words highest, >=600 zero)",
+                      word_budget: str = "700-1100 (coverage-first: every "
+                                         "ingredient from the claims that the "
+                                         "question asks about MUST appear; "
+                                         "length is only a 5%-weight soft cap)",
                       model: str = NARRATIVE_MODEL) -> dict:
     """主张集 → 分节草稿（含 [Ck] 标记）。LLM 组件=叙事编译层本体。"""
     usable = [c for c in claims if c["text"] and c["refs"]
