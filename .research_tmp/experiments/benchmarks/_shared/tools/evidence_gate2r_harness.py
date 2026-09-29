@@ -1627,6 +1627,38 @@ def run_question(q, arm, kb, tkb, grounding, glog):
                         "search_papers / findings(contains=...) calls with "
                         "DIFFERENT phrasings to surface additional papers "
                         "before answering.")
+            # FULLCHAIN 第二轮 V4（KB 空转→开放检索引导）：批17/18 实锤
+            # 3 题 KB 缺口（时事/社会主题 KB 零覆盖），双样本一致 0.15-0.30
+            # ——agent 全程只用 KB 工具 0 次开放检索（有答案但跑题）。
+            # 半程时笔记证据源仍稀薄（<4 唯一 id）且已做过 findings 尝试
+            # → 注入"KB 可能没有此主题，去开放文献检索"引导（一次性，
+            # 与 V3 同点位——KB 空转与窄面在半程点信号重叠，合并触发面）。
+            if arm == "main" and steps_left == 8:
+                _n_findings = sum(1 for s in queried
+                                  if s.startswith("findings|"))
+                _n_ext = sum(1 for s in queried
+                             if s.startswith(("search_papers|",
+                                              "gap_search|")))
+                # 触发校准（批17/18 缺口题实测：一题 14 低相关 id、一题 0 id
+                # ——唯一 id 数不可靠；共同信号=findings>=4 且 0 开放检索）
+                if (_n_findings >= 4 and _n_ext == 0
+                        and (gaps or "").strip().upper() != "NONE"):
+                    obs = ("[SYSTEM] KB COVERAGE CHECK: your findings() calls "
+                           "return little usable evidence — this topic may "
+                           "not be in the compiled knowledge base. Use "
+                           "search_papers(query=...) NOW to search the open "
+                           "literature directly (recent events, social "
+                           "impacts, and cross-domain topics often live "
+                           "only there), then admit_paper + deep_read the "
+                           "most relevant hits.\n\n" + obs) if obs else (
+                        "[SYSTEM] KB COVERAGE CHECK: your findings() calls "
+                        "return little usable evidence — this topic may "
+                        "not be in the compiled knowledge base. Use "
+                        "search_papers(query=...) NOW to search the open "
+                        "literature directly (recent events, social "
+                        "impacts, and cross-domain topics often live "
+                        "only there), then admit_paper + deep_read the "
+                        "most relevant hits.")
                 traj.append({"coverage_audit": True, "at_step": steps,
                              "unique_queries": len(queried)})
         p = build_step_prompt(system, q, notes_full(), gaps, queried, obs,

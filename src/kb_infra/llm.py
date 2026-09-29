@@ -178,14 +178,31 @@ def _walled_read(r, t0: float, wall_s: float | None = None) -> bytes:
     if wall_s is None:
         wall_s = float(os.environ.get("LLM_WALL_TIMEOUT", "240"))
     chunks = []
-    while True:
-        if time.time() - t0 > wall_s:
-            raise TimeoutError(f"wall-clock {wall_s}s exceeded (slow-drip)")
-        b = r.read(65536)
-        if not b:
-            break
-        chunks.append(b)
-    return b"".join(chunks)
+    # FULLCHAIN 第二轮 B（挂死根因修复 09-29）：r.read() 本身可无限阻塞
+    # （Windows 下 socket timeout 对 read 的覆盖实测不可靠——批14/批17b
+    # 8h 挂死：进程活着、ledger 零活动、其余题饿死。原 wall 检查只在
+    # chunk 之间，read 卡住永不触发）。read 也搬进 daemon 线程：主线程
+    # join(wall) 超时即放弃——慢滴/半开连接/SSL 卡死全部被墙挡住。
+    import threading as _th
+    box = {}
+    def _reader():
+        try:
+            while True:
+                b = r.read(65536)
+                if not b:
+                    break
+                chunks.append(b)
+            box["done"] = True
+        except Exception as e:
+            box["e"] = e
+    t = _th.Thread(target=_reader, daemon=True)
+    t.start()
+    t.join(max(1.0, wall_s - (time.time() - t0)))
+    if "done" in box:
+        return b"".join(chunks)
+    if "e" in box:
+        raise box["e"]
+    raise TimeoutError(f"read wall {wall_s}s exceeded (thread-abandon)")
 
 def _chat_once(url, key, body, timeout):
     """Single HTTP POST to an OpenAI-compat chat endpoint. Returns
